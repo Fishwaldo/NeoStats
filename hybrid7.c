@@ -55,16 +55,11 @@ static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 
-static struct ircd_srv_ {
-	int unkline;
-} ircd_srv;
-
 const char ircd_version[] = "(H)";
 const char services_bot_modes[]= "+o";
-long services_bot_umode= 0;
 
 /* this is the command list and associated functions to run */
-IrcdCommands cmd_list[] = {
+ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_STATS, m_stats, 0},
 	{MSG_VERSION, m_version, 0},
@@ -141,7 +136,6 @@ send_eob (const char *server)
 {
 	sts (":%s %s", server, MSG_EOB);
 }
-
 
 void
 send_server (const char *name, const int numeric, const char *infoline)
@@ -254,7 +248,7 @@ send_invite (const char *from, const char *to, const char *chan)
 void
 send_svinfo (void)
 {
-	sts ("SVINFO 5 3 0 :%d", (int)me.now);
+	sts ("%s %d %d 0 :%ld", MSG_SVINFO, TS_CURRENT, TS_MIN, (long)me.now);
 }
 
 /* there isn't an akill on Hybrid, so we send a kline to all servers! */
@@ -295,14 +289,16 @@ send_globops (char *from, char *buf)
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	handle_sjoin (argv[1], argv[0], ((argc <= 2) ? argv[1] : argv[2]), 3, argv[4], argv, argc);
+	handle_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), 3, argv[4], argv, argc);
 }
+
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
 	send_eob (me.name);
 	init_services_bot ();
 }
+
 static void
 m_protoctl (char *origin, char **argv, int argc, int srv)
 {
@@ -314,7 +310,6 @@ m_protoctl (char *origin, char **argv, int argc, int srv)
 		}
 	}
 }
-
 
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
@@ -381,12 +376,13 @@ m_quit (char *origin, char **argv, int argc, int srv)
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1]);
-	} else {
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
+
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
@@ -395,11 +391,13 @@ m_kill (char *origin, char **argv, int argc, int srv)
 	KillUser (argv[0], tmpbuf);
 	free(tmpbuf);
 }
+
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_pong (origin, argv, argc);
 }
+
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
@@ -413,6 +411,7 @@ m_away (char *origin, char **argv, int argc, int srv)
 		UserAway (origin, NULL);
 	}
 }
+
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
@@ -427,6 +426,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		UserNick (origin, argv[0], NULL);
 	}
 }
+
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
@@ -461,11 +461,13 @@ m_kick (char *origin, char **argv, int argc, int srv)
 	kick_chan(argv[0], argv[1], origin, tmpbuf); 
 	free(tmpbuf);
 }
+
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
 	UserJoin (origin, argv[0]);
 }
+
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
@@ -491,4 +493,3 @@ static void
 m_pass (char *origin, char **argv, int argc, int srv)
 {
 }
-

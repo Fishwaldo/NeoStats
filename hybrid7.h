@@ -270,4 +270,11 @@
 #define is_oper(x) ((x) && (x->Umode & UMODE_OPER))
 #define is_bot(x) (0)        
 
+#define TS_CURRENT      5       /* current TS protocol version */
+#ifdef TS5_ONLY
+#define TS_MIN          5
+#else
+#define TS_MIN          3       /* minimum supported TS protocol version */
+#endif
+
 #endif

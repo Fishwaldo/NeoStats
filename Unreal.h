@@ -743,5 +743,6 @@
 #define is_bot(x) ((x) && (x->Umode & UMODE_BOT))
 
 //#define NEW_STYLE_SPLITBUF
+#define NICKV2	
 
 #endif /* UNREAL_H Define */

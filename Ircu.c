@@ -51,19 +51,11 @@ static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 
-/*
-static struct ircd_srv_ {
-	int uprot;
-	int burst;
-} ircd_srv;
-*/
-
 const char ircd_version[] = "(IRCU)";
 const char services_bot_modes[]= "+oS";
-long services_bot_umode = 0;
 
 /* this is the command list and associated functions to run */
-IrcdCommands cmd_list[] = {
+ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_STATS, m_stats, 0},
 	{MSG_VERSION, m_version, 0},
@@ -335,10 +327,10 @@ m_quit (char *origin, char **argv, int argc, int srv)
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1]);
-	} else {
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 static void

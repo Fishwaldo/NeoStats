@@ -33,11 +33,14 @@
 #include "chans.h"
 #include "services.h"
 
+ircd_server ircd_srv;
+
 static char ircd_buf[BUFSIZE];
 static char UmodeStringBuf[64];
 #ifdef GOTUSERSMODES
 static char SmodeStringBuf[64];
 #endif
+static long services_bot_umode= 0;
 
 static int signon_newbot (const char *nick, const char *user, const char *host, const char *rname, long Umode);
 
@@ -502,38 +505,6 @@ joinbuf (char **av, int ac, int from)
 	return (char *) buf;
 }
 
-/** @brief process ircd commands
- *
- * 
- *
- * @return none
- */
-static void 
-process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
-{
-	int i;
-
-	SET_SEGV_LOCATION();
-	for (i = 0; i < ircd_cmdcount; i++) {
-		if (!strcmp (cmd_list[i].name, cmd)
-#ifdef GOTTOKENSUPPORT
-			||(me.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
-#endif
-			) {
-			cmd_list[i].function (origin, av, ac, cmdptr);
-			cmd_list[i].usage++;
-			break;
-		}
-	}
-#if 1
-	if(i >= ircd_cmdcount) {
-		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
-	}
-#endif
-	/* Send to modules */
-	ModuleFunction (cmdptr, cmd, origin, av, ac);
-}
-
 /** @brief process privmsg
  *
  * 
@@ -541,18 +512,19 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
  * @return none
  */
 static void
-m_privmsg (int cmdptr, char *cmd, char* origin, char **av, int ac)
+m_privmsg (int cmdptr, char* origin, char **av, int ac)
 {
+	char target[64];
 	User *u;
 	ModUser *mod_usr;
 
 	/* its a privmsg, now lets see who too... */
 	if (strstr (av[0], "!")) {
-		strlcpy (cmd, av[0], 64);
-		av[0] = strtok (cmd, "!");
+		strlcpy (target, av[0], 64);
+		av[0] = strtok (target, "!");
 	} else if (strstr (av[0], "@")) {
-		strlcpy (cmd, av[0], 64);
-		av[0] = strtok (cmd, "@");
+		strlcpy (target, av[0], 64);
+		av[0] = strtok (target, "@");
 	}
 	if (!strcasecmp (s_Services, av[0])) {
 		if (flood (finduser (origin))) {
@@ -604,6 +576,48 @@ m_privmsg (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	return;
 }
 
+/** @brief process ircd commands
+ *
+ * 
+ *
+ * @return none
+ */
+static void 
+process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
+{
+	int i;
+
+	SET_SEGV_LOCATION();
+
+	/* If a privmsg, handle it internally */
+	if( is_privmsg(cmd) ) {
+		m_privmsg (cmdptr, origin, av, ac);
+		return;
+	}
+
+	for (i = 0; i < ircd_cmdcount; i++) {
+		if (!strcmp (cmd_list[i].name, cmd)
+#ifdef GOTTOKENSUPPORT
+			||(me.token && cmd_list[i].token && !strcmp (cmd_list[i].token, cmd))
+#endif
+			) {
+			if(cmd_list[i].function) {
+				cmd_list[i].function (origin, av, ac, cmdptr);
+			} else {
+				nlog (LOG_DEBUG3, LOG_CORE, "process_ircd_cmd: ignoring command %s", cmd);
+			}
+			cmd_list[i].usage++;
+			break;
+		}
+	}
+#if 1
+	if(i >= ircd_cmdcount) {
+		nlog (LOG_INFO, LOG_CORE, "No support for %s", cmd);
+	}
+#endif
+	/* Send to modules */
+	ModuleFunction (cmdptr, cmd, origin, av, ac);
+}
 
 /** @brief parse
  *
@@ -670,13 +684,7 @@ parse (char *line)
 	ac = split_buf (coreLine, &av, 1);
 #endif
 
-	/* If a privmsg, handle it internally */
-	if( is_privmsg(cmd) ) {
-		m_privmsg (cmdptr, cmd, origin, av, ac);
-	} else {
-		/* send on the command for processing */
-		process_ircd_cmd (cmdptr, cmd, origin, av, ac);
-	}
+	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	free (av);
 }
 
@@ -1432,7 +1440,7 @@ snewnick_cmd (const char *nick, const char *ident, const char *host, const char 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
 #ifndef NEW_STYLE_SPLITBUF
 void 
-handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc)
+handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	char* nicklist;
@@ -1516,7 +1524,7 @@ handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoin
 }
 #else
 void 
-handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc)
+handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc)
 {
 	char nick[MAXNICK];
 	char* nicklist;

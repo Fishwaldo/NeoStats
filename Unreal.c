@@ -41,6 +41,7 @@ static void m_server (char *origin, char **argv, int argc, int srv);
 static void m_squit (char *origin, char **argv, int argc, int srv);
 static void m_quit (char *origin, char **argv, int argc, int srv);
 static void m_mode (char *origin, char **argv, int argc, int srv);
+static void m_umode2 (char *origin, char **argv, int argc, int srv);
 static void m_svsmode (char *origin, char **argv, int argc, int srv);
 static void m_kill (char *origin, char **argv, int argc, int srv);
 static void m_pong (char *origin, char **argv, int argc, int srv);
@@ -64,20 +65,14 @@ static void m_protocol (char *origin, char **argv, int argc, int srv);
 static void m_whois (char *origin, char **argv, int argc, int srv);
 static void m_smo (char *origin, char **argv, int argc, int srv);
 
-static struct ircd_srv_ {
-	int uprot;
-	char cloak[10];
-} ircd_srv;
-
 #ifdef UNREAL32
 const char ircd_version[] = "(U32)";
 #else
 const char ircd_version[] = "(U31)";
 #endif
 const char services_bot_modes[]= "+oSqd";
-long services_bot_umode= 0;
 
-IrcdCommands cmd_list[] = {
+ircd_cmd cmd_list[] = {
 	/*Message	Token	Function	usage */
 	{MSG_STATS, TOK_STATS, m_stats, 0},
 	{MSG_SETHOST, TOK_SETHOST, m_vhost, 0},
@@ -89,6 +84,7 @@ IrcdCommands cmd_list[] = {
 	{MSG_SQUIT, TOK_SQUIT, m_squit, 0},
 	{MSG_QUIT, TOK_QUIT, m_quit, 0},
 	{MSG_MODE, TOK_MODE, m_mode, 0},
+	{MSG_UMODE2, TOK_UMODE2, m_umode2, 0},
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
 	{MSG_KILL, TOK_KILL, m_kill, 0},
@@ -99,9 +95,6 @@ IrcdCommands cmd_list[] = {
 	{MSG_KICK, TOK_KICK, m_kick, 0},
 	{MSG_JOIN, TOK_JOIN, m_join, 0},
 	{MSG_PART, TOK_PART, m_part, 0},
-#ifdef UNREAL32
-	{MSG_EOS, TOK_EOS, m_eos, 0},
-#endif
 	{MSG_PING, TOK_PING, m_ping, 0},
 	{MSG_NETINFO, TOK_NETINFO, m_netinfo, 0},
 	{MSG_SJOIN, TOK_SJOIN, m_sjoin, 0},
@@ -110,6 +103,9 @@ IrcdCommands cmd_list[] = {
 	{MSG_PROTOCTL, TOK_PROTOCTL, m_protocol, 0},
 	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
 	{MSG_SMO, TOK_SMO, m_smo, 0},
+#ifdef UNREAL32
+	{MSG_EOS, TOK_EOS, m_eos, 0},
+#endif
 };
 
 ChanModes chan_modes[] = {
@@ -200,7 +196,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 #if 0
 	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #else
-	sts ("%s TOKEN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
+	sts ("%s TOKEN UMODE2 NICKv2", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 #endif
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
@@ -401,8 +397,7 @@ m_stats (char *origin, char **argv, int argc, int srv)
 
 /*
  * m_version
- *	parv[0] = sender prefix
- *	parv[1] = remote server
+ *	argv[0] = remote server
  */
 static void
 m_version (char *origin, char **argv, int argc, int srv)
@@ -417,8 +412,7 @@ m_motd (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_admin
- *	parv[0] = sender prefix
- *	parv[1] = servername
+ *	argv[0] = servername
  */
 static void
 m_admin (char *origin, char **argv, int argc, int srv)
@@ -428,8 +422,7 @@ m_admin (char *origin, char **argv, int argc, int srv)
 
 /*
  * m_credits
- *      parv[0] = sender prefix
- *      parv[1] = servername
+ *   argv[0] = servername
  */
 static void
 m_credits (char *origin, char **argv, int argc, int srv)
@@ -438,12 +431,11 @@ m_credits (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_server
- *	parv[0] = sender prefix
- *	parv[1] = servername
- *  parv[2] = hopcount
- *  parv[3] = numeric
- *  parv[4] = serverinfo
- * on old protocols, serverinfo is parv[3], and numeric is left out
+ *	argv[0] = servername
+ *  argv[2] = hopcount
+ *  argv[3] = numeric
+ *  argv[4] = serverinfo
+ * on old protocols, serverinfo is argv[3], and numeric is left out
  */
 /*SERVER servername hopcount :U<protocol>-flags-numeric serverdesc*/
 static void
@@ -473,9 +465,8 @@ m_server (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_squit
- *	parv[0] = sender prefix
- *	parv[1] = server name
- *	parv[parc-1] = comment
+ *	argv[0] = server name
+ *	argv[argc-1] = comment
  */
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
@@ -487,8 +478,7 @@ m_squit (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_quit
- *	parv[0] = sender prefix
- *	parv[1] = comment
+ *	argv[0] = comment
  */
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
@@ -500,26 +490,26 @@ m_quit (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_svsmode
- *  parv[0] - sender
- *  parv[1] - username to change mode for
- *  parv[2] - modes to change
- *  parv[3] - Service Stamp (if mode == d)
+ *  argv[0] - username to change mode for
+ *  argv[1] - modes to change
+ *  argv[2] - Service Stamp (if mode == d)
  */
 static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		/* its user svsmode change */
-		UserMode (argv[0], argv[1]);
-	} else {
-		/* its a channel svsmode change */
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 
 /* m_mode 
- *  parv[0] - sender
- *  parv[1] - channel
+ *  argv[0] - channel
+
+ * m_umode
+ * argv[0] - username to change mode for
+ * argv[1] - modes to change
  */
 /*  MODE
  *  :nick MODE nick :+modestring 
@@ -528,17 +518,25 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1]);
-	} else {
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 
+/* m_umode2
+ * argv[0] - modes to change
+ */
+static void
+m_umode2 (char *origin, char **argv, int argc, int srv)
+{
+	UserMode (origin, argv[0]);
+}
+
 /* m_kill
- *	parv[0] = sender prefix
- *	parv[1] = kill victim(s) - comma separated list
- *	parv[2] = kill path
+ *	argv[0] = kill victim(s) - comma separated list
+ *	argv[1] = kill path
  */
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
@@ -555,9 +553,8 @@ m_vhost (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_pong
- *  parv[0] = sender prefix
- *  parv[1] = origin
- *  parv[2] = destination
+ *  argv[0] = origin
+ *  argv[1] = destination
  */
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
@@ -566,8 +563,7 @@ m_pong (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_away
- *  parv[0] = sender prefix
- *  parv[1] = away message
+ *  argv[0] = away message
  */
 static void
 m_away (char *origin, char **argv, int argc, int srv)
@@ -584,48 +580,52 @@ m_away (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_nick
- *  parv[0] = sender prefix
- *  parv[1] = nickname
+ *  argv[0] = nickname
  * if from new client
- *  parv[2] = nick password
+ *  argv[1] = nick password
  * if from server:
- *  parv[2] = hopcount
- *  parv[3] = timestamp
- *  parv[4] = username
- *  parv[5] = hostname
- *  parv[6] = servername
+ *  argv[1] = hopcount
+ *  argv[2] = timestamp
+ *  argv[3] = username
+ *  argv[4] = hostname
+ *  argv[5] = servername
  * if NICK version 1:
- *  parv[7] = servicestamp
- *  parv[8] = info
+ *  argv[6] = servicestamp
+ *  argv[7] = info
  * if NICK version 2:
- *  parv[7] = servicestamp
- *  parv[8] = umodes
- *  parv[9] = virthost, * if none
- *  parv[10] = info
+ *  argv[6] = servicestamp
+ *  argv[7] = umodes
+ *  argv[8] = virthost, * if none
+ *  argv[9] = info
  */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
 		char *realname;
-	
+#ifdef NICKV2	
 		realname = joinbuf (argv, argc, 7);
 		AddUser (argv[0], argv[3], argv[4], realname, argv[5], NULL, argv[2]);
 		free (realname);
+		UserMode (argv[0], argv[7]);
+		SetUserVhost(argv[0], argv[8]);
+#else
+		realname = joinbuf (argv, argc, 7);
+		AddUser (argv[0], argv[3], argv[4], realname, argv[5], NULL, argv[2]);
+		free (realname);
+#endif
 	} else {
 		UserNick (origin, argv[0], NULL);
 	}
 }
 
 /* m_topic
- *  parv[0] = sender prefix
- *  parv[1] = topic text
+ *  argv[0] = topic text
  * For servers using TS:
- *  parv[0] = sender prefix
- *  parv[1] = channel name
- *  parv[2] = topic nickname
- *  parv[3] = topic time
- *  parv[4] = topic text
+ *  argv[0] = channel name
+ *  argv[1] = topic nickname
+ *  argv[2] = topic time
+ *  argv[3] = topic text
  */
 /* TOPIC #channel ownder TS :topic */
 static void
@@ -639,10 +639,9 @@ m_topic (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_kick
- *	parv[0] = sender prefix
- *	parv[1] = channel
- *	parv[2] = client to kick
- *	parv[3] = kick comment
+ *	argv[0] = channel
+ *	argv[1] = client to kick
+ *	argv[2] = kick comment
  */
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
@@ -654,9 +653,8 @@ m_kick (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_join
- *	parv[0] = sender prefix
- *	parv[1] = channel
- *	parv[2] = channel password (key)
+ *	argv[0] = channel
+ *	argv[1] = channel password (key)
  */
 static void
 m_join (char *origin, char **argv, int argc, int srv)
@@ -665,9 +663,8 @@ m_join (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_part
- *	parv[0] = sender prefix
- *	parv[1] = channel
- *	parv[2] = comment
+ *	argv[0] = channel
+ *	argv[1] = comment
  */
 static void
 m_part (char *origin, char **argv, int argc, int srv)
@@ -679,9 +676,8 @@ m_part (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_ping
- *	parv[0] = sender prefix
- *	parv[1] = origin
- *	parv[2] = destination
+ *	argv[0] = origin
+ *	argv[1] = destination
  */
 static void
 m_ping (char *origin, char **argv, int argc, int srv)
@@ -690,15 +686,14 @@ m_ping (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_netinfo
- *  parv[0] = sender prefix
- *  parv[1] = max global count
- *  parv[2] = time of end sync
- *  parv[3] = unreal protocol using (numeric)
- *  parv[4] = cloak-crc (> u2302)
- *  parv[5] = free(**)
- *  parv[6] = free(**)
- *  parv[7] = free(**)
- *  parv[8] = ircnet
+ *  argv[0] = max global count
+ *  argv[1] = time of end sync
+ *  argv[2] = unreal protocol using (numeric)
+ *  argv[3] = cloak-crc (> u2302)
+ *  argv[4] = free(**)
+ *  argv[5] = free(**)
+ *  argv[6] = free(**)
+ *  argv[7] = ircnet
  */
 static void
 m_netinfo (char *origin, char **argv, int argc, int srv)
@@ -728,34 +723,36 @@ m_eos (char *origin, char **argv, int argc, int srv)
 #endif
     
 /* m_sjoin  
- *  parv[0] = sender prefix
- *  parv[1]	aChannel *chptr;
- *    char *parv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
- *    = channel timestamp
- *  parv[2] = channel name
- * if (parc == 3) 
- *  parv[3] = nick names + modes - all in one parameter
- * if (parc == 4)
- *  parv[3] = channel modes
- *  parv[4] = nick names + modes - all in one parameter
- * if (parc > 4)
- *  parv[3] = channel modes
- *  parv[4 to parc - 2] = mode parameters
- *  parv[parc - 1] = nick names + modes
+ *  argv[0] = channel timestamp
+ *    char *argv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
+ *  argv[1] = channel name
+ *  "ts chname :"
+ * if (argc == 3) 
+ *  argv[2] = nick names + modes - all in one parameter
+ *  "ts chname modebuf :"
+ *  "ts chname :"@/"""name"	OPT_SJ3
+ * if (argc == 4)
+ *  argv[2] = channel modes
+ *  argv[3] = nick names + modes - all in one parameter
+ *  "ts chname modebuf parabuf :"
+ * if (argc > 4)
+ *  argv[2] = channel modes
+ *  argv[3 to argc - 2] = mode parameters
+ *  argv[argc - 1] = nick names + modes
+ *  "ts parabuf :parv[parc - 1]"	OPT_SJOIN | OPT_SJ3 
  */
-
 /*    MSG_SJOIN creationtime chname    modebuf parabuf :member list */
 /* R: ~         1073861298   #services +       <none>  :Mark */
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	handle_sjoin (argv[1], argv[0], argv[2], 4, origin, argv, argc);
+	nlog (LOG_INFO, LOG_CORE, "SJOIN: %s", recbuf);
+	handle_sjoin (argv[0], argv[1], argv[2], 4, origin, argv, argc);
 }
 
 /*
  * m_pass
- *	parv[0] = sender prefix
- *	parv[1] = password
+ *	argv[0] = password
  */
 static void
 m_pass (char *origin, char **argv, int argc, int srv)
@@ -764,10 +761,9 @@ m_pass (char *origin, char **argv, int argc, int srv)
 
 /*
  * m_svsnick
- *  parv[0] = sender
- *  parv[1] = old nickname
- *  parv[2] = new nickname
- *  parv[3] = timestamp
+ *  argv[0] = old nickname
+ *  argv[1] = new nickname
+ *  argv[2] = timestamp
  */
 static void
 m_svsnick (char *origin, char **argv, int argc, int srv)
@@ -776,8 +772,7 @@ m_svsnick (char *origin, char **argv, int argc, int srv)
 }
 
 /* m_whois
- *	parv[0] = sender prefix
- *	parv[1] = nickname masklist
+ *	argv[0] = nickname masklist
  */
 static void
 m_whois (char *origin, char **argv, int argc, int srv)
@@ -790,3 +785,5 @@ m_smo (char *origin, char **argv, int argc, int srv)
 {
 	/* TODO */
 }
+
+

@@ -63,19 +63,10 @@ static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_client (char *origin, char **argv, int argc, int srv);
 static void m_smode (char *origin, char **argv, int argc, int srv);
 #else
-static void m_netinfo (char *origin, char **argv, int argc, int srv);
+static void m_snetinfo (char *origin, char **argv, int argc, int srv);
 #endif
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 static void send_vctrl (void);
-
-static struct ircd_srv_ {   
-	int uprot;  
-	int modex;   
-	int nicklg;   
-	int gc;   
-	char cloak[25];   
-	int burst;   
-} ircd_srv;                                                    
 
 #ifdef ULTIMATE3
 const char ircd_version[] = "(UL3)";
@@ -84,9 +75,8 @@ const char services_bot_modes[]= "+oS";
 const char ircd_version[] = "(UL)";
 const char services_bot_modes[]= "+oS";
 #endif
-long services_bot_umode= 0;
 
-IrcdCommands cmd_list[] = {
+ircd_cmd cmd_list[] = {
 	/* Command      Token          Function       srvmsg */
 	{MSG_STATS,     /*TOK_STATS,     */m_stats,     0},
 	{MSG_SETHOST,   /*TOK_SETHOST,   */m_vhost,     0},
@@ -116,7 +106,7 @@ IrcdCommands cmd_list[] = {
 	{MSG_CLIENT,    /*NULL,          */m_client,    0},
 	{MSG_SMODE,     /*NULL,          */m_smode,     0},
 #else
-	{MSG_SNETINFO,  /*TOK_SNETINFO,  */m_netinfo,   0},
+	{MSG_SNETINFO,  /*TOK_SNETINFO,  */m_snetinfo,   0},
 #endif
 	{MSG_VCTRL,     /*TOK_VCTRL,     */m_vctrl,     0},
 	{MSG_PASS,      /*TOK_PASS,      */m_pass,      0},
@@ -328,7 +318,7 @@ send_pong (const char *reply)
 }
 
 void
-send_netinfo (void)
+send_snetinfo (void)
 {
 	sts (":%s %s 0 %ld %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, (long)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
 }
@@ -336,7 +326,7 @@ send_netinfo (void)
 void
 send_vctrl ()
 {
-	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklg, ircd_srv.modex, ircd_srv.gc, me.netname);
+	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
 }
 
 void 
@@ -427,7 +417,7 @@ send_rakill (const char *host, const char *ident)
 void
 send_svinfo (void)
 {
-	sts ("SVINFO 5 3 0 :%ld", (long)me.now);
+	sts ("%s %d %d 0 :%ld", MSG_SVINFO, TS_CURRENT, TS_MIN, (long)me.now);
 }
 
 void
@@ -462,7 +452,7 @@ send_globops (char *from, char *buf)
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	handle_sjoin (argv[1], argv[0], ((argc <= 2) ? argv[1] : argv[2]), 3, origin, argv, argc);
+	handle_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), 3, origin, argv, argc);
 }
 
 static void
@@ -552,25 +542,23 @@ m_quit (char *origin, char **argv, int argc, int srv)
 static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		/* its user svsmode change */
+	if (argv[0][0] == '#') {
+		ChanMode (origin, argv, argc);
+	} else {
 #ifdef ULTIMATE3
 		UserMode (argv[0], argv[2]);
 #else
 		UserMode (argv[0], argv[1]);
 #endif
-	} else {
-		/* its a channel svsmode change */
-		ChanMode (origin, argv, argc);
 	}
 }
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1]);
-	} else {
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 static void
@@ -675,7 +663,7 @@ static void
 m_vctrl (char *origin, char **argv, int argc, int srv)
 {
 	ircd_srv.uprot = atoi (argv[0]);
-	ircd_srv.nicklg = atoi (argv[1]);
+	ircd_srv.nicklen = atoi (argv[1]);
 	ircd_srv.modex = atoi (argv[2]);
 	ircd_srv.gc = atoi (argv[3]);
 	strlcpy (me.netname, argv[14], MAXPASS);
@@ -692,13 +680,13 @@ m_svinfo (char *origin, char **argv, int argc, int srv)
 
 #ifndef ULTIMATE3
 static void
-m_netinfo (char *origin, char **argv, int argc, int srv)
+m_snetinfo (char *origin, char **argv, int argc, int srv)
 {
 	ircd_srv.uprot = atoi (argv[2]);
 	strlcpy (ircd_srv.cloak, argv[3], 10);
 	strlcpy (me.netname, argv[7], MAXPASS);
 
-	send_netinfo ();
+	send_snetinfo ();
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 #ifdef DEBUG
@@ -726,7 +714,6 @@ m_client (char *origin, char **argv, int argc, int srv)
 	free (realname);
 	UserMode (argv[0], argv[3]);
 	UserSMode (argv[0], argv[4]);
-
 }
 
 static void
@@ -743,4 +730,3 @@ m_svsnick (char *origin, char **argv, int argc, int srv)
 {
 	UserNick (argv[0], argv[1], NULL);
 }
-

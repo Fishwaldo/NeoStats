@@ -55,16 +55,11 @@ static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 static void m_tburst (char *origin, char **argv, int argc, int srv);
 
-static struct ircd_srv_ {
-	int burst;
-} ircd_srv;
-
 const char ircd_version[] = "(N)";
 const char services_bot_modes[]= "+oS";
-long services_bot_umode= 0;
 
 /* this is the command list and associated functions to run */
-IrcdCommands cmd_list[] = {
+ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_STATS, m_stats, 0},
 	{MSG_VERSION, m_version, 0},
@@ -85,7 +80,7 @@ IrcdCommands cmd_list[] = {
 	{MSG_PART, m_part, 0},
 	{MSG_PING, m_ping, 0},
 	{MSG_SVINFO, m_svinfo, 0},
-	{MSG_PASS, m_pass, 0},
+	{MSG_PASS, NULL, 0},
 	{MSG_EOB, m_burst, 0},
 	{MSG_SJOIN, m_sjoin, 0},
 	{MSG_TBURST, m_tburst, 0},
@@ -336,9 +331,8 @@ send_globops (char *from, char *buf)
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	handle_sjoin (argv[1], argv[0], ((argc <= 2) ? argv[1] : argv[2]), 3, argv[4], argv, argc);
+	handle_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), 3, argv[4], argv, argc);
 }
-
 
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
@@ -423,10 +417,10 @@ m_quit (char *origin, char **argv, int argc, int srv)
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1]);
-	} else {
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 static void

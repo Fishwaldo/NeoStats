@@ -42,6 +42,7 @@ new_server (const char *name)
 	Server *s;
 	hnode_t *sn;
 
+	SET_SEGV_LOCATION();
 	s = calloc (sizeof (Server), 1);
 	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
@@ -74,15 +75,11 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *i
 	s->connected_since = me.now;
 	if (uplink) {
 		strlcpy (s->uplink, uplink, MAXHOST);
-	} else {
-		strsetnull (s->uplink);
 	}
 	s->ping = 0;
 	s->flags = 0;
 	if(infoline) {
 		strlcpy (s->infoline, infoline, MAXINFO);
-	} else {
-		strsetnull (s->infoline);
 	}
 
 	/* run the module event for a new server. */
@@ -136,10 +133,9 @@ findserver (const char *name)
 	if (sn) {
 		s = hnode_get (sn);
 		return s;
-	} else {
-		nlog (LOG_DEBUG2, LOG_CORE, "FindServer: %s not found!", name);
-		return NULL;
 	}
+	nlog (LOG_DEBUG2, LOG_CORE, "FindServer: %s not found!", name);
+	return NULL;
 }
 
 void
@@ -150,7 +146,6 @@ ServerDump (void)
 	hnode_t *sn;
 
 	debugtochannel("Server Listing:");
-
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);

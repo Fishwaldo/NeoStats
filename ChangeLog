@@ -28,6 +28,8 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
    All such calls renamed to m_xxx e.g. m_nick to match ircd naming conventions
    so we can easily find in ircd source. Most of these calls now just need to format 
    the incoming text and let the NeoStats core process it (M)
+ - Added NICKV2 and UMODE2 support to Unreal
+ - 
  
 * NeoStats * Fish (F) * Version 2.5.14
  - Fix a bug with HostServ unable to load the database

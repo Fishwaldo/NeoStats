@@ -360,12 +360,13 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 static Chans *
 new_chan (const char *chan)
 {
+	char **av;
+	int ac = 0;
 	Chans *c;
 	hnode_t *cn;
 
 	SET_SEGV_LOCATION();
-	c = smalloc (sizeof (Chans));
-	bzero(c, sizeof(Chans));
+	c = calloc (sizeof (Chans), 1);
 	strlcpy (c->name, chan, CHANLEN);
 	cn = hnode_create (c);
 	if (hash_isfull (ch)) {
@@ -373,6 +374,16 @@ new_chan (const char *chan)
 	} else {
 		hash_insert (ch, cn, c->name);
 	}
+	c->chanmembers = list_create (CHAN_MEM_SIZE);
+	c->modeparms = list_create (MAXMODES);
+	c->cur_users = 0;
+	c->topictime = 0;
+	c->modes = 0;
+	c->tstime = me.now;
+	c->flags = 0;
+	AddStringToList (&av, c->name, &ac);
+	ModuleEvent (EVENT_NEWCHAN, av, ac);
+	free (av);
 	return c;
 }
 
@@ -681,17 +692,6 @@ join_chan (const char* nick, const char *chan)
 		/* its a new Channel */
 		nlog (LOG_DEBUG2, LOG_CORE, "join_chan: new channel %s", chan);
 		c = new_chan (chan);
-		c->chanmembers = list_create (CHAN_MEM_SIZE);
-		c->modeparms = list_create (MAXMODES);
-		c->cur_users = 0;
-		c->topictime = 0;
-		c->modes = 0;
-		c->tstime = me.now;
-		c->flags = 0;
-		AddStringToList (&av, c->name, &ac);
-		ModuleEvent (EVENT_NEWCHAN, av, ac);
-		free (av);
-		ac = 0;
 	}
 	/* add this users details to the channel members hash */
 	cm = smalloc (sizeof (Chanmem));
@@ -867,10 +867,9 @@ findchan (const char *chan)
 	if (cn) {
 		c = hnode_get (cn);
 		return c;
-	} else {
-		nlog (LOG_DEBUG3, LOG_CORE, "FindChan: %s not found", chan);
-		return NULL;
 	}
+	nlog (LOG_DEBUG3, LOG_CORE, "FindChan: %s not found", chan);
+	return NULL;
 }
 
 /** @brief Returns if the nick is a member of the channel

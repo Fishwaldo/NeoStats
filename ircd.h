@@ -27,14 +27,14 @@
 
 typedef void (*ircd_cmd_handler) (char *origin, char **argv, int argc, int srv);
 
-typedef struct IrcdCommands{
+typedef struct ircd_cmd{
 	const char *name;
 #ifdef GOTTOKENSUPPORT
 	const char *token;
 #endif
 	ircd_cmd_handler function;
 	int usage;
-}IrcdCommands;
+}ircd_cmd;
 
 typedef struct ChanModes {
 	long mode;
@@ -50,12 +50,23 @@ typedef struct {
 	int level;
 } UserModes;
 
+typedef struct ircd_server {
+	int burst;
+	int unkline;
+	int uprot;
+	int modex;
+	int nicklen;
+	int gc;
+	char cloak[25];
+} ircd_server;
+
 extern UserModes user_umodes[];
 #ifdef GOTUSERSMODES
 extern UserModes user_smodes[];
 #endif
 
-extern IrcdCommands cmd_list[];
+extern ircd_server ircd_srv;
+extern ircd_cmd cmd_list[];
 extern ChanModes chan_modes[];
 extern const int ircd_cmdcount;
 extern const int ircd_umodecount;
@@ -75,7 +86,7 @@ void ns_usr_stats (char *origin, char **argv, int argc);
 void ns_usr_pong (char *origin, char **argv, int argc);
 void ns_usr_version (char *origin, char **argv, int argc);
 void ns_srv_protocol(char *origin, char **argv, int argc);
-void handle_sjoin (char* channame, char* tstime, char *modes, int offset, char *sjoinchan, char **argv, int argc);
+void handle_sjoin (char* tstime, char* channame, char *modes, int offset, char *sjoinchan, char **argv, int argc);
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);

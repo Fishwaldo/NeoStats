@@ -58,15 +58,10 @@ static void m_svinfo (char *origin, char **argv, int argc, int srv);
 static void m_burst (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
 
-static struct ircd_srv_ {
-	int burst;
-} ircd_srv;
-
 const char ircd_version[] = "(B)";
 const char services_bot_modes[]= "+oS";
-long services_bot_umode= 0;
 
-IrcdCommands cmd_list[] = {
+ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_STATS, m_stats, 0},
 	{MSG_VERSION, m_version, 0},
@@ -312,7 +307,7 @@ send_globops (char *from, char *buf)
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)
 {
-	handle_sjoin (argv[1], argv[0], ((argc > 4) ? argv[2] : argv[1]), 3, origin, argv, argc);
+	handle_sjoin (argv[0], argv[1], ((argc > 4) ? argv[2] : argv[1]), 3, origin, argv, argc);
 }
 
 static void
@@ -394,21 +389,19 @@ m_quit (char *origin, char **argv, int argc, int srv)
 static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		/* its user svsmode change */
-		UserMode (argv[0], argv[2]);
-	} else {
-		/* its a channel svsmode change */
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[2]);
 	}
 }
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1]);
-	} else {
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 static void

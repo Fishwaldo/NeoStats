@@ -53,26 +53,17 @@ static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_ping (char *origin, char **argv, int argc, int srv);
-static void m_netinfo (char *origin, char **argv, int argc, int srv);
+static void m_snetinfo (char *origin, char **argv, int argc, int srv);
 static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_protoctl (char *origin, char **argv, int argc, int srv);
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 static void send_vctrl (void);
 
-static struct ircd_srv_ {
-	int uprot;
-	int modex;
-	int nicklg;
-	int gc;
-	char cloak[25];
-} ircd_srv;
-
 const char ircd_version[] = "(M)";
 const char services_bot_modes[]= "+oS";
-long services_bot_umode= 0;
 
-IrcdCommands cmd_list[] = {
+ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
 	{MSG_STATS, TOK_STATS, m_stats, 0},
 	{MSG_SETHOST, TOK_SETHOST, m_vhost, 0},
@@ -94,7 +85,7 @@ IrcdCommands cmd_list[] = {
 	{MSG_JOIN, TOK_JOIN, m_join, 0},
 	{MSG_PART, TOK_PART, m_part, 0},
 	{MSG_PING, TOK_PING, m_ping, 0},
-	{MSG_SNETINFO, TOK_SNETINFO, m_netinfo, 0},
+	{MSG_SNETINFO, TOK_SNETINFO, m_snetinfo, 0},
 	{MSG_VCTRL, TOK_VCTRL, m_vctrl, 0},
 	{MSG_PASS, TOK_PASS, m_pass, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
@@ -245,7 +236,7 @@ send_pong (const char *reply)
 }
 
 void
-send_netinfo (void)
+send_snetinfo (void)
 {
 	sts (":%s %s 0 %d %d %s 0 0 0 :%s", me.name, MSG_SNETINFO, (int)me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname);
 }
@@ -253,7 +244,7 @@ send_netinfo (void)
 void
 send_vctrl (void)
 {
-	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklg, ircd_srv.modex, ircd_srv.gc, me.netname);
+	sts ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
 }
 
 void 
@@ -328,12 +319,6 @@ send_rakill (const char *host, const char *ident)
 }
 
 void
-send_svinfo (void)
-{
-	sts ("SVINFO 5 3 0 :%d", (int)me.now);
-}
-
-void
 send_privmsg (char *to, const char *from, char *buf)
 {
 	sts (":%s %s %s :%s", from, (me.token ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
@@ -351,13 +336,11 @@ send_globops (char *from, char *buf)
 	sts (":%s %s :%s", from, (me.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
 }
 
-
 static void
 m_protoctl (char *origin, char **argv, int argc, int srv)
 {
 	ns_srv_protocol(origin, argv, argc);
 }
-
 
 static void
 m_stats (char *origin, char **argv, int argc, int srv)
@@ -424,21 +407,19 @@ m_quit (char *origin, char **argv, int argc, int srv)
 static void
 m_svsmode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		/* its user svsmode change */
-		UserMode (argv[0], argv[1]);
-	} else {
-		/* its a channel svsmode change */
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-	if (!strchr (argv[0], '#')) {
-		UserMode (argv[0], argv[1]);
-	} else {
+	if (argv[0][0] == '#') {
 		ChanMode (origin, argv, argc);
+	} else {
+		UserMode (argv[0], argv[1]);
 	}
 }
 static void
@@ -449,16 +430,19 @@ m_kill (char *origin, char **argv, int argc, int srv)
 	KillUser (argv[0], tmpbuf);
 	free(tmpbuf);
 }
+
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
 	SetUserVhost(origin, argv[0]);
 }
+
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
 	ns_usr_pong (origin, argv, argc);
 }
+
 static void
 m_away (char *origin, char **argv, int argc, int srv)
 {
@@ -472,6 +456,7 @@ m_away (char *origin, char **argv, int argc, int srv)
 		UserAway (origin, NULL);
 	}
 }
+
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
@@ -485,6 +470,7 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		UserNick (origin, argv[0], NULL);
 	}
 }
+
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
@@ -503,11 +489,13 @@ m_kick (char *origin, char **argv, int argc, int srv)
 	kick_chan(argv[0], argv[1], origin, tmpbuf);
 	free(tmpbuf);
 }
+
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
 	UserJoin (origin, argv[0]);
 }
+
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
@@ -527,7 +515,7 @@ static void
 m_vctrl (char *origin, char **argv, int argc, int srv)
 {
 	ircd_srv.uprot = atoi (argv[0]);
-	ircd_srv.nicklg = atoi (argv[1]);
+	ircd_srv.nicklen = atoi (argv[1]);
 	ircd_srv.modex = atoi (argv[2]);
 	ircd_srv.gc = atoi (argv[3]);
 	strlcpy (me.netname, argv[14], MAXPASS);
@@ -535,13 +523,13 @@ m_vctrl (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-m_netinfo (char *origin, char **argv, int argc, int srv)
+m_snetinfo (char *origin, char **argv, int argc, int srv)
 {
 	ircd_srv.uprot = atoi (argv[2]);
 	strlcpy (ircd_srv.cloak, argv[3], 10);
 	strlcpy (me.netname, argv[7], MAXPASS);
 
-	send_netinfo ();
+	send_snetinfo ();
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 #ifdef DEBUG
@@ -561,4 +549,3 @@ m_svsnick (char *origin, char **argv, int argc, int srv)
 {
 	UserNick (argv[0], argv[1], NULL);
 }
-
