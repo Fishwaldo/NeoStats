@@ -193,6 +193,8 @@ static int cs_about(User * u, char **av, int ac)
 
 static int cs_set(User * u, char **av, int ac)
 {
+	if (!strcasecmp(av[2], "LIST")) {
+		cs_set_list(u, av, ac);
 #if 0
 /* work in progress */
 	} else if (!strcasecmp(av[2], "NICK")) {
@@ -212,8 +214,6 @@ static int cs_set(User * u, char **av, int ac)
 		cs_set_killwatch(u, av, ac);
 	} else if (!strcasecmp(av[2], "MODEWATCH")) {
 		cs_set_modewatch(u, av, ac);
-	} else if (!strcasecmp(av[2], "LIST")) {
-		cs_set_list(u, av, ac);
 	} else {
 		prefmsg(u->nick, s_ConnectServ,
 			"Unknown Set option %s. try /msg %s help set",
