@@ -130,7 +130,7 @@ const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
-char neostatsbase64[3];
+char neostatsbase64[3] = "\0";
 int neonickcount = 0;
 
 /*
@@ -331,7 +331,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 
 	inttobase64(IPAddress, htonl (inet_addr (server)), 6);
 
-	send_cmd ("%s %s %s 1 %lu %s %s %s %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, IPAddress, (neonickcount+'A'), realname);
+	send_cmd ("%s %s %s 1 %lu %s %s %s %s %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, IPAddress, neostatsbase64, (neonickcount+'A'), realname);
 	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (neonickcount+'A'));
 	setnickbase64 (nick, nicknumbuf);
 	neonickcount ++;
