@@ -57,7 +57,7 @@
 #define D_TABLE_SIZE	1999
 #define C_TABLE_SIZE	1999
 #define CHAN_MEM_SIZE	1000
-#define MAXJOINCHANS	15
+#define MAXJOINCHANS	1000
 #define T_TABLE_SIZE	100 /* Number of Timers */
 #define B_TABLE_SIZE	100 /* Number of Bots */
 
