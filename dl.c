@@ -486,6 +486,7 @@ run_mod_timers (void)
 			strlcpy (segv_location, mod_tmr->modname, SEGV_LOCATION_BUFSIZE);
 			if (setjmp (sigvbuf) == 0) {
 				SET_SEGV_INMODULE(mod_tmr->modname);
+				nlog(LOG_DEBUG3, LOG_CORE, "run_mod_timers: Running timer %s for module %s", mod_tmr->timername, mod_tmr->modname);
 				if (mod_tmr->function () < 0) {
 					nlog(LOG_DEBUG2, LOG_CORE, "run_mod_timers: Deleting Timer %s for Module %s as requested", mod_tmr->timername, mod_tmr->modname);
 					hash_scan_delete(th, tn);
