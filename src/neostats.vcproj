@@ -254,6 +254,12 @@
 				RelativePath="..\include\conf.h">
 			</File>
 			<File
+				RelativePath="..\include\config.h">
+			</File>
+			<File
+				RelativePath="..\include\config.h.in">
+			</File>
+			<File
 				RelativePath="..\include\configwin32.h">
 			</File>
 			<File
@@ -351,6 +357,9 @@
 		</Filter>
 		<File
 			RelativePath="..\ChangeLog">
+		</File>
+		<File
+			RelativePath="..\configure.in">
 		</File>
 		<File
 			RelativePath="..\modules\modules.txt">
