@@ -1,5 +1,5 @@
 #!/bin/sh
-# makeconf v 1.0 2001/02/11 15:21:32 Shmad - Borrowed from UnrealIRCd
+# makeconf v 1.0 2001/02/11 15:21:32 Shmad
 
 TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
@@ -51,15 +51,17 @@ fi
 # If Settings exist, load the info, otherwise tell them to run configure.
 
 if [ -r config.h ]; then
-	echo "Here we go.. "
+	echo "Lets configure this baby.. "
 else if [ -r include/config.h ]; then
-	echo "Here we go.. "
+	echo "Lets configure this baby.. "
 else
-	echo "Hmm, you need to run configure first!"
-	echo "Type ./configure"
+	echo ""
+	echo "It appears you haven't ran configure yet!"
+	echo "You probably should read the README file too"
+	echo ""
+	echo "Type ./configure (If you need help read the README before asking us)"
         echo "To enable Service Roots run configure with --enable-auth==sr"
-	echo "If you have run configure, make sure you are in the directory"
-	echo "you ran it from."
+	echo ""
 	exit 1
 fi
 fi
@@ -68,10 +70,12 @@ CONF=$STATSCONF
 if [ -r "$CONF" ]; then
 	echo "$STATSCONF found"
 	echo " "
-	echo "   I don't suggest running this with the conf file already"
-	echo "existing, since you will lose all the data in your conf file."
+	echo "   You already have ran 'makeconf'  I really would suggest"
+	echo "against running it again since you WILL LOSE all the data"
+	echo "that is already in your config file!"
+	echo ""
 	echo "This script is just for creating one. If you want to recreate"
-	echo "a conf file, type 'recreate'."
+	echo "your config file, type 'recreate'."
 	echo $n " [exit] -> $c"
 	read cc
 
@@ -135,9 +139,12 @@ else
 fi
 
 clear
-echo "*-------------------------------------*"
+echo ""
+echo "Thanks for Choosing NeoStats!"
+echo ""
+echo "*----------------------------------------*"
 echo "| Welcome to the $STATSCONF generator. |"
-echo "*-------------------------------------*"
+echo "*----------------------------------------*"
 echo " "
 echo "What will your server name be? (ie: $SERVNAME)"
 echo $n " [$SERVNAME] -> $c"
@@ -250,7 +257,7 @@ cat > $CONF << __EOF__
 ## NeoStats (c) 1999-2002 The NeoStats Group.
 ## support@neostats.net
 ## Web: http://www.NeoStats.Net
-## File Revision: 2.5.0-24
+## File Revision: 2.5.0-25
 ##################################################
 
 ##############################
@@ -276,6 +283,7 @@ SERVER_INFOLINE "$COMMENT"
 STATSERV_NETNAME $NETNAME
 
 
+
 ##########################
 # NeoStats Configuration #
 ##########################
@@ -299,6 +307,8 @@ SERVICES_CHAN $NEOCHAN
 # to reconnect to the server.
 RECONNECT_TIME $NEOCONN
 
+
+
 ########################
 # HTML OUTPUT SETTINGS #
 ########################
@@ -312,35 +322,36 @@ $NEOWRITE
 HTML_PATH $NEOHTML
 
 
+
 #####################################
 # Module Configurations and Loading #
 #####################################
 
 # Now for each Module we want to load at boot time, we specify the following
 # this loads the Spam Module
-LOAD_MODULE spam
+#LOAD_MODULE spam
 
-# This is a demo Module, called Version.. All it does is append a reply to /version <NeoStats server
-name>
-LOAD_MODULE version
+
+# This is a demo Module, called Version.. All it does is append a reply to /version <NeoStats server name>
+#LOAD_MODULE version
+
 
 # this is the StatServ Module
-LOAD_MODULE statserv
+#LOAD_MODULE statserv
+
 
 #This is the NetInfo Module, All it does is join users based on TLDs to specific channels.
 # IF you use this make sure to edit data/niconfig.db
 #LOAD_MODULE netinfo
 
+
 #This is a new module.  LoveServ, send a rose, hug, kiss, chocolate, etc to that
 # Special IRC Somebody. :D
 #LOAD_MODULE loveserv
 
-# Some Modules require there own configuration information.. Here are some
-# Configuration options that are usefull for the Modules that come with
-# NeoStats
 
 # For all other modules, just add them above in the format:
-# LOAD_MODULE modulename
+#LOAD_MODULE modulename
 
 
 
@@ -351,6 +362,7 @@ LOAD_MODULE statserv
 # This is the nickname that StatServ uses, if not specified, defaults to StatServ
 #STATSERV_NICK StatServ
 
+
 # This is the User portion that StatServ uses, if not specified, it uses
 # whatever NeoStats is configured to use
 #STATSERV_USER Stats
@@ -360,15 +372,19 @@ LOAD_MODULE statserv
 # uses whatever NeoStats is configured to use
 #STATSERV_HOST stats.irc-chat.net
 
+
 # This is used to specified the number of seconds a Server is tolerated
 # before it is considered Laged. A non value, or value of 0, disables Lag
 # Notifications
 LAG_NOTICE $NEOLAG
 
 
+
 ############################
 # ICQSERV CONFIG FOLLOWS:  #
 ############################
+
+###### NOTICE: ICQSERV IS NOT FUNCTIONAL AT THIS TIME ######
 
 # This is the nickname that IcqServ uses, if not specified, defaults to
 # ICQserv
@@ -382,9 +398,10 @@ LAG_NOTICE $NEOLAG
 # uses whatever NeoStats is configured to use
 #ICQSERV_HOST my.stats.irc.net
 
-ICQSERV_UIN 000000001
-ICQSERV_PASSWORD blahblah
-ICQSERV_SERVER 205.188.179.42
+#ICQSERV_UIN 000000001
+#ICQSERV_PASSWORD blahblah
+#ICQSERV_SERVER 205.188.179.42
+
 
 
 #######################
@@ -425,6 +442,9 @@ chmod 700 $STATSCONF
 		echo "| If you configured with --enable-auth==sr       |"
 		echo "| Edit neostats.cfg and edit the proper section  |"
 		echo "| to enable Service ROOTS.                       |"
+		echo "*------------------------------------------------*"
+		echo "| **I CANT STRESS THIS ENOUGH, PLEASE READ THE** |"
+		echo "| **README FILE BEFORE ASKING FOR HELP!!!!!   ** |"
 		echo "*------------------------------------------------*"
                 echo ""
 		exit 1

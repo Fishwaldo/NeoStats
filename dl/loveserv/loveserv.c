@@ -1,4 +1,4 @@
-/* NeoStats - IRC Statistical Services Copryight (c) 1999-2002 NeoStats Group.
+/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group.
 *
 ** Module:  LoveServ
 ** Description:  Network Love Service
