@@ -1,4 +1,21 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Version 2.0Alpha4 (we decided this is a Major Release, hence the 2.0 version)
+ - Fixed up The Module Code (as Usual)
+ - Created new Functions to Load Modules at Boot time...
+ - Finally ripped out StatServ code out of base code, and started on writting its module..
+ - Also ripped out ICQServ... Havn't start the Module for this yet
+ - Been thinking about the best way to setup the event Triggers
+ - Learnt how to use CVS, and now I love it
+ - Started to Use X windows with Kdevelop as my IDE... (like you care right)
+ - started playing with autoconf and automake stuff... hrm.. looks pretty nice
+ - Expecting to release a beta real soon (As soon as I make StatServ useable)
+ - Now have a project page at http://www.sourceforge.net/project/?group_id=2137
+ - Get the Latest Development Version of our Code at:
+      CVS: cvs -d:pserver:anonymous@cvs.neostats.sourceforge.net:/cvsroot/NeoStats/ login
+           when prompted for a password, just hit Enter
+           cvs -d:pserver:anonymous@cvs.neostats.sourceforge.net:/cvsroot/NeoStats co 2.0
+
+
 * NeoStats * Fish * Version 1.2.Alpha 4
  - The Beginnings of a Decent Module API - See dl/modules.txt for more info
  - added a BOT api for the Modules. Any Module that puts a bot on the network must use this API
