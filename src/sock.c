@@ -315,6 +315,9 @@ sock_connect (int socktype, struct in_addr ip, int port)
 	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flags, sizeof(flags));
 	
 	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
+#ifdef WIN32
+		errno =  WSAGetLastError();
+#endif
 		switch (errno) {
 		case EINPROGRESS:
 			break;
@@ -483,6 +486,9 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 
 void
 socket_linemode_write_done (struct bufferevent *bufferevent, void *arg) {
+#ifdef WIN32
+printf("linemode_write_done called back\n");
+#endif
 /* NOOP - We require this otherwise the event subsystem segv's */
 }
 
@@ -535,7 +541,7 @@ int InitSocks (void)
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
-    event_set_log_callback(libevent_log);
+	event_set_log_callback(libevent_log);
 	event_init();
 	return NS_SUCCESS;
 }
@@ -558,7 +564,7 @@ void FiniSocks (void)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		sock = hnode_get (sn);
 		del_sock(sock);
-    }
+	}
 	if (me.servsock) {
 		me.servsock = NULL;
 	}
