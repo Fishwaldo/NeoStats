@@ -357,7 +357,12 @@ sts (char *fmt, ...)
 	vsnprintf (buf, 512, fmt, ap);
 
 	nlog (LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
-	strcat (buf, "\n");
+	if(strlen (buf) < (512-2)) { 
+		strncat (buf, "\n", 512); 
+	} else { 
+		buf[512-1]=0; 
+		buf[512-2]='\n'; 
+	} 
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Write error: %s", strerror(errno));
