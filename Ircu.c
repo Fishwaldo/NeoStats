@@ -333,7 +333,8 @@ send_ping (const char *from, const char *reply, const char *to)
 void 
 send_umode (const char *who, const char *target, const char *mode)
 {
-	send_cmd (":%s %s %s :%s", who, TOK_MODE, target, mode);
+/*	send_cmd (":%s %s %s :%s", who, TOK_MODE, target, mode);*/
+	send_cmd ("%s %s %s :%s", getnumfromnick(who), TOK_MODE, getnumfromnick(target), mode);
 }
 
 void 
