@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.82 2003/06/26 05:14:16 fishwaldo Exp $
+** $Id: stats.h,v 1.83 2003/06/26 05:25:09 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -381,3 +381,4 @@ extern int init_dns();
 extern void do_dns();
 
 #endif
+

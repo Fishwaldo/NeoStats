@@ -18,16 +18,16 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.17 2003/06/26 05:14:16 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.18 2003/06/26 05:25:09 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "ircd.h"
+#include "sock.h"
 #include "hybrid7.h"
 #include "dl.h"
 #include "log.h"
 
-void sts(char *fmt, ...);
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -394,32 +394,11 @@ int srakill_cmd(const char *host, const char *ident)
 }
 
 
-void sts(char *fmt, ...)
-{
-	va_list ap;
-	char buf[512];
-	int sent;
-	va_start(ap, fmt);
-	vsnprintf(buf, 512, fmt, ap);
-
-	nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", buf);
-	strcat(buf, "\n");
-	sent = write(servsock, buf, strlen(buf));
-	if (sent == -1) {
-		nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
-		do_exit(0);
-	}
-	me.SendM++;
-	me.SendBytes = me.SendBytes + sent;
-	va_end(ap);
-}
-
 void chanalert(char *who, char *buf, ...)
 {
 	va_list ap;
 	char tmp[512];
 	char out[512];
-	int sent;
 	va_start(ap, buf);
 	vsnprintf(tmp, 512, buf, ap);
 
@@ -427,16 +406,7 @@ void chanalert(char *who, char *buf, ...)
 		snprintf(out, 512, ":%s PRIVMSG %s :%s", who, me.chan,
 			 tmp);
 		nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
-
-		strcat(out, "\n");
-		sent = write(servsock, out, strlen(out));
-		if (sent == -1) {
-			me.onchan = 0;
-			nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
-			do_exit(0);
-		}
-		me.SendM++;
-		me.SendBytes = me.SendBytes + sent;
+		sts("%s", out);
 	}
 	va_end(ap);
 }

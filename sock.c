@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.38 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: sock.c,v 1.39 2003/06/26 05:25:09 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -422,4 +422,25 @@ int sock_disconnect(char *sockname)
 	close(sock->sock_no);
 	del_socket(sockname);
 	return (1);
+}
+
+
+void sts(char *fmt, ...)
+{
+	va_list ap;
+	char buf[512];
+	int sent;
+	va_start(ap, fmt);
+	vsnprintf(buf, 512, fmt, ap);
+
+	nlog(LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
+	strcat(buf, "\n");
+	sent = write(servsock, buf, strlen(buf));
+	if (sent == -1) {
+		nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
+		do_exit(0);
+	}
+	me.SendM++;
+	me.SendBytes = me.SendBytes + sent;
+	va_end(ap);
 }

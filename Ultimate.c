@@ -20,16 +20,16 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.50 2003/06/26 05:14:16 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.51 2003/06/26 05:25:08 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "ircd.h"
+#include "sock.h"
 #include "Ultimate.h"
 #include "dl.h"
 #include "log.h"
 
-void sts(char *fmt, ...);
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */
@@ -558,32 +558,11 @@ int sburst_cmd(int b)
 
 
 
-void sts(char *fmt, ...)
-{
-	va_list ap;
-	char buf[512];
-	int sent;
-	va_start(ap, fmt);
-	vsnprintf(buf, 512, fmt, ap);
-
-	nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", buf);
-	strcat(buf, "\n");
-	sent = write(servsock, buf, strlen(buf));
-	if (sent == -1) {
-		nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
-		do_exit(0);
-	}
-	me.SendM++;
-	me.SendBytes = me.SendBytes + sent;
-	va_end(ap);
-}
-
 void chanalert(char *who, char *buf, ...)
 {
 	va_list ap;
 	char tmp[512];
 	char out[512];
-	int sent;
 	va_start(ap, buf);
 	vsnprintf(tmp, 512, buf, ap);
 
@@ -591,15 +570,7 @@ void chanalert(char *who, char *buf, ...)
 		snprintf(out, 512, ":%s PRIVMSG %s :%s", who, me.chan,
 			 tmp);
 		nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
-		strcat(out, "\n");
-		sent = write(servsock, out, strlen(out));
-		if (sent == -1) {
-			me.onchan = 0;
-			nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
-			do_exit(0);
-		}
-		me.SendM++;
-		me.SendBytes = me.SendBytes + sent;
+		sts("%s", out);
 	}
 	va_end(ap);
 }

@@ -20,15 +20,15 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.44 2003/06/13 13:11:48 fishwaldo Exp $
+** $Id: Unreal.c,v 1.45 2003/06/26 05:25:09 fishwaldo Exp $
 */
 
 #include "stats.h"
 #include "ircd.h"
+#include "sock.h"
 #include "Unreal.h"
 #include "dl.h"
 #include "log.h"
-void sts(char *fmt, ...);
 
 
 IntCommands cmd_list[] = {
@@ -466,48 +466,19 @@ int srakill_cmd(const char *host, const char *ident)
 	return 1;
 }
 
-void sts(char *fmt, ...)
-{
-	va_list ap;
-	char buf[512];
-	int sent;
-	va_start(ap, fmt);
-	vsnprintf(buf, 512, fmt, ap);
-
-	nlog(LOG_DEBUG2, LOG_CORE, "SENT: %s", buf);
-	strcat(buf, "\n");
-	sent = write(servsock, buf, strlen(buf));
-	if (sent == -1) {
-		nlog(LOG_CRITICAL, LOG_CORE, "Write error.");
-		do_exit(0);
-	}
-	me.SendM++;
-	me.SendBytes = me.SendBytes + sent;
-	va_end(ap);
-}
 
 void chanalert(char *who, char *buf, ...)
 {
 	va_list ap;
 	char tmp[512];
 	char out[512];
-	int sent;
 	va_start(ap, buf);
 	vsnprintf(tmp, 512, buf, ap);
 
 	if (me.onchan) {
 		snprintf(out, 512, ":%s PRIVMSG %s :%s", who, me.chan,
 			 tmp);
-		nlog(LOG_DEBUG3, LOG_CORE, "SENT: %s", out);
-		strcat(out, "\n");
-		sent = write(servsock, out, strlen(out));
-		if (sent == -1) {
-			me.onchan = 0;
-			nlog(LOG_DEBUG3, LOG_CORE, "Write error.");
-			do_exit(0);
-		}
-		me.SendM++;
-		me.SendBytes = me.SendBytes + sent;
+		sts("%s", out);
 	}
 	va_end(ap);
 }

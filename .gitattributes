@@ -168,6 +168,7 @@ logs/.keepme -text
 /server.c -text
 /services.c -text
 /sock.c -text
+/sock.h -text
 /stats.h -text
 /timer.c -text
 tools/Makefile.in -text
