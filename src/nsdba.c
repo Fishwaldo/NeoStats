@@ -22,8 +22,8 @@
 */
 
 /*	
- *  DBMs issue internal mallocs do these cannot be freed with ns_free
- *  This module handles the copy of data from the db to the variable and frees/
+ *  DBMs issue internal mallocs so these cannot be freed with ns_free
+ *  This module handles the copy of data from the db to the variable
  */
 
 #include "neostats.h"
@@ -45,95 +45,138 @@ typedef struct dbm_sym {
 	char *sym;
 } dbm_sym;
 
-static void *(*DBMOpenTable) (const char *name);
-static int (*DBMCloseTable) (void *handle);
-static int (*DBMGetData) (void *handle, char *key, void *data, int size);
-static int (*DBMSetData) (void *handle, char *key, void *data, int size);
-static int (*DBMGetTableRows) (void *handle, DBRowHandler handler);
-static int (*DBMDelData) (void *handle, char * key);
+static void *( *DBMOpenTable )( const char *name );
+static int( *DBMCloseTable )( void *handle );
+static int( *DBMGetData )( void *handle, char *key, void *data, int size );
+static int( *DBMSetData )( void *handle, char *key, void *data, int size );
+static int( *DBMGetTableRows )( void *handle, DBRowHandler handler );
+static int( *DBMDelData )( void *handle, char *key );
 
 static dbm_sym dbm_sym_table[] = 
 {
-	{(void *)&DBMOpenTable,		"DBMOpenTable"},
-	{(void *)&DBMCloseTable,	"DBMCloseTable"},
-	{(void *)&DBMGetData,		"DBMGetData"},
-	{(void *)&DBMSetData,		"DBMSetData"},
-	{(void *)&DBMGetTableRows,	"DBMGetTableRows"},
-	{(void *)&DBMDelData,		"DBMDelData"},
+	{( void * )&DBMOpenTable,		"DBMOpenTable"},
+	{( void * )&DBMCloseTable,	"DBMCloseTable"},
+	{( void * )&DBMGetData,		"DBMGetData"},
+	{( void * )&DBMSetData,		"DBMSetData"},
+	{( void * )&DBMGetTableRows,	"DBMGetTableRows"},
+	{( void * )&DBMDelData,		"DBMDelData"},
 	{NULL, NULL},
 };
 
 static hash_t *dbhash;
 static char dbname[MAXPATH];
 
-static int
-InitDBAMSymbols (void)
+/** @brief InitDBAMSymbols
+ *
+ *  Lookup DBM symbols for DBA layer
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int InitDBAMSymbols( void )
 {
 	static char dbm_path[MAXPATH];
 	void *dbm_module_handle;
-	dbm_sym * pdbm_sym;
+	dbm_sym *pdbm_sym;
 
-	ircsnprintf (dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_EXT);
-	nlog (LOG_NORMAL, "Using dbm module %s", dbm_path);
-	dbm_module_handle = ns_dlopen (dbm_path, RTLD_NOW || RTLD_GLOBAL);
-	if (!dbm_module_handle) {
-		dlog (DEBUG1, "DBA init %s failed!", dbm_path);
-		nlog (LOG_CRITICAL, "Unable to load dbm module %s", dbm_path);
+	ircsnprintf( dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_EXT );
+	nlog( LOG_NORMAL, "Using dbm module %s", dbm_path );
+	dbm_module_handle = ns_dlopen( dbm_path, RTLD_NOW || RTLD_GLOBAL );
+	if( !dbm_module_handle ) {
+		dlog( DEBUG1, "DBA init %s failed!", dbm_path );
+		nlog( LOG_CRITICAL, "Unable to load dbm module %s", dbm_path );
 		return NS_FAILURE;	
 	}
 	pdbm_sym = dbm_sym_table;
-	while (pdbm_sym->ptr)
+	while( pdbm_sym->ptr )
 	{
-		*pdbm_sym->ptr = ns_dlsym (dbm_module_handle, pdbm_sym->sym);
+		*pdbm_sym->ptr = ns_dlsym( dbm_module_handle, pdbm_sym->sym );
 		pdbm_sym ++;
 	}
 	return NS_SUCCESS;
 }
 
-int InitDBA (void)
+/** @brief InitDBA
+ *
+ *  Init DBA layer
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int InitDBA( void )
 {
-	if (InitDBAMSymbols() != NS_SUCCESS) {
+	if( InitDBAMSymbols() != NS_SUCCESS ) {
 		return NS_FAILURE;
 	}	
-	dbhash = hash_create (-1, 0, 0);
-	if (!dbhash) {
-		nlog (LOG_CRITICAL, "Unable to create db hash");
+	dbhash = hash_create( -1, 0, 0 );
+	if( !dbhash ) {
+		nlog( LOG_CRITICAL, "Unable to create db hash" );
 		return NS_FAILURE;
 	}
-
-	DBAOpenDatabase ();
+	DBAOpenDatabase();
 	return NS_SUCCESS;
 }
 
-void FiniDBA (void)
+/** @brief FiniDBA
+ *
+ *  Finish DBA layer
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void FiniDBA( void )
 {
 /*	dbentry *dbe;
 	hnode_t *node;
 	hscan_t hs;
 
-	hash_scan_begin(&hs, dbhash);
-	while ((node = hash_scan_next(&hs)) != NULL ) {
-		dbe = (dbentry *) hnode_get (node);
-		DBACloseTable (dbe->handle);
-		hash_delete (dbhash, node);
-		hnode_destroy (node);
-		ns_free (dbe);
+	hash_scan_begin( &hs, dbhash );
+	while(( node = hash_scan_next( &hs ) ) != NULL  ) {
+		dbe = (dbentry *) hnode_get( node );
+		DBACloseTable( dbe->handle );
+		hash_delete( dbhash, node );
+		hnode_destroy( node );
+		ns_free( dbe );
 	}
-	hash_destroy(dbhash);*/
+	hash_destroy( dbhash );*/
 }
 
-int DBAOpenDatabase (void)
+/** @brief DBAOpenDatabase
+ *
+ *  Open NeoStats database
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBAOpenDatabase( void )
 {
 	dbentry *dbe;
 
-	dlog (DEBUG1, "DBAOpenDatabase %s", GET_CUR_MODNAME());
-	dbe = ns_calloc (sizeof (dbentry));
-	dbe->tablehash = hash_create (-1, 0, 0);
-	hnode_create_insert (dbhash, dbe, GET_CUR_MODNAME());
+	dlog( DEBUG1, "DBAOpenDatabase %s", GET_CUR_MODNAME() );
+	dbe = ns_calloc( sizeof( dbentry ) );
+	dbe->tablehash = hash_create( -1, 0, 0 );
+	hnode_create_insert( dbhash, dbe, GET_CUR_MODNAME() );
 	return NS_SUCCESS;
 }
 
-int DBACloseDatabase (void)
+/** @brief DBACloseDatabase
+ *
+ *  Close NeoStats database
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBACloseDatabase( void )
 {
 	tableentry *tbe;
 	dbentry *dbe;
@@ -141,132 +184,202 @@ int DBACloseDatabase (void)
 	hnode_t *tnode;
 	hscan_t ts;
 
-	dlog (DEBUG1, "DBACloseDatabase %s", GET_CUR_MODNAME());
-	node = hash_lookup (dbhash, GET_CUR_MODNAME());
-	dbe = (dbentry*)hnode_get (node);
-	hash_scan_begin(&ts, dbe->tablehash);
-	while ((tnode = hash_scan_next(&ts)) != NULL ) {
-		tbe = (tableentry *) hnode_get (tnode);
-		DBACloseTable (tbe->table);
-		hash_delete (dbe->tablehash, tnode);
-		hnode_destroy (tnode);
-		ns_free (tbe);
+	dlog( DEBUG1, "DBACloseDatabase %s", GET_CUR_MODNAME() );
+	node = hash_lookup( dbhash, GET_CUR_MODNAME() );
+	dbe = ( dbentry* )hnode_get( node );
+	hash_scan_begin( &ts, dbe->tablehash );
+	while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
+		tbe = (tableentry *) hnode_get( tnode );
+		DBACloseTable( tbe->table );
+		hash_delete( dbe->tablehash, tnode );
+		hnode_destroy( tnode );
+		ns_free( tbe );
 	}
-	hash_destroy(dbe->tablehash);
-	hash_delete (dbhash, node);
-	hnode_destroy (node);
-	ns_free (dbe);
+	hash_destroy( dbe->tablehash );
+	hash_delete( dbhash, node );
+	hnode_destroy( node );
+	ns_free( dbe );
 	return NS_SUCCESS;
 }
 
+/** @brief DBAOpenTable
+ *
+ *  Open table in NeoStats database
+ *
+ *  @param table name
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
-int DBAOpenTable (char *table)
+int DBAOpenTable( char *table )
 {
 	dbentry *dbe;
 	tableentry *tbe;
 
-	dlog (DEBUG1, "DBAOpenTable %s", table);
-	dbe = (dbentry *)hnode_find (dbhash, GET_CUR_MODNAME());
-	if (!dbe) {
+	dlog( DEBUG1, "DBAOpenTable %s", table );
+	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
+	if( !dbe ) {
 		return NS_FAILURE;
 	}
-	tbe = ns_calloc (sizeof (tableentry));
-	strlcpy (tbe->table, table, MAX_MOD_NAME);
-	ircsnprintf (tbe->name, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "");
-	tbe->handle = DBMOpenTable (tbe->name);
-	if (!tbe->handle) {
-		ns_free (tbe);
+	tbe = ns_calloc( sizeof( tableentry ) );
+	strlcpy( tbe->table, table, MAX_MOD_NAME );
+	ircsnprintf( tbe->name, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
+	tbe->handle = DBMOpenTable( tbe->name );
+	if( !tbe->handle ) {
+		ns_free( tbe );
 		return NS_FAILURE;
 	}
-	hnode_create_insert (dbe->tablehash, tbe, tbe->name);
+	hnode_create_insert( dbe->tablehash, tbe, tbe->name );
 	return NS_SUCCESS;
 }
 
-static tableentry *DBAFetchTableEntry (char *table)
+/** @brief DBAFetchTableEntry
+ *
+ *  Get table entry info
+ *
+ *  @param table name
+ *
+ *  @return table entry or NULL for none
+ */
+
+static tableentry *DBAFetchTableEntry( char *table )
 {
 	dbentry *dbe;
 	tableentry *tbe;
 
-	dbe = (dbentry *)hnode_find (dbhash, GET_CUR_MODNAME());
-	ircsnprintf (dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "");
-	tbe = (tableentry *)hnode_find (dbe->tablehash, dbname);
-	if (!tbe) {
-		DBAOpenTable (table);
-		tbe = (tableentry *)hnode_find (dbe->tablehash, dbname);
+	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
+	ircsnprintf( dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
+	tbe = (tableentry *)hnode_find( dbe->tablehash, dbname );
+	if( !tbe ) {
+		DBAOpenTable( table );
+		tbe = (tableentry *)hnode_find( dbe->tablehash, dbname );
 	}
 	return tbe;
 }
 
-int DBACloseTable (char *table)
+/** @brief DBACloseTable
+ *
+ *  Close table in NeoStats database
+ *
+ *  @param table name
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBACloseTable( char *table )
 {
 	dbentry *dbe;
 	tableentry *tbe;
 	hnode_t *node;
 
-	dlog (DEBUG1, "DBACloseTable %s", table);
-	dbe = (dbentry *)hnode_find (dbhash, GET_CUR_MODNAME());
-	if (!dbe) {
+	dlog( DEBUG1, "DBACloseTable %s", table );
+	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
+	if( !dbe ) {
 		return NS_FAILURE;
 	}
-	ircsnprintf (dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "");
-	node = hash_lookup (dbhash, dbname);
-	if (node) {
-		tbe = (tableentry *)hnode_get (node);
-		DBMCloseTable (tbe->handle);
-		hash_delete (dbhash, node);
-		hnode_destroy (node);
-		ns_free (tbe);
+	ircsnprintf( dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
+	node = hash_lookup( dbhash, dbname );
+	if( node ) {
+		tbe = (tableentry *)hnode_get( node );
+		DBMCloseTable( tbe->handle );
+		hash_delete( dbhash, node );
+		hnode_destroy( node );
+		ns_free( tbe );
 	}
 	return NS_SUCCESS;
 }
 
-int DBAFetch (char *table, char *key, void *data, int size)
+/** @brief DBAFetch
+ *
+ *  Fetch data from table record
+ *
+ *  @param table name
+ *  @param record key
+ *  @param pointer to data to fetch data into
+ *  @param size of record
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBAFetch( char *table, char *key, void *data, int size )
 {
 	tableentry *tbe;
 	void *dptr = NULL;
 
-	dlog (DEBUG1, "DBAFetch %s %s", table, key);
-	tbe = DBAFetchTableEntry (table);
-	if (tbe) {
-		return DBMGetData (tbe->handle, key, data, size);
+	dlog( DEBUG1, "DBAFetch %s %s", table, key );
+	tbe = DBAFetchTableEntry( table );
+	if( tbe ) {
+		return DBMGetData( tbe->handle, key, data, size );
 	}
 	return NS_FAILURE;
 }
 
-int DBAStore (char *table, char *key, void *data, int size)
+/** @brief DBAStore
+ *
+ *  Store data in table record
+ *
+ *  @param table name
+ *  @param record key
+ *  @param pointer to data to store
+ *  @param size of record
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBAStore( char *table, char *key, void *data, int size )
 {
 	tableentry *tbe;
 
-	dlog (DEBUG1, "DBAStore %s %s", table, key);
-	tbe = DBAFetchTableEntry (table);
-	if (!tbe) {
+	dlog( DEBUG1, "DBAStore %s %s", table, key );
+	tbe = DBAFetchTableEntry( table );
+	if( !tbe ) {
 		return NS_FAILURE;
 	}
-	DBMSetData (tbe->handle, key, data, size);
+	DBMSetData( tbe->handle, key, data, size );
 	return NS_SUCCESS;
 }
 
-int DBAFetchRows (char *table, DBRowHandler handler)
+/** @brief DBAFetchRows
+ *
+ *  Walk through database and pass records in turn to handler
+ *
+ *  @param table name
+ *  @param handler for records
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBAFetchRows( char *table, DBRowHandler handler )
 {
 	tableentry *tbe;
 
-	dlog (DEBUG1, "DBAFetchRows %s", table);
-	tbe = DBAFetchTableEntry (table);
-	if (!tbe) {
+	dlog( DEBUG1, "DBAFetchRows %s", table );
+	tbe = DBAFetchTableEntry( table );
+	if( !tbe ) {
 		return 0;
 	}
-	return DBMGetTableRows (tbe->handle, handler);	
+	return DBMGetTableRows( tbe->handle, handler );	
 }
 
-int DBADelete (char *table, char * key)
+/** @brief DBADelete
+ *
+ *  delete table row
+ *
+ *  @param table name
+ *  @param record key
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBADelete( char *table, char *key )
 {
 	tableentry *tbe;
 
-	dlog (DEBUG1, "DBADelete %s %s", table, key);
-	tbe = DBAFetchTableEntry (table);
-	if (!tbe) {
+	dlog( DEBUG1, "DBADelete %s %s", table, key );
+	tbe = DBAFetchTableEntry( table );
+	if( !tbe ) {
 		return NS_FAILURE;
 	}
-	DBMDelData (tbe->handle, key);
+	DBMDelData( tbe->handle, key );
 	return NS_SUCCESS;
 }

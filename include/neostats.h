@@ -454,6 +454,7 @@ typedef enum {
 #define CLIENT_FLAG_SYNCHED		0x00000004 /* client is synched */
 #define CLIENT_FLAG_SETHOST		0x00000008 /* client is synched */
 #define CLIENT_FLAG_DCC			0x00000010 /* client is connected via DCC */
+#define CLIENT_FLAG_ZOMBIE		0x00000020 /* client is zombie */
 #define NS_FLAGS_NETJOIN		0x00000080 /* client is on a net join */
 
 #define CHANNEL_FLAG_EXCLUDED	NS_FLAG_EXCLUDED /* channel is excluded */
