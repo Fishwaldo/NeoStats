@@ -336,11 +336,14 @@ void UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 	u = (Client *) hnode_get (un);
 	hash_delete (userhash, un);
 	strlcpy (u->name, newnick, MAXNICK);
+	ircsnprintf( u->user->userhostmask, USERHOSTLEN, "%s!%s@%s", u->name, u->user->username, u->hostname );
+	ircsnprintf( u->user->uservhostmask, USERHOSTLEN, "%s!%s@%s", u->name, u->user->username, u->vhost );
 	if (ts) {
 		u->tsconnect = atoi (ts);
 	} else {
 		u->tsconnect = me.now;
 	}
+	ns_do_exclude_user(u);
 	hash_insert (userhash, un, u->name);
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->source = u;
