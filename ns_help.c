@@ -253,26 +253,27 @@ const char *ns_help_status[] = {
 };
 
 const char *ns_help_set_nick[] = {
-	"NICK <newnick> Change bot nickname",
+	"\2NICK <newnick>\2 Change bot nickname",
 	"(requires restart to take effect).",
 	NULL
 };
 
 const char *ns_help_set_user[] = {
-	"USER <username> Change bot username",
+	"\2USER <username>\2 Change bot username",
 	"(requires restart to take effect).",
 	NULL
 };
 
 const char *ns_help_set_host[] = {
-	"HOST <host> Change bot host",
+	"\2HOST <host>\2 Change bot host",
 	"(requires restart to take effect).",
 	NULL
 };
 
 const char *ns_help_set_realname[] = {
-	"REALNAME <realname> Change bot realname",
+	"\2REALNAME <realname>\2 Change bot realname",
 	"(requires restart to take effect).",
 	NULL
 };
+
 
