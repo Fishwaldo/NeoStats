@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.5 2002/03/05 12:59:58 fishwaldo Exp $
+** $Id: server.c,v 1.6 2002/03/05 13:48:09 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -144,6 +144,6 @@ void TimerPings()
 			s->ping = 0;
 			continue;
 		}
-		sts(":%s PING %s :%s", me.name, me.name, s->name);
+		sping_cmd(me.name, me.name, s->name);
 	}
 }

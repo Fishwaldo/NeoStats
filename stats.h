@@ -234,7 +234,7 @@ extern void ChanTopic(char *, char *, char *);
 extern void DelChan(char *);
 extern void AddUser(const char *, const char *, const char *, const char *);
 extern void DelUser(const char *);
-extern void Change_User(User *, char *);
+extern void Change_User(User *, const char *);
 extern void sendcoders(char *message,...);
 extern User *finduser(const char *);
 extern void UserDump();

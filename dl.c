@@ -315,8 +315,7 @@ int bot_nick_change(char *oldnick, char *newnick)
 			/* Now Delete the Old bot nick */
 	
 			del_mod_user(oldnick);
-			Change_User(finduser(oldnick), newnick);
-			sts(":%s NICK %s", oldnick, newnick);
+			snick_cmd(oldnick, newnick);
 			return 1;
 		}
 		}

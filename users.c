@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.16 2002/03/05 12:59:58 fishwaldo Exp $
+** $Id: users.c,v 1.17 2002/03/05 13:48:09 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -99,7 +99,7 @@ void DelUser(const char *nick)
 	free(u);
 }
 
-void Change_User(User *u, char *newnick)
+void Change_User(User *u, const char *newnick)
 {
 	hnode_t *un;
 #ifdef DEBUG
@@ -108,7 +108,7 @@ void Change_User(User *u, char *newnick)
 
 	DelUser(u->nick);
 	u->nick[1] = '\0';
-	memcpy(u->nick, newnick, MAXNICK);
+	strcpy(u->nick, newnick);
 	un = hnode_create(u);
 	hash_insert(uh, un, u->nick);
 }
@@ -134,7 +134,7 @@ void sendcoders(char *message,...)
 				privmsg(u->nick, s_Debug, "Debug: %s",tmp);
 		}
 	} else {		
-		sts(":%s SMO 1 :%s Debuging: %s ",me.name,s_Services, tmp);
+		ssmo_cmd(me.name, "o", tmp);
 	}
 #elif ULTIMATE
 	notice(s_Services, "Debuging: %s", tmp);

@@ -61,14 +61,14 @@ int schmode_cmd(const char *who, const char *chan, const char *mode, const char 
 	return 1;
 }
 
-int snick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
+int snewnick_cmd(const char *nick, const char *ident, const char *host, const char *realname) {
 	sts("%s %s 1 %lu %s %s %s 0 :%s", (me.token ? TOK_NICK : MSG_NICK), nick, time(NULL), ident, host, me.name, realname);
 	AddUser(nick,ident, host, me.name);
 	return 1;
 }  
 
 int sping_cmd(const char *from, const char *reply, const char *to) {
-	sts(":%s %s %s :%s", from, (me.token ? TOK_NICK : MSG_NICK), reply, to);
+	sts(":%s %s %s :%s", from, (me.token ? TOK_PING : MSG_PING), reply, to);
 	return 1;
 }
 
@@ -116,6 +116,18 @@ int skill_cmd(const char *from, const char *target, const char *reason,...) {
 	va_end(ap);
 	return 1;
 }
+
+int ssmo_cmd(const char *from, const char *umodetarget, const char *msg) {
+	sts(":%s %s %s :%s", from, (me.token ? TOK_SMO : MSG_SMO), umodetarget, msg);
+	return 1;
+}
+
+int snick_cmd(const char *oldnick, const char *newnick) {
+	Change_User(finduser(oldnick), newnick);
+	sts(":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, time(NULL));
+	return 1;
+}
+
 
 void sts(char *fmt,...)
 {

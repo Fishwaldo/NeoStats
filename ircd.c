@@ -44,7 +44,7 @@ void Srv_Squit(char *, char *);
 void Srv_Nick(char *, char *);
 void Srv_Svsnick(char *, char *);
 void Srv_Kill(char *, char *);
-void Srv_Connect();
+void Srv_Connect(char *, char *);
 
 
 static void ShowMOTD(char *);
@@ -209,7 +209,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		return -1;
 	}
 	add_mod_user(nick, mod_name);
-	snick_cmd(nick, user, host, rname);
+	snewnick_cmd(nick, user, host, rname);
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 	sjoin_cmd(nick, me.chan);
 	sprintf(cmd, "%s %s", nick, nick);
@@ -407,7 +407,7 @@ void init_ServBot()
 	char rname[63];
 	segv_location = sstrdup("init_ServBot");
 	sprintf(rname, "/msg %s \2HELP\2", s_Services);
-	snick_cmd(s_Services, Servbot.user, Servbot.host, rname);
+	snewnick_cmd(s_Services, Servbot.user, Servbot.host, rname);
 	sumode_cmd(s_Services, s_Services, UMODE_SERVICES | UMODE_DEAF | UMODE_KIX);
 	sjoin_cmd(s_Services, me.chan);
 	sprintf(rname, "%s %s", s_Services, s_Services);
@@ -420,12 +420,17 @@ void init_ServBot()
 
 
 
-void Srv_Connect() {
+void Srv_Connect(char *origin, char *coreLine) {
+	char *cmd;
+	cmd = strtok(coreLine, " ");
+	while (cmd) {
+		if (!strcasecmp("TOKEN", cmd)) {
+			me.token = 1;
+		}
+		cmd = strtok(NULL, " ");
+	}
 	init_ServBot();
 }
-
-
-
 
 
 void Usr_Stats(char *origin, char *coreLine) {

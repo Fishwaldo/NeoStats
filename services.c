@@ -406,7 +406,7 @@ void ns_debug_to_coders(char *u)
 		}
 		if (me.usesmo) {
 			sprintf(realname, "/msg %s \2HELP\2", s_Services);
-			snick_cmd(s_Debug, Servbot.user, Servbot.host, realname);
+			snewnick_cmd(s_Debug, Servbot.user, Servbot.host, realname);
      		}
         } else {
         	me.coder_debug = 0;
