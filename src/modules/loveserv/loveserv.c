@@ -26,15 +26,16 @@
 #include "neostats.h"
 #include "loveserv.h"
 
-static char s_LoveServ[MAXNICK];
 static Bot *ls_bot;
+static BotInfo ls_botinfo = 
+{
+	"", 
+	"", 
+	"", 
+	"", 
+	"", 	
+};
 static Module* ls_module;
-
-struct ls_cfg { 
-	char user[MAXUSER];
-	char host[MAXHOST];
-	char realname[MAXREALNAME];
-} ls_cfg;
 
 static int ls_rose(User * u, char **av, int ac);
 static int ls_kiss(User * u, char **av, int ac);
@@ -52,11 +53,14 @@ static int ls_about(User * u, char **av, int ac);
 ModuleInfo module_info = {
 	"LoveServ",
 	"Network love service",
-	"NeoStats",
+	NULL,
+	NULL,
 	NEOSTATS_VERSION,
-	NEOSTATS_VERSION,
+	CORE_MODULE_VERSION,
 	__DATE__,
-	__TIME__
+	__TIME__,
+	0,
+	0,
 };
 
 static bot_cmd ls_commands[]=
@@ -78,16 +82,15 @@ static bot_cmd ls_commands[]=
 
 static bot_setting ls_settings[]=
 {
-	{"NICK",		&s_LoveServ,		SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
-	{"USER",		&ls_cfg.user,		SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
-	{"HOST",		&ls_cfg.host,		SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&ls_cfg.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"NICK",	&ls_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
+	{"USER",	&ls_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
+	{"HOST",	&ls_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
+	{"REALNAME",&ls_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
 };
 
 static int Online(char **av, int ac)
 {
-	ls_bot = init_bot(ls_module, s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.realname, 
-		services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings);
+	ls_bot = init_bot(ls_module, &ls_botinfo, services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings);
 	return 1;
 };
 
@@ -96,40 +99,36 @@ ModuleEvent module_events[] = {
 	{NULL, NULL}
 };
 
-int ModInit(int modnum, int apiver)
+int ModInit(Module* mod_ptr)
 {
  	char *temp = NULL;
 
-	/* Check that our compiled version if compatible with the calling version of NeoStats */
-	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
-		return NS_ERR_VERSION;
-	}
 	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
-		strlcpy(s_LoveServ ,"LoveServ" ,MAXNICK);
+		strlcpy(ls_botinfo.nick ,"LoveServ" ,MAXNICK);
 	}
 	else {
-		strlcpy(s_LoveServ , temp, MAXNICK);
+		strlcpy(ls_botinfo.nick , temp, MAXNICK);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
-		strlcpy(ls_cfg.user, "SS", MAXUSER);
+		strlcpy(ls_botinfo.user, "SS", MAXUSER);
 	}
 	else {
-		strlcpy(ls_cfg.user, temp, MAXUSER);
+		strlcpy(ls_botinfo.user, temp, MAXUSER);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
-		strlcpy(ls_cfg.host, me.name, MAXHOST);
+		strlcpy(ls_botinfo.host, me.name, MAXHOST);
 	}
 	else {
-		strlcpy(ls_cfg.host, temp, MAXHOST);
+		strlcpy(ls_botinfo.host, temp, MAXHOST);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
-		strlcpy(ls_cfg.realname, "Network Love Service", MAXREALNAME);
+		strlcpy(ls_botinfo.realname, "Network Love Service", MAXREALNAME);
 	}
 	else {
-		strlcpy(ls_cfg.realname, temp, MAXREALNAME);
+		strlcpy(ls_botinfo.realname, temp, MAXREALNAME);
 		free(temp);
 	}
 	return 1;
@@ -145,12 +144,12 @@ static int ls_rose(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
-	prefmsg(u->nick, s_LoveServ, "Your rose has been sent to %s!",
+	prefmsg(u->nick, ls_bot->nick, "Your rose has been sent to %s!",
 		target_nick);
-	prefmsg(target_nick, s_LoveServ,
+	prefmsg(target_nick, ls_bot->nick,
 		"%s has sent you this beautiful rose! 3--<--<--<{4@",
 		u->nick);
 	return 1;
@@ -162,11 +161,11 @@ static int ls_kiss(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
-	prefmsg(u->nick, s_LoveServ, "You have virtually kissed %s!", target_nick);
-	prefmsg(target_nick, s_LoveServ, "%s has virtually kissed you!", u->nick);
+	prefmsg(u->nick, ls_bot->nick, "You have virtually kissed %s!", target_nick);
+	prefmsg(target_nick, ls_bot->nick, "%s has virtually kissed you!", u->nick);
 	return 1;
 }
 
@@ -176,12 +175,12 @@ static int ls_tonsil(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
-	prefmsg(u->nick, s_LoveServ,
+	prefmsg(u->nick, ls_bot->nick,
 		"You have virtually tonsilly kissed %s!", target_nick);
-	prefmsg(target_nick, s_LoveServ,
+	prefmsg(target_nick, ls_bot->nick,
 		"%s would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!",
 		u->nick);
 	return 1;
@@ -193,11 +192,11 @@ static int ls_hug(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
-	prefmsg(u->nick, s_LoveServ, "%s has received your hug! :)", target_nick);
-	prefmsg(target_nick, s_LoveServ, "%s has sent you a *BIG WARM HUG*!", u->nick);
+	prefmsg(u->nick, ls_bot->nick, "%s has received your hug! :)", target_nick);
+	prefmsg(target_nick, ls_bot->nick, "%s has sent you a *BIG WARM HUG*!", u->nick);
 	return 1;
 }
 
@@ -207,11 +206,11 @@ static int ls_admirer(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
-	prefmsg(u->nick, s_LoveServ, "Secret admirer sent to %s :)", target_nick);
-	prefmsg(target_nick, s_LoveServ, "You have a secret admirer! ;)");
+	prefmsg(u->nick, ls_bot->nick, "Secret admirer sent to %s :)", target_nick);
+	prefmsg(target_nick, ls_bot->nick, "You have a secret admirer! ;)");
 	return 1;
 }
 
@@ -221,12 +220,12 @@ static int ls_choco(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
-	prefmsg(u->nick, s_LoveServ,
+	prefmsg(u->nick, ls_bot->nick,
 		"A box of cholocates has been sent to %s :)", target_nick);
-	prefmsg(target_nick, s_LoveServ,
+	prefmsg(target_nick, ls_bot->nick,
 		"%s would like you to have this YUMMY box of chocolates!",
 		u->nick);
 	return 1;
@@ -238,12 +237,12 @@ static int ls_candy(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
-	prefmsg(u->nick, s_LoveServ,
+	prefmsg(u->nick, ls_bot->nick,
 		"A bag of yummy heart shaped candies has been sent to %s :)", target_nick);
-	prefmsg(target_nick, s_LoveServ,
+	prefmsg(target_nick, ls_bot->nick,
 		"%s would like you to have this big YUMMY bag of heart shaped candies!",
 		u->nick);
 	return 1;
@@ -256,13 +255,13 @@ static int ls_lovenote(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
 	message = joinbuf(av, ac, 3);
-	prefmsg(u->nick, s_LoveServ, 
+	prefmsg(u->nick, ls_bot->nick, 
 		"Your lovenote to %s has been sent! :)", target_nick);
-	prefmsg(target_nick, s_LoveServ,
+	prefmsg(target_nick, ls_bot->nick,
 		"%s has sent you a LoveNote which reads: \2%s\2", u->nick, message);
 	free(message);
 	return 1;
@@ -275,13 +274,13 @@ static int ls_apology(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
 	message = joinbuf(av, ac, 3);
-	prefmsg(u->nick, s_LoveServ, "Your apology has been sent to %s",
+	prefmsg(u->nick, ls_bot->nick, "Your apology has been sent to %s",
 		target_nick);
-	prefmsg(target_nick, s_LoveServ,
+	prefmsg(target_nick, ls_bot->nick,
 		"%s is sorry, and would like to apologise for \2%s\2",
 		u->nick, message);
 	free(message);
@@ -295,13 +294,13 @@ static int ls_thankyou(User * u, char **av, int ac)
 
 	SET_SEGV_LOCATION();
 	target_nick = av[2];
-	if(!is_target_valid(s_LoveServ, u, target_nick)) {
+	if(!is_target_valid(ls_bot->nick, u, target_nick)) {
 		return 0;
 	}
 	message = joinbuf(av, ac, 3);
-	prefmsg(u->nick, s_LoveServ, "Your Thank You has been sent to %s",
+	prefmsg(u->nick, ls_bot->nick, "Your Thank You has been sent to %s",
 		target_nick);
-	prefmsg(target_nick, s_LoveServ, "%s wishes to thank you for \2%s\2",
+	prefmsg(target_nick, ls_bot->nick, "%s wishes to thank you for \2%s\2",
 		u->nick, message);
 	free(message);
 	return 1;
@@ -310,17 +309,17 @@ static int ls_thankyou(User * u, char **av, int ac)
 static int ls_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	prefmsg(u->nick, s_LoveServ, "\2%s Version Information\2", s_LoveServ);
-	prefmsg(u->nick, s_LoveServ, "%s Version: %s Compiled %s at %s", s_LoveServ, 
-		module_info.module_version, module_info.module_build_date, module_info.module_build_time);
-	prefmsg(u->nick, s_LoveServ, "%s Author: Shmad <shmad@neostats.net>", s_LoveServ);
-	prefmsg(u->nick, s_LoveServ, "http://www.neostats.net");
+	prefmsg(u->nick, ls_bot->nick, "\2%s Version Information\2", ls_bot->nick);
+	prefmsg(u->nick, ls_bot->nick, "%s Version: %s Compiled %s at %s", ls_bot->nick, 
+		module_info.version, module_info.build_date, module_info.build_time);
+	prefmsg(u->nick, ls_bot->nick, "%s Author: Shmad <shmad@neostats.net>", ls_bot->nick);
+	prefmsg(u->nick, ls_bot->nick, "http://www.neostats.net");
 	return 1;
 }
 
 static int ls_about(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	privmsg_list(u->nick, s_LoveServ, ls_help_about);
+	privmsg_list(u->nick, ls_bot->nick, ls_help_about);
 	return 1;
 }

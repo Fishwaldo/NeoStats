@@ -78,7 +78,7 @@ void DisplayTLDmap(User *u) {
 	tn = list_first(Thead);
 	while (tn) {
 		t = lnode_get(tn);
-		prefmsg(u->nick, s_StatServ,
+		prefmsg(u->nick, ss_bot->nick,
 			"%3s \2%3d\2 (%2.0f%%) -> %s ---> Daily Total: %d",
 			t->tld, t->users,
 			(float) t->users /

@@ -31,6 +31,7 @@
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
+#include "services.h"
 
 /** @brief Chanmem structure
  *  
@@ -330,7 +331,7 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 	cmn = list_find (c->chanmembers, u->nick, comparef);
 	if (!cmn) {
 		if (me.debug_mode) {
-			chanalert (s_Services, "ChanUserMode: %s is not a member of channel %s", u->nick, c->name);
+			chanalert (ns_botptr->nick, "ChanUserMode: %s is not a member of channel %s", u->nick, c->name);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -443,7 +444,7 @@ void del_chan_user(Channel *c, User *u)
 	if (!un) {
 		nlog (LOG_WARNING, "del_chan_user: %s not found in channel %s", u->nick, c->name);
 		if (me.debug_mode) {
-			chanalert (s_Services, "del_chan_user: %s not found in channel %s", u->nick, c->name);
+			chanalert (ns_botptr->nick, "del_chan_user: %s not found in channel %s", u->nick, c->name);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -485,7 +486,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 	if (!u) {
 		nlog (LOG_WARNING, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 		if (me.debug_mode) {
-			chanalert (s_Services, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
+			chanalert (ns_botptr->nick, "kick_chan: user %s not found %s %s", kicked, chan, kickby);
 			ChanDump (chan);
 		}
 		return;
@@ -500,7 +501,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 		if (!un) {
 			nlog (LOG_WARNING, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
 			if (me.debug_mode) {
-				chanalert (s_Services, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
+				chanalert (ns_botptr->nick, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -515,7 +516,7 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 				AddStringToList (&av, (char*)kickreason, &ac);
 			}
 			SendModuleEvent (EVENT_KICK, av, ac);
-			if (findbot (u->nick)) {
+			if ( IsMe (u) ) {
 				/* its one of our bots */
 				del_chan_bot (u->nick, c->name);
 				SendModuleEvent (EVENT_KICKBOT, av, ac);
@@ -554,7 +555,7 @@ part_chan (User * u, const char *chan, const char *reason)
 	if (!u) {
 		nlog (LOG_WARNING, "part_chan: trying to part NULL user from %s", chan);
 		if (me.debug_mode) {
-			chanalert (s_Services, "part_chan: trying to part NULL user from %s", chan);
+			chanalert (ns_botptr->nick, "part_chan: trying to part NULL user from %s", chan);
 			ChanDump (chan);
 		}
 		return;
@@ -569,7 +570,7 @@ part_chan (User * u, const char *chan, const char *reason)
 		if (!un) {
 			nlog (LOG_WARNING, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
 			if (me.debug_mode) {
-				chanalert (s_Services, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
+				chanalert (ns_botptr->nick, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -583,7 +584,7 @@ part_chan (User * u, const char *chan, const char *reason)
 				AddStringToList (&av, (char*)reason, &ac);
 			}
 			SendModuleEvent (EVENT_PARTCHAN, av, ac);
-			if (findbot (u->nick)) {
+			if ( IsMe (u) ) {
 				/* its one of our bots */
 				del_chan_bot (u->nick, c->name);
 				SendModuleEvent (EVENT_PARTBOT, av, ac);
@@ -618,7 +619,7 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 	if (!cm) {
 		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 		if (me.debug_mode) {
-			chanalert (s_Services, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
+			chanalert (ns_botptr->nick, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 			ChanDump (c->name);
 			UserDump (oldnick);
 		}
@@ -683,7 +684,7 @@ join_chan (const char* nick, const char *chan)
 	if (list_find (c->chanmembers, u->nick, comparef)) {
 		nlog (LOG_WARNING, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
 		if (me.debug_mode) {
-			chanalert (s_Services, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
+			chanalert (ns_botptr->nick, "join_chan: tried to add %s to channel %s but they are already a member", u->nick, chan);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -709,7 +710,7 @@ join_chan (const char* nick, const char *chan)
 	SendModuleEvent (EVENT_JOINCHAN, av, ac);
 	free (av);
 	nlog (LOG_DEBUG3, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
-	if (findbot (u->nick)) {
+	if ( IsMe (u) ) {
 		nlog(LOG_DEBUG3, "join_chan: joining bot %s to channel %s", u->nick, c->name);
 		add_chan_bot (u->nick, c->name);
 	}
@@ -954,12 +955,8 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row)
 		strlcat(chanusers, final, BUFSIZE*10);
 		cmn = list_next (c->chanmembers, cmn);
 	}
-
-
-
 	return chanusers;
 }
-
 
 COLDEF neo_chanscols[] = {
 	{
@@ -1077,8 +1074,6 @@ TBLDEF neo_chans = {
 };
 #endif /* SQLSRV */
 
-
-
 /** @brief initialize the channel data
  *
  * initializes the channel data and channel hash ch.
@@ -1087,7 +1082,7 @@ TBLDEF neo_chans = {
 */
 
 int 
-init_chan_hash ()
+InitChannels ()
 {
 	ch = hash_create (C_TABLE_SIZE, 0, 0);
 	if(!ch)	
@@ -1097,6 +1092,5 @@ init_chan_hash ()
 	neo_chans.address = ch;
 	rta_add_table(&neo_chans);
 #endif
-
 	return NS_SUCCESS;
 }

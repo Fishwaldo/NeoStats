@@ -47,10 +47,11 @@ new_server (const char *name)
 	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
 	if (!sn) {
-		nlog (LOG_WARNING, "Eeek, Hash is broken\n");
+		nlog (LOG_WARNING, "Server hash broken\n");
+		return NULL;
 	}
 	if (hash_isfull (sh)) {
-		nlog (LOG_WARNING, "Eeek, Server Hash is full!\n");
+		nlog (LOG_WARNING, "Server hash full!\n");
 	} else {
 		hash_insert (sh, sn, s->name);
 	}
@@ -72,18 +73,16 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	if (uplink) {
 		strlcpy (s->uplink, uplink, MAXHOST);
 	}
-	if(infoline) {
+	if (infoline) {
 		strlcpy (s->infoline, infoline, MAXINFO);
 	}
-	if(numeric) {
+	if (numeric) {
 		s->numeric =  atoi(numeric);
 	}
 	s->connected_since = me.now;
-
 	if (!ircstrcasecmp(name, me.name)) {
 		s->flags |= NS_FLAGS_ME;
 	}
-
 	/* check exclusions */
 	ns_do_exclude_server(s);
 
@@ -298,7 +297,7 @@ TBLDEF neo_servers = {
 
 
 int 
-init_server_hash (void)
+InitServers (void)
 {
 	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {

@@ -29,5 +29,6 @@ int FiniTimers (void);
 int list_timers (User * u, char **av, int ac);
 void run_mod_timers (void);
 void CheckTimers (void);
+int del_timers (Module *mod_ptr);
 
 #endif /* _TIMER_H_ */

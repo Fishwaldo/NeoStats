@@ -34,6 +34,7 @@
 #include "neostats.h"
 #include "adns.h"
 #include "dns.h"
+#include "services.h"
 
 adns_state ads;
 
@@ -236,7 +237,7 @@ do_dns ()
 		/* there was an error */
 		if (status) {
 			nlog (LOG_CRITICAL, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
-			chanalert (s_Services, "Bad Error on DNS lookup. Please check logfile");
+			chanalert (ns_botptr->nick, "Bad Error on DNS lookup. Please check logfile");
 
 			/* set this so nlog works good */
 			SET_SEGV_INMODULE(dnsdata->mod_name);

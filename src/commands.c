@@ -25,13 +25,13 @@
 #include "neostats.h"
 #include "modules.h"
 #include "conf.h"
+#include "services.h"
 
 static int bot_cmd_help (Bot* bot_ptr, User * u, char **av, int ac);
 static int bot_cmd_set (Bot* bot_ptr, User * u, char **av, int ac);
-#if 0
 static int bot_cmd_about (Bot* bot_ptr, User * u, char **av, int ac);
 static int bot_cmd_version (Bot* bot_ptr, User * u, char **av, int ac);
-#endif
+static int bot_cmd_credits (Bot* bot_ptr, User * u, char **av, int ac);
 
 /* help title strings for different user levels */
 char * help_level_title[]=
@@ -198,7 +198,7 @@ static int getuserlevel(Bot* bot_ptr, User* u)
 
 	/* If less than a locop see if the module can give us a user level */
 	if(ulevel < NS_ULEVEL_LOCOPER) {
-		Mod = get_mod_ptr(bot_ptr->moduleptr->info->module_name);
+		Mod = get_mod_ptr(bot_ptr->moduleptr->info->name);
 		if(Mod) {
 			if(Mod->mod_auth_cb) {
 				modlevel = Mod->mod_auth_cb(u);
@@ -334,10 +334,7 @@ del_all_bot_cmds(Bot* bot_ptr)
 int 
 add_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
-	Bot* bot_ptr;
-
-	bot_ptr = findbot(s_Services);
-	return(add_bot_cmd_list(bot_ptr, bot_cmd_list));
+	return(add_bot_cmd_list(ns_botptr, bot_cmd_list));
 }
 
 /** @brief del_services_cmd_list delete a list of commands from the services bot
@@ -349,7 +346,7 @@ del_services_cmd_list(bot_cmd* bot_cmd_list)
 {
 	Bot* bot_ptr;
 
-	bot_ptr = findbot(s_Services);
+	bot_ptr = findbot(ns_botptr->nick);
 	return(del_bot_cmd_list(bot_ptr, bot_cmd_list));
 }
 
@@ -436,9 +433,8 @@ run_bot_cmd (Bot* bot_ptr, User *u, char *command_string)
 		return NS_SUCCESS;
 	}
 
-#if 0
 	/* About */
-	if (!ircstrcasecmp(av[0], "ABOUT")) {
+	if (!ircstrcasecmp(av[0], "ABOUT") && bot_ptr->moduleptr && bot_ptr->moduleptr->info->about_text ) {
 		bot_cmd_about(bot_ptr, u, av, ac);
 		free (av);
 		return NS_SUCCESS;
@@ -450,7 +446,13 @@ run_bot_cmd (Bot* bot_ptr, User *u, char *command_string)
 		free (av);
 		return NS_SUCCESS;
 	}
-#endif
+
+	/* Credits */
+	if (!ircstrcasecmp(av[0], "CREDITS") && bot_ptr->moduleptr && bot_ptr->moduleptr->info->copyright ) {
+		bot_cmd_credits(bot_ptr, u, av, ac);
+		free (av);
+		return NS_SUCCESS;
+	}
 
 	/* We have run out of commands so report failure */
 	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[0]);
@@ -937,24 +939,33 @@ bot_cmd_set (Bot* bot_ptr, User * u, char **av, int ac)
 	return 1;
 }
 
-#if 0
 /** @brief bot_cmd_about process bot about command
- *	work in progress
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 static int bot_cmd_about (Bot* bot_ptr, User * u, char **av, int ac)
 {
+	privmsg_list (u->nick, bot_ptr->nick, bot_ptr->moduleptr->info->about_text);
 	return 1;
 }
 /** @brief bot_cmd_version process bot version command
- *	work in progress
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 static int bot_cmd_version (Bot* bot_ptr, User * u, char **av, int ac)
 {
+	prefmsg (u->nick, bot_ptr->nick, "Module %s version: %s %s %s",
+		bot_ptr->moduleptr->info->name, bot_ptr->moduleptr->info->version, 
+		bot_ptr->moduleptr->info->build_date, bot_ptr->moduleptr->info->build_time);
 	return 1;
 }
-#endif
+
+/** @brief bot_cmd_credits process bot credits command
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int bot_cmd_credits (Bot* bot_ptr, User * u, char **av, int ac)
+{
+	privmsg_list (u->nick, bot_ptr->nick, bot_ptr->moduleptr->info->copyright);
+	return 1;
+}
 
 int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
 {
@@ -967,8 +978,10 @@ int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
 			bot_ptr->set_ulevel = bot_setting_list->ulevel;
 		bot_setting_list++;
 	}
+	return 1;
 }
 
 int del_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
 {
+	return 1;
 }

@@ -278,7 +278,7 @@ send_rakill (const char *sender, const char *host, const char *ident)
 	if (ircd_srv.unkline) {
 		send_cmd(":%s %s %s %s", sender, MSG_UNKLINE, ident, host);
 	} else {
-		chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
+		chanalert (ns_botptr->nick, "Please Manually remove KLINES using /unkline on each server");
 	}
 }
 

@@ -110,6 +110,7 @@
 #else
 #define NEOSTATS_VERSION NEOSTATS_PACKAGE_VERSION
 #endif
+#define CORE_MODULE_VERSION NEOSTATS_VERSION
 
 #ifndef TS_CURRENT	/* Allow IRCd to overide */
 #define TS5
@@ -209,7 +210,7 @@
 #define MAX_MOD_NAME	32
 
 /* Buffer size for version string */
-#define VERSIONSIZE		32
+#define VERSIONSIZE		64
 
 /* doesn't have to be so big atm */
 #define NUM_MODULES		20
@@ -305,9 +306,7 @@ typedef enum NS_TRANSFER {
 
 #define ARRAY_COUNT (a) ((sizeof ((a)) / sizeof ((a)[0]))
 
-extern int servsock;
 extern char recbuf[BUFSIZE];
-extern char s_Services[MAXNICK];
 extern const char services_bot_modes[];
 extern char segv_location[SEGV_LOCATION_BUFSIZE];
 extern char segv_inmodule[SEGV_INMODULE_BUFSIZE];
@@ -356,9 +355,6 @@ struct me {
 	char infoline[MAXHOST];
 	char netname[MAXPASS];
 	char local[MAXHOST];
-	char user[MAXUSER];			/* bot user */
-	char host[MAXHOST];			/* bot host */
-	char realname[MAXREALNAME];	/* bot real name */
 	time_t t_start;
 	unsigned int allbots;
 	unsigned int maxsocks;
@@ -372,7 +368,6 @@ struct me {
 	unsigned int client:1;
 #endif
 	unsigned int setservertimes;
-	int action;
 	char chan[BUFSIZE];
 	unsigned int onchan:1;
 	unsigned int synced:1;
@@ -609,18 +604,55 @@ typedef struct ModuleEvent {
 	event_function function;
 }ModuleEvent;
 
+typedef int ModuleFlags;
+typedef int ModuleProtocol;
+
 /** @brief Module Info structure
- * 
+ *	This describes the module to the NeoStats core and provides information
+ *  to end users when modules are queried.
+ *  The presence of this structure is required but some fields are optional.
  */
 typedef struct ModuleInfo {
-	char *module_name;
-	char *module_description;
-	char *module_author;
-	char *module_neostats_version;
-	char *module_version;
-	char *module_build_date;
-	char *module_build_time;
-	char *reserved;
+	/* REQUIRED: 
+	 * name of module e.g. StatServ */
+	const char *name;
+	/* REQUIRED: 
+	 * one line brief description of module */
+	const char *description;
+	/* OPTIONAL: 
+	 * pointer to a NULL terminated list with copyright information
+	 * NeoStats will automatically provide a CREDITS command to output this
+	 * use NULL for none */
+	const char **copyright;
+	/* OPTIONAL: 
+	 * pointer to a NULL terminated list with extended description
+	 * NeoStats will automatically provide an ABOUT command to output this
+	 * use NULL for none */
+	const char **about_text;
+	/* REQUIRED: 
+	 * version of neostats used to build module
+	 * must be NEOSTATS_VERSION */
+	const char *neostats_version;
+	/* REQUIRED: 
+	 * string containing version of module */
+	const char *version;
+	/* REQUIRED: string containing build date of module 
+	 * should be __DATE__ */
+	const char *build_date;
+	/* REQUIRED: string containing build time of module 
+	 * should be __TIME__ */
+	const char *build_time;
+	/* OPTIONAL: 
+	 * Module control flags, 
+	 * use 0 if not needed */
+	const ModuleFlags flags;
+	/* OPTIONAL: 
+	 * Protocol flags for required protocol specfic features e.g. SETHOST
+	 * use 0 if not needed */
+	const ModuleProtocol protocol;
+	/* DO NOT USE: 
+	 * Reserved for future expansion */
+	const int padding[6];	
 }ModuleInfo;
 
 typedef int (*mod_auth) (User * u);
@@ -633,6 +665,7 @@ typedef struct Module {
 	ModuleEvent *event_list;
 	mod_auth mod_auth_cb;
 	void *dl_handle;
+	unsigned int modnum;
 }Module;
 
 /** @brief Module socket list structure
@@ -688,11 +721,16 @@ typedef struct Timer {
 /** @brief BotInfo structure
  * 
  */
-
-typedef struct BotInfo {
+typedef struct BotInfo {		
+	/* REQUIRED: nick */
 	char nick[MAXNICK];
+	/* OPTIONAL: altnick, use NULL if not needed */
+	char altnick[MAXNICK];
+	/* REQUIRED: user */
 	char user[MAXUSER];
+	/* REQUIRED: host */
 	char host[MAXHOST];
+	/* REQUIRED: realname */
 	char realname[MAXREALNAME];
 } BotInfo;
 
@@ -727,7 +765,7 @@ int add_sockpoll (Module* moduleptr, before_poll_function beforepoll, after_poll
 int del_socket (char *name);
 Sock *findsock (char *sock_name);
 
-Bot * init_bot (Module* modptr, char * nick, char * user, char * host, char * realname, const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
+Bot * init_bot (Module* modptr, BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list);
 int del_bot (Bot *botptr, char * reason);
 Bot *findbot (char * bot_name);
 int bot_nick_change (char * oldnick, char *newnick);

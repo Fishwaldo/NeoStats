@@ -24,6 +24,7 @@
 #include "neostats.h"
 #include "modules.h"
 #include "ircd.h"
+#include "services.h"
 
 /** @brief Channel bot structure
  * 
@@ -193,7 +194,6 @@ void bot_notice (char *origin, char **av, int ac)
 		nlog (LOG_NORMAL, "%s requested %s", u->nick, av[1]);
 		return;
 	}
-
 	argc = 0;
 	AddStringToList (&argv, origin, &argc);
 	AddStringToList (&argv, av[0], &argc);
@@ -248,12 +248,12 @@ void bot_message (char *origin, char **av, int ac)
 		nlog (LOG_NORMAL, "%s requested %s", u->nick, av[1]);
 		return;
 	}
-
 	if (botptr->botcmds) {
 		if (setjmp (sigvbuf) == 0) {
 			int ret;
 
-			SET_SEGV_INMODULE(botptr->moduleptr->info->module_name);
+			if(botptr->moduleptr)
+				SET_SEGV_INMODULE(botptr->moduleptr->info->name);
 			ret = run_bot_cmd(botptr, u, av[ac - 1]);
 			CLEAR_SEGV_INMODULE();
 			if(ret == NS_SUCCESS)
@@ -286,14 +286,14 @@ list_bot_chans (User * u, char **av, int ac)
 	lnode_t *ln;
 	ChanBot *mod_chan_bot;
 
-	prefmsg (u->nick, s_Services, "BotChanDump:");
+	prefmsg (u->nick, ns_botptr->nick, "BotChanDump:");
 	hash_scan_begin (&hs, bch);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		mod_chan_bot = hnode_get (hn);
-		prefmsg (u->nick, s_Services, "%s:--------------------------------", mod_chan_bot->chan);
+		prefmsg (u->nick, ns_botptr->nick, "%s:--------------------------------", mod_chan_bot->chan);
 		ln = list_first (mod_chan_bot->bots);
 		while (ln) {
-			prefmsg (u->nick, s_Services, "Bot Name: %s", (char *)lnode_get (ln));
+			prefmsg (u->nick, ns_botptr->nick, "Bot Name: %s", (char *)lnode_get (ln));
 			ln = list_next (mod_chan_bot->bots, ln);
 		}
 	}
@@ -318,7 +318,7 @@ new_bot (char *bot_name)
 	strlcpy (botptr->nick, bot_name, MAXNICK);
 	bn = hnode_create (botptr);
 	if (hash_isfull (bh)) {
-		chanalert (s_Services, "Warning ModuleBotlist is full");
+		chanalert (ns_botptr->nick, "Warning bot list is full");
 		return NULL;
 	}
 	hash_insert (bh, bn, botptr->nick);
@@ -332,50 +332,21 @@ new_bot (char *bot_name)
  * @return
  */
 Bot *
-add_mod_user (Module* modptr, char *nick)
+add_ns_bot (Module* modptr, char *nick)
 {
 	Bot *botptr;
-	Module *mod_ptr;
-	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
 	/* add a brand new user */
 	botptr = new_bot (nick);
 	if(botptr) {
-		botptr->moduleptr = mod_ptr;
+		botptr->moduleptr = modptr;
 		botptr->botcmds = NULL;
 		botptr->bot_settings = NULL;	
 		botptr->set_ulevel = NS_ULEVEL_ROOT;
 		return botptr;
 	}
-	nlog (LOG_WARNING, "add_mod_user: Couldn't Add Bot to List");
-	return NULL;
-}
-
-/** @brief 
- *
- * @param 
- * 
- * @return
- */
-Bot *
-add_neostats_mod_user (char *nick)
-{
-	Bot *botptr;
-
-	SET_SEGV_LOCATION();
-	/* add a brand new user */
-	botptr = new_bot (nick);
-	if(botptr) {
-#if 0
-		strlcpy (botptr->modname, "NeoStats", MAX_MOD_NAME);
-#else
-		botptr->moduleptr = 0;
-#endif
-		botptr->botcmds = hash_create(-1, 0, 0);
-		return botptr;
-	}
-	nlog (LOG_WARNING, "add_neostats_mod_user: Couldn't Add Bot to List");
+	nlog (LOG_WARNING, "add_ns_bot: Couldn't Add Bot to List");
 	return NULL;
 }
 
@@ -390,8 +361,7 @@ findbot (char *bot_name)
 {
 	hnode_t *bn;
 
-	SET_SEGV_LOCATION();
-
+	SET_SEGV_LOCATION(); 
 	bn = hash_lookup (bh, bot_name);
 	if (bn) {
 		return (Bot *) hnode_get (bn);
@@ -406,7 +376,7 @@ findbot (char *bot_name)
  * @return
  */
 int
-del_mod_user (char *bot_name)
+del_ns_bot (char *bot_name)
 {
 	Bot *botptr;
 	hnode_t *bn;
@@ -448,13 +418,11 @@ bot_nick_change (char *oldnick, char *newnick)
 		if ((botptr = findbot (oldnick)) != NULL) {
 			nlog (LOG_DEBUG3, "Bot %s Changed its nick to %s", oldnick, newnick);
 			botptr_new = new_bot (newnick);
-
 			/* add a brand new user */ 
 			strlcpy (botptr_new->nick, newnick, MAXNICK);
-			strlcpy (botptr_new->moduleptr->info->module_name, botptr->moduleptr->info->module_name, MAX_MOD_NAME);
-
+			botptr_new->moduleptr->info = botptr->moduleptr->info;
 			/* Now Delete the Old bot nick */   
-			del_mod_user (oldnick);
+			del_ns_bot (oldnick);
 			snick_cmd (oldnick, newnick);
 			return NS_SUCCESS;
 		}
@@ -477,19 +445,19 @@ list_bots (User * u, char **av, int ac)
 	hscan_t bs;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, s_Services, "Module Bot List:");
+	prefmsg (u->nick, ns_botptr->nick, "Module Bot List:");
 	hash_scan_begin (&bs, bh);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
 		if(botptr->moduleptr == 0) {
-			prefmsg (u->nick, s_Services, "NeoStats");
-			prefmsg (u->nick, s_Services, "Bots: %s", botptr->nick);
+			prefmsg (u->nick, ns_botptr->nick, "NeoStats");
+			prefmsg (u->nick, ns_botptr->nick, "Bots: %s", botptr->nick);
 		} else {
-			prefmsg (u->nick, s_Services, "Module: %s", botptr->moduleptr->info->module_name);
-			prefmsg (u->nick, s_Services, "Module Bots: %s", botptr->nick);
+			prefmsg (u->nick, ns_botptr->nick, "Module: %s", botptr->moduleptr->info->name);
+			prefmsg (u->nick, ns_botptr->nick, "Module Bots: %s", botptr->nick);
 		}
 	}
-	prefmsg (u->nick, s_Services, "End of Module Bot List");
+	prefmsg (u->nick, ns_botptr->nick, "End of Module Bot List");
 	return 0;
 }
 
@@ -499,7 +467,7 @@ list_bots (User * u, char **av, int ac)
  *
  * @return none
  */
-int	del_bots (char* module_name)
+int	del_bots (Module *mod_ptr)
 {
 	Bot *botptr;
 	hnode_t *modnode;
@@ -508,8 +476,8 @@ int	del_bots (char* module_name)
 	hash_scan_begin (&hscan, bh);
 	while ((modnode = hash_scan_next (&hscan)) != NULL) {
 		botptr = hnode_get (modnode);
-		if (!ircstrcasecmp (botptr->moduleptr->info->module_name, module_name)) {
-			nlog (LOG_DEBUG1, "Module %s had bot %s Registered. Deleting..", module_name, botptr->nick);
+		if (botptr->moduleptr == mod_ptr) {
+			nlog (LOG_DEBUG1, "Module %s had bot %s Registered. Deleting..", mod_ptr->info->name, botptr->nick);
 			del_bot (botptr, "Module Unloaded");
 		}
 	}
@@ -520,34 +488,49 @@ int	del_bots (char* module_name)
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-Bot * init_bot (Module* modptr, char * nick, char * user, char * host, char * realname, 
-						const char *modes, unsigned int flags, bot_cmd *bot_cmd_list, 
-						bot_setting *bot_setting_list)
+Bot * init_bot (Module* modptr, BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd *bot_cmd_list, bot_setting *bot_setting_list)
 {
 	Bot * botptr; 
 	User *u;
 	long Umode;
+	char* nick;
 
 	SET_SEGV_LOCATION();
+	nick = botinfo->nick;
 	u = finduser (nick);
 	if (u) {
-		nlog (LOG_WARNING, "Attempting to login with a nickname that already exists: %s", nick);
-		return NULL;
-	}
-	botptr = add_mod_user (modptr, nick);
+		nlog (LOG_WARNING, "Bot nick %s already in use", botptr->nick);
+		if(botinfo->altnick) {
+			nick = botinfo->altnick;
+			u = finduser (nick);
+			if(u) {
+				nlog (LOG_WARNING, "Bot alt nick %s already in use", botinfo->altnick);
+				/* TODO: try and find a free nick */
+				nlog (LOG_WARNING, "Unable to init bot");
+				return NULL;
+			}
+		} else {
+			/* TODO: try and find a free nick */
+			nlog (LOG_WARNING, "Unable to init bot");
+			return NULL;
+		}
+	} 
+	botptr = add_ns_bot (modptr, nick);
 	if (!botptr) {
-		nlog (LOG_WARNING, "add_mod_user failed for module %s bot %s", modptr->info->module_name, nick);
+		nlog (LOG_WARNING, "add_ns_bot failed for module %s bot %s", modptr->info->name, nick);
 		return NULL;
 	}
 	Umode = UmodeStringToMask(modes, 0);
-	signon_newbot (nick, user, host, realname, Umode);
+	signon_newbot (nick, botinfo->user, botinfo->host, botinfo->realname, Umode);
 #ifdef UMODE_DEAF
 	if (flags&BOT_FLAG_DEAF) {
 		sumode_cmd (nick, nick, UMODE_DEAF);
 	}
 #endif
 	/* restore segv_inmodule from SIGNON */
-	SET_SEGV_INMODULE(modptr->info->module_name);
+	if(modptr) {
+		SET_SEGV_INMODULE(modptr->info->name);
+	}
 	botptr->flags = flags;
 	if (bot_cmd_list) {
 		add_bot_cmd_list (botptr, bot_cmd_list);
@@ -572,12 +555,12 @@ del_bot (Bot *botptr, char *reason)
 	SET_SEGV_LOCATION();
 	u = finduser (botptr->nick);
 	if (!u) {
-		nlog (LOG_WARNING, "Attempting to Logoff with a Nickname that does not Exists: %s", botptr->nick);
+		nlog (LOG_WARNING, "Attempting to delete a bot with a nick that does not exist: %s", botptr->nick);
 		return NS_FAILURE;
 	}
 	nlog (LOG_DEBUG1, "Deleting bot %s for %s", botptr->nick, reason);
 	//XXXX TODO: need to free the channel list hash. We dont according to valgrind
 	squit_cmd (botptr->nick, reason);
-	del_mod_user (botptr->nick);
+	del_ns_bot (botptr->nick);
 	return NS_SUCCESS;
 }

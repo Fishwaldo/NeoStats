@@ -48,11 +48,14 @@ bot_cmd extauth_commands[]=
 ModuleInfo module_info = {
 	"ExtAuth",
 	"ServiceRoots Authentication Module",
-	"NeoStats",
+	NULL,
+	NULL,
 	NEOSTATS_VERSION,
-	NEOSTATS_VERSION,
+	CORE_MODULE_VERSION,
 	__DATE__,
-	__TIME__
+	__TIME__,
+	0,
+	0,
 };
 
 static config_option options[] = {
@@ -78,8 +81,7 @@ int __ModInit(int modnum, int apiver)
 	/* only a max of 10 serviceroots */
 	srconf.ul = list_create(10);
 	if (!config_read(CONFIG_NAME, options) == 0) {
-		nlog(LOG_WARNING,
-		     "ServiceRoots: ehh, config failed");
+		nlog(LOG_WARNING, "ServiceRoots: config failed");
 		/* we can't unload the extauth module so don't return -1 */
 	}
 	add_services_cmd_list(extauth_commands);
@@ -110,15 +112,13 @@ void sr_cb_config(char *arg, int configtype)
 	SET_SEGV_LOCATION();
 	if (configtype == 0) {
 		if (list_isfull(srconf.ul)) {
-			nlog(LOG_WARNING,
-			     "Exceded Maxium Number of ServiceRoots(10)");
+			nlog(LOG_WARNING, "Exceeded maxium ServiceRoots(10)");
 			return;
 		} else {
-			/* new code to do hostname. ident lookups */
 			if (strstr(arg, "!")) {
 				if (!strstr(arg, "@")) {
-					nlog(LOG_WARNING,
-					     "Invalid ServiceRoots Entry. Must be of the form nick!ident@host, was %s",
+					nlog(LOG_WARNING, 
+					     "Invalid Entry. Must be of the form nick!ident@host, was %s",
 					     arg);
 					return;
 				}
@@ -130,16 +130,7 @@ void sr_cb_config(char *arg, int configtype)
 				strlcpy(sru->ident, user, MAXUSER);
 				strlcpy(sru->host, host, MAXHOST);
 				sru->lvl = NS_ULEVEL_ROOT;
-			} else {
-				/* old format... Warn, but keep going */
-				sru = malloc(sizeof(users));
-				strlcpy(sru->nick, arg, MAXNICK);
-				strlcpy(sru->ident, "*", MAXUSER);
-				strlcpy(sru->host, "*", MAXHOST);
-				sru->lvl = NS_ULEVEL_ROOT;
-				nlog(LOG_WARNING,
-				     "Old ServiceRoots Entry Detected. Suggest you upgrade ASAP to <nick>!<ident>@<host> (WildCards are allowed)");
-			}
+			} 
 			un = lnode_create(sru);
 			list_append(srconf.ul, un);
 		}
@@ -187,10 +178,10 @@ int ext_auth_list(User *u, char **av, int ac) {
 	
 	SET_SEGV_LOCATION();
 	un = list_first(srconf.ul);
-	prefmsg(u->nick, s_Services, "ServiceRoots:");
+	prefmsg(u->nick, ns_botptr->nick, "ServiceRoots:");
 	while (un) {
 		sru = lnode_get(un);
-		prefmsg(u->nick, s_Services, "%s!%s@%s %d", sru->nick, sru->ident,
+		prefmsg(u->nick, ns_botptr->nick, "%s!%s@%s %d", sru->nick, sru->ident,
 			     sru->host, sru->lvl);
 		un = list_next(srconf.ul, un);
 	}

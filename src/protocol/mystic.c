@@ -317,7 +317,7 @@ send_akill (const char *sender, const char *host, const char *ident, const char 
 void 
 send_rakill (const char *sender, const char *host, const char *ident)
 {
-	send_cmd (":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
+	send_cmd (":%s %s :%s@%s", ns_botptr->nick, MSG_REMGLINE, host, ident);
 }
 
 void

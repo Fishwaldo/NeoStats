@@ -31,7 +31,7 @@
 #undef OLDDATABASE
 
 
-void SaveStats()
+int SaveStats()
 {
 	SStats *s;
 	CStats *c;
@@ -42,12 +42,12 @@ void SaveStats()
 	SET_SEGV_LOCATION();
 
 	if (StatServ.newdb == 1) {
-		chanalert(s_StatServ, "Enabling Record yelling!");
+		chanalert(ss_bot->nick, "Enabling Record yelling!");
 		StatServ.newdb = 0;
 	}
 
 	if (StatServ.shutdown == 1) {
-		chanalert(s_Services, "Saving StatServ Database. this *could* take a while");
+		chanalert(ss_bot->nick, "Saving StatServ Database. this *could* take a while");
 	}
 	/* first thing we do is clear the old database */
 	DelTable("ServerStats");
@@ -128,8 +128,9 @@ void SaveStats()
 	SetData((void *)stats_network.maxchans, CFGINT, "NetStats", "Global", "MaxChans");
 	SetData((void *)stats_network.t_chans, CFGINT, "NetStats", "Global", "MaxChansTime");
 	if (StatServ.shutdown == 1) {
-		chanalert(s_Services, "Done");
+		chanalert(ss_bot->nick, "Done");
 	}
+	return 1;
 }
 
 void LoadStats() {
@@ -376,7 +377,7 @@ void save_chan(CStats *c) {
  * @returns nothing
  */
 
-void DelOldChan()
+int DelOldChan()
 {
 	char **row;
 	int count = 0;
@@ -404,6 +405,7 @@ void DelOldChan()
 	}
 	free(row);
 	nlog(LOG_INFO, "Took %d seconds to clean %d channel stats", (int)(time(NULL) - start), count);
+	return 1;
 }
 
 

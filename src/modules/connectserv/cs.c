@@ -94,23 +94,30 @@ struct cs_cfg {
 	int serv_watch;
 	int use_exc;
 	int modnum;
-	char user[MAXUSER];
-	char host[MAXHOST];
-	char realname[MAXREALNAME];
 } cs_cfg;
 
-static char s_ConnectServ[MAXNICK];
 static int cs_online = 0;
 static Bot *cs_bot;
+static BotInfo cs_botinfo = 
+{
+	"", 
+	"", 
+	"", 
+	"", 
+	"", 	
+};
 static Module* cs_module;
 ModuleInfo module_info = {
 	"ConnectServ",
 	"Network connection and mode monitoring service",
-	"NeoStats",
+	NULL,
+	NULL,
 	NEOSTATS_VERSION,
-	NEOSTATS_VERSION,
+	CORE_MODULE_VERSION,
 	__DATE__,
-	__TIME__
+	__TIME__,
+	0,
+	0,
 };
 
 static bot_cmd cs_commands[]=
@@ -122,10 +129,10 @@ static bot_cmd cs_commands[]=
 
 static bot_setting cs_settings[]=
 {
-	{"NICK",		&s_ConnectServ,		SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
-	{"USER",		&cs_cfg.user,		SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
-	{"HOST",		&cs_cfg.host,		SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&cs_cfg.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"NICK",		&cs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
+	{"USER",		&cs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
+	{"HOST",		&cs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
+	{"REALNAME",	&cs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
 	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "SignWatch",	NULL,	cs_help_set_signwatch },
 	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "KillWatch",	NULL,	cs_help_set_killwatch },
 	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "ModeWatch",	NULL,	cs_help_set_modewatch },
@@ -137,14 +144,13 @@ static bot_setting cs_settings[]=
 
 static int cs_about(User * u, char **av, int ac)
 {
-	privmsg_list(u->nick, s_ConnectServ, cs_help_about);
+	privmsg_list(u->nick, cs_bot->nick, cs_help_about);
 	return 1;
 }
 
 static int Online(char **av, int ac)
 {
-	cs_bot = init_bot(cs_module, s_ConnectServ, cs_cfg.user, cs_cfg.host, cs_cfg.realname, 
-		services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings);
+	cs_bot = init_bot (cs_module, &cs_botinfo, services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, cs_commands, cs_settings);
 	if(cs_bot)
 		cs_online = 1;
 	return 1;
@@ -183,10 +189,10 @@ void ModFini()
 static int cs_version(User * u, char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	prefmsg(u->nick, s_ConnectServ, "\2%s Version Information\2", s_ConnectServ);
-	prefmsg(u->nick, s_ConnectServ, "%s Version: %s Compiled %s at %s", module_info.module_name,
-		module_info.module_version, module_info.module_build_date, module_info.module_build_time);
-	prefmsg(u->nick, s_ConnectServ, "http://www.neostats.net");
+	prefmsg(u->nick, cs_bot->nick, "\2%s Version Information\2", cs_bot->nick);
+	prefmsg(u->nick, cs_bot->nick, "%s Version: %s Compiled %s at %s", module_info.name,
+		module_info.version, module_info.build_date, module_info.build_time);
+	prefmsg(u->nick, cs_bot->nick, "http://www.neostats.net");
 	return 1;
 }
 
@@ -218,7 +224,7 @@ static int cs_new_user(char **av, int ac)
 
 	/* Print Connection Notice */
 	if (cs_cfg.sign_watch) {
-		chanalert(s_ConnectServ, msg_signon,
+		chanalert(cs_bot->nick, msg_signon,
 			  u->nick, u->username, u->hostname, u->realname,
 			  u->server->name);
 	}
@@ -266,7 +272,7 @@ static int cs_del_user(char **av, int ac)
 
 			LocalCount = split_buf(lcl, &Local, 0);
 			KillMsg = joinbuf(Local, LocalCount, 7);
-			chanalert(s_ConnectServ,
+			chanalert(cs_bot->nick,
 				  msg_localkill,
 				  u->nick, u->username, u->hostname,
 				  Local[6], KillMsg);
@@ -281,7 +287,7 @@ static int cs_del_user(char **av, int ac)
 
 	/* Print Disconnection Notice */
 	if (cs_cfg.sign_watch) {
-		chanalert(s_ConnectServ,
+		chanalert(cs_bot->nick,
 			msg_signoff,
 			  u->nick, u->username, u->hostname, u->realname,
 			  u->server->name, QuitMsg);
@@ -300,13 +306,13 @@ static int cs_del_user(char **av, int ac)
 static int cs_report_mode(User* u, int add, char mode, const char* mode_desc, int serverinfo)
 {
 	if(serverinfo) {
-		chanalert(s_ConnectServ, msg_mode_serv, u->nick, 
+		chanalert(cs_bot->nick, msg_mode_serv, u->nick, 
 			add?"now":"no longer", 
 			mode_desc,
 			add?'+':'-',
 			mode, u->server->name);
 	} else {
-		chanalert(s_ConnectServ, msg_mode, u->nick, 
+		chanalert(cs_bot->nick, msg_mode, u->nick, 
 			add?"now":"no longer", 
 			mode_desc,
 			add?'+':'-',
@@ -383,7 +389,7 @@ static int cs_user_modes(char **av, int ac)
 #endif
 #ifdef UMODE_CH_BOT
 		case UMODE_CH_BOT:
-			chanalert(s_ConnectServ, msg_bot, u->nick, add?"now":"no longer", add?'+':'-', UMODE_CH_BOT);			
+			chanalert(cs_bot->nick, msg_bot, u->nick, add?"now":"no longer", add?'+':'-', UMODE_CH_BOT);			
 			break;
 #endif
 #ifdef UMODE_CH_SADMIN
@@ -528,11 +534,11 @@ static int cs_user_kill(char **av, int ac)
 
 	if (finduser(Kill[2])) {
 		/* it was a User who was killed */
-		chanalert(s_ConnectServ, msg_globalkill,
+		chanalert(cs_bot->nick, msg_globalkill,
 			u->nick, u->username, u->hostname,
 			Kill[0], GlobalMsg);
 	} else if (findserver(Kill[2])) {
-		chanalert(s_ConnectServ, msg_serverkill,
+		chanalert(cs_bot->nick, msg_serverkill,
 			u->nick, u->username, u->hostname,
 			Kill[0], GlobalMsg);
 	}
@@ -564,7 +570,7 @@ static int cs_user_nick(char **av, int ac)
 		/* its me, forget it */
 		return 1;
 	}
-	chanalert(s_ConnectServ, msg_nickchange,
+	chanalert(cs_bot->nick, msg_nickchange,
 		av[0], u->username, u->hostname, av[1]);
 	return 1;
 }
@@ -596,35 +602,35 @@ static void LoadConfig(void)
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
 #if !defined(HYBRID7)
-		strlcpy(s_ConnectServ , "ConnectServ", MAXNICK);
+		strlcpy(cs_bot->nick , "ConnectServ", MAXNICK);
 #else
 		/* just to be safe on hyrbid, keep connectservs nick less than 9 */
-		strlcpy(s_ConnectServ, "CS", MAXNICK);
+		strlcpy(cs_bot->nick, "CS", MAXNICK);
 #endif
 	}
 	else {
-		strlcpy(s_ConnectServ, temp, MAXNICK);
+		strlcpy(cs_bot->nick, temp, MAXNICK);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
-		strlcpy(cs_cfg.user, "CS", MAXUSER);
+		strlcpy(cs_botinfo.user, me.name, MAXUSER);
 	}
 	else {
-		strlcpy(cs_cfg.user, temp, MAXUSER);
+		strlcpy(cs_botinfo.user, temp, MAXUSER);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
-		strlcpy(cs_cfg.host, me.name, MAXHOST);
+		strlcpy(cs_botinfo.host, me.name, MAXHOST);
 	}
 	else {
-		strlcpy(cs_cfg.host, temp, MAXHOST);
+		strlcpy(cs_botinfo.host, temp, MAXHOST);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
-		strlcpy(cs_cfg.realname, "Connection Monitoring Service", MAXREALNAME);
+		strlcpy(cs_botinfo.realname, "Connection Monitoring Service", MAXREALNAME);
 	}
 	else {
-		strlcpy(cs_cfg.realname, temp, MAXREALNAME);
+		strlcpy(cs_botinfo.realname, temp, MAXREALNAME);
 		free(temp);
 	}
 }
@@ -644,7 +650,7 @@ static int cs_server_join(char **av, int ac)
 	if (cs_cfg.use_exc && IsExcluded(s)) 
 		return 1;
 
-	chanalert (s_ConnectServ, "\2SERVER\2 %s has joined the Network at %s",
+	chanalert (cs_bot->nick, "\2SERVER\2 %s has joined the Network at %s",
 		s->name, s->uplink);
 
 	return 1;
@@ -664,7 +670,7 @@ static int cs_server_quit(char **av, int ac)
 	if (cs_cfg.use_exc && IsExcluded(s)) 
 		return 1;
 
-	chanalert (s_ConnectServ, "\2SERVER\2 %s has left the Network at %s for %s",
+	chanalert (cs_bot->nick, "\2SERVER\2 %s has left the Network at %s for %s",
 		s->name, s->uplink, (ac == 2) ? av[1] : "");
 	return 1;
 }

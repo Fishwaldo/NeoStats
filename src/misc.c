@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include "neostats.h"
+#include "services.h"
 
 static char misc_buf[BUFSIZE];
 
@@ -305,5 +306,5 @@ debugtochannel(char *message, ...)
 	va_start (ap, message);
 	ircvsnprintf (misc_buf, BUFSIZE, message, ap);
 	va_end (ap);
-	chanalert (s_Services, misc_buf);
+	chanalert (ns_botptr->nick, misc_buf);
 }

@@ -39,7 +39,6 @@
 static char ban_buf[BANBUFSIZE];
 
 
-char s_HostServ[MAXNICK];
 typedef struct hs_map_ {
 	char nnick[MAXNICK];
 	char host[MAXHOST];
@@ -99,7 +98,7 @@ static void hs_delban(User * u, char *ban);
 
 static void SaveBans(void);
 static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who);
-void CleanupHosts(void);
+int CleanupHosts(void);
 static void LoadHosts(void);
 static void LoadConfig(void);
 
@@ -113,16 +112,27 @@ int DelArryCount = 0;
 int ListArryCount = 0;
 
 Bot *hs_bot;
+static BotInfo hs_botinfo = 
+{
+	"", 
+	"", 
+	"", 
+	"", 
+	"", 
+};
 static Module* hs_module;
 
 ModuleInfo module_info = {
 	"HostServ",
 	"Network virtual host service",
-	"NeoStats",
+	NULL,
+	NULL,
 	NEOSTATS_VERSION,
-	NEOSTATS_VERSION,
+	CORE_MODULE_VERSION,
 	__DATE__,
-	__TIME__
+	__TIME__,
+	0,
+	0,
 };
 
 static bot_cmd hs_commands[]=
@@ -141,10 +151,10 @@ static bot_cmd hs_commands[]=
 
 static bot_setting hs_settings[]=
 {
-	{"NICK",		&s_HostServ,		SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
-	{"USER",		&hs_cfg.user,		SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
-	{"HOST",		&hs_cfg.host,		SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
-	{"REALNAME",	&hs_cfg.realname,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"NICK",		&hs_botinfo.nick,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
+	{"USER",		&hs_botinfo.user,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
+	{"HOST",		&hs_botinfo.host,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
+	{"REALNAME",	&hs_botinfo.realname,SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
 	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 	NS_ULEVEL_ADMIN,	"ExpireDays",	"days",	hs_help_set_expire	},
 	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN,	"UnetVhosts",	NULL,	hs_help_set_hiddenhost	},
 	{"HOSTNAME",	&hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN,	"UnetDomain",	NULL,	hs_help_set_hostname	},
@@ -174,10 +184,10 @@ void del_vhost(hs_map *vhost) {
 
 void set_moddata(User *u) {
 	hs_user *hs;
-	if (!u->moddata[hs_cfg.modnum]) {
+	if (!u->moddata[hs_module->modnum]) {
 		hs = malloc(sizeof(hs_user));
 		hs->vhostset = 1;
-		u->moddata[hs_cfg.modnum] = hs;
+		u->moddata[hs_module->modnum] = hs;
 	}
 }
 
@@ -187,10 +197,10 @@ int del_moddata(char **av, int ac) {
 	u = finduser(av[0]);
 	if (!u) /* User not found */
 		return 1;
-	if (u->moddata[hs_cfg.modnum]) {
+	if (u->moddata[hs_module->modnum]) {
 		nlog(LOG_DEBUG2, "Freeing Module data");
-		free(u->moddata[hs_cfg.modnum]);
-		u->moddata[hs_cfg.modnum] = NULL;
+		free(u->moddata[hs_module->modnum]);
+		u->moddata[hs_module->modnum] = NULL;
 	}
 	return 1;
 }
@@ -217,8 +227,6 @@ static int hs_sign_on(char **av, int ac)
 	if (IsExcluded(u)) 
 		return 1;
 
-	if (findbot(u->nick))
-		return 1;
 	if (!load_synch)
 		return 1;
 
@@ -230,7 +238,7 @@ static int hs_sign_on(char **av, int ac)
 		nlog(LOG_DEBUG1, "Checking %s against %s for HostName Match", map->host, u->hostname);
 		if (fnmatch(map->host, u->hostname, 0) == 0) {
 			ssvshost_cmd(u->nick, map->vhost);
-			prefmsg(u->nick, s_HostServ,
+			prefmsg(u->nick, hs_bot->nick,
 				"Automatically setting your Virtual Host to %s",
 				map->vhost);
 			map->lused = me.now;
@@ -246,8 +254,7 @@ static int hs_sign_on(char **av, int ac)
 
 static int Online(char **av, int ac)
 {
-	hs_bot = init_bot(hs_module, s_HostServ, hs_cfg.user, hs_cfg.host, hs_cfg.realname, 
-		services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings);
+	hs_bot = init_bot(hs_module, &hs_botinfo, services_bot_modes, BOT_FLAG_DEAF, hs_commands, hs_settings);
 	add_timer (hs_module, CleanupHosts, "CleanupHosts", 7200);
 	LoadHosts();
 	return 1;
@@ -264,21 +271,14 @@ ModuleEvent module_events[] = {
 	{NULL, NULL}
 };
 
-int ModInit(int modnum, int apiver)
+int ModInit(Module* mod_ptr)
 {
-	/* Check that our compiled version if compatible with the calling version of NeoStats */
-	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
-		return NS_ERR_VERSION;
-	}
 	vhosts = list_create(-1);
 	bannedvhosts = hash_create(-1, 0, 0);
 	if (!vhosts) {
-		nlog(LOG_CRITICAL,
-		     "Error, Can't create vhosts hash");
-		chanalert(s_Services, "Error, Can't create Vhosts Hash");
+		nlog(LOG_CRITICAL, "Error, Can't create vhosts hash");
 		return -1;
 	}
-	hs_cfg.modnum = modnum;
 	LoadConfig();
 	return 1;
 }
@@ -330,14 +330,14 @@ int hs_mode(char **av, int ac) {
 			break;
 		case 'r':
 			if (add) {
-				if (u->moddata[hs_cfg.modnum] != NULL) {
+				if (u->moddata[hs_module->modnum] != NULL) {
 					nlog(LOG_DEBUG2, "not setting hidden host on %s", av[0]);
 					return -1;
 				}
 				nlog(LOG_DEBUG2, "Regnick Mode on %s", av[0]);
 				ircsnprintf(vhost, MAXHOST, "%s.%s", av[0], hs_cfg.vhostdom);
 				ssvshost_cmd(av[0], vhost);
-				prefmsg(av[0], s_HostServ,
+				prefmsg(av[0], hs_bot->nick,
 					"Automatically setting your Hidden Host to %s", vhost);
 				set_moddata(u);
 			}
@@ -371,7 +371,7 @@ static void hsdat(char *nick, char *host, char *vhost, char *pass, char *who)
 
 static int hs_about(User * u, char **av, int ac)
 {
-	privmsg_list(u->nick, s_HostServ, hs_help_about);
+	privmsg_list(u->nick, hs_bot->nick, hs_help_about);
 	return 1;
 }
 
@@ -379,7 +379,7 @@ static int hs_levels(User * u, char **av, int ac)
 {
 	int t;	
 	if (ac == 2) {
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"Configured Levels: Add: %d, Del: %d, List: %d, View: %d",
 			hs_cfg.add, hs_cfg.del, hs_cfg.list,hs_cfg.view);
 			return 1;
@@ -396,12 +396,12 @@ static int hs_levels(User * u, char **av, int ac)
 				SetConf((void *) &hs_cfg.view, CFGINT, "ViewLevel");
 			}
 		}
-		prefmsg(u->nick, s_HostServ, "Permission Denied");
+		prefmsg(u->nick, hs_bot->nick, "Permission Denied");
 	} else if (ac == 4) {
 		if (UserLevel(u) >= NS_ULEVEL_ADMIN) {
 			t = atoi(av[3]);
 			if ((t <= 0) || (t > NS_ULEVEL_ROOT)) {
-				prefmsg(u->nick, s_HostServ,
+				prefmsg(u->nick, hs_bot->nick,
 					"Invalid Level. Must be between 1 and %d", NS_ULEVEL_ROOT);
 				return 1;
 			}
@@ -422,20 +422,20 @@ static int hs_levels(User * u, char **av, int ac)
 				SetConf((void *) t, CFGINT,
 					"ViewLevel");
 			} else {
-				prefmsg(u->nick, s_HostServ,
+				prefmsg(u->nick, hs_bot->nick,
 					"Invalid Level. /msg %s help levels",
-					s_HostServ);
+					hs_bot->nick);
 				return 1;
 			}
-			prefmsg(u->nick, s_HostServ,
+			prefmsg(u->nick, hs_bot->nick,
 				"Level for %s set to %d", av[2],
 				t);
 			return 1;
 		}
-		prefmsg(u->nick, s_HostServ, "Permission Denied");
+		prefmsg(u->nick, hs_bot->nick, "Permission Denied");
 	}
-	prefmsg(u->nick, s_HostServ,
-		"Syntax error. /msg %s help levels", s_HostServ);
+	prefmsg(u->nick, hs_bot->nick,
+		"Syntax error. /msg %s help levels", hs_bot->nick);
 	return 1;
 }
 
@@ -453,19 +453,19 @@ static int hs_bans(User * u, char **av, int ac)
 				return 1;
 			}
 		} else {
-			prefmsg(u->nick, s_HostServ,
+			prefmsg(u->nick, hs_bot->nick,
 				"Permission Denied");
-			chanalert(s_HostServ,
+			chanalert(hs_bot->nick,
 					"%s tried to %s bans, but was not authorized",
 					u->nick, av[2]);
 			return 1;
 		}
 	} else {
 		/* if we get to here, bah, stupid lusers */
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"Syntax: /msg %s BANS [DEL/ADD] <options>",
-			s_HostServ);
-		prefmsg(u->nick, s_HostServ, "/msg %s help bans for more info", s_HostServ);
+			hs_bot->nick);
+		prefmsg(u->nick, hs_bot->nick, "/msg %s help bans for more info", hs_bot->nick);
 	}
 	return 1;
 }
@@ -476,12 +476,12 @@ static void hs_listban(User * u)
 	hscan_t hs;
 	int i = 0;
 	hash_scan_begin(&hs, bannedvhosts);
-	prefmsg(u->nick, s_HostServ, "Banned Hostnames for Vhosts");
+	prefmsg(u->nick, hs_bot->nick, "Banned Hostnames for Vhosts");
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		prefmsg(u->nick, s_HostServ, "%d - %s", ++i,
+		prefmsg(u->nick, hs_bot->nick, "%d - %s", ++i,
 			(char *) hnode_get(hn));
 	}
-	prefmsg(u->nick, s_HostServ, "End of List.");
+	prefmsg(u->nick, hs_bot->nick, "End of List.");
 
 }
 static void hs_addban(User * u, char *ban)
@@ -490,7 +490,7 @@ static void hs_addban(User * u, char *ban)
 	char *host;
 
 	if (hash_lookup(bannedvhosts, ban) != NULL) {
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"%s already exists in the banned vhost list", ban);
 		return;
 	}
@@ -498,9 +498,9 @@ static void hs_addban(User * u, char *ban)
 	strlcpy(host, ban, MAXHOST);
 	hn = hnode_create(host);
 	hash_insert(bannedvhosts, hn, host);
-	prefmsg(u->nick, s_HostServ,
+	prefmsg(u->nick, hs_bot->nick,
 		"%s has been added to the Banned Vhosts list", ban);
-	chanalert(s_HostServ, "%s added %s to the banned vhosts list",
+	chanalert(hs_bot->nick, "%s added %s to the banned vhosts list",
 		  u->nick, ban);
 	SaveBans();
 }
@@ -514,9 +514,9 @@ static void hs_delban(User * u, char *ban)
 
 	i = atoi(ban);
 	if ((i < 1) || (i > hash_count(bannedvhosts))) {
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"Invalid Entry. /msg %s bans for the list",
-			s_HostServ);
+			hs_bot->nick);
 		return;
 	}
 
@@ -525,10 +525,10 @@ static void hs_delban(User * u, char *ban)
 		++j;
 		if (i == j) {
 			hash_scan_delete(bannedvhosts, hn);
-			prefmsg(u->nick, s_HostServ,
+			prefmsg(u->nick, hs_bot->nick,
 				"Deleted %s from the banned vhost list",
 				(char *) hnode_get(hn));
-			chanalert(s_HostServ,
+			chanalert(hs_bot->nick,
 				  "%s deleted %s from the banned vhost list",
 				  u->nick, (char *) hnode_get(hn));
 			nlog(LOG_NOTICE,
@@ -540,7 +540,7 @@ static void hs_delban(User * u, char *ban)
 			return;
 		}
 	}
-	prefmsg(u->nick, s_HostServ, "Entry %d was not found (Weird?!?)", i);
+	prefmsg(u->nick, hs_bot->nick, "Entry %d was not found (Weird?!?)", i);
 }
 
 static void SaveBans()
@@ -576,9 +576,9 @@ static int hs_chpass(User * u, char **av, int ac)
 		    || (UserLevel(u) >= 100)) {
 			if (!ircstrcasecmp(map->passwd, oldpass)) {
 				strlcpy(map->passwd, newpass, MAXPASSWORD);
-				prefmsg(u->nick, s_HostServ,
+				prefmsg(u->nick, hs_bot->nick,
 					"Password Successfully changed");
-				chanalert(s_HostServ,
+				chanalert(hs_bot->nick,
 					  "%s changed the password for %s",
 					  u->nick, map->nnick);
 				map->lused = me.now;
@@ -586,9 +586,9 @@ static int hs_chpass(User * u, char **av, int ac)
 				return 1;
 			}
 		} else {
-			prefmsg(u->nick, s_HostServ, 
+			prefmsg(u->nick, hs_bot->nick, 
 				"Error, Hostname Mis-Match");
-			chanalert(s_HostServ,
+			chanalert(hs_bot->nick,
 				  "%s tried to change the password for %s, but the hosts do not match (%s->%s)",
 				  u->nick, map->nnick, u->hostname,
 				  map->host);
@@ -599,9 +599,9 @@ static int hs_chpass(User * u, char **av, int ac)
 		}
 	}
 
-	prefmsg(u->nick, s_HostServ,
+	prefmsg(u->nick, hs_bot->nick,
 		"Invalid Username or Password. Access Denied");
-	chanalert(s_HostServ,
+	chanalert(hs_bot->nick,
 		  "%s tried to change the password for %s, but got it wrong",
 		  u->nick, nick);
 	return 1;
@@ -629,7 +629,7 @@ static int hs_add(User * u, char **av, int ac)
 	hash_scan_begin(&hs, bannedvhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
 		if (fnmatch(hnode_get(hn), h, 0) == 0) {
-			prefmsg(u->nick, s_HostServ,
+			prefmsg(u->nick, hs_bot->nick,
 				"The Hostname %s has been matched against the banned hostname %s",
 				h, (char *) hnode_get(hn));
 			chanalert(u->nick,
@@ -645,27 +645,27 @@ static int hs_add(User * u, char **av, int ac)
 		nlog(LOG_NOTICE,
 		     "%s added a vhost for %s with realhost %s vhost %s and password %s",
 		     u->nick, cmd, m, h, p);
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",
 			cmd, m, h, p);
-		chanalert(s_HostServ,
+		chanalert(hs_bot->nick,
 			  "%s added a vhost %s for %s with realhost %s",
 			  u->nick, h, cmd, m);
 		/* Apply The New Hostname If The User Is Online */
 		if ((nu = finduser(cmd)) != NULL) {
-			if (findbot(cmd))
+			if (IsMe(nu)) 
 				return 1;
 			if (fnmatch(m, nu->hostname, 0) == 0) {
 				ssvshost_cmd(nu->nick, h);
-				prefmsg(u->nick, s_HostServ,
+				prefmsg(u->nick, hs_bot->nick,
 					"%s is online now, setting vhost to %s",
 					cmd, h);
-				prefmsg(cmd, s_HostServ,
+				prefmsg(cmd, hs_bot->nick,
 					"Your Vhost has been created with Real HostMask of %s and username %s with password %s",
 					m, cmd, p);
-				prefmsg(cmd, s_HostServ,
+				prefmsg(cmd, hs_bot->nick,
 					"For security, you should change your vhost password. See /msg %s help chpass",
-					s_HostServ);
+					hs_bot->nick);
 #ifdef UMODE_REGNICK
 				set_moddata(nu);
 #endif
@@ -673,7 +673,7 @@ static int hs_add(User * u, char **av, int ac)
 			}
 		}
 	} else {
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"%s already has a HostServ Entry", cmd);
 	}
 	return 1;
@@ -696,14 +696,14 @@ static int hs_list(User * u, char **av, int ac)
 	}
 
 	if (start >= list_count(vhosts)) {
-		prefmsg(u->nick, s_HostServ,  "Value out of Range. There are only %d entries", (int)list_count(vhosts));
+		prefmsg(u->nick, hs_bot->nick,  "Value out of Range. There are only %d entries", (int)list_count(vhosts));
 		return 1;
 	}
 		
 	i = 1;
-	prefmsg(u->nick, s_HostServ, "Current HostServ VHOST list: ");
-	prefmsg(u->nick, s_HostServ, "Showing %d to %d entries of %d total Vhosts", start+1, start+20, (int)list_count(vhosts));
-	prefmsg(u->nick, s_HostServ, "%-5s %-12s %-30s", "Num", "Nick",
+	prefmsg(u->nick, hs_bot->nick, "Current HostServ VHOST list: ");
+	prefmsg(u->nick, hs_bot->nick, "Showing %d to %d entries of %d total Vhosts", start+1, start+20, (int)list_count(vhosts));
+	prefmsg(u->nick, hs_bot->nick, "%-5s %-12s %-30s", "Num", "Nick",
 		"Vhost");
 	hn = list_first(vhosts);
 	while (hn != NULL) {
@@ -713,7 +713,7 @@ static int hs_list(User * u, char **av, int ac)
 			continue;
 		}
 		map = lnode_get(hn);
-		prefmsg(u->nick, s_HostServ, "%-5d %-12s %-30s", i,
+		prefmsg(u->nick, hs_bot->nick, "%-5d %-12s %-30s", i,
 			map->nnick, map->vhost);
 		i++;
 		/* limit to x entries per screen */
@@ -721,12 +721,12 @@ static int hs_list(User * u, char **av, int ac)
 			break;
 		hn = list_next(vhosts, hn);
 	}
-	prefmsg(u->nick, s_HostServ,
+	prefmsg(u->nick, hs_bot->nick,
 		"For more information on someone use /msg %s VIEW #",
-		s_HostServ);
-	prefmsg(u->nick, s_HostServ, "--- End of List ---");
+		hs_bot->nick);
+	prefmsg(u->nick, hs_bot->nick, "--- End of List ---");
 	if (list_count(vhosts) >= i) 
-	prefmsg(u->nick, s_HostServ, "Type \2/msg %s list %d\2 to see next page", s_HostServ, i-1);
+	prefmsg(u->nick, hs_bot->nick, "Type \2/msg %s list %d\2 to see next page", hs_bot->nick, i-1);
 	return 1;
 }
 
@@ -742,11 +742,11 @@ static int hs_view(User * u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	tmpint = atoi(av[2]);
 	if (!tmpint) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s VIEW #", s_HostServ);
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
+			"Syntax: /msg %s VIEW #", hs_bot->nick);
+		prefmsg(u->nick, hs_bot->nick,
 			"The users # is got from /msg %s LIST",
-			s_HostServ);
+			hs_bot->nick);
 		return 1;
 	}
 	i = 1;
@@ -754,23 +754,23 @@ static int hs_view(User * u, char **av, int ac)
 	while (hn != NULL) {
 		if (tmpint == i) {
 			map = lnode_get(hn);
-			prefmsg(u->nick, s_HostServ, "Virtual Host information:");
-			prefmsg(u->nick, s_HostServ, "Nick:     %s", map->nnick);
-			prefmsg(u->nick, s_HostServ, "RealHost: %s", map->host);
-			prefmsg(u->nick, s_HostServ, "V-host:   %s", map->vhost);
-			prefmsg(u->nick, s_HostServ, "Password: %s", map->passwd);
-			prefmsg(u->nick, s_HostServ, "Added by: %s",
+			prefmsg(u->nick, hs_bot->nick, "Virtual Host information:");
+			prefmsg(u->nick, hs_bot->nick, "Nick:     %s", map->nnick);
+			prefmsg(u->nick, hs_bot->nick, "RealHost: %s", map->host);
+			prefmsg(u->nick, hs_bot->nick, "V-host:   %s", map->vhost);
+			prefmsg(u->nick, hs_bot->nick, "Password: %s", map->passwd);
+			prefmsg(u->nick, hs_bot->nick, "Added by: %s",
 				map->added ? map->added : "<unknown>");
 			strftime(ltime, 80, "%d/%m/%Y[%H:%M]", localtime(&map->lused));
-			prefmsg(u->nick, s_HostServ, "Last Used on %s", ltime);
-			prefmsg(u->nick, s_HostServ, "--- End of information for %s ---",
+			prefmsg(u->nick, hs_bot->nick, "Last Used on %s", ltime);
+			prefmsg(u->nick, hs_bot->nick, "--- End of information for %s ---",
 				map->nnick);
 		}
 		hn = list_next(vhosts, hn);
 		i++;
 	}
 	if (tmpint > i)
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"ERROR: There is no vhost on list number \2%d\2",
 			tmpint);
 	return 1;
@@ -869,11 +869,11 @@ static int hs_del(User * u, char **av, int ac)
 	SET_SEGV_LOCATION();
 	tmpint = atoi(av[2]);
 	if (!tmpint) {
-		prefmsg(u->nick, s_HostServ,
-			"Syntax: /msg %s DEL #", s_HostServ);
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
+			"Syntax: /msg %s DEL #", hs_bot->nick);
+		prefmsg(u->nick, hs_bot->nick,
 			"The users # is got from /msg %s LIST",
-			s_HostServ);
+			hs_bot->nick);
 		return 1;
 	}
 
@@ -881,14 +881,14 @@ static int hs_del(User * u, char **av, int ac)
 	while (hn != NULL) {
 		if (i == tmpint) {
 			map = lnode_get(hn);
-			prefmsg(u->nick, s_HostServ,
+			prefmsg(u->nick, hs_bot->nick,
 				"The following vhost was removed from the Vhosts Database");
-			prefmsg(u->nick, s_HostServ, "\2%s - %s\2",
+			prefmsg(u->nick, hs_bot->nick, "\2%s - %s\2",
 				map->nnick, map->vhost);
 			nlog(LOG_NOTICE,
 			     "%s removed the VHOST: %s for %s", u->nick,
 			     map->vhost, map->nnick);
-			chanalert(s_HostServ, "%s removed vhost %s for %s",
+			chanalert(hs_bot->nick, "%s removed vhost %s for %s",
 				  u->nick, map->vhost, map->nnick);
 			del_vhost(map);
 			list_delete(vhosts, hn);
@@ -900,7 +900,7 @@ static int hs_del(User * u, char **av, int ac)
 	}
 
 	if (tmpint > i)
-		prefmsg(u->nick, s_HostServ,
+		prefmsg(u->nick, hs_bot->nick,
 			"ERROR: There is no vhost on list number \2%d\2",
 			tmpint);
 	return 1;
@@ -925,12 +925,12 @@ static int hs_login(User * u, char **av, int ac)
 		if (!ircstrcasecmp(map->passwd, pass)) {
 			ssvshost_cmd(u->nick, map->vhost);
 			map->lused = me.now;
-			prefmsg(u->nick, s_HostServ,
+			prefmsg(u->nick, hs_bot->nick,
 				"Your VHOST %s has been set.", map->vhost);
 			nlog(LOG_NORMAL,
 			     "%s used LOGIN to obtain userhost of %s",
 			     u->nick, map->vhost);
-			chanalert(s_HostServ,
+			chanalert(hs_bot->nick,
 				  "%s used login to get Vhost %s", u->nick,
 				  map->vhost);
 #ifdef UMODE_REGNICK
@@ -940,12 +940,12 @@ static int hs_login(User * u, char **av, int ac)
 			return 1;
 		}
 	}
-	prefmsg(u->nick, s_HostServ,
+	prefmsg(u->nick, hs_bot->nick,
 		"Incorrect Login or Password.  Do you have a vhost added?");
 	return 1;
 }
 
-void CleanupHosts()
+int CleanupHosts()
 {
 	lnode_t *hn, *hn2;
 	hs_map *map;
@@ -953,7 +953,7 @@ void CleanupHosts()
 	SET_SEGV_LOCATION();
 	/* Use zero value to disable this feature */
 	if(hs_cfg.old == 0)
-		return;
+		return 1;
 	hn = list_first(vhosts);
 	while (hn != NULL) {
 		map = lnode_get(hn);
@@ -970,6 +970,7 @@ void CleanupHosts()
 			hn = list_next(vhosts, hn);
 		}
 	}
+		return 1;
 }
 
 /* 
@@ -985,31 +986,31 @@ static void LoadConfig(void)
 	SET_SEGV_LOCATION();
 
 	if (GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
-		strlcpy(s_HostServ, "HostServ", MAXNICK);
+		strlcpy(hs_bot->nick, "HostServ", MAXNICK);
 	}
 	else {
-		strlcpy(s_HostServ, temp, MAXNICK);
+		strlcpy(hs_bot->nick, temp, MAXNICK);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
-		strlcpy(hs_cfg.user, "HS", MAXUSER);
+		strlcpy(hs_botinfo.user, "HS", MAXUSER);
 	}
 	else {
-		strlcpy(hs_cfg.user, temp, MAXUSER);
+		strlcpy(hs_botinfo.user, temp, MAXUSER);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
-		strlcpy(hs_cfg.host, me.name, MAXHOST);
+		strlcpy(hs_botinfo.host, me.name, MAXHOST);
 	}
 	else {
-		strlcpy(hs_cfg.host, temp, MAXHOST);
+		strlcpy(hs_botinfo.host, temp, MAXHOST);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
-		strlcpy(hs_cfg.realname, "Network Virtual Host Service", MAXREALNAME);
+		strlcpy(hs_botinfo.realname, "Network Virtual Host Service", MAXREALNAME);
 	}
 	else {
-		strlcpy(hs_cfg.realname, temp, MAXREALNAME);
+		strlcpy(hs_botinfo.realname, temp, MAXREALNAME);
 		free(temp);
 	}
 

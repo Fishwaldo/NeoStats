@@ -106,6 +106,12 @@ ConfLoad ()
 		printf ("***************************************************\n");
 		return NS_FAILURE;
 	}
+	if (me.die) {
+		printf ("\n-----> ERROR: Read the README file then edit %s! <-----\n\n",CONFIG_NAME);
+		nlog (LOG_CRITICAL, "Read the README file then edit %s",CONFIG_NAME);
+		return NS_FAILURE;
+	}
+
 	printf ("Sucessfully Loaded Config File, Now Booting NeoStats\n");
 
 	/* if all bots should join the chan */
@@ -256,10 +262,10 @@ cb_Server (char *arg, int configtype)
 		me.r_time = atoi (arg);
 	} else if (configtype == 7) {
 		/* NeoStat Host */
-		strlcpy (me.host, arg, MAXHOST);
+		strlcpy (ns_botinfo.host, arg, MAXHOST);
 	} else if (configtype == 8) {
 		/* NeoStat User */
-		strlcpy (me.user, arg, MAXUSER);
+		strlcpy (ns_botinfo.user, arg, MAXUSER);
 	} else if (configtype == 9) {
 		me.want_privmsg = 1;
 	} else if (configtype == 10) {

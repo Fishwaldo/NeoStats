@@ -26,6 +26,8 @@
 #ifndef SOCK_H
 #define SOCK_H
 
+extern int servsock;
+
 int ConnectTo (char * host, int port);
 void read_loop (void);
 int getmaxsock (void);
@@ -36,5 +38,6 @@ int check_sql_sock();
 int list_sockets (User * u, char **av, int ac);
 int InitSocks (void);
 int FiniSocks (void);
+int del_sockets (Module *mod_ptr);
 
 #endif

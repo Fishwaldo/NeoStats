@@ -34,7 +34,7 @@ void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);
 #endif
-int init_user_hash (void);
+int InitUsers (void);
 void UserAway (const char *nick, const char *awaymsg);
 void DelUser (const char *nick, int killflag, const char *reason);
 int InitExtAuth(void);

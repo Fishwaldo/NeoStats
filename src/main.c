@@ -53,8 +53,9 @@
 char segv_location[SEGV_LOCATION_BUFSIZE];
 char segv_inmodule[SEGV_INMODULE_BUFSIZE];
 
-/* this is the name of the services bot */
-char s_Services[MAXNICK] = "NeoStats";
+/*! File handle for segfault report */
+static FILE *segfault;
+
 /*! Date when we were compiled */
 const char version_date[] = __DATE__;
 /*! Time we were compiled */
@@ -65,61 +66,16 @@ static void setup_signals (void);
 static int get_options (int argc, char **argv);
 
 /*! have we forked */
-int forked = 0;
+static int forked = 0;
 static int attempts = 0;
 jmp_buf sigvbuf;
 
-/** @brief Main Entry point into program
+/** @brief init me structure
  *
- * Sets up defaults, and parses the config file.
- * Also initializes different parts of NeoStats
- * 
- * @return Exits the program!
- *
- * @todo Close STDIN etc correctly
+ * @return 
  */
-int
-main (int argc, char *argv[])
+void InitMe(void)
 {
-	FILE *fp;
-
-	/* initialise version */
-	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
-	strlcpy(me.versionfull, NEOSTATS_VERSION, VERSIONSIZE);
-	strlcat(me.versionfull, ircd_version, VERSIONSIZE);
-
-	/* get our commandline options */
-	if(get_options (argc, argv)!=NS_SUCCESS)
-		return EXIT_FAILURE;
-
-	/* Change to the working Directory */
-#if 0
-	if (chdir (NEO_PREFIX) < 0) {
-		printf ("NeoStats Could not change to %s\n", NEO_PREFIX);
-		printf ("Did you 'make install' after compiling?\n");
-		printf ("Error Was: %s\n", strerror (errno));
-		return EXIT_FAILURE;
-	}
-#endif
-
-	/* before we do anything, make sure logging is setup */
-	if(init_logs () != NS_SUCCESS)
-		return EXIT_FAILURE;
-
-	/* our crash trace variables */
-	SET_SEGV_LOCATION();
-	CLEAR_SEGV_INMODULE();
-
-	/* keep quiet if we are told to :) */
-	if (!config.quiet) {
-		printf ("NeoStats %s Loading...\n", me.versionfull);
-		printf ("-----------------------------------------------\n");
-		printf ("Copyright: NeoStats Group. 2000-2004\n");
-		printf ("Justin Hammond (fish@neostats.net)\n");
-		printf ("Adam Rutter (shmad@neostats.net)\n");
-		printf ("Mark (m@neostats.net)\n");
-		printf ("-----------------------------------------------\n\n");
-	}
 	/* set some defaults before we parse the config file */
 	me.t_start = time(NULL);
 	me.now = time(NULL);
@@ -147,13 +103,14 @@ main (int argc, char *argv[])
 #ifdef SQLSRV
 	me.sqlport = 8888;
 #endif
-	/* if we are doing recv.log, remove the previous version */
-	if (config.recvlog)
-		remove (RECV_LOG);
+}
 
-	/* prepare to catch errors */
-	setup_signals ();
-
+/** @brief init core sub systems
+ *
+ * @return 
+ */
+int InitCore(void)
+{
 	/* init the sql subsystem if used */
 #ifdef SQLSRV
 	rta_init(sqlsrvlog);
@@ -161,68 +118,112 @@ main (int argc, char *argv[])
 		
 	/* initilze our Module subsystem */
 	if(InitModules () != NS_SUCCESS)
-		return EXIT_FAILURE;
+		return NS_FAILURE;
 	if(InitTimers() != NS_SUCCESS)
-		return EXIT_FAILURE;
+		return NS_FAILURE;
 	if(InitBots() != NS_SUCCESS)
-		return EXIT_FAILURE;
+		return NS_FAILURE;
 	if(InitSocks() != NS_SUCCESS)
-		return EXIT_FAILURE;
-
+		return NS_FAILURE;
 	/* load the config files */
 	if(ConfLoad () != NS_SUCCESS)
-		return EXIT_FAILURE;
-
-	/* init NeoStats bot */
-	if(init_services () != NS_SUCCESS)
-		return EXIT_FAILURE;
-
-#ifdef EXTAUTH
-	/* load extauth if we need to */
-	load_module ("extauth", NULL);
-	InitExtAuth();
-#endif
-
-	if (me.die) {
-		printf ("\n-----> ERROR: Read the README file then edit %s! <-----\n\n",CONFIG_NAME);
-		nlog (LOG_CRITICAL, "Read the README file and edit your %s",CONFIG_NAME);
-		/* we are exiting the parent, not the program, so just return */
-		return EXIT_FAILURE;
-	}
-
+		return NS_FAILURE;
 	/* initialize the rest of the subsystems */
-	if(init_dns () != NS_SUCCESS)
-		return EXIT_FAILURE;
+	if (init_dns () != NS_SUCCESS)
+		return NS_FAILURE;
 	if (init_exclude_list() != NS_SUCCESS)
-		return EXIT_FAILURE;
-	if(init_server_hash () != NS_SUCCESS)
-		return EXIT_FAILURE;
-	if(init_user_hash () != NS_SUCCESS)
-		return EXIT_FAILURE;
-	if(init_chan_hash () != NS_SUCCESS)
-		return EXIT_FAILURE;
-	if(InitBans () != NS_SUCCESS)
-		return EXIT_FAILURE;	
+		return NS_FAILURE;
+	if (InitServers () != NS_SUCCESS)
+		return NS_FAILURE;
+	if (InitUsers () != NS_SUCCESS)
+		return NS_FAILURE;
+	if (InitChannels () != NS_SUCCESS)
+		return NS_FAILURE;
+	if (InitBans () != NS_SUCCESS)
+		return NS_FAILURE;	
 	/* initilize out transfer subsystem */
 	if (init_curl () != NS_SUCCESS)
-		return EXIT_FAILURE;
+		return NS_FAILURE;
 	init_ircd ();
+}
 
+/** @brief Main Entry point into program
+ *
+ * Sets up defaults, and parses the config file.
+ * Also initializes different parts of NeoStats
+ * 
+ * @return Exits the program!
+ *
+ * @todo Close STDIN etc correctly
+ */
+int
+main (int argc, char *argv[])
+{
+	FILE *fp;
+
+	/* initialise version */
+	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
+	strlcpy(me.versionfull, NEOSTATS_VERSION, VERSIONSIZE);
+	strlcat(me.versionfull, ircd_version, VERSIONSIZE);
+
+	/* get our commandline options */
+	if(get_options (argc, argv)!=NS_SUCCESS)
+		return EXIT_FAILURE;
+
+#if 0
+	/* Change to the working Directory */
+	if (chdir (NEO_PREFIX) < 0) {
+		printf ("NeoStats Could not change to %s\n", NEO_PREFIX);
+		printf ("Did you 'make install' after compiling?\n");
+		printf ("Error Was: %s\n", strerror (errno));
+		return EXIT_FAILURE;
+	}
+#endif
+
+	/* before we do anything, make sure logging is setup */
+	if(InitLogs () != NS_SUCCESS)
+		return EXIT_FAILURE;
+
+	/* our crash trace variables */
+	SET_SEGV_LOCATION();
+	CLEAR_SEGV_INMODULE();
+
+	/* keep quiet if we are told to :) */
+	if (!config.quiet) {
+		printf ("NeoStats %s Loading...\n", me.versionfull);
+		printf ("-----------------------------------------------\n");
+		printf ("Copyright: NeoStats Group. 2000-2004\n");
+		printf ("Justin Hammond (fish@neostats.net)\n");
+		printf ("Adam Rutter (shmad@neostats.net)\n");
+		printf ("Mark Hetherington (m@neostats.net)\n");
+		printf ("-----------------------------------------------\n\n");
+	}
+
+	InitMe();
+	/* if we are doing recv.log, remove the previous version */
+	if (config.recvlog)
+		remove (RECV_LOG);
+
+	/* prepare to catch errors */
+	setup_signals ();
+
+	if (InitCore () != NS_SUCCESS)
+		return EXIT_FAILURE;
 
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
 	if (!config.foreground) {
 		/* fix the double log message problem by closing logs prior to fork() */ 
-		close_logs(); 
+		CloseLogs (); 
 		forked = fork ();
 		/* Error check fork() */ 
-		if (forked<0) { 
+		if (forked < 0) { 
 			perror("fork"); 
 			return EXIT_FAILURE; /* fork error */ 
 		} 
 #endif
 		/* we are the parent */ 
-		if (forked>0) { 
+		if (forked > 0) { 
 			/* write out our PID */
 			fp = fopen (PID_FILENAME, "w");
 			fprintf (fp, "%i", forked);
@@ -237,7 +238,7 @@ main (int argc, char *argv[])
 #ifndef DEBUG
 		/* child (daemon) continues */ 
 		/* reopen logs for child */ 
-		if(init_logs () != NS_SUCCESS)
+		if(InitLogs () != NS_SUCCESS)
 			return EXIT_FAILURE;
 		/* detach from parent process */
 		if (setpgid (0, 0) < 0) {
@@ -358,9 +359,9 @@ serv_die ()
 #else /* VALGRIND */
 	User *u;
 
-	u = finduser (s_Services);
+	u = finduser (ns_botptr->nick);
 	nlog (LOG_CRITICAL, msg_sigterm);
-	globops (s_Services, msg_sigterm);
+	globops (ns_botptr->nick, msg_sigterm);
 	do_exit (NS_EXIT_NORMAL, msg_sigterm);
 #endif /* VALGRIND */
 }
@@ -377,7 +378,7 @@ serv_die ()
 RETSIGTYPE
 conf_rehash ()
 {
-	chanalert (s_Services, "SIGHUP received, attempting to rehash");
+	chanalert (ns_botptr->nick, "SIGHUP received, attempting to rehash");
 	globops (me.name, "SIGHUP received, attempted to rehash");
 	/* at the moment, the reshash just checks for a the SQL port is opened, if enabled */
 #ifdef SQLSRV
@@ -400,7 +401,7 @@ conf_rehash ()
  *
  */
 #ifndef HAVE_BACKTRACE
-static char backtrace_unavailable[]="Backtrace not available on this platform";
+static char backtrace_unavailable[]="Backtrace not available on this platform\n";
 #endif
 static 
 void do_backtrace(void)
@@ -411,67 +412,76 @@ void do_backtrace(void)
 	char **strings;
 	int i;
 
-	nlog (LOG_CRITICAL, "Backtrace:");
-	chanalert (s_Services, "Backtrace: %s", segv_location);
+	fprintf (segfault, "Backtrace:\n");
+	chanalert (ns_botptr->nick, "Backtrace: %s", segv_location);
 	size = backtrace (array, 10);
 	strings = backtrace_symbols (array, size);
 	for (i = 1; i < size; i++) {
-		chanalert (s_Services, "Backtrace(%d): %s", i, strings[i]);
-		nlog (LOG_CRITICAL, "BackTrace(%d): %s", i - 1, strings[i]);
+		chanalert (ns_botptr->nick, "Backtrace(%d): %s", i, strings[i]);
+		fprintf (segfault, "BackTrace(%d): %s\n", i - 1, strings[i]);
 	}
 	free (strings);
 #else
-	chanalert (s_Services, backtrace_unavailable);
-	nlog (LOG_CRITICAL, backtrace_unavailable);
+	chanalert (ns_botptr->nick, backtrace_unavailable);
+	fprintf (segfault, backtrace_unavailable);
 #endif
 }
 
 RETSIGTYPE
 serv_segv ()
 {
+	va_list ap;
 	char name[MAX_MOD_NAME];
 	/** if the segv happened while we were inside a module, unload and try to restore 
 	 *  the stack to where we were before we jumped into the module
 	 *  and continue on
 	 */
+
+	segfault = fopen ("segfault.log", "a");
 	if (segv_inmodule[0] != 0) {
-		globops (me.name, "Segmentation Fault in %s. Refer to log file for details.", segv_inmodule);
-		chanalert (s_Services, "Segmentation Fault in %s. Refer to log file for details.", segv_inmodule);
-		nlog (LOG_CRITICAL, "------------------------SEGFAULT REPORT-------------------------");
-		nlog (LOG_CRITICAL, "Please view the README for how to submit a bug report");
-		nlog (LOG_CRITICAL, "and include this segfault report in your submission.");
-		nlog (LOG_CRITICAL, "Module:   %s", segv_inmodule);
-		nlog (LOG_CRITICAL, "Location: %s", segv_location);
-		nlog (LOG_CRITICAL, "recbuf:   %s", recbuf);
-		nlog (LOG_CRITICAL, "Unloading Module and restoring stacks. Backtrace:");
-		chanalert (s_Services, "Location *could* be %s.", segv_location);
+		globops (me.name, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
+		chanalert (ns_botptr->nick, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
+		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
+		fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
+		fprintf (segfault, "Please view the README for how to submit a bug report\n");
+		fprintf (segfault, "and include this segfault report in your submission.\n");
+		fprintf (segfault, "Version:  %s\n", me.versionfull);
+		fprintf (segfault, "Module:   %s\n", segv_inmodule);
+		fprintf (segfault, "Location: %s\n", segv_location);
+		fprintf (segfault, "recbuf:   %s\n", recbuf);
+		fprintf (segfault, "Unloading Module and restoring stacks. Backtrace:\n");
+		chanalert (ns_botptr->nick, "Location *could* be %s.", segv_location);
 		do_backtrace();
-		nlog (LOG_CRITICAL, "-------------------------END OF REPORT--------------------------");
+		fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
+		fflush (segfault);
+		fclose (segfault);		
 		strlcpy (name, segv_inmodule, MAX_MOD_NAME);
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
-		chanalert (s_Services, "Restoring Stack to before Crash");
+		chanalert (ns_botptr->nick, "Restoring Stack to before Crash");
 		/* flush the logs out */
-		close_logs(); 
+		CloseLogs (); 
 		longjmp (sigvbuf, -1);
-		chanalert (s_Services, "Done");
+		chanalert (ns_botptr->nick, "Done");
 		return;
 	}
 	/** The segv happened in our core, damn it */
 	/* Thanks to Stskeeps and Unreal for this stuff :) */
 	/* Broadcast it out! */
-	globops (me.name, "Segmentation Fault. Server Terminating. Refer to log file for details.");
-	chanalert (s_Services, "Segmentation Fault. Server Terminating. Refer to log file for details.");
-	globops (me.name, "Buffer: %s, Approx Location %s", recbuf, segv_location);
-	chanalert (s_Services, "NeoStats (%s) Buffer: %s, Approx Location: %s Backtrace:", me.versionfull, recbuf, segv_location);
-	nlog (LOG_CRITICAL, "------------------------SEGFAULT REPORT-------------------------");
-	nlog (LOG_CRITICAL, "Please view the README for how to submit a bug report");
-	nlog (LOG_CRITICAL, "and include this segfault report in your submission.");
-	nlog (LOG_CRITICAL, "Location: %s", segv_location);
-	nlog (LOG_CRITICAL, "recbuf:   %s", recbuf);
+	globops (me.name, "Segmentation fault. Server terminating. Refer to segfault.log.");
+	chanalert (ns_botptr->nick, "Segmentation fault. Server terminating. Refer to segfault.log.");
+	nlog (LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log.");
+	fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
+	fprintf (segfault, "Please view the README for how to submit a bug report\n");
+	fprintf (segfault, "and include this segfault report in your submission.\n");
+	fprintf (segfault, "Version:  %s\n", me.versionfull);
+	fprintf (segfault, "Location: %s\n", segv_location);
+	fprintf (segfault, "recbuf:   %s\n", recbuf);
 	do_backtrace();
-	nlog (LOG_CRITICAL, "-------------------------END OF REPORT--------------------------");
-	close_logs();
+	fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
+	fflush (segfault);
+	fclose (segfault);		
+	CloseLogs ();
 	/* clean up */
 	do_exit (NS_EXIT_SEGFAULT, NULL);
 }
@@ -588,7 +598,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		unload_modules();
 		if(quitmsg)
 		{
-			squit_cmd (s_Services, quitmsg);
+			squit_cmd (ns_botptr->nick, quitmsg);
 			ssquit_cmd (me.name, quitmsg);
 		}
 		sleep(1);
@@ -617,7 +627,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 
 	kp_flush();
 	kp_exit();
-	fini_logs ();
+	FiniLogs ();
 
 	if ((exitcode == NS_EXIT_RECONNECT && me.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);

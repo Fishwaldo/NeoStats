@@ -24,6 +24,7 @@
 #ifndef _SERVICES_H_
 #define _SERVICES_H_
 
-int init_services(void);
+extern BotInfo ns_botinfo;
+extern Bot* ns_botptr;
 
 #endif /* _SERVICES_H_ */

@@ -29,23 +29,98 @@
 
 #include "neostats.h"	/* Neostats API */
 
-/** 
- *  A string to hold the name of our bot
+/** When we create a a bot, we must store the handle returned to us for use
+ *  when calling API bot functions
  */
-char s_module_bot_name[MAXNICK];
+static Bot *template_bot;
+
+/** When a module loads, it is passed a handle that must be used when calling 
+ *  API functions.
+ */
+static Module* template_module;
+
+/** Define information about our bot
+ */
+BotInfo template_bot_info = {
+	/* REQUIRED: 
+	 * nick */
+	"TemplateBot",
+	/* OPTIONAL: 
+	 * altnick, use "" if not needed */
+	"",
+	/* REQUIRED: 
+	 * user */
+	"user",
+	/* REQUIRED: 
+	 * host */
+	"",
+	/* REQUIRED: 
+	 * realname */
+	"Real Name",
+};
+
+/** 
+ *  Example copyright text
+ */
+const char* template_copyright[] = 
+{
+	"Copyright (c) 1999-2004, NeoStats",
+	NULL
+};
+
+/** 
+ *  Example about text
+ */
+const char* template_about[] = 
+{
+	"Template is an example module to demonstrate features",
+	"of the NeoStats API available to module coders",
+	NULL
+};
 
 /** Module Info definition 
- *  Information about our module
- *  This structure is required for your module to load and run on NeoStats
+ *	This describes the module to the NeoStats core and provides information
+ *  to end users when modules are queried.
+ *  The presence of this structure is required but some fields are optional.
  */
 ModuleInfo module_info = {
+	/* REQUIRED: 
+	 * name of module e.g. StatServ */
 	"Template",
+	/* REQUIRED: 
+	 * one line brief description of module */
 	"Put your brief module description here",
-	"NeoStats",
+	/* OPTIONAL: 
+	 * pointer to a NULL terminated list with copyright information
+	 * NeoStats will automatically provide a CREDITS command to output this
+	 * use NULL for none */
+	template_copyright,
+	/* OPTIONAL: 
+	 * pointer to a NULL terminated list with extended description
+	 * NeoStats will automatically provide an ABOUT command to output this
+	 * use NULL for none */
+	template_about,
+	/* REQUIRED: 
+	 * version of neostats used to build module
+	 * must be NEOSTATS_VERSION */
 	NEOSTATS_VERSION,
+	/* REQUIRED: 
+	 * string containing version of module */
 	"1.0",
+	/* REQUIRED: string containing build date of module 
+	 * should be __DATE__ */
 	__DATE__,
-	__TIME__
+	/* REQUIRED: string containing build time of module 
+	 * should be __TIME__ */
+	__TIME__,
+	/* OPTIONAL: 
+	 * Module control flags, 
+	 * use 0 if not needed */
+	0,
+	/* OPTIONAL: 
+	 * Protocol flags for required protocol specfic features e.g. SETHOST
+	 * use 0 if not needed */
+	0,
 };
 
 /** Online event processing
@@ -53,15 +128,8 @@ ModuleInfo module_info = {
  */
 static int Online(char **av, int ac)
 {
-	/* Introduce a bot onto the network */
-	template_bot = init_bot(template_module, s_module_bot_name, "user", me.name, "Real Name",
-		  "-x", 0, NULL, NULL);
-
-	if (init_bot(s_module_bot_name, "user", me.name, "Real Name", "-x",
-		module_info.module_name) == -1) {
-			/* Nick was in use */
-			return 0;
-	}
+	/* Introduce a bot onto the network saving the bot handle */
+	template_bot = init_bot ( template_module, &template_bot_info, "-x", 0, NULL, NULL);
 	return 1;
 };
 
@@ -79,17 +147,14 @@ ModuleEvent module_events[] = {
  *  Required if you need to do initialisation of your module when
  *  first loaded
  */
-int ModInit(int modnum, int apiver)
+int ModInit(Module* mod_ptr)
 {
-	/* Check that our compiled version if compatible with the calling version of NeoStats */
-	if(	ircstrncasecmp (me.version, NEOSTATS_VERSION, VERSIONSIZE) !=0) {
-		return NS_ERR_VERSION;
-	}
-	strlcpy(s_module_bot_name, "TemplateBot", MAXNICK);
+	/* Save our module handle so we can use API functions */
+	template_module = mod_ptr;
 	return 1;
 }
 
-/** Init module
+/** Fini module
  *  Required if you need to do cleanup of your module when it ends
  */
 void ModFini()

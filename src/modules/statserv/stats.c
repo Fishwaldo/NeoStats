@@ -27,6 +27,8 @@
 
 static char announce_buf[BUFSIZE];
 
+static int StatsMidnight();
+
 static int check_interval()
 {
 	static int lasttime;
@@ -35,7 +37,7 @@ static int check_interval()
 	if (StatServ.newdb || !StatServ.onchan || !me.synced) {
 		return -1;
 	}
-	if (me.now - lasttime < StatServ.msginterval ) {
+	if ((me.now - lasttime) < StatServ.msginterval ) {
 		if (++count > StatServ.msglimit)
 			return -1;
 	} else {
@@ -53,21 +55,20 @@ announce_record(const char *msg, ...)
 	if(StatServ.recordalert < 0) {
 		return 1;
 	}
-
 	if (check_interval() > 0) {
 		va_start (ap, msg);
 		ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
 		va_end (ap);
 		switch(StatServ.recordalert) {
 			case 3:
-				wallops (s_StatServ, "%s", announce_buf);
+				wallops (ss_bot->nick, "%s", announce_buf);
 				break;
 			case 2:
-				globops (s_StatServ, "%s", announce_buf);
+				globops (ss_bot->nick, "%s", announce_buf);
 				break;
 			case 1:
 			default:
-				chanalert (s_StatServ, "%s", announce_buf);
+				chanalert (ss_bot->nick, "%s", announce_buf);
 				break;
 		}
 	}
@@ -89,14 +90,14 @@ announce_lag(const char *msg, ...)
 		va_end (ap);
 		switch(StatServ.lagalert) {
 			case 3:
-				wallops (s_StatServ, "%s", announce_buf);
+				wallops (ss_bot->nick, "%s", announce_buf);
 				break;
 			case 2:
-				globops (s_StatServ, "%s", announce_buf);
+				globops (ss_bot->nick, "%s", announce_buf);
 				break;
 			case 1:
 			default:
-				chanalert (s_StatServ, "%s", announce_buf);
+				chanalert (ss_bot->nick, "%s", announce_buf);
 				break;
 		}
 	}
@@ -263,6 +264,7 @@ int s_chan_join(char **av, int ac)
 	}
 	return 1;
 }
+
 int s_chan_part(char **av, int ac)
 {
 	CStats *cs;
@@ -280,6 +282,7 @@ int s_chan_part(char **av, int ac)
 int s_topic_change(char **av, int ac)
 {
 	CStats *cs;
+
 	/* only check exclusions after increasing channel count */
 	if (StatServ.exclusions && IsExcluded(findchan(av[0]))) {
 		return 1;
@@ -326,40 +329,6 @@ CStats *findchanstats(char *name)
 	return cs;
 }
 
-#if 0
-CStats *AddChanStats(char *name)
-{
-	CStats *cs;
-	lnode_t *cn;
-
-	cs = malloc(sizeof(CStats));
-	strlcpy(cs->name, name, CHANLEN);
-	cs->members = 0;
-	cs->topics = 0;
-	cs->totmem = 0;
-	cs->kicks = 0;
-	cs->topicstoday = 0;
-	cs->joinstoday = 0;
-	cs->maxkickstoday = 0;
-	cs->maxmemtoday = 0;
-	cs->t_maxmemtoday = 0;
-	cs->maxmems = 0;
-	cs->t_maxmems = 0;
-	cs->maxkicks = 0;
-	cs->t_maxkicks = 0;
-	cs->maxjoins = 0;
-	cs->t_maxjoins = 0;
-	cs->lastseen = me.now;
-	cn = lnode_create(cs);
-	if (list_isfull(Chead)) {
-		nlog(LOG_CRITICAL,
-		     "Eeek, Can't add Channel to Statserv Channel Hash. Has is full");
-	} else {
-		list_append(Chead, cn);
-	}
-	return cs;
-}
-#endif
 int s_new_server(char **av, int ac)
 {
 	Server *s;
@@ -370,7 +339,6 @@ int s_new_server(char **av, int ac)
 		return 0;
 	AddStats(s);
 	IncreaseServers();
-	
 	if (stats_network.maxservers < stats_network.servers) {
 		stats_network.maxservers = stats_network.servers;
 		stats_network.t_maxservers = me.now;
@@ -384,7 +352,6 @@ int s_new_server(char **av, int ac)
 		daily.t_servers = me.now;
 	}
 	return 1;
-
 }
 
 int s_del_server(char **av, int ac)
@@ -401,9 +368,7 @@ int s_del_server(char **av, int ac)
 	if (s->name != me.uplink)
 		ss->numsplits = ss->numsplits + 1;
 	return 1;
-
 }
-
 
 int s_user_kill(char **av, int ac)
 {
@@ -416,7 +381,6 @@ int s_user_kill(char **av, int ac)
 	u = finduser(av[0]);
 	if (!u)
 		return 0;
-
 	if (StatServ.exclusions && IsExcluded(u)) {
 		return 0;
 	}
@@ -553,7 +517,6 @@ int s_del_user(char **av, int ac)
 	return 1;
 }
 
-
 int s_user_away(char **av, int ac)
 {
 	User *u;
@@ -576,6 +539,7 @@ int s_user_away(char **av, int ac)
 	return 1;
 
 }
+
 int s_got_nickip(char **av, int ac)
 {
 	User *u;
@@ -631,8 +595,6 @@ int s_new_user(char **av, int ac)
 	return 1;
 }
 
-
-
 int pong(char **av, int ac)
 {
 	SStats *ss;
@@ -681,14 +643,20 @@ int pong(char **av, int ac)
 extern bot_cmd ss_commands[];
 extern bot_setting ss_settings[];
 Bot *ss_bot;
+BotInfo ss_botinfo = 
+{
+	"", 
+	"", 
+	"", 
+	"", 
+	"", 
+};
 static Module* ss_module;
 
 int Online(char **av, int ac)
 {
 	SET_SEGV_LOCATION();
-	ss_bot = init_bot(ss_module, s_StatServ, StatServ.user, StatServ.host, StatServ.realname,
-		 services_bot_modes, BOT_FLAG_ONLY_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
-
+	ss_bot = init_bot (ss_module, &ss_botinfo, services_bot_modes, BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, ss_commands, ss_settings);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
 	add_timer (ss_module, SaveStats, "SaveStats", DBSAVETIME);
@@ -696,26 +664,21 @@ int Online(char **av, int ac)
 	/* also add a timer to check if its midnight (to reset the daily stats */
 	add_timer (ss_module, StatsMidnight, "StatsMidnight", 60);
 	add_timer (ss_module, DelOldChan, "DelOldChan", 3600);
-
-
 	return 1;
-
 }
 
-
-extern SStats *new_stats(const char *name)
+SStats *new_stats(const char *name)
 {
 	hnode_t *sn;
-	SStats *s = calloc(sizeof(SStats), 1);
+	SStats *s;
 
 	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, "new_stats(%s)", name);
-
+	s = calloc(sizeof(SStats), 1);
 	if (!s) {
 		nlog(LOG_CRITICAL, "Out of memory.");
 		FATAL_ERROR("Out of memory.")
 	}
-
 	memcpy(s->name, name, MAXHOST);
 	s->numsplits = 0;
 	s->maxusers = 0;
@@ -736,8 +699,7 @@ extern SStats *new_stats(const char *name)
 	s->serverkills = 0;
 	sn = hnode_create(s);
 	if (hash_isfull(Shead)) {
-		nlog(LOG_CRITICAL,
-		     "Eeek, StatServ Server hash is full!");
+		nlog(LOG_CRITICAL, "StatServ Server hash is full!");
 	} else {
 		hash_insert(Shead, sn, s->name);
 	}
@@ -746,11 +708,11 @@ extern SStats *new_stats(const char *name)
 
 void AddStats(Server * s)
 {
-	SStats *st = findstats(s->name);
+	SStats *st;
 
 	SET_SEGV_LOCATION();
 	nlog(LOG_DEBUG2, "AddStats(%s)", s->name);
-
+	st = findstats(s->name);
 	if (!st) {
 		st = new_stats(s->name);
 	} else {
@@ -763,53 +725,45 @@ SStats *findstats(char *name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-
 	sn = hash_lookup(Shead, name);
 	if (sn) {
 		nlog(LOG_DEBUG2, "findstats(%s) - Found", name);
 		return hnode_get(sn);
-	} else {
-		nlog(LOG_DEBUG2, "findstats(%s) - NOT Found", name);
-		return NULL;
-	}
+	} 
+	nlog(LOG_DEBUG2, "findstats(%s) - NOT Found", name);
+	return NULL;
 }
 
-
-
-void StatsMidnight()
+int StatsMidnight()
 {
 	struct tm *ltm = localtime(&me.now);
 	lnode_t *cn;
 	CStats *c;
 
 	SET_SEGV_LOCATION();
-	if (ltm->tm_hour == 0) {
-		if (ltm->tm_min == 0) {
-			/* its Midnight! */
-			chanalert(s_StatServ,
-				  "Reseting Daily Statistics - Its Midnight here!");
-			nlog(LOG_DEBUG1,
-			     "Resetting Daily Statistics");
-			daily.servers = stats_network.servers;
-			daily.t_servers = me.now;
-			daily.users = stats_network.users;
-			daily.t_users = me.now;
-			daily.opers = stats_network.opers;
-			daily.t_opers = me.now;
-			daily.chans = stats_network.chans;
-			daily.t_chans = me.now;
-			ResetTLD();
-			cn = list_first(Chead);
-			while (cn) {
-				c = lnode_get(cn);
-				c->maxmemtoday = c->members;;
-				c->joinstoday = 0;
-				c->maxkickstoday = 0;
-				c->topicstoday = 0;
-				c->t_maxmemtoday = me.now;
-				cn = list_next(Chead, cn);
-			}
-
+	if (ltm->tm_hour == 0 && ltm->tm_min == 0) {
+		/* its Midnight! */
+		chanalert(ss_bot->nick, "Reseting Daily Statistics - Its Midnight here!");
+		nlog(LOG_DEBUG1, "Resetting Daily Statistics");
+		daily.servers = stats_network.servers;
+		daily.t_servers = me.now;
+		daily.users = stats_network.users;
+		daily.t_users = me.now;
+		daily.opers = stats_network.opers;
+		daily.t_opers = me.now;
+		daily.chans = stats_network.chans;
+		daily.t_chans = me.now;
+		ResetTLD();
+		cn = list_first(Chead);
+		while (cn) {
+			c = lnode_get(cn);
+			c->maxmemtoday = c->members;;
+			c->joinstoday = 0;
+			c->maxkickstoday = 0;
+			c->topicstoday = 0;
+			c->t_maxmemtoday = me.now;
+			cn = list_next(Chead, cn);
 		}
 	}
+	return 1;
 }

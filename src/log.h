@@ -35,10 +35,10 @@
    20 should be more than sufficient */
 #define MAX_LOGFILENAME	20
 
-void close_logs ();
-int init_logs ();
-void reset_logs ();
-void fini_logs();
+void CloseLogs (void);
+int InitLogs (void);
+void ResetLogs (void);
+void FiniLogs (void);
 /* Configurable log filename format string */
 extern char LogFileNameFormat[MAX_LOGFILENAME];
 

@@ -3,6 +3,19 @@ NeoStats ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 ===============================================================================
 * NeoStats * Fish (F) & Mark (M) * Version 3.0.genesis
+ - Segfault reports are now directed to segfault.log rather than the main log
+   files for easier submission (M)
+ - subsystem structures now maintain a module pointer to lookup names rather
+   than copies of the string. We can now lookup modules via a quick pointer
+   compare rather than string compare and can access module information without
+   addition function overheads. (M)
+ - Modules must pass their module handle to the core for accessing bots/timers
+   etc, once all interfaces use this system, try to "automate" the handle using
+   some form of current_module/runlevel within the core (M)
+ - Core and modules now share bot init code (M)
+ - Updated bot interface to use a new bot_info structure (M)
+ - ExtAuth: remove old format support (M)
+ - Added instrinsic bot commands for ABOUT, CREDITS, VERSION (M)
  - Logging scope is now automatic rather than requiring a specific option (M)
  - Module support calls to access timers/bots/sockets etc must now pass 
    correctly typed function pointers rather than using core symbol lookups (M)
@@ -14,7 +27,7 @@ Anything we add/remove/fix/change is in here (even our rants)
  - Point of no return. Legacy 2.5 systems are now broken. Some 2.5.15 compliant 
    systems will still work but all module backward compatibility has been 
    stripped. 
- - All core module changelogs move to docs/old. Future core module updates will
+ - All core module changelogs moved to docs/old. Future core module updates will
    be included in the main NeoStats changelog (M)
  - Remove module API hacks (M)
  - Remove legacy stats.h, API is now exported via neostats.h only (M)

@@ -63,7 +63,7 @@ hash_t *logs;
 /** @brief initialize the logging functions 
  */
 int
-init_logs ()
+InitLogs (void)
 {
 	SET_SEGV_LOCATION();
 	logs = hash_create (-1, 0, 0);
@@ -77,7 +77,7 @@ init_logs ()
 /** @brief Occasionally flush log files out 
  */
 void
-close_logs ()
+CloseLogs (void)
 {
 	hscan_t hs;
 	hnode_t *hn;
@@ -104,7 +104,8 @@ close_logs ()
 }
 
 void 
-fini_logs() {
+FiniLogs (void) 
+{
 	hscan_t hs;
 	hnode_t *hn;
 	struct logs_ *logentry;
@@ -195,7 +196,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 /** rotate logs, called at midnight
  */
 void
-reset_logs ()
+ResetLogs (void)
 {
 	hscan_t hs;
 	hnode_t *hn;
@@ -250,7 +251,8 @@ nassert_fail (const char *expr, const char *file, const int line, const char *in
 
 #if SQLSRV
 /* this is for sqlserver logging callback */
-void sqlsrvlog(char *logline) {
+void sqlsrvlog(char *logline) 
+{
 	nlog(LOG_DEBUG1, "SqlSrv: %s", logline);
 }
 #endif

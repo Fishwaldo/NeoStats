@@ -393,7 +393,6 @@ send_svstime (const char *sender, const unsigned long ts)
 	send_cmd (":%s %s SVSTIME %lu", sender, (ircd_srv.token ? TOK_TSCTL : MSG_TSCTL), ts);
 }
 
-
 static void
 m_protocol (char *origin, char **argv, int argc, int srv)
 {

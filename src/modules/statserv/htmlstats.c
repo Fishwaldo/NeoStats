@@ -50,7 +50,7 @@ FILE *tpl, *opf;
 
 const char html_template[]="data/index.tpl";
 
-void ss_html()
+int ss_html()
 {
 	char *buf;
 	char *buf1;
@@ -62,26 +62,26 @@ void ss_html()
 		if (StatServ.htmlpath[0] == 0) {
 			nlog(LOG_WARNING,
 			     "Can't do HTML Writout as html path is not defined");
-			return;
+			return 1;
 		}
 	} else {
-		return;
+		return 1;
 	}
 	tpl = fopen(html_template, "r");
 	if (!tpl) {
 		nlog(LOG_WARNING,
 			"Failed to open StatServ HTML template %s.", html_template);
-		chanalert(s_StatServ, 
+		chanalert(ss_bot->nick, 
 			"Failed to open StatServ HTML template %s.", html_template);
-		return;
+		return 1;
 	}
 	opf = fopen(StatServ.htmlpath, "w");
 	if (!opf) {
 		nlog(LOG_WARNING,
 			"Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
-		chanalert(s_StatServ,
+		chanalert(ss_bot->nick,
 			"Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath);
-		return;
+		return 1;
 	}
 	buf = malloc(STARTBUFSIZE * 2);
 	bufold = buf;
@@ -200,7 +200,7 @@ void ss_html()
 	}
 	fclose(tpl);
 	fclose(opf);
-
+	return 1;
 }
 
 void get_title()
@@ -214,8 +214,8 @@ void put_copyright()
 		sftime(time(NULL)));
 	fprintf(opf, "<b>StatServ Information:</b>\n");
 	fprintf(opf, "<br> %s compiled on %s at %s\n", me.name, version_date, version_time);
-	fprintf(opf, "<br> %s compiled on %s at %s\n", module_info.module_name,
-		module_info.module_build_date, module_info.module_build_time);
+	fprintf(opf, "<br> %s compiled on %s at %s\n", module_info.name,
+		module_info.build_date, module_info.build_time);
 	fprintf(opf,
 		"<br><a href=\"http://www.neostats.net\">http://www.neostats.net</a>\n");
 	fprintf(opf, "</center></html>\n");

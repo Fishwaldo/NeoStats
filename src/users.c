@@ -234,13 +234,13 @@ DelUser (const char *nick, int killflag, const char *reason)
 	free (av);
 
 	/* if its one of our bots, remove it from the modlist */
-	if (findbot (u->nick)) {
+	if ( IsMe(u) ) {
 		if (killflag == 1) {
 			nlog (LOG_NOTICE, "doDelUser: deleting bot %s as it was killed", u->nick);
 			strlcpy(killnick,u->nick,MAXNICK);
 			botflag = 1;
 		}
-		del_mod_user (u->nick);
+		del_ns_bot (u->nick);
 	}
 
 	hash_delete (uh, un);
@@ -600,7 +600,7 @@ TBLDEF neo_users = {
 
 
 int
-init_user_hash ()
+InitUsers ()
 {
 	uh = hash_create (U_TABLE_SIZE, 0, 0);
 	if(!uh)	
@@ -863,16 +863,13 @@ FreeUsers ()
 	hscan_t hs;
 
 	SET_SEGV_LOCATION();
-
-
 	hash_scan_begin(&hs, uh);
 	while ((un = hash_scan_next(&hs)) != NULL) {
 		u = hnode_get (un);
-		list_process (u->chans, u, UserPart);
-		
+		list_process (u->chans, u, UserPart); 		
 		/* something is wrong if its our bots */
-		if (findbot (u->nick)) {
-			nlog (LOG_NOTICE, "Ehhh. FreeUsers called while we still have bots online. Baaad User: %s", u->nick);
+		if ( IsMe(u) ) {
+			nlog (LOG_NOTICE, "FreeUsers called with a neostats bot online: %s", u->nick);
 		}
 		hash_scan_delete (uh, un);
 		hnode_destroy (un);

@@ -40,7 +40,8 @@
 /* but only save data older than 1 hour! */
 #define PROGCHANTIME 3600
 
-extern char s_StatServ[MAXNICK];
+extern BotInfo ss_botinfo;
+extern Bot *ss_bot;
 extern ModuleInfo module_info;
 
 typedef struct tld_ TLD;
@@ -180,7 +181,7 @@ int load_client_versions(void);
 int save_client_versions(void);
 void AddStats(Server *);
 SStats *findstats(char *);
-void SaveStats();
+int SaveStats();
 void LoadStats();
 int Online(char **av, int ac);
 int pong(char **av, int ac);
@@ -200,7 +201,7 @@ CStats *findchanstats(char *);
 #if 0
 CStats *AddChanStats(char *);
 #endif
-void DelOldChan();
+int DelOldChan();
 int s_topic_change(char **av, int ac);
 int s_chan_kick(char **av, int ac);
 
@@ -261,6 +262,6 @@ void AddTLD(User *);
 void init_tld();
 void fini_tld();
 /* htmlstats.c */
-void ss_html(void);
+int ss_html(void);
 
 #endif

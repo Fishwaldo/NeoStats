@@ -545,37 +545,6 @@ parse (char *line)
 }
 #endif
 
-/** @brief init_services_bot
- *
- * 
- *
- * @return none
- */
-int 
-init_services_bot (void)
-{
-	char **av;
-	int ac = 0;
-	long Umode;
-
-	SET_SEGV_LOCATION();
-	if (finduser (s_Services)) {
-		/* nick already exists on the network */
-		strlcat (s_Services, "1", MAXNICK);
-	}
-	ircsnprintf (me.realname, MAXREALNAME, "/msg %s \2HELP\2", s_Services);
-	Umode = UmodeStringToMask(services_bot_modes, 0);
-	signon_newbot (s_Services, me.user, me.host, me.realname, Umode);
-#ifdef UMODE_DEAF
-	sumode_cmd (s_Services, s_Services, UMODE_DEAF);
-#endif
-	me.onchan = 1;
-	AddStringToList (&av, me.uplink, &ac);
-	SendModuleEvent (EVENT_ONLINE, av, ac);
-	free (av);
-	return NS_SUCCESS;
-}
-
 /** @brief do_ping
  *
  * 
@@ -645,7 +614,7 @@ flood (User * u)
 	}
 	if (u->flood >= 5) {
 		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->nick, u->username, u->hostname);
-		ssvskill_cmd (u->nick, "%s!%s (Flooding Services.)", me.host, s_Services);
+		ssvskill_cmd (u->nick, "%s!%s (Flooding Services.)", me.name, ns_botptr->nick);
 		return 1;
 	} else {
 		u->flood++;
@@ -816,7 +785,7 @@ do_stats (const char* nick, const char *what)
 		}
 	}
 	numeric (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);
-	chanalert (s_Services, "%s Requested Stats %s", u->nick, what);
+	chanalert (ns_botptr->nick, "%s Requested Stats %s", u->nick, what);
 };
 
 void
@@ -876,7 +845,7 @@ prefmsg (char *to, const char *from, char *fmt, ...)
 	va_list ap;
 
 	if (findbot (to)) {
-		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+		chanalert (ns_botptr->nick, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
 	}
 
@@ -896,7 +865,7 @@ privmsg (char *to, const char *from, char *fmt, ...)
 	va_list ap;
 
 	if (findbot (to)) {
-		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+		chanalert (ns_botptr->nick, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
 	}
 
@@ -912,7 +881,7 @@ notice (char *to, const char *from, char *fmt, ...)
 	va_list ap;
 
 	if (findbot (to)) {
-		chanalert (s_Services, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
+		chanalert (ns_botptr->nick, "Message From our Bot(%s) to Our Bot(%s), Dropping Message", from, to);
 		return;
 	}
 
@@ -965,7 +934,7 @@ numeric (const int numeric, const char *target, const char *data, ...)
 void
 unsupported_cmd(const char* cmd)
 {
-	chanalert (s_Services, "Warning, %s tried to %s which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
+	chanalert (ns_botptr->nick, "Warning, %s tried to %s which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
 	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
 }
 
@@ -1167,8 +1136,7 @@ ssvsnick_cmd (const char *target, const char *newnick)
 #ifdef GOTSVSNICK
 	send_svsnick (me.name, target, newnick, me.now);
 #else
-	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segv_inmodule);
-	nlog (LOG_NOTICE, "Warning. Module %s tried to SVSNICK, which is not supported", segv_inmodule);
+	unsupported_cmd("SVSNICK");
 #endif
 	return NS_SUCCESS;
 }

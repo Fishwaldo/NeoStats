@@ -413,7 +413,7 @@ send_rakill (const char *sender, const char *host, const char *ident)
 	send_cmd (":%s %s %s %s", sender, (ircd_srv.token ? TOK_RAKILL : MSG_RAKILL), host, ident);
 #elif ULTIMATE
 	/* ultimate2 needs an oper to remove */
-	send_cmd (":%s %s :%s@%s", s_Services, MSG_REMGLINE, host, ident);
+	send_cmd (":%s %s :%s@%s", ns_botptr->nick, MSG_REMGLINE, host, ident);
 #endif
 }
 
