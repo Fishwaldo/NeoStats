@@ -119,6 +119,7 @@ void send_smo (const char *from, const char *umodetarget, const char *msg);
 #endif
 void send_akill (const char *host, const char *ident, const char *setby, const int length, const char *reason);
 void send_rakill (const char *host, const char *ident);
+void send_sjoin (const char *who, const char *chan, const char flag, time_t tstime);
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass);

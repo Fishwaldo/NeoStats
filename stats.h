@@ -93,6 +93,8 @@
 /* SecureServ wants CHANADMIN but only a few ircds support it so we have to "fake" it */
 #ifndef CMODE_CHANADMIN
 #define CMODE_CHANADMIN CMODE_CHANOP
+/* Flag for new sjoin call to avoid duplicate case value */
+#define FAKE_CMODE_CHANADMIN
 #endif
 
 /* Temp for backwards compatibility */

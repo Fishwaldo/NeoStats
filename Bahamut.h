@@ -171,6 +171,14 @@
 #define UMODE_SERVADMIN		0x0040	/* server admin */
 #define UMODE_SERVICESADMIN	0x0080	/* Marks the client as a Services Administrator */
 
+/* Cmode chars */
+#define CMODE_CH_CHANOP 'o'
+#define CMODE_CH_VOICE	'v'
+
+/* Cmode sjoin flags */
+#define CMODE_FL_CHANOP '@'
+#define CMODE_FL_VOICE	'+'
+
 /* Cmodes */
 #define CMODE_CHANOP	0x0001
 #define	CMODE_VOICE	0x0004

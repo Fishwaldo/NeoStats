@@ -241,6 +241,24 @@
 /* Smodes */
 #define SMODE_SSL              0x1  /* */
 
+/* Cmode chars */
+#define CMODE_CH_CHANOP 'o'
+#define CMODE_CH_VOICE	'v'
+#define CMODE_CH_HALFOP	'h'
+#define CMODE_CH_CHANOWNER	'q'
+#define CMODE_CH_CHANPROT	'a'
+#define CMODE_CH_VIP	'V'
+#define CMODE_CH_UOP	'u'
+
+/* Cmode sjoin flags */
+#define CMODE_FL_CHANOP '@'
+#define CMODE_FL_VOICE	'+'
+#define CMODE_FL_HALFOP	'%'
+#define CMODE_FL_CHANOWNER	'!'
+#define CMODE_FL_CHANPROT	'*'
+#define CMODE_FL_VIP	'='
+#define CMODE_FL_UOP	'-'
+
 /* Cmodes */
 #define CMODE_CHANOP	0x0001
 #define CMODE_CHANOWNER  0x0002

@@ -65,7 +65,6 @@ static void Srv_Nick (char *origin, char **argv, int argc);
 static void Srv_Svsnick (char *origin, char **argv, int argc);
 static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Protocol (char *origin, char **argv, int argc);
-static void Srv_Sjoin (char *origin, char **argv, int argc);
 
 static struct ircd_srv_ {
 	int uprot;
@@ -109,6 +108,7 @@ IntCommands cmd_list[] = {
 	{MSG_PING, TOK_PING, Srv_Ping, 0, 0},
 	{MSG_NETINFO, TOK_NETINFO, Srv_Netinfo, 0, 0},
 	{MSG_SJOIN, TOK_SJOIN, Srv_Sjoin, 1, 0},
+	{MSG_SJOIN, TOK_SJOIN, Srv_Sjoin, 0, 0},
 	{MSG_PASS, TOK_PASS, Srv_Pass, 0, 0},
 	{MSG_SERVER, TOK_SERVER, Srv_Server, 0, 0},
 	{MSG_SQUIT, TOK_SQUIT, Srv_Squit, 0, 0},
@@ -204,9 +204,9 @@ sserver_cmd (const char *name, const int numeric, const char *infoline)
 int
 slogin_cmd (const char *name, const int numeric, const char *infoline, const char *pass)
 {
+	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 	sts ("%s %s", (me.token ? TOK_PASS : MSG_PASS), pass);
 	sts ("%s %s %d :%s", (me.token ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-	sts ("%s TOKEN SJOIN", (me.token ? TOK_PROTOCTL : MSG_PROTOCTL));
 	return 1;
 }
 
@@ -235,6 +235,12 @@ sjoin_cmd (const char *who, const char *chan)
 	sts (":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
 	join_chan (who, chan);
 	return 1;
+}
+
+void 
+send_sjoin (const char *who, const char *chan, const char flag, time_t tstime)
+{
+	sts (":%s %s %ld %s + :%c%s", me.name, (me.token ? TOK_SJOIN : MSG_SJOIN), (int)tstime, chan, flag, who);
 }
 
 void 
@@ -605,6 +611,7 @@ Usr_Eos (char *origin, char **argv, int argc)
 }
 #endif
 
+/* R: ~ 1073861298 #services + <none> :Mark */
 static void
 Srv_Sjoin (char *origin, char **argv, int argc)
 {
@@ -612,11 +619,12 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	long mode = 0;
 	long mode1 = 0;
 	char *modes;
-	int ok = 1, i, j = 3;
+	int ok = 1, i, j = 4;
 	ModesParm *m;
 	Chans *c;
 	lnode_t *mn = NULL;
 	list_t *tl;
+
 	if (argc > 4) {
 		modes = argv[2];
 	} else {
@@ -741,8 +749,8 @@ SignOn_NewBot (const char *nick, const char *user, const char *host, const char 
 	snewnick_cmd (nick, user, host, rname, Umode);
 	sumode_cmd (nick, nick, Umode);
 	if ((me.allbots > 0) || (Umode & services_bot_umode)) {
-		sjoin_cmd (nick, me.chan);
-		schmode_cmd (me.name, me.chan, "+o", nick);
+		ssjoin_cmd(nick, me.chan, CMODE_CHANOP);
+
 	}
 	return 1;
 }
