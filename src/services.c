@@ -379,7 +379,7 @@ ns_status (CmdParams* cmdparams)
 	} else if (uptime > 60) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%ld minute%s, %ld second%s\2", cmdparams->source), ns_botptr->name, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
 	} else {
-		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d second%s\2", cmdparams->source), ns_botptr->name, (init)uptime, uptime == 1 ? "" : "s");
+		irc_prefmsg (ns_botptr, cmdparams->source, __("%s up \2%d second%s\2", cmdparams->source), ns_botptr->name, (int)uptime, uptime == 1 ? "" : "s");
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Sent %ld messages, %ld bytes", cmdparams->source), me.SendM, me.SendBytes);
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Received %ld messages, %ld Bytes", cmdparams->source), me.RcveM, me.RcveBytes);
