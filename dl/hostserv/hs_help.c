@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hs_help.c,v 1.6 2002/10/15 18:43:48 shmad Exp $
+** $Id: hs_help.c,v 1.7 2002/12/27 15:03:50 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -32,7 +32,7 @@ const char *hs_help[] = {
 "     ABOUT     LOGIN     ADD",
 "     DEL       LIST      VIEW",
 "",
-"Only Network Admins can use the ADD, DEL & LIST functions",
+"Only Network Admins can use the ADD, DEL, VIEW & LIST functions",
 "",
 NULL
 };

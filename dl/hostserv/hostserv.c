@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.21 2002/10/24 20:53:55 shmad Exp $
+** $Id: hostserv.c,v 1.22 2002/12/27 15:03:50 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -82,7 +82,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "2.1"
+    "2.2"
 } };
 
 
@@ -139,28 +139,25 @@ int __Bot_Message(char *origin, char **av, int ac)
     u = finduser(origin);
 
     if (!strcasecmp(av[1], "HELP")) {
-        if (ac <= 2 && (!(UserLevel(u) >= 40))) {
-            prefmsg(u->nick, s_HostServ, "Permission Denied.");
-            return 1;
-        } else if (ac <= 2 && (UserLevel(u) >= 40)) {
+        if (ac <= 2) {
             privmsg_list(u->nick, s_HostServ, hs_help); 
             return 1;
-        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= 40)) {
+        } else if (!strcasecmp(av[2], "ADD") && (UserLevel(u) >= 100)) {
             privmsg_list(u->nick, s_HostServ, hs_help_add);
             return 1;
-        } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= 60)) {
+        } else if (!strcasecmp(av[2], "DEL") && (UserLevel(u) >= 100)) {
             privmsg_list(u->nick, s_HostServ, hs_help_del);
             return 1;        
         } else if (!strcasecmp(av[2], "LIST") && (UserLevel(u) >= 40)) {
             privmsg_list(u->nick, s_HostServ, hs_help_list);
             return 1;
-	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= 40)) {
+	} else if (!strcasecmp(av[2], "VIEW") && (UserLevel(u) >= 100)) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_view);
 	    return 1;
 	} else if (!strcasecmp(av[2], "LOGIN")) {
 	    privmsg_list(u->nick, s_HostServ, hs_help_login);
 	    return 1;
-        } else if (!strcasecmp(av[2], "ABOUT") && (UserLevel(u) >= 40)) {
+        } else if (!strcasecmp(av[2], "ABOUT")) {
             privmsg_list(u->nick, s_HostServ, hs_help_about);
             return 1;
         } else 
@@ -169,14 +166,14 @@ int __Bot_Message(char *origin, char **av, int ac)
 
     if (!strcasecmp(av[1], "ABOUT")) {
                 privmsg_list(u->nick, s_HostServ, hs_help_about);
-    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= 40)) {
+    } else if (!strcasecmp(av[1], "ADD") && (UserLevel(u) >= 100)) {
                 if (ac < 6) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s ADD <NICK> <HOST NAME> <VIRTUAL HOST NAME> <PASSWORD>", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "For addtional help: /msg %s HELP", s_HostServ);
                     return -1;
                 }
                 hs_add(u, av[2], av[3], av[4], av[5]);
-    } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= 60)) {
+    } else if (!strcasecmp(av[1], "DEL") && (UserLevel(u) >= 100)) {
                 if (!av[2]) {
                     prefmsg(u->nick, s_HostServ, "Syntax: /msg %s DEL #", s_HostServ);
                     prefmsg(u->nick, s_HostServ, "The users # is got from /msg %s LIST", s_HostServ);
@@ -191,7 +188,7 @@ int __Bot_Message(char *origin, char **av, int ac)
                 hs_del(u, t);
     } else if (!strcasecmp(av[1], "LIST") && (UserLevel(u) >= 40)) {
                 hs_list(u);
-    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= 40)) {
+    } else if (!strcasecmp(av[1], "VIEW") && (UserLevel(u) >= 100)) {
 		if (!av[2]) {
 		    prefmsg(u->nick, s_HostServ, "Syntax: /msg %s VIEW #", s_HostServ);
 		    prefmsg(u->nick, s_HostServ, "The users # is got from /msg %s LIST", s_HostServ);
@@ -476,7 +473,7 @@ static void hs_del(User *u, int tmpint)
     int i = 1;
 
     strcpy(segv_location, "hs_del");
-    if (!(UserLevel(u) >= 60)) {
+    if (!(UserLevel(u) >= 100)) {
         hslog("Access Denied To %s To User on Access list #%s", u->nick, tmpint);
         prefmsg(u->nick, s_HostServ, "Access Denied To %s To Delete User \2#%s\2", u->nick, tmpint);
         return;

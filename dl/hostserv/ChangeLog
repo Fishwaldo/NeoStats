@@ -1,6 +1,8 @@
 HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
+* Version 2.2 * Fish * December 26th, 2002
++ Fixed a problem with Permissions and a typo in the help file
 
 * Version 2.1 * Shmad * October 20, 2002
 + Fixed an issue with fnmatch being a hoe.
