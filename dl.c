@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.54 2003/04/30 13:10:49 fishwaldo Exp $
+** $Id: dl.c,v 1.55 2003/05/09 13:37:53 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -685,7 +685,10 @@ int unload_module(char *module_name, User *u) {
 		list = hnode_get(modnode);
 		hash_delete(mh, modnode);
 		hnode_destroy(modnode);
+		/* set segv in module */
+		strcpy(segvinmodule, module_name);
 		dlclose(list->dl_handle);
+		strcpy(segvinmodule, "");
 		free(list);
 		return 1;
 	} 	
