@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.37 2003/02/04 11:22:17 fishwaldo Exp $
+** $Id: hostserv.c,v 1.38 2003/04/11 07:17:28 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -92,7 +92,7 @@ int ListArryCount = 0;
 Module_Info HostServ_info[] = { {
     "HostServ",
     "Network User Virtual Host Service",
-    "2.5"
+    "2.6"
 } };
 
 
@@ -472,6 +472,8 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
     char *tmp;
     hnode_t *hn;
     hscan_t hs;
+    User *nu;
+    
     strcpy(segv_location, "hs_add");
     hash_scan_begin(&hs, bannedvhosts);
     while ((hn = hash_scan_next(&hs)) != NULL) {
@@ -489,11 +491,11 @@ static void hs_add(User *u, char *cmd, char *m, char *h, char *p) {
 	    prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s vhost: %s and password: %s",cmd, m, h, p);
 	    chanalert(s_HostServ, "%s added a vhost %s for %s with realhost %s", u->nick, h, cmd, m);
 	    /* Apply The New Hostname If The User Is Online */        
-	    if ((u = finduser(cmd)) != NULL) {
+	    if ((nu = finduser(cmd)) != NULL) {
         	  if (findbot(cmd)) return;
-	          tmp = strlower(u->hostname);
+	          tmp = strlower(nu->hostname);
 		  if (fnmatch(m, tmp, 0) == 0) {
-	              ssvshost_cmd(u->nick, h);
+	              ssvshost_cmd(nu->nick, h);
         	      prefmsg(u->nick, s_HostServ, "%s is online now, setting vhost to %s", cmd, h);
 		      prefmsg(cmd, s_HostServ, "You Vhost has been created with Real HostMask of %s and username %s with password %s", m, cmd, p);
 		      prefmsg(cmd, s_HostServ, "For security, you should change your vhost password. See /msg %s help chpass", s_HostServ);

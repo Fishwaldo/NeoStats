@@ -1,6 +1,9 @@
 HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
+* Version 2.6 * Fish * Mar 11th, 2003
++ Fixed a bug with adding Vhosts for users online already and sending a online message to the wrong user!
+
 * Version 2.5 * Fish * Feb 3rd, 2003
 + check for duplicate nicks before adding entries
 + added a command to show configured levels
