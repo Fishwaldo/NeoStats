@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: auth.h 1964 2004-07-27 12:44:20Z Mark $
+** $Id$
 */
 
 /* its huge, because we can have a *LOT* of users in a channel */
