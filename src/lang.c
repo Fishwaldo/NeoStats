@@ -22,7 +22,7 @@
 ** $Id: lang.c 12 2004-08-10 12:47:20Z Fish $
 */
 
-#include "config.h"
+#include "neostats.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -33,11 +33,10 @@
 #ifdef HAVE_DB_H
 #include <db.h>
 #endif
-#include "neostats.h"
 #include "lang.h"
 #include "hash.h"
 
-#if (defined WIN32) || (!defined HAVE_DB_H)
+#ifdef HAVE_DB_H
 void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
 {
 }
