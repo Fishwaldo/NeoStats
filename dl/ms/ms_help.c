@@ -24,102 +24,104 @@
 */
 
 const char *ms_help[] = {
-	"\2MoraleServ Help\2",
+	"\2MoraleServ\2 is a fun module to send cheery",
+	"messages to friends on IRC.",
 	"",
-	"Commands:",
-	"     HAIL     ODE     POEM     LAPDANCE     REDNECK",
+	"The following commands can be used with MoraleServ",
 	"",
-	"     CHEERUP      BEHAPPY      WONDERFUL",
+	"    ABOUT      About MoraleServ",
+	"    VERSION    Display version info",
+	"    HAIL       Hail someone on IRC",
+	"    ODE        Send an ODE to someone on IRC",
+	"    POEM       Send a poem to someone on IRC",
+	"    LAPDANCE   Give someone on IRC a lapdance",
+	"    REDNECK    Send a Redneck message.",
+	"    CHEERUP    Send an cheer up message to someone on IRC",
+	"    BEHAPPY    Send an be happy song to someone on IRC",
+	"    WONDERFUL  Send an song to someone on IRC",
+	NULL
+};
+
+const char *ms_help_on_help[] = {
 	"",
-	"     VERSION",
-	"",
-	"For Additional Help on each command type:",
-	"EXAMPLE: /msg MoraleServ HELP HAIL",
-	"",
+	"To use a command, type",
+	"    \2/msg MoraleServ command\2",
+	"For for more information on a command, type", 
+	"    \2/msg MoraleServ HELP command\2.",
+	NULL
+};
+
+const char *ms_help_about[] = {
+	"\2MoraleServ\2 is a fun module to send cheery",
+	"messages to friends on IRC.",
 	NULL
 };
 
 const char *ms_help_hail[] = {
-	"\2MoraleServ Help : HAIL",
-	"\2Usage:\2 HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>",
+	"Syntax: \2HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>\2",
 	"",
-	"Send a \"HAIL\" song greeting to a loved one on IRC.",
-	"",
+	"Send a \"hail\" song greeting to a loved one on IRC.",
 	NULL
 };
 
 const char *ms_help_ode[] = {
-	"\2MoraleServ Help : ODE",
-	"\2Usage:\2 ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>",
+	"Syntax: \2ODE <WHO THE ODE ODE IS ABOUT> <NICK TO SEND ODE TO>\2",
 	"",
-	"Send an ode about a user to a loved one on IRC.",
-	"",
+	"Send an \"ode\" about a user to a loved one on IRC.",
 	NULL
 };
 
 const char *ms_help_lapdance[] = {
-	"\2MoraleServ Help : LAPDANCE",
-	"\2Usage:\2 LAPDANCE <NICK>",
+	"Syntax: \2LAPDANCE <NICK>",
 	"",
-	"Send a lapdance to a loved one on IRC... sure to cheer any person up",
-	"",
+	"Send a \"lapdance\" to a loved one on IRC, sure to cheer any person up\2",
 	NULL
 };
 
 const char *ms_help_version[] = {
-	"\2MoraleServ Help : VERSION",
-	"Usage: \2VERISON\2",
+	"Syntax: \2VERISON\2",
 	"",
-	"Prints today's current version information via PRIVMSG/NOTICE",
-	"",
+	"Display current version information via PRIVMSG/NOTICE\2",
 	NULL
 };
 
 const char *ms_help_poem[] = {
-	"\2MoraleServ Help : POEM",
-	"Usage: \2POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>",
+	"Syntax: \2POEM <WHO THE POEM IS ABOUT> <NICK TO SEND TO>\2",
 	"",
-	"Send a poem about a user to a loved one on IRC.",
-	"",
+	"Send a \"poem\" about a user to a loved one on IRC.",
 	NULL
 };
 
 const char *ms_help_redneck[] = {
-	"\2MoraleServ Help : REDNECK",
-	"Usage: \2REDNECK <NICK>",
+	"Syntax: \2REDNECK <NICK>\2",
 	"",
-	"Send a redneck dubbing to a loved one on IRC.",
-	"",
+	"Send a \"redneck\" dubbing to a loved one on IRC.",
 	NULL
 };
 
 
 const char *ms_help_cheerup[] = {
-	"\2MoraleServ Help : CHEERUP",
-	"Usage: \2CHEERUP <NICK>\2",
+	"Syntax: \2CHEERUP <NICK>\2",
 	"",
 	"Send a \"cheerup\" message to a loved one on IRC to cheer them up.",
-	"",
 	NULL
 };
 
 const char *ms_help_behappy[] = {
-	"\2MoraleServ Help : BEHAPPY",
-	"Usage: \2BEHAPPY <NICK>\2",
+	"Syntax: \2BEHAPPY <NICK>\2",
 	"",
 	"Send a \"behappy\" song to a loved one on IRC to cheer them up.",
-	"This function sends a number of messages that may ping the target nick",
-	"out if they do not have a fast connection. 4DO NOT USE unless you are sure.",
-	"",
+	"This function sends a number of messages that may ping the target",
+	"nick out if they do not have a fast connection.",
+	"DO NOT USE unless you are sure.",
 	NULL
 };
 
 const char *ms_help_wonderful[] = {
-	"\2MoraleServ Help : WONDERFUL",
-	"Usage: \2WONDERFUL <NICK>\2",
+	"Syntax: \2WONDERFUL <NICK>\2",
 	"",
-	"Send a \"I hope you don't mind, that I put down in words...\" song to a loved one on IRC to cheer them up.",
-	"This function will send the lyrics with the target nick in them to the target nick",
-	"",
+	"Send a \"I hope you don't mind, that I put down in words...\" song",
+	"to a loved one on IRC to cheer them up. This function will send the",
+	"lyrics with the target nick in them to the target nick",
 	NULL
 };

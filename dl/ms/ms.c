@@ -32,7 +32,6 @@
 const char msversion_date[] = __DATE__;
 const char msversion_time[] = __TIME__;
 char *s_MoraleServ;
-extern const char *ms_help[];
 static void ms_hail(User * u, char *cmd, char *m);
 static void ms_ode(User * u, char *cmd, char *m);
 static void ms_lapdance(User * u, char *cmd);
@@ -80,6 +79,7 @@ int __Bot_Message(char *origin, char **av, int ac)
 	if (!strcasecmp(av[1], "HELP")) {
 		if (ac <= 2) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help);
+			privmsg_list(u->nick, s_MoraleServ, ms_help_on_help);
 			return 1;
 		} else if (!strcasecmp(av[2], "HAIL")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_hail);
@@ -94,6 +94,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 		} else if (!strcasecmp(av[2], "VERSION")) {
 			privmsg_list(u->nick, s_MoraleServ,
 				     ms_help_version);
+			return 1;
+		} else if (!strcasecmp(av[2], "ABOUT")) {
+			privmsg_list(u->nick, s_MoraleServ,
+				     ms_help_about);
 			return 1;
 		} else if (!strcasecmp(av[2], "POEM")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_poem);
@@ -157,6 +161,10 @@ int __Bot_Message(char *origin, char **av, int ac)
 			  "%s Wanted to know the current version information for %s",
 			  u->nick, s_MoraleServ);
 		ms_version(u);
+	} else if (!strcasecmp(av[1], "ABOUT")) {
+		privmsg_list(u->nick, s_MoraleServ,
+			     ms_help_about);
+		return 1;
 	} else if (!strcasecmp(av[1], "POEM")) {
 		if (ac < 4) {
 			prefmsg(u->nick, s_MoraleServ,
