@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hostserv.c,v 1.32 2003/01/07 13:07:08 fishwaldo Exp $
+** $Id: hostserv.c,v 1.33 2003/01/22 16:36:58 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -349,8 +349,8 @@ void _fini() {
 	free(s_HostServ);
 	hash_scan_begin(&hs, vhosts);
 	while ((hn = hash_scan_next(&hs)) != NULL) {
-		free(hnode_get(hn));
 		hash_scan_delete(vhosts, hn);
+		free(hnode_get(hn));
 	}
 	hash_destroy(vhosts);
 
