@@ -436,24 +436,24 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 	u = finduser (kicked);
 	k = finduser (kickby);
 	if (!u||!k) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for Kick %s %s", chan, kicked, kickby);
+		nlog (LOG_WARNING, LOG_CORE, "kick_chan: user %s not found %s %s", chan, kicked, kickby);
 		if (me.debug_mode) {
-			chanalert (s_Services, "Can't find user %s for Kick %s %s", chan, kicked, kickby);
+			chanalert (s_Services, "kick_chan: user %s not found %s %s", chan, kicked, kickby);
 			ChanDump (chan);
 		}
 		return;
 	}
-	nlog (LOG_DEBUG2, LOG_CORE, "%s Kicking %s from %s", k->nick, u->nick, chan);
+	nlog (LOG_DEBUG2, LOG_CORE, "kick_chan: %s kicking %s from %s for %s", k->nick, u->nick, chan, kickreason ? kickreason : "no reason");
 	c = findchan (chan);
 	if (!c) {
-		nlog (LOG_WARNING, LOG_CORE, "Hu, Kicking a Non existant Channel? %s", chan);
+		nlog (LOG_WARNING, LOG_CORE, "kick_chan: channel %s not found", chan);
 		return;
 	} else {
 		un = list_find (c->chanmembers, u->nick, comparef);
 		if (!un) {
-			nlog (LOG_WARNING, LOG_CORE, "Kick: hu, User %s isn't a member of this channel %s", u->nick, chan);
+			nlog (LOG_WARNING, LOG_CORE, "kick_chan: %s not found in channel %s", u->nick, chan);
 			if (me.debug_mode) {
-				chanalert (s_Services, "Kick: hu, User %s isn't a member of this channel %s", u->nick, chan);
+				chanalert (s_Services, "kick_chan: %s not found in channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -464,7 +464,9 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
 			AddStringToList (&av, k->nick, &ac);
-			if (kickreason != NULL) AddStringToList (&av, kickreason, &ac);
+			if (kickreason != NULL) {
+				AddStringToList (&av, kickreason, &ac);
+			}
 			ModuleEvent (EVENT_KICK, av, ac);
 			free (av);
 			ac = 0;
@@ -476,21 +478,14 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			AddStringToList (&av, c->name, &ac);
 			AddStringToList (&av, u->nick, &ac);
 			AddStringToList (&av, k->nick, &ac);
-			if (kickreason != NULL) AddStringToList (&av, kickreason, &ac);
+			if (kickreason != NULL) {
+				AddStringToList (&av, kickreason, &ac);
+			}
 			ModuleEvent (EVENT_KICKBOT, av, ac);
 			free (av);
 			ac = 0;
-
 		}
-		un = list_find (u->chans, c->name, comparef);
-		if (!un) {
-			nlog (LOG_WARNING, LOG_CORE, "Kick:Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-			if (me.debug_mode) {
-				chanalert (s_Services, "Kick: Hu, User %s claims not to be part of Chan %s", u->nick, chan);
-				ChanDump (c->name);
-				UserDump (u->nick);
-			}
-		} else {
+		if (un) {
 			lnode_destroy (list_delete (u->chans, un));
 		}
 		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
