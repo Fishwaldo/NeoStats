@@ -159,10 +159,6 @@ static int InitMe( void )
 	strlcpy( nsconfig.debugmodule, "all", MAX_MOD_NAME );
 #ifdef WIN32
 	nsconfig.loglevel = LOG_NORMAL;
-#else /* WIN32 */
-	/* get our commandline options */
-	if( get_options( argc, argv ) != NS_SUCCESS )
-		return EXIT_FAILURE;
 #endif /* WIN32 */
 	return NS_SUCCESS;
 }
@@ -298,6 +294,11 @@ int main( int argc, char *argv[] )
 
 	if( InitMe() != NS_SUCCESS )
 		return EXIT_FAILURE;
+#ifndef WIN32
+	/* get our commandline options */
+	if( get_options( argc, argv ) != NS_SUCCESS )
+		return EXIT_FAILURE;
+#endif /* !WIN32 */
 #if 0
 	/* Change to the working Directory */
 	if( chdir( NEO_PREFIX ) < 0 ) {
