@@ -358,6 +358,8 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 #define CLOAKKEYLEN		(40 + 1)
 
 #define HOSTIPLEN		15	/* Size of IP address in dotted quad */
+/* Size of nick!user@host mask */
+#define	USERHOSTLEN		(MAXNICK + MAXHOST + MAXUSER + 5)
 
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
@@ -513,6 +515,8 @@ typedef struct User {
 	char vhost[MAXHOST];
 	char awaymsg[MAXHOST];
 	char swhois[MAXHOST];
+	char userhostmask[USERHOSTLEN];
+	char uservhostmask[USERHOSTLEN];
 	int flood;
 	int is_away;
 	time_t tslastmsg;

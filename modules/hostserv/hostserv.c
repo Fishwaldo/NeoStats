@@ -75,7 +75,7 @@ static Bot *hs_bot;
 
 /** Copyright info */
 const char *hs_copyright[] = {
-	"Copyright( c ) 1999-2005, NeoStats",
+	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
@@ -189,9 +189,8 @@ int ExpireOldHosts( void )
 	hn = list_first( vhost_list );
 	while( hn != NULL ) {
 		vhe = lnode_get( hn );
-		if( vhe->tslastused <( me.now -( hs_cfg.expire * 86400 ) ) ) {
-			nlog( LOG_NOTICE, "Expiring old vhost: %s for %s",
-			     vhe->vhost, vhe->nick );
+		if( vhe->tslastused < ( me.now -( hs_cfg.expire * 86400 ) ) ) {
+			nlog( LOG_NOTICE, "Expiring old vhost: %s for %s", vhe->vhost, vhe->nick );
 			del_vhost( vhe );
 			hn2 = list_next( vhost_list, hn );
 			list_delete( vhost_list, hn );

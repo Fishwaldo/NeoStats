@@ -1,11 +1,11 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c)1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
-**  (at your option)any later version.
+** ( at your option)any later version.
 **
 **  This program is distributed in the hope that it will be useful,
 **  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,7 +54,7 @@ const char *ea_help_access[] =
 	"        \2ACCESS LIST\2",
 	"",
 	"Manage the list of users having access to NeoStats",
-	"<mask> must be of the form nick!user@host",
+	"<mask> must be of the form user@host",
 	"<level> must be between 0 and 200",
 	NULL
 };
@@ -136,33 +136,33 @@ static int AccessAdd( CmdParams* cmdparams )
 	AccessEntry *access;
 	
 	SET_SEGV_LOCATION();
-	if ( cmdparams->ac < 3 ) 
+	if( cmdparams->ac < 3 ) 
 	{
 		return NS_ERR_NEED_MORE_PARAMS;
 	}
-	if ( hash_lookup( accesshash, cmdparams->av[1] ) ) 
+	if( hash_lookup( accesshash, cmdparams->av[1] ) ) 
 	{
 		irc_prefmsg( NULL, cmdparams->source, "Entry for %s already exists", cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
-	if ( strstr( cmdparams->av[2], "!" ) && !strstr( cmdparams->av[2], "@" ) ) 
+	if( !strstr( cmdparams->av[2], "@" ) ) 
 	{
-		irc_prefmsg( NULL, cmdparams->source, "Invalid format for hostmask. Must be of the form nick!user@host." );
+		irc_prefmsg( NULL, cmdparams->source, "Invalid format for hostmask. Must be of the form user@host." );
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	level = atoi( cmdparams->av[3] );
-	if(level < 0 || level > NS_ULEVEL_ROOT) 
+	if( level < 0 || level > NS_ULEVEL_ROOT) 
 	{
 		irc_prefmsg( NULL, cmdparams->source, "Level out of range. Valid values range from 0 to 200." );
 		return NS_ERR_PARAM_OUT_OF_RANGE;
 	}
-	access = ns_calloc( sizeof(AccessEntry) );
+	access = ns_calloc( sizeof( AccessEntry) );
 	strlcpy( access->nick, cmdparams->av[1], MAXNICK );
 	strlcpy( access->mask, cmdparams->av[2], MAXHOST );
 	access->level = level;
  	hnode_create_insert( accesshash, access, access->nick );
 	/* save the entry */
-	DBAStore( "AccessList", access->nick, (void *)access, sizeof(AccessEntry) );
+	DBAStore( "AccessList", access->nick,( void *)access, sizeof( AccessEntry) );
 	irc_prefmsg( NULL, cmdparams->source, "Successfully added %s for host %s with level %d to access list", access->nick, access->mask, access->level );
 	return NS_SUCCESS;
 }
@@ -181,22 +181,22 @@ static int AccessDel( CmdParams *cmdparams )
 	hnode_t *node;
 
 	SET_SEGV_LOCATION();
-	if ( cmdparams->ac < 1 ) 
+	if( cmdparams->ac < 1 ) 
 	{
 		return NS_ERR_SYNTAX_ERROR;
 	}
 	node = hash_lookup( accesshash, cmdparams->av[1] );
-	if ( node) 
+	if( node ) 
 	{
 		ns_free( hnode_get( node ) );
 		hash_delete( accesshash, node );
 		hnode_destroy( node );
-		DBADelete ("AccessList", cmdparams->av[1] );
-		irc_prefmsg( NULL, cmdparams->source, "Deleted %s from Access List", cmdparams->av[1] );
+		DBADelete( "AccessList", cmdparams->av[1] );
+		irc_prefmsg( NULL, cmdparams->source, "Deleted %s from access list", cmdparams->av[1] );
 	} 
 	else 
 	{
-		irc_prefmsg( NULL, cmdparams->source, "Error, Could not find %s in access list.", cmdparams->av[1] );
+		irc_prefmsg( NULL, cmdparams->source, "Error, %s not found in access list.", cmdparams->av[1] );
 	}
 	return NS_SUCCESS;
 }
@@ -217,9 +217,9 @@ static int AccessList( CmdParams *cmdparams )
 	AccessEntry *access;
 
 	SET_SEGV_LOCATION();	
-	irc_prefmsg( NULL, cmdparams->source, "Access List (%d):", (int)hash_count( accesshash ) );
+	irc_prefmsg( NULL, cmdparams->source, "Access List (%d):",( int )hash_count( accesshash ) );
 	hash_scan_begin( &accessscan, accesshash );
-	while ((node = hash_scan_next( &accessscan ) )!= NULL) 
+	while( ( node = hash_scan_next( &accessscan ) )!= NULL) 
 	{
 		access = hnode_get( node );
 		irc_prefmsg( NULL, cmdparams->source, "%s %s (%d)", access->nick, access->mask, access->level );
@@ -240,15 +240,15 @@ static int AccessList( CmdParams *cmdparams )
 static int ea_cmd_access( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if ( !ircstrcasecmp( cmdparams->av[0], "add" ) ) 
+	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) ) 
 	{
 		return AccessAdd( cmdparams );
 	} 
-	else if ( !ircstrcasecmp( cmdparams->av[0], "del" ) ) 
+	else if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) ) 
 	{
 		return AccessDel( cmdparams );
 	} 
-	else if ( !ircstrcasecmp( cmdparams->av[0], "list" ) ) 
+	else if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) ) 
 	{
 		return AccessList( cmdparams );
 	}
@@ -281,7 +281,7 @@ int ModInit( void )
 
 int ModSynch( void )
 {
-	if ( add_services_cmd_list( extauth_commands ) != NS_SUCCESS ) 
+	if( add_services_cmd_list( extauth_commands ) != NS_SUCCESS ) 
 	{
 		return NS_FAILURE;
 	}
@@ -297,7 +297,7 @@ int ModSynch( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini (void)
+int ModFini( void)
 {
 	del_services_cmd_list( extauth_commands );
 	return NS_SUCCESS;
@@ -318,11 +318,11 @@ int ModAuthUser( Client *u )
 	AccessEntry *access;
 
 	dlog( DEBUG2, "ModAuthUser for %s", u->name );
-	access = (AccessEntry *)hnode_find( accesshash, u->name );
-	if ( access) 
+	access =( AccessEntry *)hnode_find( accesshash, u->name );
+	if( access) 
 	{
 		ircsnprintf( hostmask, MAXHOST, "%s@%s", u->user->username, u->user->hostname );
-		if ( match( access->mask, hostmask ) ) 
+		if( match( access->mask, hostmask ) ) 
 		{
 			return access->level;		
 		}
