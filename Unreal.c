@@ -386,6 +386,13 @@ send_globops (const char *from, const char *buf)
 	sts (":%s %s :%s", from, (me.token ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
 }
 
+void 
+send_svstime (const time_t ts)
+{
+	send_cmd(":%s %s SVSTIME %ld", me.name, (me.token ? TOK_TSCTL : MSG_TSCTL), (long)ts);
+}
+
+
 static void
 m_protocol (char *origin, char **argv, int argc, int srv)
 {

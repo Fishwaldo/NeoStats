@@ -33,6 +33,8 @@
 #undef GOTTOKENSUPPORT
 /* we don't support CLIENT */
 #undef GOTCLIENTSUPPORT
+/* we don't support svstime */
+#undef GOTSVSTIME
 /* we have svshost support */
 #define GOTSVSHOST 
 /* we have svsjoin support */

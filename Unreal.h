@@ -32,6 +32,8 @@
 #define GOTTOKENSUPPORT
 /* we don't support CLIENT */
 #undef GOTCLIENTSUPPORT
+/* we have svstime */
+#define GOTSVSTIME
 /* we have vhost support */
 #define GOTSVSHOST 
 /* we have svsmode */

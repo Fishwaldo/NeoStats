@@ -5,7 +5,7 @@ OBJS = ${SRCS:.c=.o}
 TARGET = connectserv.so
 DISTFILES = $(SRCS) cs.h Makefile ChangeLog
 
-all:	$(TARGET)
+all: $(TARGET)
 
 .c.o:
 	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<

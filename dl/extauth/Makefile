@@ -1,16 +1,14 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../.. -I../../adns
-
-SRCS= $(extauth_src) 
-OBJS= $(extauth_objs)
-TARGET= extauth.so
+SRCS = $(extauth_src) 
+OBJS = $(extauth_objs)
+TARGET = extauth.so
 DISTFILES = serviceroots.c Makefile
 
 all: $(TARGET)
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<
 
 $(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)

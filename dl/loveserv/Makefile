@@ -1,8 +1,8 @@
 include ../../Makefile.inc
 
-SRCS= loveserv.c ls_help.c 
-OBJS= ${SRCS:.c=.o}
-TARGET= loveserv.so
+SRCS = loveserv.c ls_help.c 
+OBJS = ${SRCS:.c=.o}
+TARGET = loveserv.so
 DISTFILES = $(SRCS) loveserv.h Makefile ChangeLog 
 
 all: $(TARGET)

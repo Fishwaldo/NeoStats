@@ -5741,7 +5741,6 @@ fi
 fi
 
 
-
 echo "$as_me:$LINENO: checking whether external symbols need an underscore prefix" >&5
 echo $ECHO_N "checking whether external symbols need an underscore prefix... $ECHO_C" >&6
 if test "${ac_cv_c_extern_prefix+set}" = set; then
@@ -6512,6 +6511,28 @@ echo $ECHO_N "checking The Modules that will be compiled... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $MODULES" >&5
 echo "${ECHO_T}$MODULES" >&6
 
+if test "$prefix" = "NONE"; then
+	cat >>confdefs.h <<_ACEOF
+#define NEOPREFIX "$DIRINST"
+_ACEOF
+
+	echo "$as_me:$LINENO: result: Prefix" >&5
+echo "${ECHO_T}Prefix" >&6
+	echo "$as_me:$LINENO: result: $prefix" >&5
+echo "${ECHO_T}$prefix" >&6
+	echo "$as_me:$LINENO: result: $DIRINST" >&5
+echo "${ECHO_T}$DIRINST" >&6
+else
+	cat >>confdefs.h <<_ACEOF
+#define NEOPREFIX "${prefix}"
+_ACEOF
+
+	echo "$as_me:$LINENO: result: $prefix" >&5
+echo "${ECHO_T}$prefix" >&6
+	echo "$as_me:$LINENO: result: $DIRINST" >&5
+echo "${ECHO_T}$DIRINST" >&6
+fi
+
 
 
 
@@ -6528,6 +6549,7 @@ echo "${ECHO_T}$MODULES" >&6
 cat >>confdefs.h <<\_ACEOF
 #define POSIX_MALLOC_THRESHOLD 10
 _ACEOF
+
 
 
 
@@ -7785,17 +7807,17 @@ echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
 echo "(*----------------------------------------------------------*)"
 echo "(| if you just typed ./configure and didnt read the README  |)"
-echo "(| NeoStats may not be configured correctly                 |)"
-echo "(| We Suggest you at least type ./configure --help          |)"
-echo "(| To see available options and read the Readme file for    |)"
-echo "(| further information on that option                       |)"
+echo "(| NeoStats may not be configured correctly.                |)"
+echo "(| We suggest you at least type ./configure --help to see   |)"
+echo "(| available options and read the README file for further   |)"
+echo "(| information on that option.                              |)"
 echo "(*----------------------------------------------------------*)"
 echo "(| For Support please visit:                                |)"
 echo "(|    IRC:                   /server irc.irc-chat.net       |)"
 echo "(|                                   #neostats channel      |)"
 echo "(|    WWW:   http://www.neostats.net/boards/                |)"
 echo "(*----------------------------------------------------------*)"
-echo "(| Now that Configure is complete, just type 'make' to      |)"
+echo "(| Now that configure is complete, just type 'make' to      |)"
 echo "(| compile the program                                      |)"
 echo "(*----------------------------------------------------------*)"
 if test "$shush" != yes; then

@@ -197,6 +197,9 @@ void send_vctrl (const int uprot, const int nicklen, const int modex, const int 
 #ifdef MSG_BURST
 void send_burst (int b);
 #endif
+#ifdef GOTSVSTIME
+void send_svstime (const time_t ts);
+#endif
 
 int sserver_cmd (const char *name, const int numeric, const char *infoline);
 int ssquit_cmd (const char *server, const char *quitmsg);

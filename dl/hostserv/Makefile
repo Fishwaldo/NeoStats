@@ -1,16 +1,14 @@
 include ../../Makefile.inc
 
-INCLUDES = -I. -I../.. -I../../adns
-
-SRCS= hostserv.c hs_help.c
-OBJS= ${SRCS:.c=.o}
-TARGET= hostserv.so
-DISTFILES = $(SRCS) hostserv.h Makefile README ChangeLog
+SRCS = hostserv.c hs_help.c
+OBJS = ${SRCS:.c=.o}
+TARGET = hostserv.so
+DISTFILES = $(SRCS) hostserv.h Makefile ChangeLog
 
 all: $(TARGET)
 
 .c.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c $<
+	$(CC) $(CFLAGS) $(MODINCLUDES) -c $<
 
 $(TARGET): $(OBJS)
 	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJS)
