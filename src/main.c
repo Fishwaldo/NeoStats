@@ -162,10 +162,12 @@ neostats ()
 	/* out default lang is always -1 */
 	me.lang = -1;
 #ifdef WIN32
+	nsconfig.loglevel = LOG_NORMAL;
+#ifdef DEBUG
 	nsconfig.debug = 1;
-	nsconfig.loglevel = LOG_INFO;
 	nsconfig.debuglevel = DEBUG10;
 	nsconfig.foreground = 1;
+#endif
 	/* default debugmodule to all */
 	strlcpy(nsconfig.debugmodule, "all", MAX_MOD_NAME);
 #else
