@@ -26,6 +26,7 @@
 #ifndef STATS_H
 #define STATS_H
 
+#include <stddef.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>

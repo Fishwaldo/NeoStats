@@ -25,10 +25,14 @@
 ** $Id$
 */
 
+
 #include "stats.h"
 #include "dl.h"
 #include "hash.h"
 #include "log.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
 
 hash_t *sh;
 
@@ -155,15 +159,97 @@ ServerDump ()
 	debugtochannel("End of Listing.");
 }
 
+#ifdef SQLSRV
+COLDEF neo_serverscols[] = {
+	{
+		"servers",
+		"name",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct Server, name),
+		0,
+		NULL,
+		NULL,
+		"The name of the server linked to the IRC network"
+	},
+	{
+		"servers",
+		"hops",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Server, hops),
+		0,
+		NULL, 
+		NULL,
+		"The Number of hops away from the NeoStats Server"
+	},
+	{
+		"servers",
+		"connected",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Server, connected_since),
+		0,
+		NULL,
+		NULL,
+		"The time the server connected to the IRC network"
+	},
+	{
+		"servers",
+		"last_ping",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct Server, ping),
+		0,
+		NULL,
+		NULL,
+		"The last ping time to this server from the NeoStats Server"
+	},
+	{	
+		"servers",
+		"uplink",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct Server, uplink),
+		0,
+		NULL,
+		NULL,
+		"The uplink Server this server is connected to. if it = self, means the NeoStats Server"
+	},
+};
+
+TBLDEF neo_servers = {
+	"servers",
+	NULL, 	/* for now */
+	sizeof(struct Server),
+	0,
+	TBL_HASH,
+	neo_serverscols,
+	sizeof(neo_serverscols) / sizeof(COLDEF),
+	"",
+	"The list of Servers connected to the IRC network"
+};
+#endif /* SQLSRV */
+
+
 int 
 init_server_hash ()
 {
+
+
 	sh = hash_create (S_TABLE_SIZE, 0, 0);
 	if (!sh) {
 		nlog (LOG_CRITICAL, LOG_CORE, "Create Server Hash Failed\n");
 		return NS_FAILURE;
 	}
 	AddServer (me.name, NULL, 0);
+#ifdef SQLSRV
+	/* add the server hash to the sql library */
+	neo_servers.address = sh;
+	rta_add_table(&neo_servers);
+#endif
+
+
 	return NS_SUCCESS;
 }
 

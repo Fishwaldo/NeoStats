@@ -33,6 +33,7 @@
 
 static char ircd_buf[BUFSIZE];
 static char UmodeStringBuf[64];
+static char SmodeStringBuf[64];
 
 /** @brief UmodeMaskToString
  *
@@ -82,6 +83,41 @@ UmodeStringToMask(char* UmodeString)
 		tmpmode = *UmodeString++;
 	}
 	return(Umode);
+}
+
+/** @brief SmodeMaskToString
+ *
+ *  Translate a smode mask to the string equivalent
+ *
+ * @return 
+ */
+char* 
+SmodeMaskToString(long Smode) 
+{
+	int i, j;
+
+	SmodeStringBuf[0] = '+';
+	j = 1;
+	for (i = 0; i < ircd_srv.usmodecount; i++) {
+		if (Smode & susr_mds[i].umodes) {
+			SmodeStringBuf[j] = susr_mds[i].mode;
+			j++;
+		}
+	}
+	SmodeStringBuf[j] = '\0';
+	return(SmodeStringBuf);
+}
+
+/** @brief SmodeStringToMask
+ *
+ *  Translate a smode string to the mask equivalent
+ *
+ * @return 
+ */
+long
+SmodeStringToMask(char* SmodeString)
+{
+	return(0);
 }
 
 /** @brief init_bot_modes

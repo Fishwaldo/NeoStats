@@ -61,6 +61,8 @@ extern aCtab cFlagTab[33];
 
 char* UmodeMaskToString(long Umode);
 long UmodeStringToMask(char* UmodeString);
+char* SmodeMaskToString(long Umode);
+long SmodeStringToMask(char* UmodeString);
 int init_services_bot (void);
 void ns_usr_motd (char *nick, char **argv, int argc);
 void ns_usr_admin (char *nick, char **argv, int argc);

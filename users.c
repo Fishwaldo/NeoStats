@@ -32,6 +32,10 @@
 #include "log.h"
 #include "users.h"
 #include "chans.h"
+#ifdef SQLSRV
+#include "sqlsrv/rta.h"
+#endif
+
 
 hash_t *uh;
 
@@ -233,6 +237,154 @@ finduser (const char *nick)
 	return NULL;
 }
 
+#ifdef SQLSRV
+
+/* @brief Returns the users server in text form that they are connected too
+*/
+
+void *display_server(void *tbl, char *col, char *sql, void *row) {
+        User *data = row;
+	return data->server->name;                        
+}                        
+
+void *display_umode(void *tbl, char *col, char *sql, void *row) {
+	User *data = row;
+	return UmodeMaskToString(data->Umode);
+}
+
+void *display_smode(void *tbl, char *col, char *sql, void *row) {
+	User *data = row;
+	return SmodeMaskToString(data->Smode);
+}
+
+COLDEF neo_userscols[] = {
+	{
+		"users",
+		"nick",
+		RTA_STR,
+		MAXNICK,
+		offsetof(struct User, nick),
+		0,
+		NULL,
+		NULL,
+		"The nickname of the user"
+	},
+	{
+		"users",
+		"hostname",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct User, hostname),
+		0,
+		NULL, 
+		NULL,
+		"The real Hostname of the user"
+	},
+	{
+		"users",
+		"ident",
+		RTA_STR,
+		MAXUSER,
+		offsetof(struct User, username),
+		0,
+		NULL,
+		NULL,
+		"The ident portion of the users connection"
+	},
+	{
+		"users",
+		"realname",
+		RTA_STR,
+		MAXREALNAME,
+		offsetof(struct User, realname),
+		0,
+		NULL,
+		NULL,
+		"The users realname/info message"
+	},
+	{	
+		"users",
+		"vhost",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct User, vhost),
+		0,
+		NULL,
+		NULL,
+		"The users Vhost, if the IRCd supports VHOSTS"
+	},
+	{	
+		"users",
+		"away",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct User, is_away),
+		0,
+		NULL,
+		NULL,
+		"Boolean variable indiciating if the user is away"
+	},
+	{	
+		"users",
+		"modes",
+		RTA_STR,
+		64, 				/* as defined in ircd.c */
+		offsetof(struct User, Umode),
+		0,
+		display_umode,
+		NULL,
+		"the users umodes. Does not include SMODES."
+	},
+	{	
+		"users",
+		"smodes",
+		RTA_STR,
+		64,
+		offsetof(struct User, Smode),
+		0,
+		display_smode,
+		NULL,
+		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
+	},
+	{	
+		"users",
+		"connected",
+		RTA_INT,
+		sizeof(int),
+		offsetof(struct User, TS),
+		0,
+		NULL,
+		NULL,
+		"When the User Connected"
+	},
+	{	
+		"users",
+		"server",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct User, server),
+		0,
+		display_server,
+		NULL,
+		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
+	},
+
+};
+
+TBLDEF neo_users = {
+	"users",
+	NULL, 	/* for now */
+	sizeof(struct User),
+	0,
+	TBL_HASH,
+	neo_userscols,
+	sizeof(neo_userscols) / sizeof(COLDEF),
+	"",
+	"The list of users connected to the IRC network"
+};
+#endif /* SQLSRV */
+
+
 
 int
 init_user_hash ()
@@ -240,6 +392,14 @@ init_user_hash ()
 	uh = hash_create (U_TABLE_SIZE, 0, 0);
 	if(!uh)	
 		return NS_FAILURE;
+
+#ifdef SQLSRV
+	/* add the server hash to the sql library */
+	neo_users.address = uh;
+	rta_add_table(&neo_users);
+#endif
+
+
 	return NS_SUCCESS;
 }
 

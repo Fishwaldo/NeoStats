@@ -1067,9 +1067,9 @@ static void
 Srv_Client (char *origin, char **argv, int argc)
 {
 	char *realname;
-
 	realname = joinbuf (argv, argc, 11);
 	AddUser (argv[0], argv[5], argv[6], realname, argv[8], strtoul (argv[10], NULL, 10), strtoul (argv[2], NULL, 10));
+	SetUserVhost(argv[0], argv[7]);
 	free (realname);
 	nlog (LOG_DEBUG1, LOG_CORE, "Mode: UserMode: %s", argv[3]);
 	UserMode (argv[0], argv[3]);
