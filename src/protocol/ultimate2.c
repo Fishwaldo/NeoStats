@@ -51,30 +51,14 @@ static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_pass (char *origin, char **argv, int argc, int srv);
 static void m_svsnick (char *, char **, int argc, int srv);
 static void m_protoctl (char *, char **, int argc, int srv);
-#ifdef ULTIMATE3
-static void m_svinfo (char *, char **, int argc, int srv);
-static void m_burst (char *origin, char **argv, int argc, int srv);
-static void m_sjoin (char *origin, char **argv, int argc, int srv);
-static void m_client (char *origin, char **argv, int argc, int srv);
-static void m_smode (char *origin, char **argv, int argc, int srv);
-#else
 static void m_snetinfo (char *origin, char **argv, int argc, int srv);
-#endif
 static void m_vctrl (char *origin, char **argv, int argc, int srv);
 
-#ifdef ULTIMATE3
-const int ircd_minprotocol = PROTOCOL_SJOIN;
-const int ircd_optprotocol = PROTOCOL_CLIENT;
-const int ircd_features = 0;
-const char services_umode[]= "+oS";
-const char services_cmode[]= "+a";
-#else
 const int ircd_minprotocol = PROTOCOL_SJOIN;
 const int ircd_optprotocol = 0;
 const int ircd_features = 0;
 const char services_umode[]= "+oS";
 const char services_cmode[]= "+a";
-#endif
 
 /* Ultimate 2 does support these 5 tokens so may need to add them back 
  * in at some point
@@ -105,16 +89,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_JOIN,      TOK_JOIN,      m_join,      0},
 	{MSG_PART,      0,      m_part,      0},
 	{MSG_PING,      0,      m_ping,      0},
-#ifdef ULTIMATE3
-	{MSG_SVINFO,    NULL,          m_svinfo,    0},
-	{MSG_CAPAB,     NULL,          m_protoctl,  0},
-	{MSG_BURST,     NULL,          m_burst,     0},
-	{MSG_SJOIN,     NULL,          m_sjoin,     0},
-	{MSG_CLIENT,    NULL,          m_client,    0},
-	{MSG_SMODE,     NULL,          m_smode,     0},
-#else
 	{MSG_SNETINFO,  0,  m_snetinfo,   0},
-#endif
 	{MSG_VCTRL,     0,     m_vctrl,     0},
 	{MSG_PASS,      0,      m_pass,      0},
 	{MSG_SVSNICK,   0,   m_svsnick,   0},
@@ -153,54 +128,6 @@ cmode_init chan_modes[] = {
 	{0, 0, 0},
 };
 
-#ifdef ULTIMATE3
-umode_init user_umodes[] = {
-	{'Z', UMODE_SRA},
-	{'S', UMODE_SERVICES},
-	{'P', UMODE_SADMIN},
-	{'a', UMODE_SERVICESOPER},
-	{'o', UMODE_OPER},
-	{'O', UMODE_LOCOP},
-	{'r', UMODE_REGNICK},
-	{'i', UMODE_INVISIBLE},
-	{'w', UMODE_WALLOP},
-	{'s', UMODE_SERVNOTICE},
-	{'c', UMODE_CLIENT},
-	{'k', UMODE_KILLS},
-	{'h', UMODE_HELPOP},
-	{'f', UMODE_FLOOD},
-	{'y', UMODE_SPY},
-	{'D', UMODE_DCC},
-	{'g', UMODE_GLOBOPS},
-	{'c', UMODE_CHATOPS},
-	{'j', UMODE_REJ},
-	{'n', UMODE_ROUTE},
-	{'m', UMODE_SPAM},
-	{'x', UMODE_HIDE},
-	{'p', UMODE_KIX},
-	{'F', UMODE_FCLIENT},
-#if 0
-	/* useless modes, ignore them as services use these modes for services ID */
-	{'d', UMODE_DEBUG},
-#endif
-	{'e', UMODE_DCCWARN},
-	{'W', UMODE_WHOIS},
-	{0, 0},
-};
-
-umode_init user_smodes[] = {
-	{'N', SMODE_NETADMIN},
-	{'n', SMODE_CONET},
-	{'T', SMODE_TECHADMIN},
-	{'t', SMODE_COTECH},
-	{'A', SMODE_SERVADMIN},
-	{'G', SMODE_GUEST},
-	{'a', SMODE_COADMIN},
-	{'s', SMODE_SSL},
-	{0, 0},
-};
-
-#else
 umode_init user_umodes[] = {
 	{'S', UMODE_SERVICES},
 	{'P', UMODE_SADMIN},
@@ -230,7 +157,6 @@ umode_init user_umodes[] = {
 umode_init user_smodes[] = {
 	{0, '0'},
 };
-#endif
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 
@@ -243,16 +169,10 @@ send_server (const char *sender, const char *name, const int numeric, const char
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
-#ifdef ULTIMATE3
-	send_cmd ("%s %s :TS", MSG_PASS, pass);
-	send_cmd ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
-	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
-#else
 	send_cmd ("%s %s", MSG_PASS, pass);
 	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 /*	send_cmd ("%s TOKEN CLIENT", MSG_PROTOCTL);*/
 	send_cmd ("%s CLIENT", MSG_PROTOCTL);
-#endif
 }
 
 void
@@ -276,9 +196,6 @@ send_part (const char *who, const char *chan)
 void 
 send_sjoin (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-#ifdef ULTIMATE3
-	send_cmd (":%s %s %lu %s + :%s", sender, MSG_SJOIN, ts, chan, who);
-#endif
 }
 
 void 
@@ -296,12 +213,8 @@ send_cmode (const char *sender, const char *who, const char *chan, const char *m
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
-#ifdef ULTIMATE3
-	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, ts, newmode, ident, host, server, ts, realname);
-#else
 	send_cmd ("%s %s 1 %lu %s %s %s 0 :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), nick, ts, ident, host, server, realname);
 	send_umode (nick, nick, newmode);
-#endif
 }
 
 void
@@ -397,11 +310,7 @@ send_wallops (const char *who, const char *buf)
 void
 send_svshost (const char *sender, const char *who, const char *vhost)
 {
-#ifdef ULTIMATE3
-	send_cmd (":%s %s %s %s", sender, MSG_SETHOST, who, vhost);
-#elif ULTIMATE
 	send_cmd (":%s %s %s %s", sender, MSG_CHGHOST, who, vhost);
-#endif
 }
 
 void
@@ -413,22 +322,14 @@ send_invite (const char *from, const char *to, const char *chan)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-#ifdef ULTIMATE3
-	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
-#elif ULTIMATE
 	send_cmd (":%s %s %s@%s %lu %lu %s :%s", sender, MSG_GLINE, ident, host, (ts + length), ts, setby, reason);
-#endif
 }
 
 void 
 send_rakill (const char *sender, const char *host, const char *ident)
 {
-#ifdef ULTIMATE3
-	send_cmd (":%s %s %s %s", sender, MSG_RAKILL, host, ident);
-#elif ULTIMATE
 	/* ultimate2 needs an oper to remove */
 	send_cmd (":%s %s :%s@%s", ns_botptr->nick, MSG_REMGLINE, host, ident);
-#endif
 }
 
 void
@@ -481,23 +382,6 @@ void
 send_svsmode (const char *sender, const char *target, const char *modes)
 {
 }
-
-#ifdef ULTIMATE3
-/* :from SJOIN TS #chan modebuf  :nickbuf */
-/* :from SJOIN TS #chan modebuf parabuf :nickbuf */
-/* :from SJOIN TS #chan */
-static void
-m_sjoin (char *origin, char **argv, int argc, int srv)
-{
-	do_sjoin (argv[0], argv[1], ((argc <= 2) ? argv[1] : argv[2]), origin, argv, argc);
-}
-
-static void
-m_burst (char *origin, char **argv, int argc, int srv)
-{
-	do_burst (origin, argv, argc);
-}
-#endif
 
 static void
 m_protoctl (char *origin, char **argv, int argc, int srv)
@@ -563,11 +447,7 @@ m_svsmode (char *origin, char **argv, int argc, int srv)
 	if (argv[0][0] == '#') {
 		do_svsmode_channel (origin, argv, argc);
 	} else {
-#ifdef ULTIMATE3
-		do_svsmode_user (argv[0], argv[2], NULL);
-#else
 		do_svsmode_user (argv[0], argv[1], NULL);
-#endif
 	}
 }
 static void
@@ -587,11 +467,7 @@ m_kill (char *origin, char **argv, int argc, int srv)
 static void
 m_vhost (char *origin, char **argv, int argc, int srv)
 {
-#ifdef ULTIMATE3
-	do_vhost (argv[0], argv[1]);
-#else
 	do_vhost (origin, argv[0]);
-#endif
 }
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
@@ -607,13 +483,8 @@ static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(!srv) {
-#ifdef ULTIMATE3
-		do_nick (argv[0], argv[1], argv[2], argv[4], argv[5], argv[6], 
-			argv[8], NULL, argv[3], NULL, argv[9], NULL, NULL);
-#elif ULTIMATE
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 			NULL, NULL, NULL, NULL, argv[7], NULL, NULL);
-#endif
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -652,44 +523,16 @@ m_vctrl (char *origin, char **argv, int argc, int srv)
 	do_vctrl (argv[0], argv[1], argv[2], argv[3], argv[14]);
 }
 
-#ifdef ULTIMATE3
-static void
-m_svinfo (char *origin, char **argv, int argc, int srv)
-{
-	do_svinfo ();
-}
-#endif
-
-#ifndef ULTIMATE3
 static void
 m_snetinfo (char *origin, char **argv, int argc, int srv)
 {
 	do_snetinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
 }
-#endif
 
 static void
 m_pass (char *origin, char **argv, int argc, int srv)
 {
 }
-
-/* Ultimate3 Client Support */
-#ifdef ULTIMATE3
-static void
-m_client (char *origin, char **argv, int argc, int srv)
-{
-	do_client (argv[0], NULL, argv[2], argv[3], argv[4], argv[5], argv[6], 
-		 argv[7], argv[8], NULL, argv[10], argv[11]);
-}
-
-static void
-m_smode (char *origin, char **argv, int argc, int srv)
-{
-	do_smode (argv[0], argv[1]);
-};
-
-/* ultimate 3 */
-#endif
 
 static void
 m_svsnick (char *origin, char **argv, int argc, int srv)

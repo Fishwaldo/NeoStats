@@ -217,9 +217,9 @@ AC_MSG_CHECKING(Whether to Enable Unreal 3.1.x IRCD Support...)
 AC_ARG_ENABLE(unreal31, [  --enable-unreal31 - enable Unreal 3.1.x IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
+	AC_DEFINE(UNREAL31, 1, 'Enable Unreal 3.1.x Support')
     	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.1", "IRCd Protocol we are compiled with")
-	PROTOCOL="unreal"
+	PROTOCOL="unreal31"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -231,10 +231,9 @@ AC_MSG_CHECKING(Whether to Enable Unreal 3.2.x IRCD Support...)
 AC_ARG_ENABLE(unreal32, [  --enable-unreal32 - enable Unreal 3.2.x IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_DEFINE(UNREAL, 1, 'Enable Unreal 3.1.x Support')
 	AC_DEFINE(UNREAL32, 1, 'Enable Unreal 3.2.x Support')
     	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Unreal 3.2", "IRCd Protocol we are compiled with")
-	PROTOCOL="unreal"
+	PROTOCOL="unreal32"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -248,9 +247,9 @@ AC_MSG_CHECKING(Whether to Enable Ultimate 2.x.x IRCD Support...)
 AC_ARG_ENABLE(ultimate2, [  --enable-ultimate2 - enable Ultimate 2.x.x IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate Support')
+	AC_DEFINE(ULTIMATE2, 1, 'Enable Ultimate Support')
     	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 2.x.x")
-	PROTOCOL="ultimate"
+	PROTOCOL="ultimate2"
 	AC_MSG_RESULT(yes)
 	;;
   *)
@@ -263,10 +262,9 @@ AC_MSG_CHECKING(Whether to Enable Ultimate 3.x.x IRCD Support...)
 AC_ARG_ENABLE(ultimate3, [  --enable-ultimate3 - enable Ultimate 3.x.x IRCD Support],
 [ case "$enableval" in
   yes)  
-	AC_DEFINE(ULTIMATE, 1, 'Enable Ultimate 2.x.x Support')
 	AC_DEFINE(ULTIMATE3, 1, "Enable Ultimate 3.x.x Support')
     	AC_DEFINE_UNQUOTED(NS_PROTOCOL, "Ultimate 3.x.x")
-	PROTOCOL="ultimate"
+	PROTOCOL="ultimate3"
 	AC_MSG_RESULT(yes)
 	;;
   *)

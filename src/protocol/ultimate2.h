@@ -29,23 +29,10 @@
  * certain functionality is available
  */
 
-#ifdef ULTIMATE3
-
-#define FEATURES FEATURE_SVSHOST \
-	| FEATURE_SMODES \
-	| FEATURE_NICKIP \
-	| FEATURE_SVSJOIN \
-	| FEATURE_SVSNICK \
-	| FEATURE_SVSKILL 
-
-#else /* !ULTIMATE3 */
-
 #define FEATURES FEATURE_SVSHOST \
 	| FEATURE_SVSPART \
 	| FEATURE_SVSNICK \
 	| FEATURE_BOTMODES
-
-#endif /* ULTIMATE3 */
 
 /* buffer sizes */
 #define MAXHOST			(128 + 1)
@@ -345,21 +332,6 @@
 #define MSG_SMODE	"SMODE"
 
 /* IRCD Specific mode chars */
-#ifdef ULTIMATE3
-#define UMODE_CH_LOCOP 'O'
-#define UMODE_CH_OPER 'o'
-#define UMODE_CH_SADMIN 'a'
-#define UMODE_CH_SERVICES 'S'
-
-/* Smode chars */
-#define SMODE_CH_GUESTADMIN 'G'
-#define SMODE_CH_COADMIN 'J'
-#define SMODE_CH_ADMIN 'A'
-#define SMODE_CH_CONETADMIN 'n'
-#define SMODE_CH_NETADMIN 'N'
-#define SMODE_CH_COTECHADMIN 't'
-#define SMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
-#else
 
 /* Umode chars */
 #define UMODE_CH_LOCOP 'O'
@@ -372,38 +344,8 @@
 #define UMODE_CH_SADMIN 'P'
 #define UMODE_CH_SERVICES 'S'
 #define UMODE_CH_BOT 'B'
-#endif
 
 /* Umodes */
-#ifdef ULTIMATE3
-#define UMODE_OPER     	0x00000001	/* umode +o - Oper */
-#define UMODE_LOCOP     	0x00000002	/* umode +O - Local Oper */
-#define UMODE_INVISIBLE     	0x00000004	/* umode +i - Invisible */
-#define UMODE_WALLOP     	0x00000008	/* umode +w - Get wallops */
-#define UMODE_SERVNOTICE     	0x00000010	/* umode +s - Server notices */
-#define UMODE_CLIENT     	0x00000020	/* umode +c - Client connections/exits */
-#define UMODE_REGNICK     	0x00000040	/* umode +r - registered nick - Should be moved to smode if possible without breaking services compat*/
-#define UMODE_KILLS     	0x00000080	/* umode +k - Server kill messages */
-#define UMODE_FLOOD     	0x00000100	/* umode +f - Server flood messages */
-#define UMODE_SPY		0x00000200	/* umode +y - Stats/links */
-#define UMODE_DCC     	0x00000400	/* umode +D - pseudo/hidden, has seen dcc warning message */
-#define UMODE_GLOBOPS     	0x00001000	/* umode +g - Globops */
-#define UMODE_CHATOPS     	0x00002000	/* umode +C - Chatops */
-#define UMODE_SERVICESOPER     	0x00004000	/* umode +a - Services Operator - Should be moved to smode */
-#define UMODE_REJ		0x00008000	/* umode +j - Reject notices */
-#define UMODE_ROUTE     	0x00010000	/* umode +n - Routing Notices */
-#define UMODE_HELPOP     	0x00020000	/* umode +h - Helper */
-#define UMODE_SPAM     	0x00040000	/* umode +m - spambot notices */
-#define UMODE_HIDE     	0x00080000	/* umode +x - hidden hostname */
-#define UMODE_SRA		0x01000000	/* umode +Z - Services Root Admin - Should be moved to smode */
-#define UMODE_SADMIN		0x02000000	/* umode +P - Services Admin - Should be moved to smode */
-#define UMODE_SERVICES		0x04000000	/* umode +S - Services Client - Should be moved to smode if possible without breaking services compat */
-#define UMODE_KIX		0x08000000	/* umode +p - Protected Oper */
-#define UMODE_FCLIENT		0x10000000	/* umode +F - Global client connections/exits */
-#define UMODE_DEBUG		0x20000000	/* umode +d - Debug Info */
-#define UMODE_DCCWARN		0x40000000	/* umode +e - See DCC send warnings */
-#define UMODE_WHOIS		0x80000000	/* umode +W - Opers can see when a user /whois's them */
-#else
 #define UMODE_INVISIBLE  	0x0001	/* makes user invisible */
 #define UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_WALLOP     	0x0004	/* send wallops to them */
@@ -434,7 +376,6 @@
 #define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
 #define UMODE_ADMIN		0x10000000	/* Marks the client as a Server Admin */
 #define UMODE_TECHADMIN		0x20000000	/* Marks the client as a Technical Admin */
-#endif
 
 /* Smodes */
 #define SMODE_SSL		0x1	/* ssl client */
@@ -455,10 +396,6 @@
 
 /* Umode macros */
 #define is_oper(x) ((x) && ((x->Umode & UMODE_OPER) || (x->Umode & UMODE_LOCOP)))
-#ifdef ULTIMATE3
-#define is_bot(x) (0)
-#else /* !ULTIMATE3 */
 #define is_bot(x) ((x) && ((x->Umode & UMODE_RBOT) || (x->Umode & UMODE_SBOT)))
-#endif /* ULTIMATE3 */
 
 #endif

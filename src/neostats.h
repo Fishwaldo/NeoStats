@@ -148,9 +148,11 @@
 #if UNREAL31 == 1
 #include "protocol/unreal31.h"
 #elif UNREAL32 == 1
-#include "protocol/unreal.h"
-#elif ULTIMATE == 1
-#include "protocol/ultimate.h"
+#include "protocol/unreal32.h"
+#elif ULTIMATE2 == 1
+#include "protocol/ultimate2.h"
+#elif ULTIMATE3 == 1
+#include "protocol/ultimate3.h"
 #elif HYBRID7 == 1	
 #include "protocol/hybrid7.h"
 #elif NEOIRCD == 1

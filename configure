@@ -27703,7 +27703,7 @@ if test "${enable_unreal31+set}" = set; then
   yes)
 
 cat >>confdefs.h <<\_ACEOF
-#define UNREAL 1
+#define UNREAL31 1
 _ACEOF
 
 
@@ -27711,7 +27711,7 @@ cat >>confdefs.h <<_ACEOF
 #define NS_PROTOCOL "Unreal 3.1"
 _ACEOF
 
-	PROTOCOL="unreal"
+	PROTOCOL="unreal31"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -27733,11 +27733,6 @@ if test "${enable_unreal32+set}" = set; then
   yes)
 
 cat >>confdefs.h <<\_ACEOF
-#define UNREAL 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
 #define UNREAL32 1
 _ACEOF
 
@@ -27746,7 +27741,7 @@ cat >>confdefs.h <<_ACEOF
 #define NS_PROTOCOL "Unreal 3.2"
 _ACEOF
 
-	PROTOCOL="unreal"
+	PROTOCOL="unreal32"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -27769,14 +27764,14 @@ if test "${enable_ultimate2+set}" = set; then
   yes)
 
 cat >>confdefs.h <<\_ACEOF
-#define ULTIMATE 1
+#define ULTIMATE2 1
 _ACEOF
 
     	cat >>confdefs.h <<_ACEOF
 #define NS_PROTOCOL "Ultimate 2.x.x"
 _ACEOF
 
-	PROTOCOL="ultimate"
+	PROTOCOL="ultimate2"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
@@ -27799,11 +27794,6 @@ if test "${enable_ultimate3+set}" = set; then
   yes)
 
 cat >>confdefs.h <<\_ACEOF
-#define ULTIMATE 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
 #define ULTIMATE3 1
 _ACEOF
 
@@ -27811,7 +27801,7 @@ _ACEOF
 #define NS_PROTOCOL "Ultimate 3.x.x"
 _ACEOF
 
-	PROTOCOL="ultimate"
+	PROTOCOL="ultimate3"
 	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	;;
