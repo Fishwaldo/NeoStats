@@ -33,42 +33,48 @@
 #include "server.h"
 #include "chans.h"
 
-void Usr_Version (char *origin, char **argv, int argc);
-void Usr_ShowMOTD (char *origin, char **argv, int argc);
-void Usr_ShowADMIN (char *origin, char **argv, int argc);
-void Usr_Showcredits (char *origin, char **argv, int argc);
-void Usr_AddServer (char *origin, char **argv, int argc);
-void Usr_DelServer (char *origin, char **argv, int argc);
-void Usr_DelUser (char *origin, char **argv, int argc);
-void Usr_Mode (char *origin, char **argv, int argc);
-void Usr_Smode (char *origin, char **argv, int argc);
-void Usr_Kill (char *origin, char **argv, int argc);
-void Usr_Pong (char *origin, char **argv, int argc);
-void Usr_Away (char *origin, char **argv, int argc);
-void Usr_Nick (char *origin, char **argv, int argc);
-void Usr_Topic (char *origin, char **argv, int argc);
-void Usr_Kick (char *origin, char **argv, int argc);
-void Usr_Join (char *origin, char **argv, int argc);
-void Usr_Part (char *origin, char **argv, int argc);
-void Usr_Stats (char *origin, char **argv, int argc);
-void Usr_Vhost (char *origin, char **argv, int argc);
-void Srv_Topic (char *origin, char **argv, int argc);
-void Srv_Ping (char *origin, char **argv, int argc);
-void Srv_Netinfo (char *origin, char **argv, int argc);
-void Srv_Pass (char *origin, char **argv, int argc);
-void Srv_Server (char *origin, char **argv, int argc);
-void Srv_Squit (char *, char **, int argc);
-void Srv_Nick (char *, char **, int argc);
-void Srv_Svsnick (char *, char **, int argc);
-void Srv_Kill (char *, char **, int argc);
-void Srv_Connect (char *, char **, int argc);
-void Srv_Svinfo (char *, char **, int argc);
-void Srv_Burst (char *origin, char **argv, int argc);
-void Srv_Sjoin (char *origin, char **argv, int argc);
-void Srv_Tburst (char *origin, char **argv, int argc);
-void Srv_Vctrl (char *origin, char **argv, int argc);
-void Srv_Client (char *origin, char **argv, int argc);
-void Srv_Smode (char *origin, char **argv, int argc);
+static void Usr_Version (char *origin, char **argv, int argc);
+static void Usr_ShowMOTD (char *origin, char **argv, int argc);
+static void Usr_ShowADMIN (char *origin, char **argv, int argc);
+static void Usr_Showcredits (char *origin, char **argv, int argc);
+static void Usr_AddServer (char *origin, char **argv, int argc);
+static void Usr_DelServer (char *origin, char **argv, int argc);
+static void Usr_DelUser (char *origin, char **argv, int argc);
+static void Usr_Mode (char *origin, char **argv, int argc);
+static void Usr_Smode (char *origin, char **argv, int argc);
+static void Usr_Kill (char *origin, char **argv, int argc);
+static void Usr_Pong (char *origin, char **argv, int argc);
+static void Usr_Away (char *origin, char **argv, int argc);
+static void Usr_Nick (char *origin, char **argv, int argc);
+static void Usr_Topic (char *origin, char **argv, int argc);
+static void Usr_Kick (char *origin, char **argv, int argc);
+static void Usr_Join (char *origin, char **argv, int argc);
+static void Usr_Part (char *origin, char **argv, int argc);
+static void Usr_Stats (char *origin, char **argv, int argc);
+static void Usr_Vhost (char *origin, char **argv, int argc);
+static void Srv_Ping (char *origin, char **argv, int argc);
+#ifndef ULTIMATE3
+static void Srv_Netinfo (char *origin, char **argv, int argc);
+#endif
+static void Srv_Pass (char *origin, char **argv, int argc);
+static void Srv_Server (char *origin, char **argv, int argc);
+static void Srv_Squit (char *, char **, int argc);
+static void Srv_Nick (char *, char **, int argc);
+static void Srv_Svsnick (char *, char **, int argc);
+static void Srv_Kill (char *, char **, int argc);
+static void Srv_Connect (char *, char **, int argc);
+#ifdef ULTIMATE3
+static void Srv_Svinfo (char *, char **, int argc);
+static void Srv_Burst (char *origin, char **argv, int argc);
+static void Srv_Sjoin (char *origin, char **argv, int argc);
+#endif
+static void Srv_Vctrl (char *origin, char **argv, int argc);
+#ifdef ULTIMATE3
+static void Srv_Client (char *origin, char **argv, int argc);
+static void Srv_Smode (char *origin, char **argv, int argc);
+#endif
+
+static int vctrl_cmd ();
 
 static char ircd_buf[BUFSIZE];
 
@@ -97,6 +103,10 @@ IntCommands cmd_list[] = {
 	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
 	,
 	{TOK_MOTD, Usr_ShowMOTD, 1, 0}
+	,
+	{MSG_ADMIN, Usr_ShowADMIN, 1, 0}
+	,
+	{TOK_ADMIN, Usr_ShowADMIN, 1, 0}
 	,
 	{MSG_CREDITS, Usr_Showcredits, 1, 0}
 	,
@@ -964,6 +974,7 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	list_destroy (tl);
 }
 
+#ifdef ULTIMATE3
 void
 Srv_Burst (char *origin, char **argv, int argc)
 {
@@ -972,12 +983,13 @@ Srv_Burst (char *origin, char **argv, int argc)
 			sburst_cmd (0);
 			ircd_srv.burst = 0;
 			me.synced = 1;
-			init_ServBot ();
+			init_services_bot ();
 		}
 	} else {
 		ircd_srv.burst = 1;
 	}
 }
+#endif
 
 void
 Srv_Connect (char *origin, char **argv, int argc)
@@ -1006,7 +1018,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
 		return;
 	}
-	ShowStats (argv[0], u);
+	ns_stats (argv[0], u);
 }
 
 void
@@ -1018,19 +1030,19 @@ Usr_Version (char *origin, char **argv, int argc)
 void
 Usr_ShowMOTD (char *origin, char **argv, int argc)
 {
-	ShowMOTD (origin);
+	ns_motd (origin);
 }
 
 void
 Usr_ShowADMIN (char *origin, char **argv, int argc)
 {
-	ShowADMIN (origin);
+	ns_admin (origin);
 }
 
 void
 Usr_Showcredits (char *origin, char **argv, int argc)
 {
-	Showcredits (origin);
+	ns_credits (origin);
 }
 
 void
@@ -1210,11 +1222,13 @@ Srv_Vctrl (char *origin, char **argv, int argc)
 	vctrl_cmd ();
 }
 
+#ifdef ULTIMATE3
 void
 Srv_Svinfo (char *origin, char **argv, int argc)
 {
 	ssvinfo_cmd ();
 }
+#endif
 
 #ifndef ULTIMATE3
 void
@@ -1226,7 +1240,7 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	strlcpy (me.netname, argv[7], MAXPASS);
 
 	snetinfo_cmd ();
-	init_ServBot ();
+	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 #ifdef DEBUG
 	me.debug_mode = 1;
@@ -1265,8 +1279,6 @@ Srv_Squit (char *origin, char **argv, int argc)
 	}
 
 }
-
-/* BE REALLY CAREFULL ABOUT THE ORDER OF THESE ifdef's */
 
 void
 Srv_Nick (char *origin, char **argv, int argc)

@@ -289,7 +289,6 @@ extern int ssvspart_cmd (const char *target, const char *chan);
 extern int ssvshost_cmd (const char *who, const char *vhost);
 extern int skick_cmd (const char *who, const char *target, const char *chan, const char *reason);
 extern int swallops_cmd (const char *who, const char *msg, ...);
-extern int vctrl_cmd ();
 extern int ssvinfo_cmd ();
 extern int sburst_cmd (int b);
 extern int seob_cmd (const char *server);

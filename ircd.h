@@ -43,11 +43,11 @@ typedef struct aCtab{
 extern IntCommands cmd_list[];
 extern aCtab cFlagTab[33];
 
-void init_ServBot (void);
-void ShowMOTD (char *nick);
-void ShowADMIN (char *nick);
-void Showcredits (char *nick);
-void ShowStats (char * what, User *u);
+void init_services_bot (void);
+void ns_motd (char *nick);
+void ns_admin (char *nick);
+void ns_credits (char *nick);
+void ns_stats (char * what, User *u);
 void dopong (Server *s);
 
 /* Defined in ircd specific files but common to all */

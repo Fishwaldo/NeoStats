@@ -741,7 +741,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 		return;
 	}
 
-	ShowStats (argv[0], u);
+	ns_stats (argv[0], u);
 }
 
 void
@@ -753,19 +753,19 @@ Usr_Version (char *origin, char **argv, int argc)
 void
 Usr_ShowMOTD (char *origin, char **argv, int argc)
 {
-	ShowMOTD (origin);
+	ns_motd (origin);
 }
 
 void
 Usr_ShowADMIN (char *origin, char **argv, int argc)
 {
-	ShowADMIN (origin);
+	ns_admin (origin);
 }
 
 void
 Usr_Showcredits (char *origin, char **argv, int argc)
 {
-	Showcredits (origin);
+	ns_credits (origin);
 }
 
 void
@@ -927,7 +927,7 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	strlcpy (me.netname, argv[7], MAXPASS);
 
 	snetinfo_cmd ();
-	init_ServBot ();
+	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 	ModuleEvent (EVENT_NETINFO, NULL, 0);
 	me.synced = 1;

@@ -52,7 +52,6 @@ static void Usr_Join (char *origin, char **argv, int argc);
 static void Usr_Part (char *origin, char **argv, int argc);
 static void Usr_Stats (char *origin, char **argv, int argc);
 static void Usr_Vhost (char *origin, char **argv, int argc);
-static void Srv_Topic (char *origin, char **argv, int argc);
 static void Srv_Ping (char *origin, char **argv, int argc);
 static void Srv_Netinfo (char *origin, char **argv, int argc);
 static void Srv_Pass (char *origin, char **argv, int argc);
@@ -62,13 +61,9 @@ static void Srv_Nick (char *origin, char **argv, int argc);
 static void Srv_Svsnick (char *origin, char **argv, int argc);
 static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Connect (char *origin, char **argv, int argc);
-static void Srv_Svinfo (char *origin, char **argv, int argc);
-static void Srv_Burst (char *origin, char **argv, int argc);
-static void Srv_Sjoin (char *origin, char **argv, int argc);
-static void Srv_Tburst (char *origin, char **argv, int argc);
 static void Srv_Vctrl (char *origin, char **argv, int argc);
-static void Srv_Client (char *origin, char **argv, int argc);
-static void Srv_Smode (char *origin, char **argv, int argc);
+
+static int vctrl_cmd ();
 
 static char ircd_buf[BUFSIZE];
 
@@ -92,6 +87,10 @@ IntCommands cmd_list[] = {
 	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
 	,
 	{TOK_MOTD, Usr_ShowMOTD, 1, 0}
+	,
+	{MSG_ADMIN, Usr_ShowADMIN, 1, 0}
+	,
+	{TOK_ADMIN, Usr_ShowADMIN, 1, 0}
 	,
 	{MSG_CREDITS, Usr_Showcredits, 1, 0}
 	,
@@ -682,107 +681,6 @@ globops (char *from, char *fmt, ...)
 }
 
 void
-Srv_Sjoin (char *origin, char **argv, int argc)
-{
-	char nick[MAXNICK];
-	long mode = 0;
-	long mode1 = 0;
-	char *modes;
-	int ok = 1, i, j = 3;
-	ModesParm *m;
-	Chans *c;
-	lnode_t *mn = NULL;
-	list_t *tl;
-
-	if (argc <= 2) {
-		modes = argv[1];
-	} else {
-		modes = argv[2];
-	}
-
-	if (*modes == '#') {
-		join_chan (finduser (origin), modes);
-		return;
-	}
-	tl = list_create (10);
-
-	if (*modes != '+') {
-		goto nomodes;
-	}
-	while (*modes) {
-		for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-			if (*modes == cFlagTab[i].flag) {
-				if (cFlagTab[i].parameters) {
-					m = smalloc (sizeof (ModesParm));
-					m->mode = cFlagTab[i].mode;
-					strlcpy (m->param, argv[j], PARAMSIZE);
-					mn = lnode_create (m);
-					if (!list_isfull (tl)) {
-						list_append (tl, mn);
-					} else {
-						nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, tl list is full in Svr_Sjoin(ircd.c)");
-						do_exit (NS_EXIT_ERROR, "List full - see log file");
-					}
-					j++;
-				} else {
-					mode1 |= cFlagTab[i].mode;
-				}
-			}
-		}
-		modes++;
-	}
-      nomodes:
-	while (argc > j) {
-		modes = argv[j];
-		mode = 0;
-		while (ok == 1) {
-			for (i = 0; i < ((sizeof (cFlagTab) / sizeof (cFlagTab[0])) - 1); i++) {
-				if (cFlagTab[i].sjoin != 0) {
-					if (*modes == cFlagTab[i].sjoin) {
-						mode |= cFlagTab[i].mode;
-						modes++;
-					}
-				}
-			}
-			strlcpy (nick, modes, MAXNICK);
-			ok = 0;
-			break;
-		}
-		join_chan (finduser (nick), argv[1]);
-		ChangeChanUserMode (findchan (argv[1]), finduser (nick), 1, mode);
-		j++;
-		ok = 1;
-	}
-	c = findchan (argv[1]);
-	c->modes |= mode1;
-	if (!list_isempty (tl)) {
-		if (!list_isfull (c->modeparms)) {
-			list_transfer (c->modeparms, tl, list_first (tl));
-		} else {
-			/* eeeeeeek, list is full! */
-			nlog (LOG_CRITICAL, LOG_CORE, "Eeeek, c->modeparms list is full in Svr_Sjoin(ircd.c)");
-			do_exit (NS_EXIT_ERROR, "List full - see log file");
-		}
-	}
-	list_destroy (tl);
-}
-
-void
-Srv_Burst (char *origin, char **argv, int argc)
-{
-	if (argc > 0) {
-		if (ircd_srv.burst == 1) {
-			sburst_cmd (0);
-			ircd_srv.burst = 0;
-			me.synced = 1;
-			init_ServBot ();
-		}
-	} else {
-		ircd_srv.burst = 1;
-	}
-}
-
-void
 Srv_Connect (char *origin, char **argv, int argc)
 {
 	int i;
@@ -804,7 +702,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
 		return;
 	}
-	ShowStats (argv[0], u);
+	ns_stats (argv[0], u);
 }
 
 void
@@ -816,19 +714,19 @@ Usr_Version (char *origin, char **argv, int argc)
 void
 Usr_ShowMOTD (char *origin, char **argv, int argc)
 {
-	ShowMOTD (origin);
+	ns_motd (origin);
 }
 
 void
 Usr_ShowADMIN (char *origin, char **argv, int argc)
 {
-	ShowADMIN (origin);
+	ns_admin (origin);
 }
 
 void
 Usr_Showcredits (char *origin, char **argv, int argc)
 {
-	Showcredits (origin);
+	ns_credits (origin);
 }
 
 void
@@ -992,12 +890,6 @@ Srv_Vctrl (char *origin, char **argv, int argc)
 }
 
 void
-Srv_Svinfo (char *origin, char **argv, int argc)
-{
-	ssvinfo_cmd ();
-}
-
-void
 Srv_Netinfo (char *origin, char **argv, int argc)
 {
 	me.onchan = 1;
@@ -1006,7 +898,7 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	strlcpy (me.netname, argv[7], MAXPASS);
 
 	snetinfo_cmd ();
-	init_ServBot ();
+	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 #ifdef DEBUG
 	me.debug_mode = 1;
@@ -1045,18 +937,14 @@ Srv_Squit (char *origin, char **argv, int argc)
 
 }
 
-/* BE REALLY CAREFULL ABOUT THE ORDER OF THESE ifdef's */
-
 void
 Srv_Nick (char *origin, char **argv, int argc)
 {
 	char *realname;
-#if MYSTIC
 	AddUser (argv[0], argv[3], argv[4], argv[5], 0, strtoul (argv[2], NULL, 10));
 	realname = joinbuf (argv, argc, 7);
 	AddRealName (argv[0], realname);
 	free (realname);
-#endif
 }
 
 

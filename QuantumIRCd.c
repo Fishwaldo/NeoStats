@@ -52,9 +52,7 @@ static void Usr_Join (char *origin, char **argv, int argc);
 static void Usr_Part (char *origin, char **argv, int argc);
 static void Usr_Stats (char *origin, char **argv, int argc);
 static void Usr_Vhost (char *origin, char **argv, int argc);
-static void Srv_Topic (char *origin, char **argv, int argc);
 static void Srv_Ping (char *origin, char **argv, int argc);
-static void Srv_Netinfo (char *origin, char **argv, int argc);
 static void Srv_Pass (char *origin, char **argv, int argc);
 static void Srv_Server (char *origin, char **argv, int argc);
 static void Srv_Squit (char *origin, char **argv, int argc);
@@ -65,10 +63,11 @@ static void Srv_Connect (char *origin, char **argv, int argc);
 static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
-static void Srv_Tburst (char *origin, char **argv, int argc);
 static void Srv_Vctrl (char *origin, char **argv, int argc);
 static void Srv_Client (char *origin, char **argv, int argc);
 static void Srv_Smode (char *origin, char **argv, int argc);
+
+static int vctrl_cmd ();
 
 static char ircd_buf[BUFSIZE];
 
@@ -92,6 +91,10 @@ IntCommands cmd_list[] = {
 	{MSG_MOTD, Usr_ShowMOTD, 1, 0}
 	,
 	{TOK_MOTD, Usr_ShowMOTD, 1, 0}
+	,
+	{MSG_ADMIN, Usr_ShowADMIN, 1, 0}
+	,
+	{TOK_ADMIN, Usr_ShowADMIN, 1, 0}
 	,
 	{MSG_CREDITS, Usr_Showcredits, 1, 0}
 	,
@@ -879,7 +882,7 @@ Srv_Burst (char *origin, char **argv, int argc)
 			sburst_cmd (0);
 			ircd_srv.burst = 0;
 			me.synced = 1;
-			init_ServBot ();
+			init_services_bot ();
 		}
 	} else {
 		ircd_srv.burst = 1;
@@ -911,7 +914,7 @@ Usr_Stats (char *origin, char **argv, int argc)
 		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
 		return;
 	}
-	ShowStats (argv[0], u);
+	ns_stats (argv[0], u);
 }
 
 void
@@ -923,19 +926,19 @@ Usr_Version (char *origin, char **argv, int argc)
 void
 Usr_ShowMOTD (char *origin, char **argv, int argc)
 {
-	ShowMOTD (origin);
+	ns_motd (origin);
 }
 
 void
 Usr_ShowADMIN (char *origin, char **argv, int argc)
 {
-	ShowADMIN (origin);
+	ns_admin (origin);
 }
 
 void
 Usr_Showcredits (char *origin, char **argv, int argc)
 {
-	Showcredits (origin);
+	ns_credits (origin);
 }
 
 void
@@ -1137,8 +1140,6 @@ Srv_Squit (char *origin, char **argv, int argc)
 	}
 
 }
-
-/* BE REALLY CAREFULL ABOUT THE ORDER OF THESE ifdef's */
 
 void
 Srv_Nick (char *origin, char **argv, int argc)

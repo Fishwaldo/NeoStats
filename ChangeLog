@@ -27,7 +27,9 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - moved all smode support into an appropriate #if block and removed susr_mds for ircds that 
    do not need them. Only need if GOTUSERSMODES (M)
  - UserMode split into two, UserMode and UserSMode to handle smodes. Makes IRCds with no smode
-   support more efficient
+   support more efficient (M)
+ - Lots of cleanups in IRCd code and fixes for ADMIN command which was missing on some IRCds (M)
+   
 
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.9
  - import of libpcre into core (M)

@@ -419,14 +419,14 @@ parse (char *line)
 	free (av);
 }
 
-/** @brief init_ServBot
+/** @brief init_services_bot
  *
  * 
  *
  * @return none
  */
 void
-init_ServBot (void)
+init_services_bot (void)
 {
 	char **av;
 	int ac = 0;
@@ -513,7 +513,7 @@ flood (User * u)
  * @return 
  */
 void
-ShowMOTD (char *nick)
+ns_motd (char *nick)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -544,7 +544,7 @@ ShowMOTD (char *nick)
  * @return 
  */
 void
-ShowADMIN (char *nick)
+ns_admin (char *nick)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -572,7 +572,7 @@ ShowADMIN (char *nick)
  * @return 
  */
 void
-Showcredits (char *nick)
+ns_credits (char *nick)
 {
 	SET_SEGV_LOCATION();
 	snumeric_cmd (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
@@ -605,7 +605,7 @@ Showcredits (char *nick)
  * @return 
  */
 void
-ShowStats (char *what, User * u)
+ns_stats (char *what, User * u)
 {
 	time_t tmp;
 	time_t tmp2;
