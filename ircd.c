@@ -559,7 +559,20 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 	Chans *c;
 	lnode_t *mn = NULL;
 	list_t *tl;
-	modes = argv[2];
+	if (argc <= 2) {
+		modes = argv[1];
+	} else {
+		modes = argv[2];
+	}
+	log("%s", modes);
+	if (*modes == '#') {
+		log("%s %s", origin, modes);
+		join_chan(finduser(origin), modes);
+		return;
+	}		
+	if (*modes != '+') {
+		return;
+	}
 	tl = list_create(10);
 	while (*modes) {
 		for (i=0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1);i++) {
