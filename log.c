@@ -106,8 +106,8 @@ void make_log_filename(char* modname, char *logname)
 {
 	time_t t = time(NULL);
 	strftime (log_fmttime, TIMEBUFSIZE, LogFileNameFormat, localtime (&t));
+	strlwr(modname);
 	ircsnprintf (logname, MAXPATH, "logs/%s%s.log", modname, log_fmttime);
-	strlwr(logname);
 }
 
 /** @Configurable logging function
