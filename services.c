@@ -58,7 +58,7 @@ static void ns_unload_module (User * u, char **av, int ac);
 
 static bot_cmd ns_commands[]=
 {
-	{"HELP",		ns_do_help,		0, 	0,					ns_help_on_help, 	1, 	ns_help_help_oneline},
+/*	{"HELP",		ns_do_help,		0, 	0,					ns_help_on_help, 	1, 	ns_help_help_oneline},*/
 	{"LEVEL",		ns_show_level,	0, 	0,					ns_level_help, 		1, 	ns_level_help_oneline},
 	{"INFO",		ns_info,		0, 	0,					ns_info_help, 		1, 	ns_info_help_oneline},
 	{"VERSION",		ns_version,		0, 	0,					ns_version_help, 	1, 	ns_version_help_oneline},
