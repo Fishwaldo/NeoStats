@@ -144,7 +144,7 @@
 #include "numeric.h"
 
 #define CONFIG_NAME		"neostats.cfg"
-#define MOD_PATH		"dl"
+#define MOD_PATH		"modules"
 #define RECV_LOG		"logs/recv.log"
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
