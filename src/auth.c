@@ -22,6 +22,8 @@
 */
 
 #include "neostats.h"
+#include "modules.h"
+#include "dl.h"
 #include "ircd.h"
 
 Module* extauth_modptr;

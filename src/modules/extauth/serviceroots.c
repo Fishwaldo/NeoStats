@@ -88,7 +88,7 @@ ModuleEvent module_events[] = {
 };
 
 
-int __ModInit(int modnum, int apiver)
+int ModInit(int modnum, int apiver)
 {
 	srconf.auth = 0;
 	/* only a max of 10 serviceroots */
@@ -100,7 +100,7 @@ int __ModInit(int modnum, int apiver)
 	return 1;
 }
 
-void __ModFini()
+void ModFini()
 {
 	lnode_t *un;
 
