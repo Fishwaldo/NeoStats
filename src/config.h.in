@@ -1,4 +1,9 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
+/**  this is a security hack to give the coders the right levels to debug NeoStats. 
+  *  Don't define unless we ask you to 
+  */
+#undef CODERHACK
+
 /* Enable Debugging */
 #undef DEBUG
 

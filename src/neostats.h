@@ -136,11 +136,6 @@
 
 #include "numeric.h"
 
-/**  this is a security hack to give the coders the right levels to debug NeoStats. 
-  *  Don't define unless we ask you to 
-  */
-#undef CODERHACK
-
 #define CONFIG_NAME		"neostats.cfg"
 #define MOD_PATH		"dl"
 #define RECV_LOG		"logs/recv.log"
