@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.8 2000/02/23 05:39:24 fishwaldo Exp $
+** $Id: ircd.c,v 1.9 2000/02/29 07:28:53 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -161,15 +161,17 @@ void Module_Event(char *event, void *data) {
 	segv_location = "Module_Event";
 	module_ptr = module_list->next;
 	while (module_ptr != NULL) {
-		log("scanning Module %s for Events",module_ptr->info->module_name);
 		/* this goes through each Module */
 		ev_list = module_ptr->other_funcs;
 		while (ev_list->cmd_name != NULL) {
-			log("Scanning Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
 			/* This goes through each Command */
 			if (!strcasecmp(ev_list->cmd_name, event)) {
+#ifdef DEBUG
+					log("Running Module %s for Comamnd %s -> %s",module_ptr->info->module_name, event, ev_list->cmd_name);
+#endif
 					segv_location = module_ptr->info->module_name;
 					ev_list->function(data);			
+					segv_location = "Module_Event_Return";
 					break;
 			}
 		ev_list++;
@@ -215,11 +217,11 @@ void parse(char *line)
 		coreLine = strtok(NULL, "");
 		coreLine++;
 		/* coreLine contains the Actual Message now, cmd, is who its too */
-		log("PRIVMSG TO: %s, coreline %s",cmd,coreLine);
-		if (!strcasecmp(s_Services,cmd)) {
+		if (!strcmp(s_Services,cmd)) {
 			/* its to the Internal Services Bot */
 			segv_location = "servicesbot";
 			servicesbot(origin,coreLine);
+			segv_location = "ServicesBot_return";
 			return;
 		} else {
 			list = findbot(cmd);
@@ -254,10 +256,14 @@ void parse(char *line)
 			/* This goes through each Command */
 			if (!strcasecmp(fn_list->cmd_name, cmd)) {
 				if (fn_list->srvmsg == cmdptr) {
+#ifdef DEBUG
+					log("Running Module %s for Function %s", module_ptr->info->module_name, fn_list->cmd_name);
+#endif
 					segv_location = module_ptr->info->module_name;
 					fn_list->function(origin, coreLine);			
+					segv_location = "Parse_Return_Module";
 					break;
-					log("should never get here-Parse");
+					log("Should never get here-Parse");
 				}	
 			}
 		fn_list++;
@@ -328,7 +334,6 @@ void Usr_Kill(char *origin, char *coreLine) {
 	char *cmd;
 	cmd = strtok(coreLine, " ");
 	DelUser(cmd);
-	Module_Event("SIGNOFF", coreLine);
 }
 void Usr_Pong(char *origin, char *coreLine) {
 			Server *s;
@@ -413,7 +418,7 @@ void Srv_Netinfo(char *origin, char *coreLine) {
 			#ifdef DEBUG
         			ns_debug_to_coders("By Compliation");
         		#endif
-			if (!strcmp(cmd ,"2109")) {
+			if (atoi(cmd) >= 2109) {
 				me.usesmo = 1;
 			}
 			Module_Event("NETINFO", coreLine); 

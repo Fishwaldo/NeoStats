@@ -215,7 +215,7 @@ Mod_User *findbot(char *bot_name) {
 	Mod_User *u;
 	
 	u = module_bot_lists[HASH(bot_name, B_TABLE_SIZE)];
-	while (u && strcasecmp(u->nick, bot_name) != 0)
+	while (u && strcmp(u->nick, bot_name) != 0)
 		u = u->next;
 	return u;
 }

@@ -4,7 +4,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.6 2000/02/22 03:32:32 fishwaldo Exp $
+** $Id: services.c,v 1.7 2000/02/29 07:28:53 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -462,8 +462,7 @@ static void ns_uptime(User *u)
 /*	privmsg(u->nick, s_Services, "%s", uptime(me.t_start)); */
 	privmsg(u->nick, s_Services, "Reconnect Time: %d", me.r_time);
 	privmsg(u->nick, s_Services, "Statistic Requests: %d", me.requests);
-	privmsg(u->nick, s_Services, "Spam Service: %s",
-		(me.enable_spam) ? "Enabled" : "Disabled");
+	privmsg(u->nick, s_Services, "Use SMO for Debug?: %s", (me.usesmo) ? "Enabled" : "Disabled"); 
 	if (me.coder_debug)
 		privmsg(u->nick, s_Services, "Debugging Mode is \2ON!\2");
 	else 
