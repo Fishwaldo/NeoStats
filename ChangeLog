@@ -1,7 +1,8 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 
-* NeoStats * Shmad & Fish * Version ????
+* NeoStats * Shmad & Fish * Version 2.5.0-Release Candidate 1
+ - Fixed problem where NeoStats (Or the bots) were not signing onto the network with Hyrbid7 IRCD (F)
  - /me beats up shmad and teaches him how to maintain backwards compatibility (F)
  - NeoStats NOW only supports UltimateIRCd 3.x.x a26+ for SSJ5 compatibility. (S)
  - Modified users.c so we could call NICK changes to events :) (S)

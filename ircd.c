@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.93 2002/09/24 10:44:18 fishwaldo Exp $
+** $Id: ircd.c,v 1.94 2002/09/24 10:54:05 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -620,6 +620,9 @@ void init_ServBot()
 	schmode_cmd(s_Services, me.chan, "+o", rname);
 #endif
 	me.onchan = 1;
+	AddStringToList(&av, me.uplink, &ac);
+	Module_Event("ONLINE", av, ac);
+	FreeList(av, ac);
 	AddStringToList(&av, s_Services, &ac);
 	Module_Event("SIGNON", av, ac);
 	FreeList(av, ac);
@@ -741,6 +744,7 @@ void Srv_Burst(char *origin, char **argv, int argc) {
 	}
 #ifdef HYBRID7
 	seob_cmd(origin);
+	init_ServBot();
 #endif
 	
 }
@@ -1064,7 +1068,6 @@ void Srv_Server(char *origin, char **argv, int argc) {
 			s = findserver(argv[0]);
 			me.s = s;
 			AddStringToList(&av, argv[0], &ac);
-			Module_Event("ONLINE", av, ac);
 			Module_Event("NEWSERVER", av, ac);
 			FreeList(av, ac);
 }
