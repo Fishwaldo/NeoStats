@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.42 2003/01/23 10:53:38 fishwaldo Exp $
+** $Id: users.c,v 1.43 2003/02/03 02:29:29 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -93,6 +93,7 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u->is_away = 0;
 	u->myuser = NULL;
 	u->Umode = 0;
+	u->Smode = 0;
 	u->chans = list_create(MAXJOINCHANS);
 	strcpy(u->modes,"");
 	u->ipaddr.s_addr = htonl(ipaddr);
@@ -314,7 +315,7 @@ void UserMode(const char *nick, const char *modes)
 #endif
 	log("Modes: %s", modes);
 #endif
-	strncpy(u->modes, modes, MODESIZE);
+	if (!smode) strncpy(u->modes, modes, MODESIZE);
 	tmpmode = *(modes);
 	while (tmpmode) {
 		switch(tmpmode) {
@@ -334,7 +335,7 @@ void UserMode(const char *nick, const char *modes)
 								}				
 							}
 					 	}
-					}
+					} else {
 #endif										
 						for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
 							if (usr_mds[i].mode == tmpmode) {
@@ -347,6 +348,9 @@ void UserMode(const char *nick, const char *modes)
 								}				
 							}
 				 		}
+#ifdef ULTIMATE3
+					}
+#endif
 		}
 	tmpmode = *modes++;
 	}
