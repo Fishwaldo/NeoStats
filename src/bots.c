@@ -35,6 +35,7 @@
 #include "bots.h"
 #include "users.h"
 #include "ctcp.h"
+#include "lang.h"
 
 #define MAX_CMD_LINE_LENGTH		350
 
@@ -96,7 +97,7 @@ flood_test (Client * u)
 	}
 	if (u->user->flood >= 5) {
 		nlog (LOG_NORMAL, "FLOODING: %s!%s@%s", u->name, u->user->username, u->user->hostname);
-		irc_svskill (ns_botptr, u, "%s!%s (Flooding Services.)", me.name, ns_botptr->name);
+		irc_svskill (ns_botptr, u, _("%s!%s (Flooding Services.)"), me.name, ns_botptr->name);
 		return NS_TRUE;
 	}
 	u->user->flood++;
@@ -471,22 +472,22 @@ list_bots (CmdParams* cmdparams)
 	hscan_t bs;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, "Module Bot List:");
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Module Bot List:", cmdparams->source));
 	hash_scan_begin (&bs, bothash);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
 		if((botptr->flags & 0x80000000)) {
-			irc_prefmsg (ns_botptr, cmdparams->source, "NeoStats");
-			irc_prefmsg (ns_botptr, cmdparams->source, "Bot: %s", botptr->name);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("NeoStats", cmdparams->source));
+			irc_prefmsg (ns_botptr, cmdparams->source, __("Bot: %s", cmdparams->source), botptr->name);
 		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source, "Module: %s", botptr->moduleptr->info->name);
-			irc_prefmsg (ns_botptr, cmdparams->source, "Bot: %s", botptr->name);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("Module: %s", cmdparams->source), botptr->moduleptr->info->name);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("Bot: %s", cmdparams->source), botptr->name);
 		}
 		cm = list_first (botptr->u->user->chans);
 		i = 0;
 		while (cm) {
 			if(i==0) {
-				irc_chanalert (ns_botptr, "Channels: %s", (char *) lnode_get (cm));
+				irc_chanalert (ns_botptr, _("Channels: %s"), (char *) lnode_get (cm));
 			} else {
 				irc_chanalert (ns_botptr, "          %s", (char *) lnode_get (cm));
 			}
@@ -494,7 +495,7 @@ list_bots (CmdParams* cmdparams)
 			i++;
 		}
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, "End of Module Bot List");
+	irc_prefmsg (ns_botptr, cmdparams->source, __("End of Module Bot List", cmdparams->source));
 	return NS_SUCCESS;
 }
 
@@ -517,7 +518,7 @@ void del_module_bots (Module *mod_ptr)
 		botptr = hnode_get (modnode);
 		if (botptr->moduleptr == mod_ptr) {
 			dlog(DEBUG1, "Deleting module %s bot %s", mod_ptr->info->name, botptr->name);
-			irc_quit (botptr, "Module Unloaded");
+			irc_quit (botptr, _("Module Unloaded"));
 		}
 	}
 	return;

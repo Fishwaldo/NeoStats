@@ -227,7 +227,6 @@ static int ctcp_req_ping (CmdParams* cmdparams)
 {
 	dlog (DEBUG5, "CTCP PING request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
 	SendModuleEvent (EVENT_CTCPPINGREQ, cmdparams, cmdparams->bot->moduleptr);
-	dlog (DEBUG5, "CTCP PING requests currently not supported");
 	return NS_SUCCESS;
 }
 

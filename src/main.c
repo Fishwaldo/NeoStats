@@ -41,6 +41,7 @@
 #include "bots.h"
 #include "timer.h"
 #include "signals.h"
+#include "lang.h"
 
 char segv_location[SEGV_LOCATION_BUFSIZE];
 
@@ -80,6 +81,7 @@ void InitMe(void)
  */
 static int InitCore(void)
 {
+	char dbpath[MAXPATH];
 	InitMe();
 	/* if we are doing recv.log, remove the previous version */
 	if (config.recvlog)
@@ -89,6 +91,9 @@ static int InitCore(void)
 	/* load the config files */
 	if (ConfLoad () != NS_SUCCESS)
 		return NS_FAILURE;
+	/* initialize Lang Subsystem */
+	ircsnprintf(dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX);
+	LANGinit(0, dbpath, NULL);
 	/* initialize Module subsystem */
 	if (InitModules () != NS_SUCCESS)
 		return NS_FAILURE;
@@ -142,6 +147,8 @@ neostats ()
 
 	/* initialise version */
 	strlcpy(me.version, VERSION, VERSIONSIZE);
+	/* out default lang is always -1 */
+	me.lang = -1;
 #ifndef WIN32
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
@@ -199,8 +206,8 @@ neostats ()
 			fclose (fp);
 			if (!config.quiet) {
 				printf ("\n");
-				printf ("NeoStats %s Successfully Launched into Background\n", me.version);
-				printf ("PID: %i - Wrote to %s\n", forked, PID_FILENAME);
+				printf (_("NeoStats %s Successfully Launched into Background\n"), me.version);
+				printf (_("PID: %i - Wrote to %s\n"), forked, PID_FILENAME);
 			}
 			return EXIT_SUCCESS; /* parent exits */ 
 		}
@@ -373,7 +380,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 	kp_flush();
 	kp_exit();
 	FiniLogs ();
-
+	LANGfini();
 	if ((exitcode == NS_EXIT_RECONNECT && config.r_time > 0) || exitcode == NS_EXIT_RELOAD) {
 		execve ("./neostats", NULL, NULL);
 		return_code=EXIT_FAILURE;	/* exit code to error */

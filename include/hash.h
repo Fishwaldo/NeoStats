@@ -236,6 +236,7 @@ EXPORTFUNC	extern hnode_t *hash_scan_delete (hash_t *, hnode_t *);
 	extern void hash_scan_delfree (hash_t *, hnode_t *);
 
 	extern int hash_verify (hash_t *);
+	extern hash_val_t hash_fun_default (const void *key);
 
 EXPORTFUNC 	extern hnode_t *hnode_create (void *);
 	extern hnode_t *hnode_init (hnode_t *, void *);

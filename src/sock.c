@@ -41,6 +41,7 @@
 #include "dotconf.h"
 #include "services.h"
 #include "ircd.h"
+#include "lang.h"
 
 static void recvlog (char *line);
 
@@ -737,19 +738,19 @@ list_sockets (CmdParams* cmdparams)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, "Sockets List: (%d)", (int)hash_count (sockethash));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Sockets List: (%d)", cmdparams->source), (int)hash_count (sockethash));
 	hash_scan_begin (&ss, sockethash);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		sock = hnode_get (sn);
 		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", sock->moduleptr->info->name);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Socket Name: %s", sock->name);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Socket Name: %s", cmdparams->source), sock->name);
 		if (sock->socktype == SOCK_STANDARD) {
-			irc_prefmsg (ns_botptr, cmdparams->source, "Socket Number: %d", sock->sock_no);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("Socket Number: %d", cmdparams->source), sock->sock_no);
 		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source, "Poll Interface");
+			irc_prefmsg (ns_botptr, cmdparams->source, __("Poll Interface", cmdparams->source));
 		}
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, "End of Socket List");
+	irc_prefmsg (ns_botptr, cmdparams->source, __("End of Socket List", cmdparams->source));
 	return 0;
 }
 

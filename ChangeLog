@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Initial import of Language Functions. Two Macro's to use now, _(x) is for
+   default language, and __(x, Client*) is for user/channel language
+   settings. (F)
  - More portability wrappers for file access since Win32 DLLs do not appear to
    be able to use fopen etc locally. This also means we can look at using more
    optimal Win32 native file processing calls. (M)

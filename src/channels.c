@@ -31,6 +31,7 @@
 #include "exclude.h"
 #include "services.h"
 #include "modules.h"
+#include "lang.h"
 
 static hash_t *channelhash;
 static char quitreason[BUFSIZE];
@@ -137,6 +138,8 @@ new_chan (const char *chan)
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
 	c->modeparms = list_create (MAXMODES);
 	c->creationtime = me.now;
+	/* XXX TODO: Set the channel language */
+	c->lang = me.lang;
 	/* check exclusions */
 	ns_do_exclude_chan(c);
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -342,7 +345,7 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 		nlog (LOG_WARNING, "ChanNickChange: %s isn't a member of %s", oldnick, c->name);
 		return;
 	}
-    dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
+    	dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
 	strlcpy (cml->nick, newnick, MAXNICK);
 }
 
@@ -433,11 +436,11 @@ dumpchanmembers (CmdParams* cmdparams, Channel* c)
  	Chanmem *cm;
 	lnode_t *cmn;
 
-	irc_prefmsg (ns_botptr, cmdparams->source, "Members:    %ld (List %d)", c->users, (int)list_count (c->chanmembers));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Members:    %ld (List %d)", cmdparams->source), c->users, (int)list_count (c->chanmembers));
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);
-		irc_prefmsg (ns_botptr, cmdparams->source, "            %s Modes %s Joined: %ld", cm->nick, CmodeMaskToString (cm->flags), (long)cm->tsjoin);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("            %s Modes %s Joined: %ld", cmdparams->source), cm->nick, CmodeMaskToString (cm->flags), (long)cm->tsjoin);
 		cmn = list_next (c->chanmembers, cmn);
 	}
 }
@@ -445,11 +448,11 @@ dumpchanmembers (CmdParams* cmdparams, Channel* c)
 static void 
 dumpchan (CmdParams* cmdparams, Channel* c)
 {
-	irc_prefmsg (ns_botptr, cmdparams->source, "Channel:    %s", c->name);
-	irc_prefmsg (ns_botptr, cmdparams->source, "Created:    %ld", (long)c->creationtime);
-	irc_prefmsg (ns_botptr, cmdparams->source, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
-	irc_prefmsg (ns_botptr, cmdparams->source, "PubChan?:   %d", is_pub_chan (c));
-	irc_prefmsg (ns_botptr, cmdparams->source, "Flags:      %x", c->flags);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Channel:    %s", cmdparams->source), c->name);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Created:    %ld", cmdparams->source), (long)c->creationtime);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("TopicOwner: %s TopicTime: %ld Topic: %s", cmdparams->source), c->topicowner, (long)c->topictime, c->topic);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("PubChan?:   %d", cmdparams->source), is_pub_chan (c));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Flags:      %x", cmdparams->source), c->flags);
 	dumpchanmodes (cmdparams, c);
 	dumpchanmembers (cmdparams, c);
 	irc_prefmsg (ns_botptr, cmdparams->source, "========================================");
@@ -466,9 +469,9 @@ void ChanDump (CmdParams* cmdparams, const char *chan)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, "================CHANDUMP================");
+	irc_prefmsg (ns_botptr, cmdparams->source, __("================CHANDUMP================",cmdparams->source));
 	if (!chan) {
-		irc_prefmsg (ns_botptr, cmdparams->source, "Channels %d", (int)hash_count (channelhash));
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Channels %d", cmdparams->source), (int)hash_count (channelhash));
 		hash_scan_begin (&sc, channelhash);
 		while ((cn = hash_scan_next (&sc)) != NULL) {
 			c = hnode_get (cn);
@@ -479,7 +482,7 @@ void ChanDump (CmdParams* cmdparams, const char *chan)
 		if (c) {
 			dumpchan(cmdparams, c);
 		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source, "ChanDump: can't find channel %s", chan);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("ChanDump: can't find channel %s", cmdparams->source), chan);
 		}
 	}
 }

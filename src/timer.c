@@ -28,6 +28,7 @@
 #include "services.h"
 #include "modules.h"
 #include "log.h"
+#include "lang.h"
 
 /* @brief Module Timer hash list */
 static hash_t *timerhash;
@@ -272,16 +273,16 @@ list_timers (CmdParams* cmdparams)
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, "Timer List:");
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Timer List:", cmdparams->source));
 	hash_scan_begin (&ts, timerhash);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		timer = hnode_get (tn);
 		irc_prefmsg (ns_botptr, cmdparams->source, "%s:", timer->moduleptr->info->name);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Timer: %s", timer->name);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Interval: %d", timer->interval);
-		irc_prefmsg (ns_botptr, cmdparams->source, "Next run in: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Timer: %s", cmdparams->source), timer->name);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Interval: %d", cmdparams->source), timer->interval);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Next run in: %ld", cmdparams->source), (long)(timer->interval - (me.now - timer->lastrun)));
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, "End of list");
+	irc_prefmsg (ns_botptr, cmdparams->source, __("End of list", cmdparams->source));
 	return 0;
 }
 

@@ -30,6 +30,7 @@
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif
+#include "lang.h"
 
 /*! File handle for segfault report */
 static FILE *segfault;
@@ -69,8 +70,8 @@ serv_die (int signum)
 RETSIGTYPE
 conf_rehash (int signum)
 {
-	irc_chanalert (ns_botptr, "SIGHUP received, attempting to rehash");
-	irc_globops (NULL, "SIGHUP received, attempted to rehash");
+	irc_chanalert (ns_botptr, _("SIGHUP received, attempting to rehash"));
+	irc_globops (NULL, _("SIGHUP received, attempted to rehash"));
 	/* at the moment, the reshash just checks for a the SQL port is opened, if enabled */
 #ifdef SQLSRV
 	check_sql_sock();
@@ -118,10 +119,10 @@ void report_segfault(const char* modulename)
 {
 	segfault = fopen ("segfault.log", "a");
 	if(modulename) {
-		irc_globops (NULL, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME());
+		irc_globops (NULL, _("Segmentation fault in %s. Refer to segfault.log for details."), GET_CUR_MODNAME());
 		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME());
 	} else {
-		irc_globops (NULL, "Segmentation fault. Server terminating. Refer to segfault.log.");
+		irc_globops (NULL, _("Segmentation fault. Server terminating. Refer to segfault.log."));
 		nlog (LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log.");
 	}
 	fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");

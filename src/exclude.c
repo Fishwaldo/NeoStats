@@ -28,6 +28,7 @@
 #include "neostats.h"
 #include "exclude.h"
 #include "services.h"
+#include "lang.h"
 
 static list_t *exclude_list;
 
@@ -95,7 +96,7 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 	e->addedon = me.now;
 	if (!ircstrcasecmp("HOST", type)) {
 		if (!index(pattern, '.')) {
-			irc_prefmsg(ns_botptr, u, "Error, Pattern must contain at least one \2.\2");
+			irc_prefmsg(ns_botptr, u, __("Error, Pattern must contain at least one \2.\2",u));
 			ns_free(e);
 			return;
 		}
@@ -103,7 +104,7 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else if (!ircstrcasecmp("CHAN", type)) {
 		if (pattern[0] != '#') {
-			irc_prefmsg(ns_botptr, u, "Error, Pattern must begin with a \2#\2");
+			irc_prefmsg(ns_botptr, u, __("Error, Pattern must begin with a \2#\2", u));
 			ns_free(e);
 			return;
 		}
@@ -111,21 +112,21 @@ void ns_do_exclude_add(Client *u, char *type, char *pattern)
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else if (!ircstrcasecmp("SERVER", type)) {
 		if (!index(pattern, '.')) {
-			irc_prefmsg(ns_botptr, u, "Error, Pattern must contain at least one \2.\2");
+			irc_prefmsg(ns_botptr, u, __("Error, Pattern must contain at least one \2.\2", u));
 			ns_free(e);
 			return;
 		}
 		e->type = NS_EXCLUDE_SERVER;
 		strlcpy(e->pattern, collapse(pattern), MAXHOST);
 	} else {
-		irc_prefmsg(ns_botptr, u, "Error, Unknown type %s", type);
+		irc_prefmsg(ns_botptr, u, __("Error, Unknown type %s",u), type);
 		ns_free(e);
 		return;
 	}
 	/* if we get here, then e is valid */
 	lnode_create_append (exclude_list, e);
-	irc_prefmsg(ns_botptr, u, "Successfully added %s (%s) to Exclusion List", e->pattern, type);
-	irc_chanalert(ns_botptr, "%s added %s (%s) to the Exclusion List", u->name, e->pattern, type);
+	irc_prefmsg(ns_botptr, u, __("Successfully added %s (%s) to Exclusion List", u), e->pattern, type);
+	irc_chanalert(ns_botptr, _("%s added %s (%s) to the Exclusion List"), u->name, e->pattern, type);
 
 	/* now save the exclusion list */
 	ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
@@ -149,7 +150,7 @@ void ns_do_exclude_del(Client *u, char *position)
 	
 	pos = atoi(position);
 	if (pos < 1) {
-		irc_prefmsg(ns_botptr, u, "Error, Position %d is out of range", pos);
+		irc_prefmsg(ns_botptr, u, __("Error, Position %d is out of range",u), pos);
 		return;
 	}
 	en = list_first(exclude_list);
@@ -159,7 +160,7 @@ void ns_do_exclude_del(Client *u, char *position)
 			e = lnode_get(en);
 			ircsnprintf(tmp, BUFSIZE, "%d", (int)e->addedon);
 			DelRow("Exclusions", tmp);
-			irc_prefmsg(ns_botptr, u, "Deleted %s out of Exclusion List", e->pattern);
+			irc_prefmsg(ns_botptr, u, __("Deleted %s out of Exclusion List",u), e->pattern);
 			ns_free(e);
 			list_delete(exclude_list, en);
 			lnode_destroy(en);
@@ -169,7 +170,7 @@ void ns_do_exclude_del(Client *u, char *position)
 		i++;
 	}
 	/* if we get here, means that we never got a match */
-	irc_prefmsg(ns_botptr, u, "Entry %d was not found in the exclusion list", pos);
+	irc_prefmsg(ns_botptr, u, __("Entry %d was not found in the exclusion list",u), pos);
 	
 } 
 
@@ -186,31 +187,31 @@ void ns_do_exclude_list(Client *source, Bot* botptr)
 	int i = 0;
 	static char tmp[BUFSIZE];
 	
-	irc_prefmsg(botptr, source, "Global Exclusion List:");
+	irc_prefmsg(botptr, source, __("Global Exclusion List:", source));
 	en = list_first(exclude_list);
 	i = 1;
 	while (en != NULL) {
 		e = lnode_get(en);
 		switch (e->type) {
 			case NS_EXCLUDE_HOST:
-				ircsnprintf(tmp, BUFSIZE, "Host");
+				ircsnprintf(tmp, BUFSIZE, __("Host", source));
 				break;
 			case NS_EXCLUDE_CHAN:
-				ircsnprintf(tmp, BUFSIZE, "Chan");
+				ircsnprintf(tmp, BUFSIZE, __("Chan", source));
 				break;
 			case NS_EXCLUDE_SERVER:
-				ircsnprintf(tmp, BUFSIZE, "Server");
+				ircsnprintf(tmp, BUFSIZE, __("Server", source));
 				break;
 			default:
-				ircsnprintf(tmp, BUFSIZE, "Unknown");
+				ircsnprintf(tmp, BUFSIZE, __("Unknown", source));
 				break;
 		}
 				
-		irc_prefmsg(botptr, source, "%d) %s (%s) Added by %s on %s", i, e->pattern, tmp, e->addedby, sftime(e->addedon));
+		irc_prefmsg(botptr, source, __("%d) %s (%s) Added by %s on %s", source), i, e->pattern, tmp, e->addedby, sftime(e->addedon));
 		i++;
 		en = list_next(exclude_list, en);
 	}
-	irc_prefmsg(botptr, source, "End of Global Exclude List.");
+	irc_prefmsg(botptr, source, __("End of Global Exclude List.", source));
 } 
 
 /* @brief check if a user is matched against a exclusion

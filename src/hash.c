@@ -84,7 +84,6 @@ static const char rcsid[] = "$Id$";
 
 static hnode_t *hnode_alloc (void *context);
 static void hnode_free (hnode_t * node, void *context);
-static hash_val_t hash_fun_default (const void *key);
 static int hash_comp_default (const void *key1, const void *key2);
 
 int hash_val_t_bit;
@@ -866,7 +865,7 @@ hash_size (hash_t * hash)
 	return hash->nchains;
 }
 
-static hash_val_t
+extern hash_val_t
 hash_fun_default (const void *key)
 {
 	static unsigned long randbox[] = {

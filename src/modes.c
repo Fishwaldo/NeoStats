@@ -28,6 +28,7 @@
 #include "users.h"
 #include "channels.h"
 #include "modules.h"
+#include "lang.h"
 
 unsigned char UmodeChRegNick = 'r';
 static char ModeStringBuf[64];
@@ -648,13 +649,13 @@ dumpchanmodes (CmdParams* cmdparams, Channel* c)
 	ModesParm *m;
 	int i;
 
-	irc_prefmsg (ns_botptr, cmdparams->source, "Mode:       %s", UmodeMaskToString (c->modes));
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Mode:       %s", cmdparams->source), UmodeMaskToString (c->modes));
 	cmn = list_first (c->modeparms);
 	while (cmn) {
 		m = lnode_get (cmn);
 		for (i = 0; i < MODE_TABLE_SIZE; i++) {
 			if (m->mask & ircd_cmodes[i].mask) {
-				irc_prefmsg (ns_botptr, cmdparams->source, "Modes:      %c Parms %s", i, m->param);
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Modes:      %c Parms %s", cmdparams->source), i, m->param);
 			}
 		}
 		cmn = list_next (c->modeparms, cmn);

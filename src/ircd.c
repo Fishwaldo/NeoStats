@@ -37,6 +37,7 @@
 #include "bans.h"
 #include "auth.h"
 #include "dns.h"
+#include "lang.h"
 
 ircd_server ircd_srv;
 
@@ -503,10 +504,10 @@ do_motd (const char* nick, const char *remoteserver)
 	SET_SEGV_LOCATION();
 	fp = fopen (MOTD_FILENAME, "r");
 	if(!fp) {
-		irc_numeric (ERR_NOMOTD, nick, ":- MOTD file Missing");
+		irc_numeric (ERR_NOMOTD, nick, _(":- MOTD file Missing"));
 	} else {
-		irc_numeric (RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name);
-		irc_numeric (RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
+		irc_numeric (RPL_MOTDSTART, nick, _(":- %s Message of the Day -"), me.name);
+		irc_numeric (RPL_MOTD, nick, _(":- %s. Copyright (c) 1999 - 2004 The NeoStats Group"), me.version);
 		irc_numeric (RPL_MOTD, nick, ":-");
 
 		while (fgets (buf, sizeof (buf), fp)) {
@@ -514,7 +515,7 @@ do_motd (const char* nick, const char *remoteserver)
 			irc_numeric (RPL_MOTD, nick, ":- %s", buf);
 		}
 		fclose (fp);
-		irc_numeric (RPL_ENDOFMOTD, nick, ":End of MOTD command.");
+		irc_numeric (RPL_ENDOFMOTD, nick, _(":End of MOTD command."));
 	}
 }
 
@@ -533,16 +534,16 @@ do_admin (const char* nick, const char *remoteserver)
 
 	fp = fopen (ADMIN_FILENAME, "r");
 	if(!fp) {
-		irc_numeric (ERR_NOADMININFO, nick, "%s :No administrative info available", me.name);
+		irc_numeric (ERR_NOADMININFO, nick, _("%s :No administrative info available"), me.name);
 	} else {
-		irc_numeric (RPL_ADMINME, nick, ":%s :Administrative info", me.name);
-		irc_numeric (RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2004 The NeoStats Group", me.version);
+		irc_numeric (RPL_ADMINME, nick, _(":%s :Administrative info"), me.name);
+		irc_numeric (RPL_ADMINME, nick, _(":%s.  Copyright (c) 1999 - 2004 The NeoStats Group"), me.version);
 		while (fgets (buf, sizeof (buf), fp)) {
 			buf[strnlen (buf, BUFSIZE) - 1] = 0;
 			irc_numeric (RPL_ADMINLOC1, nick, ":- %s", buf);
 		}
 		fclose (fp);
-		irc_numeric (RPL_ADMINLOC2, nick, "End of /ADMIN command.");
+		irc_numeric (RPL_ADMINLOC2, nick, _("End of /ADMIN command."));
 	}
 }
 
@@ -557,8 +558,9 @@ do_credits (const char* nick, const char *remoteserver)
 {
 	SET_SEGV_LOCATION();
 	irc_numeric (RPL_VERSION, nick, ":- NeoStats %s Credits ", me.version);
-	irc_numeric (RPL_VERSION, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
-	irc_numeric (RPL_VERSION, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
+	irc_numeric (RPL_VERSION, nick, ":- Now Maintained by Fish (fish@dynam.ac) and Mark (mark@ctcp.net)");
+	irc_numeric (RPL_VERSION, nick, ":- Previous Authors: Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
+	irc_numeric (RPL_VERSION, nick, ":- For Support, you can find us at");
 	irc_numeric (RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats");
 	irc_numeric (RPL_VERSION, nick, ":- Thanks to:");
 	irc_numeric (RPL_VERSION, nick, ":- Enigma for being part of the dev team");
@@ -604,7 +606,7 @@ do_stats (const char* nick, const char *what)
 	if (!ircstrcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = me.now - me.t_start;
-		irc_numeric (RPL_STATSUPTIME, u->name, "Statistical Server up %d days, %d:%02d:%02d", uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+		irc_numeric (RPL_STATSUPTIME, u->name, __("Statistical Server up %d days, %d:%02d:%02d", u), uptime / 86400, (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 	} else if (!ircstrcasecmp (what, "c")) {
 		/* Connections */
 		irc_numeric (RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, me.port);
@@ -630,8 +632,8 @@ do_stats (const char* nick, const char *what)
 			ircd_cmd_ptr ++;
 		}
 	}
-	irc_numeric (RPL_ENDOFSTATS, u->name, "%s :End of /STATS report", what);
-	irc_chanalert (ns_botptr, "%s Requested Stats %s", u->name, what);
+	irc_numeric (RPL_ENDOFSTATS, u->name, __("%s :End of /STATS report", u), what);
+	irc_chanalert (ns_botptr, _("%s Requested Stats %s"), u->name, what);
 };
 
 void
@@ -849,7 +851,7 @@ irc_numeric (const int numeric, const char *target, const char *data, ...)
 static void
 unsupported_cmd(const char* cmd)
 {
-	irc_chanalert (ns_botptr, "Warning, %s tried to %s which is not supported", GET_CUR_MODNAME(), cmd);
+	irc_chanalert (ns_botptr, _("Warning, %s tried to %s which is not supported"), GET_CUR_MODNAME(), cmd);
 	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", GET_CUR_MODNAME(), cmd);
 }
 
@@ -1307,7 +1309,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	strlcpy (me.netname, netname, MAXPASS);
 	irc_send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
-	irc_globops (NULL, "Link with Network \2Complete!\2");
+	irc_globops (NULL, _("Link with Network \2Complete!\2"));
 	SendAllModuleEvent (EVENT_NETINFO, NULL);	
 }
 
@@ -1319,7 +1321,7 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	strlcpy (me.netname, netname, MAXPASS);
 	irc_send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
-	irc_globops (NULL, "Link with Network \2Complete!\2");
+	irc_globops (NULL, _("Link with Network \2Complete!\2"));
 	SendAllModuleEvent (EVENT_NETINFO, NULL);
 }
 

@@ -31,6 +31,7 @@
 #include "servers.h"
 #include "services.h"
 #include "users.h"
+#include "lang.h"
 
 tconfig config;
 static hash_t *serverhash;
@@ -176,14 +177,14 @@ dumpserver (Client *s)
 	int uptime = s->server->uptime  + (me.now - me.t_start);
 
 	if(ircd_srv.protocol & PROTOCOL_B64SERVER) {
-		irc_chanalert (ns_botptr, "Server: %s (%s)", s->name, s->name64);
+		irc_chanalert (ns_botptr, _("Server: %s (%s)"), s->name, s->name64);
 	} else {
-		irc_chanalert (ns_botptr, "Server: %s", s->name);
+		irc_chanalert (ns_botptr, _("Server: %s"), s->name);
 	}
-	irc_chanalert (ns_botptr, "Version: %s", s->version);
-	irc_chanalert (ns_botptr, "Uptime:  %d day%s, %02d:%02d:%02d", (uptime / 86400), (uptime / 86400 == 1) ? "" : "s", ((uptime / 3600) % 24), ((uptime / 60) % 60), (uptime % 60) );
-	irc_chanalert (ns_botptr, "Flags:   %x", s->flags);
-	irc_chanalert (ns_botptr, "Uplink:  %s", s->uplink->name);
+	irc_chanalert (ns_botptr, _("Version: %s"), s->version);
+	irc_chanalert (ns_botptr, _("Uptime:  %d day%s, %02d:%02d:%02d"), (uptime / 86400), (uptime / 86400 == 1) ? "" : "s", ((uptime / 3600) % 24), ((uptime / 60) % 60), (uptime % 60) );
+	irc_chanalert (ns_botptr, _("Flags:   %x"), s->flags);
+	irc_chanalert (ns_botptr, _("Uplink:  %s"), s->uplink->name);
 	irc_chanalert (ns_botptr, "========================================");
 }
 
@@ -194,7 +195,7 @@ ServerDump (const char *name)
 	hscan_t ss;
 	hnode_t *sn;
 
-	irc_chanalert (ns_botptr, "===============SERVERDUMP===============");
+	irc_chanalert (ns_botptr, _("===============SERVERDUMP==============="));
 	if (!name) {
 		hash_scan_begin (&ss, serverhash);
 		while ((sn = hash_scan_next (&ss)) != NULL) {
@@ -206,7 +207,7 @@ ServerDump (const char *name)
 		if (s) {
 			dumpserver (s);
 		} else {
-			irc_chanalert (ns_botptr, "ServerDump: can't find server %s", name);
+			irc_chanalert (ns_botptr, _("ServerDump: can't find server %s"), name);
 		}
 	}
 }

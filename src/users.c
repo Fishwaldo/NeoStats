@@ -38,6 +38,7 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
+#include "lang.h"
 
 static hash_t *userhash;
 
@@ -339,24 +340,24 @@ dumpuser (CmdParams* cmdparams, Client * u)
 	int i = 0;
 					          
 	if (ircd_srv.protocol & PROTOCOL_B64SERVER) {
-		irc_prefmsg (ns_botptr, cmdparams->source, "User:     %s!%s@%s (%s)", u->name, u->user->username, u->user->hostname, u->name64);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("User:     %s!%s@%s (%s)", cmdparams->source), u->name, u->user->username, u->user->hostname, u->name64);
 	} else {
-		irc_prefmsg (ns_botptr, cmdparams->source, "User:     %s!%s@%s", u->name, u->user->username, u->user->hostname);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("User:     %s!%s@%s", cmdparams->source), u->name, u->user->username, u->user->hostname);
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, "IP:       %s", u->hostip);
-	irc_prefmsg (ns_botptr, cmdparams->source, "Vhost:    %s", u->user->vhost);
-	irc_prefmsg (ns_botptr, cmdparams->source, "Flags:    0x%x", u->flags);
-	irc_prefmsg (ns_botptr, cmdparams->source, "Modes:    %s (0x%x)", UmodeMaskToString(u->user->Umode), u->user->Umode);
-	irc_prefmsg (ns_botptr, cmdparams->source, "Smodes:   %s (0x%x)", SmodeMaskToString(u->user->Smode), u->user->Smode);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("IP:       %s", cmdparams->source), u->hostip);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Vhost:    %s", cmdparams->source), u->user->vhost);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Flags:    0x%x", cmdparams->source), u->flags);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Modes:    %s (0x%x)", cmdparams->source), UmodeMaskToString(u->user->Umode), u->user->Umode);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Smodes:   %s (0x%x)", cmdparams->source), SmodeMaskToString(u->user->Smode), u->user->Smode);
 	if(u->user->is_away) {
-		irc_prefmsg (ns_botptr, cmdparams->source, "Away:     %s", u->user->awaymsg);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Away:     %s", cmdparams->source), u->user->awaymsg);
 	}
-	irc_prefmsg (ns_botptr, cmdparams->source, "Version:  %s", u->version);
+	irc_prefmsg (ns_botptr, cmdparams->source, __("Version:  %s", cmdparams->source), u->version);
 
 	cm = list_first (u->user->chans);
 	while (cm) {
 		if(i==0) {
-			irc_prefmsg (ns_botptr, cmdparams->source, "Channels: %s", (char *) lnode_get (cm));
+			irc_prefmsg (ns_botptr, cmdparams->source, __("Channels: %s", cmdparams->source), (char *) lnode_get (cm));
 		} else {
 			irc_prefmsg (ns_botptr, cmdparams->source, "          %s", (char *) lnode_get (cm));
 		}
@@ -377,7 +378,7 @@ UserDump (CmdParams* cmdparams, const char *nick)
 		return;
 #endif
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ns_botptr, cmdparams->source, "================USERDUMP================");
+	irc_prefmsg (ns_botptr, cmdparams->source, __("================USERDUMP================", cmdparams->source));
 	if (!nick) {
 		hnode_t* un;
 
@@ -391,7 +392,7 @@ UserDump (CmdParams* cmdparams, const char *nick)
 		if (u) {
 			dumpuser (cmdparams, u);
 		} else {
-			irc_prefmsg (ns_botptr, cmdparams->source, "UserDump: can't find user %s", nick);
+			irc_prefmsg (ns_botptr, cmdparams->source, __("UserDump: can't find user %s", cmdparams->source), nick);
 		}
 	}
 }

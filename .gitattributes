@@ -76,6 +76,7 @@ include/exclude.h -text
 include/hash.h eol=lf
 include/ircd.h eol=lf
 include/ircstring.h eol=lf
+include/lang.h -text
 include/list.h eol=lf
 include/log.h eol=lf
 include/modes.h -text
@@ -412,6 +413,7 @@ src/hash.c eol=lf
 src/ircd.c eol=lf
 src/ircstring.c eol=lf
 src/keeper.c eol=lf
+src/lang.c -text
 src/list.c eol=lf
 src/log.c eol=lf
 src/main.c eol=lf

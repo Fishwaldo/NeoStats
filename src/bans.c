@@ -24,6 +24,7 @@
 #include "neostats.h"
 #include "modules.h"
 #include "services.h"
+#include "lang.h"
 
 static hash_t *banhash;
 
@@ -121,13 +122,13 @@ BanDump (void)
 	hscan_t ss;
 	hnode_t *bansnode;
 
-	irc_chanalert (ns_botptr, "Ban Listing:");
+	irc_chanalert (ns_botptr, _("Ban Listing:"));
 	hash_scan_begin (&ss, banhash);
 	while ((bansnode = hash_scan_next (&ss)) != NULL) {
 		ban = hnode_get (bansnode);
-		irc_chanalert (ns_botptr, "Ban: %s ", ban->mask);
+		irc_chanalert (ns_botptr, _("Ban: %s "), ban->mask);
 	}
-	irc_chanalert (ns_botptr, "End of Listing.");
+	irc_chanalert (ns_botptr, _("End of Listing."));
 }
 
 void FiniBans (void)

@@ -77,6 +77,15 @@
 /*#define USE_BERKELEY*/
 #endif
 
+/* so our defines for _(x) are not active */
+#undef USEGETTEXT
+
+/* our own defines for language support */
+/* this one is for standard language support */
+#define _(x) LANGgettext(x, me.lang)
+/* this one is for custom langs based on chan/user struct */
+#define __(x,y) LANGgettext(x,(y)->lang)
+
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__
 #define __attribute__(x)  /* NOTHING */
@@ -505,6 +514,7 @@ typedef struct _Client {
 	time_t tsconnect;
 	struct in_addr ip;
 	char hostip[HOSTIPLEN];
+	int lang;
 	void *moddata[NUM_MODULES];
 } _Client; 
 
@@ -520,6 +530,7 @@ typedef struct tme {
 	char netname[MAXPASS];
 	char local[MAXHOST];
 	int port;
+	int lang;
 	time_t t_start;
 	unsigned int maxsocks;
 	unsigned int cursocks;
@@ -586,6 +597,7 @@ typedef struct Channel {
 	char name[MAXCHANLEN];
 	char name64[B64SIZE];
 	long users;
+	int lang;
 	unsigned int modes;
 	list_t *chanmembers;
 	char topic[BUFSIZE];
