@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.c,v 1.15 2002/09/04 08:40:26 fishwaldo Exp $
+** $Id: conf.c,v 1.16 2002/10/20 16:44:33 shmad Exp $
 */
 
 #include "stats.h"
@@ -46,7 +46,8 @@ static config_option options[] =
 { "WANT_PRIVMSG", ARG_STR, cb_Server, 9},
 { "SERVICES_CHAN", ARG_STR, cb_Server, 10},
 { "LOAD_MODULE", ARG_STR, cb_Module, 0},
-{ "ONLY_OPERS", ARG_STR, cb_Server, 11}
+{ "ONLY_OPERS", ARG_STR, cb_Server, 11},
+{ "NO_LOAD", ARG_STR, cb_Server, 12}
 };
 
 
@@ -151,6 +152,8 @@ void cb_Server(char *arg, int configtype) {
 			memcpy(me.chan,arg, sizeof(me.chan));
 		} else if (configtype == 11) {
 			me.onlyopers = 1;
+		} else if (configtype == 12) {
+			me.die = 1;
 		}
 
 }

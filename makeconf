@@ -298,6 +298,10 @@ NEOSTAT_USER $NEOUSER
 #The Services Channel to Join Initially
 SERVICES_CHAN $NEOCHAN
 
+#We should load right?
+#Comment out this line to allow your NeoStats to load RTFM!
+NO_LOAD
+
 # Should we send privmsg's or notice's?
 # Comment this out for NOTICE's, otherwise
 # leave it alone.

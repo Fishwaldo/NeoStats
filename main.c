@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.72 2002/10/15 19:09:32 shmad Exp $
+** $Id: main.c,v 1.73 2002/10/20 16:44:33 shmad Exp $
 */
 
 #include <setjmp.h>
@@ -73,13 +73,14 @@ int main()
 	printf("%s Loading...\n", version);
 	printf("-----------------------------------------------\n");
 	printf("Copyright: NeoStats Group. 2000-2002\n");
-	printf("Justin Hammond (Fish@dynam.ac)\n");
+	printf("Justin Hammond (fish@neostats.net)\n");
 	printf("Adam Rutter (shmad@neostats.net)\n");
 	printf("^Enigma^ (enigma@neostats.net)\n");
 	printf("-----------------------------------------------\n\n");
 	me.t_start = time(NULL);
 	me.want_privmsg = 0;
 	me.enable_spam = 0;
+	me.die = 0;
 	me.coder_debug=0;
 	me.noticelag=0;
 	me.usesmo=0;
@@ -96,13 +97,20 @@ int main()
 	__init_mod_list();
 	setup_signals();
 	ConfLoad();
+        if (me.die) {
+		printf("\n-----> ERROR: Read the README file then edit neostats.cfg! <-----\n\n");
+                log("Read the README file and edit your neostats.cfg");
+                sleep(1);
+                close(servsock);
+                remove("neostats.pid");
+                exit(0);
+        }
 	TimerReset();
 	init_dns();
 	init_server_hash();
 	init_user_hash();
 	init_chan_hash();
 
-/* Shmad */
 /* This section ALWAYS craps out so we ignore it-- for now */
 	if (init_modules()) {
 /*		printf("WARNING: Some Modules Failed to Load"); */

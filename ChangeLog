@@ -1,6 +1,9 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 
 * NeoStats * Shmad & Fish * Version ???? 
+ - Misc. Updates (S)
+ - Added new conftype option NO_LOAD if not commented out, Neo wont load.  This is to force people
+   to read the manual and to PROPERLY configure their conf file. (S)
  - Due to major issues with Versions of UltimateIRCd3.x.x prior to a26 SSJ3 and SSJ4 support has
    again been removed.  Lets just leave it at SSJ5 now! (S)
  - stats.motd is now neostats.motd demo neostats.motd included with distro (S)

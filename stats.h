@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.60 2002/10/13 06:57:43 fishwaldo Exp $
+** $Id: stats.h,v 1.61 2002/10/20 16:44:33 shmad Exp $
 */
 
 #ifndef STATS_H
@@ -140,6 +140,7 @@ struct me {
 	unsigned int want_privmsg : 1;
 	unsigned int send_extreme_lag_notices : 1;
 	unsigned int onlyopers : 1;
+	unsigned int die : 1;
 	unsigned int collisions;
 	unsigned int enable_proxy : 1;
 	unsigned int coder_debug : 1;
