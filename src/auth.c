@@ -189,6 +189,6 @@ int DelAuthModule( Module *mod_ptr )
 int InitAuth( void )
 {
 	/* Clear the module list */
-	memset( AuthModList, 0, sizeof( AuthModList ) );
+	os_memset( AuthModList, 0, sizeof( AuthModList ) );
 	return NS_SUCCESS;
 }

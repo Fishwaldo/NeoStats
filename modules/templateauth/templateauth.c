@@ -32,10 +32,25 @@
  */
 #include "neostats.h"
 
-/** Copyright info */
+/** 
+ *  Example copyright text
+ *  You must change this or your module will not load.
+ */
+
 const char *template_copyright[] = {
-	"Copyright (c) 1999-2005, NeoStats",
-	"http://www.neostats.net/",
+	"Copyright (c) <year>, <your name>",
+	NULL
+};
+
+/** 
+ *  Example about text
+ *  Returned by an intrinsic command when a user requests
+ *  /msg botname about
+ *  You must change this or your module will not load.
+ */
+
+const char *template_about[] = {
+	"About your module",
 	NULL
 };
 
@@ -45,7 +60,7 @@ ModuleInfo module_info =
 	"TemplateAuth",
 	"Template Authentication Module",
 	template_copyright,
-	NULL,
+	template_about,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
 	__DATE__,

@@ -134,19 +134,19 @@ int
 InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const mode_init* user_umodes, const mode_init* user_smodes)
 {
 	/* build cmode lookup table */
-	memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
+	os_memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
 	dlog(DEBUG4, "Build channel mode table...");
 	ircd_supported_cmodes = BuildModeTable (ircd_cmode_char_map, ircd_cmodes, chan_modes, 0);
 	/* build cumode lookup table */
 	dlog(DEBUG4, "Build channel user mode table...");
 	ircd_supported_cumodes = BuildModeTable (ircd_cmode_char_map, ircd_cmodes, chan_umodes, NICKPARAM);
 	/* build umode lookup table */
-	memset(&ircd_umodes, 0, sizeof(ircd_umodes));
+	os_memset(&ircd_umodes, 0, sizeof(ircd_umodes));
 	dlog(DEBUG4, "Build user mode table...");
 	ircd_supported_umodes = BuildModeTable (ircd_umode_char_map, ircd_umodes, user_umodes, 0);
 	/* build smode lookup table */
 	if (user_smodes) {
-		memset(&ircd_smodes, 0, sizeof(ircd_smodes));
+		os_memset(&ircd_smodes, 0, sizeof(ircd_smodes));
 		dlog(DEBUG4, "Build user smode table...");
 		ircd_supported_smodes = BuildModeTable (ircd_smode_char_map, ircd_smodes, user_smodes, 0);
 	}

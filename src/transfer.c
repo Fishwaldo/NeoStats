@@ -89,7 +89,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 					neotrans->savemem = newbuf;
 				}
 			}
-			memcpy((char *)&neotrans->savemem[neotrans->savemempos], transferptr, size);
+			os_memcpy( (char *)&neotrans->savemem[neotrans->savemempos], transferptr, size );
 			neotrans->savemempos += size;
 			writesize = nmemb;
 			break;

@@ -137,7 +137,7 @@ void msg_permission_denied( CmdParams *cmdparams, char *subcommand )
 
 void msg_error_need_more_params( CmdParams *cmdparams )
 {
-	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Syntax error: insufficient parameters", cmdparams->source ) );
+	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Insufficient parameters", cmdparams->source ) );
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
 		cmdparams->bot->name, cmdparams->cmd );
 }
@@ -223,6 +223,16 @@ static int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	/* No handler, we cannot recover from this */
 	if( !cmd_ptr->handler ) {
 		nlog( LOG_ERROR, "add_bot_cmd: missing command handler, command %s not added", 
+			cmd_ptr->cmd );
+		return NS_FAILURE;
+	}
+	if( !cmd_ptr->onelinehelp ) {
+		nlog( LOG_ERROR, "add_bot_cmd: missing oneline help text, command %s not added", 
+			cmd_ptr->cmd );
+		return NS_FAILURE;
+	}
+	if( !cmd_ptr->helptext ) {
+		nlog( LOG_ERROR, "add_bot_cmd: missing help text, command %s not added", 
 			cmd_ptr->cmd );
 		return NS_FAILURE;
 	}
@@ -592,11 +602,7 @@ bot_cmd_help( CmdParams *cmdparams )
 							irc_prefmsg( cmdparams->bot, cmdparams->source, __( "\2Additional commands available to %s:\2", cmdparams->source ), curlevelmsg );
 							donemsg = 1;
 						}
-						if( !cmd_ptr->onelinehelp ) {
-							irc_prefmsg( cmdparams->bot, cmdparams->source, __( "    %-20s *** Missing help text ***",cmdparams->source ), cmd_ptr->cmd );
-						} else {					
-							irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp );
-						}
+						irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp );
 					}
 				}
 				if( lowlevel >= userlevel ) {
@@ -653,11 +659,7 @@ bot_cmd_help( CmdParams *cmdparams )
 				msg_permission_denied( cmdparams, NULL );
 				return NS_ERR_NO_PERMISSION;
 			}		
-			if( !cmd_ptr->helptext ) {
-				irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Missing help text for command", cmdparams->source ) );
-			} else {
-				irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext );
-			}
+			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext );
 			return NS_SUCCESS;
 		}
 	}
@@ -710,7 +712,7 @@ Client * FindValidUser( Bot* botptr, Client * sourceuser, const char *target_nic
  */
 static int bot_cmd_about( CmdParams *cmdparams )
 {
-	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->about_text ) {
+	if( cmdparams->bot->moduleptr ) {
 		irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text );
 	}
 	return NS_SUCCESS;
@@ -735,7 +737,7 @@ static int bot_cmd_version( CmdParams *cmdparams )
  */
 static int bot_cmd_credits( CmdParams *cmdparams )
 {
-	if( cmdparams->bot->moduleptr && cmdparams->bot->moduleptr->info->copyright ) {
+	if( cmdparams->bot->moduleptr ) {
 		irc_prefmsg_list( cmdparams->bot, cmdparams->source, 
 			cmdparams->bot->moduleptr->info->copyright );
 	}

@@ -474,12 +474,12 @@ int InitSocks (void)
 	}
 	me.dobind = 0;
 	/* bind to a local ip */
-	memset (&me.lsa, 0, sizeof (me.lsa));
+	os_memset( &me.lsa, 0, sizeof( me.lsa ) );
 	if (me.local[0] != 0) {
 		if ((hp = gethostbyname (me.local)) == NULL) {
 			nlog (LOG_WARNING, "Couldn't bind to IP address %s", me.local);
 		} else {
-			memcpy ((char *) &me.lsa.sin_addr, hp->h_addr, hp->h_length);
+			os_memcpy( ( char * ) &me.lsa.sin_addr, hp->h_addr, hp->h_length );
 			me.lsa.sin_family = hp->h_addrtype;
 			me.dobind = 1;
 		}

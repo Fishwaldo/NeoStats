@@ -140,7 +140,7 @@ int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
 {
 	bot_ptr->bot_info_settings = ns_calloc( sizeof( bot_info_settings ) );
 	if( bot_ptr->bot_info_settings ) {
-		memcpy( bot_ptr->bot_info_settings, bot_info_settings, sizeof( bot_info_settings ) );
+		os_memcpy( bot_ptr->bot_info_settings, bot_info_settings, sizeof( bot_info_settings ) );
 		bot_ptr->bot_info_settings[0].varptr = &botinfo->nick;
 		bot_ptr->bot_info_settings[1].varptr = &botinfo->altnick;
 		bot_ptr->bot_info_settings[2].varptr = &botinfo->user;

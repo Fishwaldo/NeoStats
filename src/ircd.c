@@ -310,7 +310,7 @@ static int InitIrcdModes( void )
 int InitIrcd( void )
 {
 	/* Clear IRCD info */
-	memset( &ircd_srv, 0, sizeof( ircd_srv ) );
+	os_memset( &ircd_srv, 0, sizeof( ircd_srv ) );
 	/* Open protocol module */
 	ircsnprintf( protocol_path, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_EXT );
 	nlog( LOG_NORMAL, "Using protocol module %s", protocol_path );

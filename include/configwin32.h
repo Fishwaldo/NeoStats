@@ -517,7 +517,6 @@
 /* Additional Win32 specifics */
 #define strcasecmp stricmp 
 #define strncasecmp strnicmp 
-#define bcopy(a, b, c) memcpy(b, a, c)
 #define index strchr
 #define rindex strrchr
 #define __PRETTY_FUNCTION__ __FUNCTION__

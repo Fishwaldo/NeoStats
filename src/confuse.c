@@ -349,7 +349,7 @@ static cfg_value_t *cfg_addval(cfg_opt_t *opt)
                                   (opt->nvalues+1) * sizeof(cfg_value_t *));
     assert(opt->values);
     opt->values[opt->nvalues] = (cfg_value_t *)malloc(sizeof(cfg_value_t));
-    memset(opt->values[opt->nvalues], 0, sizeof(cfg_value_t));
+    os_memset(opt->values[opt->nvalues], 0, sizeof(cfg_value_t));
     return opt->values[opt->nvalues++];
 }
 
@@ -369,8 +369,8 @@ static cfg_opt_t *cfg_dupopt_array(cfg_opt_t *opts)
     int n = cfg_numopts(opts);
 
     dupopts = (cfg_opt_t *)malloc((n+1) * sizeof(cfg_opt_t));
-    memset(dupopts, 0, (n+1) * sizeof(cfg_opt_t));
-    memcpy(dupopts, opts, n * sizeof(cfg_opt_t));
+    os_memset( dupopts, 0, (n+1) * sizeof( cfg_opt_t ) );
+    os_memcpy( dupopts, opts, n * sizeof( cfg_opt_t ) );
 
     for(i = 0; i < n; i++)
     {
@@ -640,7 +640,7 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value)
                 cfg_free(val->section);
                 val->section = (cfg_t *)malloc(sizeof(cfg_t));
                 assert(val->section);
-                memset(val->section, 0, sizeof(cfg_t));
+                os_memset(val->section, 0, sizeof(cfg_t));
                 val->section->name = strdup(opt->name);
                 val->section->opts = cfg_dupopt_array(opt->subopts);
                 val->section->flags = cfg->flags;
@@ -1058,7 +1058,7 @@ cfg_t *cfg_init(cfg_opt_t *opts, cfg_flag_t flags)
 
     cfg = (cfg_t *)malloc(sizeof(cfg_t));
     assert(cfg);
-    memset(cfg, 0, sizeof(cfg_t));
+    os_memset(cfg, 0, sizeof(cfg_t));
 
     cfg->name = strdup("root");
     cfg->opts = cfg_dupopt_array(opts);

@@ -140,7 +140,7 @@ strlcat(char *dst, const char *src, size_t size)
 
 	/* memcpy the desired amount */
 	if (copycount > 0) {
-		memcpy(dst + lendst, src, copycount);
+		os_memcpy( ( dst + lendst ), src, copycount );
 		dst[lendst + copycount] = 0;
 	}
 	
@@ -171,7 +171,7 @@ char *strndup(const char *src, size_t count)
 	dup = (char*)ns_malloc(count+1);
 	
 	/* Copy string into created buffer */
-	memcpy(dup, src, count);
+	os_memcpy( dup, src, count );
 	dup[count] = 0;
 	
 	/* Return pointer to duplicated string */

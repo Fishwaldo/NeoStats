@@ -38,11 +38,24 @@ static Bot *template_bot;
 
 /** 
  *  Example copyright text
+ *  You must change this or your module will not load.
  */
+
 const char* template_copyright[] = 
 {
-	"Copyright (c) 1999-2005, NeoStats",
-	"http://www.neostats.net/",
+	"Copyright (c) <year>, <your name>",
+	NULL
+};
+
+/** 
+ *  Example about text
+ *  Returned by an intrinsic command when a user requests
+ *  /msg botname about
+ *  You must change this or your module will not load.
+ */
+
+const char *template_about[] = {
+	"About your module",
 	NULL
 };
 
@@ -70,18 +83,6 @@ const char *example_help_set_example[] = {
 	"Syntax: \2EXAMPLE\2",
 	"",
 	"Example of a setting.",
-	NULL
-};
-
-/** 
- *  Example about text
- *  Returned by an intrinsic command when a user requests
- *  /msg botname about
- */
-const char* template_about[] = 
-{
-	"Template is an example module to demonstrate features",
-	"of the NeoStats API available to module coders",
 	NULL
 };
 

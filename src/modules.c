@@ -284,6 +284,16 @@ load_module (const char *modfilename, Client * u)
 		ns_dlclose (dl_handle);
 		return NULL;
 	}
+	if( !info_ptr->copyright || ircstrcasecmp (info_ptr->copyright[0], "Copyright (c) <year>, <your name>") ==0 ) {
+		load_module_error (u, __("Unable to load module: missing copyright text.", u), modfilename);
+		ns_dlclose (dl_handle);
+		return NULL;
+	}	
+	if( !info_ptr->about_text || ircstrcasecmp (info_ptr->about_text[0], "About your module") ==0 ) {
+		load_module_error (u, __("Unable to load module: missing about text.", u), modfilename);
+		ns_dlclose (dl_handle);
+		return NULL;
+	}	
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (modulehash, info_ptr->name)) {
 		ns_dlclose (dl_handle);

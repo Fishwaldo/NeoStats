@@ -88,7 +88,7 @@ static void ChanPartHandler( list_t * list, lnode_t * node, void *v )
 
 void PartAllChannels( Client *u, const char *reason )
 {
-	memset( quitreason, 0, BUFSIZE );
+	os_memset( quitreason, 0, BUFSIZE );
 	if( reason ) {
 		strlcpy( quitreason, reason, BUFSIZE );
 		strip_mirc_codes( quitreason );

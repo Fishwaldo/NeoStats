@@ -167,7 +167,7 @@ static int get_options( int argc, char **argv )
 static int InitMe( void )
 {
 	/* set some defaults before we parse the config file */
-	memset( &me, 0, sizeof( me ) );
+	os_memset( &me, 0, sizeof( me ) );
 	/* initialise version */
 	strlcpy( me.version, NEOSTATS_VERSION, VERSIONSIZE );
 	/* our default lang is always -1 */
@@ -176,7 +176,7 @@ static int InitMe( void )
 	me.now = me.ts_boot = time( NULL );
 	ircsnprintf( me.strnow, STR_TIME_T_SIZE, "%lu", ( long )me.now );
 	/* Clear config */
-	memset( &nsconfig, 0 , sizeof( config ) );
+	os_memset( &nsconfig, 0 , sizeof( config ) );
 	/* Default reconnect time */
 	nsconfig.r_time = 10;
 	/* Debug mode overrides */

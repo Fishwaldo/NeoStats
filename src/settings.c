@@ -33,19 +33,19 @@
 #include "botinfo.h"
 #include "settings.h"
 
-typedef int( *bot_cmd_set_handler )( CmdParams *cmdparams, bot_setting* set_ptr );
+typedef int( *bot_cmd_set_handler )( CmdParams *cmdparams, bot_setting *set_ptr );
 
-static int bot_cmd_set_boolean( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_string( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_channel( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_msg( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_nick( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_user( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_host( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_realname( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_ipv4( CmdParams *cmdparams, bot_setting* set_ptr );
-static int bot_cmd_set_custom( CmdParams *cmdparams, bot_setting* set_ptr );
+static int bot_cmd_set_boolean( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_string( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_channel( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_msg( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_nick( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_user( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_host( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_realname( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_ipv4( CmdParams *cmdparams, bot_setting *set_ptr );
+static int bot_cmd_set_custom( CmdParams *cmdparams, bot_setting *set_ptr );
 
 static bot_cmd_set_handler bot_cmd_set_handlers[] = 
 {
@@ -76,7 +76,7 @@ static int bot_cmd_set_list( CmdParams *cmdparams )
 {
 	hnode_t *setnode;
 	hscan_t hs;
-	bot_setting* set_ptr;
+	bot_setting *set_ptr;
 	int userlevel;
 
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Current %s settings:", cmdparams->source ), cmdparams->bot->name );
@@ -139,7 +139,7 @@ static int bot_cmd_set_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_report( CmdParams *cmdparams, bot_setting* set_ptr, char *new_setting )
+static int bot_cmd_set_report( CmdParams *cmdparams, bot_setting *set_ptr, char *new_setting )
 {
 	if( nsconfig.cmdreport ) {
 		irc_chanalert( cmdparams->bot, _( "%s set to %s by \2%s\2" ), 
@@ -168,7 +168,7 @@ static int bot_cmd_set_report( CmdParams *cmdparams, bot_setting* set_ptr, char 
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_boolean( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_boolean( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	int newsetting;
 
@@ -207,7 +207,7 @@ static int bot_cmd_set_boolean( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	int intval;
 
@@ -251,7 +251,7 @@ static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_string( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_string( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	/* Module specific handling */
 	if( set_ptr->handler ) {
@@ -275,7 +275,7 @@ static int bot_cmd_set_string( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_channel( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_channel( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	if( ValidateChannel( cmdparams->av[1] ) == NS_FAILURE ) {
 		irc_prefmsg( cmdparams->bot, cmdparams->source, 
@@ -304,7 +304,7 @@ static int bot_cmd_set_channel( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_msg( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_msg( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	char *buf;
 
@@ -327,7 +327,7 @@ static int bot_cmd_set_msg( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_nick( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_nick( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	if( ValidateNick( cmdparams->av[1] ) == NS_FAILURE ) {
 		irc_prefmsg( cmdparams->bot, cmdparams->source, 
@@ -351,7 +351,7 @@ static int bot_cmd_set_nick( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_user( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_user( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	if( ValidateUser( cmdparams->av[1] ) == NS_FAILURE ) {
 		irc_prefmsg( cmdparams->bot, cmdparams->source, 
@@ -375,7 +375,7 @@ static int bot_cmd_set_user( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_host( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_host( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	if( !index( cmdparams->av[1], '.' ) ) {
 		irc_prefmsg( cmdparams->bot, cmdparams->source, 
@@ -404,7 +404,7 @@ static int bot_cmd_set_host( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_realname( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_realname( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	char *buf;
 
@@ -427,7 +427,7 @@ static int bot_cmd_set_realname( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_ipv4( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_ipv4( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	if( !inet_addr( cmdparams->av[1] ) ) {
 		irc_prefmsg( cmdparams->bot, cmdparams->source, 
@@ -451,7 +451,7 @@ static int bot_cmd_set_ipv4( CmdParams *cmdparams, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_cmd_set_custom( CmdParams *cmdparams, bot_setting* set_ptr )
+static int bot_cmd_set_custom( CmdParams *cmdparams, bot_setting *set_ptr )
 {
 	if( set_ptr->handler ) {
 		set_ptr->handler( cmdparams, SET_CHANGE );
@@ -472,7 +472,7 @@ static int bot_cmd_set_custom( CmdParams *cmdparams, bot_setting* set_ptr )
 int bot_cmd_set( CmdParams *cmdparams )
 {
 	bot_cmd_set_handler set_handler;
-	bot_setting* set_ptr;
+	bot_setting *set_ptr;
 	int userlevel;
 
 	if( cmdparams->ac < 1 ) {
@@ -491,7 +491,7 @@ int bot_cmd_set( CmdParams *cmdparams )
 	if( cmdparams->ac < 2 ) {
 		return NS_ERR_SYNTAX_ERROR;
 	} 
-	set_ptr= ( bot_setting* )hnode_find( cmdparams->bot->botsettings, cmdparams->av[0] );
+	set_ptr= ( bot_setting *)hnode_find( cmdparams->bot->botsettings, cmdparams->av[0] );
 	if( set_ptr ) {
 		if( userlevel < set_ptr->ulevel ) {
 			msg_permission_denied( cmdparams, cmdparams->av[0] );
@@ -525,7 +525,7 @@ int bot_cmd_set( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int add_bot_setting( hash_t *set_hash, bot_setting* set_ptr ) 
+static int add_bot_setting( hash_t *set_hash, bot_setting *set_ptr ) 
 {
 	hnode_create_insert( set_hash, set_ptr, set_ptr->option );
 	dlog( DEBUG3, "add_bot_setting: added a new set option %s", set_ptr->option );
@@ -543,7 +543,7 @@ static int add_bot_setting( hash_t *set_hash, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int del_bot_setting( hash_t *set_hash, bot_setting* set_ptr ) 
+static int del_bot_setting( hash_t *set_hash, bot_setting *set_ptr ) 
 {
 	hnode_t *setnode;
 	
@@ -567,7 +567,7 @@ static int del_bot_setting( hash_t *set_hash, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int add_bot_setting_list( Bot* bot_ptr, bot_setting* set_ptr ) 
+int add_bot_setting_list( Bot* bot_ptr, bot_setting *set_ptr ) 
 {
 	if( !set_ptr ) {
 		return NS_FAILURE;
@@ -600,7 +600,7 @@ int add_bot_setting_list( Bot* bot_ptr, bot_setting* set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int del_bot_setting_list( Bot* bot_ptr, bot_setting* set_ptr ) 
+int del_bot_setting_list( Bot* bot_ptr, bot_setting *set_ptr ) 
 {
 	/* If no bot pointer return failure */
 	if( !bot_ptr ) {

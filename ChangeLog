@@ -4,6 +4,11 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Module command setup is now more strict. Commands will not be added if the
+   main help text or the one line help text is not set. (M)
+ - Module loads are now more strict. About text and copyright text are required
+   and if the code is based on the template text, this must be changed before
+   the module will load. (M)
  - Fix FNMATCH error on configure (we don't use fnmatch) (F)
  - Fix SET RECVQ. (M)
  - More work on ossocket layer. (M)

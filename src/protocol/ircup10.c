@@ -321,7 +321,7 @@ void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
 {
 	/* Reset our numeric buffer */
-	memset(neonicknumerics, 0 , sizeof(neonicknumerics));
+	os_memset( neonicknumerics, 0 , sizeof( neonicknumerics ) );
 	inttobase64(neostatsbase64, numeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
     send_cmd ("%s %s 1 %lu %lu J10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neostatsbase64, infoline);
