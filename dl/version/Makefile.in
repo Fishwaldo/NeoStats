@@ -1,11 +1,11 @@
 INCLUDES = -I../..
 
-SOURCES= spam.c
-OBJECTS= spam.lo
-TARGET= spam.so
+SOURCES= version.c
+OBJECTS= version.lo
+TARGET= version.so
 
-CC=gcc
-CFLAGS=-O2 -Wall -ggdb -fPIC
+CC=@CC@
+CFLAGS=@CFLAGS@ -fPIC
 LINKER=ld
 
 all:
@@ -14,5 +14,5 @@ all:
 	/bin/cp $(TARGET) ../
 
 clean:
-	/bin/rm -rf ../$(TARGET)
+	/bin/rm -rf ../$(TARGET) Makefile
 	/bin/rm -rf *.o *.lo *.so

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.7 2000/02/23 05:39:24 fishwaldo Exp $
+** $Id: stats.h,v 1.8 2000/02/29 10:19:52 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -28,18 +28,9 @@
 #include <sys/resource.h>
 
 #include "Unreal.h"
+#include "config.h"
 
 /* Define this to enable Debug Code */
-#define  DEBUG
-
-/* Define this to Enable Unreal Support */
-
-#define UNREAL
-
-
-
-
-
 
 #define CHANLEN			32
 #define BUFSIZE			512

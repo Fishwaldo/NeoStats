@@ -1,0 +1,126 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(dl/icq/icq.c)
+AC_CONFIG_HEADER(config.h)
+
+PACKAGE=NeoStats
+VERSION=2.0
+AC_PREFIX_DEFAULT(~/NeoStats/)
+CFLAGS="$CFLAGS -O2 -Wall"
+
+dnl Checks for programs.
+AC_PROG_CC
+
+dnl Checks for libraries.
+dnl Replace `main' with a function in -ldl:
+AC_CHECK_LIB(dl, main)
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(sys/time.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_STRUCT_TM
+
+dnl Checks for library functions.
+AC_FUNC_FNMATCH
+AC_TYPE_SIGNAL
+AC_FUNC_STRFTIME
+AC_CHECK_FUNCS(regcomp select socket strdup)
+
+dnl check if we are running with Debug....
+AC_MSG_CHECKING(Whether to Enable Debuging...)
+AC_ARG_ENABLE(debug,
+[ --enable-debug - Enable Debuging],
+[ case "$enableval" in
+  yes)
+	AC_DEFINE(DEBUG)
+	CFLAGS="$CFLAGS -ggdb"
+	AC_MSG_RESULT(yes - Watch your Log Files)
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	;;
+  esac],
+AC_MSG_RESULT(no)
+)
+
+dnl check to see if we should enable Unreal IRCD Support
+AC_MSG_CHECKING(Whether to Enable Unreal IRCD Support...)
+AC_ARG_ENABLE(unreal,
+[ --disable-unreal - Disable Unreal IRCD Support],
+[ case "$enableval" in
+  yes)  
+	AC_DEFINE(IRCD, UNREAL)
+	IRCD_FILES="Unreal.c"
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_DEFINE(IRCD,0)
+	AC_MSG_RESULT(no)
+	;;
+esac],
+[AC_DEFINE(IRCD, UNREAL)
+IRCD_FILES="Unreal.c"
+AC_MSG_RESULT(yes)])
+
+dnl Lets see what Modules to Compile
+AC_MSG_CHECKING(Whether to Enable StatServ Module?)
+AC_ARG_ENABLE(statserv,
+[ --disable-statserv - Do Not Compile StatServ Module],
+[ case "$enableval" in
+  yes)  
+	MODULES="statserv"
+	AC_MSG_RESULT(yes)
+	;;
+  *) 
+	AC_MSG_RESULT(no)
+	;;
+esac],
+[MODULES="statserv"
+AC_MSG_RESULT(yes)
+])
+
+AC_MSG_CHECKING(Whether to Enable Spam Module?)
+AC_ARG_ENABLE(spam,
+[ --disable-spam - Do Not Compile Spam Module],
+[ case "$enableval" in
+  yes)  
+	MODULES="$MODULES spam"
+	AC_MSG_RESULT(yes)
+	;;
+  *) 
+	AC_MSG_RESULT(no)
+	;;
+esac],
+[ MODULES="$MODULES spam"
+AC_MSG_RESULT(yes)
+])
+	
+AC_MSG_CHECKING(Whether to Enable Version Module?)
+AC_ARG_ENABLE(version,
+[ --enable-version - Do Compile Version Module (API example)],
+[ case "$enableval" in
+  yes)
+	MODULES="$MODULES version"
+	AC_MSG_RESULT(yes)
+	;;
+  *)
+	AC_MSG_RESULT(no)
+	;;
+esac],
+[AC_MSG_RESULT(no)]
+)
+
+
+AC_MSG_CHECKING(Your Current Bank Balance)
+AC_MSG_RESULT(Thats Impressive!!!)
+
+
+
+AC_SUBST(IRCD_FILES)
+AC_SUBST(MODULES)
+AC_OUTPUT(dl/statserv/Makefile dl/services/Makefile dl/icq/Makefile dl/version/Makefile dl/Makefile dl/spam/Makefile Makefile)

@@ -81,7 +81,7 @@ int main()
 	return 1;
 }
 
-void serv_die() {
+RETSIGTYPE serv_die() {
 	User *u;
 	u = finduser(s_Services);
 	log("Sigterm Recieved, Shuting Down Server!!!!");
@@ -91,7 +91,7 @@ void serv_die() {
 }
 
 
-void conf_rehash() {
+RETSIGTYPE conf_rehash() {
 	struct sigaction act;
 	notice(s_Services, "Recieved SIGHUP, Attempting to Rehash");
 	globops(me.name, "Received SIGHUP, Attempted to Rehash");
@@ -106,7 +106,7 @@ void conf_rehash() {
 	/* gotta do the rehash code dun I? */
 }
 
-void serv_segv() {
+RETSIGTYPE serv_segv() {
 
 	/* Thanks to Stskeeps and Unreal for this stuff :) */
 	log("Uh Oh, Segmentation Fault.. Server Terminating");

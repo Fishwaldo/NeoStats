@@ -1,6 +1,6 @@
 ##
 
-MODULES=version spam statserv
+MODULES=@MODULES@
 
 default: all
 
@@ -12,4 +12,4 @@ all clean ::
 		echo "<=== $(SDP)modules/$$i"; \
 	  fi; \
 	done
-
+	/bin/rm -rf Makefile ;
