@@ -500,14 +500,20 @@ void parse(char *line)
 	parend:
 	FreeList(EM->av, EM->ac);
 /* its upto the calling function of EM->fndata to free it, as we don't know if we are allowed to free some function data */
-//	for (I = 0; I< EM->fc; I++) {
-//		if (EM->canfree[I] == 1) {
-//			free(EM->fndata[I]);
-//			EM->canfree[I] = 0;
-//		}
-//	}
+	for (I = 0; I< EM->fc; I++) {
+		if (EM->canfree[I] == 1) {
+			free(EM->fndata[I]);
+			EM->canfree[I] = 0;
+		}
+		EM->fndata[I] = NULL;
+	}
 	EM->fc = 0;
-	free(EM);
+	if (EM->isserv) {
+		EM->s = NULL;
+	} else {
+		EM->u = NULL;
+	}
+	//free(EM);
 }
 
 
