@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.47 2003/01/15 14:18:47 fishwaldo Exp $
+** $Id: dl.c,v 1.48 2003/01/22 16:37:38 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -211,7 +211,7 @@ int del_socket(char *sock_name) {
 #endif
 		hash_scan_delete(sockh, sn);
 		hnode_destroy(sn);
-		free(list->sockname);
+//		free(list->sockname);
 		free(list);
 		return 1;
 	}		
