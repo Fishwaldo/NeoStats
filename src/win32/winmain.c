@@ -27,6 +27,43 @@
 
 #include "resource.h"
 
+extern int neostats ();
+extern void read_loop ();
+
+static char* szNeoStatsErrorTitle="NeoStats for Windows Error";
+HINSTANCE hInstance = 0;
+HANDLE hNeoStatsThread = 0;
+
+void InitDebugConsole(void)
+{
+	long lStdHandle;
+	int hConHandle;
+	FILE *fp;
+
+	AllocConsole();        
+	SetConsoleTitle("NeoStats Debug Window");
+	lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
+	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+	fp = _fdopen( hConHandle, "w" );
+	*stdout = *fp;
+	setvbuf( stdout, NULL, _IONBF, 0 );
+	lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
+	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
+	fp = _fdopen( hConHandle, "w" );
+	*stderr = *fp;
+	setvbuf( stderr, NULL, _IONBF, 0 );
+}
+
+void FiniDebugConsole(void)
+{
+	FreeConsole();
+}
+
+void ErrorMessageBox(char* error)
+{
+	MessageBox(NULL, error, szNeoStatsErrorTitle, MB_ICONEXCLAMATION | MB_OK);
+}
+
 BOOL CALLBACK DialogProc (HWND hwnd, 
                           UINT message, 
                           WPARAM wParam, 
@@ -42,22 +79,15 @@ BOOL CALLBACK DialogProc (HWND hwnd,
 			return 0;
 		case WM_DESTROY:
 			PostQuitMessage(0);
-			FreeConsole();
+			FiniDebugConsole();
 			return TRUE;
 		case WM_CLOSE:
 			DestroyWindow (hwnd);
-			FreeConsole();
+			FiniDebugConsole();
 			return TRUE;
     }
     return FALSE;
 }
-
-HINSTANCE hInstance = 0;
-
-extern int neostats ();
-HANDLE hNeoStatsThread = 0;
-extern void read_loop ();
-
 
 int WINAPI WinMain
    (HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int cmdShow)
@@ -67,31 +97,15 @@ int WINAPI WinMain
 	WSADATA WSAData;
     MSG  msg;
     HWND hDialog = 0;
-	long lStdHandle;
-	int hConHandle;
-	FILE *fp;
 	
 	hInstance = hInst;
 
-	AllocConsole();        
-	SetConsoleTitle("NeoStats Debug Window");
-	lStdHandle = (long)GetStdHandle(STD_OUTPUT_HANDLE);
-	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-	fp = _fdopen( hConHandle, "w" );
-	*stdout = *fp;
-	setvbuf( stdout, NULL, _IONBF, 0 );
-	lStdHandle = (long)GetStdHandle(STD_ERROR_HANDLE);
-	hConHandle = _open_osfhandle(lStdHandle, _O_TEXT);
-	fp = _fdopen( hConHandle, "w" );
-	*stderr = *fp;
-	setvbuf( stderr, NULL, _IONBF, 0 );
-
-
 	if (WSAStartup(MAKEWORD(1, 1), &WSAData) != 0)
    	{
-        MessageBox(NULL, "Unable to initialize WinSock", "NeoStats for Windows Error", MB_OK);
+        ErrorMessageBox("Unable to initialize WinSock");
         return FALSE;
 	}
+	InitDebugConsole();
 	hDialog = CreateDialog (hInst, 
                             MAKEINTRESOURCE (IDD_DIALOG1), 
                             0, 
@@ -99,15 +113,14 @@ int WINAPI WinMain
     if (!hDialog)
     {
         wsprintf (szMsg, "Error x%x", GetLastError ());
-        MessageBox (0, szMsg, "CreateDialog", MB_ICONEXCLAMATION | MB_OK);
-        return 1;
+        ErrorMessageBox(szMsg);
+        return FALSE;
     }
 
 	if(neostats ()!=0)
 	{
-        wsprintf (szMsg, "NeoStats init failed");
-        MessageBox (0, szMsg, "CreateDialog", MB_ICONEXCLAMATION | MB_OK);
-        return 1;
+        ErrorMessageBox("NeoStats init failed");
+        return FALSE;
 	}
 
     hNeoStatsThread = CreateThread( 
@@ -121,9 +134,8 @@ int WINAPI WinMain
    // Check the return value for success. 
  
    if (hNeoStatsThread == NULL) 
-   {
-      wsprintf( szMsg, "CreateThread failed." ); 
-      MessageBox( NULL, szMsg, "main", MB_OK );
+   {	
+	   ErrorMessageBox("CreateThread failed.");
    }
 
     while ((GetMessage (&msg, NULL, 0, 0)) != 0)
