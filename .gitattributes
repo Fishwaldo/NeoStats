@@ -84,6 +84,7 @@ curl/formdata.c -text
 curl/formdata.h -text
 curl/ftp.c -text
 curl/ftp.h -text
+curl/getdate.c -text
 curl/getdate.h -text
 curl/getdate.y -text
 curl/getenv.c -text
