@@ -625,13 +625,16 @@ static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
-		EnableEvent( EVENT_SIGNON );
-		EnableEvent( EVENT_QUIT );
-	} 
-	else 
-	{
-		DisableEvent( EVENT_SIGNON );
-		DisableEvent( EVENT_QUIT );
+		if( cs_cfg.sign_watch )
+		{
+			EnableEvent( EVENT_SIGNON );
+			EnableEvent( EVENT_QUIT );
+		} 
+		else 
+		{
+			DisableEvent( EVENT_SIGNON );
+			DisableEvent( EVENT_QUIT );
+		}
 	}
 	return NS_SUCCESS;
 }
