@@ -231,6 +231,7 @@ static int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	/* Seems OK, add the command */
 	hnode_create_insert( cmd_hash, cmd_ptr, cmd_ptr->cmd );
 	snprintf( confcmd, 32, "command%s", cmd_ptr->cmd );
+	cmd_ptr->modptr = GET_CUR_MODULE();
 	if( DBAFetchConfigInt( confcmd, &ulevel ) == NS_SUCCESS ) {
 		hashentry = ( bot_cmd * ) hnode_find( cmd_hash, cmd_ptr->cmd );
 		hashentry->ulevel = ulevel;
@@ -443,7 +444,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 					msg_error_need_more_params( cmdparams );
 				} else {
 					/* Seems OK so report the command call so modules do not have to */
-					SET_RUN_LEVEL( cmdparams->bot->moduleptr );
+					SET_RUN_LEVEL( cmd_ptr->modptr );
 					if( nsconfig.cmdreport ) {
 						irc_chanalert( cmdparams->bot, _( "%s used %s" ), cmdparams->source->name, cmd_ptr->cmd );
 					}

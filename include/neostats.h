@@ -479,6 +479,8 @@ extern adns_state ads;
 EXPORTVAR extern const char version_date[];
 EXPORTVAR extern const char version_time[];
 
+/* Forward references for cyclic structs */
+typedef struct _Module Module;
 typedef struct _Bot Bot;
 
 /** @brief Server structure
@@ -691,6 +693,7 @@ typedef struct bot_cmd {
 	const char		**helptext;	/* pointer to help text */
 	const char		*onelinehelp;/* single line help for generic help function */
 	int				flags;		/* command flags */
+	Module			*modptr;	/* NeoStats internal use only */
 }bot_cmd;
 
 /** @brief flags for bots
@@ -870,7 +873,7 @@ typedef int (*userauthfunc) ( Client *u );
 /** @brief Module structure
  * 
  */
-typedef struct Module {
+typedef struct _Module {
 	ModuleInfo *info;
 	ModuleEvent **event_list;
 	mod_auth mod_auth_cb;
@@ -880,7 +883,7 @@ typedef struct Module {
 	unsigned int insynch;
 	unsigned int synched;
 	unsigned int error;
-}Module;
+}_Module;
 
 EXPORTVAR extern Module *RunModule[10];
 EXPORTVAR extern int RunLevel;
