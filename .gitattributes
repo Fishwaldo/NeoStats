@@ -70,15 +70,6 @@ dl/hostserv/Makefile -text
 dl/hostserv/README -text
 dl/hostserv/hostserv.c -text
 dl/hostserv/hs_help.c -text
-dl/icq/DOESNOTCOMPILE -text
-dl/icq/Makefile -text
-dl/icq/README -text
-dl/icq/icq.c -text
-dl/icq/icq.h -text
-dl/icq/icq_help.c -text
-dl/icq/icqconfig.h -text
-dl/icq/icqlib.c -text
-dl/icq/icqlib.h -text
 dl/loveserv/.indent.pro -text
 dl/loveserv/ChangeLog -text
 dl/loveserv/Makefile -text
