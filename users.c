@@ -41,8 +41,7 @@ hash_t *uh;
 
 static User *new_user (const char *nick);
 #ifdef BASE64NICKNAME
-void
-setusernumeric (const char *nick, const char* num)
+void setusernumeric (const char *nick, const char* num);
 #endif
 
 static char quitreason[BUFSIZE];
