@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../..
+INCLUDES = -I../.. -I../../adns
 
 SOURCES= version.c
 OBJECTS= version.o
@@ -12,7 +12,7 @@ all:	version
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 version: $(OBJECTS)
-	$(LD) $(MODLDGLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
 	/bin/cp $(TARGET) ../
 
 clean:

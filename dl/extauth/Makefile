@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../..
+INCLUDES = -I../.. -I../../adns
 
 SOURCES= $(extauth_src) 
 OBJECTS= $(extauth_objs)

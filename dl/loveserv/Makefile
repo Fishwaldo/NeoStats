@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../..
+INCLUDES = -I../.. -I../../adns
 
 SOURCES= loveserv.c
 OBJECTS= loveserv.o

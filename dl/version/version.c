@@ -12,8 +12,8 @@ Module_Info my_info[] = { {
 	"0.1"
 } };
 
-int new_m_version(char *av, char *tmp) {
-	sts(":%s 351 %s :Module Version Loaded, v%s %s %s",me.name,av,my_info[0].module_version,v1version_date,v1version_time);
+int new_m_version(char *origin, char **av, int ac) {
+	snumeric_cmd(351, origin, "Module Version Loaded, v%s %s %s",my_info[0].module_version,v1version_date,v1version_time);
 	return 0;
 }
 
@@ -40,8 +40,8 @@ Functions *__module_get_functions() {
 };
 
 void _init() {
-	sts(":%s GLOBOPS :Version Module Loaded",me.name);
+	globops(me.name, "Version Module Loaded");
 }
 void _fini() {
-	sts(":%s GLOBOPS :Version Module Unloaded",me.name);
+	globops(me.name, "Version Module Unloaded");
 }

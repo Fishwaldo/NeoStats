@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../..
+INCLUDES = -I../.. -I../../adns
 
 SOURCES= neoserv.c
 OBJECTS= neoserv.o
@@ -12,8 +12,8 @@ all:	neoserv
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<
 
 neoserv: $(OBJECTS) 
-	(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
-	$bin/cp $(TARGET) ../
+	$(LD) $(MODLDFLAGS) -o $(TARGET) $(LIBS) $(OBJECTS)
+	/bin/cp $(TARGET) ../
 
 clean:
 	/bin/rm -rf ../$(TARGET)

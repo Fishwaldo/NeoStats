@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../..
+INCLUDES = -I../.. -I../../adns
 
 SOURCES= spam.c
 OBJECTS= spam.o

@@ -1,6 +1,6 @@
 include ../../Makefile.inc
 
-INCLUDES = -I../.. -Iares/
+INCLUDES = -I../.. -Iares/ -I../../adns
 
 SOURCES= opsb.c
 OBJECTS= opsb.o libares.a
