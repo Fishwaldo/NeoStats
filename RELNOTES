@@ -1,4 +1,4 @@
-* NeoStats * M & Fish * Version 2.5.7
+* NeoStats * M & Fish * Version 2.5.8
 ==============================================================================
 Important Changes you should know: (READ THIS!)
 ==============================================================================
@@ -7,13 +7,4 @@ RedHat/Slakware 9.0 Users:
 	affects NeoStats. If you are running RedHat or Slakware 9.0 please 
 	read http://www.neostats.net/boards/viewtopic.php?t=391
  
-Module Name Change
-	*****************************************************************
-	THIS IS IN BOLD. IF YOU ASK THIS QUESTION ON THE FORUMS, YOU WONT
-        GET A ANSWER!
-        *****************************************************************
-        MoraleServ, ConnectServ have had their module names changed. When
-        Loading these modules via neostats.cfg, use the full names
-        (lowercase) instead of previously ms, and cs
-
 Read the ChangeLog for a complete description of what has changed

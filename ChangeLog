@@ -1,7 +1,6 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 =====================================================================================
 * NeoStats * Fish (F) & Mark (M)* Version 2.5.8
-   (For my reference, Branched at 698)
  - strncpy replaced by strlcpy - faster and safer (M)
  - Replaced redundant strlen calls with faster and safer alternatives (M)
  - Created optimised irc[v]s[n]printf functions to replace [v]s[n]printf (M)
