@@ -28,26 +28,109 @@
  * events should be tokenised to improve performance
  */
 
+/*  ONLINE parameters are:
+ *	server connected to
+ */
 #define EVENT_ONLINE	    "ONLINE"
+/*  SIGNON parameters are:
+ *	user nick
+ */
 #define EVENT_SIGNON		"SIGNON"
+/*  SIGNOFF parameters are:
+ *	user nick
+ */
 #define EVENT_SIGNOFF		"SIGNOFF"
+/*  KILL parameters are:
+ *	user nick
+ */
 #define EVENT_KILL			"KILL"
+/*  BOTKILL parameters are:
+ *	
+ */
 #define EVENT_BOTKILL		"BOTKILL"
+/*  NEWSERVER parameters are:
+ *	server name
+ */
 #define EVENT_NEWSERVER		"NEWSERVER"
+/*  DELSERVER parameters are:
+ *	
+ */
 #define EVENT_DELSERVER		"DELSERVER"
+/*  SQUIT parameters are:
+ *	server name
+ */
 #define EVENT_SQUIT			"SQUIT"
+/*  NETINFO parameters are:
+ *	none
+ */
 #define EVENT_NETINFO		"NETINFO"
+/*  UMODE parameters are:
+ *	user nick
+ *	mode string
+ */
 #define EVENT_UMODE			"UMODE"
+/*  SMODE parameters are:
+ *	user nick
+ *	mode string
+ */
 #define EVENT_SMODE			"SMODE"
-#define EVENT_NICKCHANGE	"NICK_CHANGE"
+/*  NICKCHANGE parameters are:
+ *	old nick
+ *	new nick
+ */
+#define EVENT_NICKCHANGE	"NICKCHANGE"
+/*  PONG parameters are:
+ *	server name
+ */
 #define EVENT_PONG			"PONG"
+/*  AWAY parameters are:
+ *	user nick
+ *	away message if setting away, NULL if cancel away
+ */
 #define EVENT_AWAY			"AWAY"
+/*  NEWCHAN parameters are:
+ *	channel name
+ */
 #define EVENT_NEWCHAN		"NEWCHAN"
+/*  DELCHAN parameters are:
+ *	channel name
+ */
 #define EVENT_DELCHAN		"DELCHAN"
+/*  JOINCHAN parameters are:
+ *	channel name
+ *	user nick
+ */
 #define EVENT_JOINCHAN		"JOINCHAN"
+/*  PARTCHAN parameters are:
+ *	channel name
+ *	user nick
+ */
 #define EVENT_PARTCHAN		"PARTCHAN"
+/*  KICK parameters are:
+ *	channel name
+ *	nick of user who made the kick
+ *	nick of user who was kick
+ */
 #define EVENT_KICK			"KICK"
+/*  KICKBOT parameters are:
+ *	channel name
+ *	nick of user who made the kick
+ *	nick of user who was kick
+ */
 #define EVENT_KICKBOT		"KICKBOT"
+/*  PARTBOT parameters are:
+ *	channel name
+ *	user nick
+ */
 #define EVENT_PARTBOT		"PARTBOT"
+/*  TOPICCHANGE parameters are:
+ *	channel name
+ *	owner
+ *	topic
+ */
 #define EVENT_TOPICCHANGE	"TOPICCHANGE"
+/*  CLIENTVERSION parameters are:
+ *	user nick
+ *	client version string
+ */
 #define EVENT_CLIENTVERSION	"CLIENTVERSION"
