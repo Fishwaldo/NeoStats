@@ -130,8 +130,7 @@ const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
-int neonumeric;
-char neonumericbuf[3];
+char neostatsbase64[3];
 int neonickcount = 0;
 
 /*
@@ -162,8 +161,6 @@ int neonickcount = 0;
 #define NUMNICKMASK 63          /* (NUMNICKBASE-1) */
 #define NN_MAX_SERVER 4096      /* (NUMNICKBASE * NUMNICKBASE) */
 #define NN_MAX_CLIENT 262144    /* NUMNICKBASE ^ 3 */
-
-/* *INDENT-OFF* */
 
 /*
  * convert2y[] converts a numeric to the corresponding character.
@@ -206,9 +203,6 @@ static const unsigned int convert2n[] = {
    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-/* *INDENT-ON* */
-
-
 unsigned int base64toint(const char* s)
 {
 	int max = 0;
@@ -226,7 +220,6 @@ unsigned int base64toint(const char* s)
 
 unsigned int base64toIP(const char* s)
 {
-	int max = 0;
 	unsigned int i = convert2n[(unsigned char) *s++];
 	while (*s) {
 		i <<= NUMNICKLOG;
@@ -271,7 +264,7 @@ DEBUG2 CORE - SENT: :stats.mark.net PING stats.mark.net :mark.local.org
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd ("%s %s * +%s 604800 %lu :%s", neonumericbuf, TOK_JUPE, name, me.now, infoline);
+	send_cmd ("%s %s * +%s 604800 %lu :%s", neostatsbase64, TOK_JUPE, name, me.now, infoline);
 }
 
 /*
@@ -287,17 +280,16 @@ send_server (const char *sender, const char *name, const int numeric, const char
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
-	neonumeric = numeric;
-	inttobase64(neonumericbuf, neonumeric, 2);
+	inttobase64(neostatsbase64, numeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
-    send_cmd ("%s %s 1 %lu %lu J10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neonumericbuf, infoline);
-	setserverbase64 (name, neonumericbuf);
+    send_cmd ("%s %s 1 %lu %lu J10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neostatsbase64, infoline);
+	setserverbase64 (name, neostatsbase64);
 }
 
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	send_cmd ("%s %s %s 0 :%s", neonumericbuf, TOK_SQUIT, server, quitmsg);
+	send_cmd ("%s %s %s 0 :%s", neostatsbase64, TOK_SQUIT, server, quitmsg);
 }
 
 void 
@@ -328,7 +320,7 @@ send_join (const char *sender, const char *who, const char *chan, const unsigned
 void 
 send_cmode (const char *sender, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
 {
-	send_cmd ("%s %s %s %s %s", neonumericbuf, TOK_MODE, chan, mode, args);
+	send_cmd ("%s %s %s %s %s", neostatsbase64, TOK_MODE, chan, mode, args);
 }
 
 void
@@ -339,8 +331,8 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 
 	inttobase64(IPAddress, htonl (inet_addr (server)), 6);
 
-	send_cmd ("%s %s %s 1 %lu %s %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, newmode, IPAddress, (neonickcount+'A'), realname);
-	snprintf(nicknumbuf, 6, "%sAA%c", neonumericbuf, (neonickcount+'A'));
+	send_cmd ("%s %s %s 1 %lu %s %s %s %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, IPAddress, (neonickcount+'A'), realname);
+	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (neonickcount+'A'));
 	setnickbase64 (nick, nicknumbuf);
 	neonickcount ++;
 }
@@ -348,7 +340,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	send_cmd ("%s %s %s :%s", neonumericbuf, TOK_PING, reply, to);
+	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_PING, reply, to);
 }
 
 void 
@@ -361,19 +353,19 @@ send_umode (const char *who, const char *target, const char *mode)
 void 
 send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	send_cmd ("%s %d %s :%s", neonumericbuf, numeric, nicktobase64 (target), buf);
+	send_cmd ("%s %d %s :%s", neostatsbase64, numeric, nicktobase64 (target), buf);
 }
 
 void
 send_pong (const char *reply)
 {
-	send_cmd ("%s %s %s :%s", neonumericbuf, TOK_PONG, neonumericbuf, reply);
+	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_PONG, neostatsbase64, reply);
 }
 
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	send_cmd ("%s %s %s :%s", neonumericbuf, TOK_KILL, nicktobase64 (target), reason);
+	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_KILL, nicktobase64 (target), reason);
 }
 
 void 
@@ -412,14 +404,14 @@ send_end_of_burst_ack(void)
 		init_services_bot ();
 		send_end_of_burst ();
 	}
-	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST_ACK);
+	send_cmd ("%s %s", neostatsbase64, TOK_END_OF_BURST_ACK);
 	me.synced = 1;
 }
 
 void
 send_end_of_burst(void)
 {
-	send_cmd ("%s %s", neonumericbuf, TOK_END_OF_BURST);
+	send_cmd ("%s %s", neostatsbase64, TOK_END_OF_BURST);
 }
 
 void
@@ -435,13 +427,13 @@ send_burst (int b)
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
-	send_cmd ("%s %s * +%s@%s %lu :%s", neonumericbuf, TOK_GLINE, ident, host, (ts + length), reason);
+	send_cmd ("%s %s * +%s@%s %lu :%s", neostatsbase64, TOK_GLINE, ident, host, (ts + length), reason);
 }
 
 void 
 send_rakill (const char *sender, const char *host, const char *ident)
 {
-	send_cmd ("%s %s * -%s@%s", neonumericbuf, TOK_GLINE, ident, host);
+	send_cmd ("%s %s * -%s@%s", neostatsbase64, TOK_GLINE, ident, host);
 }
 
 void
@@ -799,3 +791,4 @@ ircu_m_private (char *origin, char **argv, int argc, int srv)
 	m_private (base64tonick(origin), av, ac, srv);
 	free (av);
 }
+
