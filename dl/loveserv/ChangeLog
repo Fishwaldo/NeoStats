@@ -1,12 +1,15 @@
 Program: LoveServ Module for NeoStats 2.x ChangeLog
 Author:  Shmad <shmad@neostats.net>
 ==============================================================================
+* Version 1.91 * 
+ - We now try to read nick, user, host and realname so these can be configured more 
+   easily (M)
+ - SET interface for nick/user/host/realname added (M)
+
 * Version 1.9 * 
  - Use core bot message handler to process commands (M)
  - Code cleaned up to reduce bloat (M)
  - Removed local module_function table to use core for /VERSION replies (M)
- - We now try to read nick, user, host and realname so these can be configured more 
-   easily (M)
 
 * Version 1.8 * October 6th, 2003
  - Help text cleanup (M) 

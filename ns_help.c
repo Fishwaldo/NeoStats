@@ -251,3 +251,28 @@ const char *ns_help_status[] = {
 	"Display info about NeoStats uptime and other stats.",
 	NULL
 };
+
+const char *ns_help_set_nick[] = {
+	"NICK <newnick> Change bot nickname",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_user[] = {
+	"USER <username> Change bot username",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_host[] = {
+	"HOST <host> Change bot host",
+	"(requires restart to take effect).",
+	NULL
+};
+
+const char *ns_help_set_realname[] = {
+	"REALNAME <realname> Change bot realname",
+	"(requires restart to take effect).",
+	NULL
+};
+

@@ -283,15 +283,19 @@ bot_cmd ss_commands[]=
 
 bot_setting ss_settings[]=
 {
-	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN,	"HTML_Enabled",		NULL,		ss_help_set_html},
-	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,	NS_ULEVEL_ADMIN,	"HTML_Path",		NULL,		ss_help_set_htmlpath },
-	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 		NS_ULEVEL_ADMIN,	"MsgInterval",		"seconds",	ss_help_set_msginterval },
-	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 		NS_ULEVEL_ADMIN,	"MsgLimit",			NULL,		ss_help_set_msglimit },
-	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,		NS_ULEVEL_ADMIN,	"LagTime",			"seconds",	ss_help_set_lagtime },
-	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 		NS_ULEVEL_ADMIN,	"LagAlert",			NULL,		ss_help_set_lagalert },
-	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 		NS_ULEVEL_ADMIN,	"RecordAlert",		NULL,		ss_help_set_recordalert },
-	{"USEEXCLUSIONS", &StatServ.exclusions, SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN,	"Exclusions",		NULL,		ss_help_set_exclusions },
-	{NULL,			NULL,					0,					0, 0,		0,					NULL,				NULL,		NULL },
+	{"NICK",		&s_StatServ,			SET_TYPE_STRING,	0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
+	{"USER",		&StatServ.user,			SET_TYPE_STRING,	0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
+	{"HOST",		&StatServ.host,			SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
+	{"REALNAME",	&StatServ.rname,		SET_TYPE_STRING,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN,	"HTML_Enabled",		NULL,		ss_help_set_html},
+	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN,	"HTML_Path",		NULL,		ss_help_set_htmlpath },
+	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN,	"MsgInterval",		"seconds",	ss_help_set_msginterval },
+	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN,	"MsgLimit",			NULL,		ss_help_set_msglimit },
+	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN,	"LagTime",			"seconds",	ss_help_set_lagtime },
+	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN,	"LagAlert",			NULL,		ss_help_set_lagalert },
+	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN,	"RecordAlert",		NULL,		ss_help_set_recordalert },
+	{"USEEXCLUSIONS", &StatServ.exclusions, SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN,	"Exclusions",		NULL,		ss_help_set_exclusions },
+	{NULL,			NULL,					0,					0, 0,			0,					NULL,				NULL,		NULL },
 };
 
 int topchan(const void *key1, const void *key2)

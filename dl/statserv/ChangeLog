@@ -4,6 +4,9 @@ Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
 (F) denotes Fish (M) denotes Mark
 
+* Revision 1199 * Feb 17, 2004 (M)
+ - SET interface for nick/user/host/realname added (M)
+
 * Revision 1199 * January 9, 2004 (M)
  - removed fopen attempt on old system of dl/statserv/html/index.tpl.  (M)
  - improved error message for failed open of template and output file (M)

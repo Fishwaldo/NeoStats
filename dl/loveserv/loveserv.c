@@ -73,10 +73,18 @@ static bot_cmd ls_commands[]=
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
+static bot_setting ls_settings[]=
+{
+	{"NICK",		&s_LoveServ,			SET_TYPE_STRING,	0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
+	{"USER",		&ls_cfg.user,			SET_TYPE_STRING,	0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
+	{"HOST",		&ls_cfg.host,			SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
+	{"REALNAME",	&ls_cfg.rname,		SET_TYPE_STRING,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+};
+
 static int Online(char **av, int ac)
 {
 	ls_bot = init_mod_bot(s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.rname, 
-		services_bot_modes, BOT_FLAG_DEAF, ls_commands, NULL, __module_info.module_name);
+		services_bot_modes, BOT_FLAG_DEAF, ls_commands, ls_settings, __module_info.module_name);
 	return 1;
 };
 

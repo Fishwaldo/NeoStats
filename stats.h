@@ -652,5 +652,11 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 /* Is the user or server a NeoStats one? */
 #define IsMe(x) ((x) && (x->flags & NS_FLAGS_ME))
 
+/* Some standard text help messages */
+extern const char *ns_help_set_nick[];
+extern const char *ns_help_set_user[];
+extern const char *ns_help_set_host[];
+extern const char *ns_help_set_realname[];
+
 #endif
 

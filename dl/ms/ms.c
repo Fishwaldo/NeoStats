@@ -29,6 +29,12 @@
 static char s_MoraleServ[MAXNICK];
 static ModUser *ms_bot;
 
+struct ms_cfg { 
+	char user[MAXUSER];
+	char host[MAXHOST];
+	char rname[MAXREALNAME];
+} ms_cfg;
+
 static int ms_hail(User * u, char **av, int ac);
 static int ms_ode(User * u, char **av, int ac);
 static int ms_lapdance(User * u, char **av, int ac);
@@ -63,9 +69,17 @@ static bot_cmd ms_commands[]=
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
+static bot_setting ms_settings[]=
+{
+	{"NICK",		&s_MoraleServ,			SET_TYPE_STRING,	0, MAXNICK, 	NS_ULEVEL_ADMIN, "Nick",	NULL,	ns_help_set_nick },
+	{"USER",		&ms_cfg.user,			SET_TYPE_STRING,	0, MAXUSER, 	NS_ULEVEL_ADMIN, "User",	NULL,	ns_help_set_user },
+	{"HOST",		&ms_cfg.host,			SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN, "Host",	NULL,	ns_help_set_host },
+	{"REALNAME",	&ms_cfg.rname,		SET_TYPE_STRING,	0, MAXREALNAME, NS_ULEVEL_ADMIN, "RealName",NULL,	ns_help_set_realname },
+};
+
 static int Online(char **av, int ac)
 {
-	ms_bot = init_mod_bot(s_MoraleServ, "MS", me.name, "A Network Morale Service",
+	ms_bot = init_mod_bot(s_MoraleServ, ms_cfg.user, ms_cfg.host, ms_cfg.rname, 
 		services_bot_modes, BOT_FLAG_DEAF, ms_commands, NULL, __module_info.module_name);
 	return 1;
 };
@@ -77,7 +91,36 @@ EventFnList __module_events[] = {
 
 int __ModInit(int modnum, int apiver)
 {
-	strlcpy(s_MoraleServ, "MoraleServ", MAXNICK);
+ 	char *temp = NULL;
+
+	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
+		strlcpy(s_MoraleServ ,"MoraleServ" ,MAXNICK);
+	}
+	else {
+		strlcpy(s_MoraleServ , temp, MAXNICK);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
+		strlcpy(ms_cfg.user, "SS", MAXUSER);
+	}
+	else {
+		strlcpy(ms_cfg.user, temp, MAXUSER);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
+		strlcpy(ms_cfg.host, me.name, MAXHOST);
+	}
+	else {
+		strlcpy(ms_cfg.host, temp, MAXHOST);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
+		strlcpy(ms_cfg.rname, "A Network Morale Service", MAXREALNAME);
+	}
+	else {
+		strlcpy(ms_cfg.rname, temp, MAXREALNAME);
+		free(temp);
+	}
 	return 1;
 }
 

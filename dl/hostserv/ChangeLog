@@ -2,7 +2,10 @@ HostServ Module for NeoStats 2.x ChangeLog
 Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 ==============================================================================
-* Version 3.3 * Fish (F) * Jan 27, 2003
+* Version 3.4 * Mark (M) * Feb 17, 2004
+ - SET interface for nick/user/host/realname added (M)
+
+* Version 3.3 * Fish (F) * Jan 27, 2004
  - HostServ uses Global Exclusions in Unet style vhosts, and also on signon
 
 * Version 3.2 * Mark (M) * November 27, 2003

@@ -1,5 +1,10 @@
 MoraleServ ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
 ==============================================================================
+* MoraleServ * Mark (M) * Version 2.23
+ - We now try to read nick, user, host and realname so these can be configured more 
+   easily (M)
+ - SET interface for nick/user/host/realname added (M)
+
 * MoraleServ * Mark (M) * Version 2.22
  - Use core bot message handler to process commands (M)
  - Fixed chanalert messages to report bot as sender, not neostats (M)

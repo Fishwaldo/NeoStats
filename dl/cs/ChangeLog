@@ -1,6 +1,9 @@
 ConnectServ Module for NeoStats 2.x ChangeLog
 Shmad & ^Enigma^
 ==============================================================================
+* Version 1.14 * Mark (M) * Feb 17, 2004
+ - SET interface for nick/user/host/realname added (M)
+
 * Version 1.13 * Mark (M) * January 9, 2004
  - New SERVWATCH option to track server joins/quits (M)
  - Tidy up message strings (M)
