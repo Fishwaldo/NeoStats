@@ -582,6 +582,7 @@ parse (char *line)
 	strlcpy (recbuf, line, BUFSIZE);
 	if (!(*line))
 		return;
+	nlog (LOG_DEBUG1, LOG_CORE, "R: %s", line);
 	if (!*line)
 		return;
 	coreLine = strpbrk (line, " ");
