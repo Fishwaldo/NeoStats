@@ -207,7 +207,7 @@ int __ModInit(int modnum, int apiver)
 		free(av);
 		ac = 0;
 		nlog(LOG_DEBUG2, LOG_CORE,
-		     "Adduser user %s to StatServ List", u->nick);
+		     "Add user %s to StatServ List", u->nick);
 	}
 	hash_scan_begin(&scan, ch);
 	while ((node = hash_scan_next(&scan)) != NULL) {
