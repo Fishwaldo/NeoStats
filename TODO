@@ -15,6 +15,12 @@ HostServ TODO:
 Syntax: /msg HostServ CHPASS NICK OLDPASS NEWPASS
 
 
+<JH> btw another suggest Fish... banned hosts.. or banned masks
+<JH> like i could ban *.mil
+<JH> and *.gov
+<JH> and then it just doesn't let a vhost added like that
+<JH> and you could ban *fbi* too
+
 Fish:
 -----
 
