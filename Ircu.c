@@ -334,7 +334,7 @@ void
 send_umode (const char *who, const char *target, const char *mode)
 {
 /*	send_cmd (":%s %s %s :%s", who, TOK_MODE, target, mode);*/
-	send_cmd ("%s %s %s :%s", getnumfromnick(who), TOK_MODE, getnumfromnick(target), mode);
+	send_cmd ("%s %s %s :%s", getnumfromnick(who), TOK_MODE, target, mode);
 }
 
 void 
