@@ -257,7 +257,6 @@ lib/pcre/maketables.c eol=lf
 lib/pcre/pcre.c eol=lf
 lib/pcre/pcre.h -text
 lib/pcre/study.c eol=lf
-lib/sqlsrv/Makefile -text
 lib/sqlsrv/README -text
 lib/sqlsrv/api.c -text
 lib/sqlsrv/do_sql.c -text
