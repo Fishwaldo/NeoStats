@@ -127,6 +127,10 @@ void ChannelTopic( const char *chan, const char *owner, const char *ts, const ch
 	strlcpy( c->topicowner, owner, MAXHOST );
 	c->topictime = ( ts ) ? atoi( ts ) : me.now;
 	cmdparams = (CmdParams *) ns_calloc( sizeof( CmdParams ) );
+	cmdparams->source = FindUser( owner );
+	if( !cmdparams->source ) {
+		cmdparams->source = FindServer( owner );
+	}
 	cmdparams->channel = c;
 	SendAllModuleEvent( EVENT_TOPIC, cmdparams );
 	ns_free( cmdparams );
