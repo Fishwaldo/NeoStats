@@ -781,13 +781,18 @@ ircu_m_private (char *origin, char **argv, int argc, int srv)
 	char **av;
 	int ac = 0;
 	int i;
-	char* nick = base64tonick(origin);
+	char* av0;
 	
-	AddStringToList (&av, nick, &ac);
-	for(i = 0; i < argc; i++) {
+	if(av[0][0] == '#') {
+		av0 = argv[0];
+	} else {
+		av0 = base64tonick(argv[0]);
+	}
+	
+	AddStringToList (&av, av0, &ac);
+	for(i = 1; i < argc; i++) {
 		AddStringToList (&av, argv[i], &ac);
 	}
 	m_private (base64tonick(origin), av, ac, srv);
 	free (av);
-
 }
