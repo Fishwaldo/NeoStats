@@ -33,7 +33,9 @@
 
 static char ircd_buf[BUFSIZE];
 static char UmodeStringBuf[64];
+#ifdef GOTUSERSMODES
 static char SmodeStringBuf[64];
+#endif
 
 /** @brief UmodeMaskToString
  *
@@ -84,6 +86,7 @@ UmodeStringToMask(char* UmodeString)
 	return(Umode);
 }
 
+#ifdef GOTUSERSMODES
 /** @brief SmodeMaskToString
  *
  *  Translate a smode mask to the string equivalent
@@ -118,6 +121,7 @@ SmodeStringToMask(char* SmodeString)
 {
 	return(0);
 }
+#endif
 
 /** @brief init_bot_modes
  *
