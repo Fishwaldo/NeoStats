@@ -168,6 +168,9 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\log.c">
+			</File>
+			<File
 				RelativePath="..\WIN32-Code\misc.c">
 				<FileConfiguration
 					Name="Debug|Win32">
@@ -222,6 +225,9 @@
 			</File>
 			<File
 				RelativePath="..\event.h">
+			</File>
+			<File
+				RelativePath="..\log.h">
 			</File>
 			<File
 				RelativePath="..\WIN32-Code\misc.h">

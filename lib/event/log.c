@@ -43,10 +43,12 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
+#ifndef WIN32
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #else
 #include <sys/_time.h>
+#endif
 #endif
 #include "event.h"
 

@@ -859,7 +859,8 @@ printf("read called with %d bytes %d\n", howmuch, what);
     				return;
 	    		}
 #else
-		    	n = ReadFile((HANDLE)sock->sock_no, p, howmuch, &dwBytesRead, NULL);
+//		    	n = ReadFile((HANDLE)sock->sock_no, p, howmuch, &dwBytesRead, NULL);
+		    	n = recv(sock->sock_no, p, howmuch, 0);
 		    	    if (n == 0) {
     				dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
 	    			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);

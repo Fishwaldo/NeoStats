@@ -305,12 +305,13 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	if (n == 0)
 		return (0);
 #else
-	n = ReadFile((HANDLE)fd, p, howmuch, &dwBytesRead, NULL);
+	n = recv( fd, p, howmuch, 0 ); //ReadFile((HANDLE)fd, p, howmuch, &dwBytesRead, NULL);
+	errno = GetLastError();
 	if (n == 0)
 		return (-1);
-	if (dwBytesRead == 0)
+	if (n == 0)
 		return (0);
-	n = dwBytesRead;
+	//n = dwBytesRead;
 #endif
 
 	buf->off += n;
@@ -337,12 +338,13 @@ evbuffer_write(struct evbuffer *buffer, int fd)
 	if (n == 0)
 		return (0);
 #else
-	n = WriteFile((HANDLE)fd, buffer->buffer, buffer->off, &dwBytesWritten, NULL);
+	n = send( fd, buffer->buffer, buffer->off, 0 );
+//WriteFile((HANDLE)fd, buffer->buffer, buffer->off, &dwBytesWritten, NULL);
 	if (n == 0)
 		return (-1);
-	if (dwBytesWritten == 0)
+	if (n == 0)
 		return (0);
-	n = dwBytesWritten;
+	//n = dwBytesWritten;
 #endif
 	evbuffer_drain(buffer, n);
 
