@@ -593,7 +593,7 @@ static void LoadConfig(void)
 		cs_cfg.serv_watch = 1;
 	}
 	if(GetConf((void *) &cs_cfg.use_exc, CFGBOOL, "Exclusions")<= 0) {
-		cs_cfg.serv_watch = 0;
+		cs_cfg.use_exc = 0;
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
 #if !defined(HYBRID7)

@@ -7,6 +7,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - HostServ: validate vhosts when adding - bug 151 (M)
  - ConnectServ: fix colour message case - bug 150 (M)
  - StatServ: fix NULL client versions load/save (M)
+ - Fix ConnectServ ServWatch problem (F)
  - Add recursion to squit to automatically remove leaves (M)
  - Add NOQUIT protocol support to core (M)
 
