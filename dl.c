@@ -740,13 +740,13 @@ del_bot_from_chan (char *bot, char *chan)
 
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
-		nlog (LOG_WARNING, LOG_CORE, "Hu? Can't Find Channel %s for botchanhash", chan);
+		nlog (LOG_WARNING, LOG_CORE, "del_bot_from_chan: can't find channel %s for botchanhash", chan);
 		return;
 	}
 	mod_chan_bot = hnode_get (cbn);
 	bmn = list_find (mod_chan_bot->bots, bot, comparef);
 	if (!bmn) {
-		nlog (LOG_WARNING, LOG_CORE, "Hu? Can't find bot %s in %s in botchanhash", bot, chan);
+		nlog (LOG_WARNING, LOG_CORE, "del_bot_from_chan: can't find bot %s in %s in botchanhash", bot, chan);
 		return;
 	}
 	list_delete (mod_chan_bot->bots, bmn);
@@ -781,7 +781,7 @@ bot_chan_message (char *origin, char **av, int ac)
 	cbn = hash_lookup (bch, av[0]);
 	if (!cbn) {
 		/* this isn't bad, just means our bot parted the channel? */
-		nlog (LOG_DEBUG1, LOG_CORE, "eeeh, Can't find channel %s for BotChanMessage", av[0]);
+		nlog (LOG_DEBUG1, LOG_CORE, "bot_chan_message: can't find channel %s", av[0]);
 		return;
 	}
 	mod_chan_bot = hnode_get (cbn);
@@ -789,7 +789,7 @@ bot_chan_message (char *origin, char **av, int ac)
 	while (bmn) {
 		mod_usr = findbot (lnode_get (bmn));
 		if (mod_usr->chanfunc) {
-			nlog (LOG_DEBUG2, LOG_CORE, "Running Module for Chanmessage %s", av[0]);
+			nlog (LOG_DEBUG2, LOG_CORE, "bot_chan_message: running module for chanmessage %s", av[0]);
 			mod_usr->chanfunc (origin, av, ac);
 		}
 		bmn = list_next (mod_chan_bot->bots, bmn);
@@ -1364,7 +1364,7 @@ get_mod_num (char *mod_name)
 		}
 	}
 	/* if we get here, it wasn't found */
-	nlog (LOG_DEBUG1, LOG_CORE, "Can't find %s in module number list", mod_name);
+	nlog (LOG_DEBUG1, LOG_CORE, "get_mod_num: can't find %s in module number list", mod_name);
 	return NS_FAILURE;
 }
 

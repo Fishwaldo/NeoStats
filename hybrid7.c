@@ -535,7 +535,7 @@ Usr_Topic (char *origin, char **argv, int argc)
 		ChanTopic (argv[1], argv[0], atoi(argv[2]), buf);
 		free (buf);
 	} else {
-		nlog(LOG_WARNING, LOG_CORE, "Ehhh, Can't find Topic Setter %s/%s", origin, argv[1]); 
+		nlog(LOG_WARNING, LOG_CORE, "Usr_Topic: can't find topic setter %s for topic %s", origin, argv[1]); 
 	}
 }
 

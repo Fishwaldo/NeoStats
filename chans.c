@@ -90,7 +90,7 @@ ChanTopic (const char *owner, const char* chan, time_t time, const char *topic)
 
 	c = findchan (chan);
 	if (!c) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't find Channel %s", chan);
+		nlog (LOG_WARNING, LOG_CORE, "ChanTopic: can't find channel %s", chan);
 		return;
 	}
 	if(topic) {
@@ -273,7 +273,7 @@ ChanMode (char *origin, char **av, int ac)
 							if (chan_modes[i].parameters) {
 								mn = list_find (c->modeparms, (int *) chan_modes[i].mode, comparemode);
 								if (!mn) {
-									nlog (LOG_INFO, LOG_CORE, "Can't find Mode %c for Chan %s", *modes, c->name);
+									nlog (LOG_INFO, LOG_CORE, "ChanMode: can't find mode %c for channel %s", *modes, c->name);
 								} else {
 									list_delete (c->modeparms, mn);
 									m = lnode_get (mn);
@@ -319,18 +319,18 @@ ChangeChanUserMode (const char* chan, const char* nick, int add, long mode)
 
 	u = finduser(nick);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't find user for ChangeChanUserMode");
+		nlog (LOG_WARNING, LOG_CORE, "ChangeChanUserMode: can't find user %s", nick);
 		return;
 	}
 	c = findchan(chan);
 	if (!c) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't find channel for ChangeChanUserMode");
+		nlog (LOG_WARNING, LOG_CORE, "ChangeChanUserMode: can't find channel %s", chan);
 		return;
 	}
 	cmn = list_find (c->chanmembers, u->nick, comparef);
 	if (!cmn) {
 		if (me.debug_mode) {
-			chanalert (s_Services, "ChangeChanUserMode() %s doesn't seem to be in the Chan %s", u->nick, c->name);
+			chanalert (s_Services, "ChangeChanUserMode: %s is not a member of channel %s", u->nick, c->name);
 			ChanDump (c->name);
 			UserDump (u->nick);
 		}
@@ -338,10 +338,10 @@ ChangeChanUserMode (const char* chan, const char* nick, int add, long mode)
 	}
 	cm = lnode_get (cmn);
 	if (add) {
-		nlog (LOG_DEBUG2, LOG_CORE, "Adding mode %ld to Channel %s User %s", mode, c->name, u->nick);
+		nlog (LOG_DEBUG2, LOG_CORE, "ChangeChanUserMode: Adding mode %ld to Channel %s User %s", mode, c->name, u->nick);
 		cm->flags |= mode;
 	} else {
-		nlog (LOG_DEBUG2, LOG_CORE, "Deleting Mode %ld to Channel %s User %s", mode, c->name, u->nick);
+		nlog (LOG_DEBUG2, LOG_CORE, "ChangeChanUserMode: Deleting Mode %ld to Channel %s User %s", mode, c->name, u->nick);
 		cm->flags &= ~mode;
 	}
 }
@@ -393,7 +393,7 @@ del_chan (Chans * c)
 	SET_SEGV_LOCATION();
 	cn = hash_lookup (ch, c->name);
 	if (!cn) {
-		nlog (LOG_WARNING, LOG_CORE, "Hu, Deleting a Non Existant Channel?");
+		nlog (LOG_WARNING, LOG_CORE, "del_chan: channel %s not found.", c->name);
 		return;
 	} else {
 		nlog (LOG_DEBUG2, LOG_CORE, "Deleting Channel %s", c->name);
@@ -451,9 +451,9 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 	} else {
 		un = list_find (c->chanmembers, u->nick, comparef);
 		if (!un) {
-			nlog (LOG_WARNING, LOG_CORE, "kick_chan: %s not found in channel %s", u->nick, chan);
+			nlog (LOG_WARNING, LOG_CORE, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
 			if (me.debug_mode) {
-				chanalert (s_Services, "kick_chan: %s not found in channel %s", u->nick, chan);
+				chanalert (s_Services, "kick_chan: %s isn't a member of channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -486,7 +486,14 @@ kick_chan (const char *chan, const char *kicked, const char *kickby, char *kickr
 			ac = 0;
 		}
 		un = list_find (u->chans, c->name, comparef);
-		if (un) {
+		if (!un) {
+			nlog (LOG_WARNING, LOG_CORE, "kick_chan: %s not found in channel %s", u->nick, chan);
+			if (me.debug_mode) {
+				chanalert (s_Services, "kick_chan: %s not found in channel %s", u->nick, chan);
+				ChanDump (c->name);
+				UserDump (u->nick);
+			}
+		} else {
 			lnode_destroy (list_delete (u->chans, un));
 		}
 		nlog (LOG_DEBUG3, LOG_CORE, "Cur Users %s %ld (list %d)", c->name, c->cur_users, (int)list_count (c->chanmembers));
@@ -535,14 +542,14 @@ part_chan (User * u, const char *chan, char *partreason)
 	nlog (LOG_DEBUG2, LOG_CORE, "Parting %s from %s", u->nick, chan);
 	c = findchan (chan);
 	if (!c) {
-		nlog (LOG_WARNING, LOG_CORE, "Hu, Parting a Non existant Channel? %s", chan);
+		nlog (LOG_WARNING, LOG_CORE, "part_chan: channel %s not found", chan);
 		return;
 	} else {
 		un = list_find (c->chanmembers, u->nick, comparef);
 		if (!un) {
-			nlog (LOG_WARNING, LOG_CORE, "hu, User %s isn't a member of this channel %s", u->nick, chan);
+			nlog (LOG_WARNING, LOG_CORE, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
 			if (me.debug_mode) {
-				chanalert (s_Services, "hu, User %s isn't a member of this channel %s", u->nick, chan);
+				chanalert (s_Services, "part_chan: user %s isn't a member of channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -570,9 +577,9 @@ part_chan (User * u, const char *chan, char *partreason)
 		}
 		un = list_find (u->chans, c->name, comparef);
 		if (!un) {
-			nlog (LOG_WARNING, LOG_CORE, "Hu, User %s claims not to be part of Chan %s", u->nick, chan);
+			nlog (LOG_WARNING, LOG_CORE, part_chan: user %s not found in channel %s", u->nick, chan);
 			if (me.debug_mode) {
-				chanalert (s_Services, "Hu, User %s claims not to be part of Chan %s", u->nick, chan);
+				chanalert (s_Services, part_chan: user %s not found in channel %s", u->nick, chan);
 				ChanDump (c->name);
 				UserDump (u->nick);
 			}
@@ -793,7 +800,7 @@ ChanDump (const char *chan)
 	} else {
 		c = findchan (chan);
 		if (!c) {
-			debugtochannel("Can't find Channel %s", chan);
+			debugtochannel("ChanDump: can't find channel %s", chan);
 		} else {
 			bzero (mode, 10);
 			j = 0;

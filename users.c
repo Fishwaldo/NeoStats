@@ -501,7 +501,7 @@ UserDump (const char *nick)
 				cm = list_next (u->chans, cm);
 			}
 		} else {
-			debugtochannel("Can't find user %s", nick);
+			debugtochannel("UserDump: can't find user %s", nick);
 		}
 	}
 }

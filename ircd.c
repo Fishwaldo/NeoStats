@@ -686,7 +686,7 @@ flood (User * u)
 	time_t current = me.now;
 
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user for FLOODcheck");
+		nlog (LOG_WARNING, LOG_CORE, "flood: can't find user");
 		return 0;
 	}
 	if (UserLevel (u) >= NS_ULEVEL_OPER)	/* locop or higher */
@@ -1112,7 +1112,7 @@ ssvsmode_cmd (const char *target, const char *modes)
 
 	u = finduser (target);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't find user %s for ssvsmode_cmd", target);
+		nlog (LOG_WARNING, LOG_CORE, "ssvsmode_cmd: can't find user %s", target);
 		return 0;
 	}
 	send_svsmode(target, modes);
@@ -1132,7 +1132,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 
 	u = finduser (who);
 	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
+		nlog (LOG_WARNING, LOG_CORE, "ssvshost_cmd: can't find user %s", who);
 		return 0;
 	}
 

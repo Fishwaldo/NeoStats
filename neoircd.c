@@ -655,7 +655,7 @@ Srv_Tburst (char *origin, char **argv, int argc)
 		ChanTopic (argv[3], c->name, atoi (argv[2]), buf);
 		free (buf);
 	} else {
-		nlog (LOG_WARNING, LOG_CORE, "TopicBurst: Ehhh, Can't find Channel %s", argv[1]);
+		nlog (LOG_WARNING, LOG_CORE, "Srv_Tburst: can't find channel %s", argv[1]);
 	}
 
 
