@@ -23,7 +23,7 @@ clean:
 
 install: statserv
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
-	$(INSTALL) -m 644 $(HTML) $(DIRECTORY)/dl
+	$(INSTALL) -m 644 $(HTML) $(DIRECTORY)/data
 
 
 
