@@ -26,6 +26,9 @@ dl/icq/icqconfig.h -text
 dl/icq/icqlib.c -text
 dl/icq/icqlib.h -text
 dl/modules.txt -text
+dl/netinfo/Makefile.in -text
+dl/netinfo/netinfo.c -text
+dl/netinfo/ni_help.c -text
 dl/services/DOESNOTCOMPILE -text
 dl/services/Makefile.in -text
 dl/services/build -text
