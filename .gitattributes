@@ -289,6 +289,7 @@ lib/event/WIN32-Prj/event_test/event_test/test.txt -text
 lib/event/WIN32-Prj/event_test/test.txt -text
 lib/event/WIN32-Prj/libevent.dsp -text
 lib/event/WIN32-Prj/libevent.dsw -text
+lib/event/WIN32-Prj/libevent.vcproj -text
 lib/event/WIN32-Prj/signal_test/signal_test.dsp -text
 lib/event/WIN32-Prj/signal_test/signal_test/CVS/Entries -text
 lib/event/WIN32-Prj/signal_test/signal_test/CVS/Repository -text
