@@ -127,7 +127,39 @@ int snick_cmd(const char *oldnick, const char *newnick) {
 	sts(":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, time(NULL));
 	return 1;
 }
+int sswhois_cmd(const char *target, const char *swhois) {
+	sts("%s %s :%s", (me.token ? TOK_SWHOIS : MSG_SWHOIS), target, swhois);
+	return 1;
+}
+int ssvsnick_cmd(const char *target, const char *newnick) {
+	sts("%s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, time(NULL));
+	Change_User(finduser(target), newnick);
+	return 1;
+}
 
+int ssvsjoin_cmd(const char *target, const char *chan) {
+	sts("%s %s %s", (me.token ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
+	return 1;
+}
+
+int ssvspart_cmd(const char *target, const char *chan) {
+	sts("%s %s %s", (me.token ? TOK_SVSPART : MSG_SVSPART), target, chan);
+	return 1;
+}
+
+int skick_cmd(const char *who, const char *target, const char *chan, const char *reason) {
+	sts(":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
+	return 1;
+}
+int swallops_cmd(const char *who, const char *msg,...) {
+	va_list ap;
+	char buf[512];
+	va_start(ap, msg);
+	vsnprintf(buf, 512, msg, ap);
+	sts(":%s %s :%s", who, (me.token ? TOK_WALLOPS : MSG_WALLOPS), buf);
+	va_end(ap);
+	return 1;
+}
 
 void sts(char *fmt,...)
 {

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: server.c,v 1.6 2002/03/05 13:48:09 fishwaldo Exp $
+** $Id: server.c,v 1.7 2002/03/07 12:41:12 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -16,7 +16,6 @@
 int fnmatch(const char *, const char *, int flags);
 Server *new_server(char *);
 
-hash_t *sh;
 
 void init_server() {
 	if (usr_mds);
@@ -38,7 +37,7 @@ Server *new_server(char *name)
 	memcpy(s->name, name, MAXHOST);
 	sn = hnode_create(s);
 	if (!sn) {
-		printf("eek\n");
+		log("Eeek, Hash is broken\n");
 	}
 	if (hash_isfull(sh)) {
 		log("Eeek, Server Hash is full!\n");
@@ -55,7 +54,6 @@ void AddServer(char *name,char *uplink, int hops)
 #ifdef DEBUG
 	log("New Server: %s", name);
 #endif
-	strlower(name);
 	s = new_server(name);
 	s->hops = hops;
 	s->connected_since = time(NULL);
@@ -89,7 +87,6 @@ Server *findserver(const char *name)
 	Server *s;
 	hnode_t *sn;
 
-	name = strlower((char *)name);
 	sn = hash_lookup(sh, name);
 	if (sn) {
 		s = hnode_get(sn);

@@ -49,7 +49,7 @@ Module_Info my_info[] = { {
 
 
 int new_m_version(char *av, char *tmp) {
-	sts(":%s 351 %s :MoraleServ Network Morale Service Loaded, Version: %s %s %s",me.name,av,my_info[0].module_version,msversion_date,msversion_time);
+	snumeric_cmd(351, av, ":MoraleServ Network Morale Service Loaded, Version: %s %s %s",my_info[0].module_version,msversion_date,msversion_time);
 	return 0;
 }
 
@@ -58,181 +58,161 @@ Functions my_fn_list[] = {
 	{ NULL,		NULL,		0 }
 };
 
-int __Bot_Message(char *origin, char *coreLine, int type)
+/* This is a example of the new module passing stuff. */
+/* av[0] is the bot that the message was sent to */
+/* av[1] to av[ac] is the line that was sent */
+/* to join words together, use joinbuf(av, ac, from); */
+
+
+
+int __Bot_Message(char *origin, char **av, int ac)
 {
 	User *u;
 	char *cmd;
 	u = finduser(origin);
 
-        if (coreLine == NULL) return -1;
-	cmd = strtok(coreLine, " ");
-	if (!strcasecmp(cmd, "HELP")) {
-		coreLine = strtok(NULL, " ");
-		if (!coreLine && (UserLevel(u) >= 185)) {
+
+	if (!strcasecmp(av[1], "HELP")) {
+		if (ac <= 2 && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_tech);
 			return 1;
-		} else if (!coreLine) {
+		} else if (ac <= 2) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help);
 			return 1;
-		} else if (!strcasecmp(coreLine, "HAIL")) {
+		} else if (!strcasecmp(av[2], "HAIL")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_hail);
 			return 1;
-		} else if (!strcasecmp(coreLine, "ODE")) {
+		} else if (!strcasecmp(av[2], "ODE")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_ode);
 			return 1;
-		} else if (!strcasecmp(coreLine, "LAPDANCE")) {
+		} else if (!strcasecmp(av[2], "LAPDANCE")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_lapdance);
 			return 1;
-		} else if (!strcasecmp(coreLine, "JOIN") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "JOIN") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_join);
 			return 1;
-		} else if (!strcasecmp(coreLine, "VIEWLOG") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "VIEWLOG") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_viewlog);
 			return 1;
-		} else if (!strcasecmp(coreLine, "VERSION")) {
-            privmsg_list(u->nick, s_MoraleServ, ms_help_version);
+		} else if (!strcasecmp(av[2], "VERSION")) {
+	            	privmsg_list(u->nick, s_MoraleServ, ms_help_version);
 			return 1;
-        } else if (!strcasecmp(coreLine, "POEM")) {
-            privmsg_list(u->nick, s_MoraleServ, ms_help_poem);
+        	} else if (!strcasecmp(av[2], "POEM")) {
+            		privmsg_list(u->nick, s_MoraleServ, ms_help_poem);
 			return 1;
-		} else if (!strcasecmp(coreLine, "SWHOIS") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "SWHOIS") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_swhois);
 			return 1;
-		} else if (!strcasecmp(coreLine, "REDNECK")) {
+		} else if (!strcasecmp(av[2], "REDNECK")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_redneck);
 			return 1;
-		} else if (!strcasecmp(coreLine, "SVSNICK") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "SVSNICK") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_svsnick);
 			return 1;
-		} else if (!strcasecmp(coreLine, "PART") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "PART") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_part);
 			return 1;
-		} else if (!strcasecmp(coreLine, "MSG")) {
-            privmsg_list(u->nick, s_MoraleServ, ms_help_msg);
+		} else if (!strcasecmp(av[2], "MSG")) {
+            		privmsg_list(u->nick, s_MoraleServ, ms_help_msg);
 			return 1;
-		} else if (!strcasecmp(coreLine, "LOVESERVLOGS") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "LOVESERVLOGS") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_loveservlogs);
 			return 1;
-		} else if (!strcasecmp(coreLine, "CHEERUP")) {
+		} else if (!strcasecmp(av[2], "CHEERUP")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_cheerup);		
 			return 1;
-		} else if (!strcasecmp(coreLine, "SVSJOIN") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "SVSJOIN") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_svsjoin);
 			return 1;
-		} else if (!strcasecmp(coreLine, "SVSPART") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "SVSPART") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_svspart);
 			return 1;
-		} else if (!strcasecmp(coreLine, "KICK") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "KICK") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_kick);
 			return 1;
-		} else if (!strcasecmp(coreLine, "BEHAPPY")) {
+		} else if (!strcasecmp(av[2], "BEHAPPY")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_behappy);		
 			return 1;
-		} else if (!strcasecmp(coreLine, "WONDERFUL")) {
+		} else if (!strcasecmp(av[2], "WONDERFUL")) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_wonderful);		
 			return 1;
-		} else if (!strcasecmp(coreLine, "RESET") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "RESET") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_reset);
 			return 1;
-		} else if (!strcasecmp(coreLine, "LOGBACKUP") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "LOGBACKUP") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_logbackup);
 			return 1;
-		} else if (!strcasecmp(coreLine, "PRINTFILE") && (UserLevel(u) >= 185)) {
+		} else if (!strcasecmp(av[2], "PRINTFILE") && (UserLevel(u) >= 185)) {
 			privmsg_list(u->nick, s_MoraleServ, ms_help_printfile);
 			return 1;
 		} else 
-			privmsg(u->nick, s_MoraleServ, "Unknown Help Topic: \2%s\2", coreLine);
+			privmsg(u->nick, s_MoraleServ, "Unknown Help Topic: \2%s\2", av[2]);
 		}
 
-	if (!strcasecmp(cmd, "HAIL")) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_hail(u, cmd, m);
-	} else if (!strcasecmp(cmd, "ODE")) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_ode(u, cmd, m);
-	} else if (!strcasecmp(cmd, "LAPDANCE")) {
-				cmd = strtok(NULL, " ");
-				ms_lapdance(u, cmd);
-	} else if (!strcasecmp(cmd, "JOIN") && (UserLevel(u) >= 185)) {
-				cmd = strtok(NULL, " ");
-				ms_join(u, cmd);	
-	} else if (!strcasecmp(cmd, "VIEWLOG") && (UserLevel(u) >= 185)) {
+	if (!strcasecmp(av[1], "HAIL")) {
+				if (ac < 4) {
+					privmsg(u->nick, s_MoraleServ, "Syntax: /msg %s HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>", s_MoraleServ);
+					privmsg(u->nick, s_MoraleServ, "For addtional help: /msg %s HELP", s_MoraleServ);
+					return -1;
+        			}
+				cmd = joinbuf(av, ac, 3);
+				ms_hail(u, av[2], cmd);
+				free(cmd);
+	} else if (!strcasecmp(av[1], "ODE")) {
+				ms_ode(u, av[2], av[3]);
+	} else if (!strcasecmp(av[1], "LAPDANCE")) {
+				ms_lapdance(u, av[2]);
+	} else if (!strcasecmp(av[1], "JOIN") && (UserLevel(u) >= 185)) {
+				ms_join(u, av[2]);	
+	} else if (!strcasecmp(av[1], "VIEWLOG") && (UserLevel(u) >= 185)) {
 				notice(s_Services,"%s Requested to Look at today's %s Log",u->nick,s_MoraleServ);
 				ms_viewlog(u);
-	} else if (!strcasecmp(cmd, "VERSION")) {
+	} else if (!strcasecmp(av[1], "VERSION")) {
 				notice(s_Services,"%s Wanted to know the current version information for %s",u->nick,s_MoraleServ);
 				ms_version(u);
-	} else if (!strcasecmp(cmd, "POEM")) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_poem(u, cmd, m);
-	} else if (!strcasecmp(cmd, "SWHOIS") && (UserLevel(u) >= 185)) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_swhois(u, cmd, m);
-	} else if (!strcasecmp(cmd, "REDNECK")) {
-				cmd = strtok(NULL, " ");
-				ms_redneck(u, cmd);
-	} else if (!strcasecmp(cmd, "SVSNICK") && (UserLevel(u) >= 185)) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_svsnick(u, cmd, m);
-	} else if (!strcasecmp(cmd, "PART") && (UserLevel(u) >= 185)) {
-				cmd = strtok(NULL, " ");
-				ms_part(u, cmd);	
-	} else if (!strcasecmp(cmd, "MSG")) {
-			    char *m;
-				/* char *m = " "; */
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_msg(u, cmd, m);
-	} else if (!strcasecmp(cmd, "LOVESERVLOGS") && (UserLevel(u) >= 185)) {
+	} else if (!strcasecmp(av[1], "POEM")) {
+				ms_poem(u, av[2], av[3]);
+	} else if (!strcasecmp(av[1], "SWHOIS") && (UserLevel(u) >= 185)) {
+				cmd = joinbuf(av, ac, 3);
+				ms_swhois(u, av[2], cmd);
+				free(cmd);
+	} else if (!strcasecmp(av[1], "REDNECK")) {
+				ms_redneck(u, av[2]);
+	} else if (!strcasecmp(av[1], "SVSNICK") && (UserLevel(u) >= 185)) {
+				ms_svsnick(u, av[2], av[3]);
+	} else if (!strcasecmp(av[1], "PART") && (UserLevel(u) >= 185)) {
+				ms_part(u, av[2]);	
+	} else if (!strcasecmp(av[1], "MSG")) {
+				cmd = joinbuf(av, ac, 3);
+				ms_msg(u, av[2], cmd);
+				free(cmd);
+	} else if (!strcasecmp(av[1], "LOVESERVLOGS") && (UserLevel(u) >= 185)) {
 				notice(s_Services,"%s Requested to Look at Loveserv's Logs",u->nick);
 				ms_loveservlogs(u);
-	} else if (!strcasecmp(cmd, "CHEERUP")) {
-				cmd = strtok(NULL, " ");
-				ms_cheerup(u, cmd);
-	} else if (!strcasecmp(cmd, "SVSJOIN") && (UserLevel(u) >= 185)) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_svsjoin(u, cmd, m);
-	} else if (!strcasecmp(cmd, "SVSPART") && (UserLevel(u) >= 185)) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_svspart(u, cmd, m);
-	} else if (!strcasecmp(cmd, "KICK") && (UserLevel(u) >= 185)) {
-				char *m;
-				cmd = strtok(NULL, " ");
-				m = strtok(NULL, "");
-				ms_kick(u, cmd, m);
-	} else if (!strcasecmp(cmd, "BEHAPPY")) {
-				cmd = strtok(NULL, " ");
-				ms_behappy(u, cmd);
-	} else if (!strcasecmp(cmd, "WONDERFUL")) {
-				cmd = strtok(NULL, " ");
-				ms_wonderful(u, cmd);
-	} else if (!strcasecmp(cmd, "RESET") && (UserLevel(u) >= 185)) {
+	} else if (!strcasecmp(av[1], "CHEERUP")) {
+				ms_cheerup(u, av[2]);
+	} else if (!strcasecmp(av[1], "SVSJOIN") && (UserLevel(u) >= 185)) {
+				ms_svsjoin(u, av[2], av[3]);
+	} else if (!strcasecmp(av[1], "SVSPART") && (UserLevel(u) >= 185)) {
+				ms_svspart(u, av[2], av[3]);
+	} else if (!strcasecmp(av[1], "KICK") && (UserLevel(u) >= 185)) {
+				ms_kick(u, av[2], av[3]);
+	} else if (!strcasecmp(av[1], "BEHAPPY")) {
+				ms_behappy(u, av[2]);
+	} else if (!strcasecmp(av[1], "WONDERFUL")) {
+				ms_wonderful(u, av[2]);
+	} else if (!strcasecmp(av[1], "RESET") && (UserLevel(u) >= 185)) {
 				notice(s_Services,"%s Requested %s to be RESET!",u->nick,s_MoraleServ);
 				ms_reset(u);
-	} else if (!strcasecmp(cmd, "LOGBACKUP") && (UserLevel(u) >= 185)) {
+	} else if (!strcasecmp(av[1], "LOGBACKUP") && (UserLevel(u) >= 185)) {
 				notice(s_Services,"%s Requested %s to conduct a LOGBACKUP!",u->nick,s_MoraleServ);
 				ms_logbackup(u);
-	} else if (!strcasecmp(cmd, "PRINTFILE") && (UserLevel(u) >= 185)) {
-				cmd = strtok(NULL, " ");
+	} else if (!strcasecmp(av[1], "PRINTFILE") && (UserLevel(u) >= 185)) {
 				notice(s_Services,"%s Requested the use of the PRINTFILE facility from %s",u->nick,s_MoraleServ);
-				ms_printfile(u, cmd);
-		} else {
-		notice(s_Services, "%s requested the unknown command of: %s", u->nick, coreLine);
-		privmsg(u->nick, s_MoraleServ, "Unknown Command: \2%s\2, perhaps you need some HELP?",cmd);
+				ms_printfile(u, av[2]);
+	} else {
+		notice(s_Services, "%s requested the unknown command of: %s", u->nick, av[1]);
+		privmsg(u->nick, s_MoraleServ, "Unknown Command: \2%s\2, perhaps you need some HELP?", av[1]);
 	}
 	return 1;
 
@@ -271,14 +251,14 @@ EventFnList *__module_get_events() {
 
 void _init() {
 	s_MoraleServ = "MoraleServ";
-	sts(":%s LOCOPS :MoraleServ Network Morale Service Module Loaded",me.name);
+	globops(me.name, "MoraleServ Network Morale Service Module Loaded",me.name);
 
 	mslog("*********** %s LOADED UP - server: %s ***********",s_MoraleServ, me.name);
 }
 
 
 void _fini() {
-	sts(":%s LOCOPS :MoraleServ Network Morale Service Module Unloaded",me.name);
+	globops(me.name, "MoraleServ Network Morale Service Module Unloaded",me.name);
 
 	mslog("*********** %s SHUTDOWN - server: %s ***********",s_MoraleServ, me.name);
 };
@@ -312,16 +292,6 @@ void mslog(char *fmt, ...)
 /* Routine for HAIL */
 static void ms_hail(User *u, char *cmd, char *m) {
 		segv_location = sstrdup("ms_hail");
-		if (!cmd) {
-			privmsg(u->nick, s_MoraleServ, "Syntax: /msg %s HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>", s_MoraleServ);
-			privmsg(u->nick, s_MoraleServ, "For addtional help: /msg %s HELP", s_MoraleServ);
-			return;
-        }
-		if (!m) {
-			privmsg(u->nick, s_MoraleServ, "Syntax: /msg %s HAIL <WHO TO HAIL> <NICK TO SEND HAIL TO>", s_MoraleServ);
-			privmsg(u->nick, s_MoraleServ, "For addtional help: /msg %s HELP", s_MoraleServ);
-			return;
-        }
 		if (!strcasecmp(m, s_MoraleServ)) {
 			privmsg(u->nick, s_MoraleServ, "Surley we have better things to do with our time than make a service message itself?");
 			notice(s_Services,"Prevented %s from making %s message %s",u->nick,s_MoraleServ,s_MoraleServ);
@@ -336,7 +306,7 @@ static void ms_hail(User *u, char *cmd, char *m) {
 	privmsg(u->nick, s_MoraleServ, "Your \"HAIL\" song greeting has been sent to %s!",m);
 	notice(s_Services, "%s Wanted %s to be hailed by sending the song to %s", u->nick,cmd,m);
 	privmsg(m, s_MoraleServ, "Courtesy of your friend %s:",u->nick);
-    privmsg(m, s_MoraleServ, "*sings* Hail to the %s, they're the %s and they need hailing, hail to the %s so you better all hail like crazy...",cmd,cmd,cmd);
+        privmsg(m, s_MoraleServ, "*sings* Hail to the %s, they're the %s and they need hailing, hail to the %s so you better all hail like crazy...",cmd,cmd,cmd);
 	mslog("%s sent a HAIL to the %s song to %s",u->nick,cmd,m);
 
 }
@@ -426,9 +396,7 @@ static void ms_join(User *u, char *chan)
 	
 	privmsg(me.chan, s_MoraleServ, "%s Asked me to Join %s", u->nick, chan);
 	mslog("%s!%s@%s Asked me to Join %s", u->nick, u->username, u->hostname, chan);
-	sts(":%s JOIN %s",s_MoraleServ,chan);
-    /*  Evil little mode code >;p */
-    /*	sts(":%s MODE %s +o %s",me.name,chan,s_MoraleServ); */
+	sjoin_cmd(s_MoraleServ, chan);
 
 }
 
@@ -536,7 +504,7 @@ static void ms_swhois(User *u, char *cmd, char *m) {
 	
 	mslog("%s!%s@%s Issued a SWHOIS command - SWHOIS %s :%s", u->nick, u->username, u->hostname, cmd, m);
 	notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SWHOIS on %s (%s)", u->nick, cmd, m);
-	sts("SWHOIS %s :%s", cmd, m);
+	sswhois_cmd(cmd, m);
 
 }
 
@@ -602,7 +570,7 @@ static void ms_svsnick(User *u, char *cmd, char *m) {
 
 	mslog("%s!%s@%s Issued a SVSNICK command - SVSNICK %s %s :0", u->nick, u->username, u->hostname, cmd, m);
 	notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSNICK on %s (modified to %s)", u->nick, cmd, m);
-	sts("SVSNICK %s %s :0", cmd, m);
+	ssvsnick_cmd(cmd, m);
 
 }
 
@@ -625,7 +593,7 @@ static void ms_part(User *u, char *chan)
 
 	privmsg(me.chan, s_MoraleServ, "%s Asked me to Part %s", u->nick, chan);
 	mslog("%s!%s@%s Asked me to Part %s", u->nick, u->username, u->hostname, chan);
-	sts(":%s PART %s",s_MoraleServ,chan);
+	spart_cmd(s_MoraleServ, chan);
 
 }
 
@@ -754,7 +722,7 @@ static void ms_svsjoin(User *u, char *cmd, char *m) {
 
 	mslog("%s!%s@%s Issued a SVSJOIN command - SVSJOIN %s %s", u->nick, u->username, u->hostname, cmd, m);
 	notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSJOIN on %s to %s", u->nick, cmd, m);
-	sts("SVSJOIN %s %s", cmd, m);
+	ssvsjoin_cmd(cmd, m);
 
 }
 
@@ -784,7 +752,7 @@ static void ms_svspart(User *u, char *cmd, char *m) {
 
 	mslog("%s!%s@%s Issued a SVSPART command - SVSPART %s %s", u->nick, u->username, u->hostname, cmd, m);
 	notice(s_Services, "%s Just used thier TechAdmin-ship to preform a SVSPART on %s to %s", u->nick, cmd, m);
-	sts("SVSPART %s %s", cmd, m);
+	ssvspart_cmd(cmd, m);
 
 }
 
@@ -823,7 +791,7 @@ static void ms_kick(User *u, char *cmd, char *m) {
 
 	mslog("%s Issued a KICK command - KICK %s %s", u->nick, cmd, m);
 	notice(s_Services, "%s Just used thier TechAdmin-ship to preform a KICK on %s from %s", u->nick, m, cmd);
-	sts("KICK %s %s", cmd, m);
+	skick_cmd(s_MoraleServ, cmd, m, "");
 
 }
 

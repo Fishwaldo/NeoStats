@@ -311,11 +311,14 @@ extern int split_buf(char *buf, char ***argv, int colon_special)
 	}
 	s = strpbrk(buf, " ");
 	if (s) {
-		*s++ = 0;
-		while (isspace(*s))
+		*s++ = 0; 
+	    	while (isspace(*s))
 		    s++;
 	} else {
 		s = buf + strlen(buf);
+	}
+	if (*buf == 0) {
+		buf++;
 	}
 	(*argv)[argc++] = buf;
 	buf = s;
@@ -328,7 +331,8 @@ extern char *joinbuf(char **av, int ac, int from) {
 	char *buf;
 
 	buf = malloc(512);
-	for (i = from; i < ac; i++) {
+	sprintf(buf, "%s", av[from]);
+	for (i = from+1; i < ac; i++) {
 		sprintf(buf, "%s %s", buf, av[i]);
 	}
 	return (char *)buf;
@@ -382,17 +386,7 @@ void parse(char *line)
 		coreLine = line + strlen(line);
     	strncpy(cmd, line, sizeof(cmd));
 
-	ac = split_buf(coreLine, &av, 1);
-#ifdef DEBUG
-	if (cmdptr) {
-		printf("origin %s - cmd %s\n", origin, cmd);
-	} else {
-		printf("cmd %s\n", cmd);
-	}
-	for (I = 0; I < ac; I++) {
-		printf("args %d - %s\n", I, av[I]);
-	}
-#endif
+	ac = split_buf(coreLine, &av, 0);
 	
 
 
@@ -408,7 +402,7 @@ void parse(char *line)
 		if (!strcasecmp(s_Services,av[0])) {
 			/* its to the Internal Services Bot */
 			segv_location = sstrdup("servicesbot");
-			servicesbot(origin,av[1]);
+			servicesbot(origin,av, ac);
 			segv_location = sstrdup("ServicesBot_return");
 			free(av);
 			return;

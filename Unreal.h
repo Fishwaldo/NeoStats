@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.10 2002/03/05 13:48:09 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.11 2002/03/07 12:41:12 fishwaldo Exp $
  */
 
 
@@ -417,5 +417,10 @@ extern int snetinfo_cmd();
 extern int skill_cmd(const char *from, const char *target, const char *reason,...);
 extern int ssmo_cmd(const char *from, const char *umodetarget, const char *msg);
 extern int snick_cmd(const char *oldnick, const char *newnick);
-
+extern int sswhois_cmd(const char *target, const char *swhois);
+extern int ssvsnick_cmd(const char *target, const char *newnick);
+extern int ssvsjoin_cmd(const char *target, const char *chan);
+extern int ssvspart_cmd(const char *target, const char *chan);
+extern int skick_cmd(const char *who, const char *target, const char *chan, const char *reason);
+extern int swallops_cmd(const char *who, const char *msg,...);
 #endif  /* UNREAL_H Define */

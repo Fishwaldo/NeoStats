@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.18 2002/03/07 08:42:16 fishwaldo Exp $
+** $Id: users.c,v 1.19 2002/03/07 12:41:12 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -26,7 +26,6 @@ MyUser *myuhead;
 static User *new_user(const char *);
 
 
-hash_t *uh;
 
 
 User *new_user(const char *nick)
@@ -130,12 +129,7 @@ void sendcoders(char *message,...)
 		return;
 #ifdef UNREAL
 	if (!me.usesmo) {
-		hash_scan_begin(&us, uh);
-		while ((un = hash_scan_next(&us)) != NULL) {
-			u = hnode_get(un);
-				if (u->Umode & UMODE_CODER)	
-				privmsg(u->nick, s_Debug, "Debug: %s",tmp);
-		}
+		notice(s_Services, tmp);
 	} else {		
 		ssmo_cmd(me.name, "o", tmp);
 	}
@@ -149,7 +143,8 @@ User *finduser(const char *nick)
 {
 	User *u;
 	hnode_t *un;
-		
+	char *tmp;	
+	
 	un = hash_lookup(uh, nick);
 	if (un != NULL) {
 		u = hnode_get(un);

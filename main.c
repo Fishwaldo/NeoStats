@@ -293,8 +293,9 @@ unsigned long HASH(const unsigned char *name, int size_of_table)
 char *strlower(char *s)
 {
 	char *t = s; 
-	while (*t)
-	*t++ = tolower (*t);
-return s;
+	while (*t) {
+		*t++ = tolower (*t);
+	}
+return t;
 }
 

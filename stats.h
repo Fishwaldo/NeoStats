@@ -28,6 +28,8 @@
 #include <sys/stat.h>
 #include <sys/resource.h>
 #include <setjmp.h>
+#include "list.h"
+#include "hash.h"
 
 #include "config.h"
 
@@ -67,6 +69,11 @@ extern const char version[];
 char recbuf[BUFSIZE], *segv_location;
 char segvinmodule[30];
 jmp_buf sigvbuf;
+
+hash_t *sh;
+hash_t *uh;
+
+
 
 typedef struct server_ Server;
 typedef struct user_ User;
@@ -284,7 +291,7 @@ extern int doICQProtocol();
 
 
 /* services.c */
-extern void servicesbot(char *nick, char *line);
+extern void servicesbot(char *nick, char **av, int ac);
 extern void ns_debug_to_coders(char *);
 extern void ns_shutdown(User *, char *);
 

@@ -466,7 +466,6 @@ int load_module(char *path1, User *u) {
 	mod_ptr->other_funcs = event_fn_ptr;
 
 	/* Let this module know we are online if we are! */
-printf("%d\n", me.onchan);
 	if (me.onchan == 1) {
 		while (event_fn_ptr->cmd_name != NULL ) {
 			if (!strcasecmp(event_fn_ptr->cmd_name, "ONLINE")) {
