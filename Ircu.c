@@ -28,6 +28,7 @@
 #include "dl.h"
 #include "log.h"
 #include "users.h"
+#include "server.h"
 
 void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
 

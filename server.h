@@ -30,4 +30,8 @@ void ServerDump (void);
 int init_server_hash (void);
 void PingServers (void);
 void FreeServers();
+#ifdef BASE64NICKNAME
+void setservernumeric (const char *name, const char* num);
+#endif
+
 #endif /* _SERVER_H_ */
