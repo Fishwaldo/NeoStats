@@ -462,8 +462,4 @@ tools/sqlphp/README -text
 tools/sqlphp/rta_tables.php -text
 tools/sqlphp/rta_view.php -text
 win32/README -text
-win32/adns/adns.vcproj -text
-win32/curl/curl.vcproj -text
 win32/nswin32.sln -text
-win32/nswindow/nswindow.vcproj -text
-win32/pcre/pcre.vcproj -text
