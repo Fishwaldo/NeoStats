@@ -12,8 +12,7 @@ AC_PROG_CC
 
 dnl Checks for libraries.
 dnl Replace `main' with a function in -ldl:
-AC_CHECK_LIB(dl, main)
-AC_CHECK_LIB(db, db_create)
+AC_CHECK_LIB(dl, dlopen)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -230,6 +229,7 @@ AC_MSG_RESULT($MODULES)
 AC_SUBST(IRCD_FILES_SRC)
 AC_SUBST(IRCD_FILES_OBJS)
 AC_SUBST(MODULES)
+AC_SUBST(LIBS)
 AC_OUTPUT(dl/statserv/Makefile dl/services/Makefile dl/icq/Makefile dl/version/Makefile dl/Makefile dl/spam/Makefile dl/netinfo/Makefile Makefile dl/services/Makefile dl/loveserv/Makefile)
 echo "(*----------------------------------------------------------*)"
 echo "(| Important Instructions                                   |)"
