@@ -55,7 +55,7 @@ static void ss_Config(void);
 char s_StatServ[MAXNICK];
 
 ModuleInfo __module_info = {
-	 "statserv",
+	 "StatServ",
 	 "Statistical Bot For NeoStats",
 	 "$Rev$",
 	__DATE__,

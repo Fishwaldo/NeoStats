@@ -49,7 +49,7 @@ bot_cmd extauth_commands[]=
 };
 
 ModuleInfo __module_info = {
-	"extauth",
+	"ExtAuth",
 	"ServiceRoots Authentication Module",
 	"1.2",
 	__DATE__,
