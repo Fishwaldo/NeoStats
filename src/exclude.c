@@ -43,6 +43,7 @@ int mod_cmd_exclude(CmdParams *cmdparams);
 /* this is the list of excluded hosts/servers */
 static list_t *exclude_list;
 static list_t *excludelists[NUM_MODULES];
+static bot_cmd *bot_cmd_lists[NUM_MODULES];
 
 const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
 	"Host",
@@ -94,6 +95,8 @@ int InitModExcludes(Module *mod_ptr)
 	SET_SEGV_LOCATION();
 	/* init the exclusions list */
 	excludelists[mod_ptr->modnum] = list_create(MAX_MOD_EXCLUDES);
+	bot_cmd_lists[mod_ptr->modnum] = ns_malloc( sizeof( mod_exclude_commands ) );
+	os_memcpy( bot_cmd_lists[mod_ptr->modnum], mod_exclude_commands, sizeof( mod_exclude_commands ) );
 	DBAFetchRows ("exclusions", new_mod_exclude);
 	return NS_SUCCESS;
 }
@@ -105,6 +108,7 @@ void FiniExcludes(void)
 
 void FiniModExcludes(Module *mod_ptr)
 {
+	ns_free( bot_cmd_lists[mod_ptr->modnum] );
 	list_destroy_auto (excludelists[mod_ptr->modnum]);
 }
 
@@ -178,7 +182,7 @@ static int ns_cmd_exclude_add(CmdParams* cmdparams)
 
 static int mod_cmd_exclude_add(CmdParams *cmdparams)
 {
-	return do_exclude_add(excludelists[GET_CUR_MODNUM()], cmdparams);
+	return do_exclude_add(excludelists[cmdparams->bot->moduleptr->modnum], cmdparams);
 }
 
 /* @brief del a entry from the exlusion list
@@ -220,7 +224,7 @@ static int ns_cmd_exclude_del(CmdParams* cmdparams)
 
 static int mod_cmd_exclude_del(CmdParams *cmdparams)
 {
-	return do_exclude_del(excludelists[GET_CUR_MODNUM()], cmdparams);
+	return do_exclude_del(excludelists[cmdparams->bot->moduleptr->modnum], cmdparams);
 }
 
 /* @brief list the entries from the exlusion list
@@ -253,7 +257,7 @@ static int ns_cmd_exclude_list(CmdParams* cmdparams)
 
 static int mod_cmd_exclude_list(CmdParams *cmdparams)
 {
-	return do_exclude_list(excludelists[GET_CUR_MODNUM()], cmdparams);
+	return do_exclude_list(excludelists[cmdparams->bot->moduleptr->modnum], cmdparams);
 }
 
 /** @brief EXCLUDE command handler
@@ -458,4 +462,9 @@ int ModIsChannelExcluded(Channel *c)
 		node = list_next(excludelists[GET_CUR_MODNUM()], node);
 	}
 	return NS_FALSE;
+}
+
+bot_cmd *GetModExcludeCommands( Module *mod_ptr )
+{
+	return bot_cmd_lists[mod_ptr->modnum];
 }

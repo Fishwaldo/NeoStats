@@ -431,12 +431,6 @@ unload_module (const char *modname, Client * u)
 	{
 		DelAuthModule (mod_ptr);
 	}
-	SET_RUN_LEVEL(mod_ptr);
-	if (mod_ptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
-	{
-		FiniModExcludes(mod_ptr);
-	}
-	RESET_RUN_LEVEL();
 	moduleindex = mod_ptr->modnum;
 	/* canx any DNS queries used by this module */
 	canx_dns (mod_ptr);
@@ -469,6 +463,12 @@ unload_module (const char *modname, Client * u)
 	hnode_destroy (modnode);
 	/* Close module */
 	irc_globops (NULL, _("%s Module Unloaded"), modname);
+	SET_RUN_LEVEL(mod_ptr);
+	if (mod_ptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
+	{
+		FiniModExcludes(mod_ptr);
+	}
+	RESET_RUN_LEVEL();
 #ifndef VALGRIND
 	SET_RUN_LEVEL(mod_ptr);
 	DBACloseDatabase ();
