@@ -510,6 +510,8 @@ void parse (char* line);
 char *joinbuf (char **av, int ac, int from);
 int split_buf (char *buf, char ***argv, int colon_special);
 int flood (User * u);
+int join_bot_to_chan (const char *who, const char *chan, unsigned long chflag);
+
 /* (M) For backwards compatibility only, bots are moving to a new interface */
 int init_bot (char * nick, char * user, char * host, char * rname, const char *modes, char * modname);
 int del_bot (char * nick, char * reason);
@@ -580,4 +582,3 @@ void transfer_status();
 int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 #endif
 
-int join_bot_to_chan (const char *who, const char *chan, unsigned long chflag);

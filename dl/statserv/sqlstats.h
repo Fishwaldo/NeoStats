@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.h 1086 2003-12-12 20:15:54Z Mark $
+** $Id$
 */
 
 #ifndef SQLSTATS_H

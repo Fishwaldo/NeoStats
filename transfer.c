@@ -74,6 +74,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 	int rembuffer;
 	char *newbuf;
 
+	SET_SEGV_LOCATION();
 	neo_transfer *neotrans = (neo_transfer *)stream;
 	switch (neotrans->savefileormem) {
 		case NS_FILE:
@@ -276,6 +277,7 @@ void transfer_status() {
 	CURLMsg *msg;
 	int msg_left;
 	neo_transfer *neotrans;
+	SET_SEGV_LOCATION();
 	while ((msg = curl_multi_info_read(curlmultihandle, &msg_left))) {
 		if (msg->msg == CURLMSG_DONE) {
 			/* find the handle here */
@@ -303,6 +305,7 @@ void transfer_status() {
 				/* success, so we must callback with success */
 				neotrans->callback(neotrans->data, NS_SUCCESS, neotrans->savefileormem == NS_MEMORY ? neotrans->savemem : NULL, neotrans->savememsize);
 			}
+			CLEAR_SEGV_INMODULE();
 			/* regardless, clean up the transfer */
 			curl_multi_remove_handle(curlmultihandle, neotrans->curleasyhandle);
 			curl_easy_cleanup(neotrans->curleasyhandle);
