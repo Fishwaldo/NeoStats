@@ -22,7 +22,7 @@ clean:
 
 install: statserv
 	$(INSTALL) -m 644 $(TARGET) $(DIRECTORY)/dl
-
+	$(INSTALL) -m 644 html/index.tpl $(DIRECTORY)/data
 
 
 

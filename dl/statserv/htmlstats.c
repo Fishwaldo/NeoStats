@@ -40,8 +40,11 @@ void ss_html() {
 	} else {
 		return;
 	}
-
+#ifdef DEBUG
 	tpl = fopen("dl/statserv/html/index.tpl", "r");
+#else if
+	tpl = fopen("data/index.tpl", "r");
+#endif
 	if (!tpl) {
 		printf("can't open template\n");
 		return;
