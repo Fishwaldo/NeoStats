@@ -821,6 +821,7 @@ bot_message (char *origin, char **av, int ac)
 		return;
 	}
 
+#if 0
 	/* Trap CTCP commands and silently drop them to avoid unknown command errors 
 	 * Why bother? Well we might be able to use some of them in the future
 	 * so this is mainly a test and we may want to pass some of this onto
@@ -834,6 +835,7 @@ bot_message (char *origin, char **av, int ac)
 		free(buf);
 		return;
 	}
+#endif
 
 	u = finduser (origin);
 
