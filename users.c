@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.59 2003/08/19 13:08:13 fishwaldo Exp $
+** $Id: users.c,v 1.60 2003/08/25 07:30:23 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -73,6 +73,7 @@ void
 AddUser (const char *nick, const char *user, const char *host, const char *server, const unsigned long ipaddr, const unsigned long TS)
 {
 	User *u;
+	int i;
 
 	nlog (LOG_DEBUG2, LOG_CORE, "AddUser(): %s (%s@%s)(%lu) -> %s at %lu", nick, user, host, htonl (ipaddr), server, TS);
 	strcpy (segv_location, "AddUser");
@@ -100,6 +101,12 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	strcpy (u->modes, "");
 	u->ipaddr.s_addr = htonl (ipaddr);
 	u->TS = TS;
+	
+	/* make sure the module pointers are all null */
+	for (i = 0; i < NUM_MODULES; i++) {
+		printf("clearing module %d\n", i);
+		u->moddata[i] = NULL;
+	}
 }
 
 void
