@@ -172,7 +172,7 @@ static void
 dumpserver (Client *s)
 {
 	/* Calculate uptime as uptime from server plus uptime of NeoStats */
-	int uptime = s->server->uptime  + (me.now - me.t_start);
+	time_t uptime = s->server->uptime  + (me.now - me.t_start);
 
 	if(ircd_srv.protocol & PROTOCOL_B64SERVER) {
 		irc_chanalert (ns_botptr, _("Server: %s (%s)"), s->name, s->name64);

@@ -43,7 +43,7 @@ list_t *Vhead;
 
 static int check_interval()
 {
-	static int lasttime;
+	static time_t lasttime;
 	static int count;
 
 	if (!ss_module->synched) {

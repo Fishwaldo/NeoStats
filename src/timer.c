@@ -33,7 +33,7 @@
 static hash_t *timerhash;
 
 static int midnight = 0;
-static int lastservertimesync = 0;
+static time_t lastservertimesync = 0;
 
 static int is_midnight (void);
 static void run_mod_timers (int ismidnight);

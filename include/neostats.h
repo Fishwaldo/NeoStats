@@ -41,7 +41,7 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
-#ifdef HAVE_ERRNO_H
+#if 1 /*def HAVE_ERRNO_H*/
 #include <errno.h>
 #endif
 #ifdef WIN32

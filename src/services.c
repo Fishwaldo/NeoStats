@@ -368,7 +368,7 @@ ns_bandump (CmdParams* cmdparams)
 static int 
 ns_status (CmdParams* cmdparams)
 {
-	int uptime = me.now - me.t_start;
+	time_t uptime = me.now - me.t_start;
 
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ns_botptr, cmdparams->source, __("%s status:", cmdparams->source), ns_botptr->name);

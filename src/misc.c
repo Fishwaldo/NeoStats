@@ -60,8 +60,6 @@ char *make_safe_filename (char *name)
 	return name;
 }
 
-
-
 /** @brief strip newlines carriage returns
  *
  * removes newlines and carriage returns from a string
@@ -90,7 +88,7 @@ strip (char *line)
  * @returns pointer to allocated buffer
  */
 
-void * ns_malloc ( const int size )
+void* ns_malloc ( const int size )
 {
 	unsigned int allocsize;
 	void *buf;
@@ -118,7 +116,7 @@ void * ns_malloc ( const int size )
  * @returns pointer to allocated buffer
  */
 
-void * ns_calloc ( const int size )
+void* ns_calloc ( const int size )
 {
 	void *buf;
 	unsigned int allocsize;
@@ -146,7 +144,7 @@ void * ns_calloc ( const int size )
  * @returns pointer to allocated buffer
  */
 
-void * ns_realloc ( void* ptr, const int size )
+void* ns_realloc ( void* ptr, const int size )
 {
 	void* newptr;
 
@@ -190,8 +188,7 @@ void ns_realfree ( void **buf )
  *
  */
 
-char *
-sstrdup (const char *s)
+char* sstrdup (const char *s)
 {
 	char *t = strdup (s);
 	if (!t) {
@@ -211,8 +208,7 @@ sstrdup (const char *s)
  *
  */
 
-char *
-strlwr (char *s)
+char* strlwr (char *s)
 {
 	char *t;
 	t = s;
@@ -228,8 +224,8 @@ strlwr (char *s)
  *
  * @return 
  */
-EXPORTFUNC int
-ircsplitbuf (char *buf, char ***argv, int colon_special)
+
+int ircsplitbuf (char *buf, char ***argv, int colon_special)
 {
 	int argvsize = 8;
 	int argc;
@@ -270,8 +266,13 @@ ircsplitbuf (char *buf, char ***argv, int colon_special)
 	return argc;
 }
 
-int
-split_buf (char *buf, char ***argv, int colon_special)
+/** @brief split_buf
+ *  Split a buffer into argument list
+ *
+ * @return 
+ */
+
+int split_buf (char *buf, char ***argv, int colon_special)
 {
 	int argvsize = 8;
 	int argc;
@@ -314,8 +315,8 @@ split_buf (char *buf, char ***argv, int colon_special)
  *
  * @return 
  */
-char *
-joinbuf (char **av, int ac, int from)
+
+char* joinbuf (char **av, int ac, int from)
 {
 	int i;
 	char *buf;
@@ -335,7 +336,6 @@ joinbuf (char **av, int ac, int from)
 	return (char *) buf;
 }
 
-
 /** @brief Adds a string to an array of strings
  *
  * used for the event functions, adds a string to an array of string pointers to pass to modules
@@ -348,8 +348,7 @@ joinbuf (char **av, int ac, int from)
  *
  */
 
-void
-AddStringToList (char ***List, char S[], int *C)
+void AddStringToList (char ***List, char S[], int *C)
 {
 	static int numargs = 8;
 
@@ -377,6 +376,7 @@ AddStringToList (char ***List, char S[], int *C)
  * guy, but when you added this feature you forced people to either
  * use your *SHAREWARE* client or face screenfulls of crap!)
  */
+
 void strip_mirc_codes(char *text)
 {
   char *dd = text;
@@ -441,8 +441,8 @@ void strip_mirc_codes(char *text)
  * @returns 
  *
  */
-char *
-sctime (time_t stuff)
+
+char* sctime (time_t stuff)
 {
 	char *s, *c;
 
@@ -462,13 +462,10 @@ sctime (time_t stuff)
  */
 static char fmtime[TIMEBUFSIZE];
 
-char *
-sftime (time_t stuff)
+char* sftime (time_t stuff)
 {
 	struct tm *ltm = localtime (&stuff);
 
 	strftime (fmtime, TIMEBUFSIZE, "%a %b %d %Y %I:%M %p %Z", ltm);
-
 	return fmtime;
 }
-
