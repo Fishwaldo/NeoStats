@@ -8,5 +8,7 @@ data_DATA		= neostats.motd
 docdir			= @prefix@/doc
 doc_DATA		= doc/* doc/old/*
 
+all-local:
+	@rm include/version.h
 
 include $(top_srcdir)/autotools/rules.mk

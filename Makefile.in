@@ -540,7 +540,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(SCRIPTS) $(DATA)
+all-am: Makefile $(SCRIPTS) $(DATA) all-local
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkinstalldirs) $(DESTDIR)$(bindir) $(DESTDIR)$(datadir) $(DESTDIR)$(docdir)
@@ -620,26 +620,29 @@ uninstall-am: uninstall-binSCRIPTS uninstall-dataDATA uninstall-docDATA \
 
 uninstall-info: uninstall-info-recursive
 
-.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am check check-am clean \
-	clean-generic clean-libtool clean-recursive ctags \
-	ctags-recursive dist dist-all dist-gzip distcheck distclean \
-	distclean-generic distclean-libtool distclean-recursive \
-	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am dvi-recursive info info-am info-recursive install \
-	install-am install-binSCRIPTS install-data install-data-am \
-	install-data-recursive install-dataDATA install-docDATA \
-	install-exec install-exec-am install-exec-recursive \
-	install-info install-info-am install-info-recursive install-man \
-	install-recursive install-strip installcheck installcheck-am \
-	installdirs installdirs-am installdirs-recursive \
-	maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-generic \
-	mostlyclean-libtool mostlyclean-recursive pdf pdf-am \
-	pdf-recursive ps ps-am ps-recursive tags tags-recursive \
-	uninstall uninstall-am uninstall-binSCRIPTS uninstall-dataDATA \
-	uninstall-docDATA uninstall-info-am uninstall-info-recursive \
-	uninstall-recursive
+.PHONY: $(RECURSIVE_TARGETS) CTAGS GTAGS all all-am all-local check \
+	check-am clean clean-generic clean-libtool clean-recursive \
+	ctags ctags-recursive dist dist-all dist-gzip distcheck \
+	distclean distclean-generic distclean-libtool \
+	distclean-recursive distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am dvi-recursive info info-am \
+	info-recursive install install-am install-binSCRIPTS \
+	install-data install-data-am install-data-recursive \
+	install-dataDATA install-docDATA install-exec install-exec-am \
+	install-exec-recursive install-info install-info-am \
+	install-info-recursive install-man install-recursive \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am installdirs-recursive maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive mostlyclean \
+	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
+	pdf pdf-am pdf-recursive ps ps-am ps-recursive tags \
+	tags-recursive uninstall uninstall-am uninstall-binSCRIPTS \
+	uninstall-dataDATA uninstall-docDATA uninstall-info-am \
+	uninstall-info-recursive uninstall-recursive
 
+
+all-local:
+	@rm include/version.h
 
 .c.o:
 			@echo "Building $@"

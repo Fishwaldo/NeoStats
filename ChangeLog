@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - More autotools updates to shut it up some more, and improve build process (F)
  - Update makeconf to generate a PROTOCOL line. (M)
  - Update automake files for core and protocol to observe new protocol module
    generation. (M)
