@@ -168,6 +168,11 @@
 /* Version number of package */
 #undef NEOSTATS_VERSION
 
+/* Install directory */
+#ifndef NEO_PREFIX
+#undef NEO_PREFIX
+#endif
+
 /* Major Version */
 #undef MAJOR
 

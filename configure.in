@@ -527,6 +527,13 @@ AC_MSG_RESULT(Thats Impressive!!!)
 AC_MSG_CHECKING(The Modules that will be compiled)
 AC_MSG_RESULT($MODULES)
 
+dnl Set NEO_PREFIX in config.h.
+if test "x${prefix}" = "xNONE"; then
+   AC_DEFINE_UNQUOTED(NEO_PREFIX, "${ac_default_prefix}")
+else
+  AC_DEFINE_UNQUOTED(NEO_PREFIX, "${prefix}")
+fi
+
 AC_SUBST(MAKEDEPENDENCIES)
 AC_SUBST(DIRINST)
 AC_SUBST(CFLAGS)

@@ -6525,6 +6525,18 @@ echo $ECHO_N "checking The Modules that will be compiled... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $MODULES" >&5
 echo "${ECHO_T}$MODULES" >&6
 
+if test "x${prefix}" = "xNONE"; then
+   cat >>confdefs.h <<_ACEOF
+#define NEO_PREFIX "${ac_default_prefix}"
+_ACEOF
+
+else
+  cat >>confdefs.h <<_ACEOF
+#define NEO_PREFIX "${prefix}"
+_ACEOF
+
+fi
+
 
 
 
