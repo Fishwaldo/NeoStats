@@ -21,23 +21,37 @@ void chk()
 {
 	Mod_Timer *mod_ptr = NULL;
 	time_t current = time(NULL);
-	register int j;
+	hscan_t ts;
+	hnode_t *tn;
+
 	segv_location = sstrdup("chk");
 /* First, lets see if any modules have a function that is due to run..... */
-
-	for (j = 0; j < T_TABLE_SIZE; j++) {
-		for (mod_ptr = module_timer_lists[j]; mod_ptr; mod_ptr = mod_ptr->next) {
-			if (current - mod_ptr->lastrun > mod_ptr->interval) {
-				mod_ptr->function();
-				mod_ptr->lastrun = time(NULL);
-			}
+	hash_scan_begin(&ts, th);
+	while ((tn = hash_scan_next(&ts)) != NULL) {
+		mod_ptr = hnode_get(tn); 
+		if (current - mod_ptr->lastrun > mod_ptr->interval) {
+			mod_ptr->function();
+			mod_ptr->lastrun = time(NULL);
 		}
 	}
-	free(mod_ptr); 
 
 	if (current - ping.last_sent > 60) {
 		TimerPings();
 		ping.last_sent = time(NULL);
+		if (hash_verify(sh) == 0) {
+			log("Eeeek, Corruption of the socket hash");
+		}
+		if (hash_verify(mh) == 0) {
+			log("Eeeek, Corruption of the Module hash");
+		}
+		if (hash_verify(bh) == 0) {
+			log("Eeeek, Corruption of the Bot hash");
+		}
+		if (hash_verify(th) == 0) {
+			log("Eeeek, Corruption of the Timer hash");
+		}
+	
+
 	}
 	if (is_midnight() == 1 && midnight == 0) {
 		TimerMidnight();

@@ -10,13 +10,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include "hash.h"
 #include "stats.h"
 
 extern char *sftime(time_t);
 
 struct sock_list_struct {
-	struct sock_list_struct *prev;
-	struct sock_list_struct *next;
 	long hash;
 	int sock_no;
 	char *sockname;
@@ -26,11 +25,9 @@ struct sock_list_struct {
 	long rbytes;
 };
 typedef struct sock_list_struct Sock_List;
-Sock_List *Socket_lists[MAX_SOCKS];
+hash_t *sh;
 
 struct mod_timer_list {
-	struct mod_timer_list *prev;
-	struct mod_timer_list *next;
 	long hash;
 	char *modname;
 	char *timername;
@@ -39,12 +36,9 @@ struct mod_timer_list {
 	int (*function)();
 };
 typedef struct mod_timer_list Mod_Timer;
-Mod_Timer *module_timer_lists[T_TABLE_SIZE];
-
+hash_t *th;
 
 struct mod_user_list {
-	struct mod_user_list *prev;
-	struct mod_user_list *next;
 	long hash;
 	char *nick;
 	char *modname;
@@ -52,7 +46,7 @@ struct mod_user_list {
 };
 
 typedef struct mod_user_list Mod_User;
-Mod_User *module_bot_lists[B_TABLE_SIZE];
+hash_t *bh;
 
 struct functions {
 	char *cmd_name;
@@ -78,8 +72,6 @@ struct mod_info {
 typedef struct mod_info Module_Info;
 
 struct module {
-	struct module *prev;
-	struct module *next;
 	Module_Info *info;
 	Functions *function_list;
 	EventFnList *other_funcs;
@@ -90,15 +82,8 @@ struct module {
 
 typedef struct module Module;
 
-extern Module *module_list;
+hash_t *mh;
 
-struct path {
-	struct path *prev;
-	struct path *next;
-	char dl_path[100];
-};
-
-typedef struct path LD_Path;
 
 extern void __init_mod_list();
 extern int load_module(char *path,User *u);
@@ -115,5 +100,6 @@ extern int add_socket(char *func_name, char *sock_name, int socknum, char *mod_n
 extern int del_socket(char *sockname);
 extern void list_sockets(User *);
 extern Mod_User *findbot(char *);
+extern int get_dl_handle(char *mod_name);
 
 #endif /* !_dl_h_ */

@@ -25,7 +25,7 @@
 
 char s_Debug[MAXNICK] = "Stats_Debug";
 char s_Services[MAXNICK] = "NeoStats";
-const char version[] = "NeoStats-2.5_Alpha1";
+const char version[] = "NeoStats-2.5_Alpha2";
 const char version_date[] = __DATE__;
 const char version_time[] = __TIME__;
 
@@ -125,8 +125,12 @@ RETSIGTYPE serv_segv() {
 		notice(me.name, "Oh Damn, Module %s Segv'd, Unloading Module", segvinmodule);
 		strcpy(name, segvinmodule);
 		strcpy(segvinmodule, "");
+#ifndef DEBUG
 		unload_module(name, NULL);
 		longjmp(sigvbuf, -1);
+#else
+		exit(-1);
+#endif
 	} else {	
 		/* Thanks to Stskeeps and Unreal for this stuff :) */
 		log("Uh Oh, Segmentation Fault.. Server Terminating");

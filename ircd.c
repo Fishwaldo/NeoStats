@@ -240,12 +240,13 @@ int del_bot(char *nick, char *reason)
 void Module_Event(char *event, void *data) {
 	Module *module_ptr;
 	EventFnList *ev_list;
-
+	hscan_t ms;
+	hnode_t *mn;
 
 	segv_location = sstrdup("Module_Event");
-	module_ptr = module_list->next;
-	while (module_ptr != NULL) {
-		/* this goes through each Module */
+	hash_scan_begin(&ms, mh);
+	while ((mn = hash_scan_next(&ms)) != NULL) {
+		module_ptr = hnode_get(mn);
 		ev_list = module_ptr->other_funcs;
 		while (ev_list->cmd_name != NULL) {
 			/* This goes through each Command */
@@ -255,7 +256,6 @@ void Module_Event(char *event, void *data) {
 #endif
 					segv_location = sstrdup(module_ptr->info->module_name);
 					strcpy(segvinmodule, module_ptr->info->module_name);
-printf("%s\n", segvinmodule);
 					if (setjmp(sigvbuf) == 0) {
 						ev_list->function(data);			
 					} else {
@@ -267,7 +267,6 @@ printf("%s\n", segvinmodule);
 			}
 		ev_list++;
 		}	
-	module_ptr = module_ptr->next;
 	}
 
 }
@@ -279,7 +278,9 @@ void parse(char *line)
 	Module *module_ptr;
 	Functions *fn_list;
 	Mod_User *list;
-	
+	hscan_t ms;
+	hnode_t *mn;
+		
 	segv_location = sstrdup("parse");
 	strip(line);
 	strcpy(recbuf, line);
@@ -364,9 +365,9 @@ void parse(char *line)
 	}
 	/* K, now Parse it to the Module functions */
 	segv_location = sstrdup("Parse - Module Functions");
-	module_ptr = module_list->next;
-	while (module_ptr != NULL) {
-		/* this goes through each Module */
+	hash_scan_begin(&ms, mh);
+	while ((mn = hash_scan_next(&ms)) != NULL) {
+		module_ptr = hnode_get(mn);
 		fn_list = module_ptr->function_list;
 		while (fn_list->cmd_name != NULL) {
 			/* This goes through each Command */
@@ -388,7 +389,6 @@ void parse(char *line)
 			}
 		fn_list++;
 		}	
-	module_ptr = module_ptr->next;
 	}
         	
 

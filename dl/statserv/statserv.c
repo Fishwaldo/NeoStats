@@ -843,7 +843,11 @@ static void ss_botlist(User *origuser)
         privmsg(origuser->nick, s_StatServ, "On-Line Bots:");
         for (i = 0; i < U_TABLE_SIZE; i++) {
                 for (u = userlist[i]; u; u = u->next) {
+#ifdef UNREAL
                         if (u->Umode & UMODE_BOT) {
+#elif ULTIMATE
+			if ((u->Umode & UMODE_RBOT) || (u->Umode & UMODE_SBOT)) {
+#endif
                                 j++;
                                 privmsg(origuser->nick, s_StatServ, "[%2d] %-15s %s",j, u->nick, u->server->name);
                                 continue;

@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.9 2002/02/27 11:15:16 fishwaldo Exp $
+** $Id: sock.c,v 1.10 2002/02/28 07:54:13 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -42,11 +42,12 @@ int ConnectTo(char *host, int port)
 void read_loop()
 {
 	register int i, j, SelectResult;
-	int k;
 	struct timeval TimeOut;
 	char c;
 	char buf[BUFSIZE];
 	Sock_List *mod_sock;
+	hscan_t ss;
+	hnode_t *sn;
 
 	while (1) {
 		segv_location = sstrdup("Read_Loop");
@@ -57,10 +58,10 @@ void read_loop()
 		TimeOut.tv_sec = 1;
 		TimeOut.tv_usec = 0;
 		FD_SET(servsock, &readfds);
-		for (k = 0; k < MAX_SOCKS; k++) {
-			for (mod_sock = Socket_lists[k]; mod_sock; mod_sock = mod_sock->next) {
-				FD_SET(mod_sock->sock_no, &readfds);
-			}
+		hash_scan_begin(&ss, sh);
+		while ((sn = hash_scan_next(&ss)) != NULL) {
+			mod_sock = hnode_get(sn);
+			FD_SET(mod_sock->sock_no, &readfds);
 		}
 		SelectResult = select(FD_SETSIZE, &readfds, &nullfds, &nullfds, &TimeOut);
 		if (SelectResult > 0) {
@@ -82,12 +83,11 @@ void read_loop()
 					}
 				} else {
 				/* this checks if there is any data waiting on a socket for a module */
-					for (k = 0; k < MAX_SOCKS; k++) {
-						for (mod_sock = Socket_lists[k]; mod_sock; mod_sock = mod_sock->next) {
-							if (FD_ISSET(mod_sock->sock_no, &readfds)) {
-								mod_sock->function();
-								break;
-							}
+					hash_scan_begin(&ss, sh);
+					while ((sn = hash_scan_next(&ss)) != NULL) {
+						mod_sock = hnode_get(sn);
+						if (FD_ISSET(mod_sock->sock_no, &readfds)) {
+							mod_sock->function();
 						}
 					}
 					break;

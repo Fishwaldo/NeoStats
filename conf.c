@@ -135,7 +135,6 @@ void cb_Server(char *arg, int configtype) {
 			memcpy(me.roots,arg, sizeof(me.roots));
 		} else if (configtype == 12) {
 			memcpy(me.modpath, arg, sizeof(me.modpath));
-			add_ld_path(me.modpath);
 		} else if (configtype == 13) {
 			me.onlyopers = 1;
 		}

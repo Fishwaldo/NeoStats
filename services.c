@@ -254,6 +254,9 @@ void servicesbot(char *nick, char *line) {
 extern void ns_shutdown(User *u, char *reason)
 {
 	Module *mod_ptr = NULL;
+	hscan_t ms;
+	hnode_t *mn;
+
 	segv_location = sstrdup("ns_shutdown");
 	if (strcasecmp(u->nick, s_Services)) {
 		if (!(UserLevel(u) >= 190)) {
@@ -263,16 +266,15 @@ extern void ns_shutdown(User *u, char *reason)
 		}
 	}
 	/* Unload the Modules */
-	mod_ptr = module_list->next;
-	while(mod_ptr != NULL) {
+	hash_scan_begin(&ms, mh);
+	while ((mn = hash_scan_next(&ms)) != NULL) {
+		mod_ptr = hnode_get(mn);
 		notice(s_Services,"Module %s Unloaded by %s",mod_ptr->info->module_name,u->nick);
 		unload_module(mod_ptr->info->module_name, u);
-		mod_ptr = module_list->next;
 	}
-	free(mod_ptr);
 
 
-		globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
+	globops(s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, reason);
 	sts(":%s QUIT :%s Sent SHUTDOWN: %s",s_Services,u->nick,reason);
 	sts("SQUIT %s",me.name);
 	sleep(1);
