@@ -66,11 +66,12 @@ UmodeMaskToString(long Umode)
 long
 UmodeStringToMask(char* UmodeString)
 {
+	int i;
 	int add = 0;
 	char tmpmode;
 	long Umode;
 
-	tmpmode = *(modes);
+	tmpmode = *(UmodeString);
 	while (tmpmode) {
 		switch (tmpmode) {
 		case '+':
@@ -92,7 +93,7 @@ UmodeStringToMask(char* UmodeString)
 				}
 			}
 		}
-		tmpmode = *modes++;
+		tmpmode = *UmodeString++;
 	}
 	return(Umode);
 }
