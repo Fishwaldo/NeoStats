@@ -47,6 +47,12 @@
 
 /* TCP connection management. */
 
+/* socket monitoring managemnet */
+void set_fdupdate(adns_state ads, fd_update myfdfunc) {
+    ads->fdfunc = myfdfunc;
+}
+
+
 static void tcp_close(adns_state ads) {
   int serv;
   
@@ -70,6 +76,11 @@ void adns__tcp_broken(adns_state ads, const char *what, const char *why) {
       qu->retries++;
   }
 
+/* EVNT: Delsock */
+    if (ads->fdfunc) 
+      ads->fdfunc(ads->tcpsocket, -1);
+      
+
   tcp_close(ads);
   ads->tcpstate= server_broken;
   ads->tcpserver= (serv+1)%ads->nservers;
@@ -80,6 +91,9 @@ static void tcp_connected(adns_state ads, struct timeval now) {
   
   adns__debug(ads,ads->tcpserver,0,"TCP connected");
   ads->tcpstate= server_ok;
+/* EVNT Read */
+    if (ads->fdfunc)
+      ads->fdfunc(ads->tcpsocket, POLLIN);
   for (qu= ads->tcpw.head; qu && ads->tcpstate == server_ok; qu= nqu) {
     nqu= qu->next;
     assert(qu->state == query_tcpw);
@@ -136,6 +150,10 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now) {
     if (r==0) { tcp_connected(ads,now); return; }
     if (errno == EWOULDBLOCK || errno == EINPROGRESS) {
       ads->tcptimeout= now;
+/* EVNT addsock write */
+            if (ads->fdfunc)
+              ads->fdfunc(ads->tcpsocket, POLLOUT);
+
       timevaladd(&ads->tcptimeout,TCPCONNMS);
       return;
     }

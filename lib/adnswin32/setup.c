@@ -540,6 +540,11 @@ static int init_finish(adns_state ads) {
 
   r= adns__setnonblock(ads,ads->udpsocket);
   if (r) { r= errno; goto x_closeudp; }
+    if (ads->fdfunc)
+      ads->fdfunc(ads->udpsocket, POLLIN);
+/* EVNT read */
+
+
   return 0;
 
  x_closeudp:
@@ -564,7 +569,7 @@ static void init_abort(adns_state ads) {
 
 }
 
-int adns_init(adns_state *ads_r, adns_initflags flags, FILE *diagfile) {
+int adns_init(adns_state *ads_r, adns_initflags flags, FILE *diagfile, fd_update func) {
   adns_state ads;
   const char *res_options, *adns_res_options;
   int r;
@@ -640,7 +645,7 @@ int adns_init(adns_state *ads_r, adns_initflags flags, FILE *diagfile) {
     init_abort(ads);
     return r;
   }
-
+  ads->fdfunc = func;
   r= init_finish(ads);
   if (r) return r;
 
@@ -679,8 +684,16 @@ void adns_finish(adns_state ads) {
     else if (ads->output.head) adns_cancel(ads->output.head);
     else break;
   }
+/* EVNT delsocket */
+    if (ads->fdfunc) 
+      ads->fdfunc(ads->udpsocket, -1);
+
   adns_socket_close(ads->udpsocket);
-  if (ads->tcpsocket >= 0) adns_socket_close(ads->tcpsocket);
+  if (ads->tcpsocket >= 0) { 
+      adns_socket_close(ads->tcpsocket);
+           if (ads->fdfunc) 
+               ads->fdfunc(ads->tcpsocket, -1);
+  }
   adns__vbuf_free(&ads->tcpsend);
   adns__vbuf_free(&ads->tcprecv);
   freesearchlist(ads);
