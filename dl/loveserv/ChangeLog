@@ -1,6 +1,9 @@
 Program: LoveServ Module for NeoStats 2.x ChangeLog
 Author:  Shmad <shmad@neostats.net>
 
+* Version 1.6 * July 25, 2002
+- Updated for new handlers
+
 * Version 1.5 * March 16, 2002
 - Code overhaul for NeoStats-2.5 core.
 - Fixed HELP sysetm not displaying command commands for techs
