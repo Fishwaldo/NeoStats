@@ -301,7 +301,6 @@ AX_PATH_LIB_CURL
 
 AC_DEFINE_UNQUOTED(NS_HOST, "$host_os", "Operating System Host")
 
-AC_SUBST(build_configtool)
 AC_SUBST(PROTOCOL)
 AC_SUBST(SED)
 AC_SUBST(LIBTOOL_DEPS)
