@@ -3,8 +3,10 @@
 /INSTALL -text
 /LICENCE -text
 /Makefile.in -text
+/README -text
 /TODO -text
 /Unreal.h -text
+/chans.c -text
 /conf.c -text
 /config.h.in -text
 /configure -text
@@ -53,9 +55,11 @@ doc/read-userman -text
 /dotconf.c -text
 /dotconf.h -text
 /ircd.c -text
+/ircdchk -text
 /linklist.h -text
 /main.c -text
 /ns_help.c -text
+/servers.c -text
 /services.c -text
 /sock.c -text
 /ss_help.c -text

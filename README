@@ -1,0 +1,63 @@
+Guys,
+this software is still Beta Mode, but is a lot more Stable that Beta 1 or
+Beta 1.1
+Module Status:
+--------------
+- StatServ now is almost fully functional, although some of the stats might be
+incorrect.
+- Spam is working like a dream
+- IcqServ now works, but is still under heavy development :)
+- Services havn't even been touched
+- version is a simple example of writting a Module
+
+the module.txt file in the dl directory is a bit outdated. Use it for
+reference only, but you want to find out more about the API (like specific
+Function calls, etc) then look at the statserv module as it contains almost
+all the Module API calls that are available. 
+
+I've verified it works with Unreal 2.1.7 and higher, so there should be no
+problems here. No one has come to us saying they want support for another
+IRCD, so its still only Unreal.
+it should work with Ultimate IRCD as well (based on Unreal and dreamforge)
+it might work with Elite - But who is stupid enough to pay for a IRCD
+nowdays anyway? (I bet Potvin isn't getting rich of that yet)
+
+Bugs:
+-----
+Still a few lerking around in the code. I've been concentrating on the Icq
+and Statserv modules of late, and have only been fixing bugs in the main
+code as I find them. I havn't gone on a extensive Bug hunting mission
+1. UMode support has been fixed up, but there is still one bug that I'm
+thinking on how to solve a the moment
+2. still a few memory leaks in the code somewhere, I'm slowly tracking them
+down.
+3. StatServ Daily commands are not correct
+4. Other StatServ Statistics might be questionable :)
+
+
+TODO:
+-----
+Hopefully for Beta3, the following will be done:
+1. Bug fixes!
+2. Updated Documentation. Some of the doco in this release was from version
+1.1.2 and hasn't been updated with the latest information
+3. if a NeoStats Bot gets killed, then Re-Init it automatically.
+4. Have StatServ back to what it was in 1.1.2 with a few new Features :)
+5. Get Shmads Modules updated and working with the Current version
+(Currently HostServ, which can Change your Hostname automatically, and
+LogServ, that logs Oper Kills, Splits etc on your network, and Mails (?) you
+the log each day)
+6. Portability. Shmad told me he would work on this. if it won't compile
+on your platform, send a email to shmad@neostats.net
+
+Currently, I expect that Beta 4 would be the last beta release before the
+full 2.0 comes out. Beta 3 is going to be finishing off features and so on,
+and beta 4 will be purely bug fixes and so on, no new features...
+
+Questions and Comments can be droped to me at fish@dynam.ac or ICQ 556010 or
+when I'm not travelling, you can sometimes find me at either
+canada.global-irc.net or irc.dynam.ac
+
+send me those bug reports!
+ 
+Fish
