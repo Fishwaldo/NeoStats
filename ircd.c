@@ -75,13 +75,8 @@ UmodeStringToMask(char* UmodeString)
 	while (tmpmode) {
 		for (i = 0; i < ircd_srv.umodecount; i++) {
 			if (usr_mds[i].mode == tmpmode) {
-				if (add) {
-					Umode |= usr_mds[i].umodes;
-					break;
-				} else {
-					Umode &= ~usr_mds[i].umodes;
-					break;
-				}
+				Umode |= usr_mds[i].umodes;
+				break;
 			}
 		}
 		tmpmode = *UmodeString++;
