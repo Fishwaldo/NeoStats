@@ -403,6 +403,8 @@ void *display_vhost(void *tbl, char *col, char *sql, void *row) {
 			return u->vhost;
 	}
 	return "*";	
+#else
+	return u->hostname;
 #endif
 }
 
