@@ -14,3 +14,4 @@ noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
 version.h:
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 
+include $(top_srcdir)/autotools/rules.mk

@@ -33,6 +33,7 @@ autotools/ltmain.sh -text
 autotools/missing -text
 autotools/mkinstalldirs -text
 autotools/rules.mk -text
+/ccdv.c -text
 /configure -text
 /configure.in -text
 /cronchk.in -text
@@ -352,12 +353,10 @@ lib/rta/README -text
 lib/rta/api.c -text
 lib/rta/do_sql.c -text
 lib/rta/do_sql.h -text
-lib/rta/parse.tab.c -text
 lib/rta/parse.tab.h -text
 lib/rta/parse.y -text
 lib/rta/rta.h -text
 lib/rta/rtatables.c -text
-lib/rta/token.c -text
 lib/rta/token.l -text
 lib/rtawin32/api.c -text
 lib/rtawin32/do_sql.c -text
