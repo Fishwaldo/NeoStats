@@ -512,7 +512,7 @@ m_server (char *origin, char **argv, int argc, int srv)
 	if(srv == 2) {
 		do_server (argv[0], origin, argv[1], NULL, argv[argc-1], 0);
 	} else {
-		do_server (base64toserver (argv[0]), origin, argv[1], NULL, argv[argc-1], srv);
+		do_server (argv[0], base64toserver (origin), argv[1], NULL, argv[argc-1], srv);
 	}
 	setserverbase64 (argv[0], argv[5]);
 }
