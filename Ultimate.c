@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Ultimate.c,v 1.36 2003/01/23 10:53:38 fishwaldo Exp $
+** $Id: Ultimate.c,v 1.37 2003/01/29 10:07:24 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -59,8 +59,8 @@ aCtab cFlagTab[] = {
 
 #ifdef ULTIMATE3
 Oper_Modes usr_mds[] = {
-				 {UMODE_OPER, 'O', 50},
-                                 {UMODE_LOCOP, 'o', 40},
+				 {UMODE_OPER, 'o', 50},
+                                 {UMODE_LOCOP, 'O', 40},
                                  {UMODE_INVISIBLE, 'i', 0},
                                  {UMODE_WALLOP, 'w', 0},
                                  {UMODE_SERVNOTICE, 's', 0},
