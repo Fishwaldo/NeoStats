@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Fix SET RECVQ. (M)
+ - More work on ossocket layer. (M)
  - Fix bug 221: crash when no command after ! in channel commands. (M)
  - Retire mystic, liquid, neoircd, quantum and viagra to graveyard. (M)
  - Update userhostmask/uservhostmask after nick change to keep current (D)

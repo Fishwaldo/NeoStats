@@ -1455,6 +1455,7 @@ EXPORTFUNC int os_sock_close( OS_SOCKET sock );
 EXPORTFUNC int os_sock_write( OS_SOCKET s, const char *buf, int len );
 EXPORTFUNC int os_sock_read( OS_SOCKET s, char *buf, int len );
 EXPORTFUNC int os_sock_set_nonblocking( OS_SOCKET s );
+int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen );
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );
 EXPORTFUNC void *os_memcpy( void *dest, const void *src, size_t count );

@@ -103,7 +103,6 @@ error_from_ircd_socket(int what, void *data) {
 static int
 ConnectTo (char *host, int port)
 {
-	int ret;
 	struct hostent *hp;
 	struct sockaddr_in sa;
 	int s;
@@ -123,7 +122,6 @@ ConnectTo (char *host, int port)
 	if ((hp = gethostbyname (host)) == NULL) {
 		return NS_FAILURE;
 	}
-
 	if ((s = (int)socket (AF_INET, SOCK_STREAM, 0)) < 0) {
 		ns_free(hp);
 		return NS_FAILURE;
@@ -133,17 +131,12 @@ ConnectTo (char *host, int port)
 			nlog (LOG_WARNING, "bind(): Warning, Couldn't bind to IP address %s", strerror (errno));
 		}
 	}
-
 	memset (&sa, 0, sizeof (sa));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons (port);
 	memcpy ((char *) &sa.sin_addr, hp->h_addr, hp->h_length);
-
-	ret=connect (s, (struct sockaddr *) &sa, sizeof (sa));
-	if (ret< 0) {
-#ifdef WIN32
-		nlog (LOG_ERROR, "Winsock error: %d", WSAGetLastError());
-#endif
+	if( os_sock_connect( s, ( struct sockaddr * ) &sa, sizeof( sa ) ) != 0 ) 
+	{
 		os_sock_close (s);
 		return NS_FAILURE;
 	}
@@ -306,26 +299,16 @@ sock_connect (int socktype, struct in_addr ip, int port)
 
 	/* set non blocking */
 
-#ifndef WIN32
 	if ((i = os_sock_set_nonblocking (s)) < 0) {
 		nlog (LOG_CRITICAL, "can't set socket %d(%s) non-blocking: %s", s, GET_CUR_MODNAME(), strerror (i));
 		return NS_FAILURE;
 	}
-#endif
 	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flags, sizeof(flags));
-	
-	if ((i = connect (s, (struct sockaddr *) &sa, sizeof (sa))) < 0) {
-#ifdef WIN32
-		errno =  WSAGetLastError();
-#endif
-		switch (errno) {
-		case EINPROGRESS:
-			break;
-		default:
-			nlog (LOG_WARNING, "Socket %d(%s) cant connect %s", s, GET_CUR_MODNAME(), strerror (errno));
-			os_sock_close (s);
-			return NS_FAILURE;
-		}
+	if( os_sock_connect( s, ( struct sockaddr * ) &sa, sizeof( sa ) ) != 0 ) 
+	{
+		nlog (LOG_WARNING, "Socket %d(%s) cant connect %s", s, GET_CUR_MODNAME(), strerror (errno));
+		os_sock_close (s);
+		return NS_FAILURE;
 	}
 
 	return s;
@@ -636,9 +619,6 @@ add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockc
 	Sock *sock;
 	sock = add_buffered_socket(sock_name, socknum, linemode_read, socket_linemode_write_done, socket_linemode_error, arg);
 	if (sock) {
-		if (nsconfig.recvq < 1024) {
-			nsconfig.recvq = 1024;
-		}
 		sock->sfunc.linemode.readbuf = os_malloc(nsconfig.recvq);
 		sock->sfunc.linemode.recvq = nsconfig.recvq;
 		sock->sfunc.linemode.funccb = readcb;
