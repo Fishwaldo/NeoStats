@@ -131,36 +131,7 @@ DelServer (const char *name, const char* reason)
 	free (s);
 }
 
-#ifdef BASE64NICKNAME
-void
-setservernumeric (const char *name, const char* num)
-{
-	Server *s;
-
-	s = findserver(name);
-	if(s) {
-		nlog (LOG_DEBUG1, LOG_CORE, "setservernumeric: setting %s to %s", name, num);
-		strlcpy(s->name64, num, 3);
-	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "setservernumeric: cannot find %s for %s", name, num);
-	}
-}
-
-char* 
-getnumfromserver(const char* server)
-{
-	Server *s;
-
-	nlog (LOG_DEBUG1, LOG_CORE, "getnumfromserver: scanning for %s", server);
-	s = findserver(server);
-	if(s) {
-		return s->name64;
-	} else {
-		nlog (LOG_DEBUG1, LOG_CORE, "getnumfromserver: cannot find %s", server);
-	}
-	return NULL;
-}
-
+#ifdef BASE64SERVERNAME
 Server *
 findserverbase64 (const char *num)
 {
@@ -168,11 +139,10 @@ findserverbase64 (const char *num)
 	hscan_t ss;
 	hnode_t *sn;
 
-	nlog (LOG_DEBUG1, LOG_CORE, "findserverbase64: scanning for %s", num);
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		if(strncmp(s->name64, num, 2) == 0) {
+		if(strncmp(s->name64, num, BASE64SERVERSIZE) == 0) {
 			nlog (LOG_DEBUG1, LOG_CORE, "findserverbase64: %s -> %s", num, s->name);
 			return s;
 		}
@@ -180,7 +150,6 @@ findserverbase64 (const char *num)
 	nlog (LOG_DEBUG3, LOG_CORE, "findserverbase64: %s not found!", num);
 	return NULL;
 }
-
 #endif
 
 Server *
@@ -195,11 +164,7 @@ findserver (const char *name)
 		return s;
 	}
 	nlog (LOG_DEBUG3, LOG_CORE, "findserver: %s not found!", name);
-#ifdef BASE64NICKNAME
-	return findserverbase64 (name);
-#else
 	return NULL;
-#endif
 }
 
 void

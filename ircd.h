@@ -219,4 +219,15 @@ int ssmo_cmd (const char *from, const char *umodetarget, const char *msg);
 
 void send_cmd (char *fmt, ...) __attribute__((format(printf,1,2))); /* 2=format 3=params */
 
+#ifdef BASE64SERVERNAME
+void setserverbase64 (const char *name, const char* num);
+char* servertobase64 (const char* name);
+char* base64toserver (const char* num);
+#endif
+#ifdef BASE64NICKNAME
+void setnickbase64 (const char *nick, const char* num);
+char* nicktobase64 (const char* nick);
+char* base64tonick (const char* num);
+#endif
+
 #endif

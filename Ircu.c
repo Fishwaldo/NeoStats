@@ -34,6 +34,7 @@
 void process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac);
 int splitbuf (char *buf, char ***argv, int colon_special);
 
+static void ircu_m_private (char *origin, char **argv, int argc, int srv);
 static void m_version (char *origin, char **argv, int argc, int srv);
 static void m_motd (char *origin, char **argv, int argc, int srv);
 static void m_admin (char *origin, char **argv, int argc, int srv);
@@ -65,7 +66,7 @@ const char services_bot_modes[]= "+iok";
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
 	/* Command      Function                srvmsg */
-	{MSG_PRIVATE, TOK_PRIVATE, m_private, 0},
+	{MSG_PRIVATE, TOK_PRIVATE, ircu_m_private, 0},
 	{MSG_CPRIVMSG, TOK_CPRIVMSG, m_private, 0},
 	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
 	{MSG_CNOTICE, TOK_CNOTICE, m_notice, 0},
@@ -223,6 +224,17 @@ unsigned int base64toint(const char* s)
 	return i;
 }
 
+unsigned int base64toIP(const char* s)
+{
+	int max = 0;
+	unsigned int i = convert2n[(unsigned char) *s++];
+	while (*s) {
+		i <<= NUMNICKLOG;
+		i += convert2n[(unsigned char) *s++];
+	}
+	return i;
+}
+
 const char* inttobase64(char* buf, unsigned int v, unsigned int count)
 {
 	buf[count] = '\0';  
@@ -279,7 +291,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 	inttobase64(neonumericbuf, neonumeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
     send_cmd ("%s %s 1 %lu %lu J10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neonumericbuf, infoline);
-	setservernumeric (name, neonumericbuf);
+	setserverbase64 (name, neonumericbuf);
 }
 
 void
@@ -326,7 +338,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 	
 	send_cmd ("%s %s %s 1 %lu %s %s %s %sAA%c :%s", neonumericbuf, TOK_NICK, nick, ts, ident, host, newmode, neonumericbuf, (neonickcount+'A'), realname);
 	snprintf(nicknumbuf, 6, "%sAA%c", neonumericbuf, (neonickcount+'A'));
-	setusernumeric (nick, nicknumbuf);
+	setnickbase64 (nick, nicknumbuf);
 	neonickcount ++;
 }
 
@@ -340,13 +352,13 @@ void
 send_umode (const char *who, const char *target, const char *mode)
 {
 /*	send_cmd (":%s %s %s :%s", who, TOK_MODE, target, mode);*/
-	send_cmd ("%s %s %s :%s", getnumfromnick(who), TOK_MODE, target, mode);
+	send_cmd ("%s %s %s :%s", nicktobase64 (who), TOK_MODE, target, mode);
 }
 
 void 
 send_numeric (const char *from, const int numeric, const char *target, const char *buf)
 {
-	send_cmd ("%s %d %s :%s", neonumericbuf, numeric, getnumfromnick(target), buf);
+	send_cmd ("%s %d %s :%s", neonumericbuf, numeric, nicktobase64 (target), buf);
 }
 
 void
@@ -358,7 +370,7 @@ send_pong (const char *reply)
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", from, TOK_KILL, target, reason);
+	send_cmd ("%s %s %s :%s", neonumericbuf, TOK_KILL, nicktobase64 (target), reason);
 }
 
 void 
@@ -370,20 +382,21 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 void
 send_invite (const char *from, const char *to, const char *chan) 
 {
-	send_cmd ("%s %s %s %s", getnumfromnick(from), TOK_INVITE, to, chan);
+	send_cmd ("%s %s %s %s", nicktobase64 (from), TOK_INVITE, to, chan);
 }
 
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	send_cmd ("%s %s %s %s :%s", getnumfromnick(who), TOK_KICK, chan, getnumfromnick(target), (reason ? reason : "No Reason Given"));
+	send_cmd ("%s %s %s %s :%s", nicktobase64 (who), TOK_KICK, chan, nicktobase64 (target), (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	send_cmd (":%s %s :%s", who, TOK_WALLOPS, buf);
+//send_cmd ("%s %s :%s", <function to get user or server numeric>(who), TOK_WALLUSERS, buf);
 }
+
 
 void
 send_end_of_burst_ack(void)
@@ -430,20 +443,20 @@ send_privmsg (const char *from, const char *to, const char *buf)
 	if(to[0] == '#') {
 		send_cmd (":%s %s %s :%s", from, TOK_PRIVATE, to, buf);
 	} else {
-		send_cmd ("%s %s %s :%s", getnumfromnick(from), TOK_PRIVATE, getnumfromnick(to), buf);
+		send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_PRIVATE, nicktobase64 (to), buf);
 	}
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	send_cmd ("%s %s %s :%s", getnumfromnick(from), TOK_NOTICE, getnumfromnick(to), buf);
+	send_cmd ("%s %s %s :%s", nicktobase64 (from), TOK_NOTICE, nicktobase64 (to), buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-//	send_cmd (":%s %s :%s", from, TOK_GLOBOPS, buf);
+//send_cmd ("%s %s :%s", <function to get user or server numeric>(from), TOK_WALLOPS, buf);
 }
 
 
@@ -488,8 +501,12 @@ m_admin (char *origin, char **argv, int argc, int srv)
 static void
 m_server (char *origin, char **argv, int argc, int srv)
 {
-	do_server (argv[0], origin, argv[1], NULL, argv[argc-1], srv);
-	setservernumeric (argv[0], argv[5]);
+	if(srv == 2) {
+		do_server (argv[0], origin, argv[1], NULL, argv[argc-1], 0);
+	} else {
+		do_server (base64toserver (argv[0]), origin, argv[1], NULL, argv[argc-1], srv);
+	}
+	setserverbase64 (argv[0], argv[5]);
 }
 
 /* R: AB SQ mark.local.org 0 :Ping timeout */
@@ -497,16 +514,13 @@ m_server (char *origin, char **argv, int argc, int srv)
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-	do_squit (argv[0], argv[2]);
+	do_squit (base64toserver(argv[0]), argv[2]);
 }
 
 static void
 m_quit (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 0);
-	do_quit (origin, tmpbuf);
-	free(tmpbuf);
+	do_quit (base64tonick(origin), argv[0]);
 }
 
 /* R: ABAAE M Mark :+i */
@@ -516,7 +530,7 @@ static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
 	if (argv[0][0] == '#') {
-		do_mode_channel (origin, argv, argc);
+		do_mode_channel (base64tonick(origin), argv, argc);
 	} else {
 		do_mode_user (argv[0], argv[1]);
 	}
@@ -524,17 +538,17 @@ m_mode (char *origin, char **argv, int argc, int srv)
 static void
 m_kill (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	do_kill (argv[0], tmpbuf);
-	free(tmpbuf);
+	char* num = base64tonick(argv[0]);
+	if(num) {
+		do_kill (num, argv[1]);
+	}
 }
 
 /* R: AB G !1076065765.431368 stats.mark.net 1076065765.431368 */
 static void
 m_pong (char *origin, char **argv, int argc, int srv)
 {
-	do_pong (argv[0], argv[1]);
+	do_pong (base64toserver(argv[0]), argv[1]);
 }
 
 static void
@@ -544,10 +558,10 @@ m_away (char *origin, char **argv, int argc, int srv)
 
 	if (argc > 0) {
 		buf = joinbuf (argv, argc, 0);
-		do_away (origin, buf);
+		do_away (base64tonick(origin), buf);
 		free (buf);
 	} else {
-		do_away (origin, NULL);
+		do_away (base64tonick(origin), NULL);
 	}
 }
 
@@ -574,64 +588,57 @@ static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(argc > 2) {
-		char IPAddress[32]; /* argv[argc-3] */
-		unsigned long IP = base64toint(argv[argc-3]);
+		char IPAddress[32];
+		unsigned long IP;
+
+		IP = base64toIP(argv[argc-3]);
 		ircsnprintf( IPAddress, 32, "%lu", IP);
 
 		/*       nick,    hopcount, TS,     user,    host, */       
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes*/
-			origin, IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
+			base64toserver(origin), IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
 			NULL, argv[argc-1], argv[argc-2]);
 	} else {
-		do_nickchange (origin, argv[0], NULL);
+		do_nickchange (base64tonick(origin), argv[0], argv[1]);
 	}
 }
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf (argv, argc, 2);
-	do_topic (argv[0], origin, NULL, tmpbuf);
-	free (tmpbuf);
+	do_topic (argv[0], origin, NULL, argv[2]);
 }
 
 static void
 m_kick (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 2);
-	do_kick (origin, argv[0], argv[1], tmpbuf);
-	free(tmpbuf);
+	do_kick (base64tonick(origin), argv[0], base64tonick(argv[1]), argv[2]);
 }
 
 /* R: ABAAE C #chan 1076069009 */
 static void
 m_create (char *origin, char **argv, int argc, int srv)
 {
-	do_join (origin, argv[0], argv[1]);
+	do_join (base64tonick(origin), argv[0], argv[1]);
 }
 
 static void
 m_join (char *origin, char **argv, int argc, int srv)
 {
-	do_join (origin, argv[0], argv[1]);
+	do_join (base64tonick(origin), argv[0], argv[1]);
 }
 
 static void
 m_part (char *origin, char **argv, int argc, int srv)
 {
-	char *tmpbuf;
-	tmpbuf = joinbuf(argv, argc, 1);
-	do_part (origin, argv[0], tmpbuf);
-	free(tmpbuf);
+	do_part (base64tonick(origin), argv[0], argv[1]);
 }
 
 static void
 m_ping (char *origin, char **argv, int argc, int srv)
 {
-	do_ping (argv[0], argv[1]);
+	do_ping (base64toserver(origin), argv[1]);
 }
 
 static void
@@ -662,14 +669,14 @@ m_burst (char *origin, char **argv, int argc, int srv)
 		t = s + strcspn (s, ",");
 		if (*t)
 			*t++ = 0;
-		do_join (s, argv[0], NULL);
+		do_join (base64tonick(s), argv[0], NULL);
 		if(argv[0][5] == ':') {
 			modechar = argv[0][6];
 		}
 		if(modechar) {
 			char **av;
 			int ac;
-			ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", s, modechar, argv[0]);
+			ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", base64tonick(s), modechar, argv[0]);
 			ac = split_buf (ircd_buf, &av, 0);
 			ChanMode (me.name, av, ac);
 			free (av);
@@ -681,7 +688,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 static void
 m_end_of_burst (char *origin, char **argv, int argc, int srv)
 {
-	if(strcmp(origin, getnumfromserver (me.uplink)) ==0) {
+	if(strcmp(base64toserver(origin), me.uplink) == 0) {
 		send_end_of_burst_ack();
 	}
 }
@@ -719,7 +726,7 @@ parse (char *line)
 		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
 		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", coreLine);
 		ac = splitbuf(coreLine, &av, 1);
-		cmdptr = 0;
+		cmdptr = 2;
 		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
 		/* really needs to be in AddServer since this is a NeoStats wide bug
 		 if config uplink name does not match our uplinks server name we can
@@ -749,4 +756,22 @@ parse (char *line)
 	process_ircd_cmd (cmdptr, cmd, origin, av, ac);
 	nlog (LOG_DEBUG1, LOG_CORE, "================================================================");
 	if(av) free (av);
+}
+
+
+static void 
+ircu_m_private (char *origin, char **argv, int argc, int srv)
+{
+	char **av;
+	int ac = 0;
+	int i;
+	char* nick = base64tonick(argv[0]);
+	
+	AddStringToList (&av, nick, &ac);
+	for(i = 1; i < argc; i++) {
+		AddStringToList (&av, argv[i], &ac);
+	}
+	m_private (base64tonick(origin), av, ac, srv);
+	free (av);
+
 }

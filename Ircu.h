@@ -81,6 +81,9 @@
 #define CHANLEN			(50 + 1)
 #define TOPICLEN		(250 + 1)
 
+#define BASE64SERVERSIZE	2
+#define BASE64NICKSIZE		5
+
 /* Messages/Tokens */
 
 #define MSG_PRIVATE             "PRIVMSG"       /* PRIV */

@@ -220,7 +220,7 @@ join_bot_to_chan (const char *who, const char *chan, unsigned long chflag)
 	sjoin_cmd(who, chan);
 	if(chflag == CMODE_CHANOP || chflag == CMODE_CHANADMIN)
 #if defined(IRCU)
-		schmode_cmd(who, chan, "+o", getnumfromnick(who));
+		schmode_cmd(who, chan, "+o", nicktobase64 (who));
 #else
 		schmode_cmd(who, chan, "+o", who);
 #endif
@@ -247,7 +247,7 @@ signon_newbot (const char *nick, const char *user, const char *host, const char 
 #else
 		sjoin_cmd (nick, me.chan);
 #if defined(IRCU)
-		schmode_cmd(nick, me.chan, "+o", getnumfromnick(nick));
+		schmode_cmd(nick, me.chan, "+o", nicktobase64 (nick));
 #else
 		schmode_cmd(nick, me.chan, "+o", nick);
 #endif
@@ -1834,3 +1834,98 @@ send_cmd (char *fmt, ...)
 	buflen = strnlen (buf, BUFSIZE);
 	sts (buf, buflen);
 }
+
+#ifdef BASE64SERVERNAME
+
+void
+setserverbase64 (const char *name, const char* num)
+{
+	Server *s;
+
+	s = findserver(name);
+	if(s) {
+		nlog (LOG_DEBUG1, LOG_CORE, "setserverbase64: setting %s to %s", name, num);
+		strlcpy(s->name64, num, 6);
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "setserverbase64: cannot find %s for %s", name, num);
+	}
+}
+
+char* 
+servertobase64 (const char* name)
+{
+	Server *s;
+
+	nlog (LOG_DEBUG1, LOG_CORE, "servertobase64: scanning for %s", name);
+	s = findserver(name);
+	if(s) {
+		return s->name64;
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "servertobase64: cannot find %s", name);
+	}
+	return NULL;
+}
+
+char* 
+base64toserver (const char* num)
+{
+	Server *s;
+
+	nlog (LOG_DEBUG1, LOG_CORE, "base64toserver: scanning for %s", num);
+	s = findserverbase64(num);
+	if(s) {
+		return s->name;
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "base64toserver: cannot find %s", num);
+	}
+	return NULL;
+}
+
+#endif
+
+#ifdef BASE64NICKNAME
+void
+setnickbase64 (const char *nick, const char* num)
+{
+	User *u;
+
+	u = finduser(nick);
+	if(u) {
+		nlog (LOG_DEBUG1, LOG_CORE, "setnickbase64: setting %s to %s", nick, num);
+		strlcpy(u->nick64, num, B64SIZE);
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "setnickbase64: cannot find %s for %s", nick, num);
+	}
+}
+
+char* 
+nicktobase64 (const char* nick)
+{
+	User *u;
+
+	nlog (LOG_DEBUG1, LOG_CORE, "nicktobase64: scanning for %s", nick);
+	u = finduser(nick);
+	if(u) {
+		return u->nick64;
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "nicktobase64: cannot find %s", nick);
+	}
+	return NULL;
+}
+
+char* 
+base64tonick (const char* num)
+{
+	User *u;
+
+	nlog (LOG_DEBUG1, LOG_CORE, "base64tonick: scanning for %s", num);
+	u = finduserbase64(num);
+	if(u) {
+		return u->nick;
+	} else {
+		nlog (LOG_DEBUG1, LOG_CORE, "base64tonick: cannot find %s", num);
+	}
+	return NULL;
+}
+
+#endif

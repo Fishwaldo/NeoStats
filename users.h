@@ -40,8 +40,7 @@ void DelUser (const char *nick, int killflag, const char *reason);
 int InitExtAuth(void);
 void FreeUsers();
 #ifdef BASE64NICKNAME
-void setusernumeric (const char *nick, const char* num);
-char* getnumfromnick(const char* nick);
+User *finduserbase64 (const char *num);
 #endif
 
 #endif /* _USERS_H_ */
