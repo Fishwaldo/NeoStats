@@ -120,7 +120,7 @@ void LoadStats()
 
     memset(buf, '\0', BUFSIZE);
     while (fgets(buf, BUFSIZE, fp)) {
-        s = smalloc(sizeof(SStats));
+        s = malloc(sizeof(SStats));
         name = strtok(buf, " ");
         numsplits = strtok(NULL, " ");
         maxusers = strtok(NULL, " ");
@@ -167,20 +167,20 @@ void LoadStats()
     if ((fp = fopen("data/cstats.db", "r")) == NULL)
     	return;
     memset(buf, '\0', BUFSIZE);
-    name = smalloc(CHANLEN);
-    topics = smalloc(BUFSIZE);
-    totmem = smalloc(BUFSIZE);
-    kicks = smalloc(BUFSIZE);
-    joins = smalloc(BUFSIZE);
-    lastseen = smalloc(BUFSIZE);
-    maxmems = smalloc(BUFSIZE);
-    t_maxmems = smalloc(BUFSIZE);
-    maxkicks = smalloc(BUFSIZE);
-    t_maxkicks = smalloc(BUFSIZE);
-    maxjoins = smalloc(BUFSIZE);
-    t_maxjoins = smalloc(BUFSIZE);
+    name = malloc(CHANLEN);
+    topics = malloc(BUFSIZE);
+    totmem = malloc(BUFSIZE);
+    kicks = malloc(BUFSIZE);
+    joins = malloc(BUFSIZE);
+    lastseen = malloc(BUFSIZE);
+    maxmems = malloc(BUFSIZE);
+    t_maxmems = malloc(BUFSIZE);
+    maxkicks = malloc(BUFSIZE);
+    t_maxkicks = malloc(BUFSIZE);
+    maxjoins = malloc(BUFSIZE);
+    t_maxjoins = malloc(BUFSIZE);
     while (fgets(buf, BUFSIZE, fp)) {
-        c = smalloc(sizeof(CStats));
+        c = malloc(sizeof(CStats));
         count = sscanf(buf, "%s %s %s %s %s %s %s %s %s %s %s\n", name, topics, totmem, kicks, lastseen, maxmems, t_maxmems, maxkicks, t_maxkicks, maxjoins, t_maxjoins);
         strcpy(c->name, name);
         c->topics = atol(topics);

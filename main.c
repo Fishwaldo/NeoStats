@@ -249,24 +249,6 @@ void login()
 }
 
 
-void *smalloc(long size)
-{
-	void *buf;
-	
-	strcpy(segv_location, "smalloc");
-	if (!size) {
-		log("smalloc(): illegal attempt to allocate 0 bytes!");
-		size = 1;
-	}
-	buf = malloc(size);
-	if (!buf) {
-		log("smalloc(): out of memory.");
-		exit(0);
-	}
-/*	free(segv_location); */
-	return buf;
-}
-
 char *sstrdup(const char *s)
 {
 	char *t = strdup(s);

@@ -39,7 +39,7 @@ static Mod_Timer *new_timer(char *timer_name)
 #ifdef DEBUG
 	log("New Timer: %s", timer_name);
 #endif
-	t = smalloc(sizeof(Mod_Timer));
+	t = malloc(sizeof(Mod_Timer));
 	if (!timer_name)
 		timer_name="";
 	t->timername = timer_name;	
@@ -126,7 +126,7 @@ static Sock_List *new_sock(char *sock_name)
 #ifdef DEBUG	
 	log("New Socket: %s", sock_name);
 #endif	
-	s = smalloc(sizeof(Sock_List));
+	s = malloc(sizeof(Sock_List));
 	if (!sock_name)
 		sock_name="";
 	s->sockname = sock_name;	
@@ -212,7 +212,7 @@ static Mod_User *new_bot(char *bot_name)
 #ifdef DEBUG	
 	log("New Bot: %s", bot_name);
 #endif
-	u = smalloc(sizeof(Mod_User));
+	u = malloc(sizeof(Mod_User));
 	if (!bot_name)
 		bot_name="";
 	u->nick = sstrdup(bot_name);	
@@ -446,7 +446,7 @@ int load_module(char *path1, User *u) {
 			return -1;
 	}
 	
-	mod_ptr = (Module *)smalloc(sizeof(Module));
+	mod_ptr = (Module *)malloc(sizeof(Module));
 
 	mn = hnode_create(mod_ptr);
 	if (hash_isfull(mh)) {

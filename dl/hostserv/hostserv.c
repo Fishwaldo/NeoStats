@@ -318,7 +318,7 @@ void Loadhosts()
         load_synch = 1;
 		while (fgets(buf, BUFSIZE, fp)) {
             strip(buf);
-            map = smalloc(sizeof(HS_Map));
+            map = malloc(sizeof(HS_Map));
 
             LoadArryCount = split_buf(buf, &LoadArry, 0);
             strcpy(map->nnick, LoadArry[0]);

@@ -576,7 +576,7 @@ void Srv_Sjoin(char *origin, char **argv, int argc) {
 		for (i=0; i < ((sizeof(cFlagTab) / sizeof(cFlagTab[0])) -1);i++) {
 			if (*modes == cFlagTab[i].flag) {
 				if (cFlagTab[i].parameters) {
-					m = smalloc(sizeof(ModesParm));
+					m = malloc(sizeof(ModesParm));
 					m->mode = cFlagTab[i].mode;
 					strcpy(m->param, argv[j]);										
 					mn = lnode_create(m);

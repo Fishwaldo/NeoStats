@@ -115,7 +115,7 @@ void LoadTLD()
 
         if ((tmp2 = strchr(buf2, '\n')))    *tmp2 = '\0';
 
-        t = smalloc(sizeof(TLD));
+        t = malloc(sizeof(TLD));
         t->users = 0;
         t->country = sstrdup(buf2);
         memcpy(t->tld, tmp, sizeof(t->tld));

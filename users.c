@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.28 2002/03/26 04:26:36 fishwaldo Exp $
+** $Id: users.c,v 1.29 2002/06/04 13:16:57 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -40,7 +40,7 @@ User *new_user(const char *nick)
 		notice(me.name,"Eeeeek, Users table is corrupted! Continuing but expect a crash!");
 		log("Eeek, Users table is corrupted!");
 	}
-	u = smalloc(sizeof(User));
+	u = malloc(sizeof(User));
 	if (!nick)
 		nick = "";
 	memcpy(u->nick, nick, MAXNICK);

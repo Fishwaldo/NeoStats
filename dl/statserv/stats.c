@@ -126,7 +126,7 @@ CStats *AddChanStats(char *name) {
 	CStats *cs;
 	lnode_t *cn;
 
-	cs = smalloc(sizeof(CStats));
+	cs = malloc(sizeof(CStats));
 	strcpy(cs->name, name);
 	cs->members = 0;
 	cs->topics = 0;

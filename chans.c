@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.19 2002/05/21 04:57:36 fishwaldo Exp $
+** $Id: chans.c,v 1.20 2002/06/04 13:16:57 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -68,7 +68,7 @@ int ChanMode(char *origin, char **av, int ac) {
 									j++;
 								} else {	
 									if (cFlagTab[i].parameters) {
-										m = smalloc(sizeof(ModesParm));
+										m = malloc(sizeof(ModesParm));
 										m->mode = cFlagTab[i].mode;
 										strcpy(m->param, av[j]);										
 										mn = lnode_create(m);
@@ -142,7 +142,7 @@ Chans *new_chan(char *chan) {
 	hnode_t *cn;
 
 	strcpy(segv_location, "new_chan");
-	c = smalloc(sizeof(Chans));
+	c = malloc(sizeof(Chans));
 	strcpy(c->name, chan);
 	cn = hnode_create(c);
 	if (hash_isfull(ch)) {
@@ -283,7 +283,7 @@ void join_chan(User *u, char *chan) {
 		Module_Event("NEWCHAN", c);
 	} 
 	/* add this users details to the channel members hash */	
-	cm = smalloc(sizeof(Chanmem));
+	cm = malloc(sizeof(Chanmem));
 	strcpy(cm->nick, u->nick);
 	cm->joint = time(NULL);
 	cm->flags = 0;
