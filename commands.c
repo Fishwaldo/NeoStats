@@ -615,7 +615,7 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 					"Valid values are %d to %d", set_ptr->min, set_ptr->max);
 				return 1;
 			}
-			*(int*)set_ptr->varptr = 1;
+			*(int*)set_ptr->varptr = intval;
 			SetConf((void *)intval, CFGINT, set_ptr->confitem);
 			chanalert(bot_ptr->nick, "%s set to %d by \2%s\2", 
 				set_ptr->option, intval, u->nick);
