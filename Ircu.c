@@ -227,7 +227,7 @@ void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
 	send_cmd ("%s %s", MSG_PASS, pass);
-    send_cmd ("%s %s 1 0 %lu P10 %cD] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), convert2y[numeric], name,  infoline);
+    send_cmd ("%s %s 1 %lu %lu P10 %cD] :[%s] %s\n", MSG_SERVER, name, (unsigned long)time(NULL), (unsigned long)time(NULL), convert2y[numeric], name,  infoline);
 }
 
 void
