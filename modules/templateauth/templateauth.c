@@ -21,7 +21,8 @@
 ** $Id: serviceroots.c 1721 2004-04-09 22:17:19Z Mark $
 */
 
-/** templateauth.c 
+/** TemplateAuth Module
+ *
  *  You can copy this file as a template for writing your own auth modules
  */
 
@@ -31,12 +32,14 @@
  */
 #include "neostats.h"
 
+/** Copyright info */
 const char *template_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Module info */
 ModuleInfo module_info = {
 	"TemplateAuth",
 	"Template Authentication Module",
@@ -51,21 +54,57 @@ ModuleInfo module_info = {
 	0,
 };
 
-int ModInit(Module* modptr)
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModInit (Module *modptr)
 {
-	return 1;
+	return NS_SUCCESS;
 }
 
-void ModFini()
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
+{
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
 {
 }
 
-int ModAuthUser(Client * u)
+/** @brief ModAuthUser
+ *
+ *  Lookup authentication level for user
+ *
+ *  @param pointer to user
+ *
+ *  @return authentication level for user
+ */
+
+int ModAuthUser (Client * u)
 {
 	return 0;
-}
-
-int ModAuthList(Client * u)
-{
-	return 1;
 }

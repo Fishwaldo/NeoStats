@@ -31,6 +31,21 @@
 */
 /* #define ENABLE_COLOUR_SUPPORT */
 
+/** local structures */
+struct cs_cfg { 
+	int sign_watch;
+	int kill_watch;
+	int mode_watch;
+	int nick_watch;
+	int serv_watch;
+	int use_exc;
+} cs_cfg;
+
+typedef struct ModeDef {
+	unsigned int mask;
+	unsigned int serverflag;
+}ModeDef;
+
 #ifndef ENABLE_COLOUR_SUPPORT
 static char msg_nickchange[]="\2NICK\2 %s (%s@%s) changed their nick to %s";
 static char msg_signon[]="\2SIGNON\2 %s (%s@%s - %s) has signed on at %s";
@@ -53,7 +68,7 @@ static char msg_mode_serv[]="\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\00
 static char msg_bot[]="\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
 #endif
 
-static int cs_event_online(CmdParams* cmdparams);
+/** Bot command function prototypes */
 static int cs_event_signon(CmdParams* cmdparams);
 static int cs_event_umode(CmdParams* cmdparams);
 static int cs_event_smode(CmdParams* cmdparams);
@@ -63,25 +78,20 @@ static int cs_event_nick(CmdParams* cmdparams);
 static int cs_event_server(CmdParams* cmdparams);
 static int cs_event_squit(CmdParams* cmdparams);
 
-struct cs_cfg { 
-	int sign_watch;
-	int kill_watch;
-	int mode_watch;
-	int nick_watch;
-	int serv_watch;
-	int use_exc;
-} cs_cfg;
-
+/** Bot pointer */
 static Bot *cs_bot;
 
+/** Module pointer */
 static Module* cs_module;
 
+/** Copyright info */
 const char *cs_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Module info */
 ModuleInfo module_info = {
 	"ConnectServ",
 	"Connection monitoring service",
@@ -95,6 +105,7 @@ ModuleInfo module_info = {
 	0,
 };
 
+/** Bot setting table */
 static bot_setting cs_settings[]=
 {
 	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, "SignWatch",	NULL,	cs_help_set_signwatch, NULL, (void*)1 },
@@ -106,6 +117,7 @@ static bot_setting cs_settings[]=
 	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
+/** BotInfo */
 static BotInfo cs_botinfo = 
 {
 	"ConnectServ", 
@@ -118,8 +130,8 @@ static BotInfo cs_botinfo =
 	cs_settings,
 };
 
+/** Module Events */
 ModuleEvent module_events[] = {
-	{EVENT_ONLINE,	cs_event_online},
 	{EVENT_SIGNON,	cs_event_signon},
 	{EVENT_UMODE,	cs_event_umode},
 	{EVENT_SMODE,	cs_event_smode},
@@ -130,11 +142,6 @@ ModuleEvent module_events[] = {
 	{EVENT_SQUIT,	cs_event_squit},
 	{EVENT_NULL,	NULL}
 };
-
-typedef struct ModeDef {
-	unsigned int mask;
-	unsigned int serverflag;
-}ModeDef;
 
 ModeDef OperUmodes[]=
 {
@@ -161,23 +168,52 @@ ModeDef OperSmodes[]=
 	{0, 0},
 };
 
-int ModInit(Module* mod_ptr)
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModInit (Module *mod_ptr)
 {
 	cs_module = mod_ptr;
 	ModuleConfig(cs_settings);
-	return 1;
+	return NS_SUCCESS;
 }
 
-void ModFini()
-{
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
 
-};
-
-static int cs_event_online(CmdParams* cmdparams)
+int ModSynch (void)
 {
 	cs_bot = init_bot (&cs_botinfo);
-	return 1;
-};
+	if (!cs_bot) {
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
+{
+}
 
 /* 
  * Echo signon

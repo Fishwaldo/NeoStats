@@ -21,15 +21,29 @@
 ** $Id$
 */
 
-#include <stdio.h>
 #include "neostats.h"
 
-static const char *ns_copyright[] = {
+/** ExtAuth Module
+ *
+ *  User authentication based on nick!user@host masking
+ */
+
+
+/** Access list struct */
+typedef struct AccessEntry{
+	char nick[MAXNICK];
+	char mask[MAXHOST];
+	int level;
+}AccessEntry;
+
+/** Copyright info */
+static const char *extauth_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Help text */
 const char *ea_help_access[] = {
 	"Syntax: \2ACCESS ADD <nick> <mask> <level>\2",
 	"        \2ACCESS DEL <nick>\2",
@@ -43,39 +57,55 @@ const char *ea_help_access[] = {
 
 const char ea_help_access_oneline[] = "Manage NeoStats user access list";
 
-static int AccessAdd(CmdParams* cmdparams);
-static int AccessDel(CmdParams* cmdparams);
-static int AccessList(CmdParams* cmdparams);
+/** Module info */
+ModuleInfo module_info = {
+	"ExtAuth",
+	"Access List Authentication Module",
+	extauth_copyright,
+	NULL,
+	NEOSTATS_VERSION,
+	CORE_MODULE_VERSION,
+	__DATE__,
+	__TIME__,
+	MODULE_FLAG_AUTH,
+	0,
+	0,
+};
 
-typedef struct NeoAccess{
-	char nick[MAXNICK];
-	char mask[MAXHOST];
-	int level;
-}NeoAccess;
-
+/** hash for storing access list */
 static hash_t *accesshash;
-static char confpath[CONFBUFSIZE];
+/** temporary buffer */
+static char buf[CONFBUFSIZE];
 
-static int LoadAccessList(void) 
+/** @brief LoadAccessList
+ *
+ *  Load access list 
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void LoadAccessList(void) 
 {
+	AccessEntry *access;
 	char **data, *tmp;
-	NeoAccess *access;
 	int i;
 	
 	SET_SEGV_LOCATION();
 	accesshash = hash_create(-1, 0, 0);
 	if (GetDir("AccessList", &data) > 0) {
 		for (i = 0; data[i] != NULL; i++) {	
-			access = malloc(sizeof(NeoAccess));
+			access = malloc(sizeof(AccessEntry));
 			strlcpy(access->nick, data[i], MAXNICK);
-			ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
-			if (GetConf((void *)&tmp, CFGSTR, confpath) <= 0) {
+			ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
+			if (GetConf((void *)&tmp, CFGSTR, buf) <= 0) {
 				free(access);
 			} else {
 				strlcpy(access->mask, tmp, MAXHOST);
 				free(tmp);
-				ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s/level", access->nick);
-				if (GetConf((void *)&access->level, CFGINT, confpath) <= 0) {
+				ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/level", access->nick);
+				if (GetConf((void *)&access->level, CFGINT, buf) <= 0) {
 					free(access);
 				} else {
 					hnode_create_insert (accesshash, access, access->nick);
@@ -86,13 +116,21 @@ static int LoadAccessList(void)
 			free(data);
 		}
 	}	
-	return 1;
 }
 
-static int AccessAdd(CmdParams* cmdparams) 
+/** @brief AccessAdd
+ *
+ *  Access ADD sub-command handler
+ *
+ *  @param cmdparam struct
+ *
+ *  @return NS_SUCCESS if suceeds else result of command
+ */
+
+static int AccessAdd (CmdParams* cmdparams) 
 {
 	int level = 0;
-	NeoAccess *access;
+	AccessEntry *access;
 	
 	SET_SEGV_LOCATION();
 	if (cmdparams->ac < 3) {
@@ -111,19 +149,28 @@ static int AccessAdd(CmdParams* cmdparams)
 		irc_prefmsg(NULL, cmdparams->source, "Level out of range. Valid values range from 0 to 200.");
 		return NS_ERR_PARAM_OUT_OF_RANGE;
 	}
-	access = malloc(sizeof(NeoAccess));
+	access = malloc(sizeof(AccessEntry));
 	strlcpy(access->nick, cmdparams->av[1], MAXNICK);
 	strlcpy(access->mask, cmdparams->av[2], MAXHOST);
 	access->level = level;
  	hnode_create_insert (accesshash, access, access->nick);
 	/* save the entry */
-	ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
-	SetConf((void *)access->mask, CFGSTR, confpath);
-	ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s/level", access->nick);
-	SetConf((void *)access->level, CFGINT, confpath);
+	ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/mask", access->nick);
+	SetConf((void *)access->mask, CFGSTR, buf);
+	ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s/level", access->nick);
+	SetConf((void *)access->level, CFGINT, buf);
 	irc_prefmsg(NULL, cmdparams->source, "Successfully added %s for host %s with level %d to access list", access->nick, access->mask, access->level);
 	return NS_SUCCESS;
 }
+
+/** @brief AccessDel
+ *
+ *  Access DEL sub-command handler
+ *
+ *  @param cmdparam struct
+ *
+ *  @return NS_SUCCESS if suceeds else result of command
+ */
 
 static int AccessDel(CmdParams* cmdparams) 
 {
@@ -138,8 +185,8 @@ static int AccessDel(CmdParams* cmdparams)
 		sfree(hnode_get(node));
 		hash_delete(accesshash, node);
 		hnode_destroy(node);
-		ircsnprintf(confpath, CONFBUFSIZE, "AccessList/%s", cmdparams->av[1]);
-		DelConf(confpath);
+		ircsnprintf(buf, CONFBUFSIZE, "AccessList/%s", cmdparams->av[1]);
+		DelConf(buf);
 		irc_prefmsg(NULL, cmdparams->source, "Deleted %s from Access List", cmdparams->av[1]);
 	} else {
 		irc_prefmsg(NULL, cmdparams->source, "Error, Could not find %s in access list.", cmdparams->av[1]);
@@ -147,11 +194,20 @@ static int AccessDel(CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
+/** @brief AccessList
+ *
+ *  Access LIST command handler
+ *
+ *  @param cmdparam struct
+ *
+ *  @return NS_SUCCESS if suceeds else result of command
+ */
+
 static int AccessList(CmdParams* cmdparams) 
 {
 	hscan_t accessscan;
 	hnode_t *node;
-	NeoAccess *access;
+	AccessEntry *access;
 
 	SET_SEGV_LOCATION();	
 	irc_prefmsg(NULL, cmdparams->source, "Access List (%d):", (int)hash_count(accesshash));
@@ -163,6 +219,15 @@ static int AccessList(CmdParams* cmdparams)
 	irc_prefmsg(NULL, cmdparams->source, "End of List.");	
 	return NS_SUCCESS;
 }
+
+/** @brief ea_cmd_access
+ *
+ *  Access command handler
+ *
+ *  @param cmdparam struct
+ *
+ *  @return NS_SUCCESS if suceeds else result of command
+ */
 
 static int ea_cmd_access(CmdParams* cmdparams)
 {
@@ -178,13 +243,75 @@ static int ea_cmd_access(CmdParams* cmdparams)
 	return NS_ERR_SYNTAX_ERROR;
 }
 
-static int GetAccessLevel(Client * u)
+/** Bot comand table */
+bot_cmd extauth_commands[]=
+{
+	{"ACCESS",	ea_cmd_access,	0,	NS_ULEVEL_ROOT, ea_help_access,	ea_help_access_oneline},
+	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
+};
+
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModInit (Module *modptr)
+{
+	LoadAccessList();
+	return NS_SUCCESS;
+}
+
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
+{
+	if (add_services_cmd_list (extauth_commands) != NS_SUCCESS) {
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
+{
+	del_services_cmd_list (extauth_commands);
+}
+
+/** @brief ModAuthUser
+ *
+ *  Lookup authentication level for user
+ *
+ *  @param pointer to user
+ *
+ *  @return authentication level for user
+ */
+
+int ModAuthUser (Client * u)
 {
 	static char hostmask[MAXHOST];
-	NeoAccess *access;
+	AccessEntry *access;
 
-	dlog (DEBUG2, "GetAccessLevel for %s", u->name);
-	access = (NeoAccess *)hnode_find (accesshash, u->name);
+	dlog (DEBUG2, "ModAuthUser for %s", u->name);
+	access = (AccessEntry *)hnode_find (accesshash, u->name);
 	if (access) {
 		ircsnprintf (hostmask, MAXHOST, "%s@%s", u->user->username, u->user->hostname);
 		if ((match (access->mask, hostmask))) {
@@ -192,51 +319,4 @@ static int GetAccessLevel(Client * u)
 		}
 	}		
 	return 0;
-}
-
-bot_cmd extauth_commands[]=
-{
-	{"ACCESS",	ea_cmd_access,	0,	NS_ULEVEL_ROOT, ea_help_access,	ea_help_access_oneline},
-	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
-};
-
-ModuleInfo module_info = {
-	"ExtAuth",
-	"Access List Authentication Module",
-	ns_copyright,
-	NULL,
-	NEOSTATS_VERSION,
-	CORE_MODULE_VERSION,
-	__DATE__,
-	__TIME__,
-	MODULE_FLAG_AUTH,
-	0,
-	0,
-};
-
-static int ea_event_online(CmdParams* cmdparams)
-{
-	add_services_cmd_list(extauth_commands);
-	return 1;
-};
-
-ModuleEvent module_events[] = {
-	{EVENT_ONLINE,	ea_event_online},
-	{EVENT_NULL,	NULL}
-};
-
-int ModInit(Module* modptr)
-{
-	LoadAccessList();
-	return 1;
-}
-
-void ModFini()
-{
-	del_services_cmd_list(extauth_commands);
-}
-
-int ModAuthUser(Client * u)
-{
-	return GetAccessLevel(u);
 }

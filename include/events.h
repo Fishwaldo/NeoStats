@@ -35,22 +35,14 @@ typedef enum Event {
  *    Generated in response to network events
  */
 
-/*  EVENT_ONLINE
- *    Called when NeoStats connects to the Network. 
- *    Can be used to init bots, and so on. 
- *    parameters:
- *      none
- */
-	EVENT_ONLINE = 0,
-
 /*  EVENT_NETINFO 
  *    Called when the connection to the network is synched. 
  *    parameters:
  *      none
  */
-	EVENT_NETINFO,
+	EVENT_NETINFO  = 0,
 
-/*  Network events 
+/*  Server events 
  *    Generated in response to server events
  */
 

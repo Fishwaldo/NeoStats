@@ -43,7 +43,6 @@ static int ss_clientversions(CmdParams* cmdparams);
 static int ss_forcehtml(CmdParams* cmdparams);
 
 static int ss_event_ctcpversion(CmdParams* cmdparams);
-static int ss_event_online(CmdParams* cmdparams);
 static int ss_event_pong(CmdParams* cmdparams);
 static int ss_event_away(CmdParams* cmdparams);
 static int ss_event_server(CmdParams* cmdparams);
@@ -62,11 +61,14 @@ static int ss_event_kick(CmdParams* cmdparams);
 
 static Client * listu;
 static int listindex = 0;
+/** Bot pointer */
 Bot *ss_bot;
+
+/** Module pointer */
 Module* ss_module;
 
+/** Module Events */
 ModuleEvent module_events[] = {
-	{EVENT_ONLINE,		ss_event_online,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_PONG,		ss_event_pong,		EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_SERVER,		ss_event_server,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_SQUIT,		ss_event_squit,		EVENT_FLAG_IGNORE_SYNCH},
@@ -86,12 +88,14 @@ ModuleEvent module_events[] = {
 	{EVENT_NULL,		NULL}
 };
 
+/** Copyright info */
 static const char *ns_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Module info */
 ModuleInfo module_info = {
 	"StatServ",
 	"Network statistical service",
@@ -105,6 +109,7 @@ ModuleInfo module_info = {
 	0,
 };
 
+/** Bot comand table */
 static bot_cmd ss_commands[]=
 {
 	{"SERVER",			ss_server,		0, 	0,		ss_help_server,		 	ss_help_server_oneline},
@@ -121,6 +126,7 @@ static bot_cmd ss_commands[]=
 	{NULL,				NULL,			0, 	0,					NULL, 					NULL}
 };
 
+/** Bot setting table */
 static bot_setting ss_settings[]=
 {
 	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "HTML_Enabled",NULL,		ss_help_set_html},
@@ -134,6 +140,7 @@ static bot_setting ss_settings[]=
 	{NULL,			NULL,					0,					0, 0,			0,				 NULL,			NULL,		NULL },
 };
 
+/** BotInfo */
 static BotInfo ss_botinfo = 
 {
 	"StatServ", 
@@ -146,20 +153,16 @@ static BotInfo ss_botinfo =
 	ss_settings,
 };
 
-static int ss_event_online(CmdParams* cmdparams)
-{
-	SET_SEGV_LOCATION();
-	ss_bot = init_bot (&ss_botinfo);
-	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_timer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
-	add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", 3600);
-	/* also add a timer to check if its midnight (to reset the daily stats */
-	add_timer (TIMER_TYPE_MIDNIGHT, StatsMidnight, "StatsMidnight", 60);
-	add_timer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", 3600);
-	return 1;
-}
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
 
-int ModInit(Module* mod_ptr)
+int ModInit (Module *mod_ptr)
 {
 	SET_SEGV_LOCATION();
 	ss_module = mod_ptr;
@@ -209,10 +212,44 @@ int ModInit(Module* mod_ptr)
 	DBOpenDatabase();
 #endif
 	load_client_versions();
-	return 1;
+	return NS_SUCCESS;
 }
 
-void ModFini()
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
+{
+	SET_SEGV_LOCATION();
+	ss_bot = init_bot (&ss_botinfo);
+	if (!ss_bot) {
+		return NS_FAILURE;
+	}
+	/* now that we are online, setup the timer to save the Stats database every so often */
+	add_timer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
+	add_timer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", 3600);
+	/* also add a timer to check if its midnight (to reset the daily stats */
+	add_timer (TIMER_TYPE_MIDNIGHT, StatsMidnight, "StatsMidnight", 60);
+	add_timer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", 3600);
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
 {
 	StatServ.shutdown = 1;
 	irc_chanalert (ss_bot, "Saving StatServ Database. this *could* take a while");

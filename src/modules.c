@@ -194,6 +194,51 @@ int FiniModules (void)
 	return NS_SUCCESS;
 }
 
+/** @brief SynchModule 
+ *
+ * 
+ *
+ * @return none
+ */
+int SynchModule (Module* module_ptr)
+{
+	int err = NS_SUCCESS; /*FAILURE;*/
+	int (*ModSynch) (void);
+
+	module_ptr->synched = 1;
+	ModSynch = ns_dlsym ((int *) module_ptr->dl_handle, "ModSynch");
+	if (ModSynch) {
+		SET_RUN_LEVEL(module_ptr);
+		err = (*ModSynch) (); 
+		RESET_RUN_LEVEL();
+	}
+	return err;
+}
+
+/** @brief SynchModule 
+ *
+ * 
+ *
+ * @return none
+ */
+int SynchAllModules (void)
+{
+	Module *module_ptr;
+	hscan_t ms;
+	hnode_t *mn;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin (&ms, modulehash);
+	while ((mn = hash_scan_next (&ms)) != NULL) {
+		module_ptr = hnode_get (mn);
+		if (SynchModule (module_ptr) != NS_SUCCESS) {
+			unload_module (module_ptr->info->name, NULL);
+		}
+	}
+	return NS_SUCCESS;
+}
+
+
 /** @brief SendModuleEvent
  *
  * 
@@ -204,9 +249,6 @@ void
 SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 {
 	SET_SEGV_LOCATION();
-	if (event == EVENT_ONLINE) {
-		module_ptr->synched = 1;
-	}
 	if (module_ptr->event_list) {
 		if (module_ptr->event_list[event].function) {
 			/* If we are not yet synched, check that the module supports 
@@ -326,6 +368,13 @@ void DeleteEvent (Event event)
 	}
 }
 
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+
 static void load_module_error(const Client *target, const char *fmt, ...)
 {
 	static char buf[BUFSIZE];
@@ -357,7 +406,7 @@ load_module (const char *modfilename, Client * u)
 	ModuleInfo *info_ptr = NULL;
 	ModuleEvent *event_ptr = NULL;
 	Module *mod_ptr = NULL;
-	int (*ModInit) (Module * module_ptr);
+	int (*ModInit) (Module *module_ptr);
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (modulehash)) {
@@ -403,14 +452,6 @@ load_module (const char *modfilename, Client * u)
 		ns_dlclose (dl_handle);
 		return NULL;
 	}
-    /* For Auth modules, register auth function */
-	if (info_ptr->flags & MODULE_FLAG_AUTH) {
-		if (init_auth_module (mod_ptr) != NS_SUCCESS) {
-			load_module_error (u, "Unable to load auth module: %s missing ModAuthUser function", info_ptr->name);
-			ns_dlclose (dl_handle);
-			return NULL;
-		}
-	}
 	/* Allocate module */
 	mod_ptr = (Module *) scalloc (sizeof (Module));
 	hnode_create_insert (modulehash, mod_ptr, info_ptr->name);
@@ -423,8 +464,19 @@ load_module (const char *modfilename, Client * u)
 	if(event_ptr) {
 		RegisterEventList (mod_ptr, event_ptr);
 	}
-    /* Module side user authentication for e.g. SecureServ helpers */
-	mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuth");
+    /* For Auth modules, register auth function */
+	if (info_ptr->flags & MODULE_FLAG_AUTH) {
+		if (init_auth_module (mod_ptr) != NS_SUCCESS) {
+			load_module_error (u, "Unable to load auth module: %s missing ModAuthUser function", info_ptr->name);
+			unload_module(mod_ptr->info->name, NULL);
+			return NULL;
+		}
+	}
+    /* Module side user authentication for e.g. SecureServ helpers 
+     * Not available on auth modules */
+	if (!(info_ptr->flags & MODULE_FLAG_AUTH)) {
+		mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuthUser");
+	}
 	/* assign a module number to this module */
 	while (ModList[moduleindex] != NULL)
 		moduleindex++;
@@ -436,7 +488,7 @@ load_module (const char *modfilename, Client * u)
 	SET_RUN_LEVEL(mod_ptr);
 	err = (*ModInit) (mod_ptr); 
 	RESET_RUN_LEVEL();
-	if (err < 1) {
+	if (err < 1 || mod_ptr->error) {
 		load_module_error (u, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
 		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
@@ -445,7 +497,12 @@ load_module (const char *modfilename, Client * u)
 
 	/* Let this module know we are online if we are! */
 	if (is_synched) {
-		SendModuleEvent (EVENT_ONLINE, NULL, mod_ptr);
+		if (SynchModule (mod_ptr) != NS_SUCCESS || mod_ptr->error)
+		{
+			load_module_error (u, "Unable to load module: %s. See %s.log for further information.", mod_ptr->info->name, mod_ptr->info->name);
+			unload_module(mod_ptr->info->name, NULL);
+			return NULL;
+		}
 	}
 	if (u) {
 		irc_prefmsg (ns_botptr, u, "Module %s loaded, %s", info_ptr->name, info_ptr->description);
@@ -539,6 +596,8 @@ unload_module (const char *modname, Client * u)
 	hnode_destroy (modnode);
 	/* Close module */
 	SET_RUN_LEVEL(mod_ptr);
+	irc_globops (NULL, "%s Module Unloaded", modname);
+	sfree (mod_ptr);
 #ifndef VALGRIND
 	ns_dlclose (mod_ptr->dl_handle);
 #endif
@@ -548,8 +607,6 @@ unload_module (const char *modname, Client * u)
 		dlog(DEBUG1, "Free %d from Module Numbers", moduleindex);
 		ModList[moduleindex] = NULL;
 	}
-	sfree (mod_ptr);
-	irc_globops (NULL, "%s Module Unloaded", modname);
 	return NS_SUCCESS;
 }
 

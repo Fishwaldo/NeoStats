@@ -26,6 +26,7 @@
 #include "neostats.h"
 #include "loveserv.h"
 
+/** Bot command function prototypes */
 static int ls_rose(CmdParams* cmdparams);
 static int ls_kiss(CmdParams* cmdparams);
 static int ls_tonsil(CmdParams* cmdparams);
@@ -37,14 +38,17 @@ static int ls_lovenote(CmdParams* cmdparams);
 static int ls_apology(CmdParams* cmdparams);
 static int ls_thankyou(CmdParams* cmdparams);
 
+/** Bot pointer */
 static Bot *ls_bot;
 
+/** Copyright info */
 const char *ls_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Module info */
 ModuleInfo module_info = {
 	"LoveServ",
 	"Network love service",
@@ -58,6 +62,7 @@ ModuleInfo module_info = {
 	0,
 };
 
+/** Bot comand table */
 static bot_cmd ls_commands[]=
 {
 	{"ROSE",		ls_rose,		1, 	0,	ls_help_rose,		ls_help_rose_oneline },
@@ -73,6 +78,7 @@ static bot_cmd ls_commands[]=
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
+/** BotInfo */
 static BotInfo ls_botinfo = 
 {
 	"LoveServ", 
@@ -85,25 +91,50 @@ static BotInfo ls_botinfo =
 	NULL,
 };
 
-static int ls_event_online(CmdParams* cmdparams)
-{
-	ls_bot = init_bot(&ls_botinfo);
-	return 1;
-};
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
 
-ModuleEvent module_events[] = {
-	{EVENT_ONLINE,	ls_event_online},
-	{EVENT_NULL,	NULL}
-};
-
-int ModInit(Module* mod_ptr)
+int ModInit (Module *mod_ptr)
 {
-	return 1;
+	return NS_SUCCESS;
 }
 
-void ModFini()
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
 {
-};
+	ls_bot = init_bot(&ls_botinfo);
+	if (!ls_bot) {
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
+{
+}
 
 static int ls_rose(CmdParams* cmdparams)
 {

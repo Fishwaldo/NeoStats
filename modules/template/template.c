@@ -173,23 +173,12 @@ BotInfo template_bot_info =
 	template_settings,
 };
 
-/** Online event processing
- *  What we do when we first come online
- */
-static int tm_event_online(CmdParams* cmdparams)
-{
-	/* Introduce a bot onto the network saving the bot handle */
-	template_bot = init_bot (&template_bot_info);
-	return 1;
-};
-
 /** Module event list
  *  What events we will act on
  *  This is required if you want your module to respond to events on IRC
  *  see events.h for a list of all events available
  */
 ModuleEvent module_events[] = {
-	{EVENT_ONLINE,	tm_event_online},
 	{EVENT_NULL,	NULL}
 };
 
@@ -197,17 +186,42 @@ ModuleEvent module_events[] = {
  *  Required if you need to do initialisation of your module when
  *  first loaded
  */
-int ModInit(Module* mod_ptr)
+int ModInit (Module *mod_ptr)
 {
 	/* Save our module handle */
 	template_module = mod_ptr;
-	return 1;
+	return NS_SUCCESS;
 }
 
-/** Fini module
- *  Required if you need to do cleanup of your module when it ends
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
-void ModFini()
-{
 
-};
+int ModSynch (void)
+{
+	/* Introduce a bot onto the network saving the bot handle */
+	template_bot = init_bot (&template_bot_info);
+	if (!template_bot) {
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
+{
+}
+

@@ -369,7 +369,12 @@ del_all_bot_cmds(Bot* bot_ptr)
 int 
 add_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
-	return(add_bot_cmd_list(ns_botptr, bot_cmd_list));
+	if(!GET_CUR_MODULE()->synched)
+	{
+		GET_CUR_MODULE()->error = 1;
+		return NS_FAILURE;
+	}	
+	return (add_bot_cmd_list(ns_botptr, bot_cmd_list));
 }
 
 /** @brief del_services_cmd_list delete a list of commands from the services bot

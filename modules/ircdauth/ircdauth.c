@@ -21,22 +21,28 @@
 ** $Id: serviceroots.c 1721 2004-04-09 22:17:19Z Mark $
 */
 
-#include <stdio.h>
 #include "neostats.h"
 
-static int auth_cmd_authmodelist(CmdParams* cmdparams);
+/** IRCDAuth Module
+ *
+ *  User authentication based on ircd user modes
+ */
 
+
+/** User mode lookup struct */
 typedef struct UserAuthModes{
 	unsigned long umode;
 	int level;
 } UserAuthModes;
 
-static const char *ns_copyright[] = {
+/** Copyright info */
+static const char *ircdauth_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Help text */
 const char *auth_help_authmodelist[] = {
 	"Syntax: \2AUTHMODELIST\2",
 	"",
@@ -46,16 +52,11 @@ const char *auth_help_authmodelist[] = {
 
 const char auth_help_authmodelist_oneline[] = "User mode auth list";
 
-bot_cmd auth_commands[]=
-{
-	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist,	auth_help_authmodelist_oneline},
-	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
-};
-
+/** Module info */
 ModuleInfo module_info = {
 	"IRCDAuth",
 	"IRCD User Mode Authentication Module",
-	ns_copyright,
+	ircdauth_copyright,
 	NULL,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
@@ -66,7 +67,8 @@ ModuleInfo module_info = {
 	0,
 };
 
-UserAuthModes user_auth_modes[] = {
+/** User mode lookup tables */
+static UserAuthModes user_auth_modes[] = {
 #ifdef UMODE_DEBUG
 	{UMODE_DEBUG,		NS_ULEVEL_ROOT},
 #endif
@@ -95,7 +97,7 @@ UserAuthModes user_auth_modes[] = {
 
 const int user_auth_mode_count = ((sizeof (user_auth_modes) / sizeof (user_auth_modes[0])));
 
-UserAuthModes user_auth_smodes[] = {
+static UserAuthModes user_auth_smodes[] = {
 	{SMODE_NETADMIN,	NS_ULEVEL_ADMIN},
 	{SMODE_CONETADMIN,	175},
 	{SMODE_TECHADMIN,	150},
@@ -107,12 +109,20 @@ UserAuthModes user_auth_smodes[] = {
 
 const int user_auth_smode_count = ((sizeof (user_auth_smodes) / sizeof (user_auth_smodes[0])));
 
-static int auth_cmd_authmodelist(CmdParams* cmdparams)
+/** @brief auth_cmd_authmodelist
+ *
+ *  Auth mode level list command handler
+ *
+ *  @param cmdparam struct
+ *
+ *  @return NS_SUCCESS if suceeds else result of command
+ */
+
+static int auth_cmd_authmodelist (CmdParams* cmdparams)
 {
 	int i;
 
-	irc_prefmsg (NULL, cmdparams->source, 
-		"User mode auth levels:");
+	irc_prefmsg (NULL, cmdparams->source, "User mode auth levels:");
 	for (i = 0; i < user_auth_mode_count; i++) {
 		irc_prefmsg (NULL, cmdparams->source, "%s: %d", 
 			GetUmodeDesc (user_auth_modes[i].umode), user_auth_modes[i].level);
@@ -126,28 +136,68 @@ static int auth_cmd_authmodelist(CmdParams* cmdparams)
 	return NS_SUCCESS;
 }
 
-static int auth_event_online(CmdParams* cmdparams)
+/** Bot comand table */
+bot_cmd ircdauth_commands[]=
 {
-	add_services_cmd_list(auth_commands);
-	return NS_SUCCESS;
+	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist,	auth_help_authmodelist_oneline},
+	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
 };
 
-ModuleEvent module_events[] = {
-	{EVENT_ONLINE,	auth_event_online},
-	{EVENT_NULL,	NULL}
-};
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
 
-int ModInit(Module* modptr)
+int ModInit (Module *modptr)
 {
 	return NS_SUCCESS;
 }
 
-void ModFini()
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
 {
-	del_services_cmd_list(auth_commands);
+	if (add_services_cmd_list (ircdauth_commands) != NS_SUCCESS) {
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
 }
 
-int ModAuthUser(Client * u)
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
+{
+	del_services_cmd_list (ircdauth_commands);
+}
+
+/** @brief ModAuthUser
+ *
+ *  Lookup authentication level for user
+ *
+ *  @param pointer to user
+ *
+ *  @return authentication level for user
+ */
+
+int ModAuthUser (Client * u)
 {
 	int i, authlevel;
 
@@ -160,9 +210,9 @@ int ModAuthUser(Client * u)
 			}
 		}
 	}
-	dlog(DEBUG1, "UmodeAuth: umode level for %s is %d", u->name, authlevel);
+	dlog(DEBUG1, "UmodeAuth: level after umode for %s is %d", u->name, authlevel);
+	/* Check smodes if we have them */
 	if (HaveFeature (FEATURE_USERSMODES)) {
-		/* Check smodes */
 		for (i = 0; i < user_auth_smode_count; i++) {
 			if (u->user->Smode & user_auth_smodes[i].umode) {
 				if(user_auth_smodes[i].level > authlevel) {
@@ -170,7 +220,7 @@ int ModAuthUser(Client * u)
 				}
 			}
 		}
-		dlog(DEBUG1, "UmodeAuth: smode level for %s is %d", u->name, authlevel);
+		dlog(DEBUG1, "UmodeAuth: level after smode for %s is %d", u->name, authlevel);
 	}
 	/* Return new level */
 	return authlevel;

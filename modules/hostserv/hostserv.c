@@ -83,15 +83,19 @@ int CleanupHosts(void);
 static void LoadHosts(void);
 static void LoadConfig(void);
 
+/** Bot pointer */
 Bot *hs_bot;
+/** Module pointer */
 static Module* hs_module;
 
+/** Copyright info */
 const char *hs_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Module info */
 ModuleInfo module_info = {
 	"HostServ",
 	"Network virtual host service",
@@ -106,6 +110,7 @@ ModuleInfo module_info = {
 	FEATURE_SVSHOST,
 };
 
+/** Bot comand table */
 static bot_cmd hs_commands[]=
 {
 	{"ADD",		hs_add,		4,	(int)&hs_cfg.add,	hs_help_add,	hs_help_add_oneline },
@@ -119,6 +124,7 @@ static bot_cmd hs_commands[]=
 	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
 };
 
+/** Bot setting table */
 static bot_setting hs_settings[]=
 {
 	{"EXPIRE",		&hs_cfg.old,		SET_TYPE_INT,		0, 99, 			NS_ULEVEL_ADMIN, "ExpireDays","days",hs_help_set_expire, NULL, (void*)60 },
@@ -128,6 +134,7 @@ static bot_setting hs_settings[]=
 	{NULL,			NULL,				0,					0, 0, 			0,				 NULL,		  NULL,	NULL	},
 };
 
+/** BotInfo */
 static BotInfo hs_botinfo = 
 {
 	"HostServ", 
@@ -219,15 +226,8 @@ static int hs_event_signon(CmdParams* cmdparams)
 	return 1;
 }
 
-static int hs_event_online(CmdParams* cmdparams)
-{
-	hs_bot = init_bot(&hs_botinfo);
-	add_timer (TIMER_TYPE_INTERVAL, CleanupHosts, "CleanupHosts", 7200);
-	return 1;
-};
-
+/** Module Events */
 ModuleEvent module_events[] = {
-	{EVENT_ONLINE,	hs_event_online},
 	{EVENT_SIGNON,	hs_event_signon},
 	{EVENT_UMODE,	hs_event_mode}, 
 	{EVENT_QUIT,	hs_event_quit},
@@ -235,7 +235,16 @@ ModuleEvent module_events[] = {
 	{EVENT_NULL,	NULL}
 };
 
-int ModInit(Module* mod_ptr)
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModInit (Module *mod_ptr)
 {
 	hs_module = mod_ptr;
 	vhosts = list_create(-1);
@@ -247,10 +256,38 @@ int ModInit(Module* mod_ptr)
 	ModuleConfig(hs_settings);
 	LoadConfig();
 	LoadHosts();
-	return 1;
+	return NS_SUCCESS;
 }
 
-void ModFini()
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
+{
+	hs_bot = init_bot(&hs_botinfo);
+	if (!hs_bot) {
+		return NS_FAILURE;
+	}
+	add_timer (TIMER_TYPE_INTERVAL, CleanupHosts, "CleanupHosts", 7200);
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
 {
 	list_destroy_auto (vhosts);
 }

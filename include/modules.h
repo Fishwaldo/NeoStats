@@ -35,5 +35,7 @@ int list_modules (CmdParams* cmdparams);
 void ModulesVersion (const char* nick, const char *remoteserver);
 void SendAllModuleEvent (Event event, CmdParams* cmdparams);
 void SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr);
+int SynchModule (Module* module_ptr);
+int SynchAllModules (void);
 
 #endif /* _MODULES_H_ */

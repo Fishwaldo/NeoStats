@@ -540,6 +540,11 @@ Bot *init_bot (BotInfo* botinfo)
 
 	SET_SEGV_LOCATION();
 	modptr = GET_CUR_MODULE();
+	if(!modptr->synched) {
+		nlog (LOG_WARNING, "Module %s attempted to init a bot %s but is not yet synched", modptr->info->name, botinfo->nick);
+		modptr->error = 1;
+		return NULL;
+	}
 	/* When we are using single bot mode, for example in client mode where we
 	 * can only use one bot, if we have initialised the main bot just add all 
 	 * commands and settings to it 

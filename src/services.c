@@ -64,12 +64,14 @@ static const char *ns_about[] = {
 	NULL
 };
 
+/** Copyright info */
 static const char *ns_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Module info */
 ModuleInfo ns_module_info = {
 	"NeoStats",
 	"NeoStats Statistical services", 	
@@ -83,10 +85,12 @@ ModuleInfo ns_module_info = {
 	0,
 };
 
+/** Fake Module pointer for run level code */
 Module ns_module = {
 	&ns_module_info
 };
 
+/** Bot comand table */
 static bot_cmd ns_commands[]=
 {
 	{"LEVEL",		ns_level,		0, 	0,					ns_help_level, 		ns_help_level_oneline},
@@ -111,6 +115,7 @@ static bot_cmd ns_commands[]=
 	{NULL,			NULL,			0, 	0,					NULL, 				NULL}
 };
 
+/** Bot setting table */
 static bot_setting ns_settings[]=
 {
 	{"PINGTIME",		&config.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },
@@ -126,6 +131,7 @@ static bot_setting ns_settings[]=
 	{NULL,				NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
 };
 
+/** Bot pointer */
 Bot* ns_botptr = NULL;
 
 BotInfo ns_botinfo = {
@@ -170,9 +176,10 @@ init_services_bot (void)
 	if(config.onlyopers) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	ns_botinfo.flags |= BOT_FLAG_DEAF;
+	ns_module.synched = 1;
 	ns_botptr = init_bot (&ns_botinfo);
 	me.synched = 1;
-	SendAllModuleEvent (EVENT_ONLINE, NULL);
+	SynchAllModules ();
 	RequestServerUptimes();	
 	return NS_SUCCESS;
 }

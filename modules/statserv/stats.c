@@ -588,14 +588,16 @@ void InitStats(void)
 
 void FiniStats(void)
 {
+	SStats *s;
 	hnode_t *sn;
 	hscan_t ss;
 
 	hash_scan_begin(&ss, Shead);
 	while ((sn = hash_scan_next(&ss))) {
-		sfree (hnode_get(sn));
+		s = hnode_get(sn);
 		hash_scan_delete(Shead, sn);
 		hnode_destroy(sn);
+		sfree (s);
 	}
 	hash_destroy(Shead);
 	list_destroy_auto (Chead);

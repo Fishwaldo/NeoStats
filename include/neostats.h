@@ -805,6 +805,7 @@ typedef struct Module {
 	void *dl_handle;
 	unsigned int modnum;
 	unsigned int synched;
+	unsigned int error;
 }Module;
 
 extern Module* RunModule[10];
@@ -1089,8 +1090,8 @@ EXPORTFUNC int IsBotMode(const char mode);
 EXPORTFUNC int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
 
 /* services.c */
-EXPORTFUNC int add_services_cmd_list(bot_cmd* bot_cmd_list);
-EXPORTFUNC int del_services_cmd_list(bot_cmd* bot_cmd_list);
+EXPORTFUNC int add_services_cmd_list (bot_cmd* bot_cmd_list);
+EXPORTFUNC int del_services_cmd_list (bot_cmd* bot_cmd_list);
 EXPORTFUNC Client * find_valid_user(Bot* botptr, Client * u, const char* target_nick);
 
 /* transfer.c stuff */
@@ -1199,20 +1200,14 @@ EXPORTFUNC void DeleteEvent (Event event);
 /* 
  * Module Interface 
  */
+/* Module Basic Interface */
 extern MODULEVAR ModuleInfo module_info;   
-int MODULEFUNC ModInit (Module* mod_ptr);
+int MODULEFUNC ModInit (Module *mod_ptr);
+int MODULEFUNC ModSynch (void);
 void MODULEFUNC ModFini (void);
-
-/* 
- * Module Event Interface 
- */
+/* Module Event Interface */
 extern MODULEVAR ModuleEvent module_events[];  
-
-/* 
- * Module Auth Interface 
- */
-int MODULEFUNC ModAuth (Client * u);
+/* Module Auth Interface */
 int MODULEFUNC ModAuthUser (Client * u);
-int MODULEFUNC ModAuthList (Client * u);
 
 #endif /* NEOSTATS_H */

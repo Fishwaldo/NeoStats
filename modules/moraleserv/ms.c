@@ -35,14 +35,17 @@ static int ms_cheerup(CmdParams* cmdparams);
 static int ms_behappy(CmdParams* cmdparams);
 static int ms_wonderful(CmdParams* cmdparams);
 
+/** Bot pointer */
 static Bot *ms_bot;
 
+/** Copyright info */
 const char *ms_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
+/** Module info */
 ModuleInfo module_info = {
 	"MoraleServ",
 	"Network morale service",
@@ -56,6 +59,7 @@ ModuleInfo module_info = {
 	0,
 };
 
+/** Bot comand table */
 static bot_cmd ms_commands[]=
 {
 	{"LAPDANCE",	ms_lapdance,	1, 	0,	ms_help_lapdance,	ms_help_lapdance_oneline },
@@ -69,6 +73,7 @@ static bot_cmd ms_commands[]=
 	{NULL,			NULL,			0, 	0,	NULL, 				NULL}
 };
 
+/** BotInfo */
 static BotInfo ms_botinfo = 
 {
 	"MoraleServ", 
@@ -81,25 +86,50 @@ static BotInfo ms_botinfo =
 	NULL,
 };
 
-static int ms_event_online(CmdParams* cmdparams)
-{
-	ms_bot = init_bot (&ms_botinfo);
-	return 1;
-};
+/** @brief ModInit
+ *
+ *  Init handler
+ *
+ *  @param pointer to my module
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
 
-ModuleEvent module_events[] = {
-	{EVENT_ONLINE,	ms_event_online},
-	{EVENT_NULL,	NULL}
-};
-
-int ModInit(Module* mod_ptr)
+int ModInit (Module *mod_ptr)
 {
-	return 1;
+	return NS_SUCCESS;
 }
 
-void ModFini()
+/** @brief ModSynch
+ *
+ *  Startup handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ModSynch (void)
 {
-};
+	ms_bot = init_bot (&ms_botinfo);
+	if (!ms_bot) {
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ModFini
+ *
+ *  Fini handler
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void ModFini (void)
+{
+}
 
 /* Routine for HAIL */
 static int ms_hail(CmdParams* cmdparams)

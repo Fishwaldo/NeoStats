@@ -4,6 +4,15 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Add error field to Module structure so the core can flag a module as being
+   in an erroneous state and unload it at an opportune time. E.g. if a module
+   calls init_bot from ModInit, the call will fail gracefully and the module 
+   will be automatically unloaded once the core rgains control. (M)
+ - EVENT_ONLINE removed with previous functionality available via a ModSynch
+   function. Advantages over the event are that it can return a failure status
+   if for example an init_bot call fails and we can unload the module. It also
+   means modules that do not need to use any other events can now ignore the 
+   event sub system and the core can do less event checking. (M)
  - neostats.cfg renamed to neostats.conf. This is to be more consistent with 
    other packages and to avoid someone using a config file from an older series
    with NeoStats 3.0. (M)
