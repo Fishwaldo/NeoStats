@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.52 2003/06/13 13:11:49 fishwaldo Exp $
+** $Id: users.c,v 1.53 2003/06/26 05:49:45 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -35,7 +35,7 @@
 
 
 int fnmatch(const char *, const char *, int flags);
-
+void doDelUser(const char *, int );
 
 
 
@@ -129,8 +129,15 @@ void part_u_chan(list_t * list, lnode_t * node, void *v)
 	User *u = v;
 	part_chan(u, lnode_get(node));
 }
-
+void KillUser (const char *nick)
+{
+	doDelUser(nick, 1);
+}
 void DelUser(const char *nick)
+{
+	doDelUser(nick, 0);
+}
+void doDelUser(const char *nick, int i)
 {
 	User *u;
 	hnode_t *un;
@@ -148,7 +155,11 @@ void DelUser(const char *nick)
 	u = hnode_get(un);
 	/* run the event to delete a user */
 	AddStringToList(&av, u->nick, &ac);
-	Module_Event("SIGNOFF", av, ac);
+	if (i == 0) {
+		Module_Event("SIGNOFF", av, ac);
+	} else if (i == 1) {
+		Module_Event("KILL", av, ac);
+	}
 	free(av);
 
 	list_process(u->chans, u, part_u_chan);

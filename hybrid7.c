@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: hybrid7.c,v 1.18 2003/06/26 05:25:09 fishwaldo Exp $
+** $Id: hybrid7.c,v 1.19 2003/06/26 05:49:45 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -685,29 +685,11 @@ void Usr_Mode(char *origin, char **argv, int argc)
 void Usr_Kill(char *origin, char **argv, int argc)
 {
 	User *u;
-#if 0
-	Mod_User *mod_ptr;
-#endif
-	char **av;
-	int ac = 0;
-#if 0
-	mod_ptr = findbot(argv[0]);
-	if (mod_ptr) {		/* Oh Oh, one of our Bots has been Killed off! */
-		AddStringToList(&av, argv[0], &ac);
-		Module_Event("BOTKILL", av, ac);
-		free(av);
-//              FreeList(av, ac);
-		DelUser(argv[0]);
-		return;
-	}
-#endif
 	u = finduser(argv[0]);
 	if (u) {
-		AddStringToList(&av, u->nick, &ac);
-		Module_Event("KILL", av, ac);
-		free(av);
-//              FreeList(av, ac);
-		DelUser(argv[0]);
+		KillUser(argv[0]);
+	} else {
+		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
 	}
 }
 void Usr_Vhost(char *origin, char **argv, int argc)

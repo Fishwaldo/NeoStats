@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: Unreal.c,v 1.45 2003/06/26 05:25:09 fishwaldo Exp $
+** $Id: Unreal.c,v 1.46 2003/06/26 05:49:45 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -434,10 +434,6 @@ int ssvskill_cmd(const char *target, const char *reason, ...)
 		vsnprintf(buf, 512, reason, ap);
 		sts(":%s %s %s :%s", me.name,
 		    (me.token ? TOK_SVSKILL : MSG_SVSKILL), target, buf);
-		AddStringToList(&av, u->nick, &ac);
-		Module_Event("KILL", av, ac);
-		free(av);
-		DelUser(target);
 		va_end(ap);
 		return 1;
 	}
@@ -649,31 +645,11 @@ void Usr_Mode(char *origin, char **argv, int argc)
 }
 void Usr_Kill(char *origin, char **argv, int argc)
 {
-	User *u;
-#if 0
-	Mod_User *mod_ptr;
-#endif
-	char **av;
-	int ac = 0;
-#if 0
-	mod_ptr = findbot(argv[0]);
-	if (mod_ptr) {		/* Oh Oh, one of our Bots has been Killed off! */
-		AddStringToList(&av, argv[0], &ac);
-		Module_Event("BOTKILL", av, ac);
-		free(av);
-//              FreeList(av, ac);
-		DelUser(argv[0]);
-		return;
-	}
-#endif
-/* XXX todo - make userkill function */
 	u = finduser(argv[0]);
 	if (u) {
-		AddStringToList(&av, u->nick, &ac);
-		Module_Event("KILL", av, ac);
-		free(av);
-//              FreeList(av, ac);
-		DelUser(argv[0]);
+		KillUser(argv[0]);
+	} else {
+		nlog(LOG_WARNING, LOG_CORE, "Can't find user %s for Kill", argv[0]);
 	}
 }
 void Usr_Vhost(char *origin, char **argv, int argc)

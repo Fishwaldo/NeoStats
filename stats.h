@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.83 2003/06/26 05:25:09 fishwaldo Exp $
+** $Id: stats.h,v 1.84 2003/06/26 05:49:45 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -188,9 +188,9 @@ struct server_ {
 	int hops;
 	long hash;
 	time_t connected_since;
-/*	time_t last_announce; */
 	int ping;
 	char uplink[MAXHOST];
+	void *moddata[NUM_MODULES];
 };
 
 struct user_ {
@@ -212,6 +212,7 @@ struct user_ {
 	struct in_addr ipaddr;
 	time_t TS;
 	long Smode;
+	void *moddata[NUM_MODULES];
 };
 
 struct chans_ {
@@ -223,17 +224,20 @@ struct chans_ {
 	char topic[BUFSIZE];
 	char topicowner[MAXHOST];	/* becuase a "server" can be a topic owner */
 	time_t topictime;
+	void *moddata[NUM_MODULES];
 } chans_;
 
 struct chanmem_ {
 	char nick[MAXNICK];
 	time_t joint;
 	long flags;
+	void *moddata[NUM_MODULES];
 } chanmem_;
 
 struct modeparms_ {
 	long mode;
 	char param[PARAMSIZE];
+	void *moddata[NUM_MODULES];
 } modeparms_;
 
 
@@ -247,13 +251,6 @@ struct ping {
 /* sock.c */
 extern int ConnectTo(char *, int);
 extern void read_loop();
-// extern void log(char *, ...); //
-
-#if 0
-/* this will go away one day! */
-#define log(x, rest...) \
-nlog(5,0,x, ## rest);
-#endif
 
 extern void ResetLogs();
 extern char *sctime(time_t);
@@ -330,6 +327,7 @@ extern void DeleteMyUser(char *);
 extern MyUser *findmyuser(char *);
 extern int UserLevel(User *);
 void Do_Away(User *, const char *);
+void KillUser (const char *nick);
 
 
 /* ns_help.c */

@@ -12,6 +12,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Added some Doco Updates from M, and connectserv cleanups
  - Don't rotate empty log files!
  - Finished first pass of IRCd portability updates
+ - users/servers/channels/modes now have a module data pointer
 
 * NeoStats * Fish * Version 2.5.3
  - Added ability to turn off StatServ wallops. "/msg statserv set msgthrottle off" - BugID#6
