@@ -51,8 +51,6 @@ BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
 BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
 BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
 BUILD_PCRE_TRUE = @BUILD_PCRE_TRUE@
-BUILD_SQL_FALSE = @BUILD_SQL_FALSE@
-BUILD_SQL_TRUE = @BUILD_SQL_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -80,6 +78,9 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LEX = @LEX@
+LEXLIB = @LEXLIB@
+LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
 LIBDB = @LIBDB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -165,11 +166,11 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		base64.c
 
 AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
-		-I$(top_srcdir)/lib/sqlsrv \
+		-I$(top_srcdir)/lib/rta \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
 
 neostats_LDADD = -ldl $(top_srcdir)/lib/keeper/libkeeper.a \
-		$(top_srcdir)/lib/sqlsrv/librtadb.a \
+		$(top_srcdir)/lib/rta/librtadb.a \
 		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
@@ -200,7 +201,7 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	rtausers.$(OBJEXT) base64.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/keeper/libkeeper.a \
-	$(top_srcdir)/lib/sqlsrv/librtadb.a \
+	$(top_srcdir)/lib/rta/librtadb.a \
 	$(top_srcdir)/lib/adns/libadns.la
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/include

@@ -10,13 +10,6 @@ else
 CURLDIR =
 endif
 
-if BUILD_SQL
-SQLSRVDIR = sqlsrv
-else
-SQLSRVDIR =
-endif
-
-
-SUBDIRS		= adns keeper $(CURLDIR) $(PCREDIR) $(SQLSRVDIR)
+SUBDIRS		= adns keeper $(CURLDIR) $(PCREDIR) rta
 
 include $(top_srcdir)/autotools/rules.mk

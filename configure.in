@@ -32,6 +32,7 @@ dnl AC_LIBLTDL_CONVENIENCE
 AC_PROG_CC
 AC_PROG_LIBTOOL
 AC_PROG_YACC 
+AC_PROG_LEX
 AC_PATH_PROG( SED, sed, , $PATH:/usr/bin:/usr/local/bin)
 
 # Checks for libraries.
@@ -263,23 +264,6 @@ AC_MSG_RESULT(no)
 )
 
 
-AC_MSG_CHECKING(To Enable Sql Server Emulation?)
-AC_ARG_ENABLE(sqlsrv, [  --enable-sqlsrv - Enable Sql Server Emulation],
-[ case "$enableval" in
-  yes)
-	AC_DEFINE(SQLSRV, 1, 'Use Sql Server Emulation')
-	AC_MSG_RESULT(yes)
-	AM_CONDITIONAL(BUILD_SQL, true)
-	;;
-  *)
-	AM_CONDITIONAL(BUILD_SQL, false)
-	AC_MSG_RESULT(no)
-	;;
-esac],
-AC_MSG_RESULT(no)
-AM_CONDITIONAL(BUILD_SQL, false)
-)
-
 AC_MSG_CHECKING(The Modules that will be automatically compiled)
 AC_MSG_RESULT($MODULES)
 
@@ -320,6 +304,7 @@ AC_CONFIG_FILES([Makefile
 		lib/keeper/Makefile 
 		lib/adns/Makefile
 		lib/pcre/Makefile 
+		lib/rta/Makefile 
 		modules/Makefile 
 		modules/connectserv/Makefile
 		modules/extauth/Makefile

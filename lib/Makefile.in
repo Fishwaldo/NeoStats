@@ -51,8 +51,6 @@ BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
 BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
 BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
 BUILD_PCRE_TRUE = @BUILD_PCRE_TRUE@
-BUILD_SQL_FALSE = @BUILD_SQL_FALSE@
-BUILD_SQL_TRUE = @BUILD_SQL_TRUE@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -80,6 +78,9 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LEX = @LEX@
+LEXLIB = @LEXLIB@
+LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
 LIBDB = @LIBDB@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
@@ -158,10 +159,7 @@ target_alias = @target_alias@
 
 @BUILD_CURL_TRUE@CURLDIR = curl
 
-@BUILD_SQL_TRUE@SQLSRVDIR = sqlsrv
-@BUILD_SQL_FALSE@SQLSRVDIR = 
-
-SUBDIRS = adns keeper $(CURLDIR) $(PCREDIR) $(SQLSRVDIR)
+SUBDIRS = adns keeper $(CURLDIR) $(PCREDIR) rta
 LINK = @echo "Linking $@"; $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -179,7 +177,7 @@ RECURSIVE_TARGETS = info-recursive dvi-recursive pdf-recursive \
 	check-recursive installcheck-recursive
 DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk \
 	Makefile.am
-DIST_SUBDIRS = adns keeper curl pcre sqlsrv
+DIST_SUBDIRS = adns keeper curl pcre rta
 all: all-recursive
 
 .SUFFIXES:
