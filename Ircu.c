@@ -53,13 +53,14 @@ static void Srv_Server (char *origin, char **argv, int argc);
 static void Srv_Squit (char *origin, char **argv, int argc);
 static void Srv_Nick (char *origin, char **argv, int argc);
 static void Srv_Kill (char *origin, char **argv, int argc);
-static void Srv_Protocol (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
 
+/*
 static struct ircd_srv_ {
 	int uprot;
 	int burst;
 } ircd_srv;
+*/
 
 const char ircd_version[] = "(IRCU)";
 const char services_bot_modes[]= "+oS";
@@ -91,10 +92,10 @@ IntCommands cmd_list[] = {
 	{MSG_SQUIT, Srv_Squit, 0, 0},
 	{MSG_NICK, Srv_Nick, 0, 0},
 	{MSG_KILL, Srv_Kill, 0, 0},
+	{MSG_END_OF_BURST, Srv_Burst, 1, 0},
 };
 
 ChanModes chan_modes[] = {
-	{CMODE_HALFOP, 'h', 1, 0, '%'},
 	{CMODE_CHANOP, 'o', 1, 0, '@'},
 	{CMODE_VOICE, 'v', 1, 0, '+'},
 	{CMODE_SECRET, 's', 0, 0, 0},
@@ -103,34 +104,24 @@ ChanModes chan_modes[] = {
 	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
 	{CMODE_INVITEONLY, 'i', 0, 0, 0},
 	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{CMODE_HIDEOPS, 'a', 0, 0, 0},
 	{CMODE_LIMIT, 'l', 0, 1, 0},
 	{CMODE_KEY, 'k', 0, 1, 0},
 	{CMODE_BAN, 'b', 0, 1, 0},
-	{CMODE_EXCEPT, 'e', 0, 1, 0},
-	{CMODE_INVEX, 'I', 0, 1, 0},
+	/*{CMODE_SENDTS, 'b', 0, 1, 0},*/
+	{CMODE_DELAYJOINS, 'D', 0, 1, 0},
+	/*{CMODE_LISTED, 'b', 0, 1, 0},*/
 };
 
 UserModes user_umodes[] = {
-	{UMODE_DEBUG, 'd', NS_ULEVEL_ROOT},
-	{UMODE_ADMIN, 'A', NS_ULEVEL_ADMIN},
-	{UMODE_OPER, 'o', NS_ULEVEL_ADMIN},
-	{UMODE_LOCOPS, 'l', NS_ULEVEL_ADMIN},
-	{UMODE_BOTS, 'b', 0},
-	{UMODE_CCONN, 'c', 0},
-	{UMODE_FULL, 'f', 0},
-	{UMODE_CALLERID, 'g', 0},
-	{UMODE_INVISIBLE, 'i', 0},
-	{UMODE_SKILL, 'k', 0},
-	{UMODE_NCHANGE, 'n', 0},
-	{UMODE_REJ, 'r', 0},
-	{UMODE_SERVNOTICE, 's', 0},
-	{UMODE_UNAUTH, 'u', 0},
-	{UMODE_WALLOP, 'w', 0},
-	{UMODE_EXTERNAL, 'x', 0},
-	{UMODE_SPY, 'y', 0},
-	{UMODE_OPERWALL, 'z', 0},
-	{UMODE_SERVICES, 'S', 0},
+	{UMODE_DEBUG,       'g', NS_ULEVEL_ROOT},
+	{UMODE_OPER,		'o', NS_ULEVEL_ADMIN},
+	{UMODE_LOCOP,		'O', NS_ULEVEL_OPER},
+	{UMODE_INVISIBLE,	'i', 0},
+	{UMODE_WALLOP,	'w', 0},
+	{UMODE_SERVNOTICE,	's', 0},
+	{UMODE_DEAF,		'd', 0},
+	{UMODE_CHSERV,	'k', 0},
+	{UMODE_HELPER,	'h', 0},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
@@ -291,13 +282,6 @@ void
 send_globops (char *from, char *buf)
 {
 //	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
-}
-
-
-static void
-Srv_Protocol (char *origin, char **argv, int argc)
-{
-	ns_srv_protocol(origin, argv, argc);
 }
 
 
@@ -466,3 +450,7 @@ Srv_Kill (char *origin, char **argv, int argc)
 	nlog (LOG_WARNING, LOG_CORE, "Got Srv_Kill, but its un-handled (%s)", recbuf);
 }
 
+static void
+Srv_Burst (char *origin, char **argv, int argc)
+{
+}
