@@ -284,73 +284,76 @@ struct ping {
 
 
 /* sock.c */
-extern int ConnectTo (char *, int);
-extern void read_loop ();
-extern int getmaxsock ();
-extern int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
-extern int sock_disconnect (char *sockname);
+int ConnectTo (char * host, int port);
+void read_loop (void);
+int getmaxsock (void);
+int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
+int sock_disconnect (char *sockname);
 
 /* conf.c */
-extern void strip (char *);
-extern int ConfLoad ();
-extern void rehash ();
+void strip (char * line);
+int ConfLoad (void);
+void rehash (void);
+int init_modules (void);
 
 /* main.c */
-extern int init_modules ();
-extern void *smalloc (long);
-extern char *sstrdup (const char *);
-extern unsigned long HASH (const unsigned char *, int);
-extern char *strlower (char *);
-extern void AddStringToList (char ***List, char S[], int *C);
+void *smalloc (long size);
+char *sstrdup (const char * s);
+char *strlower (char * s);
+void AddStringToList (char ***List, char S[], int *C);
 void FreeList (char **List, int C);
-void do_exit (int);
+void do_exit (int exitcode);
 void strip_mirc_codes(char *text);
-extern char *sctime (time_t);
-extern char *sftime (time_t);
+char *sctime (time_t t);
+char *sftime (time_t t);
 
 /* ircd.c */
-extern void parse ();
-extern char *joinbuf (char **av, int ac, int from);
-extern int split_buf (char *buf, char ***argv, int colon_special);
-extern void prefmsg (char *, const char *, char *, ...);
-extern void privmsg (char *, const char *, char *, ...);
-extern void notice (char *, const char *, char *, ...);
-extern void privmsg_list (char *, char *, const char **);
-extern void globops (char *, char *, ...);
-extern int flood (User *);
-extern int init_bot (char *, char *, char *, char *, char *, char *);
-extern int del_bot (char *, char *);
-extern void Module_Event (char *, char **av, int ac);
-extern int bot_nick_change (char *, char *);
+void parse (char* line);
+char *joinbuf (char **av, int ac, int from);
+int split_buf (char *buf, char ***argv, int colon_special);
+int flood (User * u);
+int init_bot (char * nick, char * user, char * host, char * rname, char *modes, char * modname);
+int del_bot (char * nick, char * reason);
+void Module_Event (char * event, char **av, int ac);
+
+/* ircd specific files */
+void prefmsg (char * to, const char * from, char * fmt, ...);
+void privmsg (char *to, const char *from, char *fmt, ...);
+void notice (char *to, const char *from, char *fmt, ...);
+void privmsg_list (char *to, char *from, const char **text);
+void globops (char * from, char * fmt, ...);
+
+/* dl.c */
+int bot_nick_change (char * oldnick, char *newnick);
 
 /* timer.c */
-extern void chk ();
-extern void TimerReset ();
-extern void TimerSpam ();
-extern void TimerPings ();
-extern void TimerMidnight ();
-extern int is_midnight ();
+void chk (void);
+void TimerReset (void);
+void TimerPings (void);
+void TimerMidnight (void);
+int is_midnight (void);
 
-extern void AddUser (const char *, const char *, const char *, const char *, const unsigned long ip, const unsigned long TS);
-extern void DelUser (const char *);
-void AddRealName (const char *, const char *);
-extern void Change_User (User *, const char *);
-extern void sendcoders (char *message, ...);
-extern User *finduser (const char *);
-extern void UserDump (char *);
-extern void part_u_chan (list_t *, lnode_t *, void *);
-extern void UserMode (const char *, const char *, int);
-extern void init_user_hash ();
-extern void init_chan_hash ();
-extern void AddServer (char *, char *, int);
-extern void DelServer (char *);
-extern Server *findserver (const char *);
-extern void ServerDump ();
-extern void ChanDump ();
-extern void init_server_hash ();
-extern int UserLevel (User *);
-void Do_Away (User *, const char *);
+/* users.c */
+void AddUser (const char *nick, const char *user, const char *host, const char *server, const unsigned long ip, const unsigned long TS);
+void DelUser (const char *nick);
+void AddRealName (const char *nick, const char *realname);
+void Change_User (User *u, const char * newnick);
+void sendcoders (char *message, ...);
+User *finduser (const char *nick);
+void UserDump (char *nick);
+void part_u_chan (list_t *list, lnode_t *node, void *v);
+void UserMode (const char *nick, const char *modes, int smode);
+void init_user_hash (void);
+int UserLevel (User *u);
+void Do_Away (User *u, const char *awaymsg);
 void KillUser (const char *nick);
+
+/* server.c */
+void AddServer (char *name, char *uplink, int hops);
+void DelServer (char *name);
+Server *findserver (const char *name);
+void ServerDump (void);
+void init_server_hash (void);
 
 /* ns_help.c */
 extern const char *ns_help[];
@@ -379,29 +382,28 @@ extern const char *ns_modbotchanlist_help[];
 extern const char *ns_info_help[];
 
 /* services.c */
-extern void servicesbot (char *nick, char **av, int ac);
-extern void ns_debug_to_coders (char *);
-extern void ns_shutdown (User * u, char *reason);
+void servicesbot (char *nick, char **av, int ac);
+void ns_debug_to_coders (char *u);
+void ns_shutdown (User * u, char *reason);
 
 /* chans.c */
-extern void chandump (char *chan);
-extern void part_chan (User * u, char *chan);
-extern void join_chan (User * u, char *chan);
-extern void change_user_nick (Chans * c, char *newnick, char *oldnick);
-extern Chans *findchan (char *chan);
-extern int ChanMode (char *origin, char **av, int ac);
-extern void Change_Topic (char *, Chans *, time_t t, char *);
-extern void ChangeChanUserMode (Chans * c, User * u, int add, long mode);
+void chandump (char *chan);
+void part_chan (User * u, char *chan);
+void join_chan (User * u, char *chan);
+void change_user_nick (Chans * c, char *newnick, char *oldnick);
+Chans *findchan (char *chan);
+int ChanMode (char *origin, char **av, int ac);
+void Change_Topic (char *, Chans *, time_t t, char *);
+void ChangeChanUserMode (Chans * c, User * u, int add, long mode);
 void kick_chan (User *, char *, User *);
 void Change_Chan_Ts (Chans * c, time_t tstime);
-extern int CheckChanMode (Chans * c, long mode);
-extern int IsChanMember(Chans *c, User *u);
+int CheckChanMode (Chans * c, long mode);
+int IsChanMember(Chans *c, User *u);
+void init_chan_hash (void);
 
 /* dns.c */
-extern int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
-extern int init_dns ();
-extern void do_dns ();
-
-
+int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);
+int init_dns (void);
+void do_dns (void);
 
 #endif
