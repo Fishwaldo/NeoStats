@@ -339,6 +339,9 @@ run_mod_timers (int ismidnight)
 						continue;
 					break;
 				case TIMER_TYPE_COUNTDOWN:
+					timer->interval--;
+					if( timer->interval > 0)
+						continue;
 					deleteme = 1;
 					break;
 			}
