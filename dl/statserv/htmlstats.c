@@ -35,6 +35,7 @@ FILE *tpl, *opf;
 void ss_html() {
 	char *buf;
 	char *buf1;
+	char *bufold;
 	char startstr = 0;
 	int gothtml = 0;
 	if (StatServ.html) {
@@ -61,10 +62,9 @@ void ss_html() {
 		return;
 	}
 	buf = malloc(STARTBUFSIZE*2);
+	bufold = buf;
+	buf1 = malloc(STARTBUFSIZE*2);
 	while (fgets(buf, STARTBUFSIZE, tpl)) {
-		bufsize = STARTBUFSIZE *2;
-		buf1 = malloc(bufsize);
-		
 
 		buf1 = strstr(buf, "!MAP!");
 		if (buf1) {
@@ -193,9 +193,9 @@ void ss_html() {
 
 		
 		fputs(buf, opf);
-		free(buf1);
 	}
-	free(buf);
+	free(buf1);
+	free(bufold);
 	if (!gothtml) {
 		put_copyright();
 	}

@@ -81,13 +81,13 @@ int main()
 		_exit(0);
 	}
 
-	init_server_hash();
-	init_user_hash();
-	init_chan_hash();
 	__init_mod_list();
 	ConfLoad();
 	init_ircd();
 	TimerReset();
+	init_server_hash();
+	init_user_hash();
+	init_chan_hash();
 
 /* Shmad */
 /* This section ALWAYS craps out so we ignore it-- for now */
