@@ -413,7 +413,7 @@ static int ss_chans(User * u, char **av, int ac)
 			}
 		}
 		prefmsg(u->nick, s_StatServ, "End of List.");
-	} else if (!strcasecmp(chan, "POP")) {
+	} else if (!ircstrcasecmp(chan, "POP")) {
 		/* they want the top10 Popular Channels (based on joins) */
 		if (!list_is_sorted(Chead, topjoin)) {
 			list_sort(Chead, topjoin);
@@ -446,7 +446,7 @@ static int ss_chans(User * u, char **av, int ac)
 			}
 		}
 		prefmsg(u->nick, s_StatServ, "End of List.");
-	} else if (!strcasecmp(chan, "KICKS")) {
+	} else if (!ircstrcasecmp(chan, "KICKS")) {
 		/* they want the top10 most unwelcome channels (based on kicks) */
 		if (!list_is_sorted(Chead, topkick)) {
 			list_sort(Chead, topkick);
@@ -481,7 +481,7 @@ static int ss_chans(User * u, char **av, int ac)
 			}
 		}
 		prefmsg(u->nick, s_StatServ, "End of List.");
-	} else if (!strcasecmp(chan, "TOPICS")) {
+	} else if (!ircstrcasecmp(chan, "TOPICS")) {
 		/* they want the top10 most undecisive channels (based on topics) */
 		if (!list_is_sorted(Chead, toptopics)) {
 			list_sort(Chead, toptopics);
@@ -666,7 +666,7 @@ static void makemap(char *uplink, User * u, int level)
 				ss->opers, ss->maxopers, (long)s->ping,
 				ss->highest_ping);
 			makemap(s->name, u, level + 1);
-		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
+		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {
@@ -827,7 +827,7 @@ static int ss_operlist(User * u, char **av, int ac)
 
 	flags = av[2];
 	server = av[3];
-	if (flags && !strcasecmp(flags, "NOAWAY")) {
+	if (flags && !ircstrcasecmp(flags, "NOAWAY")) {
 		away = 1;
 		flags = NULL;
 		prefmsg(u->nick, s_StatServ, "On-Line IRCops (Not Away):");
@@ -851,7 +851,7 @@ static int ss_operlist(User * u, char **av, int ac)
 			continue;
 		if (away && testuser->is_away)
 			continue;
-		if (!strcasecmp(testuser->server->name, me.services_name))
+		if (!ircstrcasecmp(testuser->server->name, me.services_name))
 			continue;
 		if (!server) {
 			j++;
@@ -860,7 +860,7 @@ static int ss_operlist(User * u, char **av, int ac)
 				testuser->server->name, ulevel);
 			continue;
 		} else {
-			if (strcasecmp(server, testuser->server->name))
+			if (ircstrcasecmp(server, testuser->server->name))
 				continue;
 			j++;
 			prefmsg(u->nick, s_StatServ,
@@ -912,7 +912,7 @@ static int ss_stats(User * u, char **av, int ac)
 	cmd = av[2];
 	arg = av[3]; 
 	arg2 = av[4];
-	if (!strcasecmp(cmd, "LIST")) {
+	if (!ircstrcasecmp(cmd, "LIST")) {
 		int i = 1;
 		prefmsg(u->nick, s_StatServ, "Statistics Database:");
 		hash_scan_begin(&scan, Shead);
@@ -923,7 +923,7 @@ static int ss_stats(User * u, char **av, int ac)
 		}
 		prefmsg(u->nick, s_StatServ, "End of List.");
 		nlog(LOG_NOTICE, LOG_MOD, "%s requested STATS LIST.", u->nick);
-	} else if (!strcasecmp(cmd, "DEL")) {
+	} else if (!ircstrcasecmp(cmd, "DEL")) {
 		if (!arg) {
 			prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS DEL <name>", s_StatServ);
 			prefmsg(u->nick, s_StatServ, "For additonal help, /msg %s HELP", s_StatServ);
@@ -955,7 +955,7 @@ static int ss_stats(User * u, char **av, int ac)
 				return 0;
 		}
 
-	} else if (!strcasecmp(cmd, "COPY")) {
+	} else if (!ircstrcasecmp(cmd, "COPY")) {
 		Server *s;
 
 		if (!arg || !arg2) {

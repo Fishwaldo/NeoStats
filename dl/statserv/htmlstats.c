@@ -592,7 +592,7 @@ void get_map(char *uplink, int level)
 				ss->opers, ss->maxopers, s->ping,
 				(int)ss->highest_ping);
 			get_map(s->name, level + 1);
-		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
+		} else if ((level > 0) && !ircstrcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
 			buf[0]='\0';
 			for (i = 1; i < level; i++) {

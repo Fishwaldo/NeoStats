@@ -63,7 +63,7 @@ TLD *findtld(char *tld)
 
 	SET_SEGV_LOCATION();
 	for (t = tldhead; t; t = t->next) {
-		if (!strcasecmp(t->tld, tld))
+		if (!ircstrcasecmp(t->tld, tld))
 			return t;
 	}
 
