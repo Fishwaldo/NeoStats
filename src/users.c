@@ -336,8 +336,8 @@ void UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 	u = (Client *) hnode_get (un);
 	hash_delete (userhash, un);
 	strlcpy (u->name, newnick, MAXNICK);
-	ircsnprintf( u->user->userhostmask, USERHOSTLEN, "%s!%s@%s", u->name, u->user->username, u->hostname );
-	ircsnprintf( u->user->uservhostmask, USERHOSTLEN, "%s!%s@%s", u->name, u->user->username, u->vhost );
+	ircsnprintf( u->user->userhostmask, USERHOSTLEN, "%s!%s@%s", u->name, u->user->username, u->user->hostname );
+	ircsnprintf( u->user->uservhostmask, USERHOSTLEN, "%s!%s@%s", u->name, u->user->username, u->user->vhost );
 	if (ts) {
 		u->tsconnect = atoi (ts);
 	} else {
