@@ -48,3 +48,4 @@ install-pkglibLTLIBRARIES: $(pkglib_LTLIBRARIES)
 
 
 pkglibdir = $(prefix)/modules
+datadir = $(prefix)/data
