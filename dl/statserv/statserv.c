@@ -829,6 +829,8 @@ static void ss_stats(User *u, char *cmd, char *arg, char *arg2)
 			st = hnode_get(sn);
 			hnode_destroy(sn);
 			free(st);
+			log("Tried to delete %s",arg);
+			chanalert("Deleted %s",arg);
 			s_new_server(arg, 1);
 		}
 		prefmsg(u->nick, s_StatServ, "Removed %s from the database.", arg);
