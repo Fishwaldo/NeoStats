@@ -212,12 +212,11 @@ int irc_connect (const char *name, const int numeric, const char *infoline, cons
 int irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes);
 int irc_server (const char *name, const int numeric, const char *infoline);
 int irc_squit (const char *server, const char *quitmsg);
-
 /*int snetinfo_cmd (void);*/
 /*int ssvinfo_cmd (void);*/
 /*int sburst_cmd (int b);*/
 /*int seob_cmd (const char *server);*/
-int ssmo_cmd (const char *from, const char *umodetarget, const char *msg);
+int irc_smo (const char *from, const char *umodetarget, const char *msg);
 
 EXPORTFUNC void send_cmd (char *fmt, ...) __attribute__((format(printf,1,2))); /* 2=format 3=params */
 

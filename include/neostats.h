@@ -143,6 +143,7 @@ char *LANGgettext(const char *string, int mylang);
 #include "hash.h"
 #include "support.h"
 #include "events.h"
+#include "numeric.h"
 
 #define arraylen(a)	(sizeof(a) / sizeof(*(a)))
 
@@ -164,7 +165,7 @@ char *LANGgettext(const char *string, int mylang);
 #define PROTOCOL_UNKLN		0x00008000  /* Have UNKLINE support */
 #define PROTOCOL_NICKIP		0x00010000  /* NICK passes IP address */
 
-#define PROTOCOL_CLIENTMODE		0x80000000  /* Client mode */
+#define PROTOCOL_CLIENTMODE	0x80000000  /* Client mode */
 
 #define FEATURE_SWHOIS		0x00000001	/* SWHOIS */
 #define FEATURE_SVSTIME		0x00000002	/* SVSTIME */
@@ -338,8 +339,6 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 
 #endif /* TS_MIN */
 
-#include "numeric.h"
-
 #define MOD_PATH		"modules"
 #define RECV_LOG		"logs/recv.log"
 
@@ -423,12 +422,14 @@ EXPORTFUNC char CmodeCharToPrefix (const char mode);
 #define NS_TRUE			1
 #define NS_FALSE		0
 
-/* these defines are for the flags for users, channels and servers */
-#define CLIENT_FLAG_EXCLUDED	0x00000001 /* this entry matched a exclusion */
-#define CLIENT_FLAG_ME			0x00000002 /* indicates the client is a NeoStats one */
-#define CLIENT_FLAG_SYNCHED		0x00000004 /* indicates the server is now synched */
+/* General flags for for clients (users and servers) and channels */
+#define NS_FLAG_EXCLUDED	0x00000001 /* matches a exclusion */
+
+/* Flags for clients (users and servers) */
+#define CLIENT_FLAG_ME		0x00000001 /* client is a NeoStats one */
+#define CLIENT_FLAG_SYNCHED	0x00000002 /* client is synched */
 #if 0
-#define NS_FLAGS_NETJOIN	0x00000008 /* indicates the user is on a net join */
+#define NS_FLAGS_NETJOIN	0x00000008 /* client is on a net join */
 #endif
 
 /* Specific errors beyond SUCCESS/FAILURE so that functions can handle errors 
@@ -659,10 +660,6 @@ struct ping {
 } ping;
 
 /* Comand list handling */
-/** @brief flags for command list
- *  flags to provide more information on a command to the core
- */
-#define CMD_FLAG_SET	0x00000001
 
 /** @brief bot_cmd_handler type
  *  defines handler function definition
@@ -1082,21 +1079,21 @@ EXPORTFUNC int split_buf (char *buf, char ***argv, int colon_special);
 
 /*  Messaging functions to send messages to users and channels
  */
-EXPORTFUNC void irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void irc_prefmsg_list (const Bot *botptr, const Client *target, const char **text);
-EXPORTFUNC void irc_privmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void irc_privmsg_list (const Bot *botptr, const Client *target, const char **text);
-EXPORTFUNC void irc_notice (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC void irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_prefmsg_list (const Bot *botptr, const Client *target, const char **text);
+EXPORTFUNC int irc_privmsg (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_privmsg_list (const Bot *botptr, const Client *target, const char **text);
+EXPORTFUNC int irc_notice (const Bot *botptr, const Client *target, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
 /*  Specialised messaging functions for global messages, services channel 
  *  alerts and numeric responses
  */
-EXPORTFUNC void irc_chanalert (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void irc_globops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void irc_wallops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void irc_numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_chanalert (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int irc_globops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int irc_wallops (const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC int irc_numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
 /*  General irc actions for join/part channels etc
  */
@@ -1189,7 +1186,7 @@ EXPORTFUNC void transfer_status(void);
 EXPORTFUNC int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 
 /* exclude */
-#define IsExcluded(x) ((x) && ((x)->flags & CLIENT_FLAG_EXCLUDED))
+#define IsExcluded(x) ((x) && ((x)->flags & NS_FLAG_EXCLUDED))
 
 /* Is the user or server a NeoStats one? */
 #define IsMe(x) ((x) && ((x)->flags & CLIENT_FLAG_ME))

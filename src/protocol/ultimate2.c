@@ -67,20 +67,15 @@ ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
 	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
-	0,
+	PROTOCOL_TOKEN,
 	/* Features supported by this IRCd */
 	0,
 	"+oS",
 	"+a",
 };
 
-/* Ultimate 2 does support these 5 tokens so may need to add them back 
- * in at some point
- * TOK_MODE, TOK_JOIN, TOK_NICK, TOK_AWAY, TOK_TOPIC
- */
-
 ircd_cmd cmd_list[] = {
-	/* Command      Token          Function       srvmsg */
+	/* Command Token Function usage */
 	{MSG_PRIVATE,	0,   m_private,	0},
 	{MSG_NOTICE,	0,	   m_notice,	0},
 	{MSG_STATS,     0,     m_stats,     0},
@@ -182,8 +177,7 @@ send_server_connect (const char *name, const int numeric, const char *infoline, 
 {
 	send_cmd ("%s %s", MSG_PASS, pass);
 	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
-/*	send_cmd ("%s TOKEN CLIENT", MSG_PROTOCTL);*/
-	send_cmd ("%s CLIENT", MSG_PROTOCTL);
+	send_cmd ("%s TOKEN CLIENT", MSG_PROTOCTL);
 }
 
 void

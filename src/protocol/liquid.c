@@ -74,7 +74,7 @@ ProtocolInfo protocol_info = {
 };
 
 ircd_cmd cmd_list[] = {
-	/* Command      Function                srvmsg */
+	/* Command Token Function usage */
 	{MSG_PRIVATE, 0, m_private, 0},
 	{MSG_NOTICE, 0, m_notice, 0},
 	{MSG_STATS, 0, m_stats, 0},
@@ -106,11 +106,6 @@ ircd_cmd cmd_list[] = {
 };
 
 mode_init chan_umodes[] = {
-/* CMODE_DECHANOWNER */
-/* CMODE_DECHANPROT	*/
-/* CMODE_DEOPPED */
-/* CMODE_DEHALFOPPED */
-/* CMODE_DEUOP	*/
 	{'q', CUMODE_CHANOWNER, 0, '!'},
 	{'a', CUMODE_CHANPROT, 0, '*'},
 	{'o', CUMODE_CHANOP, 0, '@'},
@@ -137,8 +132,8 @@ mode_init chan_modes[] = {
 	{'S', CMODE_STRIP, 0},
 	{'t', CMODE_TOPICLIMIT, 0},
 	{'O', CMODE_OPERONLY, 0},
-/* CMODE_MODREG */
-/* CMODE_AUDITORIUM */
+	{'M', CMODE_MODREG, 0},
+	{'N', CMODE_AUDITORIUM, 0},
 	{0, 0, 0},
 };
 
@@ -380,6 +375,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 static void
 m_protoctl (char *origin, char **argv, int argc, int srv)
 {
+	do_protocol (origin, argv, argc);
 }
 
 static void

@@ -71,7 +71,7 @@ ProtocolInfo protocol_info = {
 
 /* this is the command list and associated functions to run */
 ircd_cmd cmd_list[] = {
-	/* Command      Function                srvmsg */
+	/* Command Token Function usage */
 	{MSG_PRIVATE, 0, m_private, 0},
 	{MSG_NOTICE, 0, m_notice, 0},
 	{MSG_STATS, 0, m_stats, 0},

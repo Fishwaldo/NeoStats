@@ -237,8 +237,8 @@ void ns_do_exclude_user(Client *u)
 	/* first thing we check is the server flag. if the server
 	 * is excluded, then the user is excluded as well
 	 */
-	if (u->uplink->flags & CLIENT_FLAG_EXCLUDED) {
-	 	u->flags |= CLIENT_FLAG_EXCLUDED;
+	if (u->uplink->flags & NS_FLAG_EXCLUDED) {
+	 	u->flags |= NS_FLAG_EXCLUDED;
 		return;
 	}
 	
@@ -247,14 +247,14 @@ void ns_do_exclude_user(Client *u)
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_HOST) {
 			if (match(e->pattern, u->user->hostname)) {
-				u->flags |= CLIENT_FLAG_EXCLUDED;
+				u->flags |= NS_FLAG_EXCLUDED;
 				return;
 			}
 		}
 		en = list_next(exclude_list, en);
 	}
 	/* if we are here, there is no match */
-	u->flags &= ~CLIENT_FLAG_EXCLUDED;
+	u->flags &= ~NS_FLAG_EXCLUDED;
 }
 
 /* @brief check if a server is matched against a exclusion
@@ -276,14 +276,14 @@ void ns_do_exclude_server(Client *s)
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_SERVER) {
 			if (match(e->pattern, s->name)) {
-				s->flags |= CLIENT_FLAG_EXCLUDED;
+				s->flags |= NS_FLAG_EXCLUDED;
 				return;
 			}
 		}
 		en = list_next(exclude_list, en);
 	}
 	/* if we are here, there is no match */
-	s->flags &= ~CLIENT_FLAG_EXCLUDED;
+	s->flags &= ~NS_FLAG_EXCLUDED;
 }
 
 /* @brief check if a channel is matched against a exclusion
@@ -305,12 +305,12 @@ void ns_do_exclude_chan(Channel *c)
 		e = lnode_get(en);
 		if (e->type == NS_EXCLUDE_CHAN) {
 			if (match(e->pattern, c->name)) {
-				c->flags |= CLIENT_FLAG_EXCLUDED;
+				c->flags |= NS_FLAG_EXCLUDED;
 				return;
 			}
 		}
 		en = list_next(exclude_list, en);
 	}
 	/* if we are here, there is no match */
-	c->flags &= ~CLIENT_FLAG_EXCLUDED;
+	c->flags &= ~NS_FLAG_EXCLUDED;
 }

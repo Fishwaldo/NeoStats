@@ -122,13 +122,13 @@ InitIrcdSymbols (void)
   
 	ircsnprintf (protocol_name, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_EXT);
 	protocol_module_handle = ns_dlopen(protocol_name, RTLD_NOW || RTLD_GLOBAL);
-	if(!protocol_module_handle) {
+	if (!protocol_module_handle) {
 		printf ("\nERROR: Unable to load protocol module %s\n", protocol_name);
 		nlog (LOG_CRITICAL, "Unable to load protocol module %s\n", protocol_name);
 		return NS_FAILURE;	
 	}
-	protocol_info = ns_dlsym( protocol_module_handle, "protocol_info");
-	if(!protocol_info) {
+	protocol_info = ns_dlsym (protocol_module_handle, "protocol_info");
+	if (!protocol_info) {
 		printf ("\nERROR: Unable to find protocol_info in protocol module %s\n", protocol_name);
 		nlog (LOG_CRITICAL, "Unable to find protocol_info in protocol module %s\n", protocol_name);
 		return NS_FAILURE;	
@@ -142,111 +142,119 @@ InitIrcdSymbols (void)
 	strlcpy (me.servicesumode, protocol_info->services_umode, MODESIZE);
 
 	/* Allow protocol module to "override" the parser */
-	irc_parse = ns_dlsym( protocol_module_handle, "parse");
-	if(irc_parse == NULL)
+	irc_parse = ns_dlsym (protocol_module_handle, "parse");
+	if (irc_parse == NULL)
 		irc_parse = parse;
 
-	cmd_list = ns_dlsym( protocol_module_handle, "cmd_list");
-	if(!cmd_list) {
+	cmd_list = ns_dlsym (protocol_module_handle, "cmd_list");
+	if (!cmd_list) {
 		IrcdError("command list");
 		return NS_FAILURE;	
 	}
-	chan_umodes = ns_dlsym( protocol_module_handle, "chan_umodes");
-	if(!chan_umodes) {
+	chan_umodes = ns_dlsym (protocol_module_handle, "chan_umodes");
+	if (!chan_umodes) {
 		IrcdError("channel umode table");
 		return NS_FAILURE;	
 	}
-	chan_modes  = ns_dlsym( protocol_module_handle, "chan_modes");
-	if(!chan_modes) {
+	chan_modes  = ns_dlsym (protocol_module_handle, "chan_modes");
+	if (!chan_modes) {
 		IrcdError("channel mode table");
 		return NS_FAILURE;	
 	}
-	user_umodes = ns_dlsym( protocol_module_handle, "user_umodes");
-	if(!user_umodes) {
+	user_umodes = ns_dlsym (protocol_module_handle, "user_umodes");
+	if (!user_umodes) {
 		IrcdError("user mode table");
 		return NS_FAILURE;	
 	}
 	/* Not required */
-	user_smodes = ns_dlsym( protocol_module_handle, "user_smodes");
-	if(user_smodes) {
+	user_smodes = ns_dlsym (protocol_module_handle, "user_smodes");
+	if (user_smodes) {
 		ircd_srv.features |= FEATURE_USERSMODES;
 	}
 
-	irc_send_privmsg = ns_dlsym( protocol_module_handle, "send_privmsg");
-	if(!irc_send_privmsg) {
+	irc_send_privmsg = ns_dlsym (protocol_module_handle, "send_privmsg");
+	if (!irc_send_privmsg) {
 		IrcdError("send_privmsg handler");
 		return NS_FAILURE;	
 	}
-	irc_send_notice = ns_dlsym( protocol_module_handle, "send_notice");
-	if(!irc_send_notice) {
+	irc_send_notice = ns_dlsym (protocol_module_handle, "send_notice");
+	if (!irc_send_notice) {
 		IrcdError("send_notice handler");
 		return NS_FAILURE;	
 	}
-	irc_send_globops = ns_dlsym( protocol_module_handle, "send_globops");
-	irc_send_wallops = ns_dlsym( protocol_module_handle, "send_wallops");
-	irc_send_numeric = ns_dlsym( protocol_module_handle, "send_numeric");
-	irc_send_umode = ns_dlsym( protocol_module_handle, "send_umode");
-	irc_send_join = ns_dlsym( protocol_module_handle, "send_join");
-	irc_send_sjoin = ns_dlsym( protocol_module_handle, "send_sjoin");
-	irc_send_part = ns_dlsym( protocol_module_handle, "send_part");
-	irc_send_nickchange = ns_dlsym( protocol_module_handle, "send_nickchange");
-	irc_send_cmode = ns_dlsym( protocol_module_handle, "send_cmode");
-	irc_send_quit = ns_dlsym( protocol_module_handle, "send_quit");
-	irc_send_kill = ns_dlsym( protocol_module_handle, "send_kill");
-	irc_send_kick = ns_dlsym( protocol_module_handle, "send_kick");
-	irc_send_invite = ns_dlsym( protocol_module_handle, "send_invite");
-	irc_send_svskill = ns_dlsym( protocol_module_handle, "send_svskill");
-	if(irc_send_svskill) {
+	irc_send_globops = ns_dlsym (protocol_module_handle, "send_globops");
+	irc_send_wallops = ns_dlsym (protocol_module_handle, "send_wallops");
+	irc_send_numeric = ns_dlsym (protocol_module_handle, "send_numeric");
+	irc_send_umode = ns_dlsym (protocol_module_handle, "send_umode");
+	irc_send_join = ns_dlsym (protocol_module_handle, "send_join");
+	irc_send_sjoin = ns_dlsym (protocol_module_handle, "send_sjoin");
+	irc_send_part = ns_dlsym (protocol_module_handle, "send_part");
+	irc_send_nickchange = ns_dlsym (protocol_module_handle, "send_nickchange");
+	irc_send_cmode = ns_dlsym (protocol_module_handle, "send_cmode");
+	irc_send_quit = ns_dlsym (protocol_module_handle, "send_quit");
+	irc_send_kill = ns_dlsym (protocol_module_handle, "send_kill");
+	irc_send_kick = ns_dlsym (protocol_module_handle, "send_kick");
+	irc_send_invite = ns_dlsym (protocol_module_handle, "send_invite");
+	irc_send_svskill = ns_dlsym (protocol_module_handle, "send_svskill");
+	if (irc_send_svskill) {
 		ircd_srv.features |= FEATURE_SVSKILL;
 	}
-	irc_send_svsmode = ns_dlsym( protocol_module_handle, "send_svsmode");
-	if(irc_send_svsmode) {
+	irc_send_svsmode = ns_dlsym (protocol_module_handle, "send_svsmode");
+	if (irc_send_svsmode) {
 		ircd_srv.features |= FEATURE_SVSMODE;
 	}
-	irc_send_svshost = ns_dlsym( protocol_module_handle, "send_svshost");
-	if(irc_send_svshost) {
+	irc_send_svshost = ns_dlsym (protocol_module_handle, "send_svshost");
+	if (irc_send_svshost) {
 		ircd_srv.features |= FEATURE_SVSHOST;
 	}
-	irc_send_svsjoin = ns_dlsym( protocol_module_handle, "send_svsjoin");
-	if(irc_send_svsjoin) {
+	irc_send_svsjoin = ns_dlsym (protocol_module_handle, "send_svsjoin");
+	if (irc_send_svsjoin) {
 		ircd_srv.features |= FEATURE_SVSJOIN;
 	}
-	irc_send_svspart = ns_dlsym( protocol_module_handle, "send_svspart");
-	if(irc_send_svspart) {
+	irc_send_svspart = ns_dlsym (protocol_module_handle, "send_svspart");
+	if (irc_send_svspart) {
 		ircd_srv.features |= FEATURE_SVSPART;
 	}
-	irc_send_svsnick = ns_dlsym( protocol_module_handle, "send_svsnick");
-	if(irc_send_svsnick) {
+	irc_send_svsnick = ns_dlsym (protocol_module_handle, "send_svsnick");
+	if (irc_send_svsnick) {
 		ircd_srv.features |= FEATURE_SVSNICK;
 	}
-	irc_send_swhois = ns_dlsym( protocol_module_handle, "send_swhois");
-	if(irc_send_swhois) {
+	irc_send_swhois = ns_dlsym (protocol_module_handle, "send_swhois");
+	if (irc_send_swhois) {
 		ircd_srv.features |= FEATURE_SWHOIS;
 	}
-	irc_send_smo = ns_dlsym( protocol_module_handle, "send_smo");
-	if(irc_send_smo) {
+	irc_send_smo = ns_dlsym (protocol_module_handle, "send_smo");
+	if (irc_send_smo) {
 		ircd_srv.features |= FEATURE_SMO;
 	}
-	irc_send_svstime = ns_dlsym( protocol_module_handle, "send_svstime");
-	if(irc_send_svstime) {
+	irc_send_svstime = ns_dlsym (protocol_module_handle, "send_svstime");
+	if (irc_send_svstime) {
 		ircd_srv.features |= FEATURE_SVSTIME;
 	}
-	irc_send_akill = ns_dlsym( protocol_module_handle, "send_akill");
-	irc_send_rakill = ns_dlsym( protocol_module_handle, "send_rakill");
-	irc_send_ping = ns_dlsym( protocol_module_handle, "send_ping");
-	irc_send_pong = ns_dlsym( protocol_module_handle, "send_pong");
-	irc_send_server = ns_dlsym( protocol_module_handle, "send_server");
-	irc_send_squit = ns_dlsym( protocol_module_handle, "send_squit");
-	irc_send_nick = ns_dlsym( protocol_module_handle, "send_nick");
-	irc_send_server_connect = ns_dlsym( protocol_module_handle, "send_server_connect");
-	irc_send_netinfo = ns_dlsym( protocol_module_handle, "send_netinfo");
-	irc_send_snetinfo = ns_dlsym( protocol_module_handle, "send_snetinfo");
-	irc_send_svinfo = ns_dlsym( protocol_module_handle, "send_svinfo");
-	irc_send_vctrl = ns_dlsym( protocol_module_handle, "send_vctrl");
-	irc_send_burst = ns_dlsym( protocol_module_handle, "send_burst");
-	irc_send_setname = ns_dlsym( protocol_module_handle, "send_setname");
-	irc_send_sethost = ns_dlsym( protocol_module_handle, "send_sethost");
-	irc_send_setident = ns_dlsym( protocol_module_handle, "send_setident");
+	irc_send_akill = ns_dlsym (protocol_module_handle, "send_akill");
+	irc_send_rakill = ns_dlsym (protocol_module_handle, "send_rakill");
+	irc_send_ping = ns_dlsym (protocol_module_handle, "send_ping");
+	irc_send_pong = ns_dlsym (protocol_module_handle, "send_pong");
+	irc_send_server = ns_dlsym (protocol_module_handle, "send_server");
+	irc_send_squit = ns_dlsym (protocol_module_handle, "send_squit");
+	irc_send_nick = ns_dlsym (protocol_module_handle, "send_nick");
+	if (!irc_send_nick) {
+		IrcdError("nick handler");
+		return NS_FAILURE;	
+	}
+	irc_send_server_connect = ns_dlsym (protocol_module_handle, "send_server_connect");
+	if (!irc_send_server_connect) {
+		IrcdError("server connect handler");
+		return NS_FAILURE;	
+	}
+	irc_send_netinfo = ns_dlsym (protocol_module_handle, "send_netinfo");
+	irc_send_snetinfo = ns_dlsym (protocol_module_handle, "send_snetinfo");
+	irc_send_svinfo = ns_dlsym (protocol_module_handle, "send_svinfo");
+	irc_send_vctrl = ns_dlsym (protocol_module_handle, "send_vctrl");
+	irc_send_burst = ns_dlsym (protocol_module_handle, "send_burst");
+	irc_send_setname = ns_dlsym (protocol_module_handle, "send_setname");
+	irc_send_sethost = ns_dlsym (protocol_module_handle, "send_sethost");
+	irc_send_setident = ns_dlsym (protocol_module_handle, "send_setident");
 
 	return NS_SUCCESS;
 }
@@ -263,12 +271,12 @@ InitIrcd ()
 	/* Clear IRCD info */
 	memset(&ircd_srv, 0, sizeof(ircd_srv));
 	/* Setup IRCD function calls */
-	if(InitIrcdSymbols() != NS_SUCCESS) 
+	if (InitIrcdSymbols() != NS_SUCCESS) 
 		return NS_FAILURE;
 	/* set min protocol */
 	ircd_srv.protocol = protocol_info->minprotocol;
 	/* Build mode tables */
-	if(InitIrcdModes() != NS_SUCCESS) 
+	if (InitIrcdModes() != NS_SUCCESS) 
 		return NS_FAILURE;
 	return NS_SUCCESS;
 }
@@ -283,18 +291,18 @@ void
 m_notice (char* origin, char **av, int ac, int cmdptr)
 {
 	SET_SEGV_LOCATION();
-	if( av[0] == NULL) {
+	if ( av[0] == NULL) {
 		dlog(DEBUG1, "m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
 	dlog(DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* who to */
-	if(av[0][0] == '#') {
+	if (av[0][0] == '#') {
 		bot_chan_notice (origin, av, ac);
 		return;
 	}
 #if 0
-	if( ircstrcasecmp(av[0], "AUTH")) {
+	if ( ircstrcasecmp(av[0], "AUTH")) {
 		dlog(DEBUG1, "m_notice: dropping server notice from %s, to %s : %s", origin, av[0], av[ac-1]);
 		return;
 	}
@@ -315,13 +323,13 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 	char target[64];
 
 	SET_SEGV_LOCATION();
-	if( av[0] == NULL) {
+	if ( av[0] == NULL) {
 		dlog(DEBUG1, "m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
 	dlog(DEBUG1, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
 	/* who to */
-	if(av[0][0] == '#') {
+	if (av[0][0] == '#') {
 		bot_chan_private (origin, av, ac);
 		return;
 	}
@@ -352,7 +360,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 		if (!strcmp (ircd_cmd_ptr->name, cmd)
 			||((ircd_srv.protocol & PROTOCOL_TOKEN) && ircd_cmd_ptr->token && !strcmp (ircd_cmd_ptr->token, cmd))
 			) {
-			if(ircd_cmd_ptr->function) {
+			if (ircd_cmd_ptr->function) {
 				dlog(DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
 				ircd_cmd_ptr->function (origin, av, ac, cmdptr);
 			} else {
@@ -368,7 +376,7 @@ process_ircd_cmd (int cmdptr, char *cmd, char* origin, char **av, int ac)
 	/* Process numeric replies */
 	while(ircd_cmd_ptr->name) {
 		if (!strcmp (ircd_cmd_ptr->name, cmd)) {
-			if(ircd_cmd_ptr->function) {
+			if (ircd_cmd_ptr->function) {
 				dlog(DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name);
 				ircd_cmd_ptr->function (origin, av, ac, cmdptr);
 			} else {
@@ -434,6 +442,810 @@ parse (char *line)
 	dlog(DEBUG1, "-------------------------END PARSE--------------------------");
 }
 
+/** @brief unsupported_cmd
+ *
+ *  report attempts to use a feature not supported by the loaded protocol
+ *
+ * @return none
+ */
+static void
+unsupported_cmd (const char* cmd)
+{
+	irc_chanalert (ns_botptr, _("Warning, %s tried to %s which is not supported"), GET_CUR_MODNAME(), cmd);
+	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", GET_CUR_MODNAME(), cmd);
+}
+
+/** @brief irc_connect
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
+{
+	if (!irc_send_server_connect) {
+		unsupported_cmd ("SERVER CONNECT");
+		return NS_FAILURE;
+	}
+	irc_send_server_connect (name, numeric, infoline, pass, tsboot, tslink);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_prefmsg_list 
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_prefmsg_list (const Bot *botptr, const Client * target, const char **text)
+{
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping irc_prefmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
+		return NS_SUCCESS;
+	}
+	while (*text) {
+		if (**text) {
+			irc_prefmsg (botptr, target, (char*)*text);
+		} else {
+			irc_prefmsg (botptr, target, " ");
+		}
+		text++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief irc_privmsg_list
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_privmsg_list (const Bot *botptr, const Client * target, const char **text)
+{
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
+		return NS_SUCCESS;
+	}
+	while (*text) {
+		if (**text) {
+			irc_privmsg (botptr, target, (char*)*text);
+		} else {
+			irc_privmsg (botptr, target, " ");
+		}
+		text++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief irc_chanalert
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_chanalert (const Bot *botptr, const char *fmt, ...)
+{
+	va_list ap;
+
+	if (!is_synched)
+		return NS_SUCCESS;
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_privmsg (botptr->name, me.serviceschan, ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_prefmsg
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
+{
+	va_list ap;
+
+	if (IsMe (target)) {
+		nlog (LOG_NOTICE, "Dropping irc_prefmsg from bot (%s) to bot (%s)", botptr->u->name, target->name);
+		return NS_SUCCESS;
+	}
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	if (config.want_privmsg) {
+		irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
+	} else {
+		irc_send_notice (botptr?botptr->u->name:ns_botptr->u->name, target->name, ircd_buf);
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief irc_privmsg
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_privmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
+{
+	va_list ap;
+
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping privmsg from bot (%s) to bot (%s)", botptr->u->name, target->name);
+		return NS_SUCCESS;
+	}
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_notice
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_notice (const Bot *botptr, const Client *target, const char *fmt, ...)
+{
+	va_list ap;
+
+	if (IsMe(target)) {
+		nlog (LOG_NOTICE, "Dropping notice from bot (%s) to bot (%s)", botptr->u->name, target->name);
+		return NS_SUCCESS;
+	}
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_notice (botptr->u->name, target->name, ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_chanprivmsg
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_privmsg (botptr->u->name, chan, ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_channotice
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_notice (botptr->u->name, chan, ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_globops
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_globops (const Bot *botptr, const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	if (is_synched) {
+		if (!irc_send_globops) {
+			unsupported_cmd ("GLOBOPS");
+			nlog (LOG_NOTICE, "Dropping unhandled globops: %s", ircd_buf);
+			return NS_FAILURE;
+		}
+		irc_send_globops((botptr?botptr->u->name:me.name), ircd_buf);
+	} else {
+		nlog (LOG_NORMAL, ircd_buf);
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief irc_wallops
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_wallops (const Bot *botptr, const char *fmt, ...)
+{
+	va_list ap;
+
+	if (!irc_send_wallops) {
+		unsupported_cmd ("WALLOPS");
+		nlog (LOG_NOTICE, "Dropping unhandled wallops: %s", ircd_buf);
+		return NS_FAILURE;
+	}
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
+	va_end (ap);
+	irc_send_wallops ((botptr?botptr->name:me.name), ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_numeric
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_numeric (const int numeric, const char *target, const char *data, ...)
+{
+	va_list ap;
+
+	if (!irc_send_numeric) {
+		unsupported_cmd ("NUMERIC");
+		return NS_FAILURE;
+	}
+	va_start (ap, data);
+	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
+	va_end (ap);
+	irc_send_numeric (me.name, numeric, target, ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_nick
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes)
+{
+	if (!irc_send_nick) {
+		unsupported_cmd ("NICK");
+		return NS_FAILURE;
+	} 
+	irc_send_nick (nick, (unsigned long)me.now, modes, user, host, me.name, realname);
+	return NS_SUCCESS;
+}
+
+/** @brief CloakBotHost
+ *
+ *  Create a hidden hostmask for the bot 
+ *  Currently only Unreal support via UMODE auto cloaking
+ *  but function created for future use and propogation to
+ *  external modules to avoid a future joint release.
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+/** @brief irc_cloakhost
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_cloakhost (const Bot *botptr)
+{
+	if (ircd_srv.features&FEATURE_UMODECLOAK) {
+		irc_usermode (botptr, botptr->name, UMODE_HIDE);
+		return NS_SUCCESS;	
+	}
+	return NS_FAILURE;	
+}
+
+/** @brief irc_usermode
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_usermode (const Bot *botptr, const char *target, long mode)
+{
+	char* newmode;
+	
+	newmode = UmodeMaskToString(mode);
+	if (!irc_send_umode) {
+		unsupported_cmd ("UMODE");
+		return NS_FAILURE;
+	}
+	irc_send_umode (botptr->u->name, target, newmode);
+	UserMode (target, newmode);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_join
+ *
+ * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_join (const Bot *botptr, const char *chan, const char *mode)
+{
+	time_t ts;
+	Channel *c;
+
+	c = find_chan (chan);
+	ts = (!c) ? me.now : c->creationtime;
+	/* Use sjoin if available */
+	if ((ircd_srv.protocol & PROTOCOL_SJOIN) && irc_send_sjoin) {
+		if (mode == NULL) {
+			irc_send_sjoin (me.name, botptr->u->name, chan, (unsigned long)ts);
+		} else {
+			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix (mode[1]), botptr->u->name);
+			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
+		}
+		join_chan (botptr->u->name, chan);
+		/* Increment number of persistent users if needed */
+		if (botptr->flags & BOT_FLAG_PERSIST) {
+			c->persistentusers ++;
+		}
+		if (mode) {
+			ChanUserMode(chan, botptr->u->name, 1, CmodeStringToMask(mode));
+		}
+	/* sjoin not available so use normal join */	
+	} else if (irc_send_join) {
+		irc_send_join (botptr->u->name, chan, me.now);
+		join_chan (botptr->u->name, chan);
+		if (mode) {
+			irc_chanusermode(botptr, chan, mode, botptr->u->name);
+		}
+	/* Error */
+	} else {
+		unsupported_cmd ("SJOIN/JOIN");
+		return NS_FAILURE;
+	} 
+	return NS_SUCCESS;
+}
+
+/** @brief irc_part
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_part (const Bot *botptr, const char *chan)
+{
+	Channel *c;
+
+	if (!irc_send_part) {
+		unsupported_cmd ("PART");
+		return NS_FAILURE;
+	}
+	c = find_chan (chan);
+	/* Decrement number of persistent users if needed 
+	 * Must be BEFORE we part the channel in order to trigger
+	 * empty channel processing for other bots
+	 */
+	if (botptr->flags & BOT_FLAG_PERSIST) {
+		c->persistentusers --;
+	}
+	irc_send_part(botptr->u->name, chan);
+	part_chan (botptr->u, (char *) chan, NULL);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_nickchange
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_nickchange (const Bot *botptr, const char *newnick)
+{
+	if (!irc_send_nickchange) {
+		unsupported_cmd ("NICKCHANGE");
+		return NS_FAILURE;
+	}
+	if (!botptr) {
+		nlog (LOG_WARNING, "Unknown bot tried to change nick to %s", newnick);
+		return NS_FAILURE;
+	}
+	/* Check newnick is not in use */
+	if (find_user (newnick)) {
+		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", botptr->name, newnick);
+		return NS_FAILURE;
+	}
+	UserNick (botptr->name, newnick, NULL);
+	irc_send_nickchange (botptr->name, newnick, me.now);
+	bot_nick_change(botptr, newnick);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_setname
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_setname (const Bot *botptr, const char* realname)
+{
+	if (!irc_send_setname) {
+		unsupported_cmd ("SETNAME");
+		return NS_FAILURE;
+	}
+	irc_send_setname (botptr->name, realname);
+	strlcpy (botptr->u->info, (char*)realname, MAXHOST);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_sethost
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_sethost (const Bot *botptr, const char* host)
+{
+	if (!irc_send_sethost) {
+		unsupported_cmd ("SETNAME");
+		return NS_FAILURE;
+	}
+	irc_send_sethost (botptr->name, host);
+	strlcpy (botptr->u->user->hostname, (char*)host, MAXHOST);
+	return NS_SUCCESS;
+}
+ 
+/** @brief irc_setident
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_setident (const Bot *botptr, const char* ident)
+{
+	if (!irc_send_setident) {
+		unsupported_cmd ("SETNAME");
+		return NS_FAILURE;
+	}
+	irc_send_setident (botptr->name, ident);
+	strlcpy (botptr->u->user->username, (char*)ident, MAXHOST);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_chanmode
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char *args)
+{
+	char **av;
+	int ac;
+
+	if (!irc_send_cmode) {
+		unsupported_cmd ("CMODE");
+		return NS_FAILURE;
+	}
+	irc_send_cmode (me.name, botptr->u->name, chan, mode, args, me.now);
+	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
+	ac = split_buf (ircd_buf, &av, 0);
+	ChanMode (me.name, av, ac);
+	ns_free (av);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_chanusermode
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const char *target)
+{
+	if (!irc_send_cmode) {
+		unsupported_cmd ("CMODE");
+		return NS_FAILURE;
+	}
+	if ((ircd_srv.protocol & PROTOCOL_B64NICK)) {
+		irc_send_cmode (me.name, botptr->u->name, chan, mode, nicktobase64 (target), me.now);
+	} else {
+		irc_send_cmode (me.name, botptr->u->name, chan, mode, target, me.now);
+	}
+	ChanUserMode (chan, target, 1, CmodeStringToMask(mode));
+	return NS_SUCCESS;
+}
+
+/** @brief irc_quit
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_quit (const Bot * botptr, const char *quitmsg)
+{
+	if (!irc_send_quit) {
+		unsupported_cmd ("QUIT");
+		return NS_FAILURE;
+	}
+	irc_send_quit (botptr->u->name, quitmsg);
+	do_quit (botptr->u->name, quitmsg);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_kill
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_kill (const Bot *botptr, const char *target, const char *reason, ...)
+{
+	va_list ap;
+
+	if (!irc_send_kill) {
+		unsupported_cmd ("KILL");
+		return NS_FAILURE;
+	}
+	va_start (ap, reason);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
+	irc_send_kill (botptr->u->name, target, ircd_buf);
+	do_quit (target, ircd_buf);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_kick
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason)
+{
+	if (!irc_send_kick) {
+		unsupported_cmd ("KICK");
+		return NS_FAILURE;
+	}
+	irc_send_kick (botptr->u->name, chan, target, reason);
+	part_chan (find_user (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_invite
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_invite (const Bot *botptr, const char *to, const char *chan) 
+{
+	if (!irc_send_invite) {
+		unsupported_cmd ("INVITE");
+		return NS_FAILURE;
+	}
+	irc_send_invite(botptr->u->name, to, chan);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_svstime
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int 
+irc_svstime (const Bot *botptr, Client *target, const time_t ts)
+{
+	if (!irc_send_svstime) {
+		unsupported_cmd ("SVSTIME");
+		return NS_FAILURE;
+	}
+	irc_send_svstime(me.name, (unsigned long)ts);
+	nlog (LOG_NOTICE, "irc_svstime: synching server times to %lu", ts);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_svskill
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_svskill (const Bot *botptr, Client *target, const char *reason, ...)
+{
+	va_list ap;
+
+	va_start (ap, reason);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
+	if (irc_send_svskill) {
+		irc_send_svskill (me.name, target->name, ircd_buf);
+	} else if (irc_send_kill) {
+		irc_send_kill (me.name, target->name, ircd_buf);
+		do_quit (target->name, ircd_buf);
+	} else {
+		unsupported_cmd ("SVSKILL");
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief irc_svsmode
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_svsmode (const Bot *botptr, Client *target, const char *modes)
+{
+	if (!irc_send_svsmode) {
+		unsupported_cmd ("SVSMODE");
+		return NS_FAILURE;
+	}
+	irc_send_svsmode(me.name, target->name, modes);
+	UserMode (target->name, modes);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_svshost
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_svshost (const Bot *botptr, Client *target, const char *vhost)
+{
+	if (!irc_send_svshost) {
+		unsupported_cmd ("SVSHOST");
+		return NS_FAILURE;
+	}
+	strlcpy (target->user->vhost, vhost, MAXHOST);
+	irc_send_svshost(me.name, target->name, vhost);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_svsjoin
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_svsjoin (const Bot *botptr, Client *target, const char *chan)
+{
+	if (!irc_send_svsjoin) {
+		unsupported_cmd ("SVSJOIN");
+		return NS_FAILURE;
+	}
+	irc_send_svsjoin (me.name, target->name, chan);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_svspart
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_svspart (const Bot *botptr, Client *target, const char *chan)
+{
+	if (!irc_send_svspart) {
+		unsupported_cmd ("SVSPART");
+		return NS_FAILURE;
+	}
+	irc_send_svspart (me.name, target->name, chan);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_swhois
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_swhois (const char *target, const char *swhois)
+{
+	if (!irc_send_swhois) {
+		unsupported_cmd ("SWHOIS");
+		return NS_FAILURE;
+	}
+	irc_send_swhois (me.name, target, swhois);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_svsnick
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_svsnick (const Bot *botptr, Client *target, const char *newnick)
+{
+	if (!irc_send_svsnick) {
+		unsupported_cmd ("SVSNICK");
+		return NS_FAILURE;
+	}
+	irc_send_svsnick (me.name, target->name, newnick, me.now);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_smo
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_smo (const char *from, const char *umodetarget, const char *msg)
+{
+	if (!irc_send_smo) {
+		unsupported_cmd ("SMO");
+		return NS_FAILURE;
+	}
+	irc_send_smo (from, umodetarget, msg);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_akill
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_akill (const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...)
+{
+	va_list ap;
+
+	if (!irc_send_akill) {
+		unsupported_cmd ("AKILL");
+		return NS_FAILURE;
+	}
+	va_start (ap, reason);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
+	va_end (ap);
+	irc_send_akill(me.name, host, ident, botptr->name, length, ircd_buf, me.now);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_rakill
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_rakill (const Bot *botptr, const char *host, const char *ident)
+{
+	if (!irc_send_rakill) {
+		unsupported_cmd ("RAKILL");
+		return NS_FAILURE;
+	}
+	irc_send_rakill (me.name, host, ident);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_ping
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_ping (const char *from, const char *reply, const char *to)
+{
+	if (!irc_send_ping) {
+		unsupported_cmd ("PING");
+		return NS_FAILURE;
+	}
+	irc_send_ping (from, reply, to);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_pong
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_pong (const char *reply)
+{
+	if (!irc_send_pong) {
+		unsupported_cmd ("PONG");
+		return NS_FAILURE;
+	}
+	irc_send_pong (reply);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_server
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_server (const char *name, const int numeric, const char *infoline)
+{
+	if (!irc_send_server) {
+		unsupported_cmd ("SERVER");
+		return NS_FAILURE;
+	}
+	irc_send_server (me.name, name, numeric, infoline);
+	return NS_SUCCESS;
+}
+
+/** @brief irc_squit
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+int
+irc_squit (const char *server, const char *quitmsg)
+{
+	if (!irc_send_squit) {
+		unsupported_cmd ("SQUIT");
+		return NS_FAILURE;
+	}
+	irc_send_squit (server, quitmsg);
+	return NS_SUCCESS;
+}
+
 /** @brief do_ping
  *
  * 
@@ -443,9 +1255,9 @@ parse (char *line)
 void
 do_ping (const char* origin, const char* destination)
 {
-	irc_send_pong (origin);
+	irc_pong (origin);
 	if (ircd_srv.burst) {
-		irc_send_ping (me.name, origin, origin);
+		irc_ping (me.name, origin, origin);
 	}
 }
 
@@ -505,7 +1317,7 @@ do_motd (const char* nick, const char *remoteserver)
 
 	SET_SEGV_LOCATION();
 	fp = fopen (MOTD_FILENAME, "r");
-	if(!fp) {
+	if (!fp) {
 		irc_numeric (ERR_NOMOTD, nick, _(":- MOTD file Missing"));
 	} else {
 		irc_numeric (RPL_MOTDSTART, nick, _(":- %s Message of the Day -"), me.name);
@@ -535,7 +1347,7 @@ do_admin (const char* nick, const char *remoteserver)
 	SET_SEGV_LOCATION();
 
 	fp = fopen (ADMIN_FILENAME, "r");
-	if(!fp) {
+	if (!fp) {
 		irc_numeric (ERR_NOADMININFO, nick, _("%s :No administrative info available"), me.name);
 	} else {
 		irc_numeric (RPL_ADMINME, nick, _(":%s :Administrative info"), me.name);
@@ -645,629 +1457,36 @@ do_protocol (char *origin, char **argv, int argc)
 
 	for (i = 0; i < argc; i++) {
 		if (!ircstrcasecmp ("TOKEN", argv[i])) {
-			if(protocol_info->optprotocol&PROTOCOL_TOKEN) {
+			if (protocol_info->optprotocol&PROTOCOL_TOKEN) {
 				ircd_srv.protocol |= PROTOCOL_TOKEN;
 			}
 		}
 		else if (!ircstrcasecmp ("CLIENT", argv[i])) {
-			if(protocol_info->optprotocol&PROTOCOL_CLIENT) {
+			if (protocol_info->optprotocol&PROTOCOL_CLIENT) {
 				ircd_srv.protocol |= PROTOCOL_CLIENT;
 			}
 		}
 		else if (!ircstrcasecmp ("UNKLN", argv[i])) {
-			if(protocol_info->optprotocol&PROTOCOL_UNKLN) {
+			if (protocol_info->optprotocol&PROTOCOL_UNKLN) {
 				ircd_srv.protocol |= PROTOCOL_UNKLN;
 			}
 		}
 		else if (!ircstrcasecmp ("NOQUIT", argv[i])) {
-			if(protocol_info->optprotocol&PROTOCOL_NOQUIT) {
+			if (protocol_info->optprotocol&PROTOCOL_NOQUIT) {
 				ircd_srv.protocol |= PROTOCOL_NOQUIT;
 			}			
 		}
 		else if (!ircstrcasecmp ("NICKIP", argv[i])) {
-			if(protocol_info->optprotocol&PROTOCOL_NICKIP) {
+			if (protocol_info->optprotocol&PROTOCOL_NICKIP) {
 				ircd_srv.protocol |= PROTOCOL_NICKIP;
 			}			
 		}
 		else if (!ircstrcasecmp ("NICKv2", argv[i])) {
-			if(protocol_info->optprotocol&PROTOCOL_NICKv2) {
+			if (protocol_info->optprotocol&PROTOCOL_NICKv2) {
 				ircd_srv.protocol |= PROTOCOL_NICKv2;
 			}			
 		}
 	}
-}
-
-int 
-irc_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
-{
-	irc_send_server_connect (name, numeric, infoline, pass, tsboot, tslink);
-	return NS_SUCCESS;
-}
-
-void
-irc_prefmsg_list (const Bot *botptr, const Client * target, const char **text)
-{
-	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping irc_prefmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
-		return;
-	}
-	while (*text) {
-		if (**text) {
-			irc_prefmsg (botptr, target, (char*)*text);
-		} else {
-			irc_prefmsg (botptr, target, " ");
-		}
-		text++;
-	}
-}
-
-void
-irc_privmsg_list (const Bot *botptr, const Client * target, const char **text)
-{
-	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name);
-		return;
-	}
-	while (*text) {
-		if (**text) {
-			irc_privmsg (botptr, target, (char*)*text);
-		} else {
-			irc_privmsg (botptr, target, " ");
-		}
-		text++;
-	}
-}
-
-
-void
-irc_chanalert (const Bot *botptr, const char *fmt, ...)
-{
-	va_list ap;
-
-	if (!is_synched)
-		return;
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	irc_send_privmsg (botptr->name, me.serviceschan, ircd_buf);
-}
-
-void
-irc_prefmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
-{
-	va_list ap;
-
-	if (IsMe (target)) {
-		nlog (LOG_NOTICE, "Dropping irc_prefmsg from bot (%s) to bot (%s)", botptr->u->name, target->name);
-		return;
-	}
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	if (config.want_privmsg) {
-		irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
-	} else {
-		irc_send_notice (botptr?botptr->u->name:ns_botptr->u->name, target->name, ircd_buf);
-	}
-}
-
-void
-irc_privmsg (const Bot *botptr, const Client *target, const char *fmt, ...)
-{
-	va_list ap;
-
-	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping privmsg from bot (%s) to bot (%s)", botptr->u->name, target->name);
-		return;
-	}
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	irc_send_privmsg (botptr->u->name, target->name, ircd_buf);
-}
-
-void
-irc_notice (const Bot *botptr, const Client *target, const char *fmt, ...)
-{
-	va_list ap;
-
-	if (IsMe(target)) {
-		nlog (LOG_NOTICE, "Dropping notice from bot (%s) to bot (%s)", botptr->u->name, target->name);
-		return;
-	}
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	irc_send_notice (botptr->u->name, target->name, ircd_buf);
-}
-
-void
-irc_chanprivmsg (const Bot *botptr, const char *chan, const char *fmt, ...)
-{
-	va_list ap;
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	irc_send_privmsg (botptr->u->name, chan, ircd_buf);
-}
-
-void
-irc_channotice (const Bot *botptr, const char *chan, const char *fmt, ...)
-{
-	va_list ap;
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	irc_send_notice (botptr->u->name, chan, ircd_buf);
-}
-
-void
-irc_globops (const Bot *botptr, const char *fmt, ...)
-{
-	va_list ap;
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-
-	if (is_synched) {
-		if(irc_send_globops) {
-			irc_send_globops((botptr?botptr->u->name:me.name), ircd_buf);
-		} else {
-			nlog (LOG_NOTICE, "Dropping unhandled globops: %s", ircd_buf);
-		}
-	} else {
-		nlog (LOG_NORMAL, ircd_buf);
-	}
-}
-
-void
-irc_wallops (const Bot *botptr, const char *fmt, ...)
-{
-	va_list ap;
-
-	va_start (ap, fmt);
-	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	if(irc_send_wallops) {
-		irc_send_wallops ((botptr?botptr->name:me.name), ircd_buf);
-	} else {
-		nlog (LOG_NOTICE, "Dropping unhandled wallops: %s", ircd_buf);
-	}
-}
-
-void
-irc_numeric (const int numeric, const char *target, const char *data, ...)
-{
-	va_list ap;
-
-	va_start (ap, data);
-	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
-	va_end (ap);
-	irc_send_numeric (me.name, numeric, target, ircd_buf);
-}
-
-/** @brief unsupported_cmd
- *
- *  report attempts to use a feature not supported by the loaded protocol
- *
- * @return none
- */
-static void
-unsupported_cmd(const char* cmd)
-{
-	irc_chanalert (ns_botptr, _("Warning, %s tried to %s which is not supported"), GET_CUR_MODNAME(), cmd);
-	nlog (LOG_NOTICE, "Warning, %s tried to %s, which is not supported", GET_CUR_MODNAME(), cmd);
-}
-
-/** @brief irc_nick
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-int
-irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes)
-{
-	if(irc_send_nick) {
-		irc_send_nick (nick, (unsigned long)me.now, modes, user, host, me.name, realname);
-	} else {
-		unsupported_cmd("NICK");
-	} 
-	return NS_SUCCESS;
-}
-
-/** @brief CloakBotHost
- *
- *  Create a hidden hostmask for the bot 
- *  Currently only Unreal support via UMODE auto cloaking
- *  but function created for future use and propogation to
- *  external modules to avoid a future joint release.
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-int 
-irc_cloakhost (const Bot *botptr)
-{
-	if (ircd_srv.features&FEATURE_UMODECLOAK) {
-		irc_usermode (botptr, botptr->name, UMODE_HIDE);
-		return NS_SUCCESS;	
-	}
-	return NS_FAILURE;	
-}
-
-int
-irc_usermode (const Bot *botptr, const char *target, long mode)
-{
-	char* newmode;
-	
-	newmode = UmodeMaskToString(mode);
-	irc_send_umode (botptr->u->name, target, newmode);
-	UserMode (target, newmode);
-	return NS_SUCCESS;
-}
-
-/** @brief irc_join
- *
- * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-int 
-irc_join (const Bot *botptr, const char *chan, const char *mode)
-{
-	time_t ts;
-	Channel *c;
-
-	c = find_chan (chan);
-	ts = (!c) ? me.now : c->creationtime;
-	/* Use sjoin if available */
-	if((ircd_srv.protocol & PROTOCOL_SJOIN) && irc_send_sjoin) {
-		if (mode == NULL) {
-			irc_send_sjoin (me.name, botptr->u->name, chan, (unsigned long)ts);
-		} else {
-			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix (mode[1]), botptr->u->name);
-			irc_send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
-		}
-		join_chan (botptr->u->name, chan);
-		/* Increment number of persistent users if needed */
-		if (botptr->flags & BOT_FLAG_PERSIST) {
-			c->persistentusers ++;
-		}
-		if (mode) {
-			ChanUserMode(chan, botptr->u->name, 1, CmodeStringToMask(mode));
-		}
-	/* sjoin not available so use normal join */	
-	} else if(irc_send_join) {
-		irc_send_join (botptr->u->name, chan, me.now);
-		join_chan (botptr->u->name, chan);
-		if(mode) {
-			irc_chanusermode(botptr, chan, mode, botptr->u->name);
-		}
-	/* Error */
-	} else {
-		unsupported_cmd("SJOIN/JOIN");
-	} 
-	return NS_SUCCESS;
-}
-
-int
-irc_part (const Bot *botptr, const char *chan)
-{
-	Channel *c;
-
-	c = find_chan (chan);
-	/* Decrement number of persistent users if needed 
-	 * Must be BEFORE we part the channel in order to trigger
-	 * empty channel processing for other bots
-	 */
-	if (botptr->flags & BOT_FLAG_PERSIST) {
-		c->persistentusers --;
-	}
-	irc_send_part(botptr->u->name, chan);
-	part_chan (botptr->u, (char *) chan, NULL);
-	return NS_SUCCESS;
-}
-
-int
-irc_nickchange (const Bot *botptr, const char *newnick)
-{
-	if (!botptr) {
-		nlog (LOG_WARNING, "Unknown bot tried to change nick to %s", newnick);
-		return NS_FAILURE;
-	}
-	/* Check newnick is not in use */
-	if (find_user (newnick)) {
-		nlog (LOG_WARNING, "Bot %s tried to change nick to one that already exists %s", botptr->name, newnick);
-		return NS_FAILURE;
-	}
-	UserNick (botptr->name, newnick, NULL);
-	irc_send_nickchange (botptr->name, newnick, me.now);
-	bot_nick_change(botptr, newnick);
-	return NS_SUCCESS;
-}
-
-int irc_setname(const Bot *botptr, const char* realname)
-{
-	if (!irc_send_setname) {
-		unsupported_cmd ("SETNAME");
-		return NS_FAILURE;
-	}
-	irc_send_setname (botptr->name, realname);
-	strlcpy (botptr->u->info, (char*)realname, MAXHOST);
-	return NS_SUCCESS;
-}
-
-int irc_sethost (const Bot *botptr, const char* host)
-{
-	if (!irc_send_sethost) {
-		unsupported_cmd("SETNAME");
-		return NS_FAILURE;
-	}
-	irc_send_sethost (botptr->name, host);
-	strlcpy (botptr->u->user->hostname, (char*)host, MAXHOST);
-	return NS_SUCCESS;
-}
- 
-int irc_setident (const Bot *botptr, const char* ident)
-{
-	if (!irc_send_setident) {
-		unsupported_cmd ("SETNAME");
-		return NS_FAILURE;
-	}
-	irc_send_setident (botptr->name, ident);
-	strlcpy (botptr->u->user->username, (char*)ident, MAXHOST);
-	return NS_SUCCESS;
-}
-
-
-int
-irc_chanmode (const Bot *botptr, const char *chan, const char *mode, const char *args)
-{
-	char **av;
-	int ac;
-
-	irc_send_cmode (me.name, botptr->u->name, chan, mode, args, me.now);
-	ircsnprintf (ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args);
-	ac = split_buf (ircd_buf, &av, 0);
-	ChanMode (me.name, av, ac);
-	ns_free (av);
-	return NS_SUCCESS;
-}
-
-int
-irc_chanusermode (const Bot *botptr, const char *chan, const char *mode, const char *target)
-{
-	if((ircd_srv.protocol & PROTOCOL_B64NICK)) {
-		irc_send_cmode (me.name, botptr->u->name, chan, mode, nicktobase64 (target), me.now);
-	} else {
-		irc_send_cmode (me.name, botptr->u->name, chan, mode, target, me.now);
-	}
-	ChanUserMode (chan, target, 1, CmodeStringToMask(mode));
-	return NS_SUCCESS;
-}
-
-int
-irc_quit (const Bot * botptr, const char *quitmsg)
-{
-	irc_send_quit (botptr->u->name, quitmsg);
-	do_quit (botptr->u->name, quitmsg);
-	return NS_SUCCESS;
-}
-
-int
-irc_kill (const Bot *botptr, const char *target, const char *reason, ...)
-{
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	irc_send_kill (botptr->u->name, target, ircd_buf);
-	do_quit (target, ircd_buf);
-	return NS_SUCCESS;
-}
-
-int
-irc_kick (const Bot *botptr, const char *chan, const char *target, const char *reason)
-{
-	if(irc_send_kick) {
-		irc_send_kick (botptr->u->name, chan, target, reason);
-		part_chan (find_user (target), (char *) chan, reason[0] != 0 ? (char *)reason : NULL);
-	} else {
-		unsupported_cmd("KICK");
-	}
-	return NS_SUCCESS;
-}
-
-int 
-irc_invite (const Bot *botptr, const char *to, const char *chan) 
-{
-	if(irc_send_invite) {
-		irc_send_invite(botptr->u->name, to, chan);
-	} else {
-		unsupported_cmd("KICK");
-	}
-	return NS_SUCCESS;
-}
-
-int 
-irc_svstime (const Bot *botptr, Client *target, const time_t ts)
-{
-	if (irc_send_svstime) {
-		irc_send_svstime(me.name, (unsigned long)ts);
-		nlog (LOG_NOTICE, "irc_svstime: synching server times to %lu", ts);
-	} else {
-		unsupported_cmd("SVSTIME");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_svskill (const Bot *botptr, Client *target, const char *reason, ...)
-{
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	if (irc_send_svskill) {
-		irc_send_svskill (me.name, target->name, ircd_buf);
-	} else if(irc_send_kill) {
-		irc_send_kill (me.name, target->name, ircd_buf);
-		do_quit (target->name, ircd_buf);
-	} else {
-		unsupported_cmd("SVSKILL");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_svsmode (const Bot *botptr, Client *target, const char *modes)
-{
-	if (irc_send_svsmode) {
-		irc_send_svsmode(me.name, target->name, modes);
-		UserMode (target->name, modes);
-	} else {
-		unsupported_cmd("SVSMODE");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_svshost (const Bot *botptr, Client *target, const char *vhost)
-{
-	if (irc_send_svshost) {
-		strlcpy (target->user->vhost, vhost, MAXHOST);
-		irc_send_svshost(me.name, target->name, vhost);
-	} else {
-		unsupported_cmd("SVSHOST");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_svsjoin (const Bot *botptr, Client *target, const char *chan)
-{
-	if (irc_send_svsjoin) {
-		irc_send_svsjoin (me.name, target->name, chan);
-	} else {
-		unsupported_cmd("SVSJOIN");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_svspart (const Bot *botptr, Client *target, const char *chan)
-{
-	if (irc_send_svspart) {
-		irc_send_svspart (me.name, target->name, chan);
-	} else {
-		unsupported_cmd("SVSPART");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_swhois (const char *target, const char *swhois)
-{
-	if (irc_send_swhois) {
-		irc_send_swhois (me.name, target, swhois);
-	} else {
-		unsupported_cmd("SWHOIS");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_svsnick (const Bot *botptr, Client *target, const char *newnick)
-{
-	if (irc_send_svsnick) {
-		irc_send_svsnick (me.name, target->name, newnick, me.now);
-	} else {
-		unsupported_cmd("SVSNICK");
-	}
-	return NS_SUCCESS;
-}
-
-int
-ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
-{
-	if (irc_send_smo) {
-		irc_send_smo (from, umodetarget, msg);
-	} else {
-		unsupported_cmd("SMO");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_akill (const Bot *botptr, const char *host, const char *ident, const unsigned long length, const char *reason, ...)
-{
-	va_list ap;
-
-	va_start (ap, reason);
-	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
-	va_end (ap);
-	if(irc_send_akill) {
-		irc_send_akill(me.name, host, ident, botptr->name, length, ircd_buf, me.now);
-	} else {
-		unsupported_cmd("AKILL");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_rakill (const Bot *botptr, const char *host, const char *ident)
-{
-	if(irc_send_rakill) {
-		irc_send_rakill (me.name, host, ident);
-	} else {
-		unsupported_cmd("RAKILL");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_ping (const char *from, const char *reply, const char *to)
-{
-	if(irc_send_ping) {
-		irc_send_ping (from, reply, to);
-	} else {
-		unsupported_cmd("PING");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_pong (const char *reply)
-{
-	if(irc_send_pong) {
-		irc_send_pong (reply);
-	} else {
-		unsupported_cmd("PONG");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_server (const char *name, const int numeric, const char *infoline)
-{
-	if(irc_send_server) {
-		irc_send_server (me.name, name, numeric, infoline);
-	} else {
-		unsupported_cmd("SERVER");
-	}
-	return NS_SUCCESS;
-}
-
-int
-irc_squit (const char *server, const char *quitmsg)
-{
-	if(irc_send_squit) {
-		irc_send_squit (server, quitmsg);
-	} else {
-		unsupported_cmd("SQUIT");
-	}
-	return NS_SUCCESS;
 }
 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
@@ -1292,9 +1511,9 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		   
 	while (paramcnt > paramidx) {
 		nicklist = param[paramidx];
-		if(ircd_srv.protocol & PROTOCOL_SJ3) {
+		if (ircd_srv.protocol & PROTOCOL_SJ3) {
 			/* Unreal passes +b(&) and +e(") via SJ3 so skip them for now */	
-			if(*nicklist == '&' || *nicklist == '"') {
+			if (*nicklist == '&' || *nicklist == '"') {
 				dlog(DEBUG1, "Skipping %s", nicklist);
 				paramidx++;
 				continue;
@@ -1312,7 +1531,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		ok = 1;
 	}
 	c = find_chan (channame);
-	if(c) {
+	if (c) {
 		/* update the TS time */
 		SetChanTS (c, atoi (tstime)); 
 		j = ChanModeHandler (c, modes, j, argv, argc);
@@ -1375,13 +1594,13 @@ do_nick (const char *nick, const char *hopcount, const char* TS,
 		return;
 	}
 	AddUser (nick, user, host, realname, server, ip, TS, numeric);
-	if(modes) {
+	if (modes) {
 		UserMode (nick, modes);
 	}
-	if(vhost) {
+	if (vhost) {
 		SetUserVhost(nick, vhost);
 	}
-	if(smodes) {
+	if (smodes) {
 		UserSMode (nick, smodes);
 	}
 }
@@ -1398,13 +1617,13 @@ do_client (const char *nick, const char *arg1, const char *TS,
 		return;
 	}
 	AddUser (nick, user, host, realname, server, ip, TS, NULL);
-	if(modes) {
+	if (modes) {
 		UserMode (nick, modes);
 	}
-	if(vhost) {
+	if (vhost) {
 		SetUserVhost(nick, vhost);
 	}
-	if(smodes) {
+	if (smodes) {
 		UserSMode (nick, smodes);
 	}
 }
@@ -1447,7 +1666,7 @@ do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char*
 	ircd_srv.modex = atoi(modex);
 	ircd_srv.gc = atoi(gc);
 	strlcpy (me.netname, netname, MAXPASS);
-	if(irc_send_vctrl) {
+	if (irc_send_vctrl) {
 		irc_send_vctrl (ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
 	} 
 }
@@ -1475,7 +1694,7 @@ do_svsmode_user (const char* targetnick, const char* modes, const char* ts)
 
 		SetUserServicesTS (targetnick, ts);
 		/* If only setting TS, we do not need further mode processing */
-		if(ircstrcasecmp(modes, "+d") == 0) {
+		if (ircstrcasecmp(modes, "+d") == 0) {
 			dlog(DEBUG3, "dropping modes since this is a services TS %s", modes);
 			return;
 		}
@@ -1483,7 +1702,7 @@ do_svsmode_user (const char* targetnick, const char* modes, const char* ts)
 		pNewModes = modebuf;
 		pModes = modes;
 		while(*pModes) {
-			if(*pModes != 'd') {
+			if (*pModes != 'd') {
 				*pNewModes = *pModes;
 			}
 			pModes++;
@@ -1530,7 +1749,7 @@ do_topic (const char* chan, const char *owner, const char* ts, const char *topic
 void 
 do_server (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline, int srv)
 {
-	if(!srv) {
+	if (!srv) {
 		if (uplink == NULL || *uplink == 0) {
 			me.s = AddServer (name, me.name, hops, numeric, infoline);
 		} else {
@@ -1547,7 +1766,9 @@ do_burst (char *origin, char **argv, int argc)
 {
 	if (argc > 0) {
 		if (ircd_srv.burst == 1) {
-			irc_send_burst (0);
+			if (irc_send_burst) {
+				irc_send_burst (0);
+			}
 			ircd_srv.burst = 0;
 			init_services_bot ();
 		}
@@ -1561,7 +1782,7 @@ do_swhois (char *who, char *swhois)
 {
 	Client * u;
 	u = find_user(who);
-	if(u) {
+	if (u) {
 		strlcpy(u->user->swhois, swhois, MAXHOST);
 	}
 }
@@ -1571,7 +1792,7 @@ do_tkl(const char *add, const char *type, const char *user, const char *host, co
 {
 	char mask[MAXHOST];
 	ircsnprintf(mask, MAXHOST, "%s@%s", user, host);
-	if(add[0] == '+') {
+	if (add[0] == '+') {
 		AddBan(type, user, host, mask, reason, setby, tsset, tsexpire);
 	} else {
 		DelBan(type, user, host, mask, reason, setby, tsset, tsexpire);
@@ -1631,6 +1852,10 @@ void do_setident (const char* nick, const char* ident)
 	}
 }
 
+/** @brief send_cmd
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 void
 send_cmd (char *fmt, ...)
 {
@@ -1643,7 +1868,7 @@ send_cmd (char *fmt, ...)
 	va_end (ap);
 
 	dlog(DEBUGTX, "%s", buf);
-	if(strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
+	if (strnlen (buf, BUFSIZE) < BUFSIZE - 2) {
 		strlcat (buf, "\n", BUFSIZE);
 	} else {
 		buf[BUFSIZE - 1] = 0;
@@ -1653,13 +1878,17 @@ send_cmd (char *fmt, ...)
 	send_to_socket (buf, buflen);
 }
 
+/** @brief setserverbase64
+ *
+ *  @return none
+ */
 void
 setserverbase64 (const char *name, const char* num)
 {
 	Client *s;
 
 	s = find_server(name);
-	if(s) {
+	if (s) {
 		dlog(DEBUG1, "setserverbase64: setting %s to %s", name, num);
 		strlcpy(s->name64, num, 6);
 	} else {
@@ -1667,6 +1896,10 @@ setserverbase64 (const char *name, const char* num)
 	}
 }
 
+/** @brief servertobase64
+ *
+ *  @return base64
+ */
 char* 
 servertobase64 (const char* name)
 {
@@ -1674,7 +1907,7 @@ servertobase64 (const char* name)
 
 	dlog(DEBUG1, "servertobase64: scanning for %s", name);
 	s = find_server(name);
-	if(s) {
+	if (s) {
 		return s->name64;
 	} else {
 		dlog(DEBUG1, "servertobase64: cannot find %s", name);
@@ -1682,6 +1915,10 @@ servertobase64 (const char* name)
 	return NULL;
 }
 
+/** @brief base64toserver
+ *
+ *  @return server name
+ */
 char* 
 base64toserver (const char* num)
 {
@@ -1689,7 +1926,7 @@ base64toserver (const char* num)
 
 	dlog(DEBUG1, "base64toserver: scanning for %s", num);
 	s = findserverbase64(num);
-	if(s) {
+	if (s) {
 		return s->name;
 	} else {
 		dlog(DEBUG1, "base64toserver: cannot find %s", num);
@@ -1697,13 +1934,17 @@ base64toserver (const char* num)
 	return NULL;
 }
 
+/** @brief setnickbase64
+ *
+ *  @return none
+ */
 void
 setnickbase64 (const char *nick, const char* num)
 {
 	Client *u;
 
 	u = find_user(nick);
-	if(u) {
+	if (u) {
 		dlog(DEBUG1, "setnickbase64: setting %s to %s", nick, num);
 		strlcpy(u->name64, num, B64SIZE);
 	} else {
@@ -1711,6 +1952,10 @@ setnickbase64 (const char *nick, const char* num)
 	}
 }
 
+/** @brief nicktobase64
+ *
+ *  @return base64
+ */
 char* 
 nicktobase64 (const char* nick)
 {
@@ -1718,7 +1963,7 @@ nicktobase64 (const char* nick)
 
 	dlog(DEBUG1, "nicktobase64: scanning for %s", nick);
 	u = find_user(nick);
-	if(u) {
+	if (u) {
 		return u->name64;
 	} else {
 		dlog(DEBUG1, "nicktobase64: cannot find %s", nick);
@@ -1726,6 +1971,10 @@ nicktobase64 (const char* nick)
 	return NULL;
 }
 
+/** @brief base64tonick
+ *
+ *  @return nickname
+ */
 char* 
 base64tonick (const char* num)
 {
@@ -1733,7 +1982,7 @@ base64tonick (const char* num)
 
 	dlog(DEBUG1, "base64tonick: scanning for %s", num);
 	u = finduserbase64(num);
-	if(u) {
+	if (u) {
 		return u->name;
 	} else {
 		dlog(DEBUG1, "base64tonick: cannot find %s", num);
@@ -1749,7 +1998,7 @@ static void m_numeric351 (char *origin, char **argv, int argc, int srv)
 	Client *s;
 
 	s = find_server(origin);
-	if(s) {
+	if (s) {
 		strlcpy(s->version, argv[1], MAXHOST);
 	}
 }
@@ -1764,7 +2013,7 @@ static void m_numeric242 (char *origin, char **argv, int argc, int srv)
 	Client *s;
 
 	s = find_server(origin);
-	if(s) {
+	if (s) {
 		/* Convert "Server Up 6 days, 23:52:55" to seconds*/
 		char *ptr;
 		time_t secs;
@@ -1794,8 +2043,12 @@ static void m_numeric242 (char *origin, char **argv, int argc, int srv)
 	}
 }
 
-int HaveFeature (int mask)
+/** @brief HaveFeature
+ *
+ *  @return 1 if have else 0
+ */
+int 
+HaveFeature (int mask)
 {
 	return (ircd_srv.features&mask);
 }
-
