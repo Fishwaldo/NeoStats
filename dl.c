@@ -460,9 +460,6 @@ int load_module(char *path1, User *u) {
 	int do_msg;
 	char *path = NULL;
 	char p[255];
-#ifndef DEBUG
-	char buf[512];
-#endif
 	char **av;
 	int ac = 0;
 	Module_Info * (*mod_get_info)() = NULL;
@@ -617,19 +614,12 @@ void list_module(User *u) {
 }		
 
 int unload_module(char *module_name, User *u) {
-	char buf[512];
-	char fname[512];
 	Module *list;
 	Mod_User *mod_ptr = NULL;
 	Mod_Timer *mod_tmr = NULL;
 	Sock_List *mod_sock = NULL;
 	hnode_t *modnode;
 	hscan_t hscan;
-
-	FILE *modnme;
-	FILE *getmname;
-
-	int fmode;
 
 	strcpy(segv_location, "unload_module");
 	/* Check to see if this Module has any timers registered....  */
