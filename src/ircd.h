@@ -148,7 +148,7 @@ void do_eos(const char *name);
 #endif
 
 /* Defined in ircd specific files but common to all */
-void init_ircd (void);
+void InitIrcd (void);
 void send_privmsg (const char *from, const char *to, const char *buf);
 void send_notice (const char *from, const char *to, const char *buf);
 void send_globops (const char *from, const char *buf);

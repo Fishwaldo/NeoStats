@@ -35,7 +35,7 @@ void sts (const char *buf, const int buflen);
 
 int check_sql_sock();
 
-int list_sockets (User * u, char **av, int ac);
+int list_sockets (CmdParams* cmdparams);
 int InitSocks (void);
 int FiniSocks (void);
 int del_sockets (Module *mod_ptr);

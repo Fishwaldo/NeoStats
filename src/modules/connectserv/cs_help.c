@@ -25,21 +25,11 @@
 
 #include <stdio.h>
 
-const char cs_help_about_oneline[] = "About ConnectServ";
-const char cs_help_version_oneline[] = "Display version info";
-
-const char *cs_help_about[] = {
+const char *cs_about[] = {
 	"\2ConnectServ\2 is designed to track users signing on and",
 	"off, killing of users, modes that the operators are using",
 	"and nickname changes. These events can be optionally",
 	"echoed to the services channel.",
-	NULL
-};
-
-const char *cs_help_version[] = {
-	"Syntax: \2VERSION\2",
-	"",
-	"Show ConnectServ version information",
 	NULL
 };
 

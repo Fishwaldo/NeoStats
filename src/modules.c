@@ -26,6 +26,9 @@
 #include "timer.h"
 #include "sock.h"
 #include "services.h"
+#include "modules.h"
+#include "bots.h"
+#include "dns.h"
 
 /** @brief Module list
  * 
@@ -179,6 +182,7 @@ InitModules ()
 int FiniModules (void) 
 {
 	hash_destroy(mh);
+	return NS_SUCCESS;
 }
 
 /** @brief SendModuleEvent
@@ -188,7 +192,7 @@ int FiniModules (void)
  * @return none
  */
 void
-SendModuleEvent (char *event, char **av, int ac)
+SendModuleEvent (Event event, CmdParams* cmdparams, Bot* bot)
 {
 	Module *module_ptr;
 	ModuleEvent *ev_list;
@@ -201,14 +205,57 @@ SendModuleEvent (char *event, char **av, int ac)
 		module_ptr = hnode_get (mn);
 		ev_list = module_ptr->event_list;
 		if (ev_list) {
-			while (ev_list->cmd_name != NULL) {
+			while (ev_list->event != EVENT_NULL) {
 				/* This goes through each Command */
-				if (!ircstrcasecmp (ev_list->cmd_name, event)) {
-					nlog (LOG_DEBUG1, "Running Module %s for Command %s -> %s", module_ptr->info->name, event, ev_list->cmd_name);
+				if (ev_list->event == event) {
+					nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 					SET_SEGV_LOCATION();
 					if (setjmp (sigvbuf) == 0) {
 						SET_SEGV_INMODULE(module_ptr->info->name);
-						ev_list->function (av, ac);
+						ev_list->function (cmdparams);
+						CLEAR_SEGV_INMODULE();
+					} else {
+						nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
+					}
+					SET_SEGV_LOCATION();
+#ifndef VALGRIND
+					break;
+#endif
+				}
+				ev_list++;
+			}
+		}
+	}
+}
+
+/** @brief SendAllModuleEvent
+ *
+ * 
+ *
+ * @return none
+ */
+void
+SendAllModuleEvent (Event event, CmdParams* cmdparams)
+{
+	Module *module_ptr;
+	ModuleEvent *ev_list;
+	hscan_t ms;
+	hnode_t *mn;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin (&ms, mh);
+	while ((mn = hash_scan_next (&ms)) != NULL) {
+		module_ptr = hnode_get (mn);
+		ev_list = module_ptr->event_list;
+		if (ev_list) {
+			while (ev_list->event != EVENT_NULL) {
+				/* This goes through each Command */
+				if (ev_list->event == event) {
+					nlog (LOG_DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
+					SET_SEGV_LOCATION();
+					if (setjmp (sigvbuf) == 0) {
+						SET_SEGV_INMODULE(module_ptr->info->name);
+						ev_list->function (cmdparams);
 						CLEAR_SEGV_INMODULE();
 					} else {
 						nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s\n", module_ptr->info->name);
@@ -332,8 +379,8 @@ load_module (char *modfilename, User * u)
 		if (do_msg) {
 			chanalert (ns_botptr->nick, "Unable to load module: module list is full");
 			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: module list is full");
-			nlog (LOG_WARNING, "Unable to load module: module list is full");
 		}
+		nlog (LOG_WARNING, "Unable to load module: module list is full");
 		ns_dlclose (dl_handle);
 		free (mod_ptr);
 		return NULL;
@@ -360,8 +407,8 @@ load_module (char *modfilename, User * u)
 		if (do_msg) {
 			chanalert (ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 			prefmsg (u->nick, ns_botptr->nick, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
-			nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		}
+		nlog (LOG_WARNING, "Unable to load module: %s missing ModInit.", mod_ptr->info->name);
 		ns_dlclose (dl_handle);
 		free (mod_ptr);
 		return NULL;
@@ -381,12 +428,12 @@ load_module (char *modfilename, User * u)
 
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
-		while (event_ptr->cmd_name != NULL) {
-			if (!ircstrcasecmp (event_ptr->cmd_name, EVENT_ONLINE)) {
+		while (event_ptr->event != EVENT_NULL) {
+			if (event_ptr->event == EVENT_ONLINE) {
 				AddStringToList (&av, me.s->name, &ac);
 				SET_SEGV_LOCATION();
 				SET_SEGV_INMODULE(mod_ptr->info->name);
-				event_ptr->function (av, ac);
+				event_ptr->function (NULL);
 				CLEAR_SEGV_INMODULE();
 				SET_SEGV_LOCATION();
 				free (av);
@@ -475,7 +522,7 @@ get_mod_ptr (const char *mod_name)
  * @return
  */
 int
-list_modules (User * u, char **av, int ac)
+list_modules (CmdParams* cmdparams)
 {
 	Module *mod_ptr = NULL;
 	hnode_t *mn;
@@ -485,11 +532,11 @@ list_modules (User * u, char **av, int ac)
 	hash_scan_begin (&hs, mh);
 	while ((mn = hash_scan_next (&hs)) != NULL) {
 		mod_ptr = hnode_get (mn);
-		prefmsg (u->nick, ns_botptr->nick, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
-		prefmsg (u->nick, ns_botptr->nick, "Module Description: %s", mod_ptr->info->description);
-		prefmsg (u->nick, ns_botptr->nick, "Module Number: %d", get_mod_num (mod_ptr->info->name));
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module: %s (%s)", mod_ptr->info->name, mod_ptr->info->version);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Description: %s", mod_ptr->info->description);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Number: %d", get_mod_num (mod_ptr->info->name));
 	}
-	prefmsg (u->nick, ns_botptr->nick, "End of Module List");
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Module List");
 	return 0;
 }
 
@@ -579,4 +626,61 @@ void unload_modules(void)
 		mod_ptr = hnode_get (mn);
 		unload_module (mod_ptr->info->name, NULL);
 	}
+}
+
+/** @brief 
+ *
+ * @param 
+ * 
+ * @return
+ */
+int
+ModuleConfig(Module* moduleptr, bot_setting* set_ptr)
+{
+	char *temp = NULL;
+
+	SET_SEGV_INMODULE(moduleptr->info->name);
+	while(set_ptr->option)
+	{
+		switch(set_ptr->type) {
+			case SET_TYPE_BOOLEAN:
+				if (GetConf((void *)set_ptr->varptr, CFGBOOL, set_ptr->confitem) <= 0) {
+					set_ptr->varptr = set_ptr->defaultval;
+				}
+				break;
+			case SET_TYPE_INT:
+				if (GetConf((void *)set_ptr->varptr, CFGINT, set_ptr->confitem) <= 0) {
+					set_ptr->varptr = set_ptr->defaultval;
+				}
+				break;
+			case SET_TYPE_STRING:
+			case SET_TYPE_CHANNEL:							
+			case SET_TYPE_MSG:
+			case SET_TYPE_NICK:
+			case SET_TYPE_USER:
+			case SET_TYPE_HOST:
+			case SET_TYPE_REALNAME:
+			case SET_TYPE_IPV4:
+				if(GetConf((void *) &temp, CFGSTR, set_ptr->confitem) > 0) {
+					strlcpy(set_ptr->varptr, temp, MAXNICK);
+					free(temp);
+				} else {
+					strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
+					
+				}
+				break;			
+			case SET_TYPE_CUSTOM:
+				if(set_ptr->handler) {
+					set_ptr->handler(NULL);
+				}
+				break;
+			default:
+				nlog(LOG_WARNING, "Unsupported SET type %d in ModuleConfig %s", 
+					set_ptr->type, set_ptr->option);
+				break;
+		}
+		set_ptr++;
+	}
+	CLEAR_SEGV_INMODULE();
+	return NS_SUCCESS;
 }

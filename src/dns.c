@@ -131,7 +131,7 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 */
 
 int
-init_dns ()
+InitDns ()
 {
 	int adnsstart;
 
@@ -157,7 +157,8 @@ init_dns ()
  *
  */
 void 
-fini_adns() {
+FiniDns (void) 
+{
 	lnode_t *dnsnode;
 	DnsLookup *dnsdata;
 

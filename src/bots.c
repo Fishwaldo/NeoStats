@@ -25,6 +25,7 @@
 #include "modules.h"
 #include "ircd.h"
 #include "services.h"
+#include "commands.h"
 
 /** @brief Channel bot structure
  * 
@@ -62,6 +63,7 @@ int FiniBots (void)
 {
 	hash_destroy(bh);
 	hash_destroy(bch);
+	return NS_SUCCESS;
 }
 
 /** @brief Add a bot to a channel
@@ -142,14 +144,45 @@ del_chan_bot (char *bot, char *chan)
 	}
 }
 
-void handle_ctcp_private (Bot *botptr, User* u, char* msg)
+int process_origin(CmdParams * cmdparams, char* origin)
 {
-
+	cmdparams->source.user = finduser (origin);
+	if(cmdparams->source.user) {
+		if (flood (cmdparams->source.user)) {
+			return 0;
+		}
+		else {
+			return 1;
+		}
+	}
+	cmdparams->source.server = findserver (origin);
+	if(cmdparams->source.server) {
+		return 1;
+	}
+	return 0;
 }
 
-void handle_ctcp_notice (Bot *botptr, User* u, char* msg)
+int process_target_user(CmdParams * cmdparams, char* target)
 {
+	cmdparams->dest.user = finduser (target);
+	if(cmdparams->dest.user) {
+		cmdparams->dest.bot = findbot (target);
+		if(cmdparams->dest.bot) {
+			return 1;
+		}
+	}
+	nlog (LOG_DEBUG1, "process_target_user: user %s not found", target);
+	return 0;
+}
 
+int process_target_chan(CmdParams * cmdparams, char* target)
+{
+	cmdparams->channel = findchan(target);
+	if(cmdparams->channel) {
+		return 1;
+	}
+	nlog (LOG_DEBUG1, "cmdparams->channel: chan %s not found", target);
+	return 0;
 }
 
 /** @brief send a message to a bot
@@ -162,48 +195,19 @@ void handle_ctcp_notice (Bot *botptr, User* u, char* msg)
  */
 void bot_notice (char *origin, char **av, int ac)
 {
-	int argc;
-	char **argv;
-	User *u;
-	User *bot_user;
-	Bot *botptr;
+	CmdParams * cmdparams;
 
 	SET_SEGV_LOCATION();
-	u = finduser (origin);
-	if(!u) {
-		return;
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	/* Check origin validity */
+	if(process_origin(cmdparams, origin)) {
+		/* Find target bot */
+		if (process_target_user(cmdparams, av[0])) {
+			cmdparams->param = av[ac - 1];
+			SendModuleEvent (EVENT_NOTICE, cmdparams, NULL);
+		}
 	}
-	if (flood (u)) {
-		return;
-	}
-	bot_user = finduser(av[0]);
-	if (!bot_user) {
-		nlog (LOG_DEBUG1, "bot_message: bot %s not found", av[0]);
-		return;
-	}
-	botptr = findbot (bot_user->nick);
-	/* Check to see if any of the Modules have this nick Registered */
-	if (!botptr) {
-		nlog (LOG_DEBUG1, "bot_message: botptr %s not found", bot_user->nick);
-		return;
-	}
-	nlog (LOG_DEBUG1, "bot_message: bot %s", botptr->nick);
-
-	if (av[ac - 1][0] == '\1') {
-		handle_ctcp_notice (botptr, u, av[ac - 1]);
-		nlog (LOG_NORMAL, "%s requested %s", u->nick, av[1]);
-		return;
-	}
-	argc = 0;
-	AddStringToList (&argv, origin, &argc);
-	AddStringToList (&argv, av[0], &argc);
-	AddStringToList (&argv, av[ac-1], &argc);
-	if(av[0][0] == '#') {
-		SendModuleEvent (EVENT_CNOTICE, argv, argc);
-	} else {
-		SendModuleEvent (EVENT_NOTICE, argv, argc);
-	}
-	free (argv);
+	free (cmdparams);
 }
 
 /** @brief send a message to a bot
@@ -214,62 +218,81 @@ void bot_notice (char *origin, char **av, int ac)
  * 
  * @return none
  */
-void bot_message (char *origin, char **av, int ac)
+void bot_chan_notice (char *origin, char **av, int ac)
 {
-	int argc;
-	char **argv;
-	User *u;
-	User *bot_user;
-	Bot *botptr;
+	CmdParams * cmdparams;
 
 	SET_SEGV_LOCATION();
-	u = finduser (origin);
-	if(!u) {
-		return;
-	}
-	if (flood (u)) {
-		return;
-	}
-	bot_user = finduser(av[0]);
-	if (!bot_user) {
-		nlog (LOG_DEBUG1, "bot_message: bot %s not found", av[0]);
-		return;
-	}
-	botptr = findbot (bot_user->nick);
-	/* Check to see if any of the Modules have this nick Registered */
-	if (!botptr) {
-		nlog (LOG_DEBUG1, "bot_message: botptr %s not found", bot_user->nick);
-		return;
-	}
-	nlog (LOG_DEBUG1, "bot_message: bot %s", botptr->nick);
-
-	if (av[ac - 1][0] == '\1') {
-		handle_ctcp_private (botptr, u, av[ac - 1]);
-		nlog (LOG_NORMAL, "%s requested %s", u->nick, av[1]);
-		return;
-	}
-	if (botptr->botcmds) {
-		if (setjmp (sigvbuf) == 0) {
-			int ret;
-
-			if(botptr->moduleptr)
-				SET_SEGV_INMODULE(botptr->moduleptr->info->name);
-			ret = run_bot_cmd(botptr, u, av[ac - 1]);
-			CLEAR_SEGV_INMODULE();
-			if(ret == NS_SUCCESS)
-				return;
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	if(process_origin(cmdparams, origin)) {
+		if(process_target_chan(cmdparams, av[0])) {
+			cmdparams->param = av[ac - 1];
+			SendModuleEvent (EVENT_CNOTICE, cmdparams, NULL);
+			if (av[ac - 1][0] == '\1') {
+				/* TODO CTCP handler */
+			}
 		}
 	}
-	argc = 0;
-	AddStringToList (&argv, origin, &argc);
-	AddStringToList (&argv, av[0], &argc);
-	AddStringToList (&argv, av[ac-1], &argc);
-	if(av[0][0] == '#') {
-		SendModuleEvent (EVENT_CNOTICE, argv, argc);
-	} else {
-		SendModuleEvent (EVENT_NOTICE, argv, argc);
+	free (cmdparams);
+}
+
+/** @brief send a message to a bot
+ *
+ * @param origin 
+ * @param av 
+ * @param ac
+ * 
+ * @return none
+ */
+void bot_private (char *origin, char **av, int ac)
+{
+	CmdParams * cmdparams;
+
+	SET_SEGV_LOCATION();
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	if(process_origin(cmdparams, origin)) {
+		/* Find target bot */
+		if (process_target_user(cmdparams, av[0])) {
+			cmdparams->param = av[ac - 1];
+			if ((cmdparams->dest.bot->flags & BOT_FLAG_SERVICEBOT)) {
+				if(run_bot_cmd (cmdparams) != NS_FAILURE) {
+					free (cmdparams);
+					return;
+				}
+			}
+			SendModuleEvent (EVENT_PRIVATE, cmdparams, NULL);
+			if (av[ac - 1][0] == '\1') {
+				/* TODO CTCP handler */
+			}
+		}
 	}
-	free (argv);
+	free (cmdparams);
+}
+
+/** @brief send a message to a bot
+ *
+ * @param origin 
+ * @param av 
+ * @param ac
+ * 
+ * @return none
+ */
+void bot_chan_private (char *origin, char **av, int ac)
+{
+	CmdParams * cmdparams;
+
+	SET_SEGV_LOCATION();
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	if(process_origin(cmdparams, origin)) {
+		if(process_target_chan(cmdparams, av[0])) {
+			cmdparams->param = av[ac - 1];
+			SendModuleEvent (EVENT_CPRIVATE, cmdparams, NULL);
+			if (av[ac - 1][0] == '\1') {
+				/* TODO CTCP handler */
+			}
+		}
+	}
+	free (cmdparams);
 }
 
 /** @brief dump list of module bots and channels
@@ -279,21 +302,21 @@ void bot_message (char *origin, char **av, int ac)
  * @return none
  */
 int
-list_bot_chans (User * u, char **av, int ac)
+list_bot_chans (CmdParams* cmdparams)
 {
 	hscan_t hs;
 	hnode_t *hn;
 	lnode_t *ln;
 	ChanBot *mod_chan_bot;
 
-	prefmsg (u->nick, ns_botptr->nick, "BotChanDump:");
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "BotChanDump:");
 	hash_scan_begin (&hs, bch);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
 		mod_chan_bot = hnode_get (hn);
-		prefmsg (u->nick, ns_botptr->nick, "%s:--------------------------------", mod_chan_bot->chan);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", mod_chan_bot->chan);
 		ln = list_first (mod_chan_bot->bots);
 		while (ln) {
-			prefmsg (u->nick, ns_botptr->nick, "Bot Name: %s", (char *)lnode_get (ln));
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Bot Name: %s", (char *)lnode_get (ln));
 			ln = list_next (mod_chan_bot->bots, ln);
 		}
 	}
@@ -438,26 +461,26 @@ bot_nick_change (char *oldnick, char *newnick)
  * @return
  */
 int
-list_bots (User * u, char **av, int ac)
+list_bots (CmdParams* cmdparams)
 {
 	Bot *botptr;
 	hnode_t *bn;
 	hscan_t bs;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, ns_botptr->nick, "Module Bot List:");
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Bot List:");
 	hash_scan_begin (&bs, bh);
 	while ((bn = hash_scan_next (&bs)) != NULL) {
 		botptr = hnode_get (bn);
 		if(botptr->moduleptr == 0) {
-			prefmsg (u->nick, ns_botptr->nick, "NeoStats");
-			prefmsg (u->nick, ns_botptr->nick, "Bots: %s", botptr->nick);
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "NeoStats");
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Bots: %s", botptr->nick);
 		} else {
-			prefmsg (u->nick, ns_botptr->nick, "Module: %s", botptr->moduleptr->info->name);
-			prefmsg (u->nick, ns_botptr->nick, "Module Bots: %s", botptr->nick);
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module: %s", botptr->moduleptr->info->name);
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Bots: %s", botptr->nick);
 		}
 	}
-	prefmsg (u->nick, ns_botptr->nick, "End of Module Bot List");
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Module Bot List");
 	return 0;
 }
 
@@ -499,7 +522,7 @@ Bot * init_bot (Module* modptr, BotInfo* botinfo, const char* modes, unsigned in
 	nick = botinfo->nick;
 	u = finduser (nick);
 	if (u) {
-		nlog (LOG_WARNING, "Bot nick %s already in use", botptr->nick);
+		nlog (LOG_WARNING, "Bot nick %s already in use", botinfo->nick);
 		if(botinfo->altnick) {
 			nick = botinfo->altnick;
 			u = finduser (nick);
@@ -522,6 +545,10 @@ Bot * init_bot (Module* modptr, BotInfo* botinfo, const char* modes, unsigned in
 	}
 	Umode = UmodeStringToMask(modes, 0);
 	signon_newbot (nick, botinfo->user, botinfo->host, botinfo->realname, Umode);
+	/* Mark bot as services bot if needed */
+	if ((Umode & services_bot_umode)) {
+		flags |= BOT_FLAG_SERVICEBOT;
+	}
 #ifdef UMODE_DEAF
 	if (flags&BOT_FLAG_DEAF) {
 		sumode_cmd (nick, nick, UMODE_DEAF);

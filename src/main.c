@@ -1,10 +1,6 @@
-/* NeoStats - IRC Statistical Services k
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+/* NeoStats - IRC Statistical Services
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
-**
-**  Portions Copyright (c) 2000-2001 ^Enigma^
-**
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -25,14 +21,8 @@
 ** $Id$
 */
 
-#include <setjmp.h>
-#include <stdio.h>
 #include "neostats.h"
 #include "ircd.h"
-#ifdef HAVE_BACKTRACE
-#include <execinfo.h>
-#endif
-#include "signal.h"
 #include "conf.h"
 #include "keeper.h"
 #include "log.h"
@@ -46,6 +36,11 @@
 #include "exclude.h"
 #include "bans.h"
 #include "services.h"
+#include "modules.h"
+#include "auth.h"
+#include "bots.h"
+#include "timer.h"
+#include "signals.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -61,8 +56,7 @@ const char version_date[] = __DATE__;
 /*! Time we were compiled */
 const char version_time[] = __TIME__;
 
-static void start (void);
-static void setup_signals (void);
+static void Connect (void);
 static int get_options (int argc, char **argv);
 
 /*! have we forked */
@@ -77,29 +71,16 @@ jmp_buf sigvbuf;
 void InitMe(void)
 {
 	/* set some defaults before we parse the config file */
+	memset(&me, 0, sizeof(me));
 	me.t_start = time(NULL);
 	me.now = time(NULL);
 	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%ld", (long)me.now);
-	me.want_privmsg = 0;
-	me.want_nickip = 0;
-	me.die = 0;
-	me.local[0] = '\0';
-#ifndef DEBUG
-	me.debug_mode = 0;
-#else
+#ifdef DEBUG
 	me.debug_mode = 1;
 #endif
 	me.r_time = 10;
 	me.numeric = 1;
-	me.setservertimes = 0;
-	me.SendM = me.SendBytes = me.RcveM = me.RcveBytes = 0;
-	/* for modules, let them know we are not ready */
-	me.synced = 0;
-	me.onchan = 0;
 	me.maxsocks = getmaxsock ();
-#ifdef ULTIMATE3
-	me.client = 0;
-#endif
 #ifdef SQLSRV
 	me.sqlport = 8888;
 #endif
@@ -109,32 +90,35 @@ void InitMe(void)
  *
  * @return 
  */
-int InitCore(void)
+static int InitCore(void)
 {
+	InitMe();
+	/* if we are doing recv.log, remove the previous version */
+	if (config.recvlog)
+		remove (RECV_LOG);
+	/* prepare to catch errors */
+	InitSignals ();
+	/* load the config files */
+	if (ConfLoad () != NS_SUCCESS)
+		return NS_FAILURE;
 	/* init the sql subsystem if used */
 #ifdef SQLSRV
 	rta_init(sqlsrvlog);
-#endif
-		
-	/* initilze our Module subsystem */
-	if(InitModules () != NS_SUCCESS)
+#endif	
+	/* initialize Module subsystem */
+	if (InitModules () != NS_SUCCESS)
 		return NS_FAILURE;
-
-	InitAuth();
-
-	if(InitTimers() != NS_SUCCESS)
+	if (InitAuth() != NS_SUCCESS)
 		return NS_FAILURE;
-	if(InitBots() != NS_SUCCESS)
+	if (InitTimers() != NS_SUCCESS)
 		return NS_FAILURE;
-	if(InitSocks() != NS_SUCCESS)
+	if (InitBots() != NS_SUCCESS)
 		return NS_FAILURE;
-	/* load the config files */
-	if(ConfLoad () != NS_SUCCESS)
+	if (InitSocks() != NS_SUCCESS)
 		return NS_FAILURE;
-	/* initialize the rest of the subsystems */
-	if (init_dns () != NS_SUCCESS)
+	if (InitDns () != NS_SUCCESS)
 		return NS_FAILURE;
-	if (init_exclude_list() != NS_SUCCESS)
+	if (InitExcludes() != NS_SUCCESS)
 		return NS_FAILURE;
 	if (InitServers () != NS_SUCCESS)
 		return NS_FAILURE;
@@ -144,10 +128,9 @@ int InitCore(void)
 		return NS_FAILURE;
 	if (InitBans () != NS_SUCCESS)
 		return NS_FAILURE;	
-	/* initilize out transfer subsystem */
-	if (init_curl () != NS_SUCCESS)
+	if (InitCurl () != NS_SUCCESS)
 		return NS_FAILURE;
-	init_ircd ();
+	InitIrcd ();
 	return NS_SUCCESS;
 }
 
@@ -169,11 +152,9 @@ main (int argc, char *argv[])
 	strlcpy(me.version, NEOSTATS_VERSION, VERSIONSIZE);
 	strlcpy(me.versionfull, NEOSTATS_VERSION, VERSIONSIZE);
 	strlcat(me.versionfull, ircd_version, VERSIONSIZE);
-
 	/* get our commandline options */
 	if(get_options (argc, argv)!=NS_SUCCESS)
 		return EXIT_FAILURE;
-
 #if 0
 	/* Change to the working Directory */
 	if (chdir (NEO_PREFIX) < 0) {
@@ -183,15 +164,12 @@ main (int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 #endif
-
 	/* before we do anything, make sure logging is setup */
 	if(InitLogs () != NS_SUCCESS)
 		return EXIT_FAILURE;
-
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
 	CLEAR_SEGV_INMODULE();
-
 	/* keep quiet if we are told to :) */
 	if (!config.quiet) {
 		printf ("NeoStats %s Loading...\n", me.versionfull);
@@ -202,15 +180,7 @@ main (int argc, char *argv[])
 		printf ("Mark Hetherington (m@neostats.net)\n");
 		printf ("-----------------------------------------------\n\n");
 	}
-
-	InitMe();
-	/* if we are doing recv.log, remove the previous version */
-	if (config.recvlog)
-		remove (RECV_LOG);
-
-	/* prepare to catch errors */
-	setup_signals ();
-
+	/* Init NeoStats sub systems */
 	if (InitCore () != NS_SUCCESS)
 		return EXIT_FAILURE;
 
@@ -252,12 +222,11 @@ main (int argc, char *argv[])
 #endif
 	nlog (LOG_NOTICE, "NeoStats started (Version %s).", me.versionfull);
 
-	/* don't init_modules till after we fork. This fixes the load->fork-exit->call _fini problems when we fork */
+	/* Load modules after we fork. This fixes the load->fork-exit->call 
+	   _fini problems when we fork */
 	ConfLoadModules ();
-
-	/* we are ready to start now Duh! */
-	start ();
-
+	/* Connect to server */
+	Connect ();
 	/* We should never reach here but the compiler does not realise and may
 	   complain about not all paths control returning values without the return 
 	   Since it should never happen, treat as an error condition! */
@@ -342,187 +311,6 @@ get_options (int argc, char **argv)
 	return NS_SUCCESS;
 }
 
-
-
-/** @brief Sigterm Signal handler
- *
- * Called by the signal handler if we get a SIGTERM
- * This shutsdown NeoStats and exits
- * 
- * @return Exits the program!
- *
- * @todo Do a nice shutdown, no thtis crap :)
- */
-char msg_sigterm[]="SIGTERM received, shutting down server.";
-
-RETSIGTYPE
-serv_die ()
-{
-#ifdef VALGRIND
-	exit(NS_SUCCESS);
-#else /* VALGRIND */
-	nlog (LOG_CRITICAL, msg_sigterm);
-	globops (ns_botptr->nick, msg_sigterm);
-	do_exit (NS_EXIT_NORMAL, msg_sigterm);
-#endif /* VALGRIND */
-}
-
-/** @brief Sighup Signal handler
- *
- * Called by the signal handler if we get a SIGHUP
- * and rehashes the config file.
- * 
- * @return Nothing
- *
- * @todo Implement a Rehash function. What can we actually rehash?
- */
-RETSIGTYPE
-conf_rehash ()
-{
-	chanalert (ns_botptr->nick, "SIGHUP received, attempting to rehash");
-	globops (me.name, "SIGHUP received, attempted to rehash");
-	/* at the moment, the reshash just checks for a the SQL port is opened, if enabled */
-#ifdef SQLSRV
-	check_sql_sock();
-#endif
-}
-
-
-/** @brief Sigsegv  Signal handler
- *
- * This function is called when we get a SEGV
- * and will send some debug into to the logs and to IRC
- * to help us track down where the problem occured.
- * if the platform we are using supports backtrace
- * also print out the backtrace.
- * if the segv happened inside a module, try to unload the module
- * and continue on our merry way :)
- * 
- * @return Nothing
- *
- */
-#ifndef HAVE_BACKTRACE
-static char backtrace_unavailable[]="Backtrace not available on this platform\n";
-#endif
-static 
-void do_backtrace(void)
-{
-#ifdef HAVE_BACKTRACE
-	void *array[50];
-	size_t size;
-	char **strings;
-	int i;
-
-	fprintf (segfault, "Backtrace:\n");
-	size = backtrace (array, 10);
-	strings = backtrace_symbols (array, size);
-	for (i = 1; i < size; i++) {
-		fprintf (segfault, "BackTrace(%d): %s\n", i - 1, strings[i]);
-	}
-	free (strings);
-#else
-	fprintf (segfault, backtrace_unavailable);
-#endif
-}
-
-void report_segfault(char* modulename)
-{
-	segfault = fopen ("segfault.log", "a");
-	if(modulename) {
-		globops (me.name, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
-		nlog (LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", segv_inmodule);
-	} else {
-		globops (me.name, "Segmentation fault. Server terminating. Refer to segfault.log.");
-		nlog (LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log.");
-	}
-	fprintf (segfault, "------------------------SEGFAULT REPORT-------------------------\n");
-	fprintf (segfault, "Please view the README for how to submit a bug report\n");
-	fprintf (segfault, "and include this segfault report in your submission.\n");
-	fprintf (segfault, "Version:  %s\n", me.versionfull);
-	if (modulename) {
-		fprintf (segfault, "Module:   %s\n", segv_inmodule);
-	}
-	fprintf (segfault, "Location: %s\n", segv_location);
-	fprintf (segfault, "recbuf:   %s\n", recbuf);
-	chanalert (ns_botptr->nick, "Location *could* be %s.", segv_location);
-	do_backtrace();
-	fprintf (segfault, "-------------------------END OF REPORT--------------------------\n");
-	fflush (segfault);
-	fclose (segfault);		
-}
-
-RETSIGTYPE
-serv_segv ()
-{
-	char name[MAX_MOD_NAME];
-	/** segv happened inside a module, so unload and try to restore the stack 
-	 *  to location before we jumped into the module and continue
-	 */
-	if (segv_inmodule[0] != 0) {
-		report_segfault (segv_inmodule);
-		strlcpy (name, segv_inmodule, MAX_MOD_NAME);
-		CLEAR_SEGV_INMODULE();
-		unload_module (name, NULL);
-		chanalert (ns_botptr->nick, "Restoring Stack to before Crash");
-		/* flush the logs out */
-		CloseLogs (); 
-		longjmp (sigvbuf, -1);
-		chanalert (ns_botptr->nick, "Done");
-		return;
-	}
-	/** segv happened in our core */
-	report_segfault (NULL);
-	CloseLogs ();
-	do_exit (NS_EXIT_SEGFAULT, NULL);
-}
-
-/** @brief Sets up the signal handlers
- *
- * Sets up the signal handlers for SIGHUP (rehash)
- * SIGTERM (die) and SIGSEGV (segv fault)
- * and ignore the others (Such as SIGPIPE)
- * 
- * @return Nothing
- *
- */
-static void
-setup_signals (void)
-{
-	struct sigaction act;
-	act.sa_handler = SIG_IGN;
-	act.sa_flags = 0;
-
-	/* SIGPIPE/SIGALRM */
-	(void) sigemptyset (&act.sa_mask);
-	(void) sigaddset (&act.sa_mask, SIGPIPE);
-	(void) sigaddset (&act.sa_mask, SIGALRM);
-	(void) sigaction (SIGPIPE, &act, NULL);
-	(void) sigaction (SIGALRM, &act, NULL);
-
-	/* SIGHUP */
-	act.sa_handler = conf_rehash;
-	(void) sigemptyset (&act.sa_mask);
-	(void) sigaddset (&act.sa_mask, SIGHUP);
-	(void) sigaction (SIGHUP, &act, NULL);
-
-	/* SIGTERM/SIGINT */
-	act.sa_handler = serv_die;
-	(void) sigaddset (&act.sa_mask, SIGTERM);
-	(void) sigaction (SIGTERM, &act, NULL);
-	(void) sigaddset (&act.sa_mask, SIGINT);
-	(void) sigaction (SIGINT, &act, NULL);
-
-    /* SIGSEGV */
-	act.sa_handler = serv_segv;
-	(void) sigaddset (&act.sa_mask, SIGSEGV);
-	(void) sigaction (SIGSEGV, &act, NULL);
-
-	(void) signal (SIGHUP, conf_rehash);
-	(void) signal (SIGTERM, serv_die);
-	(void) signal (SIGSEGV, serv_segv);
-	(void) signal (SIGINT, serv_die);
-}
-
 /** @brief Connects to IRC and starts the main loop
  *
  * Connects to the IRC server and attempts to login
@@ -534,13 +322,11 @@ setup_signals (void)
  * @todo make the restart code nicer so it doesn't go mad when we can't connect
  */
 static void
-start (void)
+Connect (void)
 {
 	SET_SEGV_LOCATION();
 	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
-
 	servsock = ConnectTo (me.uplink, me.port);
-
 	if (servsock <= 0) {
 		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
@@ -548,7 +334,6 @@ start (void)
 		send_server_connect (me.name, me.numeric, me.infoline, me.pass, (unsigned long)me.t_start, (unsigned long)me.now);
 		read_loop ();
 	}
-
 	do_exit (NS_EXIT_RECONNECT, NULL);
 }
 
@@ -605,10 +390,10 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		}
 
 		/* now free up the users and servers memory */
-		FreeUsers();
-		FreeServers();
-		FreeBans();
-		fini_adns();
+		FiniUsers();
+		FiniServers();
+		FiniBans();
+		FiniDns();
 		FiniModules();
 		FiniSocks();
 		FiniBots();

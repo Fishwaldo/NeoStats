@@ -24,8 +24,8 @@
 #ifndef _DNS_H_
 #define _DNS_H_
 
-int init_dns (void);
+int InitDns (void);
 void do_dns (void);
-void fini_adns();
+void FiniDns ();
 void  canx_dns(const char *modname);
 #endif /* _DNS_H_ */

@@ -40,7 +40,8 @@ if (status == NS_FAILURE) {
 }
 
 
-int init_curl() {
+int InitCurl(void) 
+{
 	/* global curl init */
 	switch (curl_global_init(CURL_GLOBAL_ALL)) {
 		case CURLE_OK:
@@ -62,9 +63,7 @@ int init_curl() {
 	}
 	/* init the internal list to track downloads */
 	activetransfers = list_create(MAX_TRANSFERS);
-	nlog(LOG_DEBUG1, "LibCurl Initilized successfully");
-	
-/*	new_transfer("http://secure.irc-chat.net/", "", NS_MEMORY, "0", "Blah", testcallback); */
+	nlog(LOG_DEBUG1, "LibCurl Initialized successfully");
 	return NS_SUCCESS;
 }
 

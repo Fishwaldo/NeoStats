@@ -25,8 +25,6 @@
 
 #include <stdio.h>
 
-const char ms_help_about_oneline[]="About MoraleServ";
-const char ms_help_version_oneline[]="Display version info";
 const char ms_help_hail_oneline[]="Hail someone on IRC";
 const char ms_help_ode_oneline[]="Send an ODE to someone on IRC";
 const char ms_help_poem_oneline[]="Send a poem to someone on IRC";
@@ -36,7 +34,7 @@ const char ms_help_cheerup_oneline[]="Send an cheer up message to someone on IRC
 const char ms_help_behappy_oneline[]="Send an be happy song to someone on IRC";
 const char ms_help_wonderful_oneline[]="Send an song to someone on IRC";
 
-const char *ms_help_about[] = {
+const char *ms_about[] = {
 	"\2MoraleServ\2 is a fun module to send cheery",
 	"messages to friends on IRC.",
 	NULL
@@ -60,13 +58,6 @@ const char *ms_help_lapdance[] = {
 	"Syntax: \2LAPDANCE <NICK>\2",
 	"",
 	"Send a \"lapdance\" to a loved one on IRC, sure to cheer any person up",
-	NULL
-};
-
-const char *ms_help_version[] = {
-	"Syntax: \2VERISON\2",
-	"",
-	"Display current version information",
 	NULL
 };
 

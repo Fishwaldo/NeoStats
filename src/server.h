@@ -29,7 +29,7 @@ void DelServer(const char *name, const char* reason);
 void ServerDump (const char *name);
 int InitServers (void);
 void PingServers (void);
-void FreeServers();
+void FiniServers (void);
 #ifdef BASE64SERVERNAME
 Server *findserverbase64 (const char *num);
 #endif

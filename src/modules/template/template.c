@@ -126,7 +126,7 @@ ModuleInfo module_info = {
 /** Online event processing
  *  What we do when we first come online
  */
-static int Online(char **av, int ac)
+static int tm_event_online(CmdParams* cmdparams)
 {
 	/* Introduce a bot onto the network saving the bot handle */
 	template_bot = init_bot ( template_module, &template_bot_info, "-x", 0, NULL, NULL);
@@ -139,8 +139,8 @@ static int Online(char **av, int ac)
  *  see events.h for a list of all events available
  */
 ModuleEvent module_events[] = {
-	{EVENT_ONLINE, Online},
-	{NULL, NULL}
+	{EVENT_ONLINE,	tm_event_online},
+	{EVENT_NULL,	NULL}
 };
 
 /** Init module

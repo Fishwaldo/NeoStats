@@ -28,6 +28,7 @@
 #include "conf.h"
 #include "log.h"
 #include "services.h"
+#include "modules.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif

@@ -70,6 +70,6 @@ typedef struct neo_transfer {
 list_t *activetransfers;
 
 
-int init_curl();
+int InitCurl(void);
 
 #endif /* _TRANSFER_H_ */

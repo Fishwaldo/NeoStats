@@ -150,7 +150,7 @@ nlog (LOG_LEVEL level, char *fmt, ...)
 	struct logs_ *logentry;
 	
 	if (level <= config.debug) {
-		if (segv_inmodule[0] != 0) {
+		if (segv_inmodule[0]!= 0) {
 			hn = hash_lookup (logs, segv_inmodule);
 		} else {
 			hn = hash_lookup (logs, CoreLogFileName);

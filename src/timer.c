@@ -24,9 +24,10 @@
 */
 
 #include "neostats.h"
-#include "conf.h"
 #include "server.h"
 #include "services.h"
+#include "modules.h"
+#include "log.h"
 
 /* @brief Module Timer hash list */
 static hash_t *th;
@@ -49,6 +50,7 @@ int InitTimers (void)
 int FiniTimers (void)
 {
 	hash_destroy(th);
+	return NS_SUCCESS;
 }
 
 void
@@ -165,7 +167,7 @@ add_timer (Module* moduleptr, timer_function func_name, char *name, int interval
 
 	SET_SEGV_LOCATION();
 	if (func_name == NULL) {
-		nlog (LOG_WARNING, "%s: Timer %s Function %s doesn't exist", moduleptr->info->name, name, func_name);
+		nlog (LOG_WARNING, "%s: Timer %s Function doesn't exist", moduleptr->info->name, name);
 		return NS_FAILURE;
 	}
 	timer = new_timer (name);
@@ -174,7 +176,7 @@ add_timer (Module* moduleptr, timer_function func_name, char *name, int interval
 		timer->lastrun = me.now;
 		timer->moduleptr = moduleptr;
 		timer->function = func_name;
-		nlog (LOG_DEBUG2, "add_timer: Registered Module %s with timer for Function %s", moduleptr->info->name, func_name);
+		nlog (LOG_DEBUG2, "add_timer: Registered Module %s with timer for Function %s", moduleptr->info->name, name);
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -267,23 +269,23 @@ set_timer_interval (char *name, int interval)
  * @return none
 */
 int
-list_timers (User * u, char **av, int ac)
+list_timers (CmdParams* cmdparams)
 {
 	Timer *timer = NULL;
 	hscan_t ts;
 	hnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, ns_botptr->nick, "Module timer List:");
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module timer List:");
 	hash_scan_begin (&ts, th);
 	while ((tn = hash_scan_next (&ts)) != NULL) {
 		timer = hnode_get (tn);
-		prefmsg (u->nick, ns_botptr->nick, "%s:--------------------------------", timer->moduleptr->info->name);
-		prefmsg (u->nick, ns_botptr->nick, "Module Timer Name: %s", timer->name);
-		prefmsg (u->nick, ns_botptr->nick, "Module Interval: %d", timer->interval);
-		prefmsg (u->nick, ns_botptr->nick, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", timer->moduleptr->info->name);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Timer Name: %s", timer->name);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Module Interval: %d", timer->interval);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Time till next Run: %ld", (long)(timer->interval - (me.now - timer->lastrun)));
 	}
-	prefmsg (u->nick, ns_botptr->nick, "End of Module timer List");
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Module timer List");
 	return 0;
 }
 

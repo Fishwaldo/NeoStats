@@ -49,7 +49,8 @@ typedef struct excludes {
  * 
  * @returns int specifing success/failure
  */
-int init_exclude_list() {
+int InitExcludes(void) 
+{
 	char **row;
 	int i;
 	excludes *e;

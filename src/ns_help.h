@@ -27,7 +27,6 @@
 /* ns.c */
 extern const char *ns_help_shutdown[];
 extern const char *ns_help_reload[];
-extern const char *ns_help_logs[];
 extern const char *ns_help_exclude[];
 #ifdef USE_RAW
 extern const char *ns_help_raw[];
@@ -36,7 +35,6 @@ extern const char *ns_help_debug[];
 extern const char *ns_help_userdump[];
 extern const char *ns_help_chandump[];
 extern const char *ns_help_serverdump[];
-extern const char *ns_help_version[];
 extern const char *ns_help_load[];
 extern const char *ns_help_unload[];
 extern const char *ns_help_modlist[];
@@ -48,13 +46,10 @@ extern const char *ns_help_timerlist[];
 extern const char *ns_help_botchanlist[];
 extern const char *ns_help_status[];
 
-extern const char ns_help_oneline[];
 extern const char ns_help_level_oneline[];
 extern const char ns_help_status_oneline[];
-extern const char ns_help_version_oneline[];
 extern const char ns_help_shutdown_oneline[];
 extern const char ns_help_reload_oneline[];
-extern const char ns_help_logs_oneline[];
 extern const char ns_help_load_oneline[];
 extern const char ns_help_unload_oneline[];
 extern const char ns_help_jupe_oneline[];

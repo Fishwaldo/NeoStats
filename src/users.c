@@ -31,6 +31,9 @@
 #include "users.h"
 #include "chans.h"
 #include "exclude.h"
+#include "modules.h"
+#include "bots.h"
+#include "auth.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -66,27 +69,28 @@ new_user (const char *nick)
 	return (u);
 }
 #ifndef GOTNICKIP
-static void 
-lookupnickip(char *data, adns_answer *a) {
+static void lookupnickip(char *data, adns_answer *a) 
+{
+	CmdParams * cmdparams;
 	User *u;
-	char **av;
-	int ac = 0;
 	
 	u = finduser((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ipaddr.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
-		AddStringToList (&av, u->nick, &ac);
-		SendModuleEvent (EVENT_GOTNICKIP, av, ac);
+		cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+		cmdparams->source.user = u;	
+		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
+		free (cmdparams);
 	}
 }
 #endif
+
 void
 AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric)
 {
+	CmdParams * cmdparams;
 	unsigned long ipaddress = 0;
 	unsigned long time;
-	char **av;
-	int ac = 0;
 	User *u;
 	int i;
 #ifndef GOTNICKIP
@@ -170,13 +174,14 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 	}
 #endif
 
-	AddStringToList (&av, u->nick, &ac);
-	SendModuleEvent (EVENT_SIGNON, av, ac);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.user = u;	
+	SendAllModuleEvent (EVENT_SIGNON, cmdparams);
 	if (me.want_nickip == 1 && ipaddress != 0) {
 		/* only fire this event if we have the nickip and some module wants it */
-		SendModuleEvent (EVENT_GOTNICKIP, av, ac);
+		SendAllModuleEvent (EVENT_GOTNICKIP, cmdparams);
 	}
-	free (av);
+	free (cmdparams);
 }
 
 void
@@ -188,48 +193,42 @@ UserPart (list_t * list, lnode_t * node, void *v)
 void
 DelUser (const char *nick, int killflag, const char *reason)
 {
+	CmdParams * cmdparams;
 	char killnick[MAXNICK];
 	int botflag = 0;
 	User *u;
 	hnode_t *un;
-	char **av;
-	int ac = 0;
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, "doDelUser: %s", nick);
-
 	u = finduser(nick);
 	if(!u) {
 		nlog (LOG_WARNING, "doDelUser: %s failed!", nick);
 		return;
 	}
-
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
 		nlog (LOG_WARNING, "doDelUser: %s failed!", nick);
 		return;
 	}
 	u = hnode_get (un);
-
 	bzero(quitreason, BUFSIZE);
 	if(reason) {
 		strlcpy(quitreason, reason, BUFSIZE);
 		strip_mirc_codes(quitreason);
 	}
 	list_process (u->chans, u, UserPart);
-
 	/* run the event to delete a user */
-	AddStringToList (&av, u->nick, &ac);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.user = u;
 	if(reason) {
-		AddStringToList (&av, (char*)quitreason, &ac);
+		cmdparams->param = (char*)quitreason;
 	}
 	if (killflag == 0) {
-		SendModuleEvent (EVENT_SIGNOFF, av, ac);
+		SendAllModuleEvent (EVENT_QUIT, cmdparams);
 	} else if (killflag == 1) {
-		SendModuleEvent (EVENT_KILL, av, ac);
+		SendAllModuleEvent (EVENT_KILL, cmdparams);
 	}
-	free (av);
-
 	/* if its one of our bots, remove it from the modlist */
 	if ( IsMe(u) ) {
 		if (killflag == 1) {
@@ -239,24 +238,20 @@ DelUser (const char *nick, int killflag, const char *reason)
 		}
 		del_ns_bot (u->nick);
 	}
-
 	hash_delete (uh, un);
 	hnode_destroy (un);
 	list_destroy (u->chans);
 	free (u);
 	if(botflag) {
-		ac = 0;
-		AddStringToList (&av, killnick, &ac);
-		SendModuleEvent (EVENT_BOTKILL, av, ac);
-		free (av);
+		SendModuleEvent (EVENT_BOTKILL, cmdparams, findbot(u->nick));
 	}
+	free (cmdparams);
 }
 
 void
 UserAway (const char *nick, const char *awaymsg)
 {
-	char **av;
-	int ac = 0;
+	CmdParams * cmdparams;
 	User *u;
 
 	u = finduser (nick);
@@ -266,17 +261,15 @@ UserAway (const char *nick, const char *awaymsg)
 		} else {
 			u->awaymsg[0] = 0;
 		}
-		AddStringToList (&av, u->nick, &ac);
+		cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+		cmdparams->source.user = u;
 		if ((u->is_away == 1) && (!awaymsg)) {
 			u->is_away = 0;
-			SendModuleEvent (EVENT_AWAY, av, ac);
-			free (av);
 		} else if ((u->is_away == 0) && (awaymsg)) {
 			u->is_away = 1;
-			AddStringToList (&av, (char *) awaymsg, &ac);
-			SendModuleEvent (EVENT_AWAY, av, ac);
-			free (av);
 		}
+		SendAllModuleEvent (EVENT_AWAY, cmdparams);
+		free (cmdparams);
 	} else {
 		nlog (LOG_WARNING, "UserAway: unable to find user %s for away", nick);
 	}
@@ -285,11 +278,10 @@ UserAway (const char *nick, const char *awaymsg)
 int 
 UserNick (const char * oldnick, const char *newnick, const char * ts)
 {
+	CmdParams * cmdparams;
 	char uoldnick[MAXNICK];
 	hnode_t *un;
 	lnode_t *cm;
-	char **av;
-	int ac = 0;
 	User * u;
 	time_t time;
 
@@ -325,13 +317,11 @@ UserNick (const char * oldnick, const char *newnick, const char * ts)
 		u->TS = time;
 	}
 	hash_insert (uh, un, u->nick);
-	AddStringToList (&av, (char*)uoldnick, &ac);
-	AddStringToList (&av, u->nick, &ac);
-	if(ts) {
-		AddStringToList (&av, (char*)ts, &ac);
-	}
-	SendModuleEvent (EVENT_NICKCHANGE, av, ac);
-	free (av);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.user = u;
+	cmdparams->param = uoldnick;
+	SendAllModuleEvent (EVENT_NICK, cmdparams);
+	free (cmdparams);
 	return NS_SUCCESS;
 }
 
@@ -708,15 +698,11 @@ SetUserVhost(const char* nick, const char* vhost)
 	}
 }
 
-/* I don't know why, but I spent like 3 hours trying to make this function work and 
-	I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
-	if a user is losing modes (ie -o) then its a real pain in the butt, but tough... */
 void
 UserMode (const char *nick, const char *modes)
 {
+	CmdParams * cmdparams;
 	User *u;
-	char **av;
-	int ac = 0;
 	long oldmode;
 
 	SET_SEGV_LOCATION();
@@ -728,10 +714,6 @@ UserMode (const char *nick, const char *modes)
 	}
 	nlog (LOG_DEBUG1, "Modes: %s", modes);
 	strlcpy (u->modes, modes, MODESIZE);
-	AddStringToList (&av, u->nick, &ac);
-	AddStringToList (&av, (char *) modes, &ac);
-	SendModuleEvent (EVENT_UMODE, av, ac);
-	free (av);
 	oldmode = u->Umode;
 	u->Umode = UmodeStringToMask(modes, u->Umode);
 	/* This needs to track +x and +t really but
@@ -744,15 +726,19 @@ UserMode (const char *nick, const char *modes)
 	}
 #endif
 	nlog (LOG_DEBUG1, "UserMode: modes for %s is now %p", u->nick, (int *)u->Umode);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.user = u;	
+	cmdparams->param = (char*)modes;
+	SendAllModuleEvent (EVENT_UMODE, cmdparams);
+	free (cmdparams);
 }
 
 #ifdef GOTUSERSMODES
 void
 UserSMode (const char *nick, const char *modes)
 {
+	CmdParams * cmdparams;
 	User *u;
-	char **av;
-	int ac = 0;
 
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG1, "UserSMode: user %s modes %s", nick, modes);
@@ -762,12 +748,13 @@ UserSMode (const char *nick, const char *modes)
 		return;
 	}
 	nlog (LOG_DEBUG1, "Smodes: %s", modes);
-	AddStringToList (&av, u->nick, &ac);
-	AddStringToList (&av, (char *) modes, &ac);
-	SendModuleEvent (EVENT_SMODE, av, ac);
-	free (av);
 	u->Smode = SmodeStringToMask(modes, u->Smode);
 	nlog (LOG_DEBUG1, "UserSMode: smode for %s is now %p", u->nick, (int *)u->Smode);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.user = u;	
+	cmdparams->param = modes;
+	SendAllModuleEvent (EVENT_SMODE, cmdparams);
+	free (cmdparams);
 }
 #endif
 
@@ -783,10 +770,7 @@ void SetUserServicesTS(const char* nick, const char* ts)
 /* @brief Free up all the user structs and free memory. Called when we close down
  *
  */
-
-
-void
-FreeUsers ()
+void FiniUsers (void)
 {
 	User *u;
 	hnode_t *un;
@@ -799,7 +783,7 @@ FreeUsers ()
 		list_process (u->chans, u, UserPart); 		
 		/* something is wrong if its our bots */
 		if ( IsMe(u) ) {
-			nlog (LOG_NOTICE, "FreeUsers called with a neostats bot online: %s", u->nick);
+			nlog (LOG_NOTICE, "FiniUsers called with a neostats bot online: %s", u->nick);
 		}
 		hash_scan_delete (uh, un);
 		hnode_destroy (un);

@@ -1,4 +1,4 @@
-/* NeoStats - IRC Statistical Services 
+/* NeoStats - IRC Statistical Services
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
@@ -21,15 +21,9 @@
 ** $Id$
 */
 
-#ifndef _EXCLUDE_H_
-#define _EXCLUDE_H_
+#ifndef SIGNALS_H
+#define SIGNALS_H
 
-int InitExcludes(void);
-void ns_do_exclude_add(User *u, char *type, char *pattern);
-void ns_do_exclude_del(User *u, char *position);
-void ns_do_exclude_list(User *u, char *from);
-void ns_do_exclude_chan(Channel *c);
-void ns_do_exclude_server(Server *s);
-void ns_do_exclude_user(User *u);
+void InitSignals (void);
 
-#endif /* _EXCLUDE_H_ */
+#endif /* SIGNALS_H */

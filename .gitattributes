@@ -325,6 +325,8 @@ src/server.c eol=lf
 src/server.h eol=lf
 src/services.c eol=lf
 src/services.h eol=lf
+src/signals.c -text
+src/signals.h -text
 src/sock.c eol=lf
 src/sock.h eol=lf
 src/sqlsrv/Makefile.in -text

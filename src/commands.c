@@ -27,11 +27,11 @@
 #include "conf.h"
 #include "services.h"
 
-static int bot_cmd_help (Bot* bot_ptr, User * u, char **av, int ac);
-static int bot_cmd_set (Bot* bot_ptr, User * u, char **av, int ac);
-static int bot_cmd_about (Bot* bot_ptr, User * u, char **av, int ac);
-static int bot_cmd_version (Bot* bot_ptr, User * u, char **av, int ac);
-static int bot_cmd_credits (Bot* bot_ptr, User * u, char **av, int ac);
+static int bot_cmd_help (CmdParams * cmdparams);
+static int bot_cmd_set (CmdParams * cmdparams);
+static int bot_cmd_about (CmdParams * cmdparams);
+static int bot_cmd_version (CmdParams * cmdparams);
+static int bot_cmd_credits (CmdParams * cmdparams);
 
 /* help title strings for different user levels */
 char * help_level_title[]=
@@ -55,7 +55,6 @@ static const char *cmd_help_help[] = {
 	NULL
 };
 
-#if 0
 const char cmd_help_about_oneline[] = "About Module";
 const char *cmd_help_about[] = {
 	"Syntax: \2ABOUT\2",
@@ -64,15 +63,21 @@ const char *cmd_help_about[] = {
 	NULL
 };
 
-const char cmd_help_version_oneline[] = "Display Module version info";
-const char *cs_help_version[] = {
+const char cmd_help_credits_oneline[] = "Display credits";
+const char *cmd_help_credits[] = {
+	"Syntax: \2CREDITS\2",
+	"",
+	"Show credits",
+	NULL
+};
+
+const char cmd_help_version_oneline[] = "Display version";
+const char *cmd_help_version[] = {
 	"Syntax: \2VERSION\2",
 	"",
 	"Show version information",
 	NULL
 };
-#endif
-
 
 static const char *cmd_help_set[] = {
 	"Syntax: \2SET LIST\2",
@@ -92,10 +97,9 @@ static const char *cmd_help_set[] = {
 static bot_cmd intrinsic_commands[]=
 {
 	{"HELP",	NULL,	0, 	0,	cmd_help_help, 		cmd_help_oneline},	
-#if 0
 	{"VERSION",	NULL,	0, 	0,	cmd_help_version,	cmd_help_version_oneline},
 	{"ABOUT",	NULL,	0, 	0,	cmd_help_about, 	cmd_help_about_oneline },
-#endif
+	{"CREDITS",	NULL,	0, 	0,	cmd_help_credits, 	cmd_help_credits_oneline },
 	{NULL,		NULL,	0, 	0,	NULL, 				NULL}
 };
 
@@ -187,21 +191,18 @@ static int calc_cmd_ulevel(bot_cmd* cmd_ptr)
  *  @param pointer to command structure
  *  @return command user level requires
  */
-static int getuserlevel(Bot* bot_ptr, User* u)
+static int getuserlevel(CmdParams * cmdparams)
 {
 	int ulevel = 0;
 	int modlevel = 0;
-	Module * Mod;
 
 	/* Generally we just want the standard user level */
-	ulevel = UserLevel(u);
-
+	ulevel = UserLevel(cmdparams->source.user);
 	/* If less than a locop see if the module can give us a user level */
 	if(ulevel < NS_ULEVEL_LOCOPER) {
-		Mod = get_mod_ptr(bot_ptr->moduleptr->info->name);
-		if(Mod) {
-			if(Mod->mod_auth_cb) {
-				modlevel = Mod->mod_auth_cb(u);
+		if(cmdparams->dest.bot->moduleptr) {
+			if(cmdparams->dest.bot->moduleptr->mod_auth_cb) {
+				modlevel = cmdparams->dest.bot->moduleptr->mod_auth_cb(cmdparams->source.user);
 				if(modlevel > ulevel) {
 					ulevel = modlevel;
 				}
@@ -209,6 +210,40 @@ static int getuserlevel(Bot* bot_ptr, User* u)
 		}
 	}
 	return ulevel;
+}
+
+/** common message handlers */
+
+void msg_permission_denied(CmdParams * cmdparams, char* subcommand)
+{
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Permission Denied");
+	chanalert (cmdparams->dest.bot->nick, "%s tried to use %s %s, but is not authorised", cmdparams->source.user->nick, cmdparams->param, subcommand);
+	nlog (LOG_NORMAL, "%s tried to use %s %s, but is not authorised", cmdparams->source.user->nick, cmdparams->param, subcommand);
+}
+
+void msg_error_need_more_params (CmdParams * cmdparams)
+{
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Syntax error: insufficient parameters");
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
+}
+
+void msg_syntax_error (CmdParams * cmdparams)
+{
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Syntax error");
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "/msg %s HELP %s for more information", cmdparams->dest.bot->nick, cmdparams->param);
+}
+
+void msg_unknown_command (CmdParams * cmdparams)
+{
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Syntax error: unknown command: \2%s\2", cmdparams->param);
+	chanalert (cmdparams->dest.bot->nick, "%s requested %s, but that is an unknown command", cmdparams->source.user->nick, cmdparams->param);
+}
+
+void msg_only_opers (CmdParams * cmdparams)
+{
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "This service is only available to IRC operators.");
+	chanalert (cmdparams->dest.bot->nick, "%s requested %s, but is not an operator.", cmdparams->source.user->nick, cmdparams->param);
+	nlog (LOG_NORMAL, "%s requested %s, but is not an operator.", cmdparams->source.user->nick, cmdparams->param);
 }
 
 /** @brief add_bot_cmd adds a single command to the command hash
@@ -225,7 +260,7 @@ add_bot_cmd(hash_t* cmd_hash, bot_cmd* cmd_ptr)
 	 * For now we verify help during processing since it is not critical. */
 	/* No command, we cannot recover from this */
 	if(!cmd_ptr->cmd) {
-		nlog (LOG_ERROR, "add_bot_cmd: missing command, command (unknown) not added");
+		nlog (LOG_ERROR, "add_bot_cmd: missing command");
 		return NS_FAILURE;
 	}
 	/* No handler, we cannot recover from this */
@@ -344,10 +379,7 @@ add_services_cmd_list(bot_cmd* bot_cmd_list)
 int 
 del_services_cmd_list(bot_cmd* bot_cmd_list) 
 {
-	Bot* bot_ptr;
-
-	bot_ptr = findbot(ns_botptr->nick);
-	return(del_bot_cmd_list(bot_ptr, bot_cmd_list));
+	return(del_bot_cmd_list(ns_botptr, bot_cmd_list));
 }
 
 /** @brief run_bot_cmd process bot command list
@@ -355,109 +387,128 @@ del_services_cmd_list(bot_cmd* bot_cmd_list)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 int
-run_bot_cmd (Bot* bot_ptr, User *u, char *command_string)
+run_intrinsic_cmds (const char* cmd, CmdParams * cmdparams)
+{
+	/* Handle intrinsic commands */
+	/* Help */
+	if (!ircstrcasecmp(cmd, "HELP")) {
+		bot_cmd_help(cmdparams);
+		return NS_SUCCESS;
+	}
+	/* Handle SET if we have it */
+	if (cmdparams->dest.bot->bot_settings && !ircstrcasecmp(cmd, "SET") ) {
+		bot_cmd_set(cmdparams);
+		return NS_SUCCESS;
+	}
+	/* About */
+	if (!ircstrcasecmp(cmd, "ABOUT") && cmdparams->dest.bot->moduleptr && cmdparams->dest.bot->moduleptr->info->about_text ) {
+		bot_cmd_about(cmdparams);
+		return NS_SUCCESS;
+	}
+	/* Version */
+	if (!ircstrcasecmp(cmd, "VERSION")) {
+		bot_cmd_version(cmdparams);
+		return NS_SUCCESS;
+	}
+	/* Credits */
+	if (!ircstrcasecmp(cmd, "CREDITS") && cmdparams->dest.bot->moduleptr && cmdparams->dest.bot->moduleptr->info->copyright ) {
+		bot_cmd_credits(cmdparams);
+		return NS_SUCCESS;
+	}
+	return NS_FAILURE;
+}
+
+/** @brief run_bot_cmd process bot command list
+ *
+ * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+int
+run_bot_cmd (CmdParams * cmdparams)
 {
 	static char privmsgbuffer[BUFSIZE];
 	int userlevel;
 	bot_cmd* cmd_ptr;
 	hnode_t *cmdnode;
+	int cmdret = 0;
 	int cmdlevel;
-	char* parambuf; 
 	char **av;
 	int ac = 0;
+	int i;
 
 	SET_SEGV_LOCATION();
-	userlevel = getuserlevel (bot_ptr, u);
-
-	strlcpy (privmsgbuffer, command_string, BUFSIZE);
+	userlevel = getuserlevel (cmdparams); 
+	strlcpy (privmsgbuffer, cmdparams->param, BUFSIZE);
 	ac = split_buf (privmsgbuffer, &av, 0);
-
+	for(i = 1; i < ac; i++) {
+		AddStringToList (&cmdparams->av, av[i], &cmdparams->ac);
+	}
 	/* Check user authority to use this command set */
-	if (( (bot_ptr->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
-		( (bot_ptr->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
-		prefmsg (u->nick, bot_ptr->nick, "This service is only available to IRC operators.");
-		chanalert (bot_ptr->nick, "%s requested %s, but is not an operator.", u->nick, av[0]);
-		nlog (LOG_NORMAL, "%s requested %s, but is not an operator.", u->nick, av[0]);
+	if (( (cmdparams->dest.bot->flags & BOT_FLAG_RESTRICT_OPERS) && (userlevel < NS_ULEVEL_OPER) ) ||
+		( (cmdparams->dest.bot->flags & BOT_FLAG_ONLY_OPERS) && me.onlyopers && (userlevel < NS_ULEVEL_OPER) )){
+		msg_only_opers (cmdparams);
 		free (av);
+		free (cmdparams->av);
 		return NS_SUCCESS;
-	}
-	
-	/* Process command list */
-	cmdnode = hash_lookup(bot_ptr->botcmds, av[0]);
-	if (cmdnode) {
-		cmd_ptr = hnode_get(cmdnode);	
-		cmdlevel = calc_cmd_ulevel(cmd_ptr);
-		/* Is user authorised to issue this command? */
-		if (userlevel < cmdlevel) {
-			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
-			chanalert (bot_ptr->nick, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
-			nlog (LOG_NORMAL, "%s tried to use %s, but is not authorised", u->nick, cmd_ptr->cmd);
+	}	
+	if(cmdparams->dest.bot->botcmds) {
+		/* Process command list */
+		cmdnode = hash_lookup(cmdparams->dest.bot->botcmds, av[0]);
+		if (cmdnode) {
+			cmd_ptr = hnode_get(cmdnode);	
+			cmdlevel = calc_cmd_ulevel(cmd_ptr);
+			/* Is user authorised to issue this command? */
+			if (userlevel < cmdlevel) {
+				msg_permission_denied(cmdparams, NULL);
+				free (av);
+				free (cmdparams->av);
+				return NS_SUCCESS;
+			}
+			/* Check parameter count */
+			if(cmdparams->ac < cmd_ptr->minparams ) {
+				msg_error_need_more_params(cmdparams);
+				free (av);
+				free (cmdparams->av);
+				return NS_SUCCESS;
+			}
+			/* Seems OK so report the command call so modules do not have to */
+			chanalert (cmdparams->dest.bot->nick, "%s used %s", cmdparams->source.user->nick, cmd_ptr->cmd);
+			/* Log command message */
+			nlog (LOG_NORMAL, "%s used %s", cmdparams->source.user->nick, cmdparams->param);
+			/* call handler */
+			if (setjmp (sigvbuf) == 0) {
+				if(cmdparams->dest.bot->moduleptr)
+					SET_SEGV_INMODULE(cmdparams->dest.bot->moduleptr->info->name);
+				cmdret = cmd_ptr->handler(cmdparams);
+				CLEAR_SEGV_INMODULE();
+			}
+			switch(cmdret) {
+				case NS_ERR_SYNTAX_ERROR:
+					msg_syntax_error (cmdparams);
+					break;
+				case NS_ERR_NEED_MORE_PARAMS:
+					msg_error_need_more_params (cmdparams);
+					break;				
+				case NS_ERR_NO_PERMISSION:
+					break;				
+				case NS_FAILURE:
+				case NS_SUCCESS:
+				default:
+					break;
+			}
 			free (av);
+			free (cmdparams->av);
 			return NS_SUCCESS;
 		}
-		/* First two parameters are bot name and command name so 
-		 * subtract 2 to get parameter count */
-		if((ac - 1) < cmd_ptr->minparams ) {
-			prefmsg (u->nick, bot_ptr->nick, "Syntax error: insufficient parameters");
-			prefmsg (u->nick, bot_ptr->nick, "/msg %s HELP %s for more information", bot_ptr->nick, cmd_ptr->cmd);
-			free (av);
-			return NS_SUCCESS;
-		}
-		/* Seems OK so report the command call so modules do not have to */
-		chanalert (bot_ptr->nick, "%s used %s", u->nick, cmd_ptr->cmd);
-		/* Grab the parameters for the log so modules do not have to log */
-		if(ac > 1) {
-			parambuf = joinbuf(av, ac, 1);
-			nlog (LOG_NORMAL, "%s used %s %s", u->nick, cmd_ptr->cmd, parambuf);
-			free(parambuf);
-		} else {
-			nlog (LOG_NORMAL, "%s used %s", u->nick, cmd_ptr->cmd);
-		}
-		/* call handler */
-		cmd_ptr->handler(u, av, ac);
+	}
+	if(run_intrinsic_cmds (av[0], cmdparams) == NS_SUCCESS) {
 		free (av);
+		free (cmdparams->av);
 		return NS_SUCCESS;
 	}
-
-	/* Handle intrinsic commands */
-	/* Help */
-	if (!ircstrcasecmp(av[0], "HELP")) {
-		bot_cmd_help(bot_ptr, u, av, ac);
-		free (av);
-		return NS_SUCCESS;
-	}
-	/* Handle SET if we have it */
-	if (bot_ptr->bot_settings && !ircstrcasecmp(av[0], "SET") ) {
-		bot_cmd_set(bot_ptr, u, av, ac);
-		free (av);
-		return NS_SUCCESS;
-	}
-
-	/* About */
-	if (!ircstrcasecmp(av[0], "ABOUT") && bot_ptr->moduleptr && bot_ptr->moduleptr->info->about_text ) {
-		bot_cmd_about(bot_ptr, u, av, ac);
-		free (av);
-		return NS_SUCCESS;
-	}
-
-	/* Version */
-	if (!ircstrcasecmp(av[0], "VERSION")) {
-		bot_cmd_version(bot_ptr, u, av, ac);
-		free (av);
-		return NS_SUCCESS;
-	}
-
-	/* Credits */
-	if (!ircstrcasecmp(av[0], "CREDITS") && bot_ptr->moduleptr && bot_ptr->moduleptr->info->copyright ) {
-		bot_cmd_credits(bot_ptr, u, av, ac);
-		free (av);
-		return NS_SUCCESS;
-	}
-
 	/* We have run out of commands so report failure */
-	prefmsg (u->nick, bot_ptr->nick, "Syntax error: unknown command: \2%s\2", av[0]);
-	chanalert (bot_ptr->nick, "%s requested %s, but that is an unknown command", u->nick, av[0]);
+	msg_unknown_command (cmdparams);
 	free (av);
+	free (cmdparams->av);
 	return NS_FAILURE;
 }
 
@@ -466,7 +517,7 @@ run_bot_cmd (Bot* bot_ptr, User *u, char *command_string)
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 static int 
-bot_cmd_help (Bot* bot_ptr, User * u, char **av, int ac)
+bot_cmd_help (CmdParams * cmdparams)
 {
 	char* curlevelmsg=NULL;
 	int donemsg=0;
@@ -477,137 +528,138 @@ bot_cmd_help (Bot* bot_ptr, User * u, char **av, int ac)
 	int userlevel;
 	int cmdlevel;
 
-	userlevel = getuserlevel (bot_ptr, u);
+	userlevel = getuserlevel (cmdparams);
 
 	/* If no parameter to help, generate main help text */
-	if (ac < 3) {
+	if (cmdparams->ac < 1) {
 		lowlevel = 0;
 		curlevel = 30;
-		chanalert (bot_ptr->nick, "%s requested %s help", u->nick, bot_ptr->nick);
-		nlog (LOG_NORMAL, "%s requested %s help", u->nick, bot_ptr->nick);
-		prefmsg(u->nick, bot_ptr->nick, "The following commands can be used with %s:", bot_ptr->nick);
+		chanalert (cmdparams->dest.bot->nick, "%s requested %s help", cmdparams->source.user->nick, cmdparams->dest.bot->nick);
+		nlog (LOG_NORMAL, "%s requested %s help", cmdparams->source.user->nick, cmdparams->dest.bot->nick);
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "\2The following commands can be used with %s:\2", cmdparams->dest.bot->nick);
 
 		/* Handle intrinsic commands */
 		cmd_ptr = intrinsic_commands;
 		while(cmd_ptr->cmd) {
 			/* Check for module override */	
-			if(!hash_lookup(bot_ptr->botcmds, cmd_ptr->cmd))
-				prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+			if(!hash_lookup(cmdparams->dest.bot->botcmds, cmd_ptr->cmd))
+				prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
 			cmd_ptr++;
 		}
 		/* Do we have a set command? */
-		if(bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel) {
-			prefmsg(u->nick, bot_ptr->nick, "    %-20s Configure %s", "SET", bot_ptr->nick);
+		if(cmdparams->dest.bot->bot_settings && userlevel >= cmdparams->dest.bot->set_ulevel) {
+			prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s Configure %s", "SET", cmdparams->dest.bot->nick);
 		}
-		restartlevel:
-		hash_scan_begin(&hs, bot_ptr->botcmds);
-		while ((cmdnode = hash_scan_next(&hs)) != NULL) {
-			cmd_ptr = hnode_get(cmdnode);
-			cmdlevel = calc_cmd_ulevel(cmd_ptr);
-			if ((cmdlevel < curlevel) && (cmdlevel >= lowlevel)) {
-				if(curlevelmsg && !donemsg) {
-					prefmsg(u->nick, bot_ptr->nick, "\2Additional commands available to %s:\2", curlevelmsg);
-					donemsg = 1;
-				}
-				/* Warn about missing help text then skip */ 
-				if(!cmd_ptr->onelinehelp) {
-					/* Missing help text!!! */
-					nlog (LOG_WARNING, "Missing one line help text for command %s", cmd_ptr->cmd);
-				} else {					
-					prefmsg(u->nick, bot_ptr->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+		while(1) {
+			hash_scan_begin(&hs, cmdparams->dest.bot->botcmds);
+			while ((cmdnode = hash_scan_next(&hs)) != NULL) {
+				cmd_ptr = hnode_get(cmdnode);
+				cmdlevel = calc_cmd_ulevel(cmd_ptr);
+				if ((cmdlevel < curlevel) && (cmdlevel >= lowlevel)) {
+					if(curlevelmsg && !donemsg) {
+						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "\2Additional commands available to %s:\2", curlevelmsg);
+						donemsg = 1;
+					}
+					if(!cmd_ptr->onelinehelp) {
+						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s *** Missing help text ***", cmd_ptr->cmd);
+					} else {					
+						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp);
+					}
 				}
 			}
-		}
-		if (userlevel >= curlevel) {
-			switch (curlevel) {
-				case 30:
+			if (lowlevel >= userlevel) {
+				break;
+			}
+			if (userlevel >= curlevel) {
+				switch (curlevel) {
+					case 30:
 						curlevel = NS_ULEVEL_OPER;
 						lowlevel = 30;
 						curlevelmsg=NULL;
 						donemsg=0;
-						goto restartlevel;
-				case NS_ULEVEL_OPER:
+						break;
+					case NS_ULEVEL_OPER:
 						curlevel = NS_ULEVEL_ADMIN;
 						lowlevel = NS_ULEVEL_OPER;
 						curlevelmsg=help_level_title[0];
 						donemsg=0;
-						goto restartlevel;
-				case NS_ULEVEL_ADMIN:
+						break;
+					case NS_ULEVEL_ADMIN:
 						curlevel = NS_ULEVEL_ROOT;
 						lowlevel = NS_ULEVEL_ADMIN;
 						curlevelmsg=help_level_title[1];
 						donemsg=0;
-						goto restartlevel;
-				case NS_ULEVEL_ROOT:
+						break;
+					case NS_ULEVEL_ROOT:
 						curlevel = (NS_ULEVEL_ROOT + 1);
 						lowlevel = NS_ULEVEL_ROOT;
 						curlevelmsg=help_level_title[2];
 						donemsg=0;
-						goto restartlevel;
-				default:	
 						break;
-			}
-		}						
+					default:	
+						break;
+				}
+			}						
+		}
 		/* Generate help on help footer text */
-		prefmsg(u->nick, bot_ptr->nick, " ");
-		prefmsg(u->nick, bot_ptr->nick, "To use a command, type");
-		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s command\2", bot_ptr->nick);
-		prefmsg(u->nick, bot_ptr->nick, "For for more information on a command, type");
-		prefmsg(u->nick, bot_ptr->nick, "    \2/msg %s HELP command\2.", bot_ptr->nick);
-		return 1;
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, " ");
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "To execute a command:");
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    \2/msg %s command\2", cmdparams->dest.bot->nick);
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "For help on a command:");
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "    \2/msg %s HELP command\2", cmdparams->dest.bot->nick);
+		return NS_SUCCESS;
 	}
-	chanalert (bot_ptr->nick, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
-	nlog (LOG_NORMAL, "%s requested %s help on %s", u->nick, bot_ptr->nick, av[2]);
+	chanalert (cmdparams->dest.bot->nick, "%s requested %s help on %s", cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->av[0]);
+	nlog (LOG_NORMAL, "%s requested %s help on %s", cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->av[0]);
 
 	/* Process command list */
-	cmdnode = hash_lookup(bot_ptr->botcmds, av[2]);
+	cmdnode = hash_lookup(cmdparams->dest.bot->botcmds, cmdparams->av[0]);
 	if (cmdnode) {
 		cmd_ptr = hnode_get(cmdnode);
 		cmdlevel = calc_cmd_ulevel(cmd_ptr);
 		if (userlevel < cmdlevel) {
-			prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
-			return 1;
+			msg_permission_denied(cmdparams, NULL);
+			return NS_ERR_NO_PERMISSION;
 		}		
 		if(!cmd_ptr->helptext) {
-			/* Warn about missing help text then skip */ 
-			nlog (LOG_WARNING, "Missing help text for command %s", cmd_ptr->cmd);
-			return 1;
+			privmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Missing help text for command");
+		} else {
+			privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_ptr->helptext);
 		}
-		privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
-		return 1;
+		return NS_SUCCESS;
 	}
 
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
 	while(cmd_ptr->cmd) {
-		if (!ircstrcasecmp(av[2], cmd_ptr->cmd)) {
-			privmsg_list (u->nick, bot_ptr->nick, cmd_ptr->helptext);
-			return 1;
+		if (!ircstrcasecmp(cmdparams->av[0], cmd_ptr->cmd)) {
+			privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_ptr->helptext);
+			return NS_SUCCESS;
 		}
 		cmd_ptr++;
 	}
 	/* Handle SET if we have it */
-	if (bot_ptr->bot_settings && userlevel >= bot_ptr->set_ulevel && !ircstrcasecmp(av[2], "SET") ) {
+	if (cmdparams->dest.bot->bot_settings && userlevel >= cmdparams->dest.bot->set_ulevel && !ircstrcasecmp(cmdparams->av[0], "SET") ) {
 		bot_setting* set_ptr;
-		set_ptr = bot_ptr->bot_settings;
+		set_ptr = cmdparams->dest.bot->bot_settings;
 		/* Display HELP SET intro text and LIST command */
-		privmsg_list (u->nick, bot_ptr->nick, cmd_help_set);
+		privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmd_help_set);
 		/* Display option specific text for current user level */
 		while(set_ptr->option)
 		{
 			if(set_ptr->helptext && userlevel >= set_ptr->ulevel)
 			{
-				privmsg_list (u->nick, bot_ptr->nick, set_ptr->helptext);
-				prefmsg(u->nick, bot_ptr->nick, " ");
+				privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, set_ptr->helptext);
+				prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, " ");
 			}
 			set_ptr++;
 		}
-		return 1;
+		return NS_SUCCESS;
 	}
 
 	/* Command not found so report as unknown */
-	prefmsg (u->nick, bot_ptr->nick, "No help available or unknown help topic: \2%s\2", av[2]);
-	return 1;
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "No help available or unknown help topic: \2%s\2", cmdparams->av[2]);
+	return NS_ERR_UNKNOWN_COMMAND;
 }
 
 /**	Support function for command handlers to call to check that target nick 
@@ -617,354 +669,360 @@ int is_target_valid(char* bot_name, User* u, char* target_nick)
 {
 	/* Check for message to self */
 	if (!ircstrcasecmp(target_nick, bot_name)) {
-		prefmsg(u->nick, bot_name,
-			"Surely we have better things to do with our time than make a service message itself!");
+		prefmsg(u->nick, bot_name, "A service cannot message itself.");
 		return 0;
 	}
 	/* Check target user is on IRC */
 	if (!finduser(target_nick)) {
 		prefmsg(u->nick, bot_name,
-			"%s cannot be found on IRC, your message was not sent. Please check the spelling and try again.", target_nick);
+			"%s cannot be found on IRC, your message was not sent.", target_nick);
 		return 0;
 	}
 	/* User OK */
 	return 1;
 }
 
-/** @brief bot_cmd_set process bot set command
- *	work in progress
+/** @brief bot_cmd_set_list process bot set list command
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
 static int 
-bot_cmd_set (Bot* bot_ptr, User * u, char **av, int ac)
+bot_cmd_set_list (CmdParams * cmdparams)
 {
-	int intval;
 	bot_setting* set_ptr;
 	int userlevel;
 
-	if (ac < 3) {
-		prefmsg(u->nick, bot_ptr->nick,
-			"Syntax error. /msg %s HELP SET for more info", 
-			bot_ptr->nick);
-		return 1;
-	} 
-
-	userlevel = getuserlevel (bot_ptr, u);
-	if( userlevel < bot_ptr->set_ulevel) {
-		prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
-		chanalert (bot_ptr->nick, "%s tried to use SET, but is not authorised", u->nick);
-		nlog (LOG_NORMAL, "%s tried to use SET, but is not authorised", u->nick);
-		return 1;
-	}
-
-	if(!ircstrcasecmp(av[2], "LIST"))
-	{
-		prefmsg(u->nick, bot_ptr->nick, "Current %s settings:", bot_ptr->nick);
-		set_ptr = bot_ptr->bot_settings;
-		while(set_ptr->option)
-		{
-			/* Only list authorised SETTINGS */
-			if( userlevel >= set_ptr->ulevel) {
-				switch(set_ptr->type) {
-					case SET_TYPE_BOOLEAN:
-						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
-							set_ptr->option, *(int*)set_ptr->varptr ? "Enabled" : "Disabled");
-						break;
-					case SET_TYPE_INT:
-						if(set_ptr->desc) {
-								prefmsg(u->nick, bot_ptr->nick, "%s: %d %s",
-									set_ptr->option, *(int*)set_ptr->varptr, set_ptr->desc);
-							} else {
-								prefmsg(u->nick, bot_ptr->nick, "%s: %d",
-									set_ptr->option, *(int*)set_ptr->varptr);
-							}
-						break;				
-					case SET_TYPE_MSG:
-					case SET_TYPE_STRING:
-					case SET_TYPE_NICK:
-					case SET_TYPE_USER:
-					case SET_TYPE_HOST:
-					case SET_TYPE_REALNAME:
-					case SET_TYPE_IPV4:	
-					case SET_TYPE_CHANNEL:							
-						prefmsg(u->nick, bot_ptr->nick, "%s: %s",
-							set_ptr->option, (char*)set_ptr->varptr);
-						break;
-					case SET_TYPE_CUSTOM:
-						if(set_ptr->handler) {
-							set_ptr->handler(u, av, ac);
-						}
-						break;
-					default:
-						prefmsg(u->nick, bot_ptr->nick, "%s: uses an unsupported type",
-							set_ptr->option);
-						break;
-				}
-			}
-			set_ptr++;
-		}
-		return 1;
-	}
-
-	if (ac < 4) {
-		prefmsg(u->nick, bot_ptr->nick,
-			"Syntax error. /msg %s HELP SET for more info", 
-			bot_ptr->nick);
-		return 1;
-	} 
-
-	set_ptr = bot_ptr->bot_settings;
+	prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "Current %s settings:", cmdparams->dest.bot->nick);
+	userlevel = getuserlevel (cmdparams);
+	set_ptr = cmdparams->dest.bot->bot_settings;
 	while(set_ptr->option)
 	{
-		if(!ircstrcasecmp(av[2], set_ptr->option))
+		/* Only list authorised SETTINGS */
+		if( userlevel >= set_ptr->ulevel) {
+			switch(set_ptr->type) {
+				case SET_TYPE_BOOLEAN:
+					prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %s",
+						set_ptr->option, *(int*)set_ptr->varptr ? "Enabled" : "Disabled");
+					break;
+				case SET_TYPE_INT:
+					if(set_ptr->desc) {
+						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %d %s",
+							set_ptr->option, *(int*)set_ptr->varptr, set_ptr->desc);
+					} else {
+						prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %d",
+							set_ptr->option, *(int*)set_ptr->varptr);
+					}
+					break;				
+				case SET_TYPE_MSG:
+				case SET_TYPE_STRING:
+				case SET_TYPE_NICK:
+				case SET_TYPE_USER:
+				case SET_TYPE_HOST:
+				case SET_TYPE_REALNAME:
+				case SET_TYPE_IPV4:	
+				case SET_TYPE_CHANNEL:							
+					prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: %s",
+						set_ptr->option, (char*)set_ptr->varptr);
+					break;
+				case SET_TYPE_CUSTOM:
+					if(set_ptr->handler) {
+						set_ptr->handler(cmdparams);
+					}
+					break;
+				default:
+					prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s: uses an unsupported type",
+						set_ptr->option);
+					break;
+			}
+		}
+		set_ptr++;
+	}
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_report (CmdParams * cmdparams, bot_setting* set_ptr, char* new_setting)
+{
+	chanalert(cmdparams->dest.bot->nick, "%s set to %s by \2%s\2", 
+		set_ptr->option, new_setting, cmdparams->source.user->nick);
+	nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
+		cmdparams->source.user->nick, cmdparams->source.user->username, cmdparams->source.user->hostname, set_ptr->option, new_setting);
+	prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+		"%s set to %s", set_ptr->option, new_setting);
+	return NS_SUCCESS;
+} 
+
+/** @brief bot_cmd_set helper functions
+ *  validate the pamater based on type and perform appropriate action
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int 
+bot_cmd_set_boolean (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	if (!ircstrcasecmp(cmdparams->av[1], "ON")) {
+		*(int*)set_ptr->varptr = 1;
+		SetConf((void *) 1, CFGBOOL, set_ptr->confitem);
+		bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+		return NS_SUCCESS;
+	} else if (!ircstrcasecmp(cmdparams->av[1], "OFF")) {
+		*(int*)set_ptr->varptr = 0;
+		SetConf(0, CFGBOOL, set_ptr->confitem);
+		bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+		return NS_SUCCESS;
+	}
+	msg_syntax_error (cmdparams);
+	return NS_ERR_SYNTAX_ERROR;
+}
+
+static int 
+bot_cmd_set_int (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	int intval;
+
+	intval = atoi(cmdparams->av[1]);	
+	/* atoi will return 0 for a string instead of a digit so check it! */
+	if(intval == 0 && (strcmp(cmdparams->av[1],"0")!=0)) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"%s invalid setting for %s", cmdparams->av[1], set_ptr->option);
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"Valid values are %d to %d", set_ptr->min, set_ptr->max);
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	/* Check limits */
+	if((set_ptr->min != -1 && intval < set_ptr->min) || (set_ptr->max != -1 && intval > set_ptr->max)) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"%d out of range for %s", intval, set_ptr->option);
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"Valid values are %d to %d", set_ptr->min, set_ptr->max);
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	/* Set the new value */
+	*(int*)set_ptr->varptr = intval;
+	SetConf((void *)intval, CFGINT, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_string (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
+	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_channel (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	if(validate_channel (cmdparams->av[1]) == NS_FAILURE) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"%s contains invalid characters", cmdparams->av[1]);
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
+	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_msg (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	char *buf;
+
+	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
+	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
+	SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, buf);
+	free(buf);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_nick (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	if(validate_nick (cmdparams->av[1]) == NS_FAILURE) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"%s contains invalid characters", cmdparams->av[1]);
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
+	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_user (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	if(validate_user (cmdparams->av[1]) == NS_FAILURE) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"%s contains invalid characters", cmdparams->av[1]);
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
+	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_host (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	if (!index(cmdparams->av[1], '.')) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"%s is an invalid hostname", cmdparams->av[1]);
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	if(validate_host (cmdparams->av[1]) == NS_FAILURE) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"%s contains invalid characters", cmdparams->av[1]);
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
+	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_realname (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	char *buf;
+
+	buf = joinbuf(cmdparams->av, cmdparams->ac, 1);
+	strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
+	SetConf((void *)buf, CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, buf);
+	free(buf);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_ipv4 (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	if (!inet_addr(cmdparams->av[1])) {
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
+			"Invalid IPV4 format. Should be dotted quad, e.g. 1.2.3.4");
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	strlcpy((char*)set_ptr->varptr, cmdparams->av[1], set_ptr->max);
+	SetConf((void *)cmdparams->av[1], CFGSTR, set_ptr->confitem);
+	bot_cmd_set_report (cmdparams, set_ptr, cmdparams->av[1]);
+	return NS_SUCCESS;
+}
+
+static int 
+bot_cmd_set_custom (CmdParams * cmdparams, bot_setting* set_ptr)
+{
+	if(set_ptr->handler) {
+		set_ptr->handler(cmdparams);
+	}
+	return NS_SUCCESS;
+}
+
+typedef int (*bot_cmd_set_handler) (CmdParams * cmdparams, bot_setting* set_ptr);
+
+static bot_cmd_set_handler bot_cmd_set_handlers[] = 
+{
+	bot_cmd_set_boolean,
+	bot_cmd_set_int,
+	bot_cmd_set_string,
+	bot_cmd_set_channel,
+	bot_cmd_set_msg,
+	bot_cmd_set_nick,
+	bot_cmd_set_user,
+	bot_cmd_set_host,
+	bot_cmd_set_realname,
+	bot_cmd_set_ipv4,
+	bot_cmd_set_custom,
+};
+
+/** @brief bot_cmd_set process bot set command
+ *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
+ */
+static int 
+bot_cmd_set (CmdParams * cmdparams)
+{
+	bot_cmd_set_handler set_handler;
+	bot_setting* set_ptr;
+	int userlevel;
+
+	if (cmdparams->ac < 1) {
+		msg_syntax_error (cmdparams);
+		return NS_ERR_SYNTAX_ERROR;
+	} 
+	userlevel = getuserlevel (cmdparams);
+	if( userlevel < cmdparams->dest.bot->set_ulevel) {
+		msg_permission_denied(cmdparams, NULL);
+		return NS_ERR_NO_PERMISSION;
+	}
+	if(!ircstrcasecmp(cmdparams->av[0], "LIST"))
+	{
+		bot_cmd_set_list (cmdparams);
+		return NS_SUCCESS;
+	}
+	if (cmdparams->ac < 2) {
+		msg_syntax_error (cmdparams);
+		return NS_ERR_SYNTAX_ERROR;
+	} 
+	set_ptr = cmdparams->dest.bot->bot_settings;
+	while(set_ptr->option)
+	{
+		if(!ircstrcasecmp(cmdparams->av[0], set_ptr->option))
 			break;
 		set_ptr++;
 	}
 	if(!set_ptr->option) {
-		prefmsg(u->nick, bot_ptr->nick,
+		prefmsg(cmdparams->source.user->nick, cmdparams->dest.bot->nick,
 			"Unknown set option. /msg %s HELP SET for more info",
-			bot_ptr->nick);
-		return 1;
+			cmdparams->dest.bot->nick);
+		return NS_ERR_UNKNOWN_OPTION;
 	}
 	if( userlevel < set_ptr->ulevel) {
-		prefmsg (u->nick, bot_ptr->nick, "Permission Denied");
-		chanalert (bot_ptr->nick, "%s tried to use SET %s, but is not authorised", u->nick, av[2]);
-		nlog (LOG_NORMAL, "%s tried to use SET %s, but is not authorised", u->nick, av[2]);
-		return 1;
+		msg_permission_denied(cmdparams, cmdparams->av[0]);
+		return NS_ERR_NO_PERMISSION;
 	}
-	switch(set_ptr->type) {
-		case SET_TYPE_BOOLEAN:
-			if (!ircstrcasecmp(av[3], "ON")) {
-				*(int*)set_ptr->varptr = 1;
-				SetConf((void *) 1, CFGBOOL, set_ptr->confitem);
-				chanalert(bot_ptr->nick, "%s enabled by \2%s\2", 
-					set_ptr->option, u->nick);
-				nlog(LOG_NORMAL, "%s!%s@%s enabled %s",
-					u->nick, u->username, u->hostname, set_ptr->option);
-				prefmsg(u->nick, bot_ptr->nick,
-					"\2%s\2 enabled", set_ptr->option);
-			} else if (!ircstrcasecmp(av[3], "OFF")) {
-				*(int*)set_ptr->varptr = 0;
-				SetConf(0, CFGBOOL, set_ptr->confitem);
-				chanalert(bot_ptr->nick, "%s disabled by \2%s\2", 
-					set_ptr->option, u->nick);
-				nlog(LOG_NORMAL, "%s!%s@%s disabled %s ", 
-					u->nick, u->username, u->hostname, set_ptr->option);
-				prefmsg(u->nick, bot_ptr->nick,
-					"\2%s\2 disabled", set_ptr->option);
-			} else {
-				prefmsg(u->nick, bot_ptr->nick,
-					"Syntax error. /msg %s HELP SET for more info",
-					bot_ptr->nick);
-				return 1;
-			}
-			break;
-		case SET_TYPE_INT:
-			intval = atoi(av[3]);	
-			/* atoi will return 0 for a string instead of a digit so check it! */
-			if(intval == 0) {
-				if(strcmp(av[3],"0")!=0) {
-					prefmsg(u->nick, bot_ptr->nick,
-						"%s invalid setting for %s", av[3], set_ptr->option);
-					prefmsg(u->nick, bot_ptr->nick,
-						"Valid values are %d to %d", set_ptr->min, set_ptr->max);
-					return 1;
-				}
-			}
-			if(set_ptr->min != -1 && intval < set_ptr->min) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"%d out of range for %s", intval, set_ptr->option);
-				prefmsg(u->nick, bot_ptr->nick,
-					"Valid values are %d to %d", set_ptr->min, set_ptr->max);
-				return 1;
-			}
-			if(set_ptr->max != -1 && intval > set_ptr->max) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"%d out of range for %s", intval, set_ptr->option);
-				prefmsg(u->nick, bot_ptr->nick,
-					"Valid values are %d to %d", set_ptr->min, set_ptr->max);
-				return 1;
-			}
-			*(int*)set_ptr->varptr = intval;
-			SetConf((void *)intval, CFGINT, set_ptr->confitem);
-			chanalert(bot_ptr->nick, "%s set to %d by \2%s\2", 
-				set_ptr->option, intval, u->nick);
-			nlog(LOG_NORMAL, "%s!%s@%s set %s to %d", 
-				u->nick, u->username, u->hostname, set_ptr->option, intval);
-			prefmsg(u->nick, bot_ptr->nick,
-				"%s set to %d", set_ptr->option, intval);
-			break;
-		case SET_TYPE_STRING:
-			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
-			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
-			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
-			prefmsg(u->nick, bot_ptr->nick,
-				"%s set to %s", set_ptr->option, av[3]);
-			break;
-		case SET_TYPE_CHANNEL:							
-			if(validate_channel (av[3]) == NS_FAILURE) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"%s contains invalid characters", av[3]);
-				break;
-			}
-			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
-			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
-			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
-			prefmsg(u->nick, bot_ptr->nick,
-				"%s set to %s", set_ptr->option, av[3]);
-			break;
-		case SET_TYPE_MSG:
-			{
-				char *buf;
-
-				buf = joinbuf(av, ac, 3);
-				strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
-				SetConf((void *)buf, CFGSTR, set_ptr->confitem);
-				chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-					set_ptr->option, buf, u->nick);
-				nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-					u->nick, u->username, u->hostname, set_ptr->option, buf);
-				prefmsg(u->nick, bot_ptr->nick,
-					"%s set to %s", set_ptr->option, buf);
-				free(buf);
-			}
-			break;
-		case SET_TYPE_NICK:
-			if(validate_nick (av[3]) == NS_FAILURE) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"%s contains invalid characters", av[3]);
-				break;
-			}
-			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
-			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
-			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
-			prefmsg(u->nick, bot_ptr->nick,
-				"%s set to %s", set_ptr->option, av[3]);
-			break;
-		case SET_TYPE_USER:
-			if(validate_user (av[3]) == NS_FAILURE) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"%s contains invalid characters", av[3]);
-				break;
-			}
-			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
-			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
-			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
-			prefmsg(u->nick, bot_ptr->nick,
-				"%s set to %s", set_ptr->option, av[3]);
-			break;
-		case SET_TYPE_HOST:
-			if (!index(av[3], '.')) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"%s is an invalid hostname", av[3]);
-				break;
-			}
-			if(validate_host (av[3]) == NS_FAILURE) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"%s contains invalid characters", av[3]);
-				break;
-			}
-			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
-			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
-			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
-			prefmsg(u->nick, bot_ptr->nick,
-				"%s set to %s", set_ptr->option, av[3]);
-			break;
-		case SET_TYPE_REALNAME:
-			{
-				char *buf;
-
-				buf = joinbuf(av, ac, 3);
-				strlcpy((char*)set_ptr->varptr, buf, set_ptr->max);
-				SetConf((void *)buf, CFGSTR, set_ptr->confitem);
-				chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-					set_ptr->option, buf, u->nick);
-				nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-					u->nick, u->username, u->hostname, set_ptr->option, buf);
-				prefmsg(u->nick, bot_ptr->nick,
-					"%s set to %s", set_ptr->option, buf);
-				free(buf);
-			}
-			break;
-		case SET_TYPE_IPV4:
-			if (!inet_addr(av[3])) {
-				prefmsg(u->nick, bot_ptr->nick,
-					"Invalid IPV4 format. Should be dotted quad, e.g. 1.2.3.4");
-				return 0;
-			}
-			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
-			SetConf((void *)av[3], CFGSTR, set_ptr->confitem);
-			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
-				set_ptr->option, av[3], u->nick);
-			nlog(LOG_NORMAL, "%s!%s@%s set %s to %s", 
-				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
-			prefmsg(u->nick, bot_ptr->nick,
-				"%s set to %s", set_ptr->option, av[3]);
-			break;			
-		case SET_TYPE_CUSTOM:
-			if(set_ptr->handler) {
-				set_ptr->handler(u, av, ac);
-			}
-			break;
-		default:
-			chanalert(bot_ptr->nick, "Unsupported SET type %d requested by %s for %s %s", 
-				set_ptr->type, u->nick, set_ptr->option, av[3]);
-			nlog(LOG_NORMAL, "Unsupported SET type %d requested by %s for %s %s", 
-				set_ptr->type, u->nick, set_ptr->option, av[3]);
-			prefmsg(u->nick, bot_ptr->nick,"Unsupported SET type %d for %s %s", 
-				set_ptr->type, set_ptr->option, av[3]);
-			break;
+	set_handler = bot_cmd_set_handlers[set_ptr->type];
+	if(set_handler (cmdparams, set_ptr)!=NS_SUCCESS) {
+		return NS_FAILURE;
 	}
 	/* Call back after SET so that a module can "react" to a change in a setting */
 	if(set_ptr->type != SET_TYPE_CUSTOM) {
 		if(set_ptr->handler) {
-			set_ptr->handler(u, av, ac);
+			set_ptr->handler(cmdparams);
 		}
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 /** @brief bot_cmd_about process bot about command
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-static int bot_cmd_about (Bot* bot_ptr, User * u, char **av, int ac)
+static int bot_cmd_about (CmdParams * cmdparams)
 {
-	privmsg_list (u->nick, bot_ptr->nick, bot_ptr->moduleptr->info->about_text);
-	return 1;
+	privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->dest.bot->moduleptr->info->about_text);
+	return NS_SUCCESS;
 }
+
 /** @brief bot_cmd_version process bot version command
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-static int bot_cmd_version (Bot* bot_ptr, User * u, char **av, int ac)
+static int bot_cmd_version (CmdParams * cmdparams)
 {
-	prefmsg (u->nick, bot_ptr->nick, "Module %s version: %s %s %s",
-		bot_ptr->moduleptr->info->name, bot_ptr->moduleptr->info->version, 
-		bot_ptr->moduleptr->info->build_date, bot_ptr->moduleptr->info->build_time);
-	return 1;
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "\2%s version\2", cmdparams->dest.bot->moduleptr->info->name);
+	prefmsg (cmdparams->source.user->nick, cmdparams->dest.bot->nick, "%s %s %s", cmdparams->dest.bot->moduleptr->info->version, 
+		cmdparams->dest.bot->moduleptr->info->build_date, cmdparams->dest.bot->moduleptr->info->build_time);
+	return NS_SUCCESS;
 }
 
 /** @brief bot_cmd_credits process bot credits command
  *  @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-static int bot_cmd_credits (Bot* bot_ptr, User * u, char **av, int ac)
+static int bot_cmd_credits (CmdParams * cmdparams)
 {
-	privmsg_list (u->nick, bot_ptr->nick, bot_ptr->moduleptr->info->copyright);
-	return 1;
+	privmsg_list (cmdparams->source.user->nick, cmdparams->dest.bot->nick, cmdparams->dest.bot->moduleptr->info->copyright);
+	return NS_SUCCESS;
 }
 
 int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
@@ -974,14 +1032,15 @@ int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
 	bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
 	/* Now calculate minimum defined user level */
 	while(bot_setting_list->option != NULL) {
-		if(bot_setting_list->ulevel < bot_ptr->set_ulevel)
+		if(bot_setting_list->ulevel < bot_ptr->set_ulevel) {
 			bot_ptr->set_ulevel = bot_setting_list->ulevel;
+		}
 		bot_setting_list++;
 	}
-	return 1;
+	return NS_SUCCESS;
 }
 
 int del_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list)
 {
-	return 1;
+	return NS_SUCCESS;
 }

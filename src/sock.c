@@ -825,6 +825,7 @@ int InitSocks (void)
 int FiniSocks (void) 
 {
 	hash_destroy(sockh);
+	return NS_SUCCESS;
 }
 
 /** @brief create a new socket
@@ -893,15 +894,15 @@ add_socket (Module* moduleptr, socket_function readfunc, socket_function writefu
 
 	SET_SEGV_LOCATION();
 	if (!readfunc) {
-		nlog (LOG_WARNING, "add_socket: read socket function doesn't exist = %s (%s)", readfunc, moduleptr->info->name);
+		nlog (LOG_WARNING, "add_socket: read socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	if (!writefunc) {
-		nlog (LOG_WARNING, "add_socket: write socket function doesn't exist = %s (%s)", writefunc, moduleptr->info->name);
+		nlog (LOG_WARNING, "add_socket: write socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	if (!errfunc) {
-		nlog (LOG_WARNING, "add_socket: error socket function doesn't exist = %s (%s)", errfunc, moduleptr->info->name);
+		nlog (LOG_WARNING, "add_socket: error socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	sock = new_sock (sock_name);
@@ -934,11 +935,11 @@ add_sockpoll (Module* moduleptr, before_poll_function beforepoll, after_poll_fun
 
 	SET_SEGV_LOCATION();
 	if (!beforepoll) {
-		nlog (LOG_WARNING, "add_sockpoll: read socket function doesn't exist = %s (%s)", beforepoll, moduleptr->info->name);
+		nlog (LOG_WARNING, "add_sockpoll: read socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	if (!afterpoll) {
-		nlog (LOG_WARNING, "add_sockpoll: write socket function doesn't exist = %s (%s)", afterpoll, moduleptr->info->name);
+		nlog (LOG_WARNING, "add_sockpoll: write socket function doesn't exist = %s (%s)", sock_name, moduleptr->info->name);
 		return NS_FAILURE;
 	}
 	sock = new_sock (sock_name);
@@ -1013,26 +1014,26 @@ del_sockets (Module *mod_ptr)
  * @return none
 */
 int
-list_sockets (User * u, char **av, int ac)
+list_sockets (CmdParams* cmdparams)
 {
 	Sock *sock = NULL;
 	hscan_t ss;
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, ns_botptr->nick, "Sockets List: (%d)", (int)hash_count (sockh));
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Sockets List: (%d)", (int)hash_count (sockh));
 	hash_scan_begin (&ss, sockh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		sock = hnode_get (sn);
-		prefmsg (u->nick, ns_botptr->nick, "%s:--------------------------------", sock->moduleptr->info->name);
-		prefmsg (u->nick, ns_botptr->nick, "Socket Name: %s", sock->name);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "%s:--------------------------------", sock->moduleptr->info->name);
+		prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Socket Name: %s", sock->name);
 		if (sock->socktype == SOCK_STANDARD) {
-			prefmsg (u->nick, ns_botptr->nick, "Socket Number: %d", sock->sock_no);
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Socket Number: %d", sock->sock_no);
 		} else {
-			prefmsg (u->nick, ns_botptr->nick, "Poll Interface");
+			prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "Poll Interface");
 		}
 	}
-	prefmsg (u->nick, ns_botptr->nick, "End of Socket List");
+	prefmsg (cmdparams->source.user->nick, ns_botptr->nick, "End of Socket List");
 	return 0;
 }
 

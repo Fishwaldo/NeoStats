@@ -1,10 +1,8 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
+** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
-**
-**  Portions Copyright (c) 1999 Johnathan George net@lite.net
 **
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
@@ -125,33 +123,6 @@ sstrdup (const char *s)
 		do_exit (NS_EXIT_ERROR, "Out of memory");
 	}
 	return t;
-}
-
-/** @brief Create a HASH from a string
- *
- * Makes a hash of a string for a table
- *
- * @param name The string to use as the base for the hash
- * @param size_of_table The size of the hash table
- *
- * @returns unsigned long of the hash
- *
- * @deprecated  Try not to use this function, it will go away one day
- *
- */
-
-unsigned long
-HASH (const unsigned char *name, int size_of_table)
-{
-	unsigned long h = 0, g;
-
-	while (*name) {
-		h = (h << 4) + *name++;
-		if ((g = h & 0xF0000000))
-			h ^= g >> 24;
-		h &= ~g;
-	}
-	return h % size_of_table;
 }
 
 /** @brief convert a string to lowercase

@@ -26,7 +26,8 @@
 
 int add_bot_cmd_list (Bot *bot_ptr, bot_cmd *bot_cmd_list);
 int del_bot_cmd_list (Bot *bot_ptr, bot_cmd *bot_cmd_list);
-int run_bot_cmd (Bot *bot_ptr, User *u, char *command_string);
+int del_all_bot_cmds (Bot* bot_ptr);
+int run_bot_cmd (CmdParams * cmdparams);
 int add_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list);
 int del_bot_settings (Bot *bot_ptr, bot_setting *bot_setting_list);
 

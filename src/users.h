@@ -24,22 +24,22 @@
 #ifndef _USERS_H_
 #define _USERS_H_
 
+int InitUsers (void);
+void FiniUsers (void);
 void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric);
-int UserNick (const char * oldnick, const char * newnick, const char * ts);
-void UserDump (const char *nick);
-void UserPart (list_t *list, lnode_t *node, void *v);
+void DelUser (const char *nick, int killflag, const char *reason);
 void SetUserVhost (const char* nick, const char* vhost);
 void SetUserServicesTS (const char* nick, const char* ts);
+int UserNick (const char * oldnick, const char * newnick, const char * ts);
+void UserPart (list_t *list, lnode_t *node, void *v);
 void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);
 #endif
-int InitUsers (void);
 void UserAway (const char *nick, const char *awaymsg);
-void DelUser (const char *nick, int killflag, const char *reason);
-void FreeUsers();
 #ifdef BASE64NICKNAME
 User *finduserbase64 (const char *num);
 #endif
+void UserDump (const char *nick);
 
 #endif /* _USERS_H_ */

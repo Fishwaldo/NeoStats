@@ -257,6 +257,10 @@ typedef enum NS_ERR {
 	NS_ERR_OUT_OF_MEMORY	= 0x8000002,
 	NS_ERR_VERSION			= 0x8000003,
 	NS_ERR_SYNTAX_ERROR		= 0x8000004,
+	NS_ERR_NEED_MORE_PARAMS	= 0x8000005,
+	NS_ERR_NO_PERMISSION	= 0x8000006,
+	NS_ERR_UNKNOWN_COMMAND	= 0x8000007,
+	NS_ERR_UNKNOWN_OPTION	= 0x8000008,
 }NS_ERR ;
 
 /* do_exit call exit type definitions */
@@ -310,7 +314,6 @@ extern char recbuf[BUFSIZE];
 extern const char services_bot_modes[];
 extern char segv_location[SEGV_LOCATION_BUFSIZE];
 extern char segv_inmodule[SEGV_INMODULE_BUFSIZE];
-extern jmp_buf sigvbuf;
 
 extern hash_t *sh;
 extern hash_t *uh;
@@ -475,6 +478,24 @@ or:
 	void *moddata[NUMMODS];
 } Client; */
 
+typedef struct _Bot Bot;
+
+typedef struct CmdParams {
+	struct {
+		User* user;
+		Server* server;
+	}source;
+	struct {
+		User* user;
+		Server* server;
+		Bot * bot;
+	}dest;
+	char* param;
+	Channel* channel;
+	char **av;
+	int ac;
+} CmdParams; 
+
 /** @brief ModesParm structure
  *  
  */
@@ -492,9 +513,6 @@ struct ping {
 	int ulag;
 } ping;
 
-
-
-
 /* Comand list handling */
 /** @brief flags for command list
  *  flags to provide more information on a command to the core
@@ -504,7 +522,7 @@ struct ping {
 /** @brief bot_cmd_handler type
  *  defines handler function definition
  */
-typedef int (*bot_cmd_handler) (User * u, char **av, int ac);
+typedef int (*bot_cmd_handler) (CmdParams* cmdparams);
 
 /** @brief bot_cmd structure
  *  defines command lists for bots
@@ -537,11 +555,17 @@ typedef struct bot_cmd {
  * E.g. Connectserv
  */
 #define BOT_FLAG_DEAF	0x00000004
+/* Mark bot as a service bot that can receive commands
+ * If not set, private messages will not be scanned for commands
+ * and all messages received will be passed directly to the module
+ * E.g. Connectserv
+ */
+#define BOT_FLAG_SERVICEBOT	0x00000008
 
 /* SET Comand handling */
 
 typedef enum SET_TYPE {
-	SET_TYPE_BOOLEAN,	/* ON or OFF */
+	SET_TYPE_BOOLEAN = 0,	/* ON or OFF */
 	SET_TYPE_INT,		/* valid integer */
 	SET_TYPE_STRING,	/* single string */
 	SET_TYPE_MSG,		/* multiple strings to be treated as a message and stored in one field */
@@ -559,6 +583,11 @@ typedef enum SET_TYPE {
 	SET_TYPE_CUSTOM,	/* handled by module */
 }SET_TYPE;
 
+typedef union uval {
+	char*			s;
+	unsigned int	i;
+}uval;
+
 /** @brief bot_setting structure
  *  defines SET list for bots
  */
@@ -573,13 +602,13 @@ typedef struct bot_setting {
 	const char		*desc;		/* description of setting for messages e.g. seconds, days*/
 	const char**	helptext;	/* pointer to help text */
 	bot_cmd_handler	handler;	/* handler for custom/post-set processing */
+	void*			defaultval; /* default value for setting */
 }bot_setting;
 
 
 /** @brief Message function types
  * 
  */
-typedef int (*message_function) (char *origin, char **av, int ac);
 typedef int (*timer_function) (void);
 
 /** @brief Socket function types
@@ -597,10 +626,10 @@ typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
 /** @brief ModuleEvent functions structure
  * 
  */
-typedef int (*event_function) (char **av, int ac);
+typedef int (*event_function) (CmdParams *cmdparams);
 
 typedef struct ModuleEvent {
-	char *cmd_name;
+	Event event;
 	event_function function;
 }ModuleEvent;
 
@@ -738,7 +767,7 @@ typedef struct BotInfo {
  * 
  */
 
-typedef struct Bot {
+typedef struct _Bot {
 	/** Owner module ptr */
 	Module* moduleptr;
 	/** Nick */
@@ -751,9 +780,9 @@ typedef struct Bot {
 	bot_setting *bot_settings;
 	/* min ulevel for settings */
 	unsigned int set_ulevel;
-	/** channel message function */
-	message_function chanfunc;
-}Bot;
+}_Bot;
+
+int ModuleConfig(Module* moduleptr, bot_setting* bot_settings);
 
 int add_timer (Module* moduleptr, timer_function func, char* name, int interval);
 int del_timer (char *timer_name);
@@ -809,8 +838,8 @@ void privmsg (char *to, const char *from, char *fmt, ...) __attribute__((format(
 void notice (char *to, const char *from, char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 void globops (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 void chanalert (char * from, char * fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-int wallops (const char *from, const char *msg, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-int numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+void wallops (const char *from, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+void numeric (const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
 /* function declarations */
 #ifdef GOTSJOIN
@@ -881,7 +910,7 @@ int is_target_valid(char* bot_name, User* u, char* target_nick);
 
 /* transfer.c stuff */
 typedef void (transfer_callback) (void *data, int returncode, char *body, int bodysize);
-void transfer_status();
+void transfer_status(void);
 int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 
 /* exclude */
@@ -901,6 +930,8 @@ extern const char *ns_help_set_nick[];
 extern const char *ns_help_set_user[];
 extern const char *ns_help_set_host[];
 extern const char *ns_help_set_realname[];
+
+extern const char *ns_copyright[];
 
 int validate_nick (char* nick);
 int validate_user (char* user);
@@ -928,6 +959,20 @@ typedef enum LOG_LEVEL {
 	LOG_DEBUG3,		/* even more stuff, that would be useless to most normal people */
 	LOG_DEBUG4,		/* are you insane? */
 } LOG_LEVEL;
+
+/* define debug levels */
+
+typedef enum DEBUG_LEVEL {
+	DEBUG1,
+	DEBUG2,
+	DEBUG3,
+	DEBUG4,
+	DEBUG5,
+	DEBUG6,
+	DEBUG7,
+	DEBUG8,
+	DEBUG9,
+} DEBUG_LEVEL;
 
 /* this is for the neostats assert replacement. */
 /* Version 2.4 and later of GCC define a magical variable _PRETTY_FUNCTION__'
@@ -957,7 +1002,6 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
 #endif
 
 void nlog (LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-
 
 #include "conf.h"
 

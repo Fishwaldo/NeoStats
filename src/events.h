@@ -25,31 +25,36 @@
  *    av is a list of parameters.
  *    ac is the number of parameters
  */
+typedef enum Event {
+/*  EVENT_NULL
+ *    dummy value to end lists
+ */
+	EVENT_NULL = -1,
 
 /*  EVENT_ONLINE
  *    Called when NeoStats connects to the Network. 
  *    Can be used to init bots, and so on. 
  *    parameters:
- *      av[0] server connected to
+ *      none
  */
-#define EVENT_ONLINE "ONLINE"
+	EVENT_ONLINE = 0,
 
 /*  EVENT_SIGNON 
  *    Called when a new user signs onto the network. the user 
  *    nickname is passed as a parameter, so you can see who signed on.
  *    parameters:
- *      av[0] nick
+ *      user in cmdparams->source.user
  */
-#define EVENT_SIGNON "SIGNON"
+	EVENT_SIGNON,
 
-/*  EVENT_SIGNOFF 
+/*  EVENT_QUIT
  *    Called when a user quits the network. The user 
  *    nickname is passed as a parameter, so you can see who signed off.
  *    parameters:
- *      av[0] nick
- *      av[1] reason
+ *      user in cmdparams->source.user
+ *      reason in cmdparams->message
  */
-#define EVENT_SIGNOFF "SIGNOFF"
+	EVENT_QUIT,
 
 /*  EVENT_KILL 
  *    Called when a user is killed on the network. the user 
@@ -59,7 +64,7 @@
  *    parameters:
  *      av[0] nick
  */
-#define EVENT_KILL "KILL"
+	EVENT_KILL,
 
 /*  EVENT_BOTKILL 
  *    is called if one of the NeoStats bots gets killed. You would 
@@ -67,7 +72,7 @@
  *    parameters:
  *      av[0] botnick
  */
-#define EVENT_BOTKILL "BOTKILL"
+	EVENT_BOTKILL,
 
 /*  EVENT_SERVER 
  *    Called when a server connects to the network. 
@@ -78,7 +83,7 @@
  *      av[3] numeric
  *      av[4] infoline
  */
-#define EVENT_SERVER "SERVER"
+	EVENT_SERVER,
 
 /*  EVENT_SQUIT 
  *    Called when a server squits the network 
@@ -86,14 +91,14 @@
  *      av[0] server name
  *      av[1] reason
  */
-#define EVENT_SQUIT "SQUIT"
+	EVENT_SQUIT,
 
 /*  EVENT_NETINFO 
  *    Called when the connection to the network is synced. 
  *    parameters:
  *      av[0] none
  */
-#define EVENT_NETINFO "NETINFO"
+	EVENT_NETINFO,
 
 /*  EVENT_UMODE 
  *    Called when a user changes Umodes. (e.g., /mode +o fish) 
@@ -101,7 +106,7 @@
  *      av[0] nick
  *      av[1] mode string
  */
-#define EVENT_UMODE "UMODE"
+	EVENT_UMODE,
 
 /*  EVENT_SMODE 
  *    Called when a user changes Smodes.
@@ -109,55 +114,55 @@
  *      av[0] nick
  *      av[1] mode string
  */
-#define EVENT_SMODE "SMODE"
+	EVENT_SMODE,
 
-/*  EVENT_NICKCHANGE 
+/*  EVENT_NICK
  *    Called when a user changes nick
  *    parameters:
  *      av[0] old nick
  *      av[1] new nick
  */
-#define EVENT_NICKCHANGE "NICKCHANGE"
+	EVENT_NICK,
 
 /*  EVENT_PONG 
  *    parameters:
  *      av[0] server name
  */
-#define EVENT_PONG "PONG"
+	EVENT_PONG,
 
 /*  EVENT_AWAY 
  *    parameters:
  *      av[0] nick
  *      av[1] away message if setting away, NULL if cancel away
  */
-#define EVENT_AWAY "AWAY"
+	EVENT_AWAY,
 
 /*  EVENT_NEWCHAN 
  *    parameters:
  *      av[0] channel name
  */
-#define EVENT_NEWCHAN "NEWCHAN"
+	EVENT_NEWCHAN,
 
 /*  EVENT_DELCHAN 
  *    parameters:
  *      av[0] channel name
  */
-#define EVENT_DELCHAN "DELCHAN"
+	EVENT_DELCHAN,
 
-/*  EVENT_JOINCHAN 
+/*  EVENT_JOIN
  *    parameters:
  *      av[0] channel name
  *      av[1] user nick
  */
-#define EVENT_JOINCHAN "JOINCHAN"
+	EVENT_JOIN,
 
-/*  EVENT_PARTCHAN 
+/*  EVENT_PART
  *    parameters:
  *      av[0] channel name
  *      av[1] user nick
  *      av[2] reason
  */
-#define EVENT_PARTCHAN "PARTCHAN"
+	EVENT_PART,
 
 /*  EVENT_KICK 
  *    parameters:
@@ -166,7 +171,7 @@
  *      av[2] nick of user who was kick
  *      av[3] reason
  */
-#define EVENT_KICK "KICK"
+	EVENT_KICK,
 
 /*  EVENT_KICKBOT 
  *    parameters:
@@ -175,7 +180,7 @@
  *      av[2] nick of user who was kick
  *      av[3] reason
  */
-#define EVENT_KICKBOT "KICKBOT"
+	EVENT_KICKBOT,
 
 /*  EVENT_PARTBOT 
  *    parameters:
@@ -183,29 +188,29 @@
  *      av[1] user nick
  *      av[2] reason
  */
-#define EVENT_PARTBOT "PARTBOT"
+	EVENT_PARTBOT,
 
-/*  EVENT_TOPICCHANGE 
+/*  EVENT_TOPIC 
  *    parameters:
  *      av[0] channel name
  *      av[1] owner
  *      av[2] topic
  */
-#define EVENT_TOPICCHANGE "TOPICCHANGE"
+	EVENT_TOPIC,
 
-/*  EVENT_CLIENTVERSION 
+/*  EVENT_CTCPVERSION 
  *    parameters:
  *      av[0] user nick
  *      av[1] client version string
  */
-#define EVENT_CLIENTVERSION "CLIENTVERSION"
+	EVENT_CTCPVERSION,
 
 /*  EVENT_CHANMODE
  *    parameters:
  *      av[0] channel name
  *      av[1] mode string
  */
-#define EVENT_CHANMODE "CHANMODE"
+	EVENT_CHANMODE,
 
 /*  EVENT_PRIVATE
  *    parameters:
@@ -213,7 +218,7 @@
  *      av[1] to nick 
  *      av[2] message
  */
-#define EVENT_PRIVATE "PRIVATE"
+	EVENT_PRIVATE,
 
 /*  EVENT_NOTICE
  *    parameters:
@@ -221,7 +226,7 @@
  *      av[1] to nick 
  *      av[2] message
  */
-#define EVENT_NOTICE "NOTICE"
+	EVENT_NOTICE,
 
 /*  EVENT_CPRIVATE
  *    parameters:
@@ -229,7 +234,7 @@
  *      av[1] to channel
  *      av[2] message
  */
-#define EVENT_CPRIVATE "CPRIVATE"
+	EVENT_CPRIVATE,
 
 /*  EVENT_CNOTICE
  *    parameters:
@@ -237,7 +242,7 @@
  *      av[1] to channel
  *      av[2] message
  */
-#define EVENT_CNOTICE "CNOTICE"
+	EVENT_CNOTICE,
 
 /*  EVENT_CTCPPRIVATE
  *    parameters:
@@ -245,7 +250,7 @@
  *      av[1] to nick
  *      av[2] message
  */
-#define EVENT_CTCPPRIVATE "CTCPPRIVATE"
+	EVENT_CTCPPRIVATE,
 
 /*  EVENT_CTCPNOTICE
  *    parameters:
@@ -253,7 +258,7 @@
  *      av[1] to nick
  *      av[2] message
  */
-#define EVENT_CTCPNOTICE "CTCPNOTICE"
+	EVENT_CTCPNOTICE,
 
 /*  EVENT_ADDBAN
  *    parameters:
@@ -266,7 +271,7 @@
  *      av[6] tsset
  *      av[7] tsexpires
  */
-#define EVENT_ADDBAN "ADDBAN"
+	EVENT_ADDBAN,
 
 /*  EVENT_DELBAN
  *    parameters:
@@ -279,7 +284,7 @@
  *      av[6] tsset
  *      av[7] tsexpires
  */
-#define EVENT_DELBAN "DELBAN"
+	EVENT_DELBAN,
 
 /* EVENT_GOTNICKIP
  * fired when we get the IP address of a user
@@ -292,4 +297,6 @@
  *	av[0] nick
  */
  
-#define EVENT_GOTNICKIP "NICKIP"
+	EVENT_GOTNICKIP,
+
+} Event;

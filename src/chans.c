@@ -32,6 +32,7 @@
 #include "sqlsrv/rta.h"
 #endif
 #include "services.h"
+#include "modules.h"
 
 /** @brief Chanmem structure
  *  
@@ -78,8 +79,7 @@ SetChanTS (Channel * c, const time_t creationtime)
 void
 ChanTopic (const char* chan, const char *owner, const char* ts, const char *topic)
 {
-	char **av;
-	int ac = 0;
+	CmdParams * cmdparams;
 	Channel *c;
 	time_t time;
 
@@ -93,7 +93,6 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 	} else {
 		time = me.now;
 	}
-
 	if(topic) {
 		strlcpy (c->topic, topic, BUFSIZE);
 	} else {
@@ -101,15 +100,17 @@ ChanTopic (const char* chan, const char *owner, const char* ts, const char *topi
 	}
 	strlcpy (c->topicowner, owner, MAXHOST);
 	c->topictime = time;
-	AddStringToList (&av, c->name, &ac);
-	AddStringToList (&av, (char*)owner, &ac);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->channel = c;
+	AddStringToList (&cmdparams->av, (char*)owner, &cmdparams->ac);
 	if(topic) {
-		AddStringToList (&av, (char*)topic, &ac);
+		AddStringToList (&cmdparams->av, (char*)topic, &cmdparams->ac);
 	} else {
-		AddStringToList (&av, "", &ac);
+		AddStringToList (&cmdparams->av, "", &cmdparams->ac);
 	}
-	SendModuleEvent (EVENT_TOPICCHANGE, av, ac);
-	free (av);
+	SendAllModuleEvent (EVENT_TOPIC, cmdparams);
+	free (cmdparams->av);
+	free (cmdparams);
 }
 
 /** @brief Check if a mode is set on a Channel
@@ -184,6 +185,7 @@ comparemode (const void *v, const void *mode)
 int
 ChanMode (char *origin, char **av, int ac)
 {
+	CmdParams * cmdparams;
 	char *modes;
 	int add = 0;
 	int j = 2;
@@ -192,20 +194,19 @@ ChanMode (char *origin, char **av, int ac)
 	Channel *c;
 	ModesParm *m;
 	lnode_t *mn;
-	char **data;
-	int datasize = 0;
 
 	c = findchan (av[0]);
 	if (!c) {
 		return 0;
 	}
 	
-	AddStringToList(&data, origin, &datasize);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
 	for (i = 0; i < ac; i++) {
-		AddStringToList(&data, av[i], &datasize);	
+		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	
 	}
-	SendModuleEvent(EVENT_CHANMODE, data, datasize);
-	free(data);	
+	SendAllModuleEvent(EVENT_CHANMODE, cmdparams);
+	free(cmdparams);	
 
 	modes = av[1];
 	while (*modes) {
@@ -360,8 +361,7 @@ ChanUserMode (const char* chan, const char* nick, int add, long mode)
 static Channel *
 new_chan (const char *chan)
 {
-	char **av;
-	int ac = 0;
+	CmdParams * cmdparams;
 	Channel *c;
 	hnode_t *cn;
 
@@ -384,9 +384,10 @@ new_chan (const char *chan)
 	c->flags = 0;
 	/* check exclusions */
 	ns_do_exclude_chan(c);
-	AddStringToList (&av, c->name, &ac);
-	SendModuleEvent (EVENT_NEWCHAN, av, ac);
-	free (av);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->channel = c;
+	SendAllModuleEvent (EVENT_NEWCHAN, cmdparams);
+	free (cmdparams);
 	return c;
 }
 
@@ -402,6 +403,7 @@ new_chan (const char *chan)
 void
 del_chan (Channel * c)
 {
+	CmdParams * cmdparams;
 	hnode_t *cn;
 	lnode_t *cm;
 
@@ -412,6 +414,11 @@ del_chan (Channel * c)
 		return;
 	} else {
 		nlog (LOG_DEBUG2, "del_chan: deleting channel %s", c->name);
+		cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+		cmdparams->channel = c;
+		SendAllModuleEvent (EVENT_DELCHAN, cmdparams);
+		free (cmdparams);
+
 		cm = list_first (c->modeparms);
 		while (cm) {
 			free (lnode_get (cm));
@@ -436,8 +443,6 @@ del_chan (Channel * c)
 */
 void del_chan_user(Channel *c, User *u)
 {
-	char **av;
-	int ac = 0;
 	lnode_t *un;
 
 	un = list_find (u->chans, c->name, comparef);
@@ -453,10 +458,6 @@ void del_chan_user(Channel *c, User *u)
 	}
 	nlog (LOG_DEBUG3, "del_chan_user: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if (c->users <= 0) {
-		AddStringToList (&av, c->name, &ac);
-		SendModuleEvent (EVENT_DELCHAN, av, ac);
-		free (av);
-		ac = 0;
 		del_chan (c);
 	}
 }
@@ -474,8 +475,6 @@ void del_chan_user(Channel *c, User *u)
 void
 kick_chan (const char *kickby, const char *chan, const char *kicked, const char *kickreason)		
 {
-	char **av;
-	int ac = 0;
 	Channel *c;
 	Chanmem *cm;
 	lnode_t *un;
@@ -506,23 +505,24 @@ kick_chan (const char *kickby, const char *chan, const char *kicked, const char 
 				UserDump (u->nick);
 			}
 		} else {
+			CmdParams * cmdparams;
 			cm = lnode_get (un);
 			lnode_destroy (list_delete (c->chanmembers, un));
 			free (cm);
-			AddStringToList (&av, c->name, &ac);
-			AddStringToList (&av, u->nick, &ac);
-			AddStringToList (&av, (char *)kickby, &ac);
+			cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+			cmdparams->dest.user = u;
+			cmdparams->channel = c;
+			//AddStringToList (&av, (char *)kickby, &ac);
 			if (kickreason != NULL) {
-				AddStringToList (&av, (char*)kickreason, &ac);
+				cmdparams->param = (char*)kickreason;
 			}
-			SendModuleEvent (EVENT_KICK, av, ac);
+			SendAllModuleEvent (EVENT_KICK, cmdparams);
 			if ( IsMe (u) ) {
 				/* its one of our bots */
 				del_chan_bot (u->nick, c->name);
-				SendModuleEvent (EVENT_KICKBOT, av, ac);
+				SendModuleEvent (EVENT_KICKBOT, cmdparams, findbot(u->nick));
 			}
-			free (av);
-			ac = 0;
+			free (cmdparams);
 			c->users--;
 		}
 		del_chan_user(c, u);
@@ -547,9 +547,7 @@ part_chan (User * u, const char *chan, const char *reason)
 {
 	Channel *c;
 	lnode_t *un;
-	char **av;
 	Chanmem *cm;
-	int ac = 0;
 
 	SET_SEGV_LOCATION();
 	if (!u) {
@@ -575,22 +573,23 @@ part_chan (User * u, const char *chan, const char *reason)
 				UserDump (u->nick);
 			}
 		} else {
+			CmdParams * cmdparams;
 			cm = lnode_get (un);
 			lnode_destroy (list_delete (c->chanmembers, un));
 			free (cm);
-			AddStringToList (&av, c->name, &ac);
-			AddStringToList (&av, u->nick, &ac);
+			cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+			cmdparams->channel = c;
+			cmdparams->source.user = u;
 			if (reason != NULL) {
-				AddStringToList (&av, (char*)reason, &ac);
+				cmdparams->param = (char*)reason;
 			}
-			SendModuleEvent (EVENT_PARTCHAN, av, ac);
+			SendAllModuleEvent (EVENT_PART, cmdparams);
 			if ( IsMe (u) ) {
 				/* its one of our bots */
 				del_chan_bot (u->nick, c->name);
-				SendModuleEvent (EVENT_PARTBOT, av, ac);
+				SendModuleEvent (EVENT_PARTBOT, cmdparams, findbot(u->nick));
 			}
-			free (av);
-			ac = 0;
+			free (cmdparams);
 			c->users--;
 		}
 		del_chan_user(c, u);
@@ -649,12 +648,11 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 void
 join_chan (const char* nick, const char *chan)
 {
+	CmdParams * cmdparams;
 	User* u;
 	Channel *c;
 	lnode_t *un, *cn;
 	Chanmem *cm;
-	char **av;
-	int ac = 0;
 	
 	SET_SEGV_LOCATION();
 	u = finduser (nick);
@@ -705,10 +703,11 @@ join_chan (const char* nick, const char *chan)
 	} else {
 		list_append (u->chans, un);
 	}
-	AddStringToList (&av, c->name, &ac);
-	AddStringToList (&av, u->nick, &ac);
-	SendModuleEvent (EVENT_JOINCHAN, av, ac);
-	free (av);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.user = u;
+	cmdparams->channel = c;
+	SendAllModuleEvent (EVENT_JOIN, cmdparams);
+	free (cmdparams);
 	nlog (LOG_DEBUG3, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if ( IsMe (u) ) {
 		nlog(LOG_DEBUG3, "join_chan: joining bot %s to channel %s", u->nick, c->name);

@@ -27,8 +27,6 @@
 
 #include "neostats.h"
 
-const char ss_help_about_oneline[]="About StatServ";
-const char ss_help_version_oneline[]="Shows you the current StatServ Version";
 const char ss_help_server_oneline[]="Request information about a server";
 const char ss_help_map_oneline[]="Show the network map";
 const char ss_help_chan_oneline[]="Channel Information";
@@ -44,7 +42,7 @@ const char ss_help_clientversions_oneline[]="Shows you a list of Client Versions
 const char ss_help_forcehtml_oneline[]="Force an update of the HTML output file";
 const char ss_help_stats_oneline[]="Modify Statistic Entries.";
 
-const char *ss_help_about[] = {
+const char *ss_about[] = {
 	"\2StatServ\2 provides detailed statistics about your",
 	"IRC network users, channels and servers.",
 	NULL
@@ -202,13 +200,6 @@ const char *ss_help_botlist[] = {
 	NULL
 };
 #endif
-
-const char *ss_help_version[] = {
-	"Syntax: \2VERSION\2",
-	"",
-	"Shows the current StatServ Version.",
-	NULL
-};
 
 const char *ss_help_stats[] = {
 	"Syntax: \2STATS LIST\2",

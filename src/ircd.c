@@ -37,6 +37,7 @@
 #include "services.h"
 #include "server.h"
 #include "bans.h"
+#include "auth.h"
 
 ircd_server ircd_srv;
 
@@ -45,20 +46,20 @@ static char UmodeStringBuf[64];
 #ifdef GOTUSERSMODES
 static char SmodeStringBuf[64];
 #endif
-static long services_bot_umode= 0;
+long services_bot_umode= 0;
 
 #ifdef IRCU
 int scmode_op (const char *who, const char *chan, const char *mode, const char *bot);
 #endif
 
-/** @brief init_ircd
+/** @brief InitIrcd
  *
  *  ircd initialisation
  *
  * @return 
  */
 void
-init_ircd ()
+InitIrcd ()
 {
 #ifdef IRCU
 	/* Temp: force tokens for IRCU */
@@ -101,12 +102,12 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 {
 	int i;
 	int add = 0;
-	char tmpmode;
+	char* tmpmode;
 
 	/* Walk through mode string and convert to umode */
-	tmpmode = *(UmodeString);
-	while (tmpmode) {
-		switch (tmpmode) {
+	tmpmode = (char*)UmodeString;
+	while (*tmpmode) {
+		switch (*tmpmode) {
 		case '+':
 			add = 1;
 			break;
@@ -115,7 +116,7 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 			break;
 		default:
 			for (i = 0; i < ircd_umodecount; i++) {
-				if (user_umodes[i].mode == tmpmode) {
+				if (user_umodes[i].mode == *tmpmode) {
 					if (add) {
 						Umode |= user_umodes[i].umode;
 						break;
@@ -126,7 +127,7 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 				}
 			}
 		}
-		tmpmode = *UmodeString++;
+		tmpmode++;
 	}
 	return(Umode);
 }
@@ -166,12 +167,12 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 {
 	int i;
 	int add = 0;
-	char tmpmode;
+	char* tmpmode;
 
 	/* Walk through mode string and convert to smode */
-	tmpmode = *(SmodeString);
-	while (tmpmode) {
-		switch (tmpmode) {
+	tmpmode = (char*)SmodeString;
+	while (*tmpmode) {
+		switch (*tmpmode) {
 		case '+':
 			add = 1;
 			break;
@@ -180,7 +181,7 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 			break;
 		default:
 			for (i = 0; i < ircd_smodecount; i++) {
-				if (user_smodes[i].mode == tmpmode) {
+				if (user_smodes[i].mode == *tmpmode) {
 					if (add) {
 						Smode |= user_smodes[i].umode;
 						break;
@@ -191,7 +192,7 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 				}
 			}
 		}
-		tmpmode = *SmodeString++;
+		tmpmode++;
 	}
 	return(Smode);
 }
@@ -411,7 +412,13 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 {
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, "m_notice: dropping unknown privmsg from %s, to %s : %s", origin, av[0], av[ac-1]);
+		nlog (LOG_DEBUG1, "m_notice: dropping notice from %s to NULL: %s", origin, av[ac-1]);
+		return;
+	}
+	nlog (LOG_DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
+	/* who to */
+	if(av[0][0] == '#') {
+		bot_chan_notice (origin, av, ac);
 		return;
 	}
 #if 0
@@ -420,8 +427,6 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
 		return;
 	}
 #endif
-	nlog (LOG_DEBUG1, "m_notice: from %s, to %s : %s", origin, av[0], av[ac-1]);
-
 	bot_notice (origin, av, ac);
 }
 
@@ -438,11 +443,15 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 
 	SET_SEGV_LOCATION();
 	if( av[0] == NULL) {
-		nlog (LOG_DEBUG1, "m_private: dropping privmsg from %s to NULL user : %s", origin, av[ac-1]);
+		nlog (LOG_DEBUG1, "m_private: dropping privmsg from %s to NULL: %s", origin, av[ac-1]);
 		return;
 	}
 	nlog (LOG_DEBUG1, "m_private: from %s, to %s : %s", origin, av[0], av[ac-1]);
-	/* its a privmsg, now lets see who too... */
+	/* who to */
+	if(av[0][0] == '#') {
+		bot_chan_private (origin, av, ac);
+		return;
+	}
 	if (strstr (av[0], "!")) {
 		strlcpy (target, av[0], 64);
 		av[0] = strtok (target, "!");
@@ -450,8 +459,7 @@ m_private (char* origin, char **av, int ac, int cmdptr)
 		strlcpy (target, av[0], 64);
 		av[0] = strtok (target, "@");
 	}
-	bot_message (origin, av, ac);
-	return;
+	bot_private (origin, av, ac);
 }
 
 /** @brief process ircd commands
@@ -572,8 +580,7 @@ void
 do_pong (const char* origin, const char* destination)
 {
 	Server *s;
-	char **av;
-	int ac = 0;
+	CmdParams * cmdparams;
 
 	s = findserver (origin);
 	if (s) {
@@ -582,12 +589,13 @@ do_pong (const char* origin, const char* destination)
 			s->ping -= (float) ping.ulag;
 		if (!strcmp (me.s->name, s->name))
 			ping.ulag = me.s->ping;
-		AddStringToList (&av, s->name, &ac);
-		SendModuleEvent (EVENT_PONG, av, ac);
-		free (av);
-	} else {
-		nlog (LOG_NOTICE, "Received PONG from unknown server: %s", origin);
+		cmdparams = (CmdParams*)scalloc (sizeof(CmdParams));
+		cmdparams->source.server = s;
+		SendAllModuleEvent (EVENT_PONG, cmdparams);
+		free (cmdparams);
+		return;
 	}
+	nlog (LOG_NOTICE, "Received PONG from unknown server: %s", origin);
 }
 
 /** @brief flood
@@ -805,10 +813,11 @@ void
 privmsg_list (char *to, char *from, const char **text)
 {
 	while (*text) {
-		if (**text)
+		if (**text) {
 			prefmsg (to, from, (char*)*text);
-		else
+		} else {
 			prefmsg (to, from, " ");
+		}
 		text++;
 	}
 }
@@ -895,19 +904,18 @@ globops (char *from, char *fmt, ...)
 	}
 }
 
-int
-wallops (const char *from, const char *msg, ...)
+void
+wallops (const char *from, const char *fmt, ...)
 {
 	va_list ap;
 
-	va_start (ap, msg);
-	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
+	va_start (ap, fmt);
+	ircvsnprintf (ircd_buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	send_wallops ((char*)from, (char*)ircd_buf);
-	return NS_SUCCESS;
 }
 
-int
+void
 numeric (const int numeric, const char *target, const char *data, ...)
 {
 	va_list ap;
@@ -916,7 +924,6 @@ numeric (const int numeric, const char *target, const char *data, ...)
 	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
 	va_end (ap);
 	send_numeric (me.name, numeric, target, ircd_buf);
-	return NS_SUCCESS;
 }
 
 void
@@ -1426,7 +1433,7 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	SendModuleEvent (EVENT_NETINFO, NULL, 0);
+	SendAllModuleEvent (EVENT_NETINFO, NULL);
 	me.synced = 1;
 }
 #endif
@@ -1441,7 +1448,7 @@ do_snetinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, c
 	send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, me.now);
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	SendModuleEvent (EVENT_NETINFO, NULL, 0);
+	SendAllModuleEvent (EVENT_NETINFO, NULL);
 	me.synced = 1;
 }
 #endif

@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 
-const char ls_help_about_oneline[]="About LoveServ";
 const char ls_help_rose_oneline[]="Give someone a rose";
 const char ls_help_kiss_oneline[]="Give someone a kiss";
 const char ls_help_tonsil_oneline[]="Give someone a tonsil kiss";
@@ -36,9 +35,8 @@ const char ls_help_candy_oneline[]="Give someone candy";
 const char ls_help_lovenote_oneline[]="Give someone a lovenote";
 const char ls_help_apology_oneline[]="Give someone an apology";
 const char ls_help_thankyou_oneline[]="Give someone a thank you";
-const char ls_help_version_oneline[]="Display version info";
 
-const char *ls_help_about[] = {
+const char *ls_about[] = {
 	"\2LoveServ\2 is a fun module to send presents and ",
 	"messages to loved ones on IRC.",
 	NULL
@@ -111,12 +109,5 @@ const char *ls_help_thankyou[] = {
 	"Syntax: \2THANKYOU <NICK> uploading those songs\2",
 	"",
 	"Send a THANKYOU message to someone",
-	NULL
-};
-
-const char *ls_help_version[] = {
-	"Syntax: \2VERSION\2",
-	"",
-	"Show LoveServ's current version",
 	NULL
 };

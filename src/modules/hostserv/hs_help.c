@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 
-const char hs_help_about_oneline[] ="About HostServ";
 const char hs_help_login_oneline[] ="Login to HostServ";
 const char hs_help_chpass_oneline[] ="Change password for a vhost";
 const char hs_help_bans_oneline[] ="List banned vhosts";
@@ -35,7 +34,7 @@ const char hs_help_list_oneline[] ="List vhosts";
 const char hs_help_view_oneline[] ="Detailed vhost list";
 const char hs_help_levels_oneline[] ="Levels to manage HostServ";
 
-const char *hs_help_about[] = {
+const char *hs_about[] = {
 	"\2HostServ\2 allows users to use their own unique host",
 	"while on the Network. IRC Operators add them to the",
 	"database and upon connection the user gets their vhost.",

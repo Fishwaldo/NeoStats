@@ -27,34 +27,31 @@
 
 #include "neostats.h"
 
-const char ns_help_oneline[]="Provides Help on Commands";
-const char ns_help_level_oneline[]="Show permission level for NeoStats.";
-const char ns_help_status_oneline[]="Stats info on NeoStats.";
-const char ns_help_version_oneline[]="Show NeoStats version information.";
+const char ns_help_level_oneline[]="Permission level";
+const char ns_help_status_oneline[]="Status information";
 const char ns_help_shutdown_oneline[]="Shutdown NeoStats";
-const char ns_help_reload_oneline[]="Force NeoStats to reload";
-const char ns_help_logs_oneline[]="View logfiles";
-const char ns_help_load_oneline[]="Load a module";
-const char ns_help_unload_oneline[]="Unload a module";
-const char ns_help_jupe_oneline[]="Jupiter a Server";
-const char ns_help_exclude_oneline[]="Maintain Global Exclusion lists";
+const char ns_help_reload_oneline[]="Reload NeoStats";
+const char ns_help_load_oneline[]="Load module";
+const char ns_help_unload_oneline[]="Unload module";
+const char ns_help_jupe_oneline[]="Jupiter a server";
+const char ns_help_exclude_oneline[]="Maintain global exclusions";
 #ifdef USE_RAW
-const char ns_help_raw_oneline[]="Send a raw command from this Server";
+const char ns_help_raw_oneline[]="Send a raw command";
 #endif
-const char ns_help_debug_oneline[]="Toggles debug mode";
-const char ns_help_botlist_oneline[]="List current module bots";
-const char ns_help_socklist_oneline[]="List current module sockets";
-const char ns_help_timerlist_oneline[]="List current module timers";
-const char ns_help_botchanlist_oneline[]="List current module bot channels";
+const char ns_help_debug_oneline[]="Configure debug mode";
+const char ns_help_botlist_oneline[]="List module bots";
+const char ns_help_socklist_oneline[]="List module sockets";
+const char ns_help_timerlist_oneline[]="List module timers";
+const char ns_help_botchanlist_oneline[]="List module bot channels";
 const char ns_help_modlist_oneline[]="List loaded modules";
-const char ns_help_userdump_oneline[]="Debug user table";
-const char ns_help_chandump_oneline[]="Debug channel table";
-const char ns_help_serverdump_oneline[]="Debug server table";
+const char ns_help_userdump_oneline[]="Dump user table";
+const char ns_help_chandump_oneline[]="Dump channel table";
+const char ns_help_serverdump_oneline[]="Dump server table";
 
 const char *ns_help_level[] = {
 	"Syntax: \2LEVEL [nick]\2",
 	"",
-	"Show your permission level for NeoStats.",
+	"Show permission level for NeoStats.",
 	"This may range from 0 (lowest) to 200 (highest).",
 	"Optional nick parameter allows you to see the level",
 	"for another user",
@@ -67,7 +64,7 @@ const char *ns_help_jupe[] = {
 	"Cause NeoStats to jupiter a server; i.e. create a fake",
 	"\"server\" connected to the NeoStats host which prevents",
 	"any real server of that name from connecting.",
-	"To remove the jupe use the IRCD \2/SQUIT\2 command.",
+	"To remove the jupe use the \2/SQUIT\2 command.",
 	NULL
 };
 
@@ -137,18 +134,11 @@ const char *ns_help_modlist[] = {
 const char *ns_help_debug[] = {
 	"Syntax: \2DEBUG <ON|OFF>\2",
 	"",
-	"Toggles debug mode. When enabled, debugging information is",
+	"Set debug mode. When enabled, debugging information is",
 	"sent to the services channel.",
 	"",
-	"Beware, on a large network, this command will generate a",
+	"On a large network, this command will generate a",
 	"large amount of information.",
-	NULL
-};
-
-const char *ns_help_version[] = {
-	"Syntax: \2VERSION\2",
-	"",
-	"Shows the current NeoStats version.",
 	NULL
 };
 
@@ -177,7 +167,7 @@ const char *ns_help_userdump[] = {
 	"Syntax: \2USERDUMP\2",
 	"Syntax: \2USERDUMP <nick>\2",
 	"",
-	"When in debug mode, Neostats will echo its user table to",
+	"When in debug mode, Neostats will send its user table to",
 	"the services channel. Only useful for debugging Neostats",
 	"If nick is passed, only the information of that nick is",
 	"returned, otherwise the entire user list is dumped.",
@@ -188,7 +178,7 @@ const char *ns_help_serverdump[] = {
 	"Syntax: \2SERVERDUMP\2",
 	"Syntax: \2SERVERDUMP <name>\2",
 	"",
-	"When in debug mode, Neostats will echo its server table to",
+	"When in debug mode, Neostats will send its server table to",
 	"the services channel. Only useful for debugging Neostats",
 	"If name is passed, only the information for that server is",
 	"returned, otherwise the entire server list is dumped.",
@@ -199,17 +189,10 @@ const char *ns_help_chandump[] = {
 	"Syntax: \2CHANDUMP\2",
 	"Syntax: \2CHANDUMP <channel>\2",
 	"",
-	"When in debug mode, Neostats will echo its channel table to",
+	"When in debug mode, Neostats will send its channel table to",
 	"the services channel. Only useful for debugging Neostats",
 	"If channel is passed, only the information of that nick is",
 	"returned, otherwise the entire channel list is dumped.",
-	NULL
-};
-
-const char *ns_help_logs[] = {
-	"Syntax: \2LOGS\2",
-	"",
-	"Sends today's logfile via PRIVMSG/NOTICE",
 	NULL
 };
 
@@ -276,4 +259,8 @@ const char *ns_help_set_realname[] = {
 	NULL
 };
 
-
+const char *ns_copyright[] = {
+	"Copyright (c) 1999-2004, NeoStats",
+	"http://www.neostats.net/",
+	NULL
+};

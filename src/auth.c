@@ -81,8 +81,11 @@ int UmodeAuth(User * u)
 
 int UserAuth(User * u)
 {
-	int i = 0;
 	int tmplvl = 0;
+#ifdef EXTAUTH
+	int i = 0;
+#endif
+
 	tmplvl = UmodeAuth(u);
 #ifdef EXTAUTH
 	if (getauth)
@@ -91,7 +94,7 @@ int UserAuth(User * u)
 	if (i > tmplvl)
 		tmplvl = i;
 #endif
-	return;
+	return tmplvl;
 }
 
 int InitAuth(void)
@@ -101,7 +104,7 @@ int InitAuth(void)
 	extauth_modptr = load_module ("extauth", NULL);
 	InitExtAuth();
 #endif
-	return 0;
+	return NS_SUCCESS;
 }
 
 int ListAuth(User *u)

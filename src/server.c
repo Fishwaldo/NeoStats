@@ -29,6 +29,7 @@
 #include "hash.h"
 #include "ircd.h"
 #include "exclude.h"
+#include "modules.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -42,16 +43,18 @@ new_server (const char *name)
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
-	s = calloc (sizeof (Server), 1);
-	bzero(s, sizeof(Server));
+	s = scalloc (sizeof (Server));
 	strlcpy (s->name, name, MAXHOST);
 	sn = hnode_create (s);
 	if (!sn) {
 		nlog (LOG_WARNING, "Server hash broken\n");
+		free (s);
 		return NULL;
 	}
 	if (hash_isfull (sh)) {
-		nlog (LOG_WARNING, "Server hash full!\n");
+		nlog (LOG_WARNING, "Server hash full\n");
+		free (s);
+		return NULL;
 	} else {
 		hash_insert (sh, sn, s->name);
 	}
@@ -61,11 +64,10 @@ new_server (const char *name)
 Server *
 AddServer (const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline)
 {
+	CmdParams * cmdparams;
 	Server *s;
-	char **av;
-	int ac = 0;
 
-	nlog (LOG_DEBUG1, "New Server: %s", name);
+	nlog (LOG_DEBUG1, "AddServer: %s", name);
 	s = new_server (name);
 	if(hops) {
 		s->hops = atoi (hops);
@@ -85,44 +87,36 @@ AddServer (const char *name, const char *uplink, const char* hops, const char *n
 	}
 	/* check exclusions */
 	ns_do_exclude_server(s);
-
 	/* run the module event for a new server. */
-	AddStringToList (&av, (char*)name, &ac);
-	AddStringToList (&av, (char*)uplink, &ac);
-	AddStringToList (&av, (char*)hops, &ac);
-	AddStringToList (&av, (char*)numeric, &ac);
-	AddStringToList (&av, (char*)infoline, &ac);
-	SendModuleEvent (EVENT_SERVER, av, ac);
-	free (av);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.server = s;
+	SendAllModuleEvent (EVENT_SERVER, cmdparams);
+	free (cmdparams);
 	return(s);
 }
 
 void 
 DelServer (const char *name, const char* reason)
 {
+	CmdParams * cmdparams;
 	Server *s;
 	hnode_t *sn;
-	char **av;
-	int ac = 0;
 
-	if (!name) {
-		return;
-	}
+	nlog (LOG_DEBUG1, "DelServer: %s", name);
 	sn = hash_lookup (sh, name);
 	if (!sn) {
 		nlog (LOG_WARNING, "DelServer: squit from unknown server %s", name);
 		return;
 	}
 	s = hnode_get (sn);
-
 	/* run the event for delete server */
-	AddStringToList (&av, s->name, &ac);
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	cmdparams->source.server = s;
 	if(reason) {
-		AddStringToList (&av, (char*)reason, &ac);
+		cmdparams->param = (char*)reason;
 	}
-	SendModuleEvent (EVENT_SQUIT, av, ac);
-	free (av);
-
+	SendAllModuleEvent (EVENT_SQUIT, cmdparams);
+	free (cmdparams);
 	hash_delete (sh, sn);
 	hnode_destroy (sn);
 	free (s);
@@ -184,7 +178,7 @@ ServerDump (const char *name)
 	hscan_t ss;
 	hnode_t *sn;
 
-	debugtochannel("================SERVDUMP================");
+	debugtochannel("===============SERVERDUMP===============");
 	if (!name) {
 		hash_scan_begin (&ss, sh);
 		while ((sn = hash_scan_next (&ss)) != NULL) {
@@ -325,7 +319,6 @@ PingServers (void)
 		return;
 	nlog (LOG_DEBUG3, "Sending pings...");
 	ping.ulag = 0;
-
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
@@ -338,7 +331,7 @@ PingServers (void)
 }
 
 void 
-FreeServers ()
+FiniServers (void)
 {
 	Server *s;
 	hnode_t *sn;
@@ -352,5 +345,4 @@ FreeServers ()
 		free (s);
 	}
 	hash_destroy(sh);
-
 }

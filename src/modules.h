@@ -24,12 +24,15 @@
 #ifndef _MODULES_H_
 #define _MODULES_H_
 
+extern jmp_buf sigvbuf;
+
 int InitModules (void);
 int FiniModules (void);
-void SendModuleEvent (char * event, char **av, int ac);
+void SendAllModuleEvent (Event event, CmdParams* cmdparams);
+void SendModuleEvent (Event event, CmdParams* cmdparams, Bot* bot);
 Module *load_module (char *path, User * u);
 int unload_module (const char *module_name, User * u);
-int list_modules (User * u, char **av, int ac);
+int list_modules (CmdParams* cmdparams);
 int get_dl_handle (const char *mod_name);
 int get_mod_num (const char *mod_name);
 Module *get_mod_ptr (const char *mod_name);

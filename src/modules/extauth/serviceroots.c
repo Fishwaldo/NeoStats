@@ -29,27 +29,27 @@
 #include "services.h"
 
 void sr_cb_config(char *arg, int configtype);
-static int ext_auth_list(User *u, char **av, int ac);
+static int ea_cmd_srlist(CmdParams* cmdparams);
 
-const char *sr_help_list[] = {
+const char *ea_help_srlist[] = {
 	"Syntax: \2SRLIST\2",
 	"",
-	"This command lists the ServiceRoots defined in the configuration file",
+	"Lists the ServiceRoots defined in the configuration file",
 	NULL
 };
 
-const char sr_help_list_oneline[] = "ServiceRoots List";
+const char ea_help_srlist_oneline[] = "ServiceRoots List";
 
 bot_cmd extauth_commands[]=
 {
-	{"SRLIST",	ext_auth_list,	0,	NS_ULEVEL_OPER, sr_help_list,	sr_help_list_oneline},
+	{"SRLIST",	ea_cmd_srlist,	0,	NS_ULEVEL_OPER, ea_help_srlist,	ea_help_srlist_oneline},
 	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
 };
 
 ModuleInfo module_info = {
 	"ExtAuth",
 	"ServiceRoots Authentication Module",
-	NULL,
+	ns_copyright,
 	NULL,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
@@ -63,7 +63,6 @@ static config_option options[] = {
 	{"SERVICE_ROOTS", ARG_STR, sr_cb_config, 0}
 };
 
-
 struct srconf {
 	list_t *ul;
 	int auth;
@@ -76,17 +75,16 @@ typedef struct users {
 	int lvl;
 } users;
 
-static int Online(char **av, int ac)
+static int ea_event_online(CmdParams* cmdparams)
 {
 	add_services_cmd_list(extauth_commands);
 	return 1;
 };
 
 ModuleEvent module_events[] = {
-	{EVENT_ONLINE,		Online},
-	{NULL, NULL}
+	{EVENT_ONLINE,	ea_event_online},
+	{EVENT_NULL,	NULL}
 };
-
 
 int ModInit(Module* modptr)
 {
@@ -184,17 +182,18 @@ int __list_auth(User * u)
 	return 1;
 }
 
-int ext_auth_list(User *u, char **av, int ac) {
+int ea_cmd_srlist(CmdParams* cmdparams) 
+{
 	lnode_t *un;
 	users *sru;
 	
 	SET_SEGV_LOCATION();
 	un = list_first(srconf.ul);
-	prefmsg(u->nick, ns_botptr->nick, "ServiceRoots:");
+	prefmsg(cmdparams->source.user->nick, ns_botptr->nick, "ServiceRoots:");
 	while (un) {
 		sru = lnode_get(un);
-		prefmsg(u->nick, ns_botptr->nick, "%s!%s@%s %d", sru->nick, sru->ident,
-			     sru->host, sru->lvl);
+		prefmsg(cmdparams->source.user->nick, ns_botptr->nick, "%s!%s@%s %d", 
+			sru->nick, sru->ident, sru->host, sru->lvl);
 		un = list_next(srconf.ul, un);
 	}
 	return 1;

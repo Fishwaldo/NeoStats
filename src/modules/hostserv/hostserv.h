@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-extern const char hs_help_about_oneline[];
 extern const char hs_help_login_oneline[];
 extern const char hs_help_chpass_oneline[];
 extern const char hs_help_bans_oneline[];
@@ -32,7 +31,8 @@ extern const char hs_help_del_oneline[];
 extern const char hs_help_list_oneline[];
 extern const char hs_help_view_oneline[];
 extern const char hs_help_levels_oneline[];
-extern const char *hs_help_about[];
+
+extern const char *hs_about[];
 extern const char *hs_help_add[];
 extern const char *hs_help_del[];
 extern const char *hs_help_view[];

@@ -22,6 +22,7 @@
 */
 
 #include "neostats.h"
+#include "modules.h"
 #ifdef SQLSRV
 #include "sqlsrv/rta.h"
 #endif
@@ -53,8 +54,7 @@ new_ban (const char *mask)
 void AddBan(const char* type, const char* user, const char* host, const char* mask,
 	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
 {
-	char **av;
-	int ac = 0;
+	CmdParams * cmdparams;
 	Ban* ban;
 
 	ban = new_ban (mask);
@@ -67,27 +67,28 @@ void AddBan(const char* type, const char* user, const char* host, const char* ma
 	ban->tsset = atol(tsset);
 	ban->tsexpires = atol(tsexpires);
 
-	/* run the module event for a new server. */
-	AddStringToList (&av, (char*)type, &ac);
-	AddStringToList (&av, (char*)user, &ac);
-	AddStringToList (&av, (char*)host, &ac);
-	AddStringToList (&av, (char*)mask, &ac);
-	AddStringToList (&av, (char*)reason, &ac);
-	AddStringToList (&av, (char*)setby, &ac);
-	AddStringToList (&av, (char*)tsset, &ac);
-	AddStringToList (&av, (char*)tsexpires, &ac);
-	SendModuleEvent (EVENT_ADDBAN, av, ac);
-	free (av);
+	/* run the module event */
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	AddStringToList (&cmdparams->av, (char*)type, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)user, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)host, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)mask, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)reason, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)setby, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
+	SendAllModuleEvent (EVENT_ADDBAN, cmdparams);
+	free (cmdparams->av);
+	free (cmdparams);
 }
 
 void 
 DelBan(const char* type, const char* user, const char* host, const char* mask,
 	const char* reason, const char* setby, const char* tsset, const char* tsexpires)
 {
+	CmdParams * cmdparams;
 	Ban *ban;
 	hnode_t *bansnode;
-	char **av;
-	int ac = 0;
 
 	bansnode = hash_lookup (banshash, mask);
 	if (!bansnode) {
@@ -96,17 +97,19 @@ DelBan(const char* type, const char* user, const char* host, const char* mask,
 	}
 	ban = hnode_get (bansnode);
 
-	/* run the module event for a new server. */
-	AddStringToList (&av, (char*)type, &ac);
-	AddStringToList (&av, (char*)user, &ac);
-	AddStringToList (&av, (char*)host, &ac);
-	AddStringToList (&av, (char*)mask, &ac);
-	AddStringToList (&av, (char*)reason, &ac);
-	AddStringToList (&av, (char*)setby, &ac);
-	AddStringToList (&av, (char*)tsset, &ac);
-	AddStringToList (&av, (char*)tsexpires, &ac);
-	SendModuleEvent (EVENT_DELBAN, av, ac);
-	free (av);
+	/* run the module event */
+	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
+	AddStringToList (&cmdparams->av, (char*)type, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)user, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)host, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)mask, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)reason, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)setby, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)tsset, &cmdparams->ac);
+	AddStringToList (&cmdparams->av, (char*)tsexpires, &cmdparams->ac);
+	SendAllModuleEvent (EVENT_DELBAN, cmdparams);
+	free (cmdparams->av);
+	free (cmdparams);
 
 	hash_delete (banshash, bansnode);
 	hnode_destroy (bansnode);
@@ -129,8 +132,7 @@ BanDump (void)
 	debugtochannel("End of Listing.");
 }
 
-void 
-FreeBans ()
+void FiniBans (void)
 {
 	Ban *ban;
 	hnode_t *bansnode;

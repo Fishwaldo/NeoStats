@@ -174,41 +174,24 @@ int topkick(const void *key1, const void *key2);
 int toptopics(const void *key1, const void *key2);
 int topversions(const void *key1, const void *key2);
 /* stats.c */
-int s_client_version(char **av, int ac);
 int load_client_versions(void);
 int save_client_versions(void);
 void AddStats(Server *);
 SStats *findstats(char *);
 int SaveStats();
 void LoadStats();
-int Online(char **av, int ac);
-int pong(char **av, int ac);
-int s_user_away(char **av, int ac);
-int s_new_server(char **av, int ac);
-int s_del_server(char **av, int ac);
-int s_got_nickip(char **av, int ac);
-int s_new_user(char **av, int ac);
-int s_del_user(char **av, int ac);
-int s_user_modes(char **av, int ac);
-int s_user_kill(char **av, int ac);
-int s_chan_new(char **av, int ac);
-int s_chan_del(char **av, int ac);
-int s_chan_join(char **av, int ac);
-int s_chan_part(char **av, int ac);
 CStats *findchanstats(char *);
 #if 0
 CStats *AddChanStats(char *);
 #endif
 int DelOldChan();
-int s_topic_change(char **av, int ac);
-int s_chan_kick(char **av, int ac);
 
 /* database.c */
 void save_chan(CStats *c);
 CStats *load_chan(char *name);
 
 /* ss_help.c */
-extern const char *ss_help_about[];
+extern const char *ss_about[];
 extern const char *ss_help_server[];
 extern const char *ss_help_map[];
 extern const char *ss_help_netstats[];
@@ -219,7 +202,6 @@ extern const char *ss_help_operlist[];
 #ifdef GOTBOTMODE
 extern const char *ss_help_botlist[];
 #endif
-extern const char *ss_help_version[];
 extern const char *ss_help_stats[];
 extern const char *ss_help_htmlstats[];
 extern const char *ss_help_forcehtml[];
@@ -234,8 +216,6 @@ extern const char *ss_help_set_lagalert[];
 extern const char *ss_help_set_recordalert[];
 extern const char *ss_help_clientversions[];
 
-extern const char ss_help_about_oneline[];
-extern const char ss_help_version_oneline[];
 extern const char ss_help_server_oneline[];
 extern const char ss_help_map_oneline[];
 extern const char ss_help_chan_oneline[];

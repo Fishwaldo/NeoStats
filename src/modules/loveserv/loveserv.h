@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-extern const char ls_help_about_oneline[];
 extern const char ls_help_rose_oneline[];
 extern const char ls_help_kiss_oneline[];
 extern const char ls_help_tonsil_oneline[];
@@ -34,8 +33,8 @@ extern const char ls_help_candy_oneline[];
 extern const char ls_help_lovenote_oneline[];
 extern const char ls_help_apology_oneline[];
 extern const char ls_help_thankyou_oneline[];
-extern const char ls_help_version_oneline[];
-extern const char *ls_help_about[];
+
+extern const char *ls_about[];
 extern const char *ls_help_rose[];
 extern const char *ls_help_kiss[];
 extern const char *ls_help_tonsil[];
@@ -46,4 +45,3 @@ extern const char *ls_help_candy[];
 extern const char *ls_help_lovenote[];
 extern const char *ls_help_apology[];
 extern const char *ls_help_thankyou[];
-extern const char *ls_help_version[];

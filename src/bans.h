@@ -25,7 +25,7 @@
 #define _BANS_H_
 
 int InitBans (void);
-void FreeBans (void);
+void FiniBans (void);
 void AddBan(const char* type, const char* user, const char* host, const char* mask,
 	const char* reason, const char* setby, const char* tsset, const char* tsexpires);
 void DelBan(const char* type, const char* user, const char* host, const char* mask,

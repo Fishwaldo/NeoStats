@@ -23,10 +23,7 @@
 ** $Id$
 */
 
-extern const char cs_help_about_oneline[];
-extern const char cs_help_version_oneline[];
-extern const char *cs_help_about[];
-extern const char *cs_help_version[];
+extern const char *cs_about[];
 extern const char *cs_help_set_signwatch[];
 extern const char *cs_help_set_exclusions[];
 extern const char *cs_help_set_killwatch[];

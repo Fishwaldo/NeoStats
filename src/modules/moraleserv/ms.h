@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-extern const char ms_help_about_oneline[];
 extern const char ms_help_version_oneline[];
 extern const char ms_help_hail_oneline[];
 extern const char ms_help_ode_oneline[];
@@ -33,7 +32,7 @@ extern const char ms_help_redneck_oneline[];
 extern const char ms_help_cheerup_oneline[];
 extern const char ms_help_behappy_oneline[];
 extern const char ms_help_wonderful_oneline[];
-extern const char *ms_help_about[];
+
 extern const char *ms_help_hail[];
 extern const char *ms_help_ode[];
 extern const char *ms_help_lapdance[];
@@ -43,3 +42,5 @@ extern const char *ms_help_redneck[];
 extern const char *ms_help_cheerup[];
 extern const char *ms_help_behappy[];
 extern const char *ms_help_wonderful[];
+
+extern const char *ms_about[];
