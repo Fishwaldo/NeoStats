@@ -313,16 +313,10 @@ sumode_cmd (const char *who, const char *target, long mode)
 	return 1;
 }
 
-int
-snumeric_cmd (const int numeric, const char *target, const char *data, ...)
+void 
+send_numeric (const int numeric, const char *target, const char *buf)
 {
-	va_list ap;
-
-	va_start (ap, data);
-	ircvsnprintf (ircd_buf, BUFSIZE, data, ap);
-	va_end (ap);
-	sts (":%s %d %s :%s", me.name, numeric, target, ircd_buf);
-	return 1;
+	sts (":%s %d %s :%s", me.name, numeric, target, buf);
 }
 
 int
@@ -416,16 +410,9 @@ skick_cmd (const char *who, const char *target, const char *chan, const char *re
 	return 1;
 }
 
-int
-swallops_cmd (const char *who, const char *msg, ...)
+void send_wallops (char *who, char *buf)
 {
-	va_list ap;
-	
-	va_start (ap, msg);
-	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
-	va_end (ap);
-	sts (":%s %s :%s", who, MSG_WALLOPS, ircd_buf);
-	return 1;
+	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 
 int
@@ -501,7 +488,7 @@ send_notice (char *to, const char *from, char *buf)
 void
 send_globops (char *from, char *buf)
 {
-	sts (":%s %s :%s", from, MSG_WALLOPS, ircd_buf);
+	sts (":%s %s :%s", from, MSG_WALLOPS, buf);
 }
 
 static void
@@ -655,17 +642,6 @@ Usr_Quit (char *origin, char **argv, int argc)
 	DelUser (origin);
 }
 
-static void
-Usr_Smode (char *origin, char **argv, int argc)
-{
-	if (!strchr (argv[0], '#')) {
-		/* its user svsmode change */
-		UserMode (argv[0], argv[1]);
-	} else {
-		/* its a channel svsmode change */
-		ChanMode (origin, argv, argc);
-	}
-}
 static void
 Usr_Mode (char *origin, char **argv, int argc)
 {

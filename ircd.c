@@ -818,3 +818,20 @@ globops (char *from, char *fmt, ...)
 	}
 }
 
+int
+swallops_cmd (const char *who, const char *msg, ...)
+{
+	va_list ap;
+
+	va_start (ap, msg);
+	ircvsnprintf (ircd_buf, BUFSIZE, msg, ap);
+	va_end (ap);
+	send_wallops (who, ircd_buf);
+	return 1;
+}
+
+void 
+send_numeric (const int numeric, const char *target, const char *buf)
+{
+	sts (":%s %d %s :%s", me.name, numeric, target, buf);
+}

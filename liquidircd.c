@@ -398,17 +398,10 @@ sumode_cmd (const char *who, const char *target, long mode)
 	return 1;
 }
 
-int
-snumeric_cmd (const int numeric, const char *target, const char *data, ...)
+void 
+send_numeric (const int numeric, const char *target, const char *buf)
 {
-	va_list ap;
-	char buf[BUFSIZE];
-
-	va_start (ap, data);
-	ircvsnprintf (buf, BUFSIZE, data, ap);
-	va_end (ap);
 	sts (":%s %d %s :%s", me.name, numeric, target, buf);
-	return 1;
 }
 
 int
@@ -422,12 +415,11 @@ int
 skill_cmd (const char *from, const char *target, const char *reason, ...)
 {
 	va_list ap;
-	char buf[BUFSIZE];
 
 	va_start (ap, reason);
-	ircvsnprintf (buf, BUFSIZE, reason, ap);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	sts (":%s %s %s :%s", from, MSG_KILL, target, buf);
+	sts (":%s %s %s :%s", from, MSG_KILL, target, ircd_buf);
 	DelUser (target);
 	return 1;
 }
@@ -436,12 +428,11 @@ int
 ssvskill_cmd (const char *who, const char *reason, ...)
 {
 	va_list ap;
-	char buf[BUFSIZE];
 
 	va_start (ap, reason);
-	ircvsnprintf (buf, BUFSIZE, reason, ap);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, who, buf);
+	sts (":%s %s %s :%s", me.name, MSG_SVSKILL, who, ircd_buf);
 	return 1;
 }
 
@@ -500,17 +491,9 @@ skick_cmd (const char *who, const char *target, const char *chan, const char *re
 	return 1;
 }
 
-int
-swallops_cmd (const char *who, const char *msg, ...)
+void send_wallops (char *who, char *buf)
 {
-	va_list ap;
-	char buf[BUFSIZE];
-
-	va_start (ap, msg);
-	ircvsnprintf (buf, BUFSIZE, msg, ap);
-	va_end (ap);
 	sts (":%s %s :%s", who, MSG_WALLOPS, buf);
-	return 1;
 }
 
 int
@@ -537,12 +520,11 @@ int
 sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
 	va_list ap;
-	char buf[BUFSIZE];
 
 	va_start (ap, reason);
-	ircvsnprintf (buf, BUFSIZE, reason, ap);
+	ircvsnprintf (ircd_buf, BUFSIZE, reason, ap);
 	va_end (ap);
-	sts (":%s %s %s %s %d %s %d :%s", me.name, MSG_AKILL, host, ident, length, setby, (int)me.now, buf);
+	sts (":%s %s %s %s %d %s %d :%s", me.name, MSG_AKILL, host, ident, length, setby, (int)me.now, ircd_buf);
 	return 1;
 }
 

@@ -76,6 +76,8 @@ void chan_privmsg (char *who, char *buf);
 void send_privmsg (char *to, const char *from, char *buf);
 void send_notice (char *to, const char *from, char *buf);
 void send_globops (char *from, char *buf);
+void send_wallops (char *from, char *buf);
+void send_numeric (const int numeric, const char *target, const char *buf);
 
 
 #endif
