@@ -1,4 +1,9 @@
 AC_DEFUN([AX_PATH_LIB_CURL], [dnl
+AC_MSG_HEADER([Configuring for LibCurl Now])
+AX_CONFIG_LIB_CURL
+])
+
+AC_DEFUN([AX_PATH_LIB_CURL_UNUSED], [dnl
 AC_MSG_CHECKING([lib curl])
 AC_ARG_WITH(curl,
 [  --with-curl[[=prefix]]    compile libcurl part ],,
@@ -151,5 +156,4 @@ CURL_CFLAGS='-I${top_srcdir}/'lib/curl
 AC_SUBST([CURL_LIBS])
 AC_SUBST([CURL_CFLAGS])
 AM_CONDITIONAL(BUILD_CURL, true)
-AC_MSG_RESULT([ok])
 ])

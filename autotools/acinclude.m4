@@ -79,7 +79,7 @@ AC_DEFUN([TYPE_IN_ADDR_T],
 #include <sys/socket.h>
 #include <arpa/inet.h>])
 ])
-AC_DEFUN(CURL_CHECK_NONBLOCKING_SOCKET,
+AC_DEFUN([CURL_CHECK_NONBLOCKING_SOCKET],
 [
   AC_MSG_CHECKING([non-blocking sockets style])
 
@@ -242,4 +242,9 @@ define(ADNS_C_GETFUNC,[
     AC_MSG_ERROR([cannot find library function $1])
   ])
  ])
+])
+AC_DEFUN([AC_MSG_HEADER], [
+echo ""
+autotools/shtool echo -e "%B$1%b"
+echo ""
 ])

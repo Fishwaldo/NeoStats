@@ -24,6 +24,7 @@ AC_DEFINE_UNQUOTED(MAJOR, $x_maj, "Major Version Number")
 AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
 AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
 AC_DEFINE_UNQUOTED(VERSION, $x_version, "Full Version")
+AC_MSG_HEADER([Configuring Core Now])
 AC_LIBTOOL_DLOPEN
 dnl AC_DISABLE_SHARED
 dnl AC_LIBTOOL_WIN32_DLL
@@ -261,6 +262,28 @@ AC_CACHE_CHECK([for __va_copy], ns___va_copy, [AC_LINK_IFELSE(
 if test "$ns___va_copy" = "yes" ; then
   AC_DEFINE(HAVE___VA_COPY, 1, [Define if we have __va_copy]) fi
 
+
+dnl Set NEO_PREFIX in config.h.
+if test "x${prefix}" = "xNONE"; then
+   AC_DEFINE_UNQUOTED(NEO_PREFIX, "${ac_default_prefix}", "Installation Prefix")
+else
+  AC_DEFINE_UNQUOTED(NEO_PREFIX, "${prefix}", "Installation Prefix")
+fi
+
+
+
+AX_PATH_LIB_PCRE
+AX_PATH_LIB_CURL
+
+AC_DEFINE_UNQUOTED(NS_HOST, "$host_os", "Operating System Host")
+AC_MSG_HEADER([Configuring CCDV Now])
+wi_ARG_DISABLE_CCDV
+wi_PROG_CCDV
+AC_MSG_HEADER([Configuring LibEvent Now])
+CHK_LIBEVNT
+
+AC_MSG_HEADER([NeoStats Configuration Summary:])
+
 dnl check if we are running with Debug....
 AC_MSG_CHECKING(Whether to Enable Debuging...)
 AC_ARG_ENABLE(debug,
@@ -320,25 +343,6 @@ MODULES="$MODULES $withval"
 AC_MSG_RESULT($withval),
 AC_MSG_RESULT("None"))
 
-dnl Set NEO_PREFIX in config.h.
-if test "x${prefix}" = "xNONE"; then
-   AC_DEFINE_UNQUOTED(NEO_PREFIX, "${ac_default_prefix}", "Installation Prefix")
-else
-  AC_DEFINE_UNQUOTED(NEO_PREFIX, "${prefix}", "Installation Prefix")
-fi
-
-
-
-AX_PATH_LIB_PCRE
-AX_PATH_LIB_CURL
-
-AC_DEFINE_UNQUOTED(NS_HOST, "$host_os", "Operating System Host")
-
-wi_ARG_DISABLE_CCDV
-wi_PROG_CCDV
-
-CHK_LIBEVNT
-
 
 AC_SUBST(PROTOCOL)
 AC_SUBST(SED)
@@ -370,7 +374,7 @@ AC_CONFIG_FILES([Makefile
 
 AC_CACHE_SAVE
 AC_OUTPUT
-echo "Configuration complete."
+AC_MSG_HEADER([Configuration complete.])
 read -p "Press Enter key to read the release notes"
 clear
 more RELNOTES
