@@ -9,10 +9,12 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c nsdba.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c oscalls.c nsmemory.c \
 		rtaserv.c rtabans.c rtachannels.c rtamodules.c rtaservers.c rtausers.c \
 		base64.c numerics.c settings.c botinfo.c
-AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/rta \
-		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
+AM_CFLAGS = 	-I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/rta \
+		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
+		-I$(top_srcdir)/lib/event
 neostats_LDADD = $(top_srcdir)/lib/rta/librtadb.a \
-		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@
+		 $(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
+		 $(top_srcdir)/lib/event/libevent.a
 neostats_LDFLAGS = --export-dynamic -rdynamic
 
 include $(top_srcdir)/autotools/rules.mk 

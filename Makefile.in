@@ -50,7 +50,8 @@ am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_curl.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/autotools/ccdv.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/autotools/ccdv.m4 \
+	$(top_srcdir)/autotools/libevent.m4 $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -129,6 +130,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+EVNTLIBOBJS = @EVNTLIBOBJS@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@

@@ -50,6 +50,7 @@
 #include "nsdba.h"
 #include "rtaserv.h"
 #include "dcc.h"
+#include "event.h"
 
 #define PID_FILENAME	"neostats.pid"
 
@@ -217,6 +218,7 @@ static int InitCore( void )
 	/* initialize Lang Subsystem */
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );
+	event_init();
 	/* initialize Module subsystem */
 	if( InitDBA() != NS_SUCCESS )
 		return NS_FAILURE;
@@ -354,6 +356,7 @@ int main( int argc, char *argv[] )
 	if( InitCore() != NS_SUCCESS )
 		return EXIT_FAILURE;
 
+	printf("NeoStats will use %s\n", event_show_method());
 #ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */

@@ -46,7 +46,8 @@ am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_curl.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/autotools/ccdv.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/autotools/ccdv.m4 \
+	$(top_srcdir)/autotools/libevent.m4 $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
@@ -72,7 +73,8 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	numerics.$(OBJEXT) settings.$(OBJEXT) botinfo.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/rta/librtadb.a \
-	$(top_srcdir)/lib/adns/libadns.la
+	$(top_srcdir)/lib/adns/libadns.la \
+	$(top_srcdir)/lib/event/libevent.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -129,6 +131,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+EVNTLIBOBJS = @EVNTLIBOBJS@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
@@ -226,10 +229,12 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c nsdba.c \
 		base64.c numerics.c settings.c botinfo.c
 
 AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/rta \
-		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE
+		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
+		-I$(top_srcdir)/lib/event
 
 neostats_LDADD = $(top_srcdir)/lib/rta/librtadb.a \
-		$(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@
+		 $(top_srcdir)/lib/adns/libadns.la @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
+		 $(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
