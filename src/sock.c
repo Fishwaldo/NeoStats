@@ -502,7 +502,8 @@ sock_disconnect (const char *name)
 
 /** @brief send to socket
  *
- * @param fmt printf style vaarg list of text to send
+ * @param buf the text we want to send to the IRC Server
+ * @param buflen the size of the text we are sending
  * 
  * @return none
  */
@@ -533,6 +534,17 @@ send_to_ircd_socket (const char *buf, const int buflen)
 
 #undef SOCKDEBUG 
 
+/** @brief This function actually reads the data from our event buffer and 
+ *  places the data in a temporary buffer assocated with this socket
+ *  it then checks teh temporary buffer for new line charactors and if found
+ *  sends the line of text to the function specified when this socket was created
+ *
+ * @param bufferevent the bufferevent structure direct from the event subsystem
+ * @param arg is actually the Sock structure for this socket.
+ * 
+ * @return Nothing
+ *
+ */
 void
 linemode_read(struct bufferevent *bufferevent, void *arg) {
 	Sock *thisock = (Sock*)arg;
@@ -599,10 +611,37 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
 	}
 }
 
+
+/** @brief This function signals that the socket has sent all available data 
+ *  in the write buffer. We don't actually use it Currently, but we could
+ *
+ * @param bufferevent the bufferevent structure direct from the event subsystem
+ * @param arg is actually the Sock structure for this socket.
+ * 
+ * @return Nothing
+ *
+ */
+
+
 void
 write_from_ircd_socket (struct bufferevent *bufferevent, void *arg) {
-printf("wrote\n");
+/* NOOP - We require this otherwise the event subsystem segv's */
 }
+
+
+/** @brief This function signals that a error has occured on the socket
+ *  such as EOF etc. We use this to detect disconnections etc rather than 
+ *  having to worry about the return code from a read function call
+ *
+ * @param bufferevent the bufferevent structure direct from the event subsystem
+ * @param what indicates what caused this error, a read or write call
+ * @param arg is actually the Sock structure for this socket.
+ * 
+ * @return Nothing
+ *
+ */
+
+
 void 
 error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg) {
 #if 0
@@ -620,6 +659,7 @@ error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg) {
 			nlog(LOG_ERROR, "Unknown Error from IRCd Socket: %d", what);
 			break;
 	}
+#warning this needs to be cleaned up so we can exit cleanly.
 	bufferevent_free(bufferevent);
 	del_sock(me.servsock->name);
 	os_sock_close (me.servsock->sock_no);
@@ -628,6 +668,13 @@ error_from_ircd_socket(struct bufferevent *bufferevent, short what, void *arg) {
 	do_exit (NS_EXIT_ERROR, NULL);
 }	
 	
+
+/** @brief Init the socket subsystem
+ *
+ * 
+ * @return Nothing
+ *
+ */
 
 int InitSocks (void)
 {
@@ -642,10 +689,20 @@ int InitSocks (void)
 	return NS_SUCCESS;
 }
 
+
+/** @brief Finish up the socket subsystem
+ *
+ * 
+ * @return Nothing
+ *
+ */
+
+
 void FiniSocks (void) 
 {
 	ns_free(TimeOut);
 	ns_free(ufds);
+#warning we should actually scan for any existing sockets still registered here
 	if (me.servsock) {
 		bufferevent_free(me.servsock->event.buffered);
 		del_sock(me.servsock->name);
@@ -680,7 +737,7 @@ new_sock (const char *sock_name)
 	return sock;
 }
 
-/** \fn @brief find socket
+/** @brief find socket
  *
  * For core use only, finds a socket in the current list of socket
  *
@@ -701,6 +758,21 @@ find_sock (const char *sock_name)
 	return sock;
 }
 
+/** @brief create a new socket that's protocol is based on lines
+ *
+ * This sets up the core to create a buffered, newline terminated communication. 
+ * The socket connection should have already been established, and socknum should be a valid
+ * socket. 
+ *
+ * @param sock_name the name of the new socket
+ * @param socknum the Socket number, from the socket function call
+ * @param readcb function prototype that is called when a new "newline" terminated string is recieved.
+ * @param writecb function to call that indicates we have sent all buffered data
+ * @param errcb function to call when we get a error, such as EOF 
+ * 
+ * @return pointer to socket structure for reference to future calls
+ */
+
 Sock *
 add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuffercb writecb, everrorcb errcb) {
 	Sock *sock;
@@ -718,6 +790,22 @@ add_linemode_socket(const char *sock_name, int socknum, linemodecb readcb, evbuf
 	}
 	return sock;
 }
+
+
+/** @brief create a new socket that's input and output are buffered.
+ *
+ * This sets up the core to create a buffered communication. 
+ * The socket connection should have already been established, and socknum should be a valid
+ * socket. 
+ *
+ * @param sock_name the name of the new socket
+ * @param socknum the Socket number, from the socket function call
+ * @param readcb function prototype that is called when a new buffered data is ready.
+ * @param writecb function to call that indicates we have sent all buffered data
+ * @param errcb function to call when we get a error, such as EOF 
+ * 
+ * @return pointer to socket structure for reference to future calls
+ */
 
 
 Sock *
@@ -755,7 +843,19 @@ add_buffered_socket(const char *sock_name, int socknum, evbuffercb readcb, evbuf
 	return sock;
 }
 
-void
+
+/** @brief call the function to accept a new connection and handle it gracefully!
+ *
+ * This is for use only in the core, and not by modules
+ *
+ * @param fd the socket number
+ * @param what ignored
+ * @param arg is a pointer to the Sock structure for the listening socket
+ * 
+ * @return nothing
+ */
+
+static void
 listen_accept_sock(int fd, short what, void *arg) {
 	Sock *sock = (Sock *)arg;
 	
@@ -764,6 +864,7 @@ listen_accept_sock(int fd, short what, void *arg) {
 	if (sock->sfunc.listenmode.funccb(sock->sock_no, sock->data) == NS_SUCCESS) {
 		/* re-add this listen socket if the acceptcb succeeds */
 		event_add(sock->event.event, NULL);
+		sock->rmsgs++;
 		return;
 	} else {
 		dlog(DEBUG1, "Deleting Listen Socket %d port %d (%s)", sock->sock_no, sock->sfunc.listenmode.port, sock->name);
@@ -772,6 +873,21 @@ listen_accept_sock(int fd, short what, void *arg) {
 		del_sock(sock->name);
 	}
 }
+
+
+/** @brief create a new socket to listen on a port (with standard bindings)
+ *
+ * This creates a new socket that will listen on a standard port and will automatically 
+ * bind to the local host if specified in the configuration
+ *
+ * @param sock_name the socket name
+ * @param port a integer of the port to listen on.
+ * @param acceptcb the function to call to accept a new connection. Responsible for actually accepting the connection
+ * and createing the new Socket interface
+ * @param data A void pointer that is passed back to the user via the acceptcb callback
+ * 
+ * @return A socket struct that represents the new Listening Socket
+ */
 
 Sock *
 add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb, void *data) {
@@ -826,6 +942,18 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
 
 }
 
+/** @brief Read Data from a "STANDARD" Socket
+ *
+ * This function reads data from a standard socket and will handle all necessary errors
+ * When it has read the data, it calls the callback with the data that has been read from the socket 
+ *
+ * @param fd the socket number
+ * @param what ignored
+ * @param data pointer to the Sock Structure for the the socket thats being read currently
+ * 
+ * @return Nothing
+ */
+
 void
 read_sock(int fd, short what, void *data) {
 	Sock *sock = (Sock *)data;
@@ -873,6 +1001,9 @@ read_sock(int fd, short what, void *data) {
 	n = dwBytesRead;
 #endif
 	dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);
+	sock->rbytes += n;
+	/* rmsgs is just a counter for how many times we read in the standard sockets */
+	sock->rmsgs++;
 	if (sock->sfunc.standmode.readfunc(sock->data, p, n) == NS_FAILURE) {
 		dlog(DEBUG1, "sock_read: Read Failed with %s on fd %d (%s)", strerror(errno), sock->sock_no, sock->name);
 		event_del(sock->event.event);
@@ -880,23 +1011,37 @@ read_sock(int fd, short what, void *data) {
 		del_sock(sock->name);
 		return;
 	}			
+
+
 }
+
+/** @brief Called when a socket is ready for writing
+ *
+ * This function is called when a socket is ready for writing data to. It is not used to actually write data, but calls a 
+ * callback to the user telling them the socket is ready to be written to.
+ *
+ * @param fd the socket number
+ * @param what ignored
+ * @param data pointer to the Sock Structure for the the socket thats being read currently
+ * 
+ * @return Nothing
+ */
 
 void
 write_sock(int fd, short what, void *data) {
+#warning change this name, its misleading.
 printf("write\n");
 }
 
-/** @brief add a socket to the socket list
+/** @brief add a socket to the socket list as a "Standard" socket
  *
  * For core use. Adds a socket with the given functions to the socket list
  *
  * @param readfunc the name of read function to register with this socket
  * @param writefunc the name of write function to register with this socket
- * @param errfunc the name of error function to register with this socket
  * @param sock_name the name of socket to register
  * @param socknum the socket number to register with this socket
- * @param mod_name the name of module registering the socket
+ * @param data User supplied data for tracking purposes.
  * 
  * @return pointer to socket if found, NULL if not found
 */
@@ -1058,6 +1203,10 @@ ns_cmd_socklist (CmdParams* cmdparams)
 			case SOCK_LINEMODE:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("LineMode Socket - fd: %d", cmdparams->source), sock->sock_no);
 				irc_prefmsg (ns_botptr, cmdparams->source, __("RecieveQ Set: %d Current: %d", cmdparams->source), sock->sfunc.linemode.recvq, sock->sfunc.linemode.readbufsize);	
+				break;
+			case SOCK_LISTEN:
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Listen Socket - fd %d Port %d", cmdparams->source), sock->sock_no, sock->sfunc.listenmode.port);
+				irc_prefmsg (ns_botptr, cmdparams->source, __("Accepted Connections: %ld", cmdparams->source), sock->rmsgs);
 				break;
 			default:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Uknown (Error!)", cmdparams->source));
