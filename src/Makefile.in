@@ -195,7 +195,7 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) oscalls.$(OBJEXT) \
 	nsmemory.$(OBJEXT) rtaserv.$(OBJEXT) rtabans.$(OBJEXT) \
 	rtachannels.$(OBJEXT) rtamodules.$(OBJEXT) rtaservers.$(OBJEXT) \
-	rtausers.$(OBJEXT) base64.$(OBJEXT)
+	rtausers.$(OBJEXT) base64.$(OBJEXT) modexclude.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/rta/librtadb.a \
 	$(top_srcdir)/lib/adns/libadns.la
