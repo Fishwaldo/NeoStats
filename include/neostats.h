@@ -119,7 +119,7 @@
 #define _(x) (x)
 #define __(x, y) (x)
 #else
-#ifdef HAVE_NETDB_H
+#ifdef HAVE_DB_H
 char *LANGgettext(const char *string, int mylang);
 /* our own defines for language support */
 /* this one is for standard language support */
