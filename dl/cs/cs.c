@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: cs.c,v 1.18 2003/01/31 10:09:55 fishwaldo Exp $
+** $Id: cs.c,v 1.19 2003/02/11 00:11:56 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -497,7 +497,7 @@ int cs_user_kill(char **av, int ac) {
     u = finduser(av[0]);
     cmd = sstrdup(recbuf);
     KillCount = split_buf(cmd, &Kill, 0);
-	GlobalMsg = joinbuf (Kill, KillCount, 4);
+	GlobalMsg = joinbuf (Kill, KillCount, 0);
 
     if (finduser(Kill[2])) {
     /* it was a User who was killed */

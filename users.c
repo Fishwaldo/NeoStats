@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: users.c,v 1.44 2003/02/04 00:14:44 fishwaldo Exp $
+** $Id: users.c,v 1.45 2003/02/11 00:11:55 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -93,7 +93,7 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u->is_away = 0;
 	u->myuser = NULL;
 	u->Umode = 0;
-#ifdef DEBUG
+#ifdef ULTIMATE3
 	u->Smode = 0;
 #endif
 	u->chans = list_create(MAXJOINCHANS);
@@ -311,14 +311,14 @@ void UserMode(const char *nick, const char *modes)
 	}
 #ifdef DEBUG
 #ifdef ULTIMATE3
-	if (smode)
+	if (smode > 0)
 		log("Smodes: %s", modes);
 	else 
 #endif
 	log("Modes: %s", modes);
 #endif
 #ifdef ULTIMATE3
-	if (!smode) 
+	if (smode == 0) 
 #endif
 		strncpy(u->modes, modes, MODESIZE);
 	tmpmode = *(modes);
@@ -328,7 +328,7 @@ void UserMode(const char *nick, const char *modes)
 			case '-'	: add = 0; break;
 			default		: 
 #ifdef ULTIMATE3
-					if (smode) {
+					if (smode > 0) {
 						for (i=0; i < ((sizeof(susr_mds) / sizeof(susr_mds[0])) -1);i++) { 
 							if (susr_mds[i].mode == tmpmode) {
 								if (add) {
@@ -361,7 +361,7 @@ void UserMode(const char *nick, const char *modes)
 	}
 #ifdef DEBUG
 #ifdef ULTIMATE3
-	if (smode)
+	if (smode > 0)
 		log("SMODE for %s is are now %p", u->nick, u->Smode);
 	else 
 #endif
