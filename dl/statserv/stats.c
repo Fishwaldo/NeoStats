@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.45 2003/09/12 03:24:15 fishwaldo Exp $
+** $Id: stats.c,v 1.46 2003/09/12 04:36:18 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -76,6 +76,10 @@ static void strip_mirc_codes(char *text)
 
   while (*text) {
     switch (*text) {
+    case 1:
+    	text++;			/* ctcp stuff */
+    	continue;
+      break;
     case 2:			/* Bold text */
 	text++;
 	continue;
