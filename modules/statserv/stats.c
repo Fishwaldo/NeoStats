@@ -102,6 +102,7 @@ void LoadStatistic (statistic *stat, char *table, char *row, char *field)
 		LoadStatisticEntry (&stat->monthly, table, row, field, "monthly");
 	}
 	LoadStatisticEntry (&stat->alltime, table, row, field, "alltime");
+	stat->current = 0;
 }
 
 void AverageStatisticEntry (statisticentry *stat, unsigned int current)
