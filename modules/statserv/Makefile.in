@@ -65,8 +65,8 @@ pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 statserv_la_LIBADD =
 am_statserv_la_OBJECTS = ss_help.lo stats.lo statserv.lo htmlstats.lo \
-	statsrta.lo tld.lo channel.lo user.lo network.lo server.lo \
-	version.lo GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo md5.lo
+	tld.lo channel.lo user.lo network.lo server.lo version.lo \
+	GeoIPCity.lo GeoIPBitReader.lo GeoIP.lo md5.lo
 statserv_la_OBJECTS = $(am_statserv_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include -I$(top_builddir)/lib/gdbm
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -210,7 +210,7 @@ wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = statserv.la
 statserv_la_SOURCES = ss_help.c \
 			stats.c stats.h statserv.c statserv.h \
-			htmlstats.c htmlstats.h statsrta.c statsrta.h \
+			htmlstats.c htmlstats.h \
 			tld.c tld.h channel.c channel.h \
 			user.c user.h network.c network.h \
 			server.c server.h version.c version.h \
@@ -220,7 +220,7 @@ statserv_la_SOURCES = ss_help.c \
 			geoip/global.h geoip/md5.c geoip/md5.h 
 
 statserv_la_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/rta/ -I$(top_srcdir)/lib/adns/ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
 			-DSYSCONFDIR=\"$(sysconfdir)\"
 
 dist_data_DATA = GeoIP.dat html/index.tpl
@@ -297,7 +297,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ss_help.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stats.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/statserv.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/statsrta.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tld.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@

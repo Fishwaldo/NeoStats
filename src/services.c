@@ -38,7 +38,6 @@
 #include "exclude.h"
 #include "services.h"
 #include "bans.h"
-#include "rtaserv.h"
 
 static int ns_cmd_shutdown( CmdParams *cmdparams );
 static int ns_cmd_reload( CmdParams *cmdparams );
@@ -221,7 +220,6 @@ int init_services_bot( void )
 	AddEventList( neostats_events );
 	ns_module.synched = 1;
 	me.synched = 1;
-	rtaserv_init();
 	SynchAllModules();
 	RequestServerUptimes();	
 	return NS_SUCCESS;

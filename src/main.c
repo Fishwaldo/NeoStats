@@ -48,7 +48,6 @@
 #include "signals.h"
 #include "lang.h"
 #include "nsdba.h"
-#include "rtaserv.h"
 #include "dcc.h"
 #include "event.h"
 
@@ -469,7 +468,6 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 	nlog( LOG_CRITICAL, exit_reports[exitcode].exit_message );
 
 	if( exitcode != NS_EXIT_SEGFAULT ) {
-		rtaserv_fini();
 		unload_modules();
 		DBACloseDatabase();
 		if( quitmsg )

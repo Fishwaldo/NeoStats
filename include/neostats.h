@@ -1444,6 +1444,4 @@ EXPORTFUNC void ClearServerModValue( Client *s );
 EXPORTFUNC void SetServerModValue( Client *s, void *data );
 EXPORTFUNC void *GetServerModValue( Client *s );
 
-EXPORTFUNC void rtaserv_add_table( void *ptbl );
-
 #endif /* NEOSTATS_H */

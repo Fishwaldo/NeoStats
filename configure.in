@@ -363,7 +363,6 @@ AC_CONFIG_FILES([Makefile
 		lib/curl/Makefile
 		lib/adns/Makefile
 		lib/pcre/Makefile 
-		lib/rta/Makefile 
 		lib/event/Makefile
 		modules/Makefile 
 		modules/connectserv/Makefile

@@ -142,9 +142,6 @@
 				RelativePath=".\statserv.c">
 			</File>
 			<File
-				RelativePath=".\statsrta.c">
-			</File>
-			<File
 				RelativePath=".\tld.c">
 			</File>
 			<File
@@ -175,9 +172,6 @@
 			</File>
 			<File
 				RelativePath=".\statserv.h">
-			</File>
-			<File
-				RelativePath=".\statsrta.h">
 			</File>
 			<File
 				RelativePath=".\tld.h">

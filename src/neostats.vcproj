@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curld.lib pcred.lib adnsd.lib rtad.lib libevent.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curld.lib pcred.lib adnsd.lib libevent.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Debug"
@@ -81,7 +81,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib rta.lib libevent.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib adns.lib libevent.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Release"
@@ -208,24 +208,6 @@
 			</File>
 			<File
 				RelativePath=".\oscalls.c">
-			</File>
-			<File
-				RelativePath=".\rtabans.c">
-			</File>
-			<File
-				RelativePath=".\rtachannels.c">
-			</File>
-			<File
-				RelativePath=".\rtamodules.c">
-			</File>
-			<File
-				RelativePath=".\rtaserv.c">
-			</File>
-			<File
-				RelativePath=".\rtaservers.c">
-			</File>
-			<File
-				RelativePath=".\rtausers.c">
 			</File>
 			<File
 				RelativePath=".\servers.c">
@@ -363,9 +345,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\win32\resource.h">
-			</File>
-			<File
-				RelativePath="..\include\rtaserv.h">
 			</File>
 			<File
 				RelativePath="..\include\servers.h">

@@ -30,7 +30,6 @@
 
 #include "neostats.h"
 #include "statserv.h"
-#include "statsrta.h"
 #include "stats.h"
 #include "network.h"
 #include "server.h"
@@ -186,7 +185,6 @@ int ModSynch (void)
 	SET_SEGV_LOCATION();
 	/* RTA init must be in synch since core does not start 
 	   RTA during the init cycle when NeoStats first boots */
-	InitRTAStats ();
 	ss_bot = AddBot (&ss_botinfo);
 	if (!ss_bot) {
 		return NS_FAILURE;
@@ -226,7 +224,6 @@ int ModFini (void)
 	FiniChannelStats ();
 	FiniTLDStatistics ();
 	FiniVersionStats ();
-	FiniRTAStats();
 	FiniNetworkStats();
 	return NS_SUCCESS;
 }
