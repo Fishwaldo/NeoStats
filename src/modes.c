@@ -31,6 +31,7 @@
 
 unsigned char UmodeChRegNick = 'r';
 static char ModeStringBuf[64];
+static char PrefixStringBuf[64];
 unsigned int ircd_supported_umodes = 0;
 unsigned int ircd_supported_smodes = 0;
 unsigned int ircd_supported_cmodes = 0;
@@ -287,12 +288,12 @@ char *CmodeMaskToPrefixString (const unsigned int mask)
 	j = 0;
 	for (i = 0; i < MODE_TABLE_SIZE; i++) {
 		if (mask & ircd_cmodes[i].mask) {
-			ModeStringBuf[j] = ircd_cmodes[i].sjoin;
+			PrefixStringBuf[j] = ircd_cmodes[i].sjoin;
 			j++;
 		}
 	}
-	ModeStringBuf[j] = '\0';
-	return ModeStringBuf;
+	PrefixStringBuf[j] = '\0';
+	return PrefixStringBuf;
 }
 
 
