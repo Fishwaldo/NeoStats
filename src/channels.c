@@ -236,85 +236,70 @@ ChanMode (char *origin, char **av, int ac)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ircd_cmodecount; i++) {
-
-				if (*modes == chan_modes[i].flag) {
-					if (add) {
-						if (chan_modes[i].nickparam) {
-							ChanUserMode (av[0], av[j], 1, chan_modes[i].mode);
+			if (ircd_cmodes[*modes].flags&NICKPARAM) {
+				ChanUserMode (av[0], av[j], add, ircd_cmodes[*modes].mode);
+				j++;
+			} else if (add) {
+				/* mode limit and mode key replace current values */
+				if (ircd_cmodes[*modes].mode == CMODE_LIMIT) {
+					c->limit = atoi(av[j]);
+					j++;
+				} else if (ircd_cmodes[*modes].mode == CMODE_KEY) {
+					strlcpy (c->key, av[j], KEYLEN);
+					j++;
+				} else if (ircd_cmodes[*modes].flags) {
+					mn = list_first (c->modeparms);
+					modeexists = 0;
+					while (mn) {
+						m = lnode_get (mn);
+						if (((int *) m->mode == (int *) ircd_cmodes[*modes].mode) && !ircstrcasecmp (m->param, av[j])) {
+							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, av[j]);
 							j++;
-						} else {
-							if (chan_modes[i].parameters) {
-								mn = list_first (c->modeparms);
-								modeexists = 0;
-								while (mn) {
-									m = lnode_get (mn);
-									/* mode limit and mode key replace current values */
-									if ((m->mode == CMODE_LIMIT) && (chan_modes[i].mode == CMODE_LIMIT)) {
-										strlcpy (m->param, av[j], PARAMSIZE);
-										j++;
-										modeexists = 1;
-										break;
-									} else if ((m->mode == CMODE_KEY) && (chan_modes[i].mode == CMODE_KEY)) {
-										strlcpy (m->param, av[j], PARAMSIZE);
-										j++;
-										modeexists = 1;
-										break;
-									} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !ircstrcasecmp (m->param, av[j])) {
-										dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, av[j]);
-										j++;
-										modeexists = 1;
-										break;
-									}
-									mn = list_next (c->modeparms, mn);
-								}
-								if (modeexists != 1) {
-									m = smalloc (sizeof (ModesParm));
-									m->mode = chan_modes[i].mode;
-									strlcpy (m->param, av[j], PARAMSIZE);
-									mn = lnode_create (m);
-									if (list_isfull (c->modeparms)) {
-										nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
-										do_exit (NS_EXIT_ERROR, "List full - see log file");
-									} else {
-										list_append (c->modeparms, mn);
-									}
-									j++;
-								}
-							} else {
-								c->modes |= chan_modes[i].mode;
-							}
+							modeexists = 1;
+							break;
 						}
-					} else {
-						if (chan_modes[i].nickparam) {
-							ChanUserMode (av[0], av[j], 0, chan_modes[i].mode);
-							j++;
-						} else {
-							if (chan_modes[i].parameters) {
-								mn = list_find (c->modeparms, (int *) chan_modes[i].mode, comparemode);
-								if (!mn) {
-									dlog(DEBUG1, "ChanMode: can't find mode %c for channel %s", *modes, c->name);
-								} else {
-									list_delete (c->modeparms, mn);
-									m = lnode_get (mn);
-									lnode_destroy (mn);
-									sfree (m);
-
-									if (!(chan_modes[i].mode == CMODE_LIMIT))
-										j++;
-								}
-							} else {
-								c->modes &= ~chan_modes[i].mode;
-							}
-						}
+						mn = list_next (c->modeparms, mn);
 					}
+					if (modeexists != 1) {
+						m = smalloc (sizeof (ModesParm));
+						m->mode = ircd_cmodes[*modes].mode;
+						strlcpy (m->param, av[j], PARAMSIZE);
+						mn = lnode_create (m);
+						if (list_isfull (c->modeparms)) {
+							nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
+							do_exit (NS_EXIT_ERROR, "List full - see log file");
+						} else {
+							list_append (c->modeparms, mn);
+						}
+						j++;
+					}
+				} else {
+					c->modes |= ircd_cmodes[*modes].mode;
+				}
+			} else {
+				if(ircd_cmodes[*modes].mode == CMODE_LIMIT) {
+					c->limit = 0;
+				} else if (ircd_cmodes[*modes].mode == CMODE_KEY) {
+					c->key[0] = 0;
+					j++;
+				} else if (ircd_cmodes[*modes].flags) {
+					mn = list_find (c->modeparms, (int *) ircd_cmodes[*modes].mode, comparemode);
+					if (!mn) {
+						dlog(DEBUG1, "ChanMode: can't find mode %c for channel %s", *modes, c->name);
+					} else {
+						list_delete (c->modeparms, mn);
+						m = lnode_get (mn);
+						lnode_destroy (mn);
+						sfree (m);
+					}
+				} else {
+					c->modes &= ~ircd_cmodes[*modes].mode;
 				}
 			}
 		}
 		modes++;
 	}
 	return j;
-
 }
 
 /** @brief Process a mode change that affects a user on a channel
@@ -393,11 +378,7 @@ new_chan (const char *chan)
 	hash_insert (channelhash, cn, c->name);
 	c->chanmembers = list_create (CHAN_MEM_SIZE);
 	c->modeparms = list_create (MAXMODES);
-	c->users = 0;
-	c->topictime = 0;
-	c->modes = 0;
 	c->creationtime = me.now;
-	c->flags = 0;
 	/* check exclusions */
 	ns_do_exclude_chan(c);
 	cmdparams = (CmdParams*) scalloc (sizeof(CmdParams));
@@ -640,11 +621,10 @@ ChanNickChange (Channel * c, const char *newnick, const char *oldnick)
 			UserDump (oldnick);
 		}
 		return;
-	} else {
-		dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
-		cml = lnode_get (cm);
-		strlcpy (cml->nick, newnick, MAXNICK);
 	}
+    dlog(DEBUG3, "ChanNickChange: newnick %s, oldnick %s", newnick, oldnick);
+	cml = lnode_get (cm);
+	strlcpy (cml->nick, newnick, MAXNICK);
 }
 
 
@@ -749,16 +729,17 @@ dumpchan (Channel* c)
  	Chanmem *cm;
 	char mode[10];
 	int i;
-	int j = 0;
+	int j = 1;
 	ModesParm *m;
 
-	bzero (mode, 10);
 	mode[0] = '+';
-	for (i = 0; i < ircd_cmodecount; i++) {
-		if (c->modes & chan_modes[i].mode) {
-			mode[++j] = chan_modes[i].flag;
+	for (i = 0; i < MODE_TABLE_SIZE; i++) {
+		if (c->modes & ircd_cmodes[i].mode) {
+			mode[j] = i;
+			j++;
 		}
 	}
+	mode[j] = 0;
 	chanalert (ns_botptr->nick, "Channel:    %s", c->name);
 	chanalert (ns_botptr->nick, "Mode:       %s creationtime %ld", mode, (long)c->creationtime);
 	chanalert (ns_botptr->nick, "TopicOwner: %s TopicTime: %ld Topic: %s", c->topicowner, (long)c->topictime, c->topic);
@@ -767,9 +748,9 @@ dumpchan (Channel* c)
 	cmn = list_first (c->modeparms);
 	while (cmn) {
 		m = lnode_get (cmn);
-		for (i = 0; i < ircd_cmodecount; i++) {
-			if (m->mode & chan_modes[i].mode) {
-				chanalert (ns_botptr->nick, "Modes:      %c Parms %s", chan_modes[i].flag, m->param);
+		for (i = 0; i < MODE_TABLE_SIZE; i++) {
+			if (m->mode & ircd_cmodes[i].mode) {
+				chanalert (ns_botptr->nick, "Modes:      %c Parms %s", i, m->param);
 			}
 		}
 		cmn = list_next (c->modeparms, cmn);
@@ -778,14 +759,15 @@ dumpchan (Channel* c)
 	cmn = list_first (c->chanmembers);
 	while (cmn) {
 		cm = lnode_get (cmn);
-		bzero (mode, 10);
-		j = 0;
+		j = 1;
 		mode[0] = '+';
-		for (i = 0; i < ircd_cmodecount; i++) {
-			if (cm->flags & chan_modes[i].mode) {
-				mode[++j] = chan_modes[i].flag;
+		for (i = 0; i < MODE_TABLE_SIZE; i++) {
+			if (cm->flags & ircd_cmodes[i].mode) {
+				mode[j] = i;
+				j++;
 			}
 		}
+		mode[j] = 0;
 		chanalert (ns_botptr->nick, "            %s Modes %s Joined: %ld", cm->nick, mode, (long)cm->tsjoin);
 		cmn = list_next (c->chanmembers, cmn);
 	}
@@ -914,9 +896,9 @@ void *display_chanmodes (void *tbl, char *col, char *sql, void *row)
 	ModesParm *m;
 	
 	chanmodes[0] = '+';
-	for (i = 0; i < ircd_cmodecount; i++) {
-		if (c->modes & chan_modes[i].mode) {
-			chanmodes[j++] = chan_modes[i].flag;
+	for (i = 0; i < MODE_TABLE_SIZE; i++) {
+		if (c->modes & ircd_cmodes[i].mode) {
+			chanmodes[j++] = i;
 		}
 	}
 	chanmodes[j++] = '\0';
@@ -924,9 +906,9 @@ void *display_chanmodes (void *tbl, char *col, char *sql, void *row)
 	cmn = list_first (c->modeparms);
 	while (cmn) {
 		m = lnode_get (cmn);
-		for (i = 0; i < ircd_cmodecount; i++) {
-			if (m->mode & chan_modes[i].mode) {
-				ircsnprintf(tmp, BUFSIZE, " +%c %s", chan_modes[i].flag, m->param);
+		for (i = 0; i < MODE_TABLE_SIZE; i++) {
+			if (m->mode & ircd_cmodes[i].mode) {
+				ircsnprintf(tmp, BUFSIZE, " +%c %s", i, m->param);
 				strlcat(chanmodes, tmp, BUFSIZE);
 			}
 		}
@@ -956,12 +938,12 @@ void *display_chanusers (void *tbl, char *col, char *sql, void *row)
 		j = 0;
 		k = 1;
 		mode[0] = '+';
-		for (i = 0; i < ircd_cmodecount; i++) {
-			if (cm->flags & chan_modes[i].mode) {
-				if (chan_modes[i].sjoin != 0) 
-					sjoin[j++] = chan_modes[i].sjoin;
+		for (i = 0; i < MODE_TABLE_SIZE; i++) {
+			if (cm->flags & ircd_cmodes[i].mode) {
+				if (ircd_cmodes[i].sjoin) 
+					sjoin[j++] = ircd_cmodes[i].sjoin;
 				else 
-					mode[k++] = chan_modes[i].flag;
+					mode[k++] = i;
 			}
 		}
 		mode[k++] = '\0';

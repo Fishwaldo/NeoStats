@@ -568,14 +568,15 @@ Bot * init_bot (BotInfo* botinfo, const char* modes, unsigned int flags, bot_cmd
 		sumode_cmd (nick, nick, UMODE_DEAF);
 	}
 #endif
-	SET_RUN_LEVEL(modptr);
 	botptr->flags = flags;
+	SET_RUN_LEVEL(modptr);
 	if (bot_cmd_list) {
 		add_bot_cmd_list (botptr, bot_cmd_list);
 	}
 	if (bot_setting_list) {
 		add_bot_settings (botptr, bot_setting_list);
 	}
+	RESET_RUN_LEVEL();
 	return botptr;
 }
 

@@ -145,7 +145,6 @@
 /* Umodes */
 #define UMODE_OPER     0x00001	/* umode +o - Oper */
 #define UMODE_LOCOP     0x00002	/* umode +O - Local Oper */
-#define UMODE_INVISIBLE     0x00004	/* umode +i - Invisible */
 #define UMODE_WALLOP     0x00008	/* umode +w - Get wallops */
 #define UMODE_SERVNOTICE     0x00010	/* umode +s - Server notices */
 #define UMODE_CLIENT     0x00020	/* umode +c - Client connections/exits */
@@ -171,24 +170,8 @@
 #define UMODE_ULINEKILL     0x4000000   /* umode +K - U: lined server kill messages */
 
 /* Cmodes */
-#define CMODE_CHANOP	 0x0001
-#define CMODE_VOICE		 0x0002
-#define CMODE_DEOPPED	 0x0004
-#define CMODE_PRIVATE	 0x0008
-#define CMODE_SECRET	 0x0010
-#define CMODE_MODERATED  0x0020
-#define CMODE_TOPICLIMIT 0x0040
-#define CMODE_INVITEONLY 0x0080
-#define CMODE_NOPRIVMSGS 0x0100
-#define CMODE_KEY		 0x0200
-#define CMODE_BAN		 0x0400
-#define CMODE_LIMIT		 0x0800
-#define CMODE_RGSTR		 0x1000
-#define CMODE_RGSTRONLY  0x2000
-#define CMODE_NOCOLOR	 0x4000
-#define CMODE_OPERONLY   0x8000
-#define CMODE_MODREG     0x10000
-#define CMODE_LISTED	 0x20000
+#define CMODE_MODREG	0x02000000
+#define CMODE_LISTED	0x04000000
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_OPERONLY)))

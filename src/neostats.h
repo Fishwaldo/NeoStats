@@ -106,7 +106,48 @@
 #define FEATURE_BOTMODES	0x00000800	/* Umodes for bots available */
 #define FEATURE_SMO			0x00001000	/* SMO */
 
-#if UNREAL == 1
+/* cumodes are channel modes which affect a user */
+#define CUMODE_CHANOP		0x00000001
+#define CUMODE_VOICE		0x00000002
+#define CUMODE_HALFOP		0x00000004
+#define CUMODE_CHANOWNER	0x00000008
+/* Following are mutually exclusive in current IRCd support so share bits.
+ * If this changes, all these must change.
+ */
+#define CUMODE_CHANPROT		0x00000010
+#define CUMODE_CHANADMIN	0x00000010
+
+/* Channel modes available on all IRCds */
+#define CMODE_PRIVATE		0x00000020
+#define CMODE_SECRET		0x00000040
+#define CMODE_MODERATED		0x00000080
+#define CMODE_TOPICLIMIT	0x00000100
+#define CMODE_BAN			0x00000200
+#define CMODE_INVITEONLY	0x00000400
+#define CMODE_NOPRIVMSGS	0x00000800
+#define CMODE_KEY			0x00001000
+#define CMODE_LIMIT			0x00002000
+
+/* Channel modes available on most IRCds */
+#define CMODE_EXCEPT		0x00004000
+#define CMODE_RGSTR			0x00008000
+#define CMODE_RGSTRONLY		0x00010000
+#define CMODE_LINK			0x00020000
+#define CMODE_NOCOLOR		0x00040000
+#define CMODE_OPERONLY		0x00080000
+#define CMODE_ADMONLY		0x00100000
+#define CMODE_STRIP			0x00200000
+#define CMODE_NOKNOCK		0x00400000
+#define CMODE_NOINVITE		0x00800000
+#define CMODE_FLOODLIMIT	0x01000000
+
+/* Other channel modes available on IRCds cannot be easily supported so 
+ * should be defined locally beginning at 0x02000000
+ */
+
+#if UNREAL31 == 1
+#include "protocol/unreal31.h"
+#elif UNREAL32 == 1
 #include "protocol/unreal.h"
 #elif ULTIMATE == 1
 #include "protocol/ultimate.h"
@@ -208,7 +249,7 @@
 #define MAXINFO			128
 #define B64SIZE			16
 
-#define KEYLEN		32
+#define KEYLEN		(32 + 1)
 
 /* MAXCHANLIST
  * the max length a string can be that holds channel lists 
@@ -449,7 +490,7 @@ typedef struct Channel {
 	char topicowner[MAXHOST];	/* because a "server" can be a topic owner */
 	time_t topictime;
 	int  limit;
-	char key[KEYLEN + 1];
+	char key[KEYLEN];
 	list_t *modeparms;
 	time_t creationtime;
 	long flags;
@@ -938,24 +979,12 @@ int CheckChanMode (Channel * c, long mode);
 int IsChanMember(Channel *c, User *u);
 int test_chan_user_mode(char* chan, char* nick, int flag);
 
-#ifdef CMODE_CHANOP
-#define is_chanop(chan, nick)		test_chan_user_mode(chan, nick, CMODE_CHANOP)
-#endif
-#ifdef CMODE_HALFOP
-#define is_chanhalfop(chan, nick)	test_chan_user_mode(chan, nick, CMODE_HALFOP)
-#endif
-#ifdef CMODE_VOICE
-#define is_chanvoice(chan, nick)	test_chan_user_mode(chan, nick, CMODE_VOICE)
-#endif
-#ifdef CMODE_CHANOWNER
-#define is_chanowner(chan, nick)	test_chan_user_mode(chan, nick, CMODE_CHANOWNER)
-#endif
-#ifdef CMODE_CHANPROT
-#define is_chanprot(chan, nick)		test_chan_user_mode(chan, nick, CMODE_CHANPROT)
-#endif
-#ifdef CMODE_CHANADMIN
-#define is_chanadmin(chan, nick)	test_chan_user_mode(chan, nick, CMODE_CHANADMIN)
-#endif
+#define is_chanop(chan, nick)		test_chan_user_mode(chan, nick, CUMODE_CHANOP)
+#define is_chanhalfop(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_HALFOP)
+#define is_chanvoice(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_VOICE)
+#define is_chanowner(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_CHANOWNER)
+#define is_chanprot(chan, nick)		test_chan_user_mode(chan, nick, CUMODE_CHANPROT)
+#define is_chanadmin(chan, nick)	test_chan_user_mode(chan, nick, CUMODE_CHANADMIN)
 
 /* dns.c */
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);

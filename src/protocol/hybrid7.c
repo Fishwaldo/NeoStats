@@ -86,55 +86,58 @@ ircd_cmd cmd_list[] = {
 	{MSG_CAPAB, 0, m_protoctl, 0},
 };
 
-ChanModes chan_modes[] = {
+cumode_init chan_umodes[] = {
 /* CMODE_PEON */	
-	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_HALFOP, 'h', 1, 0, '%'},
+	{'o', CUMODE_CHANOP, '@'},
+	{'v', CUMODE_VOICE, '+'},
+	{'h', CUMODE_HALFOP, '%'},
 /* CMODE_DEOPPED */
-	{CMODE_PRIVATE, 'p', 0, 0, 0},
-	{CMODE_SECRET, 's', 0, 0, 0},
-	{CMODE_MODERATED, 'm', 0, 0, 0},
-	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
-	{CMODE_INVITEONLY, 'i', 0, 0, 0},
-	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{CMODE_BAN, 'b', 0, 1, 0},
-	{CMODE_EXCEPT, 'e', 0, 1, 0},
-	{CMODE_INVEX, 'I', 0, 1, 0},
-	{CMODE_HIDEOPS, 'a', 0, 0, 0},
-	{CMODE_LIMIT, 'l', 0, 1, 0},
-	{CMODE_KEY, 'k', 0, 1, 0},
+	{0, 0, 0},
 };
 
-UserModes user_umodes[] = {
-	{UMODE_DEBUG, 'd'},
-	{UMODE_ADMIN, 'a'},
-	{UMODE_OPER, 'o'},
-	{UMODE_LOCOP, 'l'},
-	{UMODE_BOTS, 'b'},
-	{UMODE_CCONN, 'c'},
-	{UMODE_FULL, 'f'},
-	{UMODE_CALLERID, 'g'},
-	{UMODE_INVISIBLE, 'i'},
-	{UMODE_SKILL, 'k'},
-	{UMODE_NCHANGE, 'n'},
-	{UMODE_REJ, 'r'},
-	{UMODE_SERVNOTICE, 's'},
-	{UMODE_UNAUTH, 'u'},
-	{UMODE_WALLOP, 'w'},
-	{UMODE_EXTERNAL, 'x'},
-	{UMODE_SPY, 'y'},
-	{UMODE_OPERWALL, 'z'},
+cmode_init chan_modes[] = {
+	{'p', CMODE_PRIVATE, 0},
+	{'s', CMODE_SECRET, 0},
+	{'m', CMODE_MODERATED, 0},
+	{'t', CMODE_TOPICLIMIT, 0},
+	{'i', CMODE_INVITEONLY, 0},
+	{'n', CMODE_NOPRIVMSGS, 0},
+	{'b', CMODE_BAN, MODEPARAM},
+	{'e', CMODE_EXCEPT, MODEPARAM},
+	{'I', CMODE_INVEX, MODEPARAM},
+	{'a', CMODE_HIDEOPS, 0},
+	{'l', CMODE_LIMIT, MODEPARAM},
+	{'k', CMODE_KEY, MODEPARAM},
+	{0, 0, 0},
 };
 
-UserModes user_smodes[] = {
+umode_init user_umodes[] = {
+	{'d', UMODE_DEBUG},
+	{'a', UMODE_ADMIN},
+	{'o', UMODE_OPER},
+	{'l', UMODE_LOCOP},
+	{'b', UMODE_BOTS},
+	{'c', UMODE_CLIENT},
+	{'f', UMODE_FULL},
+	{'g', UMODE_CALLERID},
+	{'i', UMODE_INVISIBLE},
+	{'k', UMODE_SKILL},
+	{'n', UMODE_NCHANGE},
+	{'r', UMODE_REJ},
+	{'s', UMODE_SERVNOTICE},
+	{'u', UMODE_UNAUTH},
+	{'w', UMODE_WALLOP},
+	{'x', UMODE_EXTERNAL},
+	{'y', UMODE_SPY},
+	{'z', UMODE_OPERWALL},
+	{0, 0},
+};
+
+umode_init user_smodes[] = {
 	{0, '0'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
-const int ircd_smodecount = 0;
-const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
 send_eob (const char *server)

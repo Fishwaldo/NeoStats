@@ -23,6 +23,12 @@
 #ifndef IRCD_H
 #define IRCD_H
 
+#define MODE_TABLE_SIZE	256
+
+#define NICKPARAM	0x00000001
+#define MODEPARAM	0x00000002
+#define MULTIPARAM	0x00000004
+
 typedef void (*ircd_cmd_handler) (char *origin, char **argv, int argc, int srv);
 
 typedef struct ircd_cmd{
@@ -32,23 +38,31 @@ typedef struct ircd_cmd{
 	int usage;
 }ircd_cmd;
 
+typedef struct cmode_init {
+	char modechar;
+	long mode;
+	unsigned flags;
+} cmode_init;
+
 typedef struct ChanModes {
 	long mode;
-	char flag;
-	unsigned nickparam:1;	/* 1 = yes 0 = no */
-	unsigned parameters:1;
+	unsigned flags;
 	char sjoin;
 } ChanModes;
 
-typedef struct ChanUserModes {
+typedef struct cumode_init {
+	char modechar;
 	long mode;
-	char flag;
 	char sjoin;
-} ChanUserModes;
+} cumode_init;
 
-typedef struct {
+typedef struct umode_init {
+	char modechar;
 	unsigned long umode;
-	char mode;
+} umode_init;
+
+typedef struct UserModes {
+	unsigned long umode;
 } UserModes;
 
 typedef struct ircd_server {
@@ -65,18 +79,20 @@ typedef struct ircd_server {
 	unsigned int features;
 } ircd_server;
 
-extern UserModes user_umodes[];
-extern UserModes user_smodes[];
+extern umode_init user_umodes[];
+extern umode_init user_smodes[];
 
 extern ircd_server ircd_srv;
 extern ircd_cmd cmd_list[];
-extern ChanModes chan_modes[];
-extern ChanUserModes chan_user_modes[];
+extern cmode_init chan_modes[];
+extern cumode_init chan_umodes[];
 extern const int ircd_cmdcount;
-extern const int ircd_umodecount;
-extern const int ircd_smodecount;
-extern const int ircd_cmodecount;
 extern long service_umode_mask;
+
+extern ChanModes ircd_cmodes[MODE_TABLE_SIZE];
+extern UserModes ircd_umodes[MODE_TABLE_SIZE];
+extern UserModes ircd_smodes[MODE_TABLE_SIZE];
+
 /* This is the minimum protocols that are required for the selected protocol
  * e.g. IRCu requires NOQUIT
  */

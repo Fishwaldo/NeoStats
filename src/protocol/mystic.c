@@ -91,74 +91,77 @@ ircd_cmd cmd_list[] = {
 	{MSG_PROTOCTL, TOK_PROTOCTL, m_protoctl, 0},
 };
 
-ChanModes chan_modes[] = {
-	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_HALFOP, 'h', 1, 0, '%'},
-	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_BAN, 'b', 0, 1, 0},
-	{CMODE_EXCEPT, 'e', 0, 1, 0},
-	{CMODE_FLOODLIMIT, 'f', 0, 1, 0},			/* Flood limiter */
-	{CMODE_INVITEONLY, 'i', 0, 0, 0},
-	{CMODE_KEY, 'k', 0, 1, 0},
-	{CMODE_LIMIT, 'l', 0, 1, 0},
-	{CMODE_MODERATED, 'm', 0, 0, 0},
-	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{CMODE_PRIVATE, 'p', 0, 0, 0},
-	{CMODE_RGSTR, 'r', 0, 0, 0},
-	{CMODE_SECRET, 's', 0, 0, 0},
-	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
-	{CMODE_NOCOLOR, 'x', 0, 0, 0},
-	{CMODE_ADMONLY, 'A', 0, 0, 0},
-	{CMODE_NOINVITE, 'I', 0, 0, 0},			/* no invites */
-	{CMODE_NOKNOCK, 'K', 0, 0, 0},			/* knock knock (no way!) */
-	{CMODE_LINK, 'L', 0, 1, 0},
-	{CMODE_OPERONLY, 'O', 0, 0, 0},
-	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
-	{CMODE_STRIP, 'S', 0, 0, 0},			/* works? */
-	{CMODE_STRIPBADWORDS, 'U', 0, 0, 0},
+cumode_init chan_umodes[] = {
+	{'o', CUMODE_CHANOP, '@'},
+	{'h', CUMODE_HALFOP, '%'},
+	{'v', CUMODE_VOICE, '+'},
+	{0, 0, 0},
 };
 
-UserModes user_umodes[] = {
-	{UMODE_SERVICES, 'S'},
-	{UMODE_SADMIN, 'P'},
-	{UMODE_TECHADMIN, 'T'},
-	{UMODE_NETADMIN, 'N'},
-	{UMODE_ADMIN, 'A'}, 
-	{UMODE_SERVICESOPER, 'a'},
-	{UMODE_IRCADMIN, 'Z'},
-	{UMODE_COADMIN, 'z'},
-	{UMODE_OPER, 'o'},
-	{UMODE_SUPER, 'p'},
-	{UMODE_LOCOP, 'O'},
-	{UMODE_REGNICK, 'r'},
-	{UMODE_INVISIBLE, 'i'},
-	{UMODE_WALLOP, 'w'},
-	{UMODE_FAILOP, 'g'},
-	{UMODE_HELPOP, 'h'},
-	{UMODE_SERVNOTICE, 's'},
-	{UMODE_KILLS, 'k'},
-	{UMODE_RBOT, 'B'},
-	{UMODE_SBOT, 'b'},
-	{UMODE_CLIENT, 'c'},
-	{UMODE_FLOOD, 'f'},
-	{UMODE_HIDE, 'x'},
-	{UMODE_WATCHER, 'W'},
-	{UMODE_CHATOP, 'C'},
-	{UMODE_NGLOBAL, 'G'},
-	{UMODE_WHOIS, 'm'},
-	{UMODE_NETINFO, 'n'},
-	{UMODE_MAGICK, 'M'},
-	{UMODE_NETMON, 'X'},
+cmode_init chan_modes[] = {
+	{'b', CMODE_BAN, MODEPARAM},
+	{'e', CMODE_EXCEPT, MODEPARAM},
+	{'f', CMODE_FLOODLIMIT, MODEPARAM},
+	{'i', CMODE_INVITEONLY, 0},
+	{'k', CMODE_KEY, MODEPARAM},
+	{'l', CMODE_LIMIT, MODEPARAM},
+	{'m', CMODE_MODERATED, 0},
+	{'n', CMODE_NOPRIVMSGS, 0},
+	{'p', CMODE_PRIVATE, 0},
+	{'r', CMODE_RGSTR, 0},
+	{'s', CMODE_SECRET, 0},
+	{'t', CMODE_TOPICLIMIT, 0},
+	{'x', CMODE_NOCOLOR, 0},
+	{'A', CMODE_ADMONLY, 0},
+	{'I', CMODE_NOINVITE, 0},
+	{'K', CMODE_NOKNOCK, 0},
+	{'L', CMODE_LINK, MODEPARAM},
+	{'O', CMODE_OPERONLY, 0},
+	{'R', CMODE_RGSTRONLY, 0},
+	{'S', CMODE_STRIP, 0},	
+	{'U', CMODE_STRIPBADWORDS, 0},
+	{0, 0, 0, 0, 0},
 };
 
-UserModes user_smodes[] = {
+umode_init user_umodes[] = {
+	{'S', UMODE_SERVICES},
+	{'P', UMODE_SADMIN},
+	{'T', UMODE_TECHADMIN},
+	{'N', UMODE_NETADMIN},
+	{'A', UMODE_ADMIN}, 
+	{'a', UMODE_SERVICESOPER},
+	{'Z', UMODE_IRCADMIN},
+	{'z', UMODE_COADMIN},
+	{'o', UMODE_OPER},
+	{'p', UMODE_SUPER},
+	{'O', UMODE_LOCOP},
+	{'r', UMODE_REGNICK},
+	{'i', UMODE_INVISIBLE},
+	{'w', UMODE_WALLOP},
+	{'g', UMODE_FAILOP},
+	{'h', UMODE_HELPOP},
+	{'s', UMODE_SERVNOTICE},
+	{'k', UMODE_KILLS},
+	{'B', UMODE_RBOT},
+	{'b', UMODE_SBOT},
+	{'c', UMODE_CLIENT},
+	{'f', UMODE_FLOOD},
+	{'x', UMODE_HIDE},
+	{'W', UMODE_WATCHER},
+	{'C', UMODE_CHATOP},
+	{'G', UMODE_NGLOBAL},
+	{'m', UMODE_WHOIS},
+	{'n', UMODE_NETINFO},
+	{'M', UMODE_MAGICK},
+	{'X', UMODE_NETMON},
+	{0, 0},
+};
+
+umode_init user_smodes[] = {
 	{0, '0'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
-const int ircd_smodecount = 0;
-const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)

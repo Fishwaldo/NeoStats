@@ -47,9 +47,7 @@ static void m_join (char *origin, char **argv, int argc, int srv);
 static void m_part (char *origin, char **argv, int argc, int srv);
 static void m_stats (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
-#ifdef UNREAL32
 static void m_eos (char *origin, char **argv, int argc, int srv);
-#endif
 static void m_ping (char *origin, char **argv, int argc, int srv);
 static void m_netinfo (char *origin, char **argv, int argc, int srv);
 static void m_sjoin (char *origin, char **argv, int argc, int srv);
@@ -103,96 +101,88 @@ ircd_cmd cmd_list[] = {
 	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_SMO, TOK_SMO, m_smo, 0},
-#ifdef UNREAL32
 	{MSG_EOS, TOK_EOS, m_eos, 0},
-#endif
 	{MSG_TKL, TOK_TKL, m_tkl, 0},
 };
 
-ChanModes chan_modes[] = {
-	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_HALFOP, 'h', 1, 0, '%'},
-	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_CHANPROT, 'a', 1, 0, '*'},
-	{CMODE_CHANOWNER, 'q', 1, 0, '~'},
-	{CMODE_LIMIT, 'l', 0, 1},
-	{CMODE_PRIVATE, 'p', 0, 0},
-	{CMODE_SECRET, 's', 0, 0},
-	{CMODE_MODERATED, 'm', 0, 0},
-	{CMODE_NOPRIVMSGS, 'n', 0, 0},
-	{CMODE_TOPICLIMIT, 't', 0, 0},
-	{CMODE_INVITEONLY, 'i', 0, 0},
-	{CMODE_KEY, 'k', 0, 1},
-	{CMODE_RGSTR, 'r', 0, 0},
-	{CMODE_RGSTRONLY, 'R', 0, 0},
-	{CMODE_NOCOLOR, 'c', 0, 0},
-	{CMODE_OPERONLY, 'O', 0, 0},
-	{CMODE_ADMONLY, 'A', 0, 0},
-	{CMODE_LINK, 'L', 0, 1},
-	{CMODE_NOKICKS, 'Q', 0, 0},
-	{CMODE_BAN, 'b', 0, 1},
-	{CMODE_STRIP, 'S', 0, 0},			/* works? */
-	{CMODE_EXCEPT, 'e', 0, 1},			/* exception ban */
-	{CMODE_NOKNOCK, 'K', 0, 0},			/* knock knock (no way!) */
-	{CMODE_NOINVITE, 'V', 0, 0},			/* no invites */
-	{CMODE_FLOODLIMIT, 'f', 0, 1},			/* flood limiter */
-	{CMODE_MODREG, 'M', 0, 0},			/* need umode +r to talk */
-	{CMODE_STRIPBADWORDS, 'G', 0, 0},			/* no badwords */
-	{CMODE_NOCTCP, 'C', 0, 0},			/* no CTCPs */
-	{CMODE_AUDITORIUM, 'u', 0, 0},
-	{CMODE_ONLYSECURE, 'z', 0, 0},
-	{CMODE_NONICKCHANGE, 'N', 0, 0},
+cumode_init chan_umodes[] = {
+	{'v', CUMODE_VOICE, '+'},
+	{'h', CUMODE_HALFOP, '%'},
+	{'o', CUMODE_CHANOP, '@'},
+	{'a', CUMODE_CHANPROT, '*'},
+	{'q', CUMODE_CHANOWNER, '~'},
+	{0, 0, 0},
 };
 
-UserModes user_umodes[] = {
-	{UMODE_SERVICES, 'S'},
-	{UMODE_NETADMIN, 'N'},
-	{UMODE_SADMIN, 'a'},
-	{UMODE_ADMIN, 'A'},
-	{UMODE_COADMIN, 'C'},
-	{UMODE_OPER, 'o'},
-	{UMODE_LOCOP, 'O'},
-	{UMODE_REGNICK, 'r'},
-	{UMODE_INVISIBLE, 'i'},
-	{UMODE_WALLOP, 'w'},
-	{UMODE_FAILOP, 'g'},
-	{UMODE_HELPOP, 'h'},
-	{UMODE_SERVNOTICE, 's'},
-	{UMODE_KIX, 'q'},
-	{UMODE_BOT, 'B'},
+cmode_init chan_modes[] = {
+	{'l', CMODE_LIMIT, MODEPARAM},
+	{'p', CMODE_PRIVATE, 0},
+	{'s', CMODE_SECRET, 0},
+	{'m', CMODE_MODERATED, 0},
+	{'n', CMODE_NOPRIVMSGS, 0},
+	{'t', CMODE_TOPICLIMIT, 0},
+	{'i', CMODE_INVITEONLY, 0},
+	{'k', CMODE_KEY, MODEPARAM},
+	{'r', CMODE_RGSTR, 0},
+	{'R', CMODE_RGSTRONLY, 0},
+	{'c', CMODE_NOCOLOR, 0},
+	{'O', CMODE_OPERONLY, 0},
+	{'A', CMODE_ADMONLY, 0},
+	{'L', CMODE_LINK, MODEPARAM},
+	{'Q', CMODE_NOKICKS, 0},
+	{'b', CMODE_BAN, MODEPARAM},
+	{'S', CMODE_STRIP, 0},
+	{'e', CMODE_EXCEPT, MODEPARAM},
+	{'K', CMODE_NOKNOCK, 0},
+	{'V', CMODE_NOINVITE, 0},
+	{'f', CMODE_FLOODLIMIT, MODEPARAM},
+	{'M', CMODE_MODREG, 0},
+	{'G', CMODE_STRIPBADWORDS, 0},
+	{'C', CMODE_NOCTCP, 0},
+	{'u', CMODE_AUDITORIUM, 0},
+	{'z', CMODE_ONLYSECURE, 0},
+	{'N', CMODE_NONICKCHANGE, 0},
+	{0, 0},
+};
+
+umode_init user_umodes[] = {
+	{'S', UMODE_SERVICES},
+	{'N', UMODE_NETADMIN},
+	{'a', UMODE_SADMIN},
+	{'A', UMODE_ADMIN},
+	{'C', UMODE_COADMIN},
+	{'o', UMODE_OPER},
+	{'O', UMODE_LOCOP},
+	{'r', UMODE_REGNICK},
+	{'i', UMODE_INVISIBLE},
+	{'w', UMODE_WALLOP},
+	{'g', UMODE_FAILOP},
+	{'h', UMODE_HELPOP},
+	{'s', UMODE_SERVNOTICE},
+	{'q', UMODE_KIX},
+	{'B', UMODE_BOT},
 /* temp removal of deaf for SVSMODE Services Stamp */
-/* 	{UMODE_DEAF, 'd'},*/
-#ifdef UNREAL32
-	{UMODE_RGSTRONLY, 'R'},
- 	{UMODE_NOCTCP, 'T'},
-	{UMODE_WEBTV, 'V'},
-	{UMODE_HIDEWHOIS, 'p'},
-	{UMODE_HIDEOPER, 'H'},
-#else 
-	{UMODE_KILLS, 'k'},
-	{UMODE_EYES, 'e'},
-	{UMODE_FCLIENT, 'F'},
-	{UMODE_CLIENT, 'c'},
-	{UMODE_FLOOD, 'f'},
-	{UMODE_JUNK, 'j'},
-#endif
-	{UMODE_STRIPBADWORDS, 'G'},
-	{UMODE_SETHOST, 't'},
-	{UMODE_HIDE, 'x'},
-	/*{UMODE_CHATOP, 'b'},*/
-	{UMODE_WHOIS, 'W'},
-	{UMODE_SECURE, 'z'},
-	{UMODE_VICTIM, 'v'},	
+/* 	{'d', UMODE_DEAF},*/
+	{'R', UMODE_RGSTRONLY},
+ 	{'T', UMODE_NOCTCP},
+	{'V', UMODE_WEBTV},
+	{'p', UMODE_HIDEWHOIS},
+	{'H', UMODE_HIDEOPER},
+	{'G', UMODE_STRIPBADWORDS},
+	{'t', UMODE_SETHOST},
+	{'x', UMODE_HIDE},
+	/*{'b', UMODE_CHATOP},*/
+	{'W', UMODE_WHOIS},
+	{'z', UMODE_SECURE},
+	{'v', UMODE_VICTIM},	
+	{0, 0},
 };
 
-UserModes user_smodes[] = {
+umode_init user_smodes[] = {
 	{0, '0'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
-const int ircd_smodecount = 0;
-const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
@@ -695,7 +685,6 @@ m_netinfo (char *origin, char **argv, int argc, int srv)
 	do_netinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
 }
 
-#ifdef UNREAL32
 /*  EOS
  *  :servername EOS
  */
@@ -704,7 +693,6 @@ m_eos (char *origin, char **argv, int argc, int srv)
 {
 	do_eos (origin);
 }
-#endif
     
 /* m_sjoin  
  *  argv[0] = channel timestamp

@@ -121,155 +121,156 @@ ircd_cmd cmd_list[] = {
 	{MSG_PROTOCTL,  0,  m_protoctl,  0},
 };
 
-ChanModes chan_modes[] = {
-	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_HALFOP, 'h', 1, 0, '%'},
-	{CMODE_CHANADMIN, 'a', 1, 0, '!'},
-	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_BAN, 'b', 0, 1, 0},
-	{CMODE_EXCEPT, 'e', 0, 1, 0},
-	{CMODE_FLOODLIMIT, 'f', 0, 1, 0},			/* Flood limiter */
-	{CMODE_INVITEONLY, 'i', 0, 0, 0},
-	{CMODE_KEY, 'k', 0, 1, 0},
-	{CMODE_LIMIT, 'l', 0, 1, 0},
-	{CMODE_MODERATED, 'm', 0, 0, 0},
-	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{CMODE_PRIVATE, 'p', 0, 0, 0},
-	{CMODE_RGSTR, 'r', 0, 0, 0},
-	{CMODE_SECRET, 's', 0, 0, 0},
-	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
-	{CMODE_NOCOLOR, 'x', 0, 0, 0},
-	{CMODE_ADMONLY, 'A', 0, 0, 0},
-	{CMODE_NOINVITE, 'I', 0, 0, 0},			/* no invites */
-	{CMODE_NOKNOCK, 'K', 0, 0, 0},			/* knock knock (no way!) */
-	{CMODE_LINK, 'L', 0, 1, 0},
-	{CMODE_OPERONLY, 'O', 0, 0, 0},
-	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
-	{CMODE_STRIP, 'S', 0, 0, 0},			/* works? */
+cumode_init chan_umodes[] = {
+	{'o', CUMODE_CHANOP, '@'},
+	{'h', CUMODE_HALFOP, '%'},
+	{'a', CUMODE_CHANADMIN, '!'},
+	{'v', CUMODE_VOICE, '+'},
+	{0, 0, 0},
+};
+
+cmode_init chan_modes[] = {
+	{'b', CMODE_BAN, MODEPARAM},
+	{'e', CMODE_EXCEPT, MODEPARAM},
+	{'f', CMODE_FLOODLIMIT, MODEPARAM},
+	{'i', CMODE_INVITEONLY, 0},
+	{'k', CMODE_KEY, MODEPARAM},
+	{'l', CMODE_LIMIT, MODEPARAM},
+	{'m', CMODE_MODERATED, 0},
+	{'n', CMODE_NOPRIVMSGS, 0},
+	{'p', CMODE_PRIVATE, 0},
+	{'r', CMODE_RGSTR, 0},
+	{'s', CMODE_SECRET, 0},
+	{'t', CMODE_TOPICLIMIT, 0},
+	{'x', CMODE_NOCOLOR, 0},
+	{'A', CMODE_ADMONLY, 0},
+	{'I', CMODE_NOINVITE, 0},
+	{'K', CMODE_NOKNOCK, 0},
+	{'L', CMODE_LINK, MODEPARAM},
+	{'O', CMODE_OPERONLY, 0},
+	{'R', CMODE_RGSTRONLY, 0},
+	{'S', CMODE_STRIP, 0},	
+	{0, 0, 0},
 };
 
 #ifdef ULTIMATE3
-UserModes user_umodes[] = {
-	{UMODE_SRA, 'Z'},
-	{UMODE_SERVICES, 'S'},
-	{UMODE_SADMIN, 'P'},
-	{UMODE_SERVICESOPER, 'a'},
-	{UMODE_OPER, 'o'},
-	{UMODE_LOCOP, 'O'},
-	{UMODE_REGNICK, 'r'},
-	{UMODE_INVISIBLE, 'i'},
-	{UMODE_WALLOP, 'w'},
-	{UMODE_SERVNOTICE, 's'},
-	{UMODE_CLIENT, 'c'},
-	{UMODE_KILLS, 'k'},
-	{UMODE_HELPOP, 'h'},
-	{UMODE_FLOOD, 'f'},
-	{UMODE_SPY, 'y'},
-	{UMODE_DCC, 'D'},
-	{UMODE_GLOBOPS, 'g'},
-	{UMODE_CHATOPS, 'c'},
-	{UMODE_REJ, 'j'},
-	{UMODE_ROUTE, 'n'},
-	{UMODE_SPAM, 'm'},
-	{UMODE_HIDE, 'x'},
-	{UMODE_KIX, 'p'},
-	{UMODE_FCLIENT, 'F'},
+umode_init user_umodes[] = {
+	{'Z', UMODE_SRA},
+	{'S', UMODE_SERVICES},
+	{'P', UMODE_SADMIN},
+	{'a', UMODE_SERVICESOPER},
+	{'o', UMODE_OPER},
+	{'O', UMODE_LOCOP},
+	{'r', UMODE_REGNICK},
+	{'i', UMODE_INVISIBLE},
+	{'w', UMODE_WALLOP},
+	{'s', UMODE_SERVNOTICE},
+	{'c', UMODE_CLIENT},
+	{'k', UMODE_KILLS},
+	{'h', UMODE_HELPOP},
+	{'f', UMODE_FLOOD},
+	{'y', UMODE_SPY},
+	{'D', UMODE_DCC},
+	{'g', UMODE_GLOBOPS},
+	{'c', UMODE_CHATOPS},
+	{'j', UMODE_REJ},
+	{'n', UMODE_ROUTE},
+	{'m', UMODE_SPAM},
+	{'x', UMODE_HIDE},
+	{'p', UMODE_KIX},
+	{'F', UMODE_FCLIENT},
 #if 0
 	/* useless modes, ignore them as services use these modes for services ID */
-	{UMODE_DEBUG, 'd'},
+	{'d', UMODE_DEBUG},
 #endif
-	{UMODE_DCCWARN, 'e'},
-	{UMODE_WHOIS, 'W'},
+	{'e', UMODE_DCCWARN},
+	{'W', UMODE_WHOIS},
+	{0, 0},
 };
 
-UserModes user_smodes[] = {
-	{SMODE_NETADMIN, 'N'},
-	{SMODE_CONET, 'n'},
-	{SMODE_TECHADMIN, 'T'},
-	{SMODE_COTECH, 't'},
-	{SMODE_SERVADMIN, 'A'},
-	{SMODE_GUEST, 'G'},
-	{SMODE_COADMIN, 'a'},
-	{SMODE_SSL, 's'},
+umode_init user_smodes[] = {
+	{'N', SMODE_NETADMIN},
+	{'n', SMODE_CONET},
+	{'T', SMODE_TECHADMIN},
+	{'t', SMODE_COTECH},
+	{'A', SMODE_SERVADMIN},
+	{'G', SMODE_GUEST},
+	{'a', SMODE_COADMIN},
+	{'s', SMODE_SSL},
+	{0, 0},
 };
 
 #else
-UserModes user_umodes[] = {
-	{UMODE_SERVICES, 'S'},
-	{UMODE_SADMIN, 'P'},
-	{UMODE_TECHADMIN, 'T'},
-	{UMODE_NETADMIN, 'N'},
-	{UMODE_SERVICESOPER, 'a'},
-	{UMODE_IRCADMIN, 'Z'},
-	{UMODE_ADMIN, 'z'},
-	{UMODE_OPER, 'o'},
-	{UMODE_SUPER, 'p'},
-	{UMODE_LOCOP, 'O'},
-	{UMODE_REGNICK, 'r'},
-	{UMODE_INVISIBLE, 'i'},
-	{UMODE_WALLOP, 'w'},
-	{UMODE_FAILOP, 'g'},
-	{UMODE_HELPOP, 'h'},
-	{UMODE_SERVNOTICE, 's'},
-	{UMODE_KILLS, 'k'},
-	{UMODE_RBOT, 'B'},
-	{UMODE_SBOT, 'b'},
-	{UMODE_CLIENT, 'c'},
-	{UMODE_FLOOD, 'f'},
-	{UMODE_HIDE, 'x'},
-	{UMODE_WATCHER, 'W'},
+umode_init user_umodes[] = {
+	{'S', UMODE_SERVICES},
+	{'P', UMODE_SADMIN},
+	{'T', UMODE_TECHADMIN},
+	{'N', UMODE_NETADMIN},
+	{'a', UMODE_SERVICESOPER},
+	{'Z', UMODE_IRCADMIN},
+	{'z', UMODE_ADMIN},
+	{'o', UMODE_OPER},
+	{'p', UMODE_SUPER},
+	{'O', UMODE_LOCOP},
+	{'r', UMODE_REGNICK},
+	{'i', UMODE_INVISIBLE},
+	{'w', UMODE_WALLOP},
+	{'g', UMODE_FAILOP},
+	{'h', UMODE_HELPOP},
+	{'s', UMODE_SERVNOTICE},
+	{'k', UMODE_KILLS},
+	{'B', UMODE_RBOT},
+	{'b', UMODE_SBOT},
+	{'c', UMODE_CLIENT},
+	{'f', UMODE_FLOOD},
+	{'x', UMODE_HIDE},
+	{'W', UMODE_WATCHER},
+	{0, 0},
 };
-UserModes user_smodes[] = {
+umode_init user_smodes[] = {
 	{0, '0'},
 };
 #endif
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
-#ifdef ULTIMATE3
-const int ircd_smodecount = ((sizeof (user_smodes) / sizeof (user_smodes[0])));
-#else
-const int ircd_smodecount = 0;
-#endif
-const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)
 {
-	send_cmd (":%s %s %s %d :%s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	send_cmd (":%s %s %s %d :%s", sender, MSG_SERVER, name, numeric, infoline);
 }
 
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
 #ifdef ULTIMATE3
-	send_cmd ("%s %s :TS", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PASS : MSG_PASS), pass);
+	send_cmd ("%s %s :TS", MSG_PASS, pass);
 	send_cmd ("CAPAB TS5 BURST SSJ5 NICKIP CLIENT");
-	send_cmd ("%s %s %d :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
+	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 #else
-	send_cmd ("%s %s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PASS : MSG_PASS), pass);
-	send_cmd ("%s %s %d :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SERVER : MSG_SERVER), name, numeric, infoline);
-/*	send_cmd ("%s TOKEN CLIENT", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PROTOCTL : MSG_PROTOCTL));*/
-	send_cmd ("%s CLIENT", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PROTOCTL : MSG_PROTOCTL));
+	send_cmd ("%s %s", MSG_PASS, pass);
+	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
+/*	send_cmd ("%s TOKEN CLIENT", MSG_PROTOCTL);*/
+	send_cmd ("%s CLIENT", MSG_PROTOCTL);
 #endif
 }
 
 void
 send_squit (const char *server, const char *quitmsg)
 {
-	send_cmd ("%s %s :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SQUIT : MSG_SQUIT), server, quitmsg);
+	send_cmd ("%s %s :%s", MSG_SQUIT, server, quitmsg);
 }
 
 void 
 send_quit (const char *who, const char *quitmsg)
 {
-	send_cmd (":%s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_QUIT : MSG_QUIT), quitmsg);
+	send_cmd (":%s %s :%s", who, MSG_QUIT, quitmsg);
 }
 
 void 
 send_part (const char *who, const char *chan)
 {
-	send_cmd (":%s %s %s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PART : MSG_PART), chan);
+	send_cmd (":%s %s %s", who, MSG_PART, chan);
 }
 
 void 
@@ -296,7 +297,7 @@ void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
 #ifdef ULTIMATE3
-	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), nick, ts, newmode, ident, host, server, ts, realname);
+	send_cmd ("%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, ts, newmode, ident, host, server, ts, realname);
 #else
 	send_cmd ("%s %s 1 %lu %s %s %s 0 :%s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NICK : MSG_NICK), nick, ts, ident, host, server, realname);
 	send_umode (nick, nick, newmode);
@@ -306,7 +307,7 @@ send_nick (const char *nick, const unsigned long ts, const char* newmode, const 
 void
 send_ping (const char *from, const char *reply, const char *to)
 {
-	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PING : MSG_PING), reply, to);
+	send_cmd (":%s %s %s :%s", from, MSG_PING, reply, to);
 }
 
 void 
@@ -324,7 +325,7 @@ send_numeric (const char *from, const int numeric, const char *target, const cha
 void
 send_pong (const char *reply)
 {
-	send_cmd ("%s %s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PONG : MSG_PONG), reply);
+	send_cmd ("%s %s", MSG_PONG, reply);
 }
 
 void
@@ -348,7 +349,7 @@ send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, c
 void 
 send_kill (const char *from, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_KILL : MSG_KILL), target, reason);
+	send_cmd (":%s %s %s :%s", from, MSG_KILL, target, reason);
 }
 
 void 
@@ -366,54 +367,54 @@ send_nickchange (const char *oldnick, const char *newnick, const unsigned long t
 void 
 send_svsnick (const char *sender, const char *target, const char *newnick, const unsigned long ts)
 {
-	send_cmd ("%s %s %s :%lu", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, ts);
+	send_cmd ("%s %s %s :%lu", MSG_SVSNICK, target, newnick, ts);
 }
 
 void
 send_svsjoin (const char *sender, const char *target, const char *chan)
 {
-	send_cmd ("%s %s %s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SVSJOIN : MSG_SVSJOIN), target, chan);
+	send_cmd ("%s %s %s", MSG_SVSJOIN, target, chan);
 }
 
 void
 send_svspart (const char *sender, const char *target, const char *chan)
 {
-	send_cmd ("%s %s %s", ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SVSPART : MSG_SVSPART), target, chan);
+	send_cmd ("%s %s %s", MSG_SVSPART, target, chan);
 }
 
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd (":%s %s %s %s :%s", who, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
 }
 
 void 
 send_wallops (const char *who, const char *buf)
 {
-	send_cmd (":%s %s :%s", who, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_WALLOPS : MSG_WALLOPS), buf);
+	send_cmd (":%s %s :%s", who, MSG_WALLOPS, buf);
 }
 
 void
 send_svshost (const char *sender, const char *who, const char *vhost)
 {
 #ifdef ULTIMATE3
-	send_cmd (":%s %s %s %s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_SETHOST : MSG_SETHOST), who, vhost);
+	send_cmd (":%s %s %s %s", sender, MSG_SETHOST, who, vhost);
 #elif ULTIMATE
-	send_cmd (":%s %s %s %s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
+	send_cmd (":%s %s %s %s", sender, MSG_CHGHOST, who, vhost);
 #endif
 }
 
 void
 send_invite (const char *from, const char *to, const char *chan) 
 {
-	send_cmd (":%s %s %s %s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_INVITE : MSG_INVITE), to, chan);
+	send_cmd (":%s %s %s %s", from, MSG_INVITE, to, chan);
 }
 
 void 
 send_akill (const char *sender, const char *host, const char *ident, const char *setby, const int length, const char *reason, const unsigned long ts)
 {
 #ifdef ULTIMATE3
-	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_AKILL : MSG_AKILL), host, ident, length, setby, ts, reason);
+	send_cmd (":%s %s %s %s %d %s %lu :%s", sender, MSG_AKILL, host, ident, length, setby, ts, reason);
 #elif ULTIMATE
 	send_cmd (":%s %s %s@%s %lu %lu %s :%s", sender, MSG_GLINE, ident, host, (ts + length), ts, setby, reason);
 #endif
@@ -423,7 +424,7 @@ void
 send_rakill (const char *sender, const char *host, const char *ident)
 {
 #ifdef ULTIMATE3
-	send_cmd (":%s %s %s %s", sender, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_RAKILL : MSG_RAKILL), host, ident);
+	send_cmd (":%s %s %s %s", sender, MSG_RAKILL, host, ident);
 #elif ULTIMATE
 	/* ultimate2 needs an oper to remove */
 	send_cmd (":%s %s :%s@%s", ns_botptr->nick, MSG_REMGLINE, host, ident);
@@ -449,19 +450,19 @@ send_burst (int b)
 void
 send_privmsg (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_PRIVATE : MSG_PRIVATE), to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_PRIVATE, to, buf);
 }
 
 void
 send_notice (const char *from, const char *to, const char *buf)
 {
-	send_cmd (":%s %s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_NOTICE : MSG_NOTICE), to, buf);
+	send_cmd (":%s %s %s :%s", from, MSG_NOTICE, to, buf);
 }
 
 void
 send_globops (const char *from, const char *buf)
 {
-	send_cmd (":%s %s :%s", from, ((ircd_srv.protocol & PROTOCOL_TOKEN) ? TOK_GLOBOPS : MSG_GLOBOPS), buf);
+	send_cmd (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
 
 void 

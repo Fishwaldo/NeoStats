@@ -45,6 +45,64 @@ static char UmodeStringBuf[64];
 static char SmodeStringBuf[64];
 long service_umode_mask= 0;
 
+ChanModes ircd_cmodes[MODE_TABLE_SIZE];
+UserModes ircd_umodes[MODE_TABLE_SIZE];
+UserModes ircd_smodes[MODE_TABLE_SIZE];
+
+/** @brief InitIrcdModes
+ *
+ *  Build internal mode tables by translating the protocol information
+ *  into a faster indexed lookup table
+ *
+ * @return 
+ */
+static void
+InitIrcdModes (void)
+{
+	cmode_init* cmodes;
+	cumode_init* cumodes;
+	umode_init* umodes;
+	umode_init* smodes;
+
+	/* build cmode lookup table */
+	memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
+	cmodes = chan_modes;
+	while(cmodes->modechar) 
+	{
+		dlog(DEBUG4, "Adding channel mode %c", cmodes->modechar);
+		ircd_cmodes[cmodes->modechar].mode = cmodes->mode;
+		ircd_cmodes[cmodes->modechar].flags = cmodes->flags;
+		cmodes ++;
+	}
+	cumodes = chan_umodes;
+	while(cumodes->modechar) 
+	{
+		dlog(DEBUG4, "Adding channel user mode %c", cumodes->modechar);
+		ircd_cmodes[cumodes->modechar].mode = cumodes->mode;
+		ircd_cmodes[cumodes->modechar].sjoin = cumodes->sjoin;
+		ircd_cmodes[cmodes->modechar].flags = NICKPARAM;
+		cumodes ++;
+	}
+	/* build umode lookup table */
+	memset(&ircd_umodes, 0, sizeof(ircd_umodes));
+	umodes = user_umodes;
+	while(umodes->modechar) 
+	{
+		dlog(DEBUG4, "Adding user mode %c", umodes->modechar);
+		ircd_umodes[umodes->modechar].umode = umodes->umode;
+		umodes ++;
+	}
+	/* build smode lookup table */
+	memset(&ircd_smodes, 0, sizeof(ircd_smodes));
+	smodes = user_smodes;
+	while(umodes->modechar) 
+	{
+		dlog(DEBUG4, "Adding user smode %c", smodes->modechar);
+		ircd_smodes[smodes->modechar].umode = smodes->umode;
+		smodes ++;
+	}
+};
+
 /** @brief InitIrcd
  *
  *  ircd initialisation
@@ -58,9 +116,11 @@ InitIrcd ()
 	memset(&ircd_srv, 0, sizeof(ircd_srv));
 	/* set min protocol */
 	ircd_srv.protocol = ircd_minprotocol;
+	/* Build mode tables */
+	InitIrcdModes();
 	/* preset our umode mask so we do not have to calculate in real time */
 	service_umode_mask = UmodeStringToMask(me.servicesumode, 0);
-};
+}
 
 /** @brief UmodeMaskToString
  *
@@ -75,9 +135,9 @@ UmodeMaskToString(const long Umode)
 
 	UmodeStringBuf[0] = '+';
 	j = 1;
-	for (i = 0; i < ircd_umodecount; i++) {
-		if (Umode & user_umodes[i].umode) {
-			UmodeStringBuf[j] = user_umodes[i].mode;
+	for (i = 0; i < MODE_TABLE_SIZE; i++) {
+		if (Umode & ircd_umodes[i].umode) {
+			UmodeStringBuf[j] = i;
 			j++;
 		}
 	}
@@ -109,16 +169,12 @@ UmodeStringToMask(const char* UmodeString, long Umode)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ircd_umodecount; i++) {
-				if (user_umodes[i].mode == *tmpmode) {
-					if (add) {
-						Umode |= user_umodes[i].umode;
-						break;
-					} else {
-						Umode &= ~user_umodes[i].umode;
-						break;
-					}
-				}
+			if (add) {
+				Umode |= ircd_umodes[*tmpmode].umode;
+				break;
+			} else {
+				Umode &= ~ircd_umodes[*tmpmode].umode;
+				break;
 			}
 		}
 		tmpmode++;
@@ -139,9 +195,9 @@ SmodeMaskToString(const long Smode)
 
 	SmodeStringBuf[0] = '+';
 	j = 1;
-	for (i = 0; i < ircd_smodecount; i++) {
-		if (Smode & user_smodes[i].umode) {
-			SmodeStringBuf[j] = user_smodes[i].mode;
+	for (i = 0; i < MODE_TABLE_SIZE; i++) {
+		if (Smode & ircd_smodes[i].umode) {
+			SmodeStringBuf[j] = i;
 			j++;
 		}
 	}
@@ -173,16 +229,12 @@ SmodeStringToMask(const char* SmodeString, long Smode)
 			add = 0;
 			break;
 		default:
-			for (i = 0; i < ircd_smodecount; i++) {
-				if (user_smodes[i].mode == *tmpmode) {
-					if (add) {
-						Smode |= user_smodes[i].umode;
-						break;
-					} else {
-						Smode &= ~user_smodes[i].umode;
-						break;
-					}
-				}
+			if (add) {
+				Smode |= ircd_smodes[*tmpmode].umode;
+				break;
+			} else {
+				Smode &= ~ircd_smodes[*tmpmode].umode;
+				break;
 			}
 		}
 		tmpmode++;
@@ -196,20 +248,6 @@ SmodeStringToMask(const char* SmodeString, long Smode)
  *
  * @return NS_SUCCESS if suceeds, NS_FAILURE if not 
  */
-static char get_sjoin_char(const char* mode)
-{
-	char c = 0;
-	int i;
-
-	for (i = 0; i < ircd_cmodecount; i++) {
-		if (chan_modes[i].sjoin == 0 || mode[1] == chan_modes[i].flag) {
-			c = chan_modes[i].sjoin;
-			break;
-		}
-	}
-	return(c);
-}
-
 int 
 join_bot_to_chan (const char *who, const char *chan, const char *mode)
 {
@@ -222,7 +260,7 @@ join_bot_to_chan (const char *who, const char *chan, const char *mode)
 		if (mode == NULL) {
 			send_sjoin (me.name, who, chan, (unsigned long)ts);
 		} else {
-			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", get_sjoin_char(mode), who);
+			ircsnprintf (ircd_buf, BUFSIZE, "%c%s", ircd_cmodes[mode[1]].sjoin, who);
 			send_sjoin (me.name, ircd_buf, chan, (unsigned long)ts);
 		}
 		join_chan (who, chan);
@@ -1213,7 +1251,7 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		   
 	while (paramcnt > paramidx) {
 		nicklist = param[paramidx];
-#ifdef UNREAL
+#if ( defined UNREAL31 ) || (defined UNREAL32 )
 		/* Unreal passes +b(&) and +e(") via SJ3 so skip them for now */	
 		if(*nicklist == '&' || *nicklist == '"') {
 			dlog(DEBUG1, "Skipping %s", nicklist);
@@ -1222,22 +1260,16 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		}
 #endif
 		mode = 0;
-		while (ok == 1) {
-			for (i = 0; i < ircd_cmodecount; i++) {
-				if (chan_modes[i].sjoin != 0) {
-					if (*nicklist == chan_modes[i].sjoin) {
-						mode |= chan_modes[i].mode;
-						nicklist++;
-						i = -1;
-					}
-				} else {
-					/* sjoin's should be at the top of the list */
-					ok = 0;
-					strlcpy (nick, nicklist, MAXNICK);
-					break;
+		for (i = 0; i < MODE_TABLE_SIZE; i++) {
+			if (ircd_cmodes[i].sjoin != 0) {
+				if (*nicklist == ircd_cmodes[i].sjoin) {
+					mode |= ircd_cmodes[i].mode;
+					nicklist++;
+					i = -1;
 				}
 			}
 		}
+		strlcpy (nick, nicklist, MAXNICK);
 		join_chan (nick, channame); 
 		ChanUserMode (channame, nick, 1, mode);
 		paramidx++;
@@ -1249,49 +1281,41 @@ do_sjoin (char* tstime, char* channame, char *modes, char *sjoinnick, char **arg
 		SetChanTS (c, atoi (tstime)); 
 		if (*modes == '+') {
 			while (*modes) {
-				for (i = 0; i < ircd_cmodecount; i++) {
-					if (*modes == chan_modes[i].flag) {
-						if (chan_modes[i].parameters) {
-							mn = list_first (c->modeparms);
-							modeexists = 0;
-							while (mn) {
-								m = lnode_get (mn);
-								/* mode limit and mode key replace current values */
-								if ((m->mode == CMODE_LIMIT) && (chan_modes[i].mode == CMODE_LIMIT)) {
-									strlcpy (m->param, argv[j], PARAMSIZE);
-									j++;
-									modeexists = 1;
-									break;
-								} else if ((m->mode == CMODE_KEY) && (chan_modes[i].mode == CMODE_KEY)) {
-									strlcpy (m->param, argv[j], PARAMSIZE);
-									j++;
-									modeexists = 1;
-									break;
-								} else if (((int *) m->mode == (int *) chan_modes[i].mode) && !ircstrcasecmp (m->param, argv[j])) {
-									dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", chan_modes[i].flag, argv[j]);
-									j++;
-									modeexists = 1;
-									break;
-								}
-								mn = list_next (c->modeparms, mn);
-							}
-							if (modeexists != 1) {
-								m = smalloc (sizeof (ModesParm));
-								m->mode = chan_modes[i].mode;
-								strlcpy (m->param, argv[j], PARAMSIZE);
-								mn = lnode_create (m);
-								if (list_isfull (c->modeparms)) {
-									nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
-									do_exit (NS_EXIT_ERROR, "List full - see log file");
-								} else {
-									list_append (c->modeparms, mn);
-								}
-								j++;
-							}
-						} else {
-							c->modes |= chan_modes[i].mode;
+				/* mode limit and mode key replace current values */
+				if (ircd_cmodes[*modes].mode == CMODE_LIMIT) {
+					c->limit = atoi(argv[j]);
+					j++;
+				} else if (ircd_cmodes[*modes].mode == CMODE_KEY) {
+					strlcpy (c->key, argv[j], KEYLEN);
+					j++;
+				} else if (ircd_cmodes[*modes].flags) {
+					mn = list_first (c->modeparms);
+					modeexists = 0;
+					while (mn) {
+						m = lnode_get (mn);
+						if (((int *) m->mode == (int *) ircd_cmodes[*modes].mode) && !ircstrcasecmp (m->param, argv[j])) {
+							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, argv[j]);
+							j++;
+							modeexists = 1;
+							break;
 						}
+						mn = list_next (c->modeparms, mn);
 					}
+					if (modeexists != 1) {
+						m = smalloc (sizeof (ModesParm));
+						m->mode = ircd_cmodes[*modes].mode;
+						strlcpy (m->param, argv[j], PARAMSIZE);
+						mn = lnode_create (m);
+						if (list_isfull (c->modeparms)) {
+							nlog (LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name);
+							do_exit (NS_EXIT_ERROR, "List full - see log file");
+						} else {
+							list_append (c->modeparms, mn);
+						}
+						j++;
+					}
+				} else {
+					c->modes |= ircd_cmodes[*modes].mode;
 				}
 				modes++;
 			}

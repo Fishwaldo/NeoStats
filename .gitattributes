@@ -351,6 +351,8 @@ src/protocol/ultimate.c eol=lf
 src/protocol/ultimate.h eol=lf
 src/protocol/unreal.c eol=lf
 src/protocol/unreal.h eol=lf
+src/protocol/unreal31.c eol=lf
+src/protocol/unreal31.h eol=lf
 src/protocol/viagra.c -text
 src/protocol/viagra.h -text
 src/servers.c eol=lf

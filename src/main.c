@@ -273,12 +273,12 @@ get_options (int argc, char **argv)
 			config.recvlog = 1;
 			break;
 		case 'd':
-			printf ("debug.log enabled. Watch your disk space\n");
 			level = atoi (optarg);
 			if ((level >= DEBUGMAX) || (level < 1)) {
 				printf ("Invalid debug level %d\n", level);
 				return NS_FAILURE;
 			}
+			printf ("debug.log enabled at level %d. Watch your disk space\n", level);
 			config.debuglevel = level;
 			break;
 		case 'n':

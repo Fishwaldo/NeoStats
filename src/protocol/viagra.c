@@ -88,51 +88,53 @@ ircd_cmd cmd_list[] = {
 	{MSG_SVSNICK, 0, m_svsnick, 0},
 };
 
-ChanModes chan_modes[] = {
-	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_HALFOP, 'h', 1, 0, '%'},
-	{CMODE_CHANADMIN, 'a', 1, 0, '*'},
-	{CMODE_CHANOWNER, 'q', 1, 0, '!'},
-	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_BAN, 'b', 0, 1, 0},
-	{CMODE_INVITEONLY, 'i', 0, 0, 0},
-	{CMODE_KEY, 'k', 0, 1, 0},
-	{CMODE_LIMIT, 'l', 0, 1, 0},
-	{CMODE_MODERATED, 'm', 0, 0, 0},
-	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{CMODE_PRIVATE, 'p', 0, 0, 0},
-	{CMODE_RGSTR, 'r', 0, 0, 0},
-	{CMODE_SECRET, 's', 0, 0, 0},
-	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
-	{CMODE_NOCOLOR, 'x', 0, 0, 0},
-	{CMODE_OPERONLY, 'O', 0, 0, 0},
-	{CMODE_RGSTRONLY, 'R', 0, 0, 0},
+cumode_init chan_umodes[] = {
+	{'o', CUMODE_CHANOP, '@'},
+	{'h', CUMODE_HALFOP, '%'},
+	{'a', CUMODE_CHANADMIN, '*'},
+	{'q', CUMODE_CHANOWNER, '!'},
+	{'v', CUMODE_VOICE, '+'},
+	{0, 0, 0},
 };
 
-UserModes user_umodes[] = {
-	{UMODE_SADMIN, 'a'},
-	{UMODE_ADMIN, 'A'},
-	{UMODE_OPER, 'o'},
-	{UMODE_REGNICK, 'r'},
-	{UMODE_INVISIBLE, 'i'},
-	{UMODE_REGONLY, 'R'},
-	{UMODE_HIDE, 'x'},
-	{UMODE_WALLOP, 'w'},
-	{UMODE_CLIENT, 'c'},
-	{UMODE_HELPOP, 'h'},
-	{UMODE_GLOBCON, 'e'},
-	{UMODE_WHOIS, 'W'},
-
+cmode_init chan_modes[] = {
+	{'b', CMODE_BAN, MODEPARAM},
+	{'i', CMODE_INVITEONLY, 0},
+	{'k', CMODE_KEY, MODEPARAM},
+	{'l', CMODE_LIMIT, MODEPARAM},
+	{'m', CMODE_MODERATED, 0},
+	{'n', CMODE_NOPRIVMSGS, 0},
+	{'p', CMODE_PRIVATE, 0},
+	{'r', CMODE_RGSTR, 0},
+	{'s', CMODE_SECRET, 0},
+	{'t', CMODE_TOPICLIMIT, 0},
+	{'x', CMODE_NOCOLOR, 0},
+	{'O', CMODE_OPERONLY, 0},
+	{'R', CMODE_RGSTRONLY, 0},
+	{0, 0, 0},
 };
 
-UserModes user_smodes[] = {
+umode_init user_umodes[] = {
+	{'a', UMODE_SADMIN},
+	{'A', UMODE_ADMIN},
+	{'o', UMODE_OPER},
+	{'r', UMODE_REGNICK},
+	{'i', UMODE_INVISIBLE},
+	{'R', UMODE_RGSTRONLY},
+	{'x', UMODE_HIDE},
+	{'w', UMODE_WALLOP},
+	{'c', UMODE_CLIENT},
+	{'h', UMODE_HELPOP},
+	{'e', UMODE_GLOBCON},
+	{'W', UMODE_WHOIS},
+	{0, 0},
+};
+
+umode_init user_smodes[] = {
 	{0, '0'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
-const int ircd_smodecount = 0;
-const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
 send_server (const char *sender, const char *name, const int numeric, const char *infoline)

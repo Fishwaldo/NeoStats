@@ -96,71 +96,75 @@ ircd_cmd cmd_list[] = {
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
 };
 
-ChanModes chan_modes[] = {
-	{CMODE_CHANOP, 'o', 1, 0, '@'},
-	{CMODE_VOICE, 'v', 1, 0, '+'},
-	{CMODE_SECRET, 's', 0, 0, 0},
-	{CMODE_PRIVATE, 'p', 0, 0, 0},
-	{CMODE_MODERATED, 'm', 0, 0, 0},
-	{CMODE_TOPICLIMIT, 't', 0, 0, 0},
-	{CMODE_INVITEONLY, 'i', 0, 0, 0},
-	{CMODE_NOPRIVMSGS, 'n', 0, 0, 0},
-	{CMODE_LIMIT, 'l', 0, 1, 0},
-	{CMODE_KEY, 'k', 0, 1, 0},
-	{CMODE_BAN, 'b', 0, 1, 0},
-	/*{CMODE_SENDTS, 'b', 0, 1, 0},*/
+cumode_init chan_umodes[] = {
+	{'o', CUMODE_CHANOP, '@'},
+	{'v', CUMODE_VOICE, '+'},
+	{0, 0, 0},
+};
+
+cmode_init chan_modes[] = {
+	{'s', CMODE_SECRET, 0},
+	{'p', CMODE_PRIVATE, 0},
+	{'m', CMODE_MODERATED, 0},
+	{'t', CMODE_TOPICLIMIT, 0},
+	{'i', CMODE_INVITEONLY, 0},
+	{'n', CMODE_NOPRIVMSGS, 0},
+	{'l', CMODE_LIMIT, 1},
+	{'k', CMODE_KEY, 1},
+	{'b', CMODE_BAN, 1},
+	/*{'b', CMODE_SENDTS, 1},*/
 #if ( defined NEFARIOUS ) || (defined ASUKA )
-	{CMODE_NOCOLOUR, 'c', 0, 0, 0},
-	{CMODE_NOCTCP, 'C', 0, 0, 0},
-	{CMODE_NONOTICE, 'N', 0, 0, 0},
+	{'c', CMODE_NOCOLOR, 0},
+	{'C', CMODE_NOCTCP, 0},
+	{'N', CMODE_NONOTICE, 0},
 #endif
 #ifdef ASUKA
-	{CMODE_DELJOINS, 'D', 0, 0, 0},
-	{CMODE_NOQUITPARTS, 'u', 0, 0, 0},
-	{CMODE_WASDELJOIN, 'd', 0, 0, 0},
+	{'D', CMODE_DELJOINS, 0},
+	{'u', CMODE_NOQUITPARTS, 0},
+	{'d', CMODE_WASDELJOIN, 0},
 #endif
 #ifdef NEFARIOUS
-	{CMODE_NOQUITPARTS, 'Q', 0, 0, 0},
-	{CMODE_SSLONLY, 'z', 0, 0, 0},
-	{CMODE_ACCONLY, 'M', 0, 0, 0},
-	{CMODE_OPERONLY, 'O', 0, 0, 0},
-	{CMODE_STRIP, 'S', 0, 0, 0},
-	{CMODE_NOAMSG, 'T', 0, 0, 0},
+	{'Q', CMODE_NOQUITPARTS, 0},
+	{'z', CMODE_ONLYSECURE, 0},
+	{'M', CMODE_ACCONLY, 0},
+	{'O', CMODE_OPERONLY, 0},
+	{'S', CMODE_STRIP, 0},
+	{'T', CMODE_NOAMSG, 0},
 #endif
-	/*{CMODE_LISTED, 'b', 0, 1, 0},*/
-	{CMODE_RGSTRONLY, 'r', 0, 0, 0},
+	/*{'b', CMODE_LISTED, 1},*/
+	{'r', CMODE_RGSTRONLY, 0},
+	{0, 0, 0},
 };
 
-UserModes user_umodes[] = {
-	{UMODE_OPER,		'o'},
-	{UMODE_LOCOP,		'O'},
-	{UMODE_DEBUG,       'g'},
-	{UMODE_INVISIBLE,	'i'},
-	{UMODE_WALLOP,		'w'},
-	{UMODE_SERVNOTICE,	's'},
-	{UMODE_DEAF,		'd'},
-	{UMODE_CHSERV,		'k'},
-	{UMODE_ACCOUNT,     'r'},
-	{UMODE_HIDE,		'x'},
+umode_init user_umodes[] = {
+	{'o', UMODE_OPER},
+	{'O', UMODE_LOCOP},
+	{'g', UMODE_DEBUG},
+	{'i', UMODE_INVISIBLE},
+	{'w', UMODE_WALLOP},
+	{'s', UMODE_SERVNOTICE},
+	{'d', UMODE_DEAF},
+	{'k', UMODE_CHSERV},
+	{'r', UMODE_ACCOUNT},
+	{'x', UMODE_HIDE},
 #ifdef NEFARIOUS
-	{UMODE_BOT,         'B'},
+	{'B', UMODE_BOT},
 #endif
 #if ( defined NEFARIOUS ) || (defined ASUKA )
-	{UMODE_SETHOST,		'h'},
-	{UMODE_ACCOUNTONLY, 'R'},
-	{UMODE_XTRAOP,      'X'},
-	{UMODE_NOCHAN,      'n'},
-	{UMODE_NOIDLE,      'I'},
+	{'h', UMODE_SETHOST},
+	{'R', UMODE_ACCOUNTONLY},
+	{'X', UMODE_XTRAOP},
+	{'n', UMODE_NOCHAN},
+	{'I', UMODE_NOIDLE},
 #endif
+	{0, 0},
 };
 
-UserModes user_smodes[] = {
+umode_init user_smodes[] = {
 	{0, '0'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
-const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
-const int ircd_smodecount = 0;
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
@@ -761,7 +765,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 					int i;
 					for (i = 0; i < ircd_cmodecount; i++) {
 						if (*modes == chan_modes[i].flag) {
-							if (chan_modes[i].parameters) {
+							if (chan_modes[i].flags&MODEPARAM) {
 								param ++;
 							}
 							break;
@@ -820,7 +824,7 @@ m_burst (char *origin, char **argv, int argc, int srv)
 					int i;
 					for (i = 0; i < ircd_cmodecount; i++) {
 						if (*modes == chan_modes[i].flag) {
-							if (chan_modes[i].parameters) {
+							if (chan_modes[i].flags&MODEPARAM) {
 								ircsnprintf (ircd_buf, BUFSIZE, "%s +%c %s", argv[0], *modes, argv[param]);
 								param ++;
 							} else {

@@ -4,6 +4,13 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.genesis
+ - Begin moving common mode defines to neostats.h from ircd specific files. (M)
+ - Channel key and limit modes now have explicit support rather than being 
+   included in general mode parameters list. (M)
+ - Begin improved mode handling. Protocol module tables are parsed at boot into
+   a faster core lookup table. The speedup is based on the fact that more often
+   than not we lookup a mode char so we can index on this char rather than loop
+   through every mode multiple times looking for a match. (M)
  - Import libtools wrappers for dynamic module support (F)
  - Full AutoConf Support on the way. Core Compiles. Modules Dont yet (F)
  - Remove hard coded protocol/feature references in StatServ and HostServ. 

@@ -53,6 +53,8 @@
 /* Messages/Tokens */
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"	/* 33 */
+#define MSG_WHO		"WHO"	/* WHO  -> WHOC */
+#define TOK_WHO		"\""	/* 34 */
 #define MSG_WHOIS	"WHOIS"	/* WHOI */
 #define TOK_WHOIS	"#"	/* 35 */
 #define MSG_WHOWAS	"WHOWAS"	/* WHOW */
@@ -223,18 +225,22 @@
 #define TOK_ADDLINE     "z"	/* 122 */
 #define MSG_GLINE	"GLINE"	/* The awesome g-line */
 #define TOK_GLINE	"}"	/* 125 */
+#define MSG_GZLINE	"GZLINE" /* Teh awesome global z-line */
+#define TOK_GZLINE	"{"	/* ahem? */
 #define MSG_SJOIN	"SJOIN"
 #define TOK_SJOIN	"~"
 #define MSG_SETHOST 	"SETHOST"	/* sethost */
 #define TOK_SETHOST 	"AA"	/* 127 4ever !;) */
 #define MSG_NACHAT  	"NACHAT"	/* netadmin chat */
 #define TOK_NACHAT  	"AC"	/* *beep* */
-#define MSG_SETIDENT    "SETIDENT"
-#define TOK_SETIDENT    "AD"
+#define MSG_SETIDENT 	"SETIDENT"	/* set ident */
+#define TOK_SETIDENT	"AD"	/* good old BASIC ;P */
 #define MSG_SETNAME	"SETNAME"	/* set GECOS */
 #define TOK_SETNAME	"AE"	/* its almost unreeaaall... */
 #define MSG_LAG		"LAG"	/* Lag detect */
 #define TOK_LAG		"AF"	/* a or ? */
+#define MSG_SDESC       "SDESC"	/* set description */
+#define TOK_SDESC       "AG"
 #define MSG_STATSERV	"STATSERV"	/* alias */
 #define TOK_STATSERV	"AH"
 #define MSG_KNOCK	"KNOCK"
@@ -266,11 +272,11 @@
 #define MSG_TSCTL 	"TSCTL"
 #define TOK_TSCTL 	"AW"
 #define MSG_SVSJOIN 	"SVSJOIN"
-#define TOK_SVSJOIN 	"BR"
+#define TOK_SVSJOIN 	"AX"
 #define MSG_SAJOIN 	"SAJOIN"
-#define TOK_SAJOIN 	"AX"
+#define TOK_SAJOIN 	"AY"
 #define MSG_SVSPART 	"SVSPART"
-#define TOK_SVSPART 	"BT"
+#define TOK_SVSPART 	"AX"
 #define MSG_SAPART 	"SAPART"
 #define TOK_SAPART 	"AY"
 #define MSG_CHGIDENT 	"CHGIDENT"
@@ -289,6 +295,8 @@
 #define TOK_BOTMOTD 	"BF"
 #define MSG_REMGLINE	"REMGLINE"	/* remove g-line */
 #define TOK_REMGLINE	"BG"
+#define MSG_REMGZLINE	"REMGZLINE"	/* remove global z-line */
+#define TOK_REMGZLINE	"BP"
 #define MSG_HTM		"HTM"
 #define TOK_HTM		"BH"
 #define MSG_UMODE2	"UMODE2"
@@ -312,19 +320,6 @@
 #define MSG_BOTSERV	"BOTSERV"
 #define TOK_BOTSERV	"BS"
 
-#define MSG_CYCLE	"CYCLE"
-#define TOK_CYCLE	"BP"
-
-#define MSG_MODULE	"MODULE"
-#define TOK_MODULE	"BQ"
-/* BR and BT are in use */
-
-#define MSG_SENDSNO	"SENDSNO"
-#define TOK_SENDSNO	"Ss"
-
-#define MSG_EOS		"EOS"
-#define TOK_EOS		"ES"
-
 /* Umode chars */
 #define UMODE_CH_LOCOP 'O'
 #define UMODE_CH_OPER 'o'
@@ -336,33 +331,38 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_INVISIBLE		0x00000001	
-#define UMODE_OPER			0x00000002	
-#define UMODE_WALLOP		0x00000004	
-#define UMODE_FAILOP		0x00000008	
-#define UMODE_HELPOP		0x00000010	
-#define UMODE_REGNICK		0x00000020	
-#define UMODE_SADMIN		0x00000040	
-#define UMODE_ADMIN			0x00000080	
-#define UMODE_SERVNOTICE	0x00000100	
-#define UMODE_LOCOP			0x00000200	
-#define UMODE_RGSTRONLY		0x00000400	
-#define UMODE_NOCTCP		0x00000800	
-#define UMODE_WEBTV			0x00001000	
-#define UMODE_SERVICES		0x00002000	
-#define UMODE_HIDE			0x00004000	
-#define UMODE_NETADMIN		0x00008000	
-#define UMODE_COADMIN		0x00010000	
-#define UMODE_WHOIS			0x00020000	
-#define UMODE_KIX			0x00040000
-#define UMODE_BOT			0x00080000	
-#define UMODE_SECURE		0x00100000
-#define UMODE_VICTIM		0x00200000
-#define UMODE_DEAF			0x00400000
-#define UMODE_HIDEOPER		0x00800000
-#define UMODE_SETHOST		0x01000000
-#define UMODE_STRIPBADWORDS	0x02000000
-#define UMODE_HIDEWHOIS		0x04000000
+#define UMODE_INVISIBLE		0x00000001	/* makes user invisible */
+#define UMODE_OPER			0x00000002	/* Operator */
+#define UMODE_WALLOP		0x00000004	/* send wallops to them */
+#define UMODE_FAILOP		0x00000008	/* Shows some global messages */
+#define UMODE_HELPOP		0x00000010	/* Help system operator */
+#define UMODE_REGNICK		0x00000020	/* Nick set by services as registered */
+#define UMODE_SADMIN		0x00000040	/* Services Admin */
+#define UMODE_ADMIN			0x00000080	/* Admin */
+#define UMODE_SERVNOTICE	0x00000100	/* server notices such as kill */
+#define UMODE_LOCOP			0x00000200	/* Local operator -- SRB */
+#define UMODE_KILLS			0x00000400	/* Show server-kills... */
+#define UMODE_CLIENT		0x00000800	/* Show client information */
+#define UMODE_FLOOD			0x00001000	/* Receive flood warnings */
+#define UMODE_JUNK			0x00002000	/* can junk */
+#define UMODE_SERVICES		0x00004000	/* services */
+#define UMODE_HIDE			0x00008000	/* Hide from Nukes */
+#define UMODE_NETADMIN		0x00010000	/* Network Admin */
+#define UMODE_EYES			0x00020000	/* Mode to see server stuff */
+#define UMODE_COADMIN		0x00080000	/* Co Admin */
+#define UMODE_WHOIS			0x00100000	/* gets notice on /whois */
+#define UMODE_KIX			0x00200000	/* usermode +q 
+										cannot be kicked from any channel 
+										except by U:Lines */
+#define UMODE_BOT			0x00400000	/* User is a bot */
+#define UMODE_SECURE		0x00800000	/* User is a secure connect */
+#define UMODE_FCLIENT		0x01000000	/* recieve client on far connects.. */
+
+#define UMODE_VICTIM		0x08000000	/* Intentional Victim */
+#define UMODE_DEAF			0x10000000
+#define UMODE_HIDEOPER		0x20000000	/* Hide oper mode */
+#define UMODE_SETHOST		0x40000000	/* used sethost */
+#define UMODE_STRIPBADWORDS 0x80000000	/* */
 
 /* Cmodes */
 #define CMODE_NOKICKS		0x02000000
