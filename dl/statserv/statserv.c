@@ -387,7 +387,6 @@ static int ss_chans(User * u, char **av, int ac)
 	CStats *cs;
 	lnode_t *cn;
 	int i;
-	char *chan;
 
 	chanalert(s_StatServ, "%s Wanted to see Channel Statistics", u->nick);
 	if (!av[2]) {
