@@ -505,6 +505,7 @@ int is_target_valid(char* bot_name, User* u, char* target_nick)
 static int 
 bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 {
+	int intval;
 	bot_setting* set_ptr;
 
 	if (ac < 3) {
@@ -527,8 +528,13 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 					break;
 				case SET_TYPE_INT:
 				case SET_TYPE_INTRANGE:
-					prefmsg(u->nick, bot_ptr->nick, "%s: %d",
-						set_ptr->option, *(int*)set_ptr->varptr);
+					if(set_ptr->desc) {
+							prefmsg(u->nick, bot_ptr->nick, "%s: %d %s",
+								set_ptr->option, *(int*)set_ptr->varptr, set_ptr->desc);
+						} else {
+							prefmsg(u->nick, bot_ptr->nick, "%s: %d",
+								set_ptr->option, *(int*)set_ptr->varptr);
+						}
 					break;
 				case SET_TYPE_STRING:
 				case SET_TYPE_STRINGRANGE:
@@ -545,6 +551,13 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 		}
 		return 1;
 	}
+
+	if (ac < 4) {
+		prefmsg(u->nick, bot_ptr->nick,
+			"Invalid Syntax. /msg %s HELP SET for more info", 
+			bot_ptr->nick);
+		return 1;
+	} 
 
 	set_ptr = bot_ptr->bot_settings;
 	while(set_ptr->option)
@@ -587,8 +600,41 @@ bot_cmd_set (ModUser* bot_ptr, User * u, char **av, int ac)
 			}
 			break;
 		case SET_TYPE_INT:
-		case SET_TYPE_INTRANGE:
+			intval = atoi(av[3]);	
+			if(set_ptr->min != -1 && intval < set_ptr->min) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"%d out of range for %s", intval, set_ptr->option);
+				prefmsg(u->nick, bot_ptr->nick,
+					"Valid values are %d to %d", set_ptr->min, set_ptr->max);
+				return 1;
+			}
+			if(set_ptr->max != -1 && intval > set_ptr->max) {
+				prefmsg(u->nick, bot_ptr->nick,
+					"%d out of range for %s", intval, set_ptr->option);
+				prefmsg(u->nick, bot_ptr->nick,
+					"Valid values are %d to %d", set_ptr->min, set_ptr->max);
+				return 1;
+			}
+			*(int*)set_ptr->varptr = 1;
+			SetConf((void *)intval, CFGINT, set_ptr->confitem);
+			chanalert(bot_ptr->nick, "%s set to %d by \2%s\2", 
+				set_ptr->option, intval, u->nick);
+			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %d", 
+				u->nick, u->username, u->hostname, set_ptr->option, intval);
+			prefmsg(u->nick, bot_ptr->nick,
+				"%s set to %d", set_ptr->option, intval);
+			break;
 		case SET_TYPE_STRING:
+			strlcpy((char*)set_ptr->varptr, av[3], set_ptr->max);
+			SetConf((void *)intval, CFGINT, set_ptr->confitem);
+			chanalert(bot_ptr->nick, "%s set to %s by \2%s\2", 
+				set_ptr->option, av[3], u->nick);
+			nlog(LOG_NORMAL, LOG_MOD, "%s!%s@%s set %s to %s", 
+				u->nick, u->username, u->hostname, set_ptr->option, av[3]);
+			prefmsg(u->nick, bot_ptr->nick,
+				"%s set to %s", set_ptr->option, av[3]);
+			break;
+		case SET_TYPE_INTRANGE:
 		case SET_TYPE_STRINGRANGE:
 		case SET_TYPE_NICK:
 		case SET_TYPE_USER:

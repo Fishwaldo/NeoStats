@@ -278,7 +278,7 @@ Syntax:
     /msg NeoStats RELOAD [reason]
 Description: 
     Force NeoStats to reload.
-    This command will cause StatServ to split from the network, reload 
+    This command will cause NeoStats to split from the network, reload 
     data files and connect. 
     This command SHOULD be used wisely. 
     reason is optional.
@@ -932,12 +932,16 @@ Description:
     The Following Options are only available to Network Administration:
     EXPIRE  <days>
     How long before un-used vhosts are automatically deleted. Default is 60
-    days
-    HIDDENHOST <domain/OFF>
-    Enable Undernet Style Hidden hosts (nick.domain) when users identify to
-    services. Only sets their Hidden host once, and will not reset the
+    days. A value of 0 makes all vhosts permanent.
+	HIDDENHOST <ON/OFF>
+	Turns on undernet style hidden hosts when users identify to nickserv.
+	You will also need to set HOSTNAME to the host you want to use
+    Default is is off (disabled).
+	HOSTNAME <hostname>
+	The hidden host you want to set on users.
+	Users will then be set to <user>.<hostname>.
+    Only sets their Hidden host once, and will not reset the
     hidden host if they identify for another nickname.
-    If you specify OFF, then this feature is disabled (default)
 Example: 
     /msg HostServ SET EXPIRE 10
     /msg HostServ SET HIDDENHOST NeoStats.net
