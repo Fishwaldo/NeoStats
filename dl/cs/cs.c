@@ -177,6 +177,7 @@ static bot_cmd cs_commands[]=
 	{"SET",			do_set,			0, 	NS_ULEVEL_ADMIN,	cs_help_set, 	1, 	cs_help_set_oneline },
 	{"ABOUT",		do_about,		0, 	NS_ULEVEL_ADMIN,	cs_help_about, 	1, 	cs_help_about_oneline },
 	{"VERSION",		cs_version,		0, 	NS_ULEVEL_ADMIN,	cs_help_version,1, 	cs_help_version_oneline },
+	{NULL,			NULL,			0, 	0,			NULL, 			0,	NULL}
 };
 
 static void do_about(User * u, char **av, int ac)
