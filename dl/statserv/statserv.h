@@ -204,23 +204,44 @@ CStats *load_chan(char *name);
 /* ss_help.c */
 extern const char *ss_help[];
 extern const char *ss_help_on_help[];
-extern const char *ss_myuser_help[];
-extern const char *ss_about_help[];
-extern const char *ss_server_help[];
-extern const char *ss_map_help[];
-extern const char *ss_netstats_help[];
-extern const char *ss_daily_help[];
-extern const char *ss_tld_help[];
-extern const char *ss_tld_map_help[];
-extern const char *ss_operlist_help[];
-extern const char *ss_botlist_help[];
-extern const char *ss_version_help[];
-extern const char *ss_stats_help[];
-extern const char *ss_htmlstats_help[];
-extern const char *ss_forcehtml_help[];
-extern const char *ss_chan_help[];
-extern const char *ss_set_help[];
-extern const char *ss_clientversions_help[];
+extern const char *ss_help_myuser[];
+extern const char *ss_help_about[];
+extern const char *ss_help_server[];
+extern const char *ss_help_map[];
+extern const char *ss_help_netstats[];
+extern const char *ss_help_daily[];
+extern const char *ss_help_tld[];
+extern const char *ss_help_tldmap[];
+extern const char *ss_help_operlist[];
+#ifdef HAVE_BOT_MODE
+extern const char *ss_help_botlist[];
+#endif
+extern const char *ss_help_version[];
+extern const char *ss_help_stats[];
+extern const char *ss_help_htmlstats[];
+extern const char *ss_help_forcehtml[];
+extern const char *ss_help_chan[];
+extern const char *ss_help_set[];
+extern const char *ss_help_clientversions[];
+
+extern const char ss_help_about_oneline[];
+extern const char ss_help_version_oneline[];
+extern const char ss_help_server_oneline[];
+extern const char ss_help_map_oneline[];
+extern const char ss_help_chan_oneline[];
+extern const char ss_help_netstats_oneline[];
+extern const char ss_help_daily_oneline[];
+extern const char ss_help_tld_oneline[];
+extern const char ss_help_tldmap_oneline[];
+extern const char ss_help_operlist_oneline[];
+#ifdef HAVE_BOT_MODE
+extern const char ss_help_botlist_oneline[];
+#endif
+extern const char ss_help_clientversions_oneline[];
+extern const char ss_help_set_oneline[];
+extern const char ss_help_forcehtml_oneline[];
+extern const char ss_help_stats_oneline[];
+
 /* tld.c */
 void DelTLD(User * u);
 

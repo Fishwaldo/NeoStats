@@ -45,7 +45,7 @@ static void ss_server(User * u, char **av, int ac);
 static void ss_map(User *u, char **av, int ac);
 static void ss_netstats(User *u, char **av, int ac);
 static void ss_set(User *u, char **av, int ac);
-static void ss_versions(User * u, char **av, int ac);
+static void ss_clientversions(User * u, char **av, int ac);
 void ss_html(User * u, char **av, int ac);
 
 static void ss_Config();
@@ -244,118 +244,31 @@ void __ModFini()
 
 }
 
-int __BotMessage(char *origin, char **av, int ac)
+bot_cmd ss_commands[]=
 {
-	User *u;
-
-	SET_SEGV_LOCATION();
-	u = finduser(origin);
-	if (!u) {
-		nlog(LOG_WARNING, LOG_CORE,
-		     "Unable to finduser %s (statserv)", origin);
-		return -1;
-	}
-
-	if (me.onlyopers && UserLevel(u) < NS_ULEVEL_OPER) {
-		prefmsg(u->nick, s_StatServ, "This service is only available to IRCops.");
-		chanalert(s_StatServ, "%s tried to use me but is not Authorized", u->nick);
-		return -1;
-	}
-
-	if (!strcasecmp(av[1], "HELP")) {
-		if (ac < 3) {
-			chanalert(s_StatServ, "%s requested %s Help", u->nick, s_StatServ);
-		} else {
-			chanalert(s_StatServ, "%s requested more help from %s on %s", u->nick, s_StatServ, av[2]);
-		}
-		if (ac < 3) {
-			privmsg_list(u->nick, s_StatServ, ss_help);
-			if (UserLevel(u) >= 150)
-				privmsg_list(u->nick, s_StatServ, ss_myuser_help);
-			privmsg_list(u->nick, s_StatServ, ss_help_on_help);
-		} else if (!strcasecmp(av[2], "SERVER"))
-			privmsg_list(u->nick, s_StatServ, ss_server_help);
-		else if (!strcasecmp(av[2], "CHAN"))
-			privmsg_list(u->nick, s_StatServ, ss_chan_help);
-		else if (!strcasecmp(av[2], "CLIENTVERSIONS"))
-			privmsg_list(u->nick, s_StatServ, ss_clientversions_help);
-		else if (!strcasecmp(av[2], "MAP"))
-			privmsg_list(u->nick, s_StatServ, ss_map_help);
-		else if (!strcasecmp(av[2], "NETSTATS"))
-			privmsg_list(u->nick, s_StatServ, ss_netstats_help);
-		else if (!strcasecmp(av[2], "DAILY"))
-			privmsg_list(u->nick, s_StatServ, ss_daily_help);
-		else if (!strcasecmp(av[2], "FORCEHTML"))
-			privmsg_list(u->nick, s_StatServ, ss_forcehtml_help);
-		else if (!strcasecmp(av[2], "TLD"))
-			privmsg_list(u->nick, s_StatServ, ss_tld_help);
-		else if (!strcasecmp(av[2], "TLDMAP"))
-			privmsg_list(u->nick, s_StatServ, ss_tld_map_help);
-		else if (!strcasecmp(av[2], "OPERLIST"))
-			privmsg_list(u->nick, s_StatServ, ss_operlist_help);
-#ifdef HAVE_BOT_MODE
-		else if (!strcasecmp(av[2], "BOTLIST"))
-			privmsg_list(u->nick, s_StatServ, ss_botlist_help);
-#endif
-		else if (!strcasecmp(av[2], "VERSION"))
-			privmsg_list(u->nick, s_StatServ, ss_version_help);
-		else if (!strcasecmp(av[2], "ABOUT"))
-			privmsg_list(u->nick, s_StatServ, ss_about_help);
-		else if (!strcasecmp(av[2], "STATS")
-			 && UserLevel(u) >= NS_ULEVEL_ADMIN)
-			privmsg_list(u->nick, s_StatServ, ss_stats_help);
-		else if (!strcasecmp(av[2], "SET") && UserLevel(u) >= NS_ULEVEL_ADMIN)
-			privmsg_list(u->nick, s_StatServ, ss_set_help);
-		else
-			prefmsg(u->nick, s_StatServ, "Unknown Help Topic: \2%s\2", av[2]);
-	} else if (!strcasecmp(av[1], "CHAN")) {
-		ss_chans(u, av, ac);
-	} else if (!strcasecmp(av[1], "SET")) {
-		ss_set(u, av, ac);
-	} else if (!strcasecmp(av[1], "SERVER")) {
-		ss_server(u, av, ac);
-	} else if (!strcasecmp(av[1], "CLIENTVERSIONS")) {
-		ss_versions(u, av, ac);
-	} else if (!strcasecmp(av[1], "MAP")) {
-		ss_map(u, av, ac);
-	} else if (!strcasecmp(av[1], "VERSION")) {
-		ss_version(u, av, ac);
-	} else if (!strcasecmp(av[1], "ABOUT")) {
-		ss_about(u, av, ac);
-	} else if (!strcasecmp(av[1], "NETSTATS")) {
-		ss_netstats(u, av, ac);
-	} else if (!strcasecmp(av[1], "DAILY")) {
-		ss_daily(u, av, ac);
-	} else if (!strcasecmp(av[1], "FORCEHTML")) {
-		ss_html(u, av, ac);
-	} else if (!strcasecmp(av[1], "TLD")) {
-		ss_tld(u, av, ac);
-	} else if (!strcasecmp(av[1], "TLDMAP")) {
-		ss_tld_map(u, av, ac);
-	} else if (!strcasecmp(av[1], "OPERLIST")) {
-		ss_operlist(u, av, ac);
-#ifdef HAVE_BOT_MODE
-	} else if (!strcasecmp(av[1], "BOTLIST")) {
-		ss_botlist(u, av, ac);
-#endif
-	} else if (!strcasecmp(av[1], "STATS")) {
-		ss_stats(u, av, ac);
-	} else {
-		prefmsg(u->nick, s_StatServ, "Unknown Command: \2%s\2", av[1]);
-		chanalert(s_StatServ, "%s Reqested %s, but that is an Unknown Command", u->nick, av[1]);
-	}
-	return 1;
-}
+	{"ABOUT",			ss_about,		0, 	NS_ULEVEL_OPER,	ss_help_about, 		1, 		ss_help_about_oneline},
+	{"VERSION",			ss_version,		0, 	NS_ULEVEL_OPER,	ss_help_version, 	1, 		ss_help_version_oneline},
+	{"SERVER",			ss_server,		0, 	NS_ULEVEL_OPER,	ss_help_server,		1, 		ss_help_server_oneline},
+	{"MAP",				ss_map,			0, 	NS_ULEVEL_OPER,	ss_help_map, 		1, 		ss_help_map_oneline},
+	{"CHAN",			ss_chans,		0, 	NS_ULEVEL_OPER,	ss_help_chan, 		1, 		ss_help_chan_oneline},
+	{"NETSTATS",		ss_netstats,	0, 	NS_ULEVEL_OPER,	ss_help_netstats, 	1, 		ss_help_netstats_oneline},
+	{"DAILY",			ss_daily,		0, 	NS_ULEVEL_OPER,	ss_help_daily, 		1, 		ss_help_daily_oneline},
+	{"TLD",				ss_tld,			1, 	NS_ULEVEL_OPER,	ss_help_tld, 		1, 		ss_help_tld_oneline},
+	{"TLDMAP",			ss_tld_map,		0, 	NS_ULEVEL_OPER,	ss_help_tldmap, 	1, 		ss_help_tldmap_oneline},
+	{"OPERLIST",		ss_operlist,	0, 	NS_ULEVEL_OPER,	ss_help_operlist, 	1, 		ss_help_operlist_oneline},
+#ifdef HAVE_BOT_MODE																		
+	{"BOTLIST",			ss_botlist,		0, 	NS_ULEVEL_OPER,	ss_help_botlist, 	1, 		ss_help_botlist_oneline},
+#endif																						
+	{"CLIENTVERSIONS",	ss_clientversions,0,NS_ULEVEL_OPER,	ss_help_clientversions,1, 	ss_help_clientversions_oneline},
+	{"SET",				ss_set,			1, 	NS_ULEVEL_ADMIN,ss_help_set, 		1,		ss_help_set_oneline},
+	{"FORCEHTML",		ss_html,		0, 	NS_ULEVEL_ADMIN,ss_help_forcehtml, 	1,		ss_help_forcehtml_oneline},
+	{"STATS",			ss_stats,		1, 	NS_ULEVEL_ADMIN,ss_help_stats, 		1,		ss_help_stats_oneline},
+	{NULL,				NULL,			0, 	0,					NULL, 				0,		NULL}
+};
 
 static void ss_set(User * u, char **av, int ac)
 {
-	if (UserLevel(u) < NS_ULEVEL_ADMIN) {
-		prefmsg(u->nick, s_StatServ, "Permission Denied");
-		chanalert(s_StatServ,
-				"%s tried to set, but don't have access",
-				u->nick);
-	}
-	if (ac == 2) {
+	if (!strcasecmp(av[2], "LIST")) {
 		prefmsg(u->nick, s_StatServ, "Current Settings are:");
 		prefmsg(u->nick, s_StatServ, "HTML Statistics: %s",
 			StatServ.html > 0 ? "Enabled" : "Disabled");
@@ -368,14 +281,12 @@ static void ss_set(User * u, char **av, int ac)
 		prefmsg(u->nick, s_StatServ,
 			"Lag Warnings: %d (0 = Disabled)", StatServ.lag);
 		return;
-	}
-	if (!strcasecmp(av[2], "HTML")) {
+	} else if (!strcasecmp(av[2], "HTML")) {
 		if (StatServ.html == 0) {
 			/* its disabled, enable it */
 			if (strlen(StatServ.htmlpath) > 0) {
 				StatServ.html = 1;
-				chanalert(s_StatServ,
-					  "%s Enabled HTML output",
+				chanalert(s_StatServ, "%s Enabled HTML output",
 					  u->nick);
 				prefmsg(u->nick, s_StatServ,
 					"HTML output is now enabled to: %s",
@@ -385,17 +296,14 @@ static void ss_set(User * u, char **av, int ac)
 			} else {
 				prefmsg(u->nick, s_StatServ,
 					"Error, No Path Defined for HTML output, can not enable");
-				prefmsg(u->nick, s_StatServ,
-					"Please see /msg %s help set",
+				prefmsg(u->nick, s_StatServ, "Please see /msg %s help set",
 					s_StatServ);
 			}
 		} else {
 			/* its enabled, disable it */
 			StatServ.html = 0;
-			chanalert(s_StatServ, "%s Disabled HTML output",
-				  u->nick);
-			prefmsg(u->nick, s_StatServ,
-				"HTML output is now disabled");
+			chanalert(s_StatServ, "%s Disabled HTML output", u->nick);
+			prefmsg(u->nick, s_StatServ, "HTML output is now disabled");
 			SetConf((void *) 0, CFGINT, "HTML_Enabled");
 		}
 		return;
@@ -408,20 +316,15 @@ static void ss_set(User * u, char **av, int ac)
 			return;
 		}
 		if (!strcasecmp(av[3], "off")) {
-			prefmsg(u->nick, s_StatServ,
-				"Record Yelling is Now Disabled. ");
-			chanalert(s_StatServ,
-				  "%s disabled Record Broadcasts",
-				  u->nick);
+			prefmsg(u->nick, s_StatServ, "Record Yelling is Now Disabled. ");
+			chanalert(s_StatServ, "%s disabled Record Broadcasts", u->nick);
 			StatServ.interval = -1;
 		} else {
 			StatServ.interval = atoi(av[3]);
 			/* atoi will = 0 if av[3] != isnumeric */
 			if (StatServ.interval <= 0) {
-				prefmsg(u->nick, s_StatServ,
-					"Wallop Throttles are disabled");
-				chanalert(s_StatServ,
-					  "%s disabled Wallop Throttling",
+				prefmsg(u->nick, s_StatServ, "Wallop Throttles are disabled");
+				chanalert(s_StatServ, "%s disabled Wallop Throttling",
 					  u->nick);
 				StatServ.interval = 0;
 			} else {
@@ -433,8 +336,7 @@ static void ss_set(User * u, char **av, int ac)
 					  u->nick, StatServ.interval);
 			}
 		}
-		SetConf((void *) StatServ.interval, CFGINT,
-			"Wallop_Throttle");
+		SetConf((void *) StatServ.interval, CFGINT, "Wallop_Throttle");
 		return;
 	} else if (!strcasecmp(av[2], "HTMLPATH")) {
 		if (ac != 4) {
@@ -516,7 +418,7 @@ int topversions(const void *key1, const void *key2)
 	return (ver2->count - ver1->count);
 }
 
-static void ss_versions(User * u, char **av, int ac)
+static void ss_clientversions(User * u, char **av, int ac)
 {
 	CVersions *cv;
 	lnode_t *cn;
@@ -779,7 +681,7 @@ static void ss_version(User * u, char **av, int ac)
 
 static void ss_about(User * u, char **av, int ac)
 {
-	privmsg_list(u->nick, s_StatServ, ss_about_help);
+	privmsg_list(u->nick, s_StatServ, ss_help_about);
 }
 
 static void ss_netstats(User * u, char **av, int ac)
@@ -880,7 +782,6 @@ static void ss_map(User * u, char **av, int ac)
 
 static void ss_server(User * u, char **av, int ac)
 {
-
 	SStats *ss;
 	Server *s;
 	hscan_t hs;
@@ -891,8 +792,6 @@ static void ss_server(User * u, char **av, int ac)
 	server =  av[2];
 	chanalert(s_StatServ, "%s Wanted Server Information on %s", u->nick, av[2]);
 	if (!server) {
-		prefmsg(u->nick, s_StatServ,
-			"Error, the Syntax is Incorrect. Please Specify a Server");
 		prefmsg(u->nick, s_StatServ, "Server Listing:");
 		hash_scan_begin(&hs, Shead);
 		while ((sn = hash_scan_next(&hs))) {
@@ -1098,11 +997,6 @@ static void ss_stats(User * u, char **av, int ac)
 	char *arg2;
 
 	SET_SEGV_LOCATION();
-	if (UserLevel(u) < NS_ULEVEL_ADMIN) {
-		nlog(LOG_NORMAL, LOG_MOD, "Access Denied (STATS) to %s", u->nick);
-		prefmsg(u->nick, s_StatServ, "Access Denied.");
-		return;
-	}
 	cmd = av[2];
 	arg = av[3]; 
 	arg2 = av[4];

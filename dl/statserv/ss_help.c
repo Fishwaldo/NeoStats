@@ -27,6 +27,24 @@
 
 #include "stats.h"
 
+const char ss_help_about_oneline[]="About StatServ";
+const char ss_help_version_oneline[]="Shows you the current StatServ Version";
+const char ss_help_server_oneline[]="Request information about a server";
+const char ss_help_map_oneline[]="Show the network map";
+const char ss_help_chan_oneline[]="Channel Information";
+const char ss_help_netstats_oneline[]="General Network Statistics";
+const char ss_help_daily_oneline[]="Daily Network Statistics";
+const char ss_help_tld_oneline[]="Show what country a TLD represents";
+const char ss_help_tldmap_oneline[]="Statistics on TLD's";
+const char ss_help_operlist_oneline[]="Show a listing of on-line IRCops";
+#ifdef HAVE_BOT_MODE
+const char ss_help_botlist_oneline[]="Show a listing of on-line BOTS";
+#endif
+const char ss_help_clientversions_oneline[]="Shows you a list of Client Versions";
+const char ss_help_set_oneline[]="Change StatServ Settings";
+const char ss_help_forcehtml_oneline[]="Force an update of the HTML output file";
+const char ss_help_stats_oneline[]="Modify Statistic Entries.";
+
 const char *ss_help[] = {
 	"The following commands can be used with StatServ",
 	"",
@@ -66,13 +84,13 @@ const char *ss_myuser_help[] = {
 	NULL
 };
 
-const char *ss_about_help[] = {
+const char *ss_help_about[] = {
 	"\2StatServ\2 provides detailed statistics about your",
 	"IRC network users, channels and servers.",
 	NULL
 };
 
-const char *ss_clientversions_help[] = {
+const char *ss_help_clientversions[] = {
 	"Syntax: \2CLIENTVERSIONS \37<limit>\37\2",
 	"",
 	"Provides Statistics on the Client Versions found",
@@ -83,8 +101,11 @@ const char *ss_clientversions_help[] = {
 	NULL
 };
 
-const char *ss_set_help[] = {
-	"Syntax: \2SET <option> [<value>]\2",
+const char *ss_help_set[] = {
+	"Syntax: \2SET LIST\2",
+	"        \2SET <option> [<value>]\2",
+	"",
+	"LIST will display the current settings",
 	"",
 	"Available Options are:",
 	"\2HTMLPATH <path>\2",
@@ -104,13 +125,10 @@ const char *ss_set_help[] = {
 	"if <seconds> is greater than 0, then when servers are",
 	"lagged by this many seconds, issue a warning",
 	"if <seconds> is equal to 0, then disable Lag Monitoring",
-	"",
-	"If you specify \2SET\2 without any options, the current",
-	"settings are disabled",
 	NULL
 };
 
-const char *ss_chan_help[] = {
+const char *ss_help_chan[] = {
 	"Syntax: \2CHAN \37<POP/KICKS/TOPICS/<Channame>>\37\2",
 	"",
 	"Provides Statistics on Channels on the network",
@@ -124,21 +142,21 @@ const char *ss_chan_help[] = {
 	NULL
 };
 
-const char *ss_server_help[] = {
+const char *ss_help_server[] = {
 	"Syntax: \2SERVER \37<server name>\37\2",
 	"",
 	"Provides statistics on a specific server.",
 	NULL
 };
 
-const char *ss_map_help[] = {
+const char *ss_help_map[] = {
 	"Syntax: \2MAP\2",
 	"",
 	"Provides a server listing with minimal statistics.",
 	NULL
 };
 
-const char *ss_netstats_help[] = {
+const char *ss_help_netstats[] = {
 	"Syntax: \2NETSTATS\2",
 	"",
 	"Provides information about the",
@@ -146,7 +164,7 @@ const char *ss_netstats_help[] = {
 	NULL
 };
 
-const char *ss_daily_help[] = {
+const char *ss_help_daily[] = {
 	"Syntax: \2DAILY\2",
 	"",
 	"Provides information about records",
@@ -154,7 +172,7 @@ const char *ss_daily_help[] = {
 	NULL
 };
 
-const char *ss_tld_help[] = {
+const char *ss_help_tld[] = {
 	"Syntax: \2TLD \37top_level_domain\37\2",
 	"",
 	"Provides the country-name for a specific TLD.",
@@ -162,7 +180,7 @@ const char *ss_tld_help[] = {
 	NULL
 };
 
-const char *ss_tld_map_help[] = {
+const char *ss_help_tldmap[] = {
 	"Syntax: \2TLDMAP\2",
 	"",
 	"Shows the network map in",
@@ -170,7 +188,7 @@ const char *ss_tld_map_help[] = {
 	NULL
 };
 
-const char *ss_operlist_help[] = {
+const char *ss_help_operlist[] = {
 	"Syntax: \2OPERLIST\2",
 	"        \2OPERLIST NOAWAY\2",
 	"        \2OPERLIST SERVER <servername>\2",
@@ -182,7 +200,7 @@ const char *ss_operlist_help[] = {
 };
 
 #ifdef HAVE_BOT_MODE
-const char *ss_botlist_help[] = {
+const char *ss_help_botlist[] = {
 	"Syntax: \2BOTLIST\2",
 	"",
 	"Shows all current bots on the network.",
@@ -191,14 +209,14 @@ const char *ss_botlist_help[] = {
 };
 #endif
 
-const char *ss_version_help[] = {
+const char *ss_help_version[] = {
 	"Syntax: \2VERSION\2",
 	"",
 	"Shows the current StatServ Version.",
 	NULL
 };
 
-const char *ss_stats_help[] = {
+const char *ss_help_stats[] = {
 	"Syntax: \2STATS LIST\2",
 	"        \2STATS DEL <servername>\2",
 	"        \2STATS COPY <oldservername> <newservername>\2",
@@ -208,7 +226,7 @@ const char *ss_stats_help[] = {
 	NULL
 };
 
-const char *ss_forcehtml_help[] = {
+const char *ss_help_forcehtml[] = {
 	"Syntax: \2FORCEUPDATE\2",
 	"",
 	"Forces an update of the HTML data file with the most",
