@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: mystic.c,v 1.4 2003/07/02 09:48:55 fishwaldo Exp $
+** $Id: mystic.c,v 1.5 2003/07/02 10:05:11 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -320,7 +320,7 @@ int schmode_cmd(const char *who, const char *chan, const char *mode,
 	    (me.token ? TOK_MODE : MSG_MODE), chan, mode, args,
 	    time(NULL));
 	snprintf(tmp, 512, "%s %s %s", chan, mode, args);
-	ac = split_buf(tmp, &av, &ac);
+	ac = split_buf(tmp, &av, 0);
 	ChanMode("", av, ac);
 	free(av);
 	return 1;
