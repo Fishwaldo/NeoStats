@@ -1806,6 +1806,18 @@ do_burst (char *origin, char **argv, int argc)
 }
 #endif
 
+#ifdef MSG_SWHOIS
+void 
+do_swhois (char *who, char *swhois)
+{
+	User* u;
+	u = finduser(who);
+	if(u) {
+		strlcpy(u->swhois, swhois, MAXHOST);
+	}
+}
+#endif
+
 void
 send_cmd (char *fmt, ...)
 {

@@ -58,6 +58,7 @@ static void m_svsnick (char *origin, char **argv, int argc, int srv);
 static void m_protocol (char *origin, char **argv, int argc, int srv);
 static void m_whois (char *origin, char **argv, int argc, int srv);
 static void m_smo (char *origin, char **argv, int argc, int srv);
+static void m_swhois (char *origin, char **argv, int argc, int srv);
 
 #define SJOIN
 #define NICKV2	
@@ -101,6 +102,7 @@ ircd_cmd cmd_list[] = {
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
 	{MSG_PROTOCTL, TOK_PROTOCTL, m_protocol, 0},
 	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
+	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_SMO, TOK_SMO, m_smo, 0},
 #ifdef UNREAL32
 	{MSG_EOS, TOK_EOS, m_eos, 0},
@@ -164,6 +166,7 @@ UserModes user_umodes[] = {
  	{UMODE_NOCTCP, 'T', 0},
 	{UMODE_WEBTV, 'V', 0},
 	{UMODE_HIDEWHOIS, 'p', 0},
+	{UMODE_HIDEOPER, 'H', 0},
 #else 
 	{UMODE_KILLS, 'k', 0},
 	{UMODE_EYES, 'e', 0},
@@ -177,7 +180,10 @@ UserModes user_umodes[] = {
 	{UMODE_HIDE, 'x', 0},
 	/*{UMODE_CHATOP, 'b', 0},*/
 	{UMODE_WHOIS, 'W', 0},
+	{UMODE_SECURE, 'z', 0},
+	{UMODE_VICTIM, 'v', 0},	
 };
+
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
@@ -738,6 +744,16 @@ static void
 m_whois (char *origin, char **argv, int argc, int srv)
 {
 	/* TODO */
+}
+
+/* m_swhois
+ *  argv[0] = nickname
+ *  argv[1] = new swhois
+ */
+static void
+m_swhois (char *origin, char **argv, int argc, int srv)
+{
+	do_swhois (argv[0], argv[1]);
 }
 
 static void

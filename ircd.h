@@ -137,6 +137,9 @@ void do_server (const char *name, const char *uplink, const char* hops, const ch
 #ifdef MSG_BURST
 void do_burst (char *origin, char **argv, int argc);
 #endif
+#ifdef MSG_SWHOIS
+void do_swhois (char *who, char *swhois);
+#endif
 
 /* Defined in ircd specific files but common to all */
 void init_ircd (void);

@@ -397,6 +397,8 @@ typedef struct User {
 	char username[MAXUSER];
 	char realname[MAXREALNAME];
 	char vhost[MAXHOST];
+	char awaymsg[MAXHOST];
+	char swhois[MAXHOST];
 	Server *server;
 	int flood;
 	int is_away;

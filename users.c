@@ -518,7 +518,7 @@ COLDEF neo_userscols[] = {
 		RTA_READONLY,
 		display_server,
 		NULL,
-		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
+		"the users server"
 	},
 	{	
 		"users",
@@ -529,7 +529,29 @@ COLDEF neo_userscols[] = {
 		RTA_READONLY,
 		display_chans,
 		NULL,
-		"the users Smodes, if the IRCd supports it.  Does not include UMODES."
+		"the users channels."
+	},
+	{	
+		"users",
+		"awaymsg",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct User, awaymsg),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"the users away message."
+	},
+	{	
+		"users",
+		"swhois",
+		RTA_STR,
+		MAXHOST,
+		offsetof(struct User, swhois),
+		RTA_READONLY,
+		NULL,
+		NULL,
+		"the users swhois."
 	},
 
 };
@@ -590,7 +612,11 @@ UserDump (const char *nick)
 		un = hash_lookup (uh, nick);
 		if (un) {
 			u = hnode_get (un);
-			debugtochannel("User: %s!%s@%s (%s) Flags %lx", u->nick, u->username, u->hostname, u->vhost, u->flags);
+#ifdef GOTUSERSMODES
+			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx) Smodes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode, u->Smode);
+#else
+			debugtochannel("User: %s!%s@%s (%s) Flags %lx Modes %s (%lx)", u->nick, u->username, u->hostname, u->vhost, u->flags, u->modes, u->Umode);
+#endif
 			cm = list_first (u->chans);
 			while (cm) {
 				debugtochannel("     Chans: %s", (char *) lnode_get (cm));
