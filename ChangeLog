@@ -6,6 +6,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add extra checks to ircstr[n]case routines for stability when passed NULL (M)
  - Unreal: fix sjoin bug (M)
  - Fix NULL pointer in dns_lookup (M)
+ - IRCu: Fix +D problem reported on ASUKA bug 138 (M)
 
 * NeoStats * Fish (F) & Mark (M) * Version 2.5.15
  - Remove sprotocol_cmd since it is very ircd specfic (M)

@@ -114,7 +114,7 @@ ChanModes chan_modes[] = {
 	{CMODE_NONOTICE, 'N', 0, 0, 0},
 #endif
 #ifdef ASUKA
-	{CMODE_DELJOINS, 'D', 0, 1, 0},
+	{CMODE_DELJOINS, 'D', 0, 0, 0},
 	{CMODE_NOQUITPARTS, 'u', 0, 0, 0},
 	{CMODE_WASDELJOIN, 'd', 0, 0, 0},
 #endif
