@@ -107,7 +107,7 @@ static void ss_Config(void)
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "RealName") < 0) {
 		ircsnprintf(ss_botinfo.realname, MAXREALNAME, "/msg %s help",
-			 ss_bot->nick);
+			 ss_botinfo.nick);
 	} else {
 		strlcpy(ss_botinfo.realname, tmp, MAXREALNAME);
 		free(tmp);
