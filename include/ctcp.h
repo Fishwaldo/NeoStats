@@ -24,9 +24,9 @@
 #ifndef _CTCP_H_
 #define _CTCP_H_
 
-int ctcp_private (CmdParams *cmdparams);
-int ctcp_notice (CmdParams *cmdparams);
-int ctcp_cprivate (CmdParams *cmdparams);
-int ctcp_cnotice (CmdParams *cmdparams);
+int ctcp_private( CmdParams *cmdparams );
+int ctcp_notice( CmdParams *cmdparams );
+int ctcp_cprivate( CmdParams *cmdparams );
+int ctcp_cnotice( CmdParams *cmdparams );
 
 #endif /* _CTCP_H_ */

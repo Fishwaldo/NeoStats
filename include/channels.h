@@ -24,15 +24,15 @@
 #ifndef _CHANNELS_H_
 #define _CHANNELS_H_
 
-void ListChannels (CmdParams* cmdparams, const char *chan);
-void PartChannel (Client *u, const char *chan, const char *reason);
-void PartAllChannels (Client *u, const char *reason);
-void JoinChannel (const char *nick, const char *chan);
-void ChannelTopic (const char *chan, const char *owner, const char *ts, const char *topic);
-void KickChannel (const char *kickby, const char *chan, const char *kicked, const char *kickreason);
-int InitChannels (void);
-void FiniChannels (void);
-void CleanupChannelModdata (int index);
-int comparechanmember (const void *key1, const void *key2);
+void ListChannels( CmdParams* cmdparams, const char *chan );
+void PartChannel( Client *u, const char *chan, const char *reason );
+void PartAllChannels( Client *u, const char *reason );
+void JoinChannel( const char *nick, const char *chan );
+void ChannelTopic( const char *chan, const char *owner, const char *ts, const char *topic );
+void KickChannel( const char *kickby, const char *chan, const char *kicked, const char *kickreason );
+int InitChannels( void );
+void FiniChannels( void );
+void CleanupChannelModdata( int index );
+int comparechanmember( const void *key1, const void *key2 );
 
 #endif /* _CHANNELS_H_ */

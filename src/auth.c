@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright( c) 1999-2004 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -51,13 +51,12 @@ static Module* AuthModList[NUM_MODULES];
  *  @return NS_TRUE if is, NS_FALSE if not 
  */
 
-static int IsServiceRoot (Client *u)
+static int IsServiceRoot( Client *u )
 {
-	/* match client nick!user@host against the service root 
-	 * nick!user@host */
-	if ((match (nsconfig.rootuser.nick, u->name))
-		&& (match (nsconfig.rootuser.user, u->user->username))
-		&& (match (nsconfig.rootuser.host, u->user->hostname))) {
+	/* Test client nick!user@host against the configured service root */
+	if( ( match( nsconfig.rootuser.nick, u->name ) ) &&
+		( match( nsconfig.rootuser.user, u->user->username ) ) &&
+		( match( nsconfig.rootuser.host, u->user->hostname ) ) ) {
 		return NS_TRUE;
 	}
 	return NS_FALSE;
@@ -73,7 +72,7 @@ static int IsServiceRoot (Client *u)
  *  @return authentication level
  */
 
-int AuthUser (Client *u)
+int AuthUser( Client *u )
 {
 	int newauthlvl = 0;
 	int authlvl = 0;
@@ -83,27 +82,27 @@ int AuthUser (Client *u)
 #ifdef CODERHACK
 	/* this is only cause I dun have the right O lines on some of my "Beta" 
 	   Networks, so I need to hack this in :) */
-	if (!ircstrcasecmp (u->name, "FISH")) {
+	if( !ircstrcasecmp( u->name, "FISH" ) ) {
 		return NS_ULEVEL_ROOT;
-	} else if (!ircstrcasecmp (u->name, "SHMAD")) {
+	} else if( !ircstrcasecmp( u->name, "SHMAD" ) ) {
 		return NS_ULEVEL_ROOT;
-	} else if (!ircstrcasecmp (u->name, "MARK")) {
+	} else if( !ircstrcasecmp( u->name, "MARK" ) ) {
 		return NS_ULEVEL_ROOT;
 	} else
 #endif /* CODERHACK */
 #endif /* DEBUG */
 	/* Check for master service root first */
-	if (IsServiceRoot (u)) {
+	if( IsServiceRoot( u ) ) {
 		return NS_ULEVEL_ROOT;
 	} 
 	/* Run through list of authentication modules */
-	for (i = 0; i < NUM_MODULES; i++)
+	for( i = 0; i < NUM_MODULES; i++ )
 	{
-		if (AuthModList[i]) {
+		if( AuthModList[i] ) {
 			/* Get auth level */
-			authlvl = AuthModList[i]->userauth (u);
+			authlvl = AuthModList[i]->userauth( u );
 			/* if authlvl is greater than newauthlvl, use it */
-			if (authlvl > newauthlvl) {
+			if( authlvl > newauthlvl ) {
 				newauthlvl = authlvl;
 			}
 		}
@@ -122,19 +121,19 @@ int AuthUser (Client *u)
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int AddAuthModule (Module *mod_ptr)
+int AddAuthModule( Module *mod_ptr )
 {
 	int i;
 	mod_auth auth;
 
 	/* Check module has the auth function */
-	auth = ns_dlsym (mod_ptr->dl_handle, "ModAuthUser");
-	if (auth) 
+	auth = ns_dlsym( mod_ptr->dl_handle, "ModAuthUser" );
+	if( auth ) 
 	{
 		/* Find free slot for module */
-		for( i = 0; i < NUM_MODULES; i++)
+		for( i = 0; i < NUM_MODULES; i++ )
 		{
-			if (AuthModList[i] == NULL)
+			if( AuthModList[i] == NULL )
 			{
 				/* Set entries for authentication */
 				mod_ptr->userauth = auth;					
@@ -156,14 +155,14 @@ int AddAuthModule (Module *mod_ptr)
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DelAuthModule (Module *mod_ptr)
+int DelAuthModule( Module *mod_ptr )
 {
 	int i;
 
 	/* Run through authentication module list */
-	for (i = 0; i < NUM_MODULES; i++)
+	for( i = 0; i < NUM_MODULES; i++ )
 	{
-		if (AuthModList[i] == mod_ptr)
+		if( AuthModList[i] == mod_ptr )
 		{
 			/* Found requested module so clear entry */
 			AuthModList[i] = NULL;
@@ -175,7 +174,7 @@ int DelAuthModule (Module *mod_ptr)
 
 /** @brief InitAuth
  *
- *  Init authentication sub system
+ *  Init authentication subsystem
  *  NeoStats core use only.
  *
  *  @param none
@@ -183,9 +182,9 @@ int DelAuthModule (Module *mod_ptr)
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int InitAuth(void)
+int InitAuth( void )
 {
 	/* Clear the module list */
-	memset (AuthModList, 0, sizeof(AuthModList));
+	memset( AuthModList, 0, sizeof( AuthModList ) );
 	return NS_SUCCESS;
 }

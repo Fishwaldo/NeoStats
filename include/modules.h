@@ -29,16 +29,16 @@ extern unsigned int fusermoddata;
 extern unsigned int fservermoddata;
 extern unsigned int fchannelmoddata;
 
-int InitModules (void);
-void FiniModules (void);
-Module *load_module (const char *path, Client * u);
-int unload_module (const char *module_name, Client * u);
-void unload_modules(void);
-int ns_cmd_modlist (CmdParams* cmdparams);
-void ModulesVersion (const char* nick, const char *remoteserver);
-void SendAllModuleEvent (Event event, CmdParams* cmdparams);
-void SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr);
-int SynchModule (Module* module_ptr);
-int SynchAllModules (void);
+int InitModules( void );
+void FiniModules( void );
+Module *load_module( const char *path, Client * u );
+int unload_module( const char *module_name, Client * u );
+void unload_modules( void );
+int ns_cmd_modlist( CmdParams* cmdparams );
+void ModulesVersion( const char* nick, const char *remoteserver );
+void SendAllModuleEvent( Event event, CmdParams* cmdparams );
+void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr );
+int SynchModule( Module* module_ptr );
+int SynchAllModules( void );
 
 #endif /* _MODULES_H_ */

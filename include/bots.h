@@ -24,16 +24,16 @@
 #ifndef _BOTS_H_
 #define _BOTS_H_
 
-int InitBots (void);
-void FiniBots (void);
-int ns_cmd_botlist (CmdParams* cmdparams);
-int DelBot (const char *nick);
-void DelModuleBots (Module *mod_ptr);
-int BotNickChange (const Bot *botptr, const char *newnick);
-void bot_private (char *origin, char **av, int ac);
-void bot_notice (char *origin, char **av, int ac);
-void bot_chan_private (char *origin, char **av, int ac);
-void bot_chan_notice (char *origin, char **av, int ac);
-void handle_dead_channel (Channel *c);
+int InitBots( void );
+void FiniBots( void );
+int ns_cmd_botlist( CmdParams* cmdparams );
+int DelBot( const char *nick );
+void DelModuleBots( Module *mod_ptr );
+int BotNickChange( const Bot *botptr, const char *newnick );
+void bot_private( char *origin, char **av, int ac );
+void bot_notice( char *origin, char **av, int ac );
+void bot_chan_private( char *origin, char **av, int ac );
+void bot_chan_notice( char *origin, char **av, int ac );
+void handle_dead_channel( Channel *c );
 
 #endif /* _BOTS_H_ */

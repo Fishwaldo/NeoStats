@@ -32,8 +32,8 @@
 
 #define CONFIG_NAME		"neostats.conf"
 
-static void cb_Server (char *arg, int configtype);
-static void cb_Module (char *arg, int configtype);
+static void cb_Server( char *arg, int configtype );
+static void cb_Module( char *arg, int configtype );
 
 /** @brief The list of modules to load
  */
@@ -74,58 +74,58 @@ static config_option options[] = {
  */
 
 int
-ConfLoad ()
+ConfLoad(  )
 {
 	/* Read in the Config File */
-	printf ("Reading the Config File. Please wait.....\n");
-	if (config_read (CONFIG_NAME, options) != 0) {
-		printf ("***************************************************\n");
-		printf ("*                  Error!                         *\n");
-		printf ("*                                                 *\n");
-		printf ("* Config file not found, or unable to open. Check *\n");
-		printf ("* its location and permissions and try again.     *\n");
-		printf ("*                                                 *\n");
-		printf ("*             NeoStats NOT Started                *\n");
-		printf ("***************************************************\n");
+	printf( "Reading the Config File. Please wait.....\n" );
+	if( config_read( CONFIG_NAME, options ) != 0 ) {
+		printf( "***************************************************\n" );
+		printf( "*                  Error!                         *\n" );
+		printf( "*                                                 *\n" );
+		printf( "* Config file not found, or unable to open. Check *\n" );
+		printf( "* its location and permissions and try again.     *\n" );
+		printf( "*                                                 *\n" );
+		printf( "*             NeoStats NOT Started                *\n" );
+		printf( "***************************************************\n" );
 		return NS_FAILURE;
 	}
-	if (nsconfig.die) {
-		printf ("\n-----> ERROR: Read the README file then edit %s <-----\n\n",CONFIG_NAME);
-		nlog (LOG_CRITICAL, "Read the README file then edit %s",CONFIG_NAME);
+	if( nsconfig.die ) {
+		printf( "\n-----> ERROR: Read the README file then edit %s <-----\n\n",CONFIG_NAME );
+		nlog( LOG_CRITICAL, "Read the README file then edit %s",CONFIG_NAME );
 		return NS_FAILURE;
 	}
-	if (nsconfig.error) {
-		printf ("\n-----> CONFIG ERROR: Check log file for more information then edit %s <-----\n\n",CONFIG_NAME);
-		nlog (LOG_CRITICAL, "CONFIG ERROR: Check log file for more information then edit %s",CONFIG_NAME);
+	if( nsconfig.error ) {
+		printf( "\n-----> CONFIG ERROR: Check log file for more information then edit %s <-----\n\n",CONFIG_NAME );
+		nlog( LOG_CRITICAL, "CONFIG ERROR: Check log file for more information then edit %s",CONFIG_NAME );
 		return NS_FAILURE;
 	}
-	printf ("Sucessfully loaded config file, booting NeoStats\n");
+	printf( "Sucessfully loaded config file, booting NeoStats\n" );
 	return NS_SUCCESS;
 }
 
 
 /** @brief prepare Modules defined in the config file
  *
- * When the config file encounters directives to Load Modules, it calls this function which prepares to load the modules (but doesn't actually load them)
+ * When the config file encounters directives to Load Modules, it calls this function which prepares to load the modules( but doesn't actually load them )
  *
  * @param arg the module name in this case
  * @param configtype an index of what config item is currently being processed. Ignored
  * @returns Nothing
  */
 void
-cb_Module (char *arg, int configtype)
+cb_Module( char *arg, int configtype )
 {
 	int i;
 
-	SET_SEGV_LOCATION();
-	if (!nsconfig.modnoload) {
-		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-			if (!ircstrcasecmp (load_mods[i], arg)) {
+	SET_SEGV_LOCATION( );
+	if( !nsconfig.modnoload ) {
+		for( i = 0;( i < NUM_MODULES ) &&( load_mods[i] != 0 ); i++ ) {
+			if( !ircstrcasecmp( load_mods[i], arg ) ) {
 				return;
 			}
 		}
-		load_mods[i] = sstrdup (arg);
-		dlog(DEBUG1, "Added Module %d :%s", i, (char *)load_mods[i]);
+		load_mods[i] = sstrdup( arg );
+		dlog(DEBUG1, "Added Module %d :%s", i,( char * )load_mods[i] );
 	}
 }
 
@@ -138,25 +138,25 @@ cb_Module (char *arg, int configtype)
  */
 
 int
-ConfLoadModules ()
+ConfLoadModules(  )
 {
 	int i;
 
-	SET_SEGV_LOCATION();
-	if(load_mods[0] == 0) {
-		nlog (LOG_NORMAL, "No modules configured for loading"); 
+	SET_SEGV_LOCATION( );
+	if(load_mods[0] == 0 ) {
+		nlog( LOG_NORMAL, "No modules configured for loading" ); 
 	} else {
-		nlog (LOG_NORMAL, "Loading configured modules"); 
-		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-			dlog(DEBUG1, "ConfLoadModules: Loading Module %s", (char *)load_mods[i]);
-			if (load_module (load_mods[i], NULL)) {
-				nlog (LOG_NORMAL, "Loaded module %s", (char *)load_mods[i]);
+		nlog( LOG_NORMAL, "Loading configured modules" ); 
+		for( i = 0;( i < NUM_MODULES ) &&( load_mods[i] != 0 ); i++ ) {
+			dlog(DEBUG1, "ConfLoadModules: Loading Module %s",( char * )load_mods[i] );
+			if( load_module( load_mods[i], NULL ) ) {
+				nlog( LOG_NORMAL, "Loaded module %s",( char * )load_mods[i] );
 			} else {
-				nlog (LOG_WARNING, "Failed to load module %s. Please check above error messages", (char *)load_mods[i]);
+				nlog( LOG_WARNING, "Failed to load module %s. Please check above error messages",( char * )load_mods[i] );
 			}
-			ns_free(load_mods[i]);
+			ns_free(load_mods[i] );
 		}
-		nlog (LOG_NORMAL, "Completed loading configured modules"); 
+		nlog( LOG_NORMAL, "Completed loading configured modules" ); 
 	}
 	return NS_SUCCESS;
 }
@@ -172,80 +172,80 @@ ConfLoadModules ()
  */
 
 void
-cb_Server (char *arg, int configtype)
+cb_Server( char *arg, int configtype )
 {
-	if (configtype == 0) {
+	if( configtype == 0 ) {
 		/* Server name */
-		strlcpy (me.name, arg, sizeof (me.name));
-	} else if (configtype == 1) {
+		strlcpy( me.name, arg, sizeof( me.name ) );
+	} else if( configtype == 1 ) {
 		/* Server Port */
-		me.port = atoi (arg);
-	} else if (configtype == 2) {
+		me.port = atoi( arg );
+	} else if( configtype == 2 ) {
 		/* Connect To */
-		strlcpy (me.uplink, arg, sizeof (me.uplink));
-	} else if (configtype == 3) {
+		strlcpy( me.uplink, arg, sizeof( me.uplink ) );
+	} else if( configtype == 3 ) {
 		/* Connect Pass */
-		strlcpy (nsconfig.pass, arg, sizeof (nsconfig.pass));
-	} else if (configtype == 4) {
+		strlcpy( nsconfig.pass, arg, sizeof( nsconfig.pass ) );
+	} else if( configtype == 4 ) {
 		/* Server InfoLine */
-		strlcpy (me.infoline, arg, sizeof (me.infoline));
-	} else if (configtype == 5) {
+		strlcpy( me.infoline, arg, sizeof( me.infoline ) );
+	} else if( configtype == 5 ) {
 		/* NetName */
-		strlcpy (me.netname, arg, sizeof (me.netname));
-	} else if (configtype == 6) {
+		strlcpy( me.netname, arg, sizeof( me.netname ) );
+	} else if( configtype == 6 ) {
 		/* Reconnect time */
-		nsconfig.r_time = atoi (arg);
-	} else if (configtype == 9) {
+		nsconfig.r_time = atoi( arg );
+	} else if( configtype == 9 ) {
 		nsconfig.want_privmsg = 1;
-	} else if (configtype == 10) {
-		strlcpy (me.serviceschan, arg, sizeof (me.serviceschan));
-	} else if (configtype == 11) {
+	} else if( configtype == 10 ) {
+		strlcpy( me.serviceschan, arg, sizeof( me.serviceschan ) );
+	} else if( configtype == 11 ) {
 		nsconfig.onlyopers = 1;
-	} else if (configtype == 12) {
+	} else if( configtype == 12 ) {
 		nsconfig.die = 1;
-	} else if (configtype == 13) {
-		strlcpy (me.local, arg, sizeof (me.local));
-	} else if (configtype == 14) {
-		strlcpy(LogFileNameFormat,arg,MAX_LOGFILENAME);
-	} else if (configtype == 15) {
-		me.numeric = atoi (arg);
+	} else if( configtype == 13 ) {
+		strlcpy( me.local, arg, sizeof( me.local ) );
+	} else if( configtype == 14 ) {
+		strlcpy(LogFileNameFormat,arg,MAX_LOGFILENAME );
+	} else if( configtype == 15 ) {
+		me.numeric = atoi( arg );
 		/* limit value - really need to print error and quit */
-		if(me.numeric<=0)
+		if(me.numeric<=0 )
 			me.numeric=1;
-		if(me.numeric>254)
+		if(me.numeric>254 )
 			me.numeric=254;
-	} else if (configtype == 16) {
-		nsconfig.setservertimes = atoi (arg);
+	} else if( configtype == 16 ) {
+		nsconfig.setservertimes = atoi( arg );
 		/* Convert hours input to seconds */
 		nsconfig.setservertimes = nsconfig.setservertimes * 60 * 60;
 		/* limit value - really need to print error and quit */
-		if(nsconfig.setservertimes <= 0) {
-			nsconfig.setservertimes = (24 * 60 * 60);
+		if(nsconfig.setservertimes <= 0 ) {
+			nsconfig.setservertimes =( 24 * 60 * 60 );
 		}
-	} else if (configtype == 17) {
+	} else if( configtype == 17 ) {
 		char *nick;
 		char *user;
 		char *host;
 
-		if (strstr(arg, "!")&& !strstr(arg, "@")) {
+		if( strstr(arg, "!" )&& !strstr(arg, "@" ) ) {
 			nlog(LOG_WARNING, 
 				"Invalid SERVICEROOT. Must be of the form nick!ident@host, was %s",
-				arg);
+				arg );
 			nsconfig.error = 1;
 		} else {
-			nick = strtok(arg, "!");
-			user = strtok(NULL, "@");
-			host = strtok(NULL, "");
-			strlcpy(nsconfig.rootuser.nick, nick, MAXNICK);
-			strlcpy(nsconfig.rootuser.user, user, MAXUSER);
-			strlcpy(nsconfig.rootuser.host, host, MAXHOST);
+			nick = strtok(arg, "!" );
+			user = strtok(NULL, "@" );
+			host = strtok(NULL, "" );
+			strlcpy(nsconfig.rootuser.nick, nick, MAXNICK );
+			strlcpy(nsconfig.rootuser.user, user, MAXUSER );
+			strlcpy(nsconfig.rootuser.host, host, MAXHOST );
 			nsconfig.rootuser.level = NS_ULEVEL_ROOT;
 		}
-	} else if (configtype == 18) {
-		strlcpy(me.protocol,arg,MAXHOST);
-	} else if (configtype == 19) {
-		strlcpy(me.dbm,arg,MAXHOST);
-	} else if (configtype == 20) {
-		strlcpy(me.rootnick,arg,MAXNICK);
+	} else if( configtype == 18 ) {
+		strlcpy(me.protocol,arg,MAXHOST );
+	} else if( configtype == 19 ) {
+		strlcpy(me.dbm,arg,MAXHOST );
+	} else if( configtype == 20 ) {
+		strlcpy(me.rootnick,arg,MAXNICK );
 	}
 }

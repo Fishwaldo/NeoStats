@@ -31,8 +31,8 @@
  * match_esc - compare with support for escaping chars
  * match_cidr - compares u!h@addr with u!h@addr/cidr
  */
-extern int match_esc(const char *mask, const char *name);
-extern int match_cidr(const char *mask, const char *name);
+int match_esc( const char *mask, const char *name );
+int match_cidr( const char *mask, const char *name );
 
 /*
  * collapse - collapse a string in place, converts multiple adjacent *'s 
@@ -41,8 +41,8 @@ extern int match_cidr(const char *mask, const char *name);
  *
  * collapse_esc() - collapse with support for escaping chars
  */
-extern char* collapse(char *pattern);
-extern char *collapse_esc(char *pattern);
+char *collapse( char *pattern );
+char *collapse_esc( char *pattern );
 
 extern const unsigned char ToLowerTab[];
 #define ToLower(c) (ToLowerTab[(unsigned char)(c)])

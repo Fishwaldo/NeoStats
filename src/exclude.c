@@ -435,7 +435,7 @@ int ModIsChannelExcluded(Channel *c)
 	Exclude *e;
 
 	SET_SEGV_LOCATION();
-	if (IsServicesChannel( c )) {
+	if (IsServicesChannel ( c ) ) {
 		dlog (DEBUG1, "Services channel %s is exclude.", c->name);
 		return NS_TRUE;
 	}

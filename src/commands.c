@@ -23,7 +23,6 @@
 
 /*  TODO:
  *  - More error processing
- *  - Configurable user levels for commands
  *  - Make SET options use a hash to speed up lookups?
  */
 
@@ -414,7 +413,7 @@ run_intrinsic_cmds (const char *cmd, CmdParams *cmdparams)
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 int
-run_bot_cmd (CmdParams *cmdparams)
+run_bot_cmd (CmdParams *cmdparams, int ischancmd)
 {
 	static char privmsgbuffer[BUFSIZE];
 	int userlevel;
@@ -445,6 +444,16 @@ run_bot_cmd (CmdParams *cmdparams)
 		/* Process command list */
 		cmd_ptr = (bot_cmd *)hnode_find (cmdparams->bot->botcmds, av[0]);
 		if (cmd_ptr) {
+			if( ischancmd && ( cmd_ptr->flags & CMD_FLAG_PRIVMSGONLY ) ) {
+				ns_free (av);
+				ns_free (cmdparams->av);
+				return NS_FAILURE;
+			}
+			if( !ischancmd && ( cmd_ptr->flags & CMD_FLAG_CHANONLY ) ) {
+				ns_free (av);
+				ns_free (cmdparams->av);
+				return NS_FAILURE;
+			}
 			cmdlevel = calc_cmd_ulevel(cmd_ptr);
 			/* Is user authorised to issue this command? */
 			if (userlevel < cmdlevel) {
@@ -479,7 +488,8 @@ run_bot_cmd (CmdParams *cmdparams)
 		return NS_SUCCESS;
 	}
 	/* We have run out of commands so report failure */
-	msg_unknown_command (cmdparams);
+	if(!ischancmd)
+		msg_unknown_command (cmdparams);
 	ns_free (av);
 	ns_free (cmdparams->av);
 	return NS_FAILURE;

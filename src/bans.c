@@ -49,19 +49,19 @@ static hash_t *banhash;
  *  @return pointer to newly created entry or NULL for failure
  */
 
-static Ban *new_ban (const char *mask)
+static Ban *new_ban( const char *mask )
 {
 	Ban *ban;
 
-	if (hash_isfull (banhash)) {
-		nlog (LOG_CRITICAL, "new_ban: bans hash is full");
+	if( hash_isfull( banhash ) ) {
+		nlog( LOG_CRITICAL, "new_ban: bans hash is full" );
 		return NULL;
 	}
 	/* Allocate memory for ban and add to hash table */
-	dlog(DEBUG2, "new_ban: %s", mask);
-	ban = ns_calloc (sizeof (Ban));
-	strlcpy (ban->mask, mask, MAXHOST);
-	hnode_create_insert (banhash, ban, ban->mask);
+	dlog( DEBUG2, "new_ban: %s", mask );
+	ban = ns_calloc( sizeof( Ban ) );
+	strlcpy( ban->mask, mask, MAXHOST );
+	hnode_create_insert( banhash, ban, ban->mask );
 	return ban;
 }
 
@@ -82,30 +82,30 @@ static Ban *new_ban (const char *mask)
  *  @return nothing
  */
 
-void AddBan (const char *type, const char *user, const char *host, const char *mask,
-			 const char *reason, const char *setby, const char *tsset, const char *tsexpires)
+void AddBan( const char *type, const char *user, const char *host, const char *mask,
+			 const char *reason, const char *setby, const char *tsset, const char *tsexpires )
 {
 	CmdParams * cmdparams;
 	Ban* ban;
 
 	SET_SEGV_LOCATION();
-	ban = new_ban (mask);
-	if (!ban) {
+	ban = new_ban( mask );
+	if( !ban ) {
 		return;
 	}
-	strlcpy (ban->type, type, 8);
-	strlcpy (ban->user, user, MAXUSER);
-	strlcpy (ban->host, host, MAXHOST);
-	strlcpy (ban->mask, mask, MAXHOST);
-	strlcpy (ban->reason, reason,BUFSIZE);
-	strlcpy (ban->setby ,setby, MAXHOST);
-	ban->tsset = atol(tsset);
-	ban->tsexpires = atol(tsexpires);
+	strlcpy( ban->type, type, 8 );
+	strlcpy( ban->user, user, MAXUSER );
+	strlcpy( ban->host, host, MAXHOST );
+	strlcpy( ban->mask, mask, MAXHOST );
+	strlcpy( ban->reason, reason,BUFSIZE );
+	strlcpy( ban->setby ,setby, MAXHOST );
+	ban->tsset = atol( tsset );
+	ban->tsexpires = atol( tsexpires );
 	/* run the module event */
-	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	cmdparams->param = (char *)ban;
-	SendAllModuleEvent (EVENT_ADDBAN, cmdparams);
-	ns_free (cmdparams);
+	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
+	cmdparams->param = ( char * )ban;
+	SendAllModuleEvent( EVENT_ADDBAN, cmdparams );
+	ns_free( cmdparams );
 }
 
 /** @brief DelBan
@@ -125,28 +125,28 @@ void AddBan (const char *type, const char *user, const char *host, const char *m
  *  @return nothing
  */
 
-void DelBan (const char *type, const char *user, const char *host, const char *mask,
-			 const char *reason, const char *setby, const char *tsset, const char *tsexpires)
+void DelBan( const char *type, const char *user, const char *host, const char *mask,
+			 const char *reason, const char *setby, const char *tsset, const char *tsexpires )
 {
 	CmdParams * cmdparams;
 	Ban *ban;
 	hnode_t *bansnode;
 
 	SET_SEGV_LOCATION();
-	bansnode = hash_lookup (banhash, mask);
-	if (!bansnode) {
-		nlog (LOG_WARNING, "DelBan: unknown ban %s", mask);
+	bansnode = hash_lookup( banhash, mask );
+	if( !bansnode ) {
+		nlog( LOG_WARNING, "DelBan: unknown ban %s", mask );
 		return;
 	}
-	ban = hnode_get (bansnode);
+	ban = hnode_get( bansnode );
 	/* run the module event */
-	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
-	cmdparams->param = (char *)ban;
-	SendAllModuleEvent (EVENT_DELBAN, cmdparams);
-	ns_free (cmdparams);
-	hash_delete (banhash, bansnode);
-	hnode_destroy (bansnode);
-	ns_free (ban);
+	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
+	cmdparams->param = ( char * )ban;
+	SendAllModuleEvent( EVENT_DELBAN, cmdparams );
+	ns_free( cmdparams );
+	hash_delete( banhash, bansnode );
+	hnode_destroy( bansnode );
+	ns_free( ban );
 }
 
 /** @brief ListBans
@@ -159,19 +159,19 @@ void DelBan (const char *type, const char *user, const char *host, const char *m
  *  @return nothing
  */
 
-void ListBans (void)
+void ListBans( void )
 {
 	Ban *ban;
 	hscan_t ss;
 	hnode_t *bansnode;
 
-	irc_chanalert (ns_botptr, _("Ban Listing:"));
-	hash_scan_begin (&ss, banhash);
-	while ((bansnode = hash_scan_next (&ss)) != NULL) {
-		ban = hnode_get (bansnode);
-		irc_chanalert (ns_botptr, _("Ban: %s "), ban->mask);
+	irc_chanalert( ns_botptr, _( "Ban Listing:" ) );
+	hash_scan_begin( &ss, banhash );
+	while( ( bansnode = hash_scan_next( &ss ) ) != NULL ) {
+		ban = hnode_get( bansnode );
+		irc_chanalert( ns_botptr, _( "Ban: %s " ), ban->mask );
 	}
-	irc_chanalert (ns_botptr, _("End of list."));
+	irc_chanalert( ns_botptr, _( "End of list." ) );
 }
 
 /** @brief FiniBans
@@ -184,20 +184,20 @@ void ListBans (void)
  *  @return nothing
  */
 
-void FiniBans (void)
+void FiniBans( void )
 {
 	Ban *ban;
 	hnode_t *bansnode;
 	hscan_t hs;
 
-	hash_scan_begin (&hs, banhash);
-	while ((bansnode = hash_scan_next(&hs)) != NULL ) {
-		ban = hnode_get (bansnode);
-		hash_delete (banhash, bansnode);
-		hnode_destroy (bansnode);
-		ns_free (ban);
+	hash_scan_begin( &hs, banhash );
+	while( ( bansnode = hash_scan_next(&hs ) ) != NULL  ) {
+		ban = hnode_get( bansnode );
+		hash_delete( banhash, bansnode );
+		hnode_destroy( bansnode );
+		ns_free( ban );
 	}
-	hash_destroy (banhash);
+	hash_destroy( banhash );
 }
 
 /** @brief InitBans
@@ -210,11 +210,11 @@ void FiniBans (void)
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int InitBans (void)
+int InitBans( void )
 {
-	banhash = hash_create (-1, 0, 0);
-	if (!banhash) {
-		nlog (LOG_CRITICAL, "Unable to create bans hash");
+	banhash = hash_create( -1, 0, 0 );
+	if( !banhash ) {
+		nlog( LOG_CRITICAL, "Unable to create bans hash" );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -230,7 +230,7 @@ int InitBans (void)
  *  @return pointer to hash table
  */
 
-hash_t *GetBanHash (void)
+hash_t *GetBanHash( void )
 {
 	return banhash;
 }

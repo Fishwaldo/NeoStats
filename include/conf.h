@@ -27,7 +27,7 @@
 #ifndef _conf_h_
 #define _conf_h_
 
-int ConfLoad (void);
-int ConfLoadModules (void);
+int ConfLoad( void );
+int ConfLoadModules( void );
 
 #endif

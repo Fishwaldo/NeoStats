@@ -24,11 +24,11 @@
 #ifndef _DCC_H_
 #define _DCC_H_
 
-int dcc_req  (CmdParams* cmdparams);
-int InitDCC(void);
-void FiniDCC(void);
-void dcc_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set);
-void dcc_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set);
-void dcc_send_msg(Client* dcc, char * buf);
+int InitDCC( void );
+void FiniDCC( void );
+void dcc_hook_1( fd_set *read_fd_set, fd_set *write_fd_set );
+void dcc_hook_2( fd_set *read_fd_set, fd_set *write_fd_set );
+int dcc_req ( CmdParams* cmdparams );
+void dcc_send_msg( Client* dcc, char * buf );
 
 #endif /* _DCC_H_ */

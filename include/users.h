@@ -24,22 +24,22 @@
 #ifndef _USERS_H_
 #define _USERS_H_
 
-int InitUsers (void);
-void FiniUsers (void);
-Client *AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const char*ip, const char* TS, const char* numeric);
-void KillUser (const char* source, const char *nick, const char *reason);
-void QuitUser (const char *nick, const char *reason);
-void SetUserVhost (const char* nick, const char* vhost);
-void SetUserServicesTS (const char* nick, const char* ts);
-int UserNickChange (const char * oldnick, const char * newnick, const char * ts);
-void UserMode (const char *nick, const char *modes);
-void UserSMode (const char *nick, const char *modes);
-void UserAway (const char *nick, const char *awaymsg);
-Client *find_user_base64 (const char *num);
-void ListUsers (CmdParams* cmdparams, const char *nick);
-void QuitServerUsers (Client *s);
-EXPORTFUNC void AddFakeUser(const char *mask);
-EXPORTFUNC void DelFakeUser(const char *mask);
-void CleanupUserModdata (int index);
+int InitUsers( void );
+void FiniUsers( void );
+Client *AddUser( const char *nick, const char *user, const char *host, const char *realname, const char *server, const char *ip, const char *TS, const char *numeric );
+void KillUser( const char *source, const char *nick, const char *reason );
+void QuitUser( const char *nick, const char *reason );
+void SetUserVhost( const char *nick, const char *vhost );
+void SetUserServicesTS( const char *nick, const char *ts );
+void UserNickChange( const char *oldnick, const char *newnick, const char *ts );
+void UserMode( const char *nick, const char *modes );
+void UserSMode( const char *nick, const char *modes );
+void UserAway( const char *nick, const char *awaymsg );
+Client *find_user_base64( const char *num );
+void ListUsers( CmdParams* cmdparams, const char *nick );
+void QuitServerUsers( Client *s );
+EXPORTFUNC void AddFakeUser( const char *mask );
+EXPORTFUNC void DelFakeUser( const char *mask );
+void CleanupUserModdata( int index );
 
 #endif /* _USERS_H_ */

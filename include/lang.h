@@ -68,13 +68,13 @@ struct lang_stats {
 typedef void (*LANGDebugFunc) (const char *fmt, ...);
 
 
-extern void LANGSetData(char* key, void* data, int size, char *lang, int keydone);
-extern int LANGGotData(char *key, char *lang);
-extern int LANGDumpDB(char *lang, int missing, void *);
-extern int LANGNewLang(char *lang);
-extern void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc);
-extern void LANGfini();
-extern int LANGfindlang(char *);
+void LANGSetData( char* key, void* data, int size, char *lang, int keydone );
+int LANGGotData( char *key, char *lang );
+int LANGDumpDB( char *lang, int missing, void *mylist );
+int LANGNewLang( char *lang );
+void LANGinit( int debug, char *dbpath, LANGDebugFunc debugfunc );
+void LANGfini( void );
+int LANGfindlang( char * string);
 
 #ifdef USEGETTEXT
 #define _(x) LANGgettext(x, lang)

@@ -695,6 +695,15 @@ typedef enum SET_REASON {
 typedef int (*bot_cmd_handler) ( CmdParams* cmdparams );
 typedef int (*bot_set_handler) ( CmdParams* cmdparams, SET_REASON reason );
 
+/* Command will only respond to privmsg. !command in channel is ignored.
+ * Use of this flag is discouraged.
+ */
+#define CMD_FLAG_PRIVMSGONLY	0x00000001
+/* Command will only respond to !command in channel. privmsg is ignored.
+ * Use of this flag is discouraged.
+ */
+#define CMD_FLAG_CHANONLY		0x00000002
+
 /** @brief bot_cmd structure
  *  defines command lists for bots
  */
@@ -705,6 +714,7 @@ typedef struct bot_cmd {
 	int				ulevel;		/* min user level */
 	const char		**helptext;	/* pointer to help text */
 	const char		*onelinehelp;/* single line help for generic help function */
+	int				flags;		/* command flags */
 }bot_cmd;
 
 /** @brief flags for bots

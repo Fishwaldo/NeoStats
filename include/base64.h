@@ -26,12 +26,12 @@
 #ifndef _BASE64_H_
 #define _BASE64_H_
 
-EXPORTFUNC int set_server_base64 (const char *name, const char *base64name);
-EXPORTFUNC char *server_to_base64 (const char *name);
-EXPORTFUNC char *base64_to_server (const char *base64name);
+EXPORTFUNC int set_server_base64( const char *name, const char *base64name );
+EXPORTFUNC char *server_to_base64( const char *name );
+EXPORTFUNC char *base64_to_server( const char *base64name );
 
-EXPORTFUNC int set_nick_base64 (const char *nick, const char *base64name);
-EXPORTFUNC char *nick_to_base64 (const char *nick);
-EXPORTFUNC char *base64_to_nick (const char *base64name);
+EXPORTFUNC int set_nick_base64( const char *nick, const char *base64name );
+EXPORTFUNC char *nick_to_base64( const char *nick );
+EXPORTFUNC char *base64_to_nick( const char *base64name );
 
 #endif /* _BASE64_H_ */

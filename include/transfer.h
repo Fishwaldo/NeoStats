@@ -69,7 +69,7 @@ typedef struct neo_transfer {
 list_t *activetransfers;
 
 
-int InitCurl(void);
-void FiniCurl(void);
+int InitCurl( void );
+void FiniCurl( void );
 
 #endif /* _TRANSFER_H_ */

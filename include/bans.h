@@ -24,12 +24,12 @@
 #ifndef _BANS_H_
 #define _BANS_H_
 
-int InitBans (void);
-void FiniBans (void);
-void AddBan (const char *type, const char *user, const char *host, const char *mask,
-			 const char *reason, const char *setby, const char *tsset, const char *tsexpires);
-void DelBan (const char *type, const char *user, const char *host, const char *mask,
-			 const char *reason, const char *setby, const char *tsset, const char *tsexpires);
-void ListBans (void);
+int InitBans( void );
+void FiniBans( void );
+void AddBan( const char *type, const char *user, const char *host, const char *mask,
+			 const char *reason, const char *setby, const char *tsset, const char *tsexpires );
+void DelBan( const char *type, const char *user, const char *host, const char *mask,
+			 const char *reason, const char *setby, const char *tsset, const char *tsexpires );
+void ListBans( void );
 
 #endif /* _BANS_H_ */

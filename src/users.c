@@ -316,7 +316,7 @@ void UserAway (const char *nick, const char *awaymsg)
 	ns_free (cmdparams);
 }
 
-int UserNickChange (const char *oldnick, const char *newnick, const char *ts)
+void UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 {
 	CmdParams *cmdparams;
 	hnode_t *un;
@@ -327,7 +327,7 @@ int UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 	un = hash_lookup (userhash, oldnick);
 	if (!un) {
 		nlog (LOG_WARNING, "UserNickChange: can't find user %s", oldnick);
-		return NS_FAILURE;
+		return;
 	}
 	u = (Client *) hnode_get (un);
 	hash_delete (userhash, un);
@@ -346,7 +346,7 @@ int UserNickChange (const char *oldnick, const char *newnick, const char *ts)
 	if (IsMe(u)) {
 		BotNickChange (u->user->bot, newnick);
 	}
-	return NS_SUCCESS;
+	return;
 }
 
 Client *find_user_base64 (const char *num)

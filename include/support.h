@@ -25,19 +25,19 @@
 #define _SUPPORT_H_
 
 #ifndef HAVE_STRNLEN
-EXPORTFUNC size_t strnlen(const char * src, size_t count);
+EXPORTFUNC size_t strnlen( const char * src, size_t count );
 #endif /* HAVE_STRNLEN */
 #ifndef HAVE_STRLCPY
-EXPORTFUNC size_t strlcpy(char *dst, const char *src, size_t size);
+EXPORTFUNC size_t strlcpy( char *dst, const char *src, size_t size );
 #endif /* HAVE_STRLCPY */
 #ifndef HAVE_STRLCAT
-EXPORTFUNC size_t strlcat(char *dst, const char *src, size_t size);
+EXPORTFUNC size_t strlcat( char *dst, const char *src, size_t size );
 #endif /* HAVE_STRLCAT */
 #ifndef HAVE_STRNDUP
-EXPORTFUNC char *strndup(const char *src, size_t count);
+EXPORTFUNC char *strndup( const char *src, size_t count );
 #endif /* HAVE_STRNDUP */
 #ifndef HAVE_INET_NTOP
-EXPORTFUNC char *inet_ntop(int af, const unsigned char *src, char *dst, size_t size); 
+EXPORTFUNC char *inet_ntop( int af, const unsigned char *src, char *dst, size_t size ); 
 #endif /* HAVE_INET_NTOP */
 
 #endif /* _SUPPORT_H_ */

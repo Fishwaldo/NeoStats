@@ -47,12 +47,12 @@ static int ctcp_req_ping (CmdParams* cmdparams);
 static int ctcp_rpl_ping (CmdParams* cmdparams);
 
 static ctcp_cmd ctcp_cmds[]= {
-	{"VERSION",		ctcp_req_version,		ctcp_rpl_version },
-	{"FINGER",		ctcp_req_finger,		ctcp_rpl_finger },
-	{"ACTION",		ctcp_req_action,		NULL },
-	{"DCC",			ctcp_req_dcc,			ctcp_rpl_dcc },
-	{"TIME",		ctcp_req_time,			ctcp_rpl_time },
-	{"PING",		ctcp_req_ping,			ctcp_rpl_ping },
+	{"VERSION",	ctcp_req_version,	ctcp_rpl_version },
+	{"FINGER",	ctcp_req_finger,	ctcp_rpl_finger },
+	{"ACTION",	ctcp_req_action,	NULL },
+	{"DCC",		ctcp_req_dcc,		ctcp_rpl_dcc },
+	{"TIME",	ctcp_req_time,		ctcp_rpl_time },
+	{"PING",	ctcp_req_ping,		ctcp_rpl_ping },
 	{NULL, NULL, NULL}
 };
 

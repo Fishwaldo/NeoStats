@@ -24,7 +24,7 @@
 #ifndef _NSDB_H_
 #define _NSDB_H_
 
-int InitDBA (void);
-void FiniDBA (void);
+int InitDBA( void );
+void FiniDBA( void );
 
 #endif /* _NSDB_H_ */

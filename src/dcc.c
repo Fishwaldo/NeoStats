@@ -154,7 +154,7 @@ void dcc_parse(Client *dcc, char *line)
 			if (cmdparams->bot->flags & BOT_FLAG_SERVICEBOT) 
 			{
 				cmdparams->param = cmd;
-				run_bot_cmd (cmdparams);
+				run_bot_cmd (cmdparams, 0);
 			}
 		}
 		ns_free (cmdparams);

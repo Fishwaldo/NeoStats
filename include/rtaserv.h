@@ -32,11 +32,9 @@ extern TBLDEF neo_users;
 extern TBLDEF neo_modules;
 extern TBLDEF neo_servers;
 
-void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set);
-void rta_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set);
-
-void rtaserv_init (void);
-void rtaserv_fini (void);
-void rtaserv_init2 (void);
+void rta_hook_1( fd_set *read_fd_set, fd_set *write_fd_set );
+void rta_hook_2( fd_set *read_fd_set, fd_set *write_fd_set );
+void rtaserv_init( void );
+void rtaserv_fini( void );
 
 #endif /* _RTASERV_H_ */

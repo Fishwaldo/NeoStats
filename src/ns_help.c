@@ -228,6 +228,20 @@ const char *ns_help_set_splittime[] = {
 	NULL
 };
 
+const char *ns_help_set_msgsampletime[] = {
+	"\2MSGSAMPLETIME <number>\2",
+	"Sets the threshold for message floods.",
+	"<number> is number of changes in 10 seconds.",
+	NULL
+};
+
+const char *ns_help_set_msgthreshold[] = {
+	"\2MSGTHRESHOLD <number>\2",
+	"Sets the threshold for message floods.",
+	"<number> is number of changes in 10 seconds.",
+	NULL
+};
+
 const char *ns_help_set_pingtime[] = {
 	"\2PINGTIME <seconds>\2",
 	"Interval at which NeoStats pings servers",

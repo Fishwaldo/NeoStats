@@ -120,6 +120,8 @@ static bot_cmd ns_commands[]=
 /** Bot setting table */
 static bot_setting ns_settings[]=
 {
+	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgsampletime",	NULL,	ns_help_set_msgsampletime, NULL, (void *)10 },
+	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, "msgthreshold",	NULL,	ns_help_set_msgthreshold, NULL, (void *)5 },
 	{"SPLITTIME",		&nsconfig.splittime,	SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, "splittime",	NULL,	ns_help_set_splittime, NULL, (void *)300 },
 	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,		0, 0, 	NS_ULEVEL_ADMIN, "joinserviceschan",	NULL,	ns_help_set_joinserviceschan, NULL, (void*)1 },
 	{"PINGTIME",		&nsconfig.pingtime,	SET_TYPE_INT,		0, 0, 	NS_ULEVEL_ADMIN, "pingtime",	NULL,	ns_help_set_pingtime, NULL, (void*)120 },

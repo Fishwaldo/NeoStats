@@ -61,7 +61,7 @@ typedef struct _cfgoption {
  * 2. the list of optionnames to recognize
  *
  * returns 0 on success; !0 on error */
-int config_read (char *fname, config_option * options);
-void config_register_options (config_option *);
+int config_read( char *fname, config_option *options );
+void config_register_options( config_option *options );
 
 #endif /* HAVE_CFG_H */

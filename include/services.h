@@ -50,6 +50,8 @@ typedef struct config {
 	unsigned int onlyopers:1;
 	int setservertimes;
 	int splittime;
+	int msgsampletime;
+	int msgthreshold;
 	unsigned int versionscan;
 	int r_time;
 	char pass[MAXPASS];
@@ -73,7 +75,7 @@ extern Module ns_module;
 extern BotInfo ns_botinfo;
 EXPORTVAR extern Bot* ns_botptr;
 
-void InitServices(void);
-int init_services_bot (void);
+void InitServices( void );
+int init_services_bot( void );
 
 #endif /* _SERVICES_H_ */

@@ -24,10 +24,10 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-int InitTimers (void);
-void FiniTimers (void);
-int ns_cmd_timerlist (CmdParams* cmdparams);
-void CheckTimers (void);
-int del_timers (Module *mod_ptr);
+int InitTimers( void );
+void FiniTimers( void );
+int ns_cmd_timerlist( CmdParams* cmdparams );
+void CheckTimers( void );
+int del_timers( Module *mod_ptr );
 
 #endif /* _TIMER_H_ */

@@ -211,21 +211,21 @@ MODULEFUNC void send_setname(const char *nick, const char *realname);
 MODULEFUNC void send_sethost (const char *nick, const char *host);
 MODULEFUNC void send_setident (const char *nick, const char *ident);
 
-int InitIrcd (void);
-int irc_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink);
-int irc_nick (const char *nick, const char *user, const char *host, const char *realname, const char *modes);
-int irc_server (const char *name, const int numeric, const char *infoline);
-int irc_squit (const char *server, const char *quitmsg);
+int InitIrcd( void );
+int irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink );
+int irc_nick( const char *nick, const char *user, const char *host, const char *realname, const char *modes );
+int irc_server( const char *name, const int numeric, const char *infoline );
+int irc_squit( const char *server, const char *quitmsg );
 /*int snetinfo_cmd (void);*/
 /*int ssvinfo_cmd (void);*/
 /*int sburst_cmd (int b);*/
 /*int seob_cmd (const char *server);*/
-int irc_smo (const char *source, const char *umodetarget, const char *msg);
+int irc_smo( const char *source, const char *umodetarget, const char *msg );
 
 EXPORTFUNC void send_cmd (char *fmt, ...) __attribute__((format(printf,1,2))); /* 2=format 3=params */
 
 MODULEFUNC void parse (char *line);
 
-void (*irc_parse) (char *line);
+void (*irc_parse) ( char *line );
 
 #endif

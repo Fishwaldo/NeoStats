@@ -26,13 +26,13 @@
 #ifndef SOCK_H
 #define SOCK_H
 
-int InitSocks (void);
-void FiniSocks (void);
-int ns_cmd_socklist (CmdParams* cmdparams);
-int del_sockets (Module *mod_ptr);
-void Connect (void);
-void send_to_socket (const char *buf, const int buflen);
-int check_sql_sock();
+int InitSocks( void );
+void FiniSocks( void );
+int ns_cmd_socklist( CmdParams* cmdparams );
+int del_sockets( Module *mod_ptr );
+void Connect( void );
+void send_to_socket( const char *buf, const int buflen );
+int check_sql_sock( void );
 
 extern char recbuf[BUFSIZE];
 

@@ -24,6 +24,6 @@
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-void InitSignals (void);
+void InitSignals( void );
 
 #endif /* SIGNALS_H */
