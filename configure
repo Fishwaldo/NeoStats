@@ -464,7 +464,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED LIBOBJS ALLOCA POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE wi_PWD PROTOCOL LIBTOOL_DEPS MODULES LIBDB CCDV LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED LIBOBJS ALLOCA POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE wi_PWD USECCDV PROTOCOL LIBTOOL_DEPS MODULES LIBDB CCDV LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -30789,8 +30789,10 @@ if test "x$CCDV" = "x" ; then
 	./ccdv >/dev/null 2>&1
 	if test $? -eq 96 ; then
 		CCDV="./ccdv"
+		USECCDV="#"
 	else
 		/bin/rm -f ccdv
+		USECCDV=""
 	fi
 fi
 if test "x$CCDV" != x ; then
@@ -30848,8 +30850,11 @@ unset wi_resolved_path wi_path
 
 	wi_cv_path_ccdv="$CCDV"
 	CC="$CCDV $CC"	# trailing space needed
+	USECCDV="#"
 else
 	wi_cv_path_ccdv=""
+	USECCDV=""
+
 fi
 
 fi
@@ -30862,6 +30867,7 @@ if test "$wi_used_cache_path_ccdv" = yes ; then
 	fi
 fi
 
+
 fi
 
 
@@ -30872,7 +30878,7 @@ fi
 
 
 
-                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile lib/Makefile lib/curl/Makefile lib/keeper/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile lib/gdbm/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile cronchk"
+                                                                                                                                                                                              ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile lib/Makefile lib/curl/Makefile lib/adns/Makefile lib/pcre/Makefile lib/rta/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/loveserv/Makefile modules/moraleserv/Makefile modules/statserv/Makefile cronchk"
 
 
 cat >confcache <<\_ACEOF
@@ -31558,11 +31564,9 @@ do
   "src/dbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/dbm/Makefile" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "lib/curl/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/curl/Makefile" ;;
-  "lib/keeper/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/keeper/Makefile" ;;
   "lib/adns/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/adns/Makefile" ;;
   "lib/pcre/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/pcre/Makefile" ;;
   "lib/rta/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/rta/Makefile" ;;
-  "lib/gdbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/gdbm/Makefile" ;;
   "modules/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/Makefile" ;;
   "modules/connectserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/connectserv/Makefile" ;;
   "modules/extauth/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/extauth/Makefile" ;;
@@ -31747,6 +31751,7 @@ s,@CURL_CFLAGS@,$CURL_CFLAGS,;t t
 s,@BUILD_CURL_TRUE@,$BUILD_CURL_TRUE,;t t
 s,@BUILD_CURL_FALSE@,$BUILD_CURL_FALSE,;t t
 s,@wi_PWD@,$wi_PWD,;t t
+s,@USECCDV@,$USECCDV,;t t
 s,@PROTOCOL@,$PROTOCOL,;t t
 s,@LIBTOOL_DEPS@,$LIBTOOL_DEPS,;t t
 s,@MODULES@,$MODULES,;t t

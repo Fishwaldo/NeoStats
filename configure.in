@@ -316,11 +316,9 @@ AC_CONFIG_FILES([Makefile
 		src/dbm/Makefile 
 		lib/Makefile
 		lib/curl/Makefile
-		lib/keeper/Makefile 
 		lib/adns/Makefile
 		lib/pcre/Makefile 
 		lib/rta/Makefile 
-		lib/gdbm/Makefile 
 		modules/Makefile 
 		modules/connectserv/Makefile
 		modules/extauth/Makefile

@@ -3306,16 +3306,21 @@ if test "x$CCDV" = "x" ; then
 	./ccdv >/dev/null 2>&1
 	if test $? -eq 96 ; then
 		CCDV="./ccdv"
+		USECCDV="#"
 	else
 		/bin/rm -f ccdv
+		USECCDV=""
 	fi
 fi
 if test "x$CCDV" != x ; then
 	wi_RESOLVE_PATH([$CCDV], [CCDV])
 	wi_cv_path_ccdv="$CCDV"
 	CC="$CCDV $CC"	# trailing space needed
+	USECCDV="#"
 else
 	wi_cv_path_ccdv=""
+	USECCDV=""
+
 fi
 ])
 if test "$wi_used_cache_path_ccdv" = yes ; then
@@ -3325,6 +3330,7 @@ if test "$wi_used_cache_path_ccdv" = yes ; then
 	fi
 fi
 AC_SUBST(CC)
+AC_SUBST(USECCDV)
 fi
 ])
 dnl
