@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.a2-dev
+ - Fix problems with persistent bots reported by DNB. (M)
  - va_copy handling courtesy of Reed. (M)
 
 * NeoStats * Version 3.0.a1

@@ -1150,30 +1150,34 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 	c = FindChannel( chan );
 	ts =( !c ) ? me.now : c->creationtime;
 	/* Use sjoin if available */
-	if( ( ircd_srv.protocol & PROTOCOL_SJOIN ) && irc_send_sjoin ) {
-		if( mode == NULL ) {
+	if( ( ircd_srv.protocol & PROTOCOL_SJOIN ) && irc_send_sjoin ) 
+	{
+		if( mode == NULL ) 
+		{
 			irc_send_sjoin( me.name, botptr->u->name, chan,( unsigned long )ts );
-		} else {
+		} 
+		else 
+		{
 			ircsnprintf( ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix( mode[1] ), botptr->u->name );
 			irc_send_sjoin( me.name, ircd_buf, chan,( unsigned long )ts );
-		}
-		JoinChannel( botptr->u->name, chan );
-		/* Increment number of persistent users if needed */
-		if( botptr->flags & BOT_FLAG_PERSIST ) {
-			if( !c )
-				c = FindChannel( chan );
-			c->persistentusers ++;
-		}
-		if( mode ) {
 			ChanUserMode( chan, botptr->u->name, 1, CmodeStringToMask( mode ) );
 		}
-		return NS_SUCCESS;
+		JoinChannel( botptr->u->name, chan );
 	}
-	/* sjoin not available so use normal join */	
-	irc_send_join( botptr->u->name, chan, NULL, ( unsigned long )me.now );
-	JoinChannel( botptr->u->name, chan );
-	if( mode ) {
-		irc_chanusermode( botptr, chan, mode, botptr->u->name );
+	else
+	{
+		/* sjoin not available so use normal join */	
+		irc_send_join( botptr->u->name, chan, NULL, ( unsigned long )me.now );
+		JoinChannel( botptr->u->name, chan );
+		if( mode ) {
+			irc_chanusermode( botptr, chan, mode, botptr->u->name );
+		}
+	}
+	/* Increment number of persistent users if needed */
+	if( botptr->flags & BOT_FLAG_PERSIST ) {
+		if( !c )
+			c = FindChannel( chan );
+		c->persistentusers ++;
 	}
 	return NS_SUCCESS;
 }
