@@ -2,6 +2,12 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
+** Based on:
+** KEEPER: A configuration reading and writing library
+**
+** Copyright (C) 1999-2000 Miklos Szeredi
+** Email: mszeredi@inf.bme.hu
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -20,34 +26,8 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-/*
- * KEEPER: A configuration reading and writing library
- *
- * Copyright (C) 1999-2000 Miklos Szeredi
- * Email: mszeredi@inf.bme.hu
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
- */
 
 #include "kp_util.h"
-
-#include <errno.h>
-#include <time.h>
-#include <unistd.h>
-#include <sys/stat.h>
 
 /* One physical file's cached data */
 typedef struct _kp_fil {
@@ -104,8 +84,8 @@ static kp_fil *kp_new_cached_file(kp_path * kpp)
 {
 	kp_fil *fil;
 
-	fil = (kp_fil *) malloc_check(sizeof(kp_fil));
-	fil->kpp.path = strdup_check(kpp->path);
+	fil = (kp_fil *) smalloc(sizeof(kp_fil));
+	fil->kpp.path = sstrdup(kpp->path);
 	fil->kpp.dbindex = kpp->dbindex;
 	fil->keys = NULL;
 	fil->dirty = 0;
@@ -385,7 +365,7 @@ int _kp_cache_set(kp_path * kpp, kp_key * ck)
 #ifdef KPDEBUG
 		printf("kp_cache_set: create new %s\n", kpp->path);
 #endif
-		key = (kp_key *) malloc_check(sizeof(kp_key));
+		key = (kp_key *) smalloc(sizeof(kp_key));
 		key->next = fil->keys;
 		fil->keys = key;
 	}
@@ -546,7 +526,7 @@ static int kp_get_subkeys_file(kp_path * kpp, const char *keyname,
 			if (*s == '/')
 				s++;
 
-			ent = strdup_check(s);
+			ent = sstrdup(s);
 			s = ent;
 			while (*s && *s != '/')
 				s++;

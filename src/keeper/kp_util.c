@@ -2,6 +2,12 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
+** Based on:
+** KEEPER: A configuration reading and writing library
+**
+** Copyright (C) 1999-2000 Miklos Szeredi
+** Email: mszeredi@inf.bme.hu
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -20,34 +26,10 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-/*
- * KEEPER: A configuration reading and writing library
- *
- * Copyright (C) 1999-2000 Miklos Szeredi
- * Email: mszeredi@inf.bme.hu
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
- */
 
 #include "kp_util.h"
 
 #include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/stat.h>
 
 /* Initialization is done */
 static volatile int kp_inited = 0;
@@ -72,7 +54,7 @@ static char *kp_basedirs[KPDB_NUMDBS];
 
 #define GLOBALDIR "data/kpconf"	/* Default global database path */
 #define LOCALDIR  "data/kpdata"	/* Local database path */
-#define USERSUBDIR "kplang"	/* Default user database dir */
+#define USERSUBDIR "data/kplang"	/* Default user database dir */
 #define LOCKFILE ":lock:"	/* Lock file name */
 
 /* ------------------------------------------------------------------------- 
@@ -89,7 +71,7 @@ static void kp_init_tmpname()
 
 	pid = getpid();
 
-	kp_tmpname = (char *) malloc_check(strlen(hostname) + 64);
+	kp_tmpname = (char *) smalloc(strlen(hostname) + 64);
 	sprintf(kp_tmpname, ":tmp.%s.%u:", hostname, pid);
 }
 
@@ -100,7 +82,7 @@ static char *kp_init_localdb(void)
 {
 	char *basedir;
 
-	basedir = (char *) malloc_check(strlen(LOCALDIR) + 2);
+	basedir = (char *) smalloc(strlen(LOCALDIR) + 2);
 	sprintf(basedir, "%s/", LOCALDIR);
 	mkdir(basedir, 0755);
 
@@ -118,7 +100,7 @@ static char *kp_init_userdb(void)
 	char *basedir;
 	userdir = getenv("KEEPER_USERDIR");
 	if (userdir != 0) {
-		basedir = (char *) malloc_check(strlen(userdir) + 2);
+		basedir = (char *) smalloc(strlen(userdir) + 2);
 		sprintf(basedir, "%s/", userdir);
 	} else {
 		homeval = getenv("HOME");
@@ -126,7 +108,7 @@ static char *kp_init_userdb(void)
 			homeval = "";
 		/* FIXME: where to find home, if $HOME is not set? */
 
-		basedir = (char *) malloc_check(strlen(homeval) + 1 +
+		basedir = (char *) smalloc(strlen(homeval) + 1 +
 						strlen(USERSUBDIR) + 2);
 		sprintf(basedir, "%s/%s/", homeval, USERSUBDIR);
 	}
@@ -151,9 +133,9 @@ static char *kp_init_globaldb(void)
 	kp_get_string("l/keeper/globaldir", &globaldir);
 	if (globaldir == NULL)
 #endif
-		globaldir = strdup_check(GLOBALDIR);
+		globaldir = sstrdup(GLOBALDIR);
 
-	basedir = (char *) malloc_check(strlen(globaldir) + 2);
+	basedir = (char *) smalloc(strlen(globaldir) + 2);
 	sprintf(basedir, "%s/", globaldir);
 	free(globaldir);
 
@@ -221,8 +203,7 @@ static char *kp_read_line(FILE * fp)
 			eol = 1;
 		}
 
-		line = (char *)
-		    check_ptr(realloc(line, linelen + buflen + 1));
+		line = (char *) srealloc(line, linelen + buflen + 1);
 
 		strcpy(line + linelen, buf);
 		linelen += buflen;
@@ -305,7 +286,7 @@ int _kp_get_path(const char *keypath, kp_path * kpp, char **keynamep,
 
 	ibeg = strlen(basedir);
 
-	path = (char *) malloc_check(ibeg + strlen(keypath) + 1);
+	path = (char *) smalloc(ibeg + strlen(keypath) + 1);
 	sprintf(path, "%s%s", basedir, keypath);
 
 	i = ibeg;
@@ -349,7 +330,7 @@ int _kp_lock_file(int dbindex, int iswrite)
 
 	basedir = kp_basedirs[dbindex];
 	lockfile =
-	    (char *) malloc_check(strlen(basedir) + strlen(LOCKFILE) + 1);
+	    (char *) smalloc(strlen(basedir) + strlen(LOCKFILE) + 1);
 	sprintf(lockfile, "%s%s", basedir, LOCKFILE);
 
 	if (iswrite)
@@ -429,7 +410,7 @@ char *_kp_get_tmpfile(int dbindex)
 
 	basedir = kp_basedirs[dbindex];
 	filename =
-	    (char *) malloc_check(strlen(basedir) + strlen(kp_tmpname) +
+	    (char *) smalloc(strlen(basedir) + strlen(kp_tmpname) +
 				  1);
 	sprintf(filename, "%s%s", basedir, kp_tmpname);
 
@@ -488,11 +469,11 @@ static void kp_add_subkey(struct key_array *keys, char *name)
 
 	keys->num++;
 	keys->array = (char **)
-	    check_ptr(realloc(keys->array,
+	    srealloc(keys->array,
 			      (keys->num + 1) * sizeof(char *) +
-			      keys->strsize));
+			      keys->strsize);
 
-	namedup = strdup_check(name);
+	namedup = sstrdup(name);
 
 	keys->array[keys->num - 1] = namedup;
 	keys->array[keys->num] = NULL;

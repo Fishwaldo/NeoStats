@@ -2,6 +2,12 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
+** Based on:
+** KEEPER: A configuration reading and writing library
+**
+** Copyright (C) 1999-2000 Miklos Szeredi
+** Email: mszeredi@inf.bme.hu
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -20,35 +26,11 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-/*
- * KEEPER: A configuration reading and writing library
- *
- * Copyright (C) 1999-2000 Miklos Szeredi
- * Email: mszeredi@inf.bme.hu
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
- */
 
 #include "kp_util.h"
 
-#include <errno.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include <sys/stat.h>
 
 /* ------------------------------------------------------------------------- 
  * Code data (character array) to a string
@@ -59,7 +41,7 @@ static char *kp_code_data(kp_key * ck)
 	int i;
 	int val;
 
-	buf = (char *) malloc_check(ck->len * 3 + 64);
+	buf = (char *) smalloc(ck->len * 3 + 64);
 	ds = buf;
 
 	*ds++ = 'D';
@@ -85,7 +67,7 @@ static char *kp_code_string(kp_key * ck)
 	unsigned char *os;
 	int i;
 
-	buf = (char *) malloc_check(ck->len * 4 + 64);
+	buf = (char *) smalloc(ck->len * 4 + 64);
 	ds = buf;
 	*ds++ = 'S';
 	*ds++ = SEP2;
@@ -159,7 +141,7 @@ static char *kp_code_int(kp_key * ck)
 	char *buf, *ds;
 	int val;
 
-	buf = (char *) malloc_check(64);
+	buf = (char *) smalloc(64);
 	ds = buf;
 	*ds++ = 'I';
 	*ds++ = SEP2;
@@ -178,7 +160,7 @@ static char *kp_code_float(kp_key * ck)
 	char *buf, *ds;
 	double val;
 
-	buf = (char *) malloc_check(64);
+	buf = (char *) smalloc(64);
 	ds = buf;
 	*ds++ = 'F';
 	*ds++ = SEP2;
@@ -235,7 +217,7 @@ static void kp_delete_path(kp_path * kpp)
 	int i;
 	int ibeg = _kp_get_ibeg(kpp->dbindex);
 
-	ipath = strdup_check(kpp->path);
+	ipath = sstrdup(kpp->path);
 
 	i = strlen(ipath) - 1;
 	while (1) {
@@ -295,7 +277,7 @@ static int kp_create_path(kp_path * kpp)
 	int cmode;
 	int ibeg = _kp_get_ibeg(kpp->dbindex);
 
-	ipath = strdup_check(kpp->path);
+	ipath = sstrdup(kpp->path);
 
 	i = strlen(ipath) - 1;
 	while (1) {

@@ -2,6 +2,12 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
+** Based on:
+** KEEPER: A configuration reading and writing library
+**
+** Copyright (C) 1999-2000 Miklos Szeredi
+** Email: mszeredi@inf.bme.hu
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -20,48 +26,9 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-/*
- * KEEPER: A configuration reading and writing library
- *
- * Copyright (C) 1999-2000 Miklos Szeredi
- * Email: mszeredi@inf.bme.hu
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
- */
 
+#include "neostats.h"
 #include "keeper.h"
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-
-#ifdef ALLOC_CHECK
-extern void *_iamalloc(size_t size, int id);
-extern void *_iarealloc(void *ptr, size_t size, int id);
-extern void _iafree(void *ptr, int id);
-#define malloc(size)        _iamalloc(size, 4)
-#define free(ptr)           _iafree(ptr, 4)
-#define realloc(ptr, size)  _iarealloc(ptr, size, 4)
-#endif
 
 #define SEP1 ':'
 #define SEP2 '='
@@ -98,38 +65,6 @@ struct key_array {
 #define KPFL_BADDB   (1 << 2)	/* database contained an error for this key */
 
 /* ------------------------------------------------------------------------- 
- * This function check if an allocation was successful. If not it aborts
- * the program. I think this is OK, because keeper only allocates very
- * small amounts of memory, and if that fails there will probably be
- * greater problems in the program itself. If you don't like this
- * don't use keeper :)
- * ------------------------------------------------------------------------- */
-static inline void *check_ptr(void *ptr)
-{
-	if (ptr == NULL) {
-		fprintf(stderr, "keeper: Out of Memory!\n");
-		abort();
-	}
-	return ptr;
-}
-
-/* ------------------------------------------------------------------------- 
- * Malloc memory and check if successful
- * ------------------------------------------------------------------------- */
-static inline void *malloc_check(size_t size)
-{
-	return check_ptr(malloc(size ? size : 1));
-}
-
-/* ------------------------------------------------------------------------- 
- * Strdup a string and check if successful
- * ------------------------------------------------------------------------- */
-static inline char *strdup_check(const char *s)
-{
-	return strcpy((char *) check_ptr(malloc(strlen(s) + 1)), s);
-}
-
-/* ------------------------------------------------------------------------- 
  * Create a new key list element, and allocate space for the value data
  * ------------------------------------------------------------------------- */
 static inline void kp_value_new(kp_key * ck, kpval_t type,
@@ -138,7 +73,7 @@ static inline void kp_value_new(kp_key * ck, kpval_t type,
 	ck->type = type;
 	ck->len = len;
 	if (type != KPVAL_UNKNOWN)
-		ck->data = malloc_check(ck->len + 1);
+		ck->data = smalloc(ck->len + 1);
 	else
 		ck->data = NULL;
 

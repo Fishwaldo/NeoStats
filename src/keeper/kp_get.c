@@ -2,6 +2,12 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
+** Based on:
+** KEEPER: A configuration reading and writing library
+**
+** Copyright (C) 1999-2000 Miklos Szeredi
+** Email: mszeredi@inf.bme.hu
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -20,34 +26,10 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-/*
- * KEEPER: A configuration reading and writing library
- *
- * Copyright (C) 1999-2000 Miklos Szeredi
- * Email: mszeredi@inf.bme.hu
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
- */
 
 #include "kp_util.h"
 
-#include <ctype.h>
-#include <errno.h>
 #include <dirent.h>
-#include <sys/stat.h>
 
 /* ------------------------------------------------------------------------- 
  * Decode the type of a key
@@ -327,9 +309,9 @@ int _kp_read_file(char *path, kp_key ** ksp)
 				ck.flags |= KPFL_BADDB;
 			}
 
-			newkey = (kp_key *) malloc_check(sizeof(kp_key));
+			newkey = (kp_key *) smalloc(sizeof(kp_key));
 			*newkey = ck;
-			newkey->name = strdup_check(buf);
+			newkey->name = sstrdup(buf);
 			newkey->next = keys;
 			keys = newkey;
 		}
@@ -397,7 +379,7 @@ int _kp_get_subkeys_dir(char *path, struct key_array *keys)
 		    strcmp(dirent->d_name, "..") != 0 &&
 		    dirent->d_name[0] != ':') {
 
-			fullpath = (char *) malloc_check(strlen(path) + 1 +
+			fullpath = (char *) smalloc(strlen(path) + 1 +
 							 strlen(dirent->
 								d_name) +
 							 1);
@@ -417,7 +399,7 @@ int _kp_get_subkeys_dir(char *path, struct key_array *keys)
 				else {
 					char *realname;
 					realname = (char *)
-					    malloc_check(strlen
+					    smalloc(strlen
 							 (dirent->d_name) +
 							 2);
 					sprintf(realname, "%s:",

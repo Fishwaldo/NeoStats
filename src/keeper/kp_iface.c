@@ -2,6 +2,12 @@
 ** Copyright (c) 1999-2004 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
+** Based on:
+** KEEPER: A configuration reading and writing library
+**
+** Copyright (C) 1999-2000 Miklos Szeredi
+** Email: mszeredi@inf.bme.hu
+**
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by
 **  the Free Software Foundation; either version 2 of the License, or
@@ -20,33 +26,8 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-/*
- * KEEPER: A configuration reading and writing library
- *
- * Copyright (C) 1999-2000 Miklos Szeredi
- * Email: mszeredi@inf.bme.hu
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA
- */
 
 #include "kp_util.h"
-
-#include <errno.h>
-#include <sys/stat.h>
-
 
 /* ------------------------------------------------------------------------- 
  * Checks the key-path for correct syntax
@@ -148,7 +129,7 @@ int kp_get_string(const char *keypath, char **stringp)
 	if (res != 0)
 		return res;
 
-	*stringp = (char *) malloc_check(ck.len + 1);
+	*stringp = (char *) smalloc(ck.len + 1);
 	memcpy(*stringp, ck.data, ck.len);
 	(*stringp)[ck.len] = '\0';
 	kp_value_destroy(&ck);
@@ -204,7 +185,7 @@ int kp_get_data(const char *keypath, void **datap, unsigned int *lenp)
 	if (res != 0)
 		return res;
 
-	*datap = malloc_check(ck.len);
+	*datap = smalloc(ck.len);
 	memcpy(*datap, ck.data, ck.len);
 	*lenp = ck.len;
 	kp_value_destroy(&ck);
@@ -283,7 +264,7 @@ int kp_get_dir(const char *keypath, char ***keysp, unsigned int *nump)
 	int res;
 	struct key_array keys;
 
-	keys.array = (char **) malloc_check(sizeof(char *));
+	keys.array = (char **) smalloc(sizeof(char *));
 	keys.array[0] = NULL;
 	keys.num = 0;
 	keys.strsize = 0;
@@ -348,7 +329,7 @@ static int kp_set(const char *keypath, kp_key * ck)
 	if (iskeyfile && !keyname[0])
 		res = KPERR_BADKEY;
 	else {
-		ck->name = strdup_check(keyname);
+		ck->name = sstrdup(keyname);
 		res = _kp_cache_set(&kpp, ck);
 	}
 	free(kpp.path);
