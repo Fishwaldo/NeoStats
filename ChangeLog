@@ -5,6 +5,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fixed a compile problem with StatServ (BugID: 47)
  - Strip Colors from clientversions in StatServ
  - Output clientversions in the HTML output (ReqID: 40)
+ - First go and implementing Data API. SLOOOOW (DON'T USE THIS FOR PRODUCTION)
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

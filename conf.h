@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: conf.h,v 1.7 2003/08/01 14:32:12 fishwaldo Exp $
+** $Id: conf.h,v 1.8 2003/09/12 16:52:26 fishwaldo Exp $
 */
 
 
@@ -58,5 +58,10 @@ int GetConf (void **data, int type, const char *item);
 int SetConf (void *data, int type, char *item);
 int GetDir (char *item, char ***data);
 int DelConf (char *item);
+int DelRow (char *table, char *row);
+int DelTable(char *table);
+int SetData (void *data, int type, char *table, char *row, char *field);
+int GetTableData (char *table, char ***data);
+int GetData (void **data, int type, const char *table, const char *row, const char *field);
 
 #endif

@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: statserv.c,v 1.70 2003/09/11 12:55:40 fishwaldo Exp $
+** $Id: statserv.c,v 1.71 2003/09/12 16:52:26 fishwaldo Exp $
 */
 
 #include <stdio.h>
@@ -166,7 +166,7 @@ int new_m_version(char *origin, char **av, int ac)
 	return 0;
 }
 
-void _init()
+int __ModInit()
 {
 	Server *ss;
 	User *u;
@@ -247,9 +247,10 @@ void _init()
 			}
 		}
 	}
+	return 1;
 }
 
-void _fini()
+void __ModFini()
 {
 	SaveStats();
 

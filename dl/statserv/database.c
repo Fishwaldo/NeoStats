@@ -22,17 +22,85 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: database.c,v 1.15 2003/06/13 14:49:33 fishwaldo Exp $
+** $Id: database.c,v 1.16 2003/09/12 16:52:26 fishwaldo Exp $
 */
 
 
 #include "stats.h"
+#include "conf.h"
 #include "statserv.h"
 #include "log.h"
 
 
 void SaveStats()
 {
+	SStats *s;
+	CStats *c;
+	hnode_t *sn;
+	lnode_t *cn;
+	hscan_t ss;
+	strcpy(segv_location, "StatServ-SaveStats");
+
+	if (StatServ.newdb == 1) {
+		chanalert(s_StatServ, "Enabling Record yelling!");
+		StatServ.newdb = 0;
+	}
+
+	/* first thing we do is clear the old database */
+	DelTable("ServerStats");
+	DelTable("ChanStats");
+	DelTable("NetStats");
+	
+	/* ok, run through the server stats, and save them */
+	hash_scan_begin(&ss, Shead);
+	while ((sn = hash_scan_next(&ss))) {
+		s = hnode_get(sn);
+		nlog(LOG_DEBUG1, LOG_MOD,
+		     "Writing statistics to database for %s", s->name);
+		SetData((void *)s->numsplits, CFGINT, "ServerStats", s->name, "Splits");
+		SetData((void *)s->maxusers, CFGINT, "ServerStats", s->name, "MaxUsers");
+		SetData((void *)s->t_maxusers, CFGINT, "ServerStats", s->name, "MaxUsersTime");
+		SetData((void *)s->lastseen, CFGINT, "ServerStats", s->name, "LastSeen");
+		SetData((void *)s->starttime, CFGINT, "ServerStats", s->name, "StartTime");
+		SetData((void *)s->operkills, CFGINT, "ServerStats", s->name, "OperKills");
+		SetData((void *)s->serverkills, CFGINT, "ServerStats", s->name, "ServerKills");
+		SetData((void *)s->totusers, CFGINT, "ServerStats", s->name, "TotalUsers");
+	}
+
+	/* ok, Now Channel Stats */
+
+	cn = list_first(Chead);
+	while (cn) {
+		c = lnode_get(cn);
+		nlog(LOG_DEBUG1, LOG_MOD,
+		     "Writting Statistics to database for %s", c->name);
+		SetData((void *)c->topics, CFGINT, "ChanStats", c->name, "Topics");
+		SetData((void *)c->totmem, CFGINT, "ChanStats", c->name, "TotalMems");
+		SetData((void *)c->kicks, CFGINT, "ChanStats", c->name, "Kicks");
+		SetData((void *)c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
+		SetData((void *)c->maxmems, CFGINT, "ChanStats", c->name, "MaxMems");
+		SetData((void *)c->t_maxmems, CFGINT, "ChanStats", c->name, "MaxMemsTime");
+		SetData((void *)c->maxkicks, CFGINT, "ChanStats", c->name, "MaxKicks");
+		SetData((void *)c->t_maxkicks, CFGINT, "ChanStats", c->name, "MaxKicksTime");
+		SetData((void *)c->maxjoins, CFGINT, "ChanStats", c->name, "MaxJoins");
+		SetData((void *)c->t_maxjoins, CFGINT, "ChanStats", c->name, "MaxJoinsTime");
+		cn = list_next(Chead, cn);
+	}
+
+	/* and finally, the network data */
+
+	SetData((void *)stats_network.maxopers, CFGINT, "NetStats", "Global", "MaxOpers");
+	SetData((void *)stats_network.maxusers, CFGINT, "NetStats", "Global", "MaxUsers");
+	SetData((void *)stats_network.maxservers, CFGINT, "NetStats", "Global", "MaxServers");
+	SetData((void *)stats_network.t_maxopers, CFGINT, "NetStats", "Global", "MaxOpersTime");
+	SetData((void *)stats_network.t_maxusers, CFGINT, "NetStats", "Global", "MaxUsersTime");
+	SetData((void *)stats_network.t_maxservers, CFGINT, "NetStats", "Global", "MaxServersTime");
+	SetData((void *)stats_network.totusers, CFGINT, "NetStats", "Global", "TotalUsers");
+	SetData((void *)stats_network.maxchans, CFGINT, "NetStats", "Global", "MaxChans");
+	SetData((void *)stats_network.t_chans, CFGINT, "NetStats", "Global", "MaxChansTime");
+
+	/* old config file stuff follows*/
+#if 0
 	FILE *fp = fopen("data/stats.db", "w");
 	SStats *s;
 	CStats *c;
@@ -94,6 +162,7 @@ void SaveStats()
 		stats_network.totusers, stats_network.maxchans,
 		stats_network.t_chans);
 	fclose(fp);
+#endif
 }
 
 void LoadStats()

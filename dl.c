@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dl.c,v 1.65 2003/08/19 13:08:13 fishwaldo Exp $
+** $Id: dl.c,v 1.66 2003/09/12 16:52:26 fishwaldo Exp $
 */
 
 #include <dlfcn.h>
@@ -804,11 +804,12 @@ unload_module (char *module_name, User * u)
 		i = get_mod_num (module_name);
 
 		list = hnode_get (modnode);
+		strcpy(segvinmodule, module_name);
 		dofini = dlsym ((int *) list->dl_handle, "__ModFini");
 		if (dofini) {
 			(*dofini) ();
 		}
-
+		strcpy(segvinmodule, "");
 
 
 		hash_delete (mh, modnode);

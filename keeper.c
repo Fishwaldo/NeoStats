@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: keeper.c,v 1.12 2003/08/01 14:32:12 fishwaldo Exp $
+** $Id: keeper.c,v 1.13 2003/09/12 16:52:26 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -162,6 +162,171 @@ DelConf (char *item)
 	/* check for errors */
 	if (i != 0) {
 		nlog (LOG_WARNING, LOG_CORE, "DelConf: %s (%s)", kp_strerror (i), keypath);
+		return -1;
+	}
+	kp_flush ();
+	return 1;
+}	
+
+
+/** @brief Gets Data of Type
+ */
+int
+GetData (void **data, int type, const char *table, const char *row, const char *field)
+{
+	char keypath[255];
+	int i = 0;
+
+	/* determine if its a module setting */
+	if (strlen (segvinmodule) > 0) {
+		snprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
+	} else {
+		snprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
+	}
+
+	switch (type) {
+	case CFGSTR:
+		i = kp_get_string (keypath, (char **) *&data);
+		break;
+	case CFGINT:
+		i = kp_get_int (keypath, (int *) *&data);
+		break;
+	case CFGFLOAT:
+		i = kp_get_float (keypath, (double *) *&data);
+		break;
+	case CFGBOOL:
+		i = kp_get_bool (keypath, (int *) *&data);
+		break;
+	default:
+		nlog (LOG_WARNING, LOG_CORE, "Keeper: Called GetData with invalid datatype %d", type);
+		return -1;
+	}
+	/* check for errors */
+	if (i != 0) {
+/*
+		data = malloc(255);
+*/
+		nlog (LOG_DEBUG1, LOG_CORE, "GetData: %s - Path: %s", kp_strerror (i), keypath);
+		return -1;
+	}
+	return 1;
+}
+
+/* @brief return a array of strings containing all rows in a database */
+
+int
+GetTableData (char *table, char ***data)
+{
+	int i;
+	char keypath[255];
+	char **data1;
+
+	/* determine if its a module setting */
+	if (strlen (segvinmodule) > 0) {
+		snprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
+	} else {
+		snprintf (keypath, 255, "l/core:/%s", table);
+	}
+	i = kp_get_dir (keypath, &data1, NULL);
+	if (i == 0) {
+		*data = data1;
+		return 1;
+	}
+	*data = NULL;
+	nlog (LOG_DEBUG1, LOG_CORE, "GetTableData: %s - Path: %s", kp_strerror (i), keypath);
+	return -1;
+
+}
+
+
+
+/** @brief Sets Config Data of Type
+*/
+int
+SetData (void *data, int type, char *table, char *row, char *field)
+{
+	char keypath[255];
+	int i = 0;
+
+	/* determine if its a module setting */
+	if (strlen (segvinmodule) > 0) {
+		snprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
+	} else {
+		snprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
+	}
+
+	switch (type) {
+	case CFGSTR:
+		i = kp_set_string (keypath, (char *) data);
+		break;
+	case CFGINT:
+		i = kp_set_int (keypath, (int) data);
+		break;
+	case CFGFLOAT:
+/*
+			i = kp_set_float(keypath, (double *)data);
+*/
+		break;
+	case CFGBOOL:
+		i = kp_set_bool (keypath, (int) data);
+		break;
+	default:
+		nlog (LOG_WARNING, LOG_CORE, "Keeper: Called SetData with invalid datatype %d", type);
+		return -1;
+	}
+	/* check for errors */
+	if (i != 0) {
+		nlog (LOG_WARNING, LOG_CORE, "SetData: %s", kp_strerror (i));
+		return -1;
+	}
+	kp_flush ();
+	return 1;
+
+}
+
+
+/** @brief removes a row from the Database
+*/
+int
+DelRow (char *table, char *row)
+{
+	char keypath[255];
+	int i = 0;
+
+	/* determine if its a module setting */
+	if (strlen (segvinmodule) > 0) {
+		snprintf (keypath, 255, "l/%s:/%s/%s", segvinmodule, table, row);
+	} else {
+		snprintf (keypath, 255, "l/core:/%s/%s", table, row);
+	}
+	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
+	/* check for errors */
+	if (i != 0) {
+		nlog (LOG_WARNING, LOG_CORE, "DelRow: %s (%s)", kp_strerror (i), keypath);
+		return -1;
+	}
+	kp_flush ();
+	return 1;
+}	
+
+/** @brief removes a row from the Database
+*/
+int
+DelTable (char *table)
+{
+	char keypath[255];
+	int i = 0;
+
+	/* determine if its a module setting */
+	if (strlen (segvinmodule) > 0) {
+		snprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
+	} else {
+		snprintf (keypath, 255, "l/core:/%s", table);
+	}
+	i = kp_recursive_do(keypath, (kp_func) kp_remove, 0, NULL);
+	/* check for errors */
+	if (i != 0) {
+		nlog (LOG_WARNING, LOG_CORE, "DelTable: %s (%s)", kp_strerror (i), keypath);
 		return -1;
 	}
 	kp_flush ();
