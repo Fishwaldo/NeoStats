@@ -45,3 +45,4 @@ extern const char *hs_help_set_expire[];
 extern const char *hs_help_set_hiddenhost[];
 extern const char *hs_help_set_hostname[];
 extern const char *hs_help_set_operhosts[];
+extern const char *hs_help_set_verbose[];

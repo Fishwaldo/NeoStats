@@ -144,3 +144,9 @@ const char *hs_help_set_operhosts[] = {
 	"not provide oper hosts, you might want to use this option.",
 	NULL
 };
+
+const char *hs_help_set_verbose[] = {
+	"\2SET VERBOSE <ON/OFF>\2",
+	"Control HostServ verbosity",
+	NULL
+};

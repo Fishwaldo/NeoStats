@@ -49,6 +49,7 @@ struct hs_cfg {
 	int regnick;
 	char vhostdom[MAXHOST];
 	int operhosts;
+	int verbose;
 } hs_cfg;
 
 static int hs_event_signon (CmdParams *cmdparams);
@@ -109,11 +110,12 @@ static bot_cmd hs_commands[]=
 /** Bot setting table */
 static bot_setting hs_settings[]=
 {
-	{"EXPIRE",		&hs_cfg.expire,		SET_TYPE_INT,		0, 99, 			NS_ULEVEL_ADMIN, "ExpireDays","days",hs_help_set_expire, hs_set_expire_cb, (void*)60 },
-	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "UnetVhosts",NULL,	hs_help_set_hiddenhost, hs_set_regnick_cb, (void*)0 },
-	{"HOSTNAME",	hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, 	NS_ULEVEL_ADMIN, "UnetDomain",NULL,	hs_help_set_hostname, NULL, (void*)"" },
-	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, "operhosts",NULL,	hs_help_set_operhosts, NULL, (void*)0 },
-	{NULL,			NULL,				0,					0, 0, 			0,				 NULL,		  NULL,	NULL	},
+	{"EXPIRE",		&hs_cfg.expire,		SET_TYPE_INT,		0, 99, 		NS_ULEVEL_ADMIN, "ExpireDays","days",hs_help_set_expire,	hs_set_expire_cb, (void*)60 },
+	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, "UnetVhosts",NULL,	hs_help_set_hiddenhost, hs_set_regnick_cb, (void*)0 },
+	{"HOSTNAME",	hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST, NS_ULEVEL_ADMIN, "UnetDomain",NULL,	hs_help_set_hostname,	NULL, (void*)"" },
+	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, "operhosts",NULL,	hs_help_set_operhosts,	NULL, (void*)0 },
+	{"VERBOSE",		&hs_cfg.verbose,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, "verbose",NULL,	hs_help_set_verbose,	NULL, (void*)1 },
+	{NULL,			NULL,				0,					0, 0, 		0,				 NULL,		  NULL,	NULL	},
 };
 
 /** BotInfo */
@@ -387,8 +389,10 @@ static int hs_event_umode (CmdParams *cmdparams)
 					ircsnprintf(vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom);
 					irc_svshost (hs_bot, cmdparams->source, vhost);
 					irc_prefmsg (hs_bot, cmdparams->source, "Setting your host to %s", vhost);
-					irc_chanalert (hs_bot, "\2VHOST\2 registered nick %s now using vhost %s", 
-						cmdparams->source->name, vhost);
+					if( hs_cfg.verbose ) {
+						irc_chanalert (hs_bot, "\2VHOST\2 registered nick %s now using vhost %s", 
+							cmdparams->source->name, vhost);
+					}
 
 				}
 			}
@@ -896,8 +900,10 @@ static int hs_cmd_login (CmdParams *cmdparams)
 				"Your vhost %s has been set.", vhe->vhost);
 			nlog (LOG_NORMAL, "%s used LOGIN to obtain vhost of %s",
 			    cmdparams->source->name, vhe->vhost);
-			irc_chanalert (hs_bot, "\2VHOST\2 %s login to vhost %s", 
-				cmdparams->source->name, vhe->vhost);
+			if( hs_cfg.verbose ) {
+				irc_chanalert (hs_bot, "\2VHOST\2 %s login to vhost %s", 
+					cmdparams->source->name, vhe->vhost);
+			}
 			SaveVhost (vhe);
 			return NS_SUCCESS;
 		}
