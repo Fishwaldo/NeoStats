@@ -230,8 +230,9 @@ void StatsDelChan(Channel* c)
 	lnode_t *ln;
 	
 	stats_network.chans --;
-	cs = findchanstats(c->name);
-	if (cs) {
+	ln = list_find(Chead, c->name, comparef);
+	if (ln) {
+		cs = lnode_get(ln);
 		save_chan(cs);
 		list_delete(Chead, ln);
 		lnode_destroy(ln);
