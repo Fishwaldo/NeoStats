@@ -91,6 +91,10 @@ release versions. Also, please indicate which revision you are running.
 This is given when you type 'svn update' to get files but if you forget, 
 type 'svn info' to see which revision you are running. 
 
+If you have modified NeoStats in any way, do not contact us unless you
+can reproduce the problem on an unmodified version. We provide no support
+at all for modifications made to NeoStats by others. 
+
 -----------------------------------<>-----------------------------------
 
 6 I get warnings when I compile, do you want to know?
