@@ -23,7 +23,7 @@
 
 #include "neostats.h"
 #include "rta.h"
-#include "sqlsrv.h"
+#include "rtaserv.h"
 #include <fcntl.h>
 
 #define MAXSQLCON 5
@@ -406,7 +406,7 @@ sql_handle_ui_output(lnode_t *sqlnode)
 }
 
 //from read_loop
-MODULEFUNC void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set)
+void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set)
 {
 	lnode_t *sqlnode;
 	Sql_Conn *sqldata;
@@ -429,7 +429,7 @@ MODULEFUNC void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set)
 	}
 }
 
-MODULEFUNC void rta_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set)
+void rta_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set)
 {
 	lnode_t *sqlnode;
 	Sql_Conn *sqldata;
@@ -457,6 +457,7 @@ restart:
 	}
 }
 
+#if 0
 /** Copyright info */
 static const char *sql_copyright[] = {
 	"Copyright (c) 1999-2004, NeoStats",
@@ -527,8 +528,22 @@ void ModFini (void)
 {
 	del_services_set_list (sql_settings);
 }
+#else
 
-#ifdef WIN32
-/* temporary work around for linker error */
-void main(void) {}
+void rtaserv_init (void)
+{
+	//ModuleConfig (sql_settings);
+	InitSqlSrv ();
+}
+
+void rtaserv_init2 (void)
+{
+	//add_services_set_list (sql_settings);
+}
+
+void rtaserv_fini (void)
+{
+	//del_services_set_list (sql_settings);
+}
+
 #endif

@@ -776,15 +776,6 @@ typedef int (*sock_func) (int sock_no, char *name);
 typedef int (*before_poll_func) (void *data, struct pollfd *);
 typedef void (*after_poll_func) (void *data, struct pollfd *, unsigned int);
 
-/*
-  TEMP while moving sqlsrv to module API
-*/
-#ifdef NEOSTATSCORE
-typedef void (*rta_hook_func) (fd_set *read_fd_set, fd_set *write_fd_set);
-extern rta_hook_func rta_hook_1;
-extern rta_hook_func rta_hook_2;
-#endif
-
 /* socket interface type */
 #define SOCK_POLL 1
 #define SOCK_STANDARD 2

@@ -352,12 +352,6 @@ load_module (const char *modfilename, Client * u)
 		irc_prefmsg (ns_botptr, u, __("Module %s loaded, %s",u), info_ptr->name, info_ptr->description);
 		irc_globops (NULL, _("Module %s loaded"), info_ptr->name);
 	}
-/*
-  TEMP while moving sqlsrv to module API
-*/
-	rta_hook_1 = ns_dlsym (dl_handle, "rta_hook_1");
-	rta_hook_2 = ns_dlsym (dl_handle, "rta_hook_2");
-
 	return mod_ptr;
 }
 

@@ -37,6 +37,7 @@
 #include "exclude.h"
 #include "services.h"
 #include "bans.h"
+#include "rtaserv.h"
 
 static int ns_cmd_shutdown (CmdParams* cmdparams);
 static int ns_cmd_reload (CmdParams* cmdparams);
@@ -183,6 +184,7 @@ init_services_bot (void)
 	me.synched = 1;
 	SynchAllModules ();
 	RequestServerUptimes();	
+	rtaserv_init2 ();
 	return NS_SUCCESS;
 }
 

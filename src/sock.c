@@ -42,6 +42,7 @@
 #include "dotconf.h"
 #include "services.h"
 #include "ircd.h"
+#include "rtaserv.h"
 
 static void recvlog (char *line);
 
@@ -52,9 +53,6 @@ static int servsock;
 char recbuf[BUFSIZE];
 static struct timeval *TimeOut;
 static struct pollfd *ufds;
-
-rta_hook_func rta_hook_1 = NULL;
-rta_hook_func rta_hook_2 = NULL;
 
 /** @brief Connect to a server
  *
@@ -202,9 +200,7 @@ read_loop ()
 		/* add the fds for the curl library as well */
 		/* XXX Should this be a pollsize or maxfdsunused... not sure yet */ 
 		curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
-		if (rta_hook_1) {
-			rta_hook_1 (&readfds, &writefds);
-		}  
+		rta_hook_1 (&readfds, &writefds);
 		SelectResult = select (FD_SETSIZE, &readfds, &writefds, &errfds, TimeOut);
 		me.now = time(NULL);
 		ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
@@ -219,9 +215,7 @@ read_loop ()
 			while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &maxfdsunused)) {
 			}
 			transfer_status();
-			if (rta_hook_2) {
-				rta_hook_2 (&readfds, &writefds);
-			}
+			rta_hook_2 (&readfds, &writefds);
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
 					i = os_sock_read (servsock, &c, 1);

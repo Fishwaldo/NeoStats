@@ -123,6 +123,7 @@ static int InitCore(void)
 		return NS_FAILURE;
 	if (InitIrcd () != NS_SUCCESS)
 		return NS_FAILURE;
+	rtaserv_init ();
 	InitServices();
 	dlog(DEBUG1, "Core init successful");
 	return NS_SUCCESS;
@@ -368,6 +369,7 @@ do_exit (NS_EXIT_TYPE exitcode, char* quitmsg)
 		FiniSocks();
 		FiniBots();
 		FiniTimers();
+		rtaserv_fini ();
 		if (exitcode == NS_EXIT_RECONNECT) {
 			if(nsconfig.r_time>0) {
 				nlog (LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", nsconfig.r_time, attempts);

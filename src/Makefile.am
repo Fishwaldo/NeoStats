@@ -7,6 +7,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c conf.c db.c \
 		keeper.c lang.c list.c log.c main.c match.c misc.c modules.c \
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c oscalls.c nsmemory.c \
+		rtaserv.c rtabans.c rtachannels.c rtamodules.c rtaservers.c rtausers.c \
 		base64.c
 AM_CFLAGS = -I$(top_srcdir)/lib/adns -I$(top_srcdir)/lib/keeper \
 		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE

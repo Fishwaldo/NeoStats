@@ -21,8 +21,10 @@
 ** $Id$
 */
 
-#ifndef _SQLSRV_H_
-#define _SQLSRV_H_
+#ifndef _RTASERV_H_
+#define _RTASERV_H_
+
+#include "rta.h"
 
 extern TBLDEF neo_bans;
 extern TBLDEF neo_chans;
@@ -30,4 +32,11 @@ extern TBLDEF neo_users;
 extern TBLDEF neo_modules;
 extern TBLDEF neo_servers;
 
-#endif /* _SQLSRV_H_ */
+void rta_hook_1 (fd_set *read_fd_set, fd_set *write_fd_set);
+void rta_hook_2 (fd_set *read_fd_set, fd_set *write_fd_set);
+
+void rtaserv_init (void);
+void rtaserv_fini (void);
+void rtaserv_init2 (void);
+
+#endif /* _RTASERV_H_ */
