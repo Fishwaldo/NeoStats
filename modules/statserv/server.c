@@ -158,6 +158,7 @@ static void DelServerStat (Client* s)
 int ss_event_squit (CmdParams *cmdparams)
 {
 	DelServerStat (cmdparams->source);
+	DelNetworkServer ();
 	return NS_SUCCESS;
 }
 
