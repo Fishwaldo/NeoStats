@@ -4,12 +4,15 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.c,v 1.5 2000/02/06 07:12:46 fishwaldo Exp $
+** $Id: statserv.c,v 1.6 2000/02/18 00:42:25 fishwaldo Exp $
 */
 
 #include "statserv.h"
-#include "stats.c"
 #include "ss_help.c"
+
+SStats *Shead;
+TLD *tldhead;
+
 
 extern const char version_date[], version_time[];
 static void ss_JOIN(User *u, char *chan);
@@ -21,6 +24,7 @@ static void ss_server(User *u, char *server);
 static int Online(Server *);
 static int pong(Server *);
 static int s_new_server(Server *);
+static int s_new_user(User *);
 static void ss_cb_Config(char *, int);
 static int new_m_version(char *av, char *tmp);
 
@@ -43,6 +47,7 @@ EventFnList StatServ_Event_List[] = {
 	{"ONLINE", 	Online},
 	{"PONG", 	pong},
 	{"NEWSERVER",	s_new_server},
+	{"SIGNON", 	s_new_user},
 	{ NULL, 	NULL}
 };
 
@@ -87,8 +92,148 @@ void _fini() {
 static int s_new_server(Server *s) {
 
 	AddStats(s);
+	IncreaseServers();
+	if (stats_network.maxservers < stats_network.servers) {
+		stats_network.maxservers = stats_network.servers;
+		stats_network.t_maxservers = time(NULL);
+		sts("%s WALLOPS :\2NEW SERVER RECORD\2 Wow, there are now %d Servers on the Network", stats_network.servers); 
+	}
 	return 1;
 
+}
+
+static int s_user_modes(User *u) {
+	User *u = finduser(nick);
+	int add = 0;
+
+	if (!u) {
+		log("Changing modes for unknown user: %s", nick);
+		return;
+	}
+#ifdef DEBUG
+	log("Modes for %s are: %s",nick,modes);
+#endif
+	while (*modes++) {
+
+		switch(*modes) {
+			case '+': add = 1;	break;
+			case '-': add = 0;	break;
+			case 'N':
+				if (add) {
+					u->is_netmin = 1;
+				} else {
+					u->is_netmin = 0;
+				}
+				break;
+			case 'S':
+				if (add) {
+					u->is_serv = 1;
+				} else {
+					u->is_serv = 0;
+				}
+				break;
+			case '1':
+				if (add) {
+					u->is_coder = 1;
+				} else {
+					u->is_coder = 0;
+				}
+				break;
+			case 'q':
+				if (add) {
+					u->is_prot = 1;
+					globops(me.name,"\2%s\2 Has been Marked As Protected (+q)",nick);
+				} else {
+					u->is_prot = 0;
+					globops(me.name,"\2%s\2 Has been Un-Marked As Protected (-q)",nick);
+				}
+				break;
+			case 'T':
+				if (add) {
+					u->is_tecmin = 1;
+				} else {
+					u->is_tecmin = 0;
+				}
+				break;
+			case 'A':
+				if (add) {
+					u->is_admin = 1;
+				} else {
+					u->is_admin = 0;
+				}
+				break;
+			case 'a':
+				if (add) {
+					u->is_svsmin = 1;
+				} else {
+					u->is_svsmin = 0;
+				}
+				break;
+			case 'C':
+				if (add) {
+					u->is_comin = 1;
+				} else {
+					u->is_comin = 0;
+				}
+				break;
+			case 'B':
+				if (add) {
+					u->is_bot = 1;
+				} else {
+					u->is_bot = 0;
+				}
+				break;
+			case 'I':
+				if (add) {
+					u->is_invis = 1;
+					globops(me.name,"\2%s\2 Is Using \2Invisible Mode\2 (+I)",nick);
+				} else {
+					u->is_invis = 0;
+					globops(me.name,"\2%s\2 Is no longer using \2Invisible Mode\2 (-I)",nick);
+				}
+				break;
+			case 'o':
+				if (add) {
+					u->is_oper = 1;
+				} else {
+					u->is_oper = 0;
+				}
+				break;
+			case 'O':
+				if (add) {
+					u->is_oper = 1;
+				} else {
+					u->is_oper = 0;
+				}
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+
+static int s_new_user(User *u) {
+	SStats *s;
+	
+	s=findstats(u->server->name);
+	IncreaseUsers(s);
+#ifdef DEBUG
+	log("added a User %s to stats, now at %d", u->nick, s->users);
+#endif
+	if (s->maxusers < s->users) {
+		/* New User Record */
+		s->maxusers = s->users;
+		s->t_maxusers = time(NULL);
+		sts("%s WALLOPS :\2NEW USER RECORD!\2 Wow, %s is cranking at the moment with %d users!", me.name, s->name, s->users);	
+	}
+	if (stats_network.maxusers < stats_network.users) {
+		stats_network.maxusers = stats_network.users;
+		stats_network.t_maxusers = time(NULL);
+		sts("%s WALLOPS :\2NEW NETWORK RECORD!\2 Wow, a New Global User record has been reached with %d users!", me.name, stats_network.users);
+	}
+	
+	return 1;
 }
 
 int pong(Server *s) {
@@ -106,9 +251,6 @@ int pong(Server *s) {
 	if (ss->highest_ping < 0) {
 		ss->highest_ping = 0;
 	}
-
-	log("ping %d", s->ping);
-	log("hping %d", ss->highest_ping);
 
 	if (s->ping > ss->highest_ping) {
 		ss->highest_ping = s->ping;
@@ -128,9 +270,9 @@ int pong(Server *s) {
 }
 int Online(Server *s) {
 
-/* We should go the the existing server/user lists and add them to stats, cause its possible 
-   that this has been called after the server already connected */
-
+   Server *ss;
+   User *u;
+   int i;
    memcpy(StatServ.user, Servbot.user, 8);
    memcpy(StatServ.host, Servbot.host, MAXHOST);
    StatServ.lag = 0;
@@ -141,6 +283,30 @@ int Online(Server *s) {
    } else {
 	   init_bot(s_StatServ, StatServ.user,StatServ.host,"/msg Statserv HELP", "+Sd", Statserv_Info[0].module_name);
    }
+   
+/* We should go the the existing server/user lists and add them to stats, cause its possible 
+   that this has been called after the server already connected */
+
+   for (i=0; i < S_TABLE_SIZE; i++) {
+   	for (ss = serverlist[i]; ss; ss = ss->next) {
+   		/* do server table stuff */ 
+		s_new_server(ss);
+#ifdef DEBUG
+		log("Added Server %s to StatServ List", ss->name);
+#endif
+	}
+   }
+
+   for (i=0; i < U_TABLE_SIZE; i++) {
+   	for (u = userlist[i]; u; u = u->next) {
+   		/* do User stuff, as yet, we have nuffin... :( */
+   		/* Should also process Usermodes and fun stuff like that (maybe?) */
+		s_new_user(u);
+#ifdef DEBUG
+		log("Adduser user %s to StatServ List", u->nick);
+#endif
+	}
+   }   	
 
 /* now that we are online, setup the timer to save the Stats database every so often */
    add_mod_timer("SaveStats", "Save_Stats_DB", Statserv_Info[0].module_name, 600);
@@ -570,4 +736,281 @@ static void ss_JOIN(User *u, char *chan)
 	sprintf(me.chan,"%s",chan);
 	sts(":%s JOIN %s",s_StatServ,chan);
 	sts(":%s MODE %s +o %s",me.name,chan,s_StatServ);
+}
+
+
+/* "net" -- not DOT"net" */
+TLD *findtld(char *tld)
+{
+	TLD *t;
+
+	for (t = tldhead; t; t = t->next) {
+		if (!strcasecmp(t->tld, tld))
+			return t;
+	}
+
+	return NULL;
+}
+
+TLD *AddTLD(User *u)
+{
+	TLD *t = NULL;
+	char *m;
+
+	m = strrchr(u->hostname, '.');
+
+	if (!m)
+		t = findtld("num");
+	else
+		m++;
+
+	if (!t) {
+		if (!isdigit(*m))
+			t = findtld(m);
+		else
+			t = findtld("num");
+	}
+
+	if (!t) {
+		log("Unable to find TLD entry for %s (%s)", u->nick, m);
+		log("*** NOTICE *** Please send a copy of this logfile to "
+			"net@lite.net");
+		return NULL;
+	}
+	t->users++;
+
+	return t;
+}
+
+void LoadTLD()
+{
+	register int i;
+	FILE *fp;
+	char buf[BUFSIZE], buf2[BUFSIZE];
+	char *tmp = NULL, *tmp2 = NULL;
+	TLD *t;
+
+	if ((fp = fopen("data/tlds.nfo", "r")) == NULL) {
+		log("Top Level Domain Statistics not loaded: file not found.");
+		return;
+	}
+
+    while (fgets(buf, BUFSIZE, fp)) {
+		memcpy(buf2, buf, sizeof(buf));
+		tmp = strrchr(buf, '(');
+		tmp++;
+		tmp[strlen(tmp) - 1] = '\0';
+		tmp[strlen(tmp) - 1] = '\0';
+		for (i = 0; buf[i] != '('; i++)
+			buf2[strlen(buf2) + 1] = buf[i];
+
+		if ((tmp2 = strchr(buf2, '\n')))	*tmp2 = '\0';
+
+		t = smalloc(sizeof(TLD));
+		t->users = 0;
+		t->country = sstrdup(buf2);
+		memcpy(t->tld, tmp, sizeof(t->tld));
+
+		if (!tldhead) {
+			tldhead = t;
+			tldhead->next = NULL;
+		} else {
+			t->next = tldhead;
+			tldhead = t;
+		}
+    }
+	fclose(fp);
+}
+
+void init_tld()
+{
+	TLD *t;
+
+	for (t = tldhead; t; t = t->next) {
+		t->users = 0;
+	}
+}
+
+static SStats *new_stats(const char *name)
+{
+	SStats *s = calloc(sizeof(SStats), 1);
+
+#ifdef DEBUG
+	log("new_stats(%s)", name);
+#endif
+
+	if (!s) {
+		log("Out of memory.");
+		exit(0);
+	}
+
+	memcpy(s->name, name, MAXHOST);
+	s->numsplits = 0;
+	s->maxusers = 0;
+	s->t_maxusers = time(NULL);
+	s->t_maxopers = time(NULL);
+	s->maxopers = 0;
+	s->totusers = 0;
+	s->daily_totusers = 0;
+	s->lastseen = time(NULL);
+	s->starttime = time(NULL);
+	s->t_highest_ping = time(NULL);
+	s->t_lowest_ping = time(NULL);
+	s->lowest_ping = 0;
+	s->highest_ping = 0;
+	s->users = 0;
+	s->opers = 0;
+	s->operkills = 0;
+	s->serverkills = 0;
+	
+
+
+
+	if (!Shead) {
+		Shead = s;
+		Shead->next = NULL;
+	} else {
+		s->next = Shead;
+		Shead = s;
+	}
+	return s;
+}
+
+void AddStats(Server *s)
+{
+	SStats *st = findstats(s->name);
+
+#ifdef DEBUG
+	log("AddStats(%s)", s->name);
+#endif
+
+	if (!st) {
+		st = new_stats(s->name);
+	} else {
+		st->lastseen = time(NULL);
+	}
+}
+
+SStats *findstats(char *name)
+{
+	SStats *t;
+#ifdef DEBUG
+	log("findstats(%s)", name);
+#endif
+	for (t = Shead; t; t = t->next) {
+		if (!strcasecmp(name, t->name))
+			return t;
+	}
+	return NULL;
+}
+
+
+
+void SaveStats()
+{
+	FILE *fp = fopen("data/stats.db", "w");
+	SStats *s;
+
+	if (!fp) {
+		log("Unable to open stats.db for writing.");
+		return;
+	}
+
+	for (s = Shead; s; s = s->next) {
+#ifdef DEBUG
+	log("Writing statistics to database for %s", s->name);
+#endif
+		fprintf(fp, "%s %d %ld %ld %d %ld %ld %ld %d %d %ld\n", s->name,
+			s->numsplits, s->maxusers, s->t_maxusers, s->maxopers,
+			s->t_maxopers, s->lastseen, s->starttime, s->operkills,
+			s->serverkills, s->totusers);
+	}
+	fclose(fp);
+	if ((fp = fopen("data/nstats.db", "w")) == NULL) {
+		log("Unable to open nstats.db for writing.");
+		return;
+	}
+	fprintf(fp, "%d %ld %d %ld %ld %ld %ld\n", stats_network.maxopers, stats_network.maxusers,
+		stats_network.maxservers, stats_network.t_maxopers, stats_network.t_maxusers, stats_network.t_maxservers, stats_network.totusers);
+	fclose(fp);
+}
+
+void LoadStats()
+{
+	FILE *fp = fopen("data/nstats.db", "r");
+	SStats *s;
+	char buf[BUFSIZE];
+	char *tmp;
+	char *name, *numsplits, *maxusers, *t_maxusers,
+		*maxopers, *t_maxopers, *lastseen, *starttime,
+		*operkills, *serverkills, *totusers;
+	if (fp) {
+	while (fgets(buf, BUFSIZE, fp)) {
+		stats_network.maxopers = atoi(strtok(buf, " "));
+		stats_network.maxusers = atol(strtok(NULL, " "));
+		stats_network.maxservers = atoi(strtok(NULL, " "));
+		stats_network.t_maxopers = atoi(strtok(NULL, " "));
+		stats_network.t_maxusers = atol(strtok(NULL, " "));
+		stats_network.t_maxservers = atoi(strtok(NULL, " "));
+		tmp = strtok(NULL, "");
+		if (tmp==NULL) {
+			fprintf(stderr, "Detected Old Version of Network Database, Upgrading\n");
+			stats_network.totusers = stats_network.maxusers;
+		} else {
+			stats_network.totusers = atoi(tmp);
+		}
+	}
+	fclose(fp);
+	}
+
+	if ((fp = fopen("data/stats.db", "r")) == NULL)
+		return;
+
+	memset(buf, '\0', BUFSIZE);
+	while (fgets(buf, BUFSIZE, fp)) {
+		s = smalloc(sizeof(SStats));
+		name = strtok(buf, " ");
+		numsplits = strtok(NULL, " ");
+		maxusers = strtok(NULL, " ");
+		t_maxusers = strtok(NULL, " ");
+		maxopers = strtok(NULL, " ");
+		t_maxopers = strtok(NULL, " ");
+		lastseen = strtok(NULL, " ");
+		starttime = strtok(NULL, " ");
+		operkills = strtok(NULL, " ");
+		serverkills = strtok(NULL, " ");
+		totusers = strtok(NULL, " ");
+
+		memcpy(s->name, name, MAXHOST);
+		s->numsplits = atoi(numsplits);
+		s->maxusers = atol(maxusers);
+		s->t_maxusers = atol(t_maxusers);
+		s->maxopers = atoi(maxopers);
+		s->t_maxopers = atol(t_maxopers);
+		s->lastseen = atol(lastseen);
+		s->starttime = atol(starttime);
+		s->operkills = atoi(operkills);
+		s->serverkills = atol(serverkills);
+		s->users = 0;
+		s->opers = 0;
+		s->daily_totusers = 0;
+		if (totusers==NULL) {
+			s->totusers = 0;
+			fprintf(stderr, "Detected Old Version of Server Database, Upgrading\n");
+		} else {
+			s->totusers = atol(totusers);
+		}
+
+#ifdef DEBUG
+	log("LoadStats(): Loaded statistics for %s", s->name);
+#endif
+		if (!Shead) {
+			Shead = s;
+			Shead->next = NULL;
+		} else {
+			s->next = Shead;
+			Shead = s;
+		}
+	}
+	fclose(fp);
 }

@@ -4,12 +4,12 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: services.c,v 1.4 2000/02/05 02:51:50 fishwaldo Exp $
+** $Id: services.c,v 1.5 2000/02/18 00:42:24 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include "dl.h"
-
+#include "Unreal.h"
 
 
 extern const char version_date[], version_time[];
@@ -50,8 +50,7 @@ void servicesbot(char *nick, char *line) {
 		return;
 
 	log("%s received message from %s: %s", s_Services, nick, cmd);
- 
-	if (me.onlyopers && !u->is_oper) {
+	if (me.onlyopers && (UserLevel(u) >= 50)) {
 		privmsg(u->nick, s_Services,
 			"This service is only available to IRCops.");
 		notice ("%s Requested %s, but he is Not a Operator!", u->nick, cmd);
@@ -63,36 +62,36 @@ void servicesbot(char *nick, char *line) {
 		notice(s_Services,"%s is a Dummy and wanted help on %s",u->nick, cmd);
 		if (!cmd) {
 			privmsg_list(nick, s_Services, ns_help);
-			if (u->is_tecmin)
+			if (u->Umode & (UserLevel(u) >= 190))
 				privmsg_list(nick, s_Services, ns_myuser_help);
-			if (u->is_coder)
+			if (u->Umode & (UserLevel(u) >= 200))
 				privmsg_list(nick, s_Services, ns_coder_help);
                 } else if (!strcasecmp(cmd, "VERSION"))
                         privmsg_list(nick, s_Services, ns_version_help);
-		else if (!strcasecmp(cmd, "SHUTDOWN") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "SHUTDOWN") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_shutdown_help);
-                else if (!strcasecmp(cmd, "RELOAD") && u->is_tecmin)
+                else if (!strcasecmp(cmd, "RELOAD") && (UserLevel(u) >= 190))
                         privmsg_list(nick, s_Services, ns_reload_help);
-		else if (!strcasecmp(cmd, "LOGS") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "LOGS") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_logs_help);
-		else if (!strcasecmp(cmd, "LOAD") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "LOAD") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_load_help);
-		else if (!strcasecmp(cmd, "UNLOAD") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "UNLOAD") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_unload_help);
-		else if (!strcasecmp(cmd, "MODLIST") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "MODLIST") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_modlist_help);
-		else if (!strcasecmp(cmd, "JOIN") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "JOIN") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_join_help);
-		else if (!strcasecmp(cmd, "USERDUMP") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "USERDUMP") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_userdump_help);
-		else if (!strcasecmp(cmd, "CHANDUMP") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "CHANDUMP") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_chandump_help);
-		else if (!strcasecmp(cmd, "SERVERDUMP") && u->is_tecmin)
+		else if (!strcasecmp(cmd, "SERVERDUMP") && (UserLevel(u) >= 190))
 			privmsg_list(nick, s_Services, ns_serverdump_help);
 		else
 			privmsg(nick, s_Services, "Unknown Help Topic: \2%s\2", cmd);
 	} else if (!strcasecmp(cmd, "LOAD")) {
-		if (!u->is_tecmin) {
+		if (!(UserLevel(u) >= 190)) {
 			privmsg(nick,s_Services,"Permission Denied");
 			notice(s_Services,"%s Tried to UNLOAD, but is not a Techadmin",nick);
 			return;
@@ -110,14 +109,14 @@ void servicesbot(char *nick, char *line) {
 			notice(s_Services,"%s Tried to Load Module %s, but Failed",u->nick,cmd);
 		}
 	} else if (!strcasecmp(cmd,"MODLIST")) {
-		if (!u->is_tecmin) {
+		if (!(UserLevel(u) >= 190)) {
 			privmsg(nick,s_Services,"Permission Denied");
 			notice(s_Services,"%s Tried to MODLIST, but is not a Techadmin",nick);
 			return;
 		}
 		list_module(u);
 	} else if (!strcasecmp(cmd,"UNLOAD")) {
-		if (!u->is_tecmin) {
+		if (!(UserLevel(u) >= 190)) {
 			privmsg(nick,s_Services,"Permission Denied");
 			notice(s_Services,"%s Tried to UNLOAD, but is not a Techadmin",nick);
 			return;
@@ -134,14 +133,14 @@ void servicesbot(char *nick, char *line) {
 			notice(s_Services,"%s Tried to Unload the Module %s, but that does not exist", u->nick, cmd);
 		}
 	} else if (!strcasecmp(cmd, "MODBOTLIST")) {
-		if (!u->is_coder) {
+		if (!(UserLevel(u) >= 200)) {
 			privmsg(nick,s_Services,"Permission Denied");
 			notice(s_Services,"%s Tried to MODBOTLIST, but is not a Coder",nick);
 			return;
 		}
 		list_module_bots(u);
 	} else if (!strcasecmp(cmd, "MODTIMERLIST")) {
-		if (!u->is_coder) {
+		if (!(UserLevel(u) >= 200)) {
 			privmsg(nick,s_Services,"Permission Denied");
 			notice(s_Services,"%s Tried to MODTIMERLIST, but is not a Coder",nick);
 			return;
@@ -171,7 +170,7 @@ void servicesbot(char *nick, char *line) {
 		cmd = strtok(NULL, " ");
 		ns_JOIN(u, cmd);
 	} else if (!strcasecmp(cmd, "DEBUG")) {
-		if (!u->is_coder) {
+		if (!(UserLevel(u) >= 200)) {
 			privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
 			return;
 		}		
@@ -237,7 +236,7 @@ extern void ns_shutdown(User *u, char *reason)
 	Module *mod_ptr = NULL;
 	segv_location = "ns_shutdown";
 	if (strcasecmp(u->nick, s_Services)) {
-		if (!u->is_tecmin) {
+		if (!(UserLevel(u) >= 190)) {
 			log("Access Denied (SHUTDOWN) to %s", u->nick);
 			privmsg(u->nick, s_Services, "Access Denied.");
 			return;
@@ -269,7 +268,7 @@ extern void ns_shutdown(User *u, char *reason)
 static void ns_reload(User *u, char *reason)
 {
 	segv_location = "ns_reload";
-        if (!u->is_tecmin) {
+        if (!(UserLevel(u) >= 190)) {
                 log("Access Denied (RELOAD) to %s", u->nick);
                 privmsg(u->nick, s_Services, "Access Denied.");
                 return;
@@ -321,7 +320,7 @@ static void ns_logs(User *u)
 	char buf[512];
 
 	segv_location = "ns_logs";
-	if (!u->is_tecmin) {
+	if (!(UserLevel(u) >= 190)) {
 		log("Access Denied (LOGS) to %s", u->nick);
 		privmsg(u->nick, s_Services, "Access Denied.");
 		return;
@@ -344,7 +343,7 @@ static void ns_logs(User *u)
 static void ns_jupe(User *u, char *server)
 {
 	segv_location = "ns_jupe";
-	if (!u->is_tecmin) {
+	if (!(UserLevel(u) >= 190)) {
 		privmsg(u->nick, s_Services, "Access Denied.");
 		return;
 	}
@@ -360,7 +359,7 @@ static void ns_jupe(User *u, char *server)
 static void ns_JOIN(User *u, char *chan)
 {
 	segv_location = "ns_JOIN";
-	if (!u->is_tecmin) {
+	if (!(UserLevel(u) >= 190)) {
 		log("Access Denied (JOIN) to %s", u->nick);
 		privmsg(u->nick, s_Services, "Access Denied.");
 		notice(s_Services,"%s Requested JOIN, but is not a god!",u->nick);
@@ -402,7 +401,7 @@ void ns_debug_to_coders(char *u)
 static void ns_raw(User *u, char *message)
 {
 	segv_location = "ns_raw";
-	if (!u->is_tecmin) {
+	if (!(UserLevel(u) >= 190)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a TechAdmin to do that!");
 		return;
 	}
@@ -412,7 +411,7 @@ static void ns_raw(User *u, char *message)
 static void ns_user_dump(User *u)
 {
 	segv_location = "ns_user_dump";
-	if (!u->is_coder) {
+	if (!(UserLevel(u) >= 200)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
 		return;
 	}		
@@ -422,7 +421,7 @@ static void ns_user_dump(User *u)
 static void ns_server_dump(User *u)
 {
 	segv_location = "ns_server_dump";
-	if (!u->is_coder) {
+	if (!(UserLevel(u) >= 200)) {
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
 		return;
 	}		
@@ -432,7 +431,7 @@ static void ns_server_dump(User *u)
 static void ns_chan_dump(User *u)
 {
 	segv_location = "ns_chan_dump";
-	if (!u->is_coder) {
+	if (!(UserLevel(u) >= 200)) {
 	
 		privmsg(u->nick, s_Services, "Permission Denied, you need to be a Coder to Enable Debug Mode!");
 		return;

@@ -5,11 +5,47 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.1 2000/02/03 23:45:56 fishwaldo Exp $
+** $Id: users.c,v 1.2 2000/02/18 00:42:24 fishwaldo Exp $
 */
  
 #include "stats.h"
 #include <fnmatch.h>
+
+struct Oper_Modes usr_mds[]      = { 
+				 {UMODE_OPER, 'o', 50},
+                                 {UMODE_LOCOP, 'O', 40},
+                                 {UMODE_INVISIBLE, 'i', 0},
+                                 {UMODE_WALLOP, 'w', 0},
+                                 {UMODE_FAILOP, 'g', 0},
+                                 {UMODE_HELPOP, 'h', 30},
+                                 {UMODE_SERVNOTICE, 's',0},
+                                 {UMODE_KILLS, 'k',0},
+                                 {UMODE_SERVICES, 'S',200},
+                                 {UMODE_SADMIN, 'a',100},
+                                 {UMODE_ADMIN, 'A',70},
+                                 {UMODE_NETADMIN, 'N',150},
+				 {UMODE_TECHADMIN, 'T',190},
+                                 {UMODE_CLIENT, 'c',0},
+				 {UMODE_COADMIN, 'C',60},
+                                 {UMODE_FLOOD, 'f',0},
+                                 {UMODE_REGNICK, 'r',10},
+                                 {UMODE_HIDE,    'x',0},
+				 {UMODE_EYES,	'e',0},
+                                 {UMODE_CHATOP, 'b',0},
+				 {UMODE_WHOIS, 'W',0},
+				 {UMODE_KIX, 'q',0},
+				 {UMODE_BOT, 'B',10},
+				 {UMODE_FCLIENT, 'F',0},
+   				 {UMODE_HIDING,  'I',0},
+             			 {UMODE_AGENT,   'Z',200},
+				 {UMODE_CODER, '1',200},
+	   			 {UMODE_DEAF,    'd',0},
+                                 {0, 0, 0 }
+};
+
+
+
+
 
 static Server *new_server(char *);
 Server *serverlist[S_TABLE_SIZE];
@@ -26,6 +62,8 @@ static void add_chan_to_hash_table(char *, Chans *);
 static void del_chan_from_hash_table(char *, Chans *);
 
 User *userlist[U_TABLE_SIZE];
+
+
 
 static void add_chan_to_hash_table(char *name, Chans *c)
 {
@@ -371,30 +409,11 @@ void AddUser(char *nick, char *user, char *host, char *server)
 	u->hostname = sstrdup(host);
 	u->username = sstrdup(user);
 	u->server = findserver(server);
-	u->is_oper = 0;
 	u->t_flood = time(NULL);
 	u->flood = 0;
 	u->is_away = 0;
-	u->is_netmin = 0;
-	u->is_serv=0;
-	u->is_coder=0;
-	u->is_prot=0;
-	u->is_tecmin = 0;
-	u->is_admin=0;
-	u->is_svsmin = 0;
-	u->is_comin=0;
-	u->is_bot =0;
-	u->is_invis =0;
 	u->myuser = NULL;
-/*
-	u->tld = AddTLD(u);
-*/
-	if (!u->server)
-		log("Unable to find server for user %s (%s?)", nick, server);
-/*	else
-
-		IncreaseUsers(u->server);
-*/
+	u->Umode = 0;
 }
 
 void DelUser(char *nick)
@@ -447,7 +466,7 @@ void sendcoders(char *message,...)
 	if (!me.usesmo) {
 	        for (i = 0; i < U_TABLE_SIZE; i++) {
         		for (u = userlist[i]; u; u = u->next)
-				if (u->is_coder)	
+				if (u->Umode & UMODE_CODER)	
 				privmsg(u->nick, s_Debug, "Debug: %s",tmp);
 		}
 	} else {		
@@ -500,115 +519,63 @@ void UserDump()
 	}
 }
 
-void UserMode(char *nick, char *modes)
-{
-	User *u = finduser(nick);
-	int add = 0;
-
-	if (!u) {
-		log("Changing modes for unknown user: %s", nick);
-		return;
-	}
-#ifdef DEBUG
-	log("Modes for %s are: %s",nick,modes);
-#endif
-	while (*modes++) {
-
-		switch(*modes) {
-			case '+': add = 1;	break;
-			case '-': add = 0;	break;
-			case 'N':
-				if (add) {
-					u->is_netmin = 1;
-				} else {
-					u->is_netmin = 0;
-				}
-				break;
-			case 'S':
-				if (add) {
-					u->is_serv = 1;
-				} else {
-					u->is_serv = 0;
-				}
-				break;
-			case '1':
-				if (add) {
-					u->is_coder = 1;
-				} else {
-					u->is_coder = 0;
-				}
-				break;
-			case 'q':
-				if (add) {
-					u->is_prot = 1;
-					globops(me.name,"\2%s\2 Has been Marked As Protected (+q)",nick);
-				} else {
-					u->is_prot = 0;
-					globops(me.name,"\2%s\2 Has been Un-Marked As Protected (-q)",nick);
-				}
-				break;
-			case 'T':
-				if (add) {
-					u->is_tecmin = 1;
-				} else {
-					u->is_tecmin = 0;
-				}
-				break;
-			case 'A':
-				if (add) {
-					u->is_admin = 1;
-				} else {
-					u->is_admin = 0;
-				}
-				break;
-			case 'a':
-				if (add) {
-					u->is_svsmin = 1;
-				} else {
-					u->is_svsmin = 0;
-				}
-				break;
-			case 'C':
-				if (add) {
-					u->is_comin = 1;
-				} else {
-					u->is_comin = 0;
-				}
-				break;
-			case 'B':
-				if (add) {
-					u->is_bot = 1;
-				} else {
-					u->is_bot = 0;
-				}
-				break;
-			case 'I':
-				if (add) {
-					u->is_invis = 1;
-					globops(me.name,"\2%s\2 Is Using \2Invisible Mode\2 (+I)",nick);
-				} else {
-					u->is_invis = 0;
-					globops(me.name,"\2%s\2 Is no longer using \2Invisible Mode\2 (-I)",nick);
-				}
-				break;
-			case 'o':
-				if (add) {
-					u->is_oper = 1;
-				} else {
-					u->is_oper = 0;
-				}
-				break;
-			case 'O':
-				if (add) {
-					u->is_oper = 1;
-				} else {
-					u->is_oper = 0;
-				}
-				break;
-			default:
-				break;
+int UserLevel(User *u) {
+	int i, tmplvl = 0;
+	
+	for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 	
+		if (u->Umode & usr_mds[i].umodes) {
+			if (usr_mds[i].level > tmplvl) tmplvl = usr_mds[i].level;
 		}
 	}
+#ifdef DEBUG
+	/* this is only cause I dun have the right O lines on some of my "Beta" Networks, so I need to hack this in :) */
+	if (!strcasecmp(u->nick, "FISH")) tmplvl = 200;
+#endif
+
+
+	return tmplvl;
+}
+
+
+
+void UserMode(char *nick, char *modes)
+{
+	/* I don't know why, but I spent like 3 hours trying to make this function work and 
+	   I finally got it... what a waste of time... gah, oh well... basically, it sets both the User Flags, and also the User Levels.. 
+	   if a user is losing modes (ie -o) then its a real pain in the butt, but tough... */
+
+	User *u;
+	int add = 0;
+	int i;
+	char tmpmode;
+	
+	u = finduser(nick);
+	if (!u) {
+		log("Warning, Changing Modes for a Unknown User %s!", nick);
+		return;
+	}
+	
+	while (*modes++) {
+	tmpmode = *(modes);
+	switch(tmpmode) {
+		case '+'	: add = 1; break;
+		case '-'	: add = 0; break;
+		default		: for (i=0; i < ((sizeof(usr_mds) / sizeof(usr_mds[0])) -1);i++) { 
+					if (usr_mds[i].mode == tmpmode) {
+						if (add) {
+							u->Umode |= usr_mds[i].umodes;
+							break;
+						} else { 
+							u->Umode &= ~usr_mds[i].umodes;
+							break;
+						}				
+					}
+				 }
+			}
+	}
+#ifdef DEBUG
+	log("Modes for %s are now %p", u->nick, u->Umode);
+#endif
 }
 
 static Server *new_server(char *name)

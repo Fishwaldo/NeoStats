@@ -17,8 +17,14 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.1 2000/02/03 23:45:53 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.2 2000/02/18 00:42:24 fishwaldo Exp $
  */
+
+
+#ifndef UNREAL_H
+
+#define UNREAL_H
+
 
 /* Shamelessly Stolen from Unreal2.1.7 for Token Support!  - Fish*/
 
@@ -52,6 +58,10 @@
 	okie 60*60 commands more :P - Sowwy!!! -sts
 	
  */
+
+
+
+
 
 #define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
 #define TOK_PRIVATE	"!"		/* 33 */
@@ -300,3 +310,49 @@
 #define TOK_SWHOIS "BA"
 #define MSG_SVSO "SVSO"
 #define TOK_SVSO "BB"
+
+#define	UMODE_INVISIBLE  0x0001 /* makes user invisible */
+#define	UMODE_OPER       0x0002	/* Operator */
+#define	UMODE_WALLOP     0x0004 /* send wallops to them */
+#define UMODE_FAILOP	 0x0008 /* Shows some global messages */
+#define UMODE_HELPOP	 0x0010 /* Help system operator */
+#define UMODE_REGNICK	 0x0020 /* Nick set by services as registered */
+#define UMODE_SADMIN	 0x0040 /* Services Admin */
+#define UMODE_ADMIN	 0x0080 /* Admin */
+
+#define	UMODE_SERVNOTICE 0x0100 /* server notices such as kill */
+#define	UMODE_LOCOP      0x0200 /* Local operator -- SRB */
+#define UMODE_KILLS	 0x0400 /* Show server-kills... */
+#define UMODE_CLIENT	 0x0800 /* Show client information */
+#define UMODE_FLOOD	 0x1000 /* Receive flood warnings */
+#define UMODE_CHATOP	 0x2000 /* can receive chatops */
+#define UMODE_SERVICES   0x4000 /* services */
+#define UMODE_HIDE	 0x8000 /* Hide from Nukes */
+#define UMODE_NETADMIN  0x10000 /* Network Admin */
+#define UMODE_EYES      0x20000 /* Mode to see server stuff */
+#define UMODE_TECHADMIN 0x40000 /* Tech Admin */
+#define UMODE_COADMIN   0x80000 /* Co Admin */
+#define UMODE_WHOIS    0x100000 /* gets notice on /whois */
+#define UMODE_KIX      0x200000 /* usermode +q 
+                                   cannot be kicked from any channel 
+                                   except by U:Lines
+                                */
+#define UMODE_BOT       0x400000 /* User is a bot */
+#define UMODE_CODER	0x800000 /* User is a network coder */
+#define UMODE_FCLIENT  0x1000000 /* recieve client on far connects.. */
+#define UMODE_HIDING   0x2000000 /* Totally invisible .. */
+#define UMODE_AGENT    0x4000000 /* Is an IRCd Agent local only */
+#define UMODE_DEAF     0x8000000 /* User can't here anything in channel */
+
+
+struct Oper_Modes {
+	long umodes;
+	char mode;
+	int level;
+};
+
+
+
+
+
+#endif  /* UNREAL_H Define */

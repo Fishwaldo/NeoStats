@@ -5,13 +5,14 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: statserv.h,v 1.3 2000/02/06 07:12:46 fishwaldo Exp $
+** $Id: statserv.h,v 1.4 2000/02/18 00:42:25 fishwaldo Exp $
 */
 
 #ifndef STATSERV_H
 #define STATSERV_H
 
 #include "dl.h"
+#include "m_stats.h"
 #include "stats.h"
 #include "dotconf.h"
 

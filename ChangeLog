@@ -1,4 +1,16 @@
 NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rants)
+* NeoStats * Fish * Its Under CVS Control now... Still a Beta/Alpha Version though!
+ - Implemented Levels for Users, and finally fixed it all up.. if your
+   Coding a module, and need some sort of Security, use "UserLevel(u)" which
+   will return the Level of the user..... see users.c for a list of current O
+   lines, that map to Levels (highest is 200)
+ - More work on StatServ to make it produce some useable stats.. almost
+   there... I know Shmad and HeadBanger are going to kick my butt when they
+   find out that I have been away for over a week and hardly done anything on
+   it during those lonely nights in the hotel, but f*ck em :)
+ - More work on the Event Triggers... I'm happier with the interface now
+ - Flew around Asia.. Singapore, Malasia, and Phillipines!
+
 * NeoStats * Fish * Version 2.0Alpha4 (we decided this is a Major Release, hence the 2.0 version)
  - Fixed up The Module Code (as Usual)
  - Created new Functions to Load Modules at Boot time...

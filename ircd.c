@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: ircd.c,v 1.4 2000/02/06 07:12:46 fishwaldo Exp $
+** $Id: ircd.c,v 1.5 2000/02/18 00:42:24 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -37,6 +37,7 @@ void Srv_Squit(char *, char *);
 void Srv_Nick(char *, char *);
 void Srv_Svsnick(char *, char *);
 void Srv_Kill(char *, char *);
+
 
 
 static void ShowMOTD(char *);
@@ -433,7 +434,7 @@ void Srv_Nick(char *origin, char *coreLine) {
 			host = strtok(NULL, " ");
 			server = strtok(NULL, " ");
 			AddUser(cmd, user, host, server);
-			Module_Event("SIGNON", coreLine);
+			Module_Event("SIGNON", finduser(cmd));
 }
 void Srv_Svsnick(char *origin, char *coreLine) {
 			char *nnick;
@@ -495,7 +496,7 @@ int flood(User *u)
 {
 	time_t current = time(NULL);
 
-	if (u->is_oper) 
+	if (u->Umode & UMODE_OPER) 
 		return 0;
 	if (current - u->t_flood > 10) {
 		u->t_flood = time(NULL);

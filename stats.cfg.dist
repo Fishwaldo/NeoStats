@@ -77,6 +77,10 @@ LOAD_MODULE statserv
 # uses whatever NeoStats is configured to use
 #STATSERV_HOST my.stats.irc.net
 
+# This is used to specified the number of seconds a Server is tolerated
+# before it is considered Laged. A non value, or value of 0, disables Lag
+# Notifications
+LAG_NOTICE 60
 
 ###############################################################################
 ## End of Configuration                                                      ##

@@ -1,12 +1,12 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile,v 1.1 2000/02/03 23:45:52 fishwaldo Exp $
+# $Id: Makefile,v 1.2 2000/02/18 00:42:24 fishwaldo Exp $
 # makefile originally created by Andy Church.
  
 CC=gcc
 CFLAGS = -O2 -Wall -ggdb
 #CFLAGS	= -O3 -Wall
-LDFLAGS= -rdynamic -ldl
+LDFLAGS= -rdynamic -ldl -lefence
 
 OBJS =	dotconf.o services.o main.o sock.o conf.o ircd.o timer.o users.o \
 		ns_help.o dl.o 

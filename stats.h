@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: stats.h,v 1.4 2000/02/06 07:12:46 fishwaldo Exp $
+** $Id: stats.h,v 1.5 2000/02/18 00:42:24 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -29,7 +29,18 @@
 
 #include "Unreal.h"
 
+/* Define this to enable Debug Code */
 #define  DEBUG
+
+/* Define this to Enable Unreal Support */
+
+#define UNREAL
+
+
+
+
+
+
 #define CHANLEN			32
 #define BUFSIZE			512
 #define CONFIG_NAME		"stats.cfg"
@@ -150,21 +161,12 @@ struct user_ {
 	Server *server;
 	MyUser *myuser;
 	int flood;
+	int is_away;
 	time_t t_flood;
 	long hash;
-	unsigned int is_oper : 1;
-	unsigned int is_away : 1;
-	unsigned int is_coder : 1;
-	unsigned int is_netmin : 1;
-	unsigned int is_tecmin : 1;
-	unsigned int is_srvmin : 1;
-	unsigned int is_comin : 1;
-	unsigned int is_serv : 1;
-	unsigned int is_invis : 1;
-	unsigned int is_admin : 1;
-	unsigned int is_prot : 1;
-	unsigned int is_svsmin : 1;
-	unsigned int is_bot : 1;
+	char *modes;
+	int *ulevel;
+	long Umode;
 };
 
 struct ping {
@@ -255,6 +257,8 @@ extern void LoadMyUsers();
 extern void SaveMyUsers();
 extern void DeleteMyUser(char *);
 extern MyUser *findmyuser(char *);
+extern int UserLevel(User *);
+
 
 /* ns_help.c */
 extern const char *ns_help[];
