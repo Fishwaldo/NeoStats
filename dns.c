@@ -13,6 +13,7 @@
 /* this file does the dns checking for adns. it provides a callback mechinism for dns lookups
 ** so that DNS lookups will not block. It uses the adns libary (installed in the adns directory
 */
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

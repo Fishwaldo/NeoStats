@@ -4,11 +4,12 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: proxy.c,v 1.7 2002/08/31 07:40:35 fishwaldo Exp $
+** $Id: proxy.c,v 1.8 2002/08/31 07:50:49 fishwaldo Exp $
 */
 
 
 #include <stdio.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -24,6 +25,11 @@ int sock4_proxy(int sock);
 int sock5_proxy(int sock);
 int cisco_proxy(int sock);
 int wingate_proxy(int sock);
+
+
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
 
 
 proxy_types proxy_list[] = {
