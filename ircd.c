@@ -69,6 +69,7 @@ struct int_commands {
 	char *name;
 	void (*function)();
 	int srvmsg; /* Should this be a Server Message(1), or a User Message?(0) */
+	int exec;
 };
 
 /* The Following Array is a list of Commands that are Handled Internally by NeoStats 
@@ -83,137 +84,137 @@ typedef struct int_commands IntCommands;
 #ifdef UNREAL
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
-	{MSG_STATS,	Usr_Stats, 		1},
-	{TOK_STATS,	Usr_Stats,		1},
-	{MSG_SETHOST, 	Usr_Vhost,		1},
-	{TOK_SETHOST, 	Usr_Vhost, 		1},
-	{MSG_VERSION,	Usr_Version,		1},
-	{TOK_VERSION,	Usr_Version,		1},
-	{MSG_MOTD,	Usr_ShowMOTD,		1},
-	{TOK_MOTD,	Usr_ShowMOTD,		1},
-	{MSG_ADMIN,	Usr_ShowADMIN,		1},
-	{TOK_ADMIN,	Usr_ShowADMIN,		1},
-	{MSG_CREDITS,	Usr_Showcredits,	1},
-	{TOK_CREDITS,	Usr_Showcredits,	1},
-	{MSG_SERVER,	Usr_AddServer,		1},
-	{TOK_SERVER,	Usr_AddServer,		1},
-	{MSG_SQUIT,	Usr_DelServer,		1},
-	{TOK_SQUIT,	Usr_DelServer,		1},
-	{MSG_QUIT,	Usr_DelUser,		1},
-	{TOK_QUIT,	Usr_DelUser,		1},
-	{MSG_MODE,	Usr_Mode,		1},
-	{TOK_MODE,	Usr_Mode,		1},
-	{MSG_SVSMODE,	Usr_Smode,		1},
-	{TOK_SVSMODE,	Usr_Smode,		1},
-	{MSG_SVS2MODE,	Usr_Smode,		1},
-	{TOK_SVS2MODE,	Usr_Smode,		1},
-	{MSG_KILL,	Usr_Kill,		1},
-	{TOK_KILL,	Usr_Kill,		1},
-	{MSG_PONG,	Usr_Pong,		1},
-	{TOK_PONG,	Usr_Pong,		1},
-	{MSG_AWAY,	Usr_Away,		1},
-	{TOK_AWAY,	Usr_Away,		1},
-	{MSG_NICK,	Usr_Nick,		1},
-	{TOK_NICK,	Usr_Nick,		1},
-	{MSG_TOPIC,	Usr_Topic,		1},
-	{TOK_TOPIC,	Usr_Topic,		1},
-	{MSG_TOPIC, 	Usr_Topic, 		0},
-	{TOK_TOPIC, 	Usr_Topic, 		0},
-	{MSG_KICK,	Usr_Kick,		1},
-	{TOK_KICK,	Usr_Kick,		1},
-	{MSG_JOIN,	Usr_Join,		1},
-	{TOK_JOIN,	Usr_Join,		1},
-	{MSG_PART,	Usr_Part,		1},
-	{TOK_PART,	Usr_Part,		1},
-	{MSG_PING,	Srv_Ping,		0},
-	{TOK_PING,	Srv_Ping,		0},
-	{MSG_NETINFO,	Srv_Netinfo,		0},
-	{TOK_NETINFO,	Srv_Netinfo,		0},
-	{MSG_PASS,	Srv_Pass,		0},
-	{TOK_PASS,	Srv_Pass,		0},
-	{MSG_SERVER,	Srv_Server,		0},
-	{TOK_SERVER,	Srv_Server,		0},
-	{MSG_SQUIT,	Srv_Squit,		0},
-	{TOK_SQUIT,	Srv_Squit,		0},
-	{MSG_NICK,	Srv_Nick,		0},
-	{TOK_NICK,	Srv_Nick,		0},
-	{MSG_SVSNICK,	Srv_Svsnick,		0},
-	{TOK_SVSNICK,	Srv_Svsnick,		0},
-	{MSG_KILL,	Srv_Kill,		0},
-	{TOK_KILL,	Srv_Kill,		0},
-	{MSG_PROTOCTL, 	Srv_Connect, 		0},
-	{TOK_PROTOCTL,	Srv_Connect,		0},
-	{NULL,		NULL,			0}
+	{MSG_STATS,	Usr_Stats, 		1, 	0},
+	{TOK_STATS,	Usr_Stats,		1, 	0},
+	{MSG_SETHOST, 	Usr_Vhost,		1, 	0},
+	{TOK_SETHOST, 	Usr_Vhost, 		1, 	0},
+	{MSG_VERSION,	Usr_Version,		1, 	0},
+	{TOK_VERSION,	Usr_Version,		1, 	0},
+	{MSG_MOTD,	Usr_ShowMOTD,		1, 	0},
+	{TOK_MOTD,	Usr_ShowMOTD,		1, 	0},
+	{MSG_ADMIN,	Usr_ShowADMIN,		1, 	0},
+	{TOK_ADMIN,	Usr_ShowADMIN,		1, 	0},
+	{MSG_CREDITS,	Usr_Showcredits,	1, 	0},
+	{TOK_CREDITS,	Usr_Showcredits,	1, 	0},
+	{MSG_SERVER,	Usr_AddServer,		1, 	0},
+	{TOK_SERVER,	Usr_AddServer,		1, 	0},
+	{MSG_SQUIT,	Usr_DelServer,		1, 	0},
+	{TOK_SQUIT,	Usr_DelServer,		1, 	0},
+	{MSG_QUIT,	Usr_DelUser,		1, 	0},
+	{TOK_QUIT,	Usr_DelUser,		1, 	0},
+	{MSG_MODE,	Usr_Mode,		1, 	0},
+	{TOK_MODE,	Usr_Mode,		1, 	0},
+	{MSG_SVSMODE,	Usr_Smode,		1, 	0},
+	{TOK_SVSMODE,	Usr_Smode,		1, 	0},
+	{MSG_SVS2MODE,	Usr_Smode,		1, 	0},
+	{TOK_SVS2MODE,	Usr_Smode,		1, 	0},
+	{MSG_KILL,	Usr_Kill,		1, 	0},
+	{TOK_KILL,	Usr_Kill,		1, 	0},
+	{MSG_PONG,	Usr_Pong,		1, 	0},
+	{TOK_PONG,	Usr_Pong,		1, 	0},
+	{MSG_AWAY,	Usr_Away,		1, 	0},
+	{TOK_AWAY,	Usr_Away,		1, 	0},
+	{MSG_NICK,	Usr_Nick,		1, 	0},
+	{TOK_NICK,	Usr_Nick,		1, 	0},
+	{MSG_TOPIC,	Usr_Topic,		1, 	0},
+	{TOK_TOPIC,	Usr_Topic,		1, 	0},
+	{MSG_TOPIC, 	Usr_Topic, 		0, 	0},
+	{TOK_TOPIC, 	Usr_Topic, 		0, 	0},
+	{MSG_KICK,	Usr_Kick,		1, 	0},
+	{TOK_KICK,	Usr_Kick,		1, 	0},
+	{MSG_JOIN,	Usr_Join,		1, 	0},
+	{TOK_JOIN,	Usr_Join,		1, 	0},
+	{MSG_PART,	Usr_Part,		1, 	0},
+	{TOK_PART,	Usr_Part,		1, 	0},
+	{MSG_PING,	Srv_Ping,		0, 	0},
+	{TOK_PING,	Srv_Ping,		0, 	0},
+	{MSG_NETINFO,	Srv_Netinfo,		0, 	0},
+	{TOK_NETINFO,	Srv_Netinfo,		0, 	0},
+	{MSG_PASS,	Srv_Pass,		0, 	0},
+	{TOK_PASS,	Srv_Pass,		0, 	0},
+	{MSG_SERVER,	Srv_Server,		0, 	0},
+	{TOK_SERVER,	Srv_Server,		0, 	0},
+	{MSG_SQUIT,	Srv_Squit,		0, 	0},
+	{TOK_SQUIT,	Srv_Squit,		0, 	0},
+	{MSG_NICK,	Srv_Nick,		0, 	0},
+	{TOK_NICK,	Srv_Nick,		0, 	0},
+	{MSG_SVSNICK,	Srv_Svsnick,		0, 	0},
+	{TOK_SVSNICK,	Srv_Svsnick,		0, 	0},
+	{MSG_KILL,	Srv_Kill,		0, 	0},
+	{TOK_KILL,	Srv_Kill,		0, 	0},
+	{MSG_PROTOCTL, 	Srv_Connect, 		0, 	0},
+	{TOK_PROTOCTL,	Srv_Connect,		0, 	0},
+	{NULL,		NULL,			0, 	0}
 };
 #endif
 #ifdef ULTIMATE
 IntCommands cmd_list[] = {
 	/* Command	Function		srvmsg*/
-	{MSG_STATS,	Usr_Stats, 		1},
-	{TOK_STATS,	Usr_Stats,		1},
-	{MSG_SETHOST, 	Usr_Vhost,		1},
-	{TOK_SETHOST, 	Usr_Vhost, 		1},
-	{MSG_VERSION,	Usr_Version,		1},
-	{TOK_VERSION,	Usr_Version,		1},
-	{MSG_MOTD,	Usr_ShowMOTD,		1},
-	{TOK_MOTD,	Usr_ShowMOTD,		1},
-	{MSG_CREDITS,	Usr_Showcredits,	1},
-	{TOK_CREDITS,	Usr_Showcredits,	1},
-	{MSG_SERVER,	Usr_AddServer,		1},
-	{TOK_SERVER,	Usr_AddServer,		1},
-	{MSG_SQUIT,	Usr_DelServer,		1},
-	{TOK_SQUIT,	Usr_DelServer,		1},
-	{MSG_QUIT,	Usr_DelUser,		1},
-	{TOK_QUIT,	Usr_DelUser,		1},
-	{MSG_MODE,	Usr_Mode,		1},
-	{TOK_MODE,	Usr_Mode,		1},
-	{MSG_SVSMODE,	Usr_Smode,		1},
-	{TOK_SVSMODE,	Usr_Smode,		1},
-	{MSG_KILL,	Usr_Kill,		1},
-	{TOK_KILL,	Usr_Kill,		1},
-	{MSG_PONG,	Usr_Pong,		1},
-	{TOK_PONG,	Usr_Pong,		1},
-	{MSG_AWAY,	Usr_Away,		1},
-	{TOK_AWAY,	Usr_Away,		1},
-	{MSG_NICK,	Usr_Nick,		1},
-	{TOK_NICK,	Usr_Nick,		1},
-	{MSG_TOPIC,	Usr_Topic,		1},
-	{TOK_TOPIC,	Usr_Topic,		1},
-	{MSG_KICK,	Usr_Kick,		1},
-	{TOK_KICK,	Usr_Kick,		1},
-	{MSG_JOIN,	Usr_Join,		1},
-	{TOK_JOIN,	Usr_Join,		1},
-	{MSG_PART,	Usr_Part,		1},
-	{TOK_PART,	Usr_Part,		1},
-	{MSG_PING,	Srv_Ping,		0},
-	{TOK_PING,	Srv_Ping,		0},
+	{MSG_STATS,	Usr_Stats, 		1, 	0},
+	{TOK_STATS,	Usr_Stats,		1, 	0},
+	{MSG_SETHOST, 	Usr_Vhost,		1, 	0},
+	{TOK_SETHOST, 	Usr_Vhost, 		1, 	0},
+	{MSG_VERSION,	Usr_Version,		1, 	0},
+	{TOK_VERSION,	Usr_Version,		1, 	0},
+	{MSG_MOTD,	Usr_ShowMOTD,		1, 	0},
+	{TOK_MOTD,	Usr_ShowMOTD,		1, 	0},
+	{MSG_CREDITS,	Usr_Showcredits,	1, 	0},
+	{TOK_CREDITS,	Usr_Showcredits,	1, 	0},
+	{MSG_SERVER,	Usr_AddServer,		1, 	0},
+	{TOK_SERVER,	Usr_AddServer,		1, 	0},
+	{MSG_SQUIT,	Usr_DelServer,		1, 	0},
+	{TOK_SQUIT,	Usr_DelServer,		1, 	0},
+	{MSG_QUIT,	Usr_DelUser,		1, 	0},
+	{TOK_QUIT,	Usr_DelUser,		1, 	0},
+	{MSG_MODE,	Usr_Mode,		1, 	0},
+	{TOK_MODE,	Usr_Mode,		1, 	0},
+	{MSG_SVSMODE,	Usr_Smode,		1, 	0},
+	{TOK_SVSMODE,	Usr_Smode,		1, 	0},
+	{MSG_KILL,	Usr_Kill,		1, 	0},
+	{TOK_KILL,	Usr_Kill,		1, 	0},
+	{MSG_PONG,	Usr_Pong,		1, 	0},
+	{TOK_PONG,	Usr_Pong,		1, 	0},
+	{MSG_AWAY,	Usr_Away,		1, 	0},
+	{TOK_AWAY,	Usr_Away,		1, 	0},
+	{MSG_NICK,	Usr_Nick,		1, 	0},
+	{TOK_NICK,	Usr_Nick,		1, 	0},
+	{MSG_TOPIC,	Usr_Topic,		1, 	0},
+	{TOK_TOPIC,	Usr_Topic,		1, 	0},
+	{MSG_KICK,	Usr_Kick,		1, 	0},
+	{TOK_KICK,	Usr_Kick,		1, 	0},
+	{MSG_JOIN,	Usr_Join,		1, 	0},
+	{TOK_JOIN,	Usr_Join,		1, 	0},
+	{MSG_PART,	Usr_Part,		1, 	0},
+	{TOK_PART,	Usr_Part,		1, 	0},
+	{MSG_PING,	Srv_Ping,		0, 	0},
+	{TOK_PING,	Srv_Ping,		0, 	0},
 #ifndef ULTIMATE3
-	{MSG_SNETINFO,	Srv_Netinfo,		0},
-	{TOK_SNETINFO,	Srv_Netinfo,		0},
+	{MSG_SNETINFO,	Srv_Netinfo,		0, 	0},
+	{TOK_SNETINFO,	Srv_Netinfo,		0, 	0},
 #endif
 #ifdef ULTIMATE3
-	{MSG_SVINFO,	Srv_Svinfo,		0},
-	{MSG_CAPAB,	Srv_Connect, 		0},
-	{MSG_BURST,	Srv_Burst, 		0},
-	{MSG_SJOIN,	Srv_Sjoin,		1},
+	{MSG_SVINFO,	Srv_Svinfo,		0, 	0},
+	{MSG_CAPAB,	Srv_Connect, 		0, 	0},
+	{MSG_BURST,	Srv_Burst, 		0, 	0},
+	{MSG_SJOIN,	Srv_Sjoin,		1, 	0},
 #endif
-	{MSG_VCTRL,	Srv_Vctrl, 		0},
-	{TOK_VCTRL,	Srv_Vctrl, 		0},
-	{MSG_PASS,	Srv_Pass,		0},
-	{TOK_PASS,	Srv_Pass,		0},
-	{MSG_SERVER,	Srv_Server,		0},
-	{TOK_SERVER,	Srv_Server,		0},
-	{MSG_SQUIT,	Srv_Squit,		0},
-	{TOK_SQUIT,	Srv_Squit,		0},
-	{MSG_NICK,	Srv_Nick,		0},
-	{TOK_NICK,	Srv_Nick,		0},
-	{MSG_SVSNICK,	Srv_Svsnick,		0},
-	{TOK_SVSNICK,	Srv_Svsnick,		0},
-	{MSG_KILL,	Srv_Kill,		0},
-	{TOK_KILL,	Srv_Kill,		0},
-	{MSG_PROTOCTL, 	Srv_Connect, 		0},
-	{TOK_PROTOCTL,	Srv_Connect,		0},
-	{NULL,		NULL,			0}
+	{MSG_VCTRL,	Srv_Vctrl, 		0, 	0},
+	{TOK_VCTRL,	Srv_Vctrl, 		0, 	0},
+	{MSG_PASS,	Srv_Pass,		0, 	0},
+	{TOK_PASS,	Srv_Pass,		0, 	0},
+	{MSG_SERVER,	Srv_Server,		0, 	0},
+	{TOK_SERVER,	Srv_Server,		0, 	0},
+	{MSG_SQUIT,	Srv_Squit,		0, 	0},
+	{TOK_SQUIT,	Srv_Squit,		0, 	0},
+	{MSG_NICK,	Srv_Nick,		0, 	0},
+	{TOK_NICK,	Srv_Nick,		0, 	0},
+	{MSG_SVSNICK,	Srv_Svsnick,		0, 	0},
+	{TOK_SVSNICK,	Srv_Svsnick,		0, 	0},
+	{MSG_KILL,	Srv_Kill,		0, 	0},
+	{TOK_KILL,	Srv_Kill,		0, 	0},
+	{MSG_PROTOCTL, 	Srv_Connect, 		0, 	0},
+	{TOK_PROTOCTL,	Srv_Connect,		0, 	0},
+	{NULL,		NULL,			0, 	0}
 };
 #endif
 
@@ -501,6 +502,7 @@ void parse(char *line)
 	for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
 		if (!strcmp(cmd_list[I].name, cmd)) {
 			if (cmd_list[I].srvmsg == cmdptr) {
+				cmd_list[I].exec++;
 				strcpy(segv_location, cmd_list[I].name);
 				cmd_list[I].function(EM);
 				break; log("should never get here-Parse");
@@ -707,6 +709,7 @@ void Srv_Connect(EvntMsg *EM) {
 void Usr_Stats(EvntMsg *EM) {
 	time_t tmp;
 	time_t tmp2;
+	int I;
 #ifdef EXTAUTH
 	int dl;
 	int (*listauth)(User *u);
@@ -741,7 +744,15 @@ void Usr_Stats(EvntMsg *EM) {
 		tmp2 = time(NULL) - me.t_start;
 		snumeric_cmd(211, EM->u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		snumeric_cmd(241, EM->u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes,me.RcveM , me.RcveBytes, tmp2, tmp);  	
+	} else if (!strcasecmp(EM->av[0], "z")) {
+		for (I=0; I < ((sizeof(cmd_list) / sizeof(cmd_list[0])) -1); I++) {
+			if (cmd_list[I].exec > 0) {
+			snumeric_cmd(212, EM->u->nick, "%s - %d", cmd_list[I].name, cmd_list[I].exec);
+			}
+		}
 	}
+
+	
 	snumeric_cmd(219, EM->u->nick, "%s :End of /STATS report", EM->av[0]);
 	notice(s_Services,"%s Requested Stats %s", EM->u->nick, EM->av[0]);
 }
