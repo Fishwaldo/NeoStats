@@ -191,10 +191,10 @@ read_loop ()
 			do_dns ();
 
 			/* check CURL fds */
-			while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &maxfdsunused))
-			if (maxfdsunused >=0) { 
-				transfer_status();
+			while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &maxfdsunused)) {
 			}
+			transfer_status();
+
 			if (FD_ISSET (servsock, &readfds)) {
 				for (j = 0; j < BUFSIZE; j++) {
 					i = read (servsock, &c, 1);

@@ -30,6 +30,17 @@
 #include "transfer.h"
 #include "curl.h"
 
+void testcallback(void *data, int status, char *body, int bodysize) {
+if (status == NS_FAILURE) {
+	printf("gotcallback for %s\n", (char *)data);
+	printf("Error: %s\n", body);
+} else {
+	printf("got good callback for %s\n", (char *)data);
+	printf("Body:(%d - %d)\n%s\n", bodysize, strlen(body),body);
+}
+}
+
+
 int init_curl() {
 	/* global curl init */
 	switch (curl_global_init(CURL_GLOBAL_ALL)) {
@@ -53,23 +64,97 @@ int init_curl() {
 	/* init the internal list to track downloads */
 	activetransfers = list_create(MAX_TRANSFERS);
 	nlog(LOG_DEBUG1, LOG_CORE, "LibCurl Initilized successfully");
-	new_transfer("http://secure.irc-chat.net/", "", 1, "", NULL, NULL);
+	
+	new_transfer("http://secure.irc-chat.net/", "", NS_MEMORY, "0", "Blah", testcallback);
 	return NS_SUCCESS;
 }
 
 static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, void *stream) {
+	size_t writesize;
+	int rembuffer;
+	char *newbuf;
+
 	neo_transfer *neotrans = (neo_transfer *)stream;
-	printf("from url %s\n", neotrans->url);
-	printf("Got %s\n", (char *)transferptr);
-	return size*nmemb;
+	switch (neotrans->savefileormem) {
+		case NS_FILE:
+			/* we are saving to a file... :) */
+			writesize = fwrite(transferptr, size, nmemb, neotrans->savefile);
+			nlog(LOG_DEBUG1, LOG_CORE, "Write %d to file from transfer from URL %s", (int)size*nmemb, neotrans->url);
+			break;
+		case NS_MEMORY:
+			size *= nmemb;
+			rembuffer = neotrans->savememsize - neotrans->savemempos; /* the remianing buffer size */
+			if (size > rembuffer) {
+				newbuf = realloc(neotrans->savemem, neotrans->savememsize + (size - rembuffer));
+				if (newbuf == NULL) {
+					nlog(LOG_WARNING, LOG_CORE, "Ran out of Memory for transfer %s. %s", neotrans->url, strerror(errno));
+					return -1;
+				} else {
+					neotrans->savememsize += size - rembuffer;
+					neotrans->savemem = newbuf;
+				}
+			}
+			memcpy((char *)&neotrans->savemem[neotrans->savemempos], transferptr, size);
+			neotrans->savemempos += size;
+			writesize = nmemb;
+			break;
+		default:
+			nlog(LOG_WARNING, LOG_CORE, "Unknown SaveTo type. Failed download for URL %s", neotrans->url);
+			writesize = -1;
+			break;
+	}
+	return writesize;
 }
 
 
-int new_transfer(char *url, char *params, int savetofileormemory, char *filename, void *data, transfer_callback *callback) {
+int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback) {
 	int ret;
 	neo_transfer *newtrans;
 	
+
+	/* sanity check the input first */
+	if (url[0] == 0) {
+		nlog(LOG_WARNING, LOG_CORE, "Undefined URL new_transfer , Aborting");
+		return NS_FAILURE;
+	}
+	if (!callback) {
+		nlog(LOG_WARNING, LOG_CORE, "Undefined Callback function for new_transfer URL %s, Aborting", url);
+		return NS_FAILURE;
+	}
+
 	newtrans = malloc(sizeof(neo_transfer));
+	bzero(newtrans, sizeof(neo_transfer));
+	switch (savetofileormemory) {
+		case NS_FILE:
+			/* if we don't have a filename, bail out */
+			if (filename[0] == 0) {
+				nlog(LOG_WARNING, LOG_CORE, "Undefined Filename for new_transfer URL %s, Aborting", url);
+				free(newtrans);
+				return NS_FAILURE;
+			}
+			
+			newtrans->savefile = fopen(filename, "w");
+			if (!newtrans->savefile) {
+				nlog(LOG_WARNING, LOG_CORE, "Error Opening file for writting in new_transfer: %s", strerror(errno));
+				free(newtrans);
+				return NS_FAILURE;
+			}
+			newtrans->savefileormem = NS_FILE;
+			strlcpy(newtrans->filename, filename, MAXPATH);			
+			nlog(LOG_DEBUG1, LOG_CORE, "Saving new download to %s from %s", filename, url);	
+			break;
+		case NS_MEMORY:
+			newtrans->savefileormem = NS_MEMORY;
+			break;
+		default:
+			break;
+	}
+	/* save the callback function */
+	newtrans->callback = callback;
+	
+	/* save the data function */
+	newtrans->data = data;
+
 	/* init the easy handle */
 	newtrans->curleasyhandle = curl_easy_init();
 	if (!newtrans->curleasyhandle) {
@@ -174,7 +259,9 @@ int new_transfer(char *url, char *params, int savetofileormemory, char *filename
 	
 	
 	if (curl_multi_add_handle(curlmultihandle, newtrans->curleasyhandle)) {
-		printf("hrm: %s\n", newtrans->curlerror);
+		nlog(LOG_WARNING, LOG_CORE, "Curl Init Failed: %s", newtrans->curlerror);
+		free(newtrans);
+		return NS_FAILURE;
 	}
 #if 0
 	if (curl_easy_perform(newtrans->curleasyhandle)) {
@@ -189,26 +276,39 @@ void transfer_status() {
 	CURLMsg *msg;
 	int msg_left;
 	neo_transfer *neotrans;
-	
 	while ((msg = curl_multi_info_read(curlmultihandle, &msg_left))) {
 		if (msg->msg == CURLMSG_DONE) {
 			/* find the handle here */
-			printf("result is %d\n", msg->data.result);
 			curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &neotrans);
+
+			/* close up any handles */
+			switch (neotrans->savefileormem) {
+				case NS_FILE:
+					/* we are saving to a file... :) */
+					fclose(neotrans->savefile);
+					nlog(LOG_DEBUG1, LOG_CORE, "Write Finished to file from transfer from URL %s",  neotrans->url);
+					break;
+				case NS_MEMORY:
+					break;
+			}
+
 			/* check if it failed etc */
 			if (msg->data.result != 0) {
 				/* it failed for whatever reason */
 				/* XXX TODO... Callback with a failure */
 				nlog(LOG_NOTICE, LOG_CORE, "Transfer %s Failed. Error was: %s", neotrans->url, neotrans->curlerror);
+				neotrans->callback(neotrans->data, NS_FAILURE, neotrans->curlerror, strlen(neotrans->curlerror));
 			} else {
-				printf("url was %s\n", neotrans->url);
+				nlog(LOG_DEBUG1, LOG_CORE, "Transfer %s succeded.", neotrans->url);
 				/* success, so we must callback with success */
-
+				neotrans->callback(neotrans->data, NS_SUCCESS, neotrans->savefileormem == NS_MEMORY ? neotrans->savemem : NULL, neotrans->savememsize);
 			}
 			/* regardless, clean up the transfer */
 			curl_multi_remove_handle(curlmultihandle, neotrans->curleasyhandle);
 			curl_easy_cleanup(neotrans->curleasyhandle);
 			/* XXX remove from list */
+			if (neotrans->savefileormem == NS_MEMORY)
+				free(neotrans->savemem);
 			free(neotrans);
 		}
 	}

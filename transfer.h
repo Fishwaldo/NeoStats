@@ -36,14 +36,21 @@
 CURLM *curlmultihandle;
 
 
+
 /* this struct contains info for each transfer in progress */
 typedef struct neo_transfer {
 	/* the curl handle used to track downloads by curl */
 	CURL *curleasyhandle;
 	/* should we save to a file or a memory space */
 	int savefileormem;
-	/* if saving to memory, save here, otherwise contains file name */
-	void *savemem;
+	/* if saving to memory, save here, */
+	char *savemem;
+	/* the allocated amount size of the savemem area */
+	int savememsize;
+	/* the current position of hte savemem area */
+	int savemempos; 
+	/* the file to save to */
+	char filename[MAXPATH];
 	/* if saving to a file, the file handle */
 	FILE *savefile;
 	/* the error, if any */
@@ -56,6 +63,8 @@ typedef struct neo_transfer {
 	char useragent[MAXURL];
 	/* the params, if any */
 	char params[512];
+	/* the callback function */
+	transfer_callback *callback;
 } neo_transfer;
 
 list_t *activetransfers;

@@ -188,6 +188,14 @@ typedef enum {
 #define NS_ULEVEL_ADMIN	185
 #define NS_ULEVEL_OPER	40
 
+/* transfer stuff */
+typedef enum NS_TRANSFER {
+	NS_FILE=0,
+	NS_MEMORY=1,
+} NS_TRANSFER;
+
+
+
 #define SEGV_LOCATION_BUFSIZE	255
 #ifdef LEAN_AND_MEAN
 #define SET_SEGV_LOCATION()
@@ -491,7 +499,7 @@ void services_cmd_help (User * u, char **av, int ac);
 int is_target_valid(char* bot_name, User* u, char* target_nick);
 
 /* transfer.c stuff */
-typedef void (*transfer_callback) (void *data, int returncode, void *body);
+typedef void (transfer_callback) (void *data, int returncode, char *body, int bodysize);
 void transfer_status();
-int new_transfer(char *url, char *params, int savetofileormemory, char *filename, void *data, transfer_callback *callback);
+int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback);
 #endif
