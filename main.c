@@ -108,6 +108,7 @@ main (int argc, char *argv[])
 	}
 	/* set some defaults before we parse the config file */
 	me.t_start = time(NULL);
+	me.now = time(NULL);
 	me.want_privmsg = 0;
 	me.die = 0;
 	me.local[0] = '\0';
