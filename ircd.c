@@ -651,10 +651,21 @@ void Usr_Nick(char *origin, char **argv, int argc) {
 void Usr_Topic(char *origin, char **argv, int argc) {
 }
 void Usr_Kick(char *origin, char **argv, int argc) {
+	part_chan(finduser(argv[1]), argv[0]);
+
 }
 void Usr_Join(char *origin, char **argv, int argc) {
+	char *s, *t;
+	t = argv[0];
+	while (*(s=t)) {
+		t = s + strcspn(s, ",");
+                if (*t)
+                	*t++ = 0;
+		join_chan(finduser(origin), s);
+	}
 }
 void Usr_Part(char *origin, char **argv, int argc) {
+	part_chan(finduser(origin), argv[0]);
 }
 void Srv_Ping(char *origin, char **argv, int argc) {
 			spong_cmd(origin);

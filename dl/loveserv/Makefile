@@ -1,0 +1,25 @@
+# Generated automatically from Makefile.in by configure.
+# Generated automatically from Makefile.in by configure.
+INCLUDES = -I../..
+
+SOURCES= loveserv.c
+OBJECTS= loveserv.lo
+TARGET= loveserv.so
+
+CC=gcc
+CFLAGS= -O2 -Wall -fPIC
+LINKER=ld
+
+$(warning *** NOTE:)
+$(warning If you receive a "`../loveserv.so': Permission denied" message, UNLOAD the module)  
+$(warning from NeoStats and then compile the module & the 'make' will function properly)
+$(warning )
+
+all:
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(OBJECTS) -c $(SOURCES)
+	$(LINKER) -shared -o $(TARGET) $(LIBS) $(OBJECTS)
+	/bin/cp $(TARGET) ../
+
+clean:
+	/bin/rm -rf ../$(TARGET) Makefile
+	/bin/rm -rf *.o *.lo *.so

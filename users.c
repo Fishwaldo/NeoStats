@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: users.c,v 1.19 2002/03/07 12:41:12 fishwaldo Exp $
+** $Id: users.c,v 1.20 2002/03/08 09:00:31 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -74,6 +74,7 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 	u->is_away = 0;
 	u->myuser = NULL;
 	u->Umode = 0;
+	u->chans = hash_create(MAXJOINCHANS, 0, 0);
 	strcpy(u->modes,"");
 
 }
@@ -81,7 +82,8 @@ void AddUser(const char *nick, const char *user, const char *host, const char *s
 void DelUser(const char *nick)
 {
 	User *u;
-	hnode_t *un;
+	hnode_t *un, *cn;
+	hscan_t sc;
 
 #ifdef DEBUG
 	log("DelUser(%s)", nick);
@@ -92,15 +94,20 @@ void DelUser(const char *nick)
 		log("DelUser(%s) failed!", nick);
 		return;
 	}
-	hash_delete(uh, un);
 	u = hnode_get(un);
+	hash_scan_begin(&sc, u->chans);
+	while ((cn = hash_scan_next(&sc)) != NULL) {
+		part_chan(u, hnode_get(cn));
+	}
+	hash_delete(uh, un);
 	hnode_destroy(un);
 	free(u);
 }
 
 void Change_User(User *u, const char *newnick)
 {
-	hnode_t *un;
+	hnode_t *un, *cm;
+	hscan_t cs;
 #ifdef DEBUG
 	log("Change_User(%s, %s)", u->nick, newnick);
 #endif
@@ -110,6 +117,11 @@ void Change_User(User *u, const char *newnick)
 		log("ChangeUser(%s) Failed!", u->nick);
 		return;
 	}
+	hash_scan_begin(&cs, u->chans);
+	while ((cm = hash_scan_next(&cs)) != NULL) {
+		change_user_nick(findchan(hnode_get(cm)), newnick, u->nick);
+	}
+
 	hash_delete(uh, un);
 	strcpy(u->nick, newnick);
 	hash_insert(uh, un, u->nick);
@@ -166,12 +178,17 @@ void init_user_hash()
 void UserDump()
 {
 	User *u;
-	hnode_t *un;
-	hscan_t us;
+	hnode_t *un, *cm;
+	hscan_t us, cs;
+	sendcoders("Users======================");
 	hash_scan_begin(&us, uh);
 	while ((un = hash_scan_next(&us)) != NULL) {
 		u = hnode_get(un);
 		sendcoders("User: %s", u->nick);
+		hash_scan_begin(&cs, u->chans);
+		while ((cm = hash_scan_next(&cs)) != NULL) {
+			sendcoders("     Chans: %s", (char *)hnode_get(cm));
+		}
 	}
 }
 

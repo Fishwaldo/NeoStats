@@ -48,11 +48,13 @@ int squit_cmd(const char *who, const char *quitmsg) {
 
 int spart_cmd(const char *who, const char *chan) {
 	sts("%s %s %s", who, (me.token ? TOK_PART : MSG_PART), chan);
+	part_chan(finduser(who), chan);
 	return 1;
 }
 
 int sjoin_cmd(const char *who, const char *chan) {
 	sts(":%s %s %s", who, (me.token ? TOK_JOIN : MSG_JOIN), chan);
+	join_chan(finduser(who), chan);
 	return 1;
 }
 
@@ -114,6 +116,7 @@ int skill_cmd(const char *from, const char *target, const char *reason,...) {
 	vsnprintf(buf, 512, reason, ap);
 	sts(":%s %s %s :%s", from, (me.token ? TOK_KILL : MSG_KILL), target, buf);
 	va_end(ap);
+	DelUser(target);
 	return 1;
 }
 
@@ -133,7 +136,6 @@ int sswhois_cmd(const char *target, const char *swhois) {
 }
 int ssvsnick_cmd(const char *target, const char *newnick) {
 	sts("%s %s %s :%d", (me.token ? TOK_SVSNICK : MSG_SVSNICK), target, newnick, time(NULL));
-	Change_User(finduser(target), newnick);
 	return 1;
 }
 
@@ -149,6 +151,7 @@ int ssvspart_cmd(const char *target, const char *chan) {
 
 int skick_cmd(const char *who, const char *target, const char *chan, const char *reason) {
 	sts(":%s %s %s %s :%s", who, (me.token ? TOK_KICK : MSG_KICK), chan, target, (reason ? reason : "No Reason Given"));
+	part_chan(finduser(target), chan); 
 	return 1;
 }
 int swallops_cmd(const char *who, const char *msg,...) {

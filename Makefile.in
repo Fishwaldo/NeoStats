@@ -1,6 +1,6 @@
 # Makefile for GeoStats
 # GeoStats CVS Identification
-# $Id: Makefile.in,v 1.9 2002/03/06 13:25:51 fishwaldo Exp $
+# $Id: Makefile.in,v 1.10 2002/03/08 09:00:30 fishwaldo Exp $
 # makefile originally created by Andy Church.
  
 CC=@CC@
@@ -8,9 +8,9 @@ CFLAGS=@CFLAGS@
 LDFLAGS= -rdynamic @LIBS@
 
 
-OBJS =	dotconf.o services.o main.o sock.o conf.o ircd.o timer.o users.o \
+OBJS =	chans.o dotconf.o services.o main.o sock.o conf.o ircd.o timer.o users.o \
 		ns_help.o dl.o list.o hash.o server.o @IRCD_FILES_OBJS@
-SRCS =	dotconf.c services.c main.c sock.c conf.c ircd.c timer.c users.c \
+SRCS =	chans.c dotconf.c services.c main.c sock.c conf.c ircd.c timer.c users.c \
 		ns_help.c dl.c list.c hash.c server.c @IRCD_FILES_SRC@
 
 .c.o:
@@ -46,3 +46,4 @@ hash.o:		hash.c		hash.h
 server.o:	server.c	stats.h		hash.h		hash.c	 	config.h
 Ultimate.o:	Ultimate.c	stats.h		Ultimate.h
 Unreal.o:	Unreal.c	stats.h		Unreal.h
+chans.o:	hash.c		stats.h

@@ -57,6 +57,8 @@
 #define U_TABLE_SIZE	1999
 #define D_TABLE_SIZE	1999
 #define C_TABLE_SIZE	1999
+#define CHAN_MEM_SIZE	1000
+#define MAXJOINCHANS	15
 #define T_TABLE_SIZE	100 /* Number of Timers */
 #define B_TABLE_SIZE	100 /* Number of Bots */
 
@@ -72,7 +74,7 @@ jmp_buf sigvbuf;
 
 hash_t *sh;
 hash_t *uh;
-
+hash_t *ch;
 
 
 typedef struct server_ Server;
@@ -80,7 +82,7 @@ typedef struct user_ User;
 typedef struct myuser_ MyUser;
 typedef struct chans_ Chans;
 typedef struct config_mod_ Config_Mod;
-
+typedef struct chanmem_ Chanmem;
 
 
 struct me {
@@ -125,31 +127,6 @@ struct Servbot {
 	char host[MAXHOST];
 } Servbot;
 
-struct chans_ {
-	Chans *next, *prev;
-	char name[CHANLEN];
-	long cur_users;
-	long hash;
-	char modes[BUFSIZE];
-	unsigned int is_priv : 1;
-	unsigned int is_secret : 1;
-	unsigned int is_invite : 1;
-	unsigned int is_mod : 1;
-	unsigned int is_outside : 1;
-	unsigned int is_optopic : 1;
-	unsigned int is_regchan : 1;
-	unsigned int is_regnick : 1;
-	unsigned int is_nocolor : 1;
-	unsigned int is_nokick : 1;
-	unsigned int is_ircoponly : 1;
-	unsigned int is_Svrmode : 1;
-	unsigned int is_noknock : 1;
-	unsigned int is_noinvite : 1;
-	unsigned int is_stripcolor : 1;
-	User *users;
-	char topic[BUFSIZE];
-	char topicowner[BUFSIZE];
-} chans_;
 
 
 struct server_ {
@@ -176,7 +153,24 @@ struct user_ {
 	char modes[BUFSIZE];
 	int ulevel;
 	long Umode;
+	hash_t *chans;
 };
+
+struct chans_ {
+	char name[CHANLEN];
+	long cur_users;
+	long modes;
+	hash_t *chanmembers;
+	char topic[BUFSIZE];
+	char topicowner[BUFSIZE];
+} chans_;
+
+struct chanmem_ {
+	User *u;
+	time_t joint;
+	long flags;
+} chanmem_;
+
 
 struct ping {
     time_t last_sent;
