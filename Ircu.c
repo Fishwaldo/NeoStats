@@ -577,18 +577,15 @@ m_nick (char *origin, char **argv, int argc, int srv)
 {
 	if(argc > 2) {
 		char IPAddress[32]; /* argv[argc-3] */
-		char *realname;
 		unsigned long IP = base64toint(argv[argc-3]);
 		ircsnprintf( IPAddress, 32, "%lu", IP);
 
-		realname = joinbuf (argv, argc, (argc - 1));
 		/*       nick,    hopcount, TS,     user,    host, */       
 		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes*/
 			origin, IPAddress, NULL, (argv[5][0] == '+' ? argv[5]: NULL),
 			/*, vhost, realname, numeric*/ 
-			NULL, realname, argv[argc-2]);
-		free (realname);
+			NULL, argv[argc-1], argv[argc-2]);
 	} else {
 		do_nickchange (origin, argv[0], NULL);
 	}
@@ -738,7 +735,7 @@ parse (char *line)
 		nlog (LOG_DEBUG1, LOG_CORE, "cmd   : %s", cmd);
 		nlog (LOG_DEBUG1, LOG_CORE, "args  : %s", line);
 		strlcpy (privmsgbuffer, line, BUFSIZE);
-		if(line) ac = splitbuf(line, &av, 0);
+		if(line) ac = splitbuf(line, &av, 1);
 		nlog (LOG_DEBUG1, LOG_CORE, "0 %d", ac);
 	}
 
