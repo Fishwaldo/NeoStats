@@ -20,6 +20,7 @@ data/tlds.nfo -text
 /dl.c -text
 /dl.h -text
 dl/Makefile.in -text
+dl/README -text
 dl/cs/ChangeLog -text
 dl/cs/Makefile.in -text
 dl/cs/cs.c -text
