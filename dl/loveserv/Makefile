@@ -38,10 +38,10 @@ pkglibdir = $(libdir)/NeoStats
 pkgincludedir = $(includedir)/NeoStats
 top_builddir = ../..
 
-ACLOCAL = ${SHELL} /home/fish/2.5Alpha4/2.0/missing --run aclocal-1.6
-AUTOCONF = ${SHELL} /home/fish/2.5Alpha4/2.0/missing --run autoconf
-AUTOMAKE = ${SHELL} /home/fish/2.5Alpha4/2.0/missing --run automake-1.6
-AUTOHEADER = ${SHELL} /home/fish/2.5Alpha4/2.0/missing --run autoheader
+ACLOCAL = ${SHELL} /home/fish/2.0/2.0/missing --run aclocal-1.6
+AUTOCONF = ${SHELL} /home/fish/2.0/2.0/missing --run autoconf
+AUTOMAKE = ${SHELL} /home/fish/2.0/2.0/missing --run automake-1.6
+AUTOHEADER = ${SHELL} /home/fish/2.0/2.0/missing --run autoheader
 
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = /usr/bin/install -c
@@ -64,7 +64,7 @@ host_triplet = i686-pc-linux-gnu
 EXEEXT = 
 OBJEXT = o
 PATH_SEPARATOR = :
-AMTAR = ${SHELL} /home/fish/2.5Alpha4/2.0/missing --run tar
+AMTAR = ${SHELL} /home/fish/2.0/2.0/missing --run tar
 AS = @AS@
 AWK = gawk
 CC = gcc
@@ -72,8 +72,8 @@ DEPDIR = .deps
 DLLTOOL = @DLLTOOL@
 ECHO = echo
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
-IRCD_FILES_OBJS = Unreal.o
-IRCD_FILES_SRC = Unreal.c
+IRCD_FILES_OBJS = 
+IRCD_FILES_SRC = 
 LIBS = -ldl 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
@@ -85,7 +85,7 @@ STRIP = strip
 VERSION = 2.5.0Alpha5
 am__include = include
 am__quote = 
-install_sh = /home/fish/2.5Alpha4/2.0/install-sh
+install_sh = /home/fish/2.0/2.0/install-sh
 lib_LTLIBRARIES = loveserv.so
 loveserv_so_SOURCES = loveserv.c ls_help.c
 loveserv_so_LDFLAGS = -module -shared -nostdlib
@@ -113,7 +113,7 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-CFLAGS = -g -O2 -O2 -Wall -ggdb
+CFLAGS = -g -O2 -O2 -Wall
 DIST_SOURCES = $(loveserv_so_SOURCES)
 DIST_COMMON = ChangeLog Makefile.am Makefile.in TODO
 SOURCES = $(loveserv_so_SOURCES)

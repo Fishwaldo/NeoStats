@@ -143,7 +143,7 @@ RETSIGTYPE serv_segv() {
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		notice(s_Services, "Damn IT, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
 		globops(me.name,"Dumped Core to netstats.debug, Please Read the Readme file to find out what to do with it!");
-		
+		RemoveLock();		
 		sleep(2);
 		kill(forked, 3);
 		kill(forked, 9);
