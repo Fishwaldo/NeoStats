@@ -229,11 +229,6 @@ extern int is_midnight();
 extern Server *serverlist[S_TABLE_SIZE];
 extern User *userlist[U_TABLE_SIZE];
 extern MyUser *myuhead;
-extern void Addchan(char *);
-extern Chans *findchan(char *);
-extern void ChanMode(char *, char *);
-extern void ChanTopic(char *, char *, char *);
-extern void DelChan(char *);
 extern void AddUser(const char *, const char *, const char *, const char *);
 extern void DelUser(const char *);
 extern void Change_User(User *, const char *);
@@ -294,7 +289,7 @@ extern void chandump(User *u, char *chan);
 extern void part_chan(User *u, char *chan);
 extern void join_chan(User *u, char *chan);
 extern void change_user_nick(Chans *c, char *newnick, char *oldnick);
-
-
+extern Chans *findchan(char *chan);
+void ChanMode(char *origin, char **av, int ac);
 #endif
 

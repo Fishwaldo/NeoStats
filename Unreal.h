@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.11 2002/03/07 12:41:12 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.12 2002/03/08 14:18:08 fishwaldo Exp $
  */
 
 
@@ -350,10 +350,65 @@
 
 
 
+#define	MODE_CHANOP		0x0001
+#define	MODE_VOICE		0x0002
+#define	MODE_PRIVATE		0x0004
+#define	MODE_SECRET			0x0008
+#define	MODE_MODERATED  	0x0010
+#define	MODE_TOPICLIMIT 	0x0020
+#define MODE_CHANOWNER		0x0040
+#define MODE_CHANPROT		0x0080
+#define	MODE_HALFOP			0x0100
+#define MODE_EXCEPT			0x0200
+#define	MODE_BAN			0x0400
+#define	MODE_INVITEONLY 	0x0800
+#define	MODE_NOPRIVMSGS 	0x1000
+#define	MODE_KEY			0x2000
+#define	MODE_LIMIT			0x4000
+#define MODE_RGSTR			0x8000
+#define MODE_RGSTRONLY 		 	0x10000
+#define MODE_LINK			0x20000
+#define MODE_NOCOLOR		0x40000
+#define MODE_OPERONLY   	0x80000
+#define MODE_ADMONLY   		0x100000
+#define MODE_NOKICKS   		0x200000
+#define MODE_STRIP	   	0x400000
+#define MODE_NOKNOCK		0x800000
+#define MODE_NOINVITE  		0x1000000
+#define MODE_FLOODLIMIT		0x2000000
+#define MODE_NOHIDING		0x4000000
+#define MODE_STRIPBADWORDS	0x8000000
+#define MODE_NOCTCP		0x10000000
+#define MODE_AUDITORIUM		0x20000000
+#define MODE_ONLYSECURE		0x40000000
+#define MODE_NONICKCHANGE	0x80000000
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct ircd_srv_ {
 	int uprot;
 	char cloak[10];
 } ircd_srv;
+
+typedef struct {
+	long mode;
+	char flag;
+	unsigned  nickparam : 1;		/* 1 = yes 0 = no */
+	unsigned  parameters : 1; 
+} aCtab;
+
+
+
 
 
 typedef struct {

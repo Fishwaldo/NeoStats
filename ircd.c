@@ -587,6 +587,7 @@ void Usr_Mode(char *origin, char **argv, int argc) {
 				UserMode(argv[0], argv[1]);
 				Module_Event("UMODE", finduser(argv[0]));
 			} else {
+				ChanMode(origin, argv, argc);
 			}	
 }	
 void Usr_Kill(char *origin, char **argv, int argc) {
