@@ -96,6 +96,8 @@ dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answ
 	if (segv_inmodule[0]) {
 		/* why MAXHOST? because thats the size of mod_name!?!? */
 		strlcpy(dnsdata->mod_name, segv_inmodule, MAX_MOD_NAME);
+	} else {
+		strlcpy(dnsdata->mod_name, "NeoStats", MAX_MOD_NAME);
 	}
 	strlcpy (dnsdata->data, data, 254);
 	dnsdata->callback = callback;
