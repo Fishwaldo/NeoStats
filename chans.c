@@ -19,7 +19,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: chans.c,v 1.31 2002/10/14 05:44:39 fishwaldo Exp $
+** $Id: chans.c,v 1.32 2002/10/14 09:37:00 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -66,6 +66,7 @@ int ChanMode(char *origin, char **av, int ac) {
 	int add = 0;
 	int j = 2; 
 	int i;
+	int modeexists;
 	Chans *c;
 	ModesParm *m;
 	lnode_t *mn;
@@ -88,28 +89,31 @@ int ChanMode(char *origin, char **av, int ac) {
 								} else {	
 									if (cFlagTab[i].parameters) {
 										mn = list_first(c->modeparms);
+										modeexists = 0;
 										while (mn) {
 											m = lnode_get(mn);
 											if (((int *)m->mode == (int *)cFlagTab[i].mode) && !strcasecmp(m->param, av[j])) {
 #ifdef DEBUG
-						 						log("Mode %c (%s) already exists, not adding again");
+						 						log("Mode %c (%s) already exists, not adding again", cFlagTab[i].flag, av[j]);
 #endif
 												j++;
-												continue;
+												modeexists = 1;
 											}
 											mn = list_next(c->modeparms, mn);
 										}
-										m = smalloc(sizeof(ModesParm));
-										m->mode = cFlagTab[i].mode;
-										strcpy(m->param, av[j]);
-										mn = lnode_create(m);
-										if (list_isfull(c->modeparms)) {
-											log("Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);
-											assert(0);
-										} else {
-											list_append(c->modeparms, mn);
+										if (modeexists != 1) {
+											m = smalloc(sizeof(ModesParm));
+											m->mode = cFlagTab[i].mode;
+											strcpy(m->param, av[j]);
+											mn = lnode_create(m);
+											if (list_isfull(c->modeparms)) {
+												log("Eeek, Can't add additional Modes to Channel %s. Modelist is full", c->name);
+												assert(0);
+											} else {
+												list_append(c->modeparms, mn);
+											}
+											j++;
 										}
-										j++;
 									} else {
 										c->modes |= cFlagTab[i].mode;
 									}
