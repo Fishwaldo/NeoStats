@@ -4,4 +4,3 @@ DISTFILES = serviceroots.c Makefile
 
 include ../Makefile.inc
 
-serviceroots.o:		serviceroots.c

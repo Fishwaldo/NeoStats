@@ -4,4 +4,3 @@ DISTFILES = $(SRCS) hostserv.h Makefile ChangeLog
 
 include ../Makefile.inc
 
-hostserv.o:		hostserv.c

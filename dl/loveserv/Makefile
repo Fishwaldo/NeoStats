@@ -4,4 +4,3 @@ DISTFILES = $(SRCS) loveserv.h Makefile ChangeLog
 
 include ../Makefile.inc
 
-loveserv.o:		loveserv.c	ls_help.c
