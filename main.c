@@ -204,6 +204,9 @@ void RemoveLock()
 void start()
 {
 	static int attempts = 0;
+	Module *mod_ptr = NULL;
+	hscan_t ms;
+	hnode_t *mn;
 	
 	strcpy(segv_location, "start");
 /* 
@@ -226,6 +229,14 @@ void start()
 	}
 	log("Reconnecting to the server in %d seconds (Attempt %i)", me.r_time, attempts);
 	close(servsock);
+
+	/* Unload the Modules */
+	hash_scan_begin(&ms, mh);
+	while ((mn = hash_scan_next(&ms)) != NULL) {
+		mod_ptr = hnode_get(mn);
+		unload_module(mod_ptr->info->module_name, finduser(s_Services));
+	}
+	sleep(5);
 	execve("./stats", NULL, NULL);
 }
 

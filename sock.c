@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: sock.c,v 1.15 2002/03/11 06:55:04 fishwaldo Exp $
+** $Id: sock.c,v 1.16 2002/03/25 08:13:52 fishwaldo Exp $
 */
 
 #include "stats.h"
@@ -55,6 +55,9 @@ void read_loop()
 	Sock_List *mod_sock;
 	hscan_t ss;
 	hnode_t *sn;
+	Module *mod_ptr = NULL;
+	hscan_t ms;
+	hnode_t *mn;
 
 	while (1) {
 		strcpy(segv_location, "Read_Loop");
@@ -102,6 +105,21 @@ void read_loop()
 					}
 					break;
 				}
+			}
+		} else if (SelectResult == 0) {
+			if ((time(NULL) - me.lastmsg) >	180) {
+				/* if we havnt had a message for 3 minutes, more than likely, we are on a zombie server */
+				/* disconnect and try to reconnect */
+				/* Unload the Modules */
+				hash_scan_begin(&ms, mh);
+				while ((mn = hash_scan_next(&ms)) != NULL) {
+					mod_ptr = hnode_get(mn);
+					unload_module(mod_ptr->info->module_name, finduser(s_Services));
+				}
+				close(servsock);
+				sleep(5);
+				log("Eeek, Zombie Server, Reconnecting");
+				execve("./stats", NULL, NULL);
 			}
 		} else if (SelectResult == -1) {
 				log("Lost connection to server."); 

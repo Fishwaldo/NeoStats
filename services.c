@@ -288,33 +288,24 @@ extern void ns_shutdown(User *u, char *reason)
 
 static void ns_reload(User *u, char *reason)
 {
+	Module *mod_ptr = NULL;
+	hscan_t ms;
+	hnode_t *mn;
 	char quitmsg[255];
 	strcpy(segv_location, "ns_reload");
 	globops(s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
 	log("%s requested RELOAD.", u->nick);
 	sprintf(quitmsg, "%s Sent RELOAD: %s", u->nick, (reason ? reason : "No reason"));
+	hash_scan_begin(&ms, mh);
+	while ((mn = hash_scan_next(&ms)) != NULL) {
+		mod_ptr = hnode_get(mn);
+		notice(s_Services,"Module %s Unloaded by %s",mod_ptr->info->module_name,u->nick);
+		unload_module(mod_ptr->info->module_name, u);
+	}
 	squit_cmd(s_Services, quitmsg);
 	ssquit_cmd(me.name);
-	sleep(1);
-	close(servsock);
-	init_server_hash(); 
-	init_user_hash();  
-	me.onchan = 0;
-	log("Connecting to %s:%d", me.uplink, me.port);
-	if (servsock > 0)
-		close(servsock);
-		
-	servsock = ConnectTo(me.uplink, me.port);
-		
-	if (servsock <= 0) {
-		log("Unable to connect to %s", me.uplink);
-	} else {
-		login();
-		read_loop();
-	}
-	log("Reconnecting to the server in %d seconds", me.r_time);
-	sleep(me.r_time);
-
+	sleep(5);
+	execve("./stats", NULL, NULL);
 }
 
 
