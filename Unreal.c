@@ -52,7 +52,9 @@ static void Usr_Join (char *origin, char **argv, int argc);
 static void Usr_Part (char *origin, char **argv, int argc);
 static void Usr_Stats (char *origin, char **argv, int argc);
 static void Usr_Vhost (char *origin, char **argv, int argc);
+#ifdef UNREAL32
 static void Usr_Eos (char *origin, char **argv, int argc);
+#endif
 static void Srv_Ping (char *origin, char **argv, int argc);
 static void Srv_Netinfo (char *origin, char **argv, int argc);
 static void Srv_Sjoin (char *origin, char **argv, int argc);
@@ -602,6 +604,7 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	me.synced = 1;
 }
 
+#ifdef UNREAL32
 /*  EOS
  *  :servername EOS
  */
@@ -610,6 +613,7 @@ Usr_Eos (char *origin, char **argv, int argc)
 {
     
 }
+#endif
 
 static void
 Srv_Sjoin (char *origin, char **argv, int argc)
