@@ -602,14 +602,14 @@ static void LoadConfig(void)
 	}
 	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
 #if !defined(HYBRID7)
-		strlcpy(cs_bot->nick , "ConnectServ", MAXNICK);
+		strlcpy(cs_botinfo.nick , "ConnectServ", MAXNICK);
 #else
 		/* just to be safe on hyrbid, keep connectservs nick less than 9 */
-		strlcpy(cs_bot->nick, "CS", MAXNICK);
+		strlcpy(cs_botinfo.nick, "CS", MAXNICK);
 #endif
 	}
 	else {
-		strlcpy(cs_bot->nick, temp, MAXNICK);
+		strlcpy(cs_botinfo.nick, temp, MAXNICK);
 		free(temp);
 	}
 	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {

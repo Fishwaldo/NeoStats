@@ -88,28 +88,28 @@ static void ss_Config(void)
 	SET_SEGV_LOCATION();
 
 	if (GetConf((void *) &tmp, CFGSTR, "Nick") < 0) {
-		strlcpy(ss_bot->nick, "StatServ", MAXNICK);
+		strlcpy(ss_botinfo.nick, "StatServ", MAXNICK);
 	} else {
-		strlcpy(ss_bot->nick, tmp, MAXNICK);
+		strlcpy(ss_botinfo.nick, tmp, MAXNICK);
 		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "User") < 0) {
-		strlcpy(StatServ.user, "SS", MAXUSER);
+		strlcpy(ss_botinfo.user, "SS", MAXUSER);
 	} else {
-		strlcpy(StatServ.user, tmp, MAXUSER);
+		strlcpy(ss_botinfo.user, tmp, MAXUSER);
 		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "Host") < 0) {
-		strlcpy(StatServ.host, me.name, MAXHOST);
+		strlcpy(ss_botinfo.host, me.name, MAXHOST);
 	} else {
-		strlcpy(StatServ.host, tmp, MAXHOST);
+		strlcpy(ss_botinfo.host, tmp, MAXHOST);
 		free(tmp);
 	}
 	if (GetConf((void *) &tmp, CFGSTR, "RealName") < 0) {
-		ircsnprintf(StatServ.realname, MAXREALNAME, "/msg %s help",
+		ircsnprintf(ss_botinfo.realname, MAXREALNAME, "/msg %s help",
 			 ss_bot->nick);
 	} else {
-		strlcpy(StatServ.realname, tmp, MAXREALNAME);
+		strlcpy(ss_botinfo.realname, tmp, MAXREALNAME);
 		free(tmp);
 	}
 	if (GetConf((void *) &StatServ.lagtime, CFGINT, "LagTime") < 0) {

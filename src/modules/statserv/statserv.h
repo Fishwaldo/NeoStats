@@ -73,9 +73,6 @@ struct stats_network_ {
 
 
 struct StatServ { 
-	char user[MAXUSER]; 
-	char host[MAXHOST]; 
-	char realname[MAXREALNAME]; 
 	int lagtime; 
 	int lagalert; 
 	int recordalert; 
