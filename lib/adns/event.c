@@ -725,9 +725,6 @@ void adns_beforeselect(adns_state ads, int *maxfd_io, fd_set * readfds_io,
 			inter_immed(tv_mod, tv_tobuf);
 			adns__consistency(ads, 0, cc_entex);
 			return;
-#if 0
-			goto xit;
-#endif
 		}
 		adns__timeouts(ads, 0, tv_mod, tv_tobuf, *now);
 	}
@@ -742,9 +739,6 @@ void adns_beforeselect(adns_state ads, int *maxfd_io, fd_set * readfds_io,
     if (pollfds[i].events & POLLPRI) FD_SET(fd,exceptfds_io);
 	}
 	*maxfd_io = maxfd;
-#if 0
-      xit:
-#endif
 	adns__consistency(ads, 0, cc_entex);
 }
 
@@ -758,17 +752,17 @@ void adns_afterselect(adns_state ads, int maxfd, const fd_set * readfds,
 
 	adns__consistency(ads, 0, cc_entex);
 	adns__must_gettimeofday(ads, &now, &tv_buf);
-	if (!now)
-		goto xit;
-	adns_processtimeouts(ads, now);
+	if (now)
+	{
+		adns_processtimeouts(ads, now);
 
-	npollfds = adns__pollfds(ads, pollfds);
-	for (i = 0; i < npollfds; i++)
-		pollfds[i].revents = POLLIN | POLLOUT | POLLPRI;
-	adns__fdevents(ads,
-		       pollfds, npollfds,
-		       maxfd, readfds, writefds, exceptfds, *now, 0);
-      xit:
+		npollfds = adns__pollfds(ads, pollfds);
+		for (i = 0; i < npollfds; i++)
+			pollfds[i].revents = POLLIN | POLLOUT | POLLPRI;
+		adns__fdevents(ads,
+				pollfds, npollfds,
+				maxfd, readfds, writefds, exceptfds, *now, 0);
+	}
 	adns__consistency(ads, 0, cc_entex);
 }
 
