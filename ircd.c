@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.111 2003/02/13 14:54:59 fishwaldo Exp $
+** $Id: ircd.c,v 1.112 2003/03/04 12:49:05 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -293,6 +293,9 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		log("Attempting to Login with a Nickname that already Exists: %s",nick);
 		return -1;
 	}
+	if (strlen(user) > 8) {
+		log("Warning, %s bot %s has a username longer than 8 chars. Some IRCd's don't like that", mod_name, nick);
+	}		
 	add_mod_user(nick, mod_name);
 
 
