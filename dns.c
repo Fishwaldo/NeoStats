@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: dns.c,v 1.6 2002/09/04 08:42:06 fishwaldo Exp $
+** $Id: dns.c,v 1.7 2002/09/06 04:34:11 fishwaldo Exp $
 */
 
 
@@ -86,9 +86,8 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 		status = adns_submit(ads, str, type, adns_qf_owner|adns_qf_cname_loose, NULL, &dnsdata->q);
 	}
 	if (status) {
-#ifdef DEBUG
 		log("DNS: adns_submit error: %s", strerror(status));
-#endif
+		free(dnsdata);
 		return 0;
 	}
 	

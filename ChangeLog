@@ -12,6 +12,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - fixed up the backtrace function (F)
  - Fixed up the timer.c segv in module code (F)
  - Fixed up segv locatation code in dns.c (F)
+ - Fixed up a few mem leaks in dns.c
 
 * NeoStats * Fish * Version 2.5.0-Beta5
  - Fixed a problem with prefmsg in Unreal only.
