@@ -9,6 +9,7 @@ Shmad & ^Enigma^
  - Coloured output is now optional - see cs.c for details (M)
  - Changed to new Module API system removing need for __module_get_xxx() calls (M)
  - Added missing NULL checks for finduser results to avoid referencing NULL pointers (M)
+ - Renamed output module to connectserv to fix load/unload issues (M)
 
 * Version 1.7 * July 15th, 2003
  - Fixed a problem with connectserv clobering the avlist for modes

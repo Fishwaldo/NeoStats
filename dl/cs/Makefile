@@ -4,7 +4,7 @@ INCLUDES = -I../.. -I../../adns
 
 SOURCES= cs.c
 OBJECTS= cs.o
-TARGET= cs.so
+TARGET= connectserv.so
 DISTFILES = $(SOURCES) cs.h Makefile ChangeLog cs_help.c
 
 all:	cs
