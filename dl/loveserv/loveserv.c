@@ -29,6 +29,12 @@
 static char s_LoveServ[MAXNICK];
 static ModUser *ls_bot;
 
+struct ls_cfg { 
+	char user[MAXUSER];
+	char host[MAXHOST];
+	char rname[MAXREALNAME];
+} ls_cfg;
+
 static int ls_rose(User * u, char **av, int ac);
 static int ls_kiss(User * u, char **av, int ac);
 static int ls_tonsil(User * u, char **av, int ac);
@@ -69,7 +75,7 @@ static bot_cmd ls_commands[]=
 
 static int Online(char **av, int ac)
 {
-	ls_bot = init_mod_bot(s_LoveServ, "LS", me.name, "Network Love Service",
+	ls_bot = init_mod_bot(s_LoveServ, ls_cfg.user, ls_cfg.host, ls_cfg.rname, 
 		services_bot_modes, BOT_FLAG_DEAF, ls_commands, NULL, __module_info.module_name);
 	return 1;
 };
@@ -81,7 +87,36 @@ EventFnList __module_events[] = {
 
 int __ModInit(int modnum, int apiver)
 {
-	strlcpy (s_LoveServ, "LoveServ", MAXNICK);
+ 	char *temp = NULL;
+
+	if(GetConf((void *) &temp, CFGSTR, "Nick") < 0) {
+		strlcpy(s_LoveServ ,"LoveServ" ,MAXNICK);
+	}
+	else {
+		strlcpy(s_LoveServ , temp, MAXNICK);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "User") < 0) {
+		strlcpy(ls_cfg.user, "SS", MAXUSER);
+	}
+	else {
+		strlcpy(ls_cfg.user, temp, MAXUSER);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "Host") < 0) {
+		strlcpy(ls_cfg.host, me.name, MAXHOST);
+	}
+	else {
+		strlcpy(ls_cfg.host, temp, MAXHOST);
+		free(temp);
+	}
+	if(GetConf((void *) &temp, CFGSTR, "RealName") < 0) {
+		strlcpy(ls_cfg.rname, "Network Love Service", MAXREALNAME);
+	}
+	else {
+		strlcpy(ls_cfg.rname, temp, MAXREALNAME);
+		free(temp);
+	}
 	return 1;
 }
 

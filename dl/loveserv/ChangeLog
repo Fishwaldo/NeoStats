@@ -5,6 +5,8 @@ Author:  Shmad <shmad@neostats.net>
  - Use core bot message handler to process commands (M)
  - Code cleaned up to reduce bloat (M)
  - Removed local module_function table to use core for /VERSION replies (M)
+ - We now try to read nick, user, host and realname so these can be configured more 
+   easily (M)
 
 * Version 1.8 * October 6th, 2003
  - Help text cleanup (M) 
