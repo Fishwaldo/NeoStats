@@ -656,6 +656,26 @@ Server *findserver (const char *name);
 Chans *findchan (const char *chan);
 int CheckChanMode (Chans * c, long mode);
 int IsChanMember(Chans *c, User *u);
+int test_chan_user_mode(char* chan, char* nick, int flag);
+
+#ifdef CMODE_CHANOP
+#define is_chanop(chan, nick)		test_chan_user_mode(chan, nick, CMODE_CHANOP)
+#endif
+#ifdef CMODE_HALFOP
+#define is_chanhalfop(chan, nick)	test_chan_user_mode(chan, nick, CMODE_HALFOP)
+#endif
+#ifdef CMODE_VOICE
+#define is_chanvoice(chan, nick)	test_chan_user_mode(chan, nick, CMODE_VOICE)
+#endif
+#ifdef CMODE_CHANOWNER
+#define is_chanowner(chan, nick)	test_chan_user_mode(chan, nick, CMODE_CHANOWNER)
+#endif
+#ifdef CMODE_CHANPROT
+#define is_chanprot(chan, nick)		test_chan_user_mode(chan, nick, CMODE_CHANPROT)
+#endif
+#ifdef CMODE_CHANADMIN
+#define is_chanadmin(chan, nick)	test_chan_user_mode(chan, nick, CMODE_CHANADMIN)
+#endif
 
 /* dns.c */
 int dns_lookup (char *str, adns_rrtype type, void (*callback) (char *data, adns_answer * a), char *data);

@@ -867,6 +867,37 @@ IsChanMember (Chans *c, User *u)
 	return 0;
 }
 
+/** @brief Returns if the nick has a particular channel status e.g. ChanOp
+ *
+ * @param chan the channel to check
+ * @param nick the nick to check 
+ *
+ * @returns 1 if they are, 0 if they are not 
+*/
+
+int test_chan_user_mode(char* chan, char* nick, int flag)
+{
+	User* u;
+	Chans* c;
+	lnode_t *cmn;
+ 	Chanmem *cm;
+
+	u = finduser(nick);
+	c = findchan(chan);
+	if (!u || !c) {
+		return 0;
+	}
+	cmn = list_find (c->chanmembers, nick, comparef);
+	if (!cmn) {
+		return 0;
+	}
+	cm = lnode_get (cmn);
+	if (cm->flags & flag) {
+			return 1;
+	}	
+	return 0;
+}
+
 #ifdef SQLSRV
 
 /* display the channel modes */
