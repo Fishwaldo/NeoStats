@@ -25,13 +25,10 @@
 ** $Id$
 */
 
-#include <fnmatch.h>
-
 #include "stats.h"
 #include "hash.h"
 #include "log.h"
 
-int fnmatch (const char *, const char *, int flags);
 Server *new_server (char *);
 
 
@@ -79,7 +76,7 @@ AddServer (char *name, char *uplink, int hops)
 	if (uplink) {
 		memcpy (s->uplink, uplink, MAXHOST);
 	} else {
-		strcpy (s->uplink, "\0");
+		s->uplink[0]='\0';
 	}
 	s->ping = 0;
 

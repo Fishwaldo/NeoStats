@@ -28,175 +28,215 @@
 #include "stats.h"
 
 const char *ns_help[] = {
-	"*** NeoStats Help ***",
+	"The following commands can be used with NeoStats",
 	"",
-	"Commands:",
-	"\2INFO\2       Stats Info on NeoStats.",
-	"\2VERSION\2    Shows you the current StatServ Version.",
-	"\2LEVEL\2      Show you your Permission Level for NeoStats.",
-	"",
+	"    INFO           Stats info on NeoStats.",
+	"    VERSION        Show NeoStats version information.",
+	"    LEVEL          Show your permission level for NeoStats.",
 	NULL
 };
 
 const char *ns_myuser_help[] = {
 	"",
-	"*** Additional Commands For Service Roots!***",
+	"Additional commands for Service Roots",
 	"",
-	"\2SHUTDOWN\2   Shutdown NeoStats.",
-	"\2RELOAD\2     Force NeoStats to Reload Itself.",
-	"\2LOAD\2       Load a Module.",
-	"\2UNLOAD\2     Unload a Module.",
-	"\2MODLIST\2    List Loaded Modules.",
-	"\2LOGS\2       View logfiles.",
+	"    SHUTDOWN       Shutdown NeoStats",
+	"    RELOAD         Force NeoStats to reload",
+	"    LOAD           Load a module",
+	"    UNLOAD         Unload a module",
+	"    MODLIST        List loaded modules",
+	"    LOGS           View logfiles",
 #ifdef USE_RAW
-	"\2RAW\2        Send a Raw Command from this Server!",
+	"    RAW            Send a raw command from this Server",
 #endif
-	"\2JUPE\2       Jupiter a Server",
+	"    JUPE           Jupiter a Server",
+	"    DEBUG          Toggles debug mode",
+	"    USERDUMP       Debug user table",
+	"    CHANDUMP       Debug channel table",
+	"    SERVERDUMP     Debug server table",
+	"    MODBOTLIST     List of current module bots",
+	"    MODSOCKLIST    List of current module sockets",
+	"    MODTIMERLIST   List of current module timers",
+	"    MODBOTCHANLIST List of current module bot channels",
+	NULL
+};
+
+const char *ns_help_on_help[] = {
 	"",
+	"To use a command, type",
+	"    \2/msg ConnectServ command\2",
+	"For for more information on a command, type", 
+	"    \2/msg ConnectServ HELP command\2.",
 	NULL
 };
 
 const char *ns_level_help[] = {
-	"*** NeoStats: \2LEVEL\2 Help ***",
-	"Usage: \2LEVEL\2",
+	"Syntax: \2LEVEL\2",
 	"",
-	"Allows you to see your Permissions level with regards",
-	"NeoStats. 0 is lowest, 200 is highest, you could be anywhere in between!",
-	"",
+	"Show your permission level for NeoStats.",
+	"This may range from 0 (lowest) to 200 (highest).",
 	NULL
 };
 
 const char *ns_jupe_help[] = {
-	"*** NeoStats: \2JUPE\2 Help ***",
-	"Usage: \2JUPE \37Server\37\2",
+	"Syntax: \2JUPE \37Server\37\2",
 	"",
-	"Allows you to Jupe a server on the network",
-	"",
+	"Cause NeoStats to jupiter a server; i.e. create a fake",
+	"\"server\" connected to the NeoStats host which prevents",
+	"any real server of that name from connecting.",
+	"To remove the jupe use the IRCD \2/SQUIT\2 command.",
 	NULL
 };
 
 #ifdef USE_RAW
 const char *ns_raw_help[] = {
-	"*** NeoStats: \2RAW\2 Help ***",
-	"Usage: \2RAW \37Command\37\2",
+	"Syntax: \2RAW \37Command\37\2",
 	"",
-	"Allow you to send Raw IRC commands from this Server",
-	"Nothing is Returned to the User after a Raw Command",
-	"",
+	"Sends a string of raw text directly to the server to which",
+	"NeoStats is connected. Nothing is returned to the user",
+	"after a raw command.",
+	"Raw can cause a number of problems on the network and is",
+	"used at your own risk. No support of any kind is provided",
+	"for this command.",
 	NULL
 };
 #endif
 
 const char *ns_load_help[] = {
-	"*** NeoStats: \2LOAD\2 Help ***",
-	"Usage: \2LOAD \37module file name\37\2",
+	"Syntax: \2LOAD \37module file name\37\2",
 	"",
-	"Allows you to Load a Module while NeoStats is running",
-	"Some Modules can Not be loaded at Runtime, and will return a error",
-	"",
+	"Load a module while NeoStats is running. Some modules",
+	"cannot be loaded at runtime, and will return an error.",
 	NULL
 };
 
 const char *ns_unload_help[] = {
-	"*** NeoStats: \2UNLOAD\2 Help ***",
-	"Usage: \2UNLOAD \37module name\37\2",
+	"Syntax: \2UNLOAD \37module name\37\2",
 	"",
-	"Allows you to UnLoad a Module while NeoStats is running",
-	"Some Modules can Not be Unloaded at Runtime, and will return a error",
-	"",
+	"Unload a module while NeoStats is running. Some modules",
+	"cannot be unloaded at runtime, and will return an error.",
 	NULL
 };
 
 const char *ns_modlist_help[] = {
-	"*** NeoStats: \2MODLIST\2 Help ***",
-	"Usage: \2MODLIST\2",
+	"Syntax: \2MODLIST\2",
 	"",
-	"Will Display Module Names and Descriptions of Loaded Modules",
-	"",
+	"Display module names and descriptions of all loaded",
+	"modules.",
 	NULL
 };
 
 const char *ns_debug_help[] = {
-	"*** NeoStats: \2DEBUG\2 Help ***",
-	"Usage: \2DEBUG\2",
+	"Syntax: \2DEBUG <ON|OFF>\2",
 	"",
-	"This Toggles the Debug Command, Introducing a New User on the Server called",
-	"stats_debug. Any User that has their Coder Flag set will Recieve Debuging Information",
+	"Toggles debug mode. When enabled, debugging information is",
+	"sent to the services channel.",
 	"",
-	"On a Large Network, this Command should be used considered Dangerous as a Large amount of Information may be sent to you.",
-	"",
+	"Beware, on a large network, this command will generate a",
+	"large amount of information.",
 	NULL
 };
 
 const char *ns_version_help[] = {
-	"*** NeoStats: \2VERSION\2 Help ***",
-	"Usage: \2VERSION\2",
+	"Syntax: \2VERSION\2",
 	"",
-	"Shows the current StatServ Version.",
-	"",
+	"Shows the current NeoStats version.",
 	NULL
 };
 
 const char *ns_shutdown_help[] = {
-	"*** NeoStats: \2SHUTDOWN\2 Help ***",
-	"Usage: \2SHUTDOWN\2 <REASON>",
+	"Syntax: \2SHUTDOWN <reason>\2",
 	"",
-	"Force NeoStats to exit immediately.",
+	"Cause NeoStats to save data files and exit immediately.",
+	"The reason provided will be broadcast to the services",
+	"channel and other operators on the network.",
 	"This command should be used wisely.",
-	"<REASON> is optional.",
-	"",
 	NULL
 };
 
 const char *ns_reload_help[] = {
-	"*** NeoStats: \2RELOAD\2 Help ***",
-	"Usage: \2RELOAD\2 <REASON>",
+	"Syntax: \2RELOAD <reason>\2",
 	"",
-	"Force NeoStats to Reload Itself.",
-	"This command will cause StatServ to split from",
-	"the network and reload datafiles and connect.",
+	"Cause NeoStats to leave the network, reload datafiles,",
+	"then reconnect to the network.",
+	"The reason provided will be broadcast to the services",
+	"channel and other operators on the network.",
 	"This command SHOULD be used wisely.",
-	"<REASON> is optional.",
-	"",
 	NULL
 };
 
 const char *ns_userdump_help[] = {
-	"*** NeoStats: \2UserDump\2 Help ***",
-	"Usage: \2USERDUMP\2",
+	"Syntax: \2USERDUMP\2",
+	"Syntax: \2USERDUMP <nick>\2",
 	"",
-	"When in Debug Mode, Neostats will send Coders its Entire User table",
-	"Only really usefull when you are debuging Neostats",
-	"",
+	"When in debug mode, Neostats will echo its user table to",
+	"the services channel. Only useful for debugging Neostats",
+	"If nick is passed, only the information of that nick is",
+	"returned, otherwise the entire user list is dumped.",
 	NULL
 };
 
 const char *ns_serverdump_help[] = {
-	"*** NeoStats: \2ServerDump\2 Help ***",
-	"Usage: \2SERVERDUMP\2",
+	"Syntax: \2SERVERDUMP\2",
 	"",
-	"When in Debug Mode, Neostats will send Coders its Entire SERVER table",
-	"Only really usefull when you are debuging Neostats",
-	"",
+	"When in debug mode, Neostats will echo its server table to",
+	"the services channel. Only useful for debugging Neostats",
 	NULL
 };
 
 const char *ns_chandump_help[] = {
-	"*** NeoStats: \2ChanDump\2 Help ***",
-	"Usage: \2CHANDUMP\2",
+	"Syntax: \2CHANDUMP <channel>\2",
 	"",
-	"When in Debug Mode, Neostats will send Coders its Entire CHANNEL table",
-	"Only really usefull when you are debuging Neostats",
-	"",
+	"When in debug mode, Neostats will echo its channel table to",
+	"the services channel. Only useful for debugging Neostats",
+	"If channel is passed, only the information of that nick is",
+	"returned, otherwise the entire channel list is dumped.",
 	NULL
 };
 
 const char *ns_logs_help[] = {
-	"*** NeoStats: \2LOGS\2 Help ***",
-	"Usage: \2LOGS\2",
+	"Syntax: \2LOGS\2",
 	"",
 	"Sends today's logfile via PRIVMSG/NOTICE",
-	"",
 	NULL
 };
 
+const char *ns_modbotlist_help[] = {
+	"Syntax: \2MODBOTLIST\2",
+	"",
+	"NeoStats will send you by notice a list of the current bots",
+	"being used on the network for each module.",
+	NULL
+};
+
+const char *ns_modsocklist_help[] = {
+	"Syntax: \2MODSOCKLIST\2",
+	"",
+	"NeoStats will send you by notice a list of the current",
+	"sockets being used on the network for each module.",	
+	NULL
+};
+
+const char *ns_modtimerlist_help[] = {
+	"Syntax: \2MODTIMERLIST\2",
+	"",
+	"NeoStats will send you by notice a list of the current",
+	"timer functions being used on the network by each module.",	
+	NULL
+};
+
+const char *ns_modbotchanlist_help[] = {
+	"Syntax: \2MODBOTCHANLIST\2",
+	"",
+	"NeoStats will send you by notice a list of the current bots",
+	"and the channels they are using for each module.",
+	"List of current module bot channels",
+	NULL
+};
+
+const char *ns_info_help[] = {
+	"Syntax: \2INFO\2",
+	"",
+	"Display info about NeoStats uptime and other stats.",
+	NULL
+};

@@ -48,7 +48,7 @@ chk ()
 		SET_SEGV_LOCATION();
 		mod_ptr = hnode_get (tn);
 		if (current - mod_ptr->lastrun > mod_ptr->interval) {
-			strcpy (segv_location, mod_ptr->modname);
+			strncpy (segv_location, mod_ptr->modname, SEGV_LOCATION_BUFSIZE);
 			SET_SEGV_INMODULE(mod_ptr->modname);
 			if (setjmp (sigvbuf) == 0) {
 				if (mod_ptr->function () < 0) {

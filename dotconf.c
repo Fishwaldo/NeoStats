@@ -418,7 +418,7 @@ dotconf_cb_include (char *str)
 	char old_fname[CFG_MAX_FILENAME];
 
 	bzero (&old_fname, CFG_MAX_FILENAME);
-	strcpy (old_fname, dotconf_file);
+	strncpy (old_fname, dotconf_file, CFG_MAX_FILENAME);
 	if (str[0] != '/' && dotconf_includepath[0] != '\0') {
 		/* relative file AND include path is used */
 
@@ -434,14 +434,14 @@ dotconf_cb_include (char *str)
 
 	if (access (dotconf_file, R_OK)) {
 		fprintf (stderr, "Error in %s line %d: Cannot open %s for inclusion\n", old_fname, dotconf_line, dotconf_file);
-		strcpy (dotconf_file, old_fname);	/* restore settings */
+		strncpy (dotconf_file, old_fname, CFG_MAX_FILENAME);	/* restore settings */
 		return;
 	}
 
 	config = fopen (dotconf_file, "r");
 	config_parse (config);
 	fclose (config);
-	strcpy (dotconf_file, old_fname);
+	strncpy (dotconf_file, old_fname, CFG_MAX_FILENAME);
 }
 
 void

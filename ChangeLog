@@ -22,7 +22,14 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - updates from mark on Log formatting
  - HostServ upgraded to use lists, keeper for datastorage. list output is sorted and a max of 20 entries are displayed per /msg hostserv list
  - More cleanups and IRCd portability updates from Mark. 
- - You can now specify the expire time with hostserv (/msg hostserv help set)
+ - (M) Changes to help files to use a common format, fix typos etc
+ - (M) Added missing help text for MODBOTLIST etc
+ - (M) Overhaul of module system to improve error checks and minor bug fixes
+ - (M) Minor cleanups throughout the code
+ - (M) Completion of log filename format system. Filename format is now user configurable
+ - (M) Module unloading cleanup. We now have a common function unload_modules() to do this.
+ - (M) Paranoid buffer overflow checking - all strcpy and sprintf changed to strncpy and snprintf
+ - (M) Changed all instances of "neostats.cfg" to CONFIG_NAME
 
 * NeoStats * Fish * Version 2.5.5
  - Module API version number

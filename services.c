@@ -1,5 +1,5 @@
-/* NeoStats - IRC Statistical Services Copyright (c) 1999-2002 NeoStats Group Inc.
-** Copyright (c) 1999-2002 Adam Rutter, Justin Hammond
+/* NeoStats - IRC Statistical Services 
+** Copyright (c) 1999-2003 Adam Rutter, Justin Hammond
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -32,7 +32,6 @@
 
 extern const char version_date[], version_time[];
 extern const char protocol_version[];
-
 
 static void ns_reload (User * u, char *reason);
 static void ns_logs (User *);
@@ -77,6 +76,7 @@ servicesbot (char *nick, char **av, int ac)
 			privmsg_list (nick, s_Services, ns_help);
 			if (UserLevel (u) >= 180)
 				privmsg_list (nick, s_Services, ns_myuser_help);
+			privmsg_list (nick, s_Services, ns_help_on_help);			
 		} else if (!strcasecmp (av[2], "VERSION"))
 			privmsg_list (nick, s_Services, ns_version_help);
 		else if (!strcasecmp (av[2], "SHUTDOWN")
@@ -118,6 +118,16 @@ servicesbot (char *nick, char **av, int ac)
 			privmsg_list (nick, s_Services, ns_level_help);
 		else if (!strcasecmp (av[2], "DEBUG"))
 			privmsg_list (nick, s_Services, ns_debug_help);
+		else if (!strcasecmp (av[2], "MODBOTLIST"))
+			privmsg_list (nick, s_Services, ns_modbotlist_help);
+		else if (!strcasecmp (av[2], "MODSOCKLIST"))
+			privmsg_list (nick, s_Services, ns_modsocklist_help);
+		else if (!strcasecmp (av[2], "MODTIMERLIST"))
+			privmsg_list (nick, s_Services, ns_modtimerlist_help);
+		else if (!strcasecmp (av[2], "MODBOTCHANLIST"))
+			privmsg_list (nick, s_Services, ns_modbotchanlist_help);
+		else if (!strcasecmp (av[2], "INFO"))
+			privmsg_list (nick, s_Services, ns_info_help);
 		else
 			prefmsg (nick, s_Services, "Unknown Help Topic: \2%s\2", av[2]);
 	} else if (!strcasecmp (av[1], "LEVEL")) {
@@ -141,14 +151,14 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "MODLIST")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODLIST, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to MODLIST, but is not authorised", nick);
 			return;
 		}
 		list_module (u);
 	} else if (!strcasecmp (av[1], "UNLOAD")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to UNLOAD, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to UNLOAD, but is not authorised", nick);
 			return;
 		}
 		if (ac <= 2) {
@@ -163,28 +173,28 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "MODBOTLIST")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODBOTLIST, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to MODBOTLIST, but is not authorised", nick);
 			return;
 		}
 		list_module_bots (u);
 	} else if (!strcasecmp (av[1], "MODSOCKLIST")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODSOCKLIST, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to MODSOCKLIST, but is not authorised", nick);
 			return;
 		}
 		list_sockets (u);
 	} else if (!strcasecmp (av[1], "MODTIMERLIST")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to MODTIMERLIST, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to MODTIMERLIST, but is not authorised", nick);
 			return;
 		}
 		list_module_timer (u);
 	} else if (!strcasecmp (av[1], "MODBOTCHANLIST")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s tried to MODBOTCHANLIST, but is not a techadmin", nick);
+			chanalert (s_Services, "%s tried to MODBOTCHANLIST, but is not authorised", nick);
 			return;
 		}
 		botchandump (u);
@@ -194,12 +204,17 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "SHUTDOWN")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to SHUTDOWN, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to SHUTDOWN, but is not authorised", nick);
 			return;
 		}
-		chanalert (s_Services, "%s Wants me to Go to BED!!! Good Night!", u->nick);
-		tmp = joinbuf (av, ac, 2);
-		ns_shutdown (u, tmp);
+		if (ac <= 2) {
+			chanalert (s_Services, "%s Requested SHUTDOWN", u->nick);
+			ns_shutdown (u, NULL);
+		} else {
+			tmp = joinbuf (av, ac, 2);
+			chanalert (s_Services, "%s Requested SHUTDOWN for: ", u->nick, tmp);
+			ns_shutdown (u, tmp);
+		}
 		free (tmp);
 	} else if (!strcasecmp (av[1], "VERSION")) {
 		ns_version (u);
@@ -207,7 +222,7 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "RELOAD")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to RELOAD, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to RELOAD, but is not authorised", nick);
 			return;
 		}
 		if (ac <= 2) {
@@ -221,7 +236,7 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "LOGS")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to view LOGS, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to view LOGS, but is not authorised", nick);
 			return;
 		}
 		ns_logs (u);
@@ -229,7 +244,7 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "JUPE")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to JUPE, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to JUPE, but is not authorised", nick);
 			return;
 		}
 		if (ac <= 2) {
@@ -240,7 +255,7 @@ servicesbot (char *nick, char **av, int ac)
 		chanalert (s_Services, "%s Wants to JUPE this Server %s", u->nick, av[2]);
 	} else if (!strcasecmp (av[1], "DEBUG")) {
 		if (!(UserLevel (u) >= 180)) {
-			prefmsg (u->nick, s_Services, "Permission Denied, you need to be a Techadmin to Enable Debug Mode!");
+			prefmsg (u->nick, s_Services, "Permission Denied, you need to be authorised to Enable Debug Mode!");
 			return;
 		}
 		ns_debug_to_coders (u->nick);
@@ -273,7 +288,7 @@ servicesbot (char *nick, char **av, int ac)
 	} else if (!strcasecmp (av[1], "RAW")) {
 		if (!(UserLevel (u) >= 180)) {
 			prefmsg (nick, s_Services, "Permission Denied");
-			chanalert (s_Services, "%s Tried to use RAW, but is not a Techadmin", nick);
+			chanalert (s_Services, "%s Tried to use RAW, but is not authorised", nick);
 			return;
 		}
 #ifdef USE_RAW
@@ -291,28 +306,36 @@ servicesbot (char *nick, char **av, int ac)
 	}
 }
 
-
-extern void
-ns_shutdown (User * u, char *reason)
+void unload_modules(User * u)
 {
 	Module *mod_ptr = NULL;
 	hscan_t ms;
 	hnode_t *mn;
-	char quitmsg[255];
-	char *no_reason="no reason given";
-
-	SET_SEGV_LOCATION();
 	/* Unload the Modules */
 	hash_scan_begin (&ms, mh);
 	while ((mn = hash_scan_next (&ms)) != NULL) {
 		mod_ptr = hnode_get (mn);
-		chanalert (s_Services, "Module %s Unloaded by %s", mod_ptr->info->module_name, u->nick);
-		unload_module (mod_ptr->info->module_name, u);
+		if(u) {
+			chanalert (s_Services, "Module %s Unloaded by %s", mod_ptr->info->module_name, u->nick);
+			unload_module (mod_ptr->info->module_name, u);
+		}
+		else {
+			unload_module (mod_ptr->info->module_name, finduser (s_Services));
+		}
 	}
+}
 
+void
+ns_shutdown (User * u, char *reason)
+{
+	char quitmsg[255];
+	char *no_reason="no reason given";
+
+	SET_SEGV_LOCATION();
 	globops (s_Services, "%s requested \2SHUTDOWN\2 for %s", u->nick, (reason ? reason : no_reason));
-	snprintf (quitmsg, 255, "%s Set SHUTDOWN: %s", u->nick, (reason ? reason : no_reason));
+	snprintf (quitmsg, 255, "%s requested SHUTDOWN: %s", u->nick, (reason ? reason : no_reason));
 	nlog (LOG_NOTICE, LOG_CORE, "%s [%s](%s) requested SHUTDOWN for %s.", u->nick, u->username, u->hostname,(reason ? reason : no_reason));
+	unload_modules(u);
 	squit_cmd (s_Services, quitmsg);
 	ssquit_cmd (me.name);
 	sleep (1);
@@ -323,26 +346,19 @@ ns_shutdown (User * u, char *reason)
 static void
 ns_reload (User * u, char *reason)
 {
-	Module *mod_ptr = NULL;
-	hscan_t ms;
-	hnode_t *mn;
 	char quitmsg[255];
+
 	SET_SEGV_LOCATION();
 	globops (s_Services, "%s requested \2RELOAD\2 for %s", u->nick, reason);
+	snprintf (quitmsg, 255, "%s requested RELOAD: %s", u->nick, reason);
 	nlog (LOG_NOTICE, LOG_CORE, "%s requested RELOAD. -> reason", u->nick);
-	snprintf (quitmsg, 255, "%s Sent RELOAD: %s", u->nick, reason);
-	hash_scan_begin (&ms, mh);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		mod_ptr = hnode_get (mn);
-		chanalert (s_Services, "Module %s Unloaded by %s", mod_ptr->info->module_name, u->nick);
-		unload_module (mod_ptr->info->module_name, u);
-	}
+	unload_modules(u);
 	squit_cmd (s_Services, quitmsg);
 	ssquit_cmd (me.name);
 	sleep (5);
+	close (servsock);
 	do_exit (2);
 }
-
 
 static void
 ns_logs (User * u)
@@ -458,15 +474,15 @@ ns_uptime (User * u)
 	int uptime = time (NULL) - me.t_start;
 
 	SET_SEGV_LOCATION();
-	prefmsg (u->nick, s_Services, "Statistics Information:");
+	prefmsg (u->nick, s_Services, "%s Information:", s_Services);
 	if (uptime > 86400) {
-		prefmsg (u->nick, s_Services, "Statistics up \2%ld\2 day%s, \2%02ld:%02ld\2", uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
+		prefmsg (u->nick, s_Services, "%s up \2%ld\2 day%s, \2%02ld:%02ld\2", s_Services, uptime / 86400, (uptime / 86400 == 1) ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60);
 	} else if (uptime > 3600) {
-		prefmsg (u->nick, s_Services, "Statistics up \2%ld hour%s, %ld minute%s\2", uptime / 3600, uptime / 3600 == 1 ? "" : "s", (uptime / 60) % 60, (uptime / 60) % 60 == 1 ? "" : "s");
+		prefmsg (u->nick, s_Services, "%s up \2%ld hour%s, %ld minute%s\2", s_Services, uptime / 3600, uptime / 3600 == 1 ? "" : "s", (uptime / 60) % 60, (uptime / 60) % 60 == 1 ? "" : "s");
 	} else if (uptime > 60) {
-		prefmsg (u->nick, s_Services, "Statistics up \2%ld minute%s, %ld second%s\2", uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
+		prefmsg (u->nick, s_Services, "%s up \2%ld minute%s, %ld second%s\2", s_Services, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s");
 	} else {
-		prefmsg (u->nick, s_Services, "Statistics up \2%ld second%s\2", uptime, uptime == 1 ? "" : "s");
+		prefmsg (u->nick, s_Services, "%s up \2%ld second%s\2", s_Services, uptime, uptime == 1 ? "" : "s");
 	}
 	prefmsg (u->nick, s_Services, "Sent %ld Messages Totaling %ld Bytes", me.SendM, me.SendBytes);
 	prefmsg (u->nick, s_Services, "Recieved %ld Messages, Totaling %ld Bytes", me.RcveM, me.RcveBytes);

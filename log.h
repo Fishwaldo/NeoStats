@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-
 #ifndef _log_h_
 #define _log_h_
 
@@ -55,12 +54,14 @@
 /* are you insane? */
 #define LOG_DEBUG4	10
 
-
 /* Scope of Logging Defines: */
 
 #define LOG_CORE	0
 #define LOG_MOD		1
 
+/* buffer size for new customisable filenames 
+   20 should be more than sufficient */
+#define MAX_LOGFILENAME	20
 
 /* this is for the neostats assert replacement. */
 /* Version 2.4 and later of GCC define a magical variable _PRETTY_FUNCTION__'
@@ -85,12 +86,12 @@ extern void nassert_fail (const char *expr, const char *file, const int line, co
   (__ASSERT_VOID_CAST ((expr) ? 0 :                                           \
 	(nassert_fail(__STRING(expr), __FILE__, __LINE__, __NASSERT_FUNCTION), 0)))
 
-
-
-
 extern void nlog (int level, int scope, char *fmt, ...);
 void *close_logs ();
 int init_logs ();
 void ResetLogs ();
+
+/* Configurable log filename format string */
+extern char LogFileNameFormat[MAX_LOGFILENAME];
 
 #endif

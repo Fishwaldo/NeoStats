@@ -33,13 +33,14 @@
 #include "config.h"
 #include "log.h"
 
-
-
-
+/* 
+ * __init_mod_list 
+ * Initialise module list hashes
+ * Core use only
+ */
 void
 __init_mod_list ()
 {
-
 	SET_SEGV_LOCATION();
 	mh = hash_create (NUM_MODULES, 0, 0);
 	bh = hash_create (B_TABLE_SIZE, 0, 0);
@@ -48,6 +49,9 @@ __init_mod_list ()
 	sockh = hash_create (me.maxsocks, 0, 0);
 }
 
+/* 
+ *
+ */
 static Mod_Timer *
 new_timer (char *timer_name)
 {
@@ -70,6 +74,9 @@ new_timer (char *timer_name)
 	return t;
 }
 
+/* 
+ *
+ */
 Mod_Timer *
 findtimer (char *timer_name)
 {
@@ -81,13 +88,15 @@ findtimer (char *timer_name)
 	return NULL;
 }
 
+/* 
+ *
+ */
 int
 add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 {
 	Mod_Timer *Mod_timer_list;
 
 	SET_SEGV_LOCATION();
-
 	if (dlsym ((int *) get_dl_handle (mod_name), func_name) == NULL) {
 		nlog (LOG_WARNING, LOG_CORE, "Oh Oh, The Timer Function doesn't exist");
 		return -1;
@@ -105,11 +114,15 @@ add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval)
 	}
 }
 
+/* 
+ *
+ */
 int
 del_mod_timer (char *timer_name)
 {
 	Mod_Timer *list;
 	hnode_t *tn;
+
 	SET_SEGV_LOCATION();
 	tn = hash_lookup (th, timer_name);
 	if (tn) {
@@ -123,6 +136,9 @@ del_mod_timer (char *timer_name)
 	return -1;
 }
 
+/* 
+ *
+ */
 void
 list_module_timer (User * u)
 {
@@ -143,6 +159,9 @@ list_module_timer (User * u)
 	prefmsg (u->nick, s_Services, "End of Module timer List");
 }
 
+/* 
+ *
+ */
 static Sock_List *
 new_sock (char *sock_name)
 {
@@ -165,16 +184,23 @@ new_sock (char *sock_name)
 	return s;
 }
 
+/* 
+ *
+ */
 Sock_List *
 findsock (char *sock_name)
 {
 	hnode_t *sn;
+
 	sn = hash_lookup (sockh, sock_name);
 	if (sn)
 		return hnode_get (sn);
 	return NULL;
 }
 
+/* 
+ *
+ */
 int
 add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name)
 {
@@ -209,11 +235,15 @@ add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int
 	return 1;
 }
 
+/* 
+ *
+ */
 int
 del_socket (char *sock_name)
 {
 	Sock_List *list;
 	hnode_t *sn;
+
 	SET_SEGV_LOCATION();
 	sn = hash_lookup (sockh, sock_name);
 	if (sn) {
@@ -221,13 +251,15 @@ del_socket (char *sock_name)
 		nlog (LOG_DEBUG2, LOG_CORE, "Unregistered Socket function %s from Module %s", sock_name, list->modname);
 		hash_scan_delete (sockh, sn);
 		hnode_destroy (sn);
-//              free(list->sockname);
 		free (list);
 		return 1;
 	}
 	return -1;
 }
 
+/* 
+ *
+ */
 void
 list_sockets (User * u)
 {
@@ -247,13 +279,17 @@ list_sockets (User * u)
 	prefmsg (u->nick, s_Services, "End of Socket List");
 }
 
-extern void
+/* 
+ *
+ */
+void
 add_bot_to_chan (char *bot, char *chan)
 {
 	hnode_t *cbn;
 	Chan_Bot *bc;
 	lnode_t *bmn;
 	char *botname;
+
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
 		bc = malloc (sizeof (Chan_Bot));
@@ -278,12 +314,16 @@ add_bot_to_chan (char *bot, char *chan)
 	return;
 }
 
-extern void
+/* 
+ *
+ */
+void
 del_bot_from_chan (char *bot, char *chan)
 {
 	hnode_t *cbn;
 	Chan_Bot *bc;
 	lnode_t *bmn;
+
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
 		nlog (LOG_WARNING, LOG_CORE, "Hu? Can't Find Channel %s for botchanhash", chan);
@@ -307,13 +347,17 @@ del_bot_from_chan (char *bot, char *chan)
 	}
 }
 
-extern void
+/* 
+ *
+ */
+void
 bot_chan_message (char *origin, char *chan, char **av, int ac)
 {
 	hnode_t *cbn;
 	Chan_Bot *bc;
 	lnode_t *bmn;
 	Mod_User *u;
+
 	cbn = hash_lookup (bch, chan);
 	if (!cbn) {
 		/* this isn't bad, just means our bot parted the channel? */
@@ -330,18 +374,19 @@ bot_chan_message (char *origin, char *chan, char **av, int ac)
 		}
 		bmn = list_next (bc->bots, bmn);
 	}
-
-
-
 }
 
-extern void
+/* 
+ *
+ */
+void
 botchandump (User * u)
 {
 	hscan_t hs;
 	hnode_t *hn;
 	lnode_t *ln;
 	Chan_Bot *bc;
+
 	prefmsg (u->nick, s_Services, "BotChanDump:");
 	hash_scan_begin (&hs, bch);
 	while ((hn = hash_scan_next (&hs)) != NULL) {
@@ -355,11 +400,15 @@ botchandump (User * u)
 	}
 }
 
+/* 
+ *
+ */
 static Mod_User *
 new_bot (char *bot_name)
 {
 	Mod_User *u;
 	hnode_t *bn;
+
 	SET_SEGV_LOCATION();
 	nlog (LOG_DEBUG2, LOG_CORE, "New Bot: %s", bot_name);
 	u = malloc (sizeof (Mod_User));
@@ -377,6 +426,9 @@ new_bot (char *bot_name)
 	return u;
 }
 
+/* 
+ *
+ */
 int
 add_mod_user (char *nick, char *mod_name)
 {
@@ -401,7 +453,9 @@ add_mod_user (char *nick, char *mod_name)
 	return 0;
 }
 
-
+/* 
+ *
+ */
 Mod_User *
 findbot (char *bot_name)
 {
@@ -415,6 +469,9 @@ findbot (char *bot_name)
 	return NULL;
 }
 
+/* 
+ *
+ */
 int
 del_mod_user (char *bot_name)
 {
@@ -431,12 +488,11 @@ del_mod_user (char *bot_name)
 		return 1;
 	}
 	return -1;
-
-
-
 }
 
-
+/* 
+ *
+ */
 int
 bot_nick_change (char *oldnick, char *newnick)
 {
@@ -456,14 +512,12 @@ bot_nick_change (char *oldnick, char *newnick)
 			nlog (LOG_DEBUG3, LOG_CORE, "Bot %s Changed its nick to %s", oldnick, newnick);
 			mod_tmp = new_bot (newnick);
 
-			/* add a brand new user */
-
+			/* add a brand new user */ 
 			strncpy (mod_tmp->nick, newnick, MAXNICK);
 			strncpy (mod_tmp->modname, mod_ptr->modname, MAXHOST);
 			mod_tmp->function = mod_ptr->function;
 
-			/* Now Delete the Old bot nick */
-
+			/* Now Delete the Old bot nick */   
 			del_mod_user (oldnick);
 			snick_cmd (oldnick, newnick);
 			return 1;
@@ -473,15 +527,16 @@ bot_nick_change (char *oldnick, char *newnick)
 	return -1;
 }
 
-
-
-
+/* 
+ *
+ */
 void
 list_module_bots (User * u)
 {
 	Mod_User *mod_ptr;
 	hnode_t *bn;
 	hscan_t bs;
+
 	SET_SEGV_LOCATION();
 	prefmsg (u->nick, s_Services, "Module Bot List:");
 	hash_scan_begin (&bs, bh);
@@ -493,14 +548,12 @@ list_module_bots (User * u)
 	prefmsg (u->nick, s_Services, "End of Module Bot List");
 }
 
-
-
-
+/* 
+ *
+ */
 int
-load_module (char *path1, User * u)
+load_module (char *modfilename, User * u)
 {
-
-
 #ifndef HAVE_LIBDL
 	const char *dl_error;
 #else
@@ -509,7 +562,6 @@ load_module (char *path1, User * u)
 	void *dl_handle;
 	int do_msg;
 	char path[255];
-	char p[255];
 	char **av;
 	int ac = 0;
 	int i = 0;
@@ -523,24 +575,21 @@ load_module (char *path1, User * u)
 	hnode_t *mn;
 	int (*doinit) (int modnum, int apiver);
 
-
 	SET_SEGV_LOCATION();
 	if (u == NULL) {
 		do_msg = 0;
 	} else {
 		do_msg = 1;
 	}
-	snprintf (p, 255, "dl/%s.so", path1);
-	dl_handle = dlopen (p, RTLD_NOW || RTLD_GLOBAL);
+	snprintf (path, 255, "dl/%s.so", modfilename);
+	dl_handle = dlopen (path, RTLD_NOW || RTLD_GLOBAL);
 	CLEAR_SEGV_INMODULE();
 	if (!dl_handle) {
 		dl_error = dlerror ();
 		if (do_msg) {
-			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
-			prefmsg (u->nick, s_Services, "%s", dl_error);
+			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
-		nlog (LOG_WARNING, LOG_CORE, "Module was %s", p);
+		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
 		return -1;
 	}
 
@@ -552,11 +601,16 @@ load_module (char *path1, User * u)
 	if ((dl_error = dlerror ()) != NULL) {
 #endif
 		if (do_msg) {
-			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
-			prefmsg (u->nick, s_Services, "%s", dl_error);
+			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
+		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
 		dlclose (dl_handle);
+		return -1;
+	}
+	mod_info_ptr = (*mod_get_info) ();
+	if (mod_info_ptr == NULL) {
+		dlclose (dl_handle);
+		nlog (LOG_WARNING, LOG_CORE, "Module has no info structure: %s", path);
 		return -1;
 	}
 
@@ -568,36 +622,30 @@ load_module (char *path1, User * u)
 	if ((dl_error = dlerror ()) != NULL) {
 #endif
 		if (do_msg) {
-			prefmsg (u->nick, s_Services, "Error, Couldn't Load Module");
-			prefmsg (u->nick, s_Services, "%s", dl_error);
+			prefmsg (u->nick, s_Services, "Couldn't Load Module: %s %s", dl_error, path);
 		}
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", dl_error);
+		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s %s", dl_error, path);
 		dlclose (dl_handle);
+		return -1;
+	}
+	mod_funcs_ptr = (*mod_get_funcs) ();
+	if (mod_funcs_ptr == NULL) {
+		dlclose (dl_handle);
+		nlog (LOG_WARNING, LOG_CORE, "Module has no function structure: %s", path);
 		return -1;
 	}
 
 	mod_get_events = dlsym (dl_handle, "__module_get_events");
 	/* no error check here - this one isn't essential to the functioning of the module */
 
-	mod_info_ptr = (*mod_get_info) ();
-	mod_funcs_ptr = (*mod_get_funcs) ();
 	if (mod_get_events)
 		event_fn_ptr = (*mod_get_events) ();
 
-	if (mod_info_ptr == NULL || mod_funcs_ptr == NULL) {
-		dlclose (dl_handle);
-		nlog (LOG_WARNING, LOG_CORE, "%s: Could not load dynamic library %s!\n", __PRETTY_FUNCTION__, path);
-		nlog (LOG_WARNING, LOG_CORE, "Couldn't Load Module: %s", p);
-		return -1;
-	}
-
 	/* Check that the Module hasn't already been loaded */
-
 	if (hash_lookup (mh, mod_info_ptr->module_name)) {
 		dlclose (dl_handle);
 		if (do_msg)
 			prefmsg (u->nick, s_Services, "Module %s already Loaded, Can't Load 2 Copies", mod_info_ptr->module_name);
-		free (mod_ptr);
 		return -1;
 	}
 
@@ -632,7 +680,6 @@ load_module (char *path1, User * u)
 	ModNum[i].mod = mod_ptr;
 	nlog (LOG_DEBUG1, LOG_CORE, "Assigned %d to Module %s for ModuleNum", i, ModNum[i].mod->info->module_name);
 
-
 	doinit = dlsym ((int *) dl_handle, "__ModInit");
 	if (doinit) {
 		SET_SEGV_LOCATION();
@@ -645,9 +692,6 @@ load_module (char *path1, User * u)
 		CLEAR_SEGV_INMODULE();
 
 	}
-
-
-
 
 	/* Let this module know we are online if we are! */
 	if (me.onchan == 1) {
@@ -670,14 +714,17 @@ load_module (char *path1, User * u)
 		globops (me.name, "%s Module Loaded", mod_info_ptr->module_name);
 	}
 	return 0;
-
-
 }
-extern int
+
+/* 
+ *
+ */
+int
 get_dl_handle (char *mod_name)
 {
 	Module *list_ptr;
 	hnode_t *mn;
+
 	mn = hash_lookup (mh, mod_name);
 	if (mn) {
 		list_ptr = hnode_get (mn);
@@ -685,11 +732,16 @@ get_dl_handle (char *mod_name)
 	}
 	return 0;
 }
-extern int
+
+/* 
+ *
+ */
+int
 get_mod_num (char *mod_name)
 {
 	int i;
-	for (i = 0; i <= NUM_MODULES; i++) {
+
+	for (i = 0; i < NUM_MODULES; i++) {
 		if (ModNum[i].used > 0) {
 			if (!strcasecmp (ModNum[i].mod->info->module_name, mod_name)) {
 				return i;
@@ -701,7 +753,9 @@ get_mod_num (char *mod_name)
 	return -1;
 };
 
-
+/* 
+ *
+ */
 void
 list_module (User * u)
 {
@@ -720,6 +774,9 @@ list_module (User * u)
 	prefmsg (u->nick, s_Services, "End of Module List");
 }
 
+/* 
+ *
+ */
 int
 unload_module (char *module_name, User * u)
 {
@@ -732,10 +789,7 @@ unload_module (char *module_name, User * u)
 	int i;
 	void (*dofini) ();
 
-
 	SET_SEGV_LOCATION();
-	
-
 	/* Check to see if this Module is loaded....  */
 	modnode = hash_lookup (mh, module_name);
 	if (modnode) {
@@ -793,11 +847,10 @@ unload_module (char *module_name, User * u)
 			(*dofini) ();
 		}
 		CLEAR_SEGV_INMODULE();
-
-
+		/* Remove hash */
 		hash_delete (mh, modnode);
 		hnode_destroy (modnode);
-		/* set segv in module */
+		/* Close module */
 		SET_SEGV_INMODULE(module_name);
 		dlclose (list->dl_handle);
 		CLEAR_SEGV_INMODULE();
@@ -813,3 +866,4 @@ unload_module (char *module_name, User * u)
 	}
 	return -1;
 }
+

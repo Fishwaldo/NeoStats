@@ -516,7 +516,7 @@ ssvshost_cmd (const char *who, const char *vhost)
 		nlog (LOG_WARNING, LOG_CORE, "Can't Find user %s for ssvshost_cmd", who);
 		return 0;
 	} else {
-		strcpy (u->vhost, vhost);
+		strncpy (u->vhost, vhost, MAXHOST);
 		sts (":%s %s %s %s", me.name, (me.token ? TOK_CHGHOST : MSG_CHGHOST), who, vhost);
 		return 1;
 	}

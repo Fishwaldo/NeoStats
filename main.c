@@ -138,7 +138,8 @@ main (int argc, char *argv[])
 #ifdef ULTIMATE3
 	me.client = 0;
 #endif
-	strcpy (me.modpath, "dl");
+/* M - Not used */
+/*	strcpy (me.modpath, "dl"); */
 
 	/* if we are doing recv.log, remove the previous version */
 	if (config.recvlog)
@@ -154,8 +155,8 @@ main (int argc, char *argv[])
 	if(ConfLoad ()<0)
 		exit(-1);
 	if (me.die) {
-		printf ("\n-----> ERROR: Read the README file then edit neostats.cfg! <-----\n\n");
-		nlog (LOG_CRITICAL, LOG_CORE, "Read the README file and edit your neostats.cfg");
+		printf ("\n-----> ERROR: Read the README file then edit %s! <-----\n\n",CONFIG_NAME);
+		nlog (LOG_CRITICAL, LOG_CORE, "Read the README file and edit your %s",CONFIG_NAME);
 		sleep (1);
 		close (servsock);
 		/* we are exiting the parent, not the program, don't call do_exit() */
@@ -394,7 +395,7 @@ serv_segv ()
 		chanalert (s_Services, "Backtrace not available on this platform");
 		nlog (LOG_CRITICAL, LOG_CORE, "Backtrace not available on this platform");
 #endif
-		strcpy (name, segvinmodule);
+		strncpy (name, segvinmodule, 30);
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
 		chanalert (s_Services, "Restoring Stack to before Crash");
@@ -511,12 +512,8 @@ start ()
 		nlog (LOG_NOTICE, LOG_CORE, "Reconnect time is zero, shutting down");
 	close (servsock);
 
-	/* Unload the Modules */
-	hash_scan_begin (&ms, mh);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		mod_ptr = hnode_get (mn);
-		unload_module (mod_ptr->info->module_name, finduser (s_Services));
-	}
+	unload_modules(NULL);
+
 	if(me.r_time>0) {
 		sleep (me.r_time);
 		do_exit (2);

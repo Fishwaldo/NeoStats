@@ -116,7 +116,7 @@
 #endif
 
 #define SEGV_INMODULE_BUFSIZE	30
-#define SET_SEGV_INMODULE(module) strncpy(segv_inmodule,(module),SEGV_INMODULE_BUFSIZE);
+#define SET_SEGV_INMODULE(module_name) strncpy(segv_inmodule,(module_name),SEGV_INMODULE_BUFSIZE);
 #define CLEAR_SEGV_INMODULE() segv_inmodule[0]='\0';
 
 /* temporary define while module settings are ported to macro system */
@@ -155,7 +155,8 @@ typedef struct modeparms_ ModesParm;
 
 struct me {
 	char name[MAXHOST];
-	char modpath[BUFSIZE];
+/* M - Not used */
+/*	char modpath[BUFSIZE]; */
 	int port;
 	int r_time;
 	int lag_time;
@@ -350,6 +351,7 @@ void KillUser (const char *nick);
 
 /* ns_help.c */
 extern const char *ns_help[];
+extern const char *ns_help_on_help[];
 extern const char *ns_myuser_help[];
 extern const char *ns_shutdown_help[];
 extern const char *ns_reload_help[];
@@ -367,11 +369,16 @@ extern const char *ns_unload_help[];
 extern const char *ns_modlist_help[];
 extern const char *ns_jupe_help[];
 extern const char *ns_level_help[];
+extern const char *ns_modbotlist_help[];
+extern const char *ns_modsocklist_help[];
+extern const char *ns_modtimerlist_help[];
+extern const char *ns_modbotchanlist_help[];
+extern const char *ns_info_help[];
 
 /* services.c */
 extern void servicesbot (char *nick, char **av, int ac);
 extern void ns_debug_to_coders (char *);
-extern void ns_shutdown (User *, char *);
+extern void ns_shutdown (User * u, char *reason);
 
 /* chans.c */
 extern void chandump (char *chan);

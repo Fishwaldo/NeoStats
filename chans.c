@@ -22,8 +22,6 @@
 ** $Id$
 */
 
-#include <fnmatch.h>
-
 #include "stats.h"
 #include "dl.h"
 #include "hash.h"

@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-
 #ifndef _dl_h_
 #define _dl_h_
 
@@ -39,10 +38,15 @@
 #include "hash.h"
 #include "stats.h"
 
-
+/* 
+ * NeoStats core API version.
+ * A module should check this when loaded to ensure compatibility
+ */
 #define API_VER 1
 
-
+/* 
+ *   Ensure RTLD flags correctly defined
+ */
 #ifndef RTLD_NOW
 #define RTLD_NOW RTLD_LAZY	/* openbsd deficiency */
 #endif
@@ -50,10 +54,15 @@
 #define RTLD_GLOBAL 0
 #endif
 
-
+/* 
+ * Need to locate lib include for this
+ */
 extern char *sftime (time_t);
 
-struct sock_list_struct {
+/* 
+ * Module socket list structure
+ */
+struct _Sock_List {
 	long hash;
 	int sock_no;
 	char sockname[MAXHOST];
@@ -64,10 +73,18 @@ struct sock_list_struct {
 	long rmsgs;
 	long rbytes;
 };
-typedef struct sock_list_struct Sock_List;
+
+typedef struct _Sock_List Sock_List;
+
+/* 
+ * Module Socket List hash
+ */
 hash_t *sockh;
 
-struct mod_timer_list {
+/* 
+ * Module Timer structure
+ */
+struct _Mod_Timer {
 	long hash;
 	char modname[MAXHOST];
 	char timername[MAXHOST];
@@ -75,10 +92,13 @@ struct mod_timer_list {
 	time_t lastrun;
 	int (*function) ();
 };
-typedef struct mod_timer_list Mod_Timer;
+typedef struct _Mod_Timer Mod_Timer;
 hash_t *th;
 
-struct mod_user_list {
+/* 
+ *
+ */
+struct _Mod_User {
 	long hash;
 	char nick[MAXNICK];
 	char modname[MAXHOST];
@@ -87,91 +107,128 @@ struct mod_user_list {
 	hash_t *chanlist;
 };
 
-typedef struct mod_user_list Mod_User;
+typedef struct _Mod_User Mod_User;
 hash_t *bh;
 
-struct _chan_bot_list {
+/* 
+ *
+ */
+struct _Chan_Bot {
 	char chan[CHANLEN];
 	list_t *bots;
 };
 
-typedef struct _chan_bot_list Chan_Bot;
+typedef struct _Chan_Bot Chan_Bot;
 hash_t *bch;
 
-
-struct functions {
+/* 
+ *
+ */
+struct _Functions {
 	char *cmd_name;
 	int (*function) (char *origin, char **av, int ac);
 	int srvmsg;
 };
 
-struct evtfunctions {
+typedef struct _Functions Functions;
+
+/* 
+ *
+ */
+struct _EventFnList {
 	char *cmd_name;
 	int (*function) (char **av, int ac);
 };
 
+typedef struct _EventFnList EventFnList;
 
-typedef struct functions Functions;
-typedef struct evtfunctions EventFnList;
-
-struct mod_info {
+/* 
+ *
+ */
+struct _Module_Info {
 	char *module_name;
 	char *module_description;
 	char *module_version;
 };
 
-typedef struct mod_info Module_Info;
+typedef struct _Module_Info Module_Info;
 
-struct module {
+/* 
+ * New module info structure
+ */
+struct _ModuleInfo {
+	char *module_name;
+	char *module_description;
+	char *module_version;
+	char *module_build_date;
+	char *module_build_time;
+};
+
+typedef struct _ModuleInfo ModuleInfo;
+
+/* 
+ *
+ */
+struct _Module {
 	Module_Info *info;
 	Functions *function_list;
 	EventFnList *other_funcs;
 	void *dl_handle;
-
 };
 
-
-typedef struct module Module;
+typedef struct _Module Module;
 
 hash_t *mh;
 
+/* 
+ *
+ */
 struct mod_num {
 	Module *mod;
 	int used;
 };
 struct mod_num ModNum[NUM_MODULES];
 
+/* 
+ * Prototypes
+ */
+void __init_mod_list (void);
+int load_module (char *path, User * u);
+int unload_module (char *module_name, User * u);
+int add_ld_path (char *path);
+void list_module (User * u);
+void list_module_bots (User * u);
+int add_mod_user (char *nick, char *mod_name);
+int del_mod_user (char *nick);
+int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
+int del_mod_timer (char *timer_name);
+void list_module_timer (User * u);
+int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
+int del_socket (char *sockname);
+void list_sockets (User * u);
+Sock_List *findsock (char *sock_name);
+Mod_User *findbot (char * bot_name);
+int get_dl_handle (char *mod_name);
+void add_bot_to_chan (char *bot, char *chan);
+void del_bot_from_chan (char *bot, char *chan);
+void bot_chan_message (char *origin, char *chan, char **av, int ac);
+void botchandump (User * u);
+int get_mod_num (char *mod_name);
 
-extern void __init_mod_list ();
-extern int load_module (char *path, User * u);
-extern int unload_module (char *module_name, User * u);
-extern int add_ld_path (char *path);
-extern void list_module (User *);
-extern void list_module_bots (User *);
-extern int add_mod_user (char *nick, char *mod_name);
-extern int del_mod_user (char *nick);
-extern int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
-extern int del_mod_timer (char *timer_name);
-extern void list_module_timer (User *);
-extern int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
-extern int del_socket (char *sockname);
-extern void list_sockets (User *);
-extern Sock_List *findsock (char *sock_name);
-extern Mod_User *findbot (char *);
-extern int get_dl_handle (char *mod_name);
-extern void add_bot_to_chan (char *, char *);
-extern void del_bot_from_chan (char *, char *);
-extern void bot_chan_message (char *origin, char *chan, char **av, int ac);
-extern void botchandump (User * u);
-extern int get_mod_num (char *);
-
-/* Module Interface */
+/* 
+ * Module Interface 
+ */
 int __ModInit(int modnum, int apiver);
 void __ModFini(void);
 int __Bot_Message(char *origin, char **av, int ac);
-/* need to check include order before enabling the following */
-/* Module_Info *__module_get_info(void); */
-/* Functions *__module_get_functions(void); */
-/* EventFnList *__module_get_events(void); */
+int __Chan_Message(char *origin, char *chan, char **argv, int argc);
+Module_Info *__module_get_info(void);
+Functions *__module_get_functions(void);
+EventFnList *__module_get_events(void);
+
+/* WIP: New module interface */
+/*Module_Info __module_info;   */
+/*Functions __module_functions[];*/
+/*EventFnList __module_events[];  */
 
 #endif /* !_dl_h_ */

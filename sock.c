@@ -184,12 +184,7 @@ read_loop ()
 			if ((time (NULL) - me.lastmsg) > 180) {
 				/* if we havnt had a message for 3 minutes, more than likely, we are on a zombie server */
 				/* disconnect and try to reconnect */
-				/* Unload the Modules */
-				hash_scan_begin (&ms, mh);
-				while ((mn = hash_scan_next (&ms)) != NULL) {
-					mod_ptr = hnode_get (mn);
-					unload_module (mod_ptr->info->module_name, finduser (s_Services));
-				}
+				unload_modules(NULL);
 				close (servsock);
 				sleep (5);
 				nlog (LOG_WARNING, LOG_CORE, "Eeek, Zombie Server, Reconnecting");

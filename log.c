@@ -33,9 +33,9 @@
 
 const char* CoreLogFileName="NeoStats";
 /*Original NeoStats logging format*/
-char* LogFileNameFormat="-%m-%d";
+char LogFileNameFormat[MAX_LOGFILENAME]="-%m-%d";
 /*test logging format*/
-/*char* LogFileNameFormat="%Y%M%d";*/
+/*char LogFileNameFormat[MAX_LOGFILENAME]="%Y%M%d";*/
 
 const char *loglevels[10] = {
 	"CRITICAL",
@@ -148,13 +148,12 @@ nlog (int level, int scope, char *fmt, ...)
 			hash_insert (logs, hn, logentry->name);
 		}
 
-		if (!logentry->logfile) {
-
 #ifdef DEBUG
+		if (!logentry->logfile) {
 			printf ("%s\n", strerror (errno));
 			do_exit (0);
-#endif
 		}
+#endif
 		strftime (fmttime, 80, "%d/%m/%Y[%H:%M]", localtime (&ts));
 		va_start (ap, fmt);
 		vsnprintf (buf, 512, fmt, ap);

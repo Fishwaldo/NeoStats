@@ -206,7 +206,7 @@ int
 sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 {
 	char flag;
-	char mode[2];
+	char mode;
 	char **av;
 	int ac;
 	time_t tstime;
@@ -222,19 +222,19 @@ sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 	switch (chflag) {
 	case MODE_CHANOP:
 		flag = '@';
-		strcpy (mode, "o");
+		mode= 'o';
 		break;
 	case MODE_VOICE:
 		flag = '+';
-		strcpy (mode, "v");
+		mode= 'v';
 		break;
 	default:
 		flag = ' ';
-		strcpy (mode, "");
+		mode= '\0';
 	}
 	sts (":%s %s %d %s + :%c%s", me.name, MSG_SJOIN, tstime, chan, flag, who);
 	join_chan (finduser (who), (char *) chan);
-	snprintf (tmp, 512, "%s +%s %s", chan, mode, who);
+	snprintf (tmp, 512, "%s +%c %s", chan, mode, who);
 	ac = split_buf (tmp, &av, 0);
 	ChanMode (me.name, av, ac);
 	free (av);

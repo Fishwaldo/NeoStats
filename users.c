@@ -25,8 +25,6 @@
 ** $Id$
 */
 
-#include <fnmatch.h>
-
 #include "stats.h"
 #include "hash.h"
 #include "dl.h"
@@ -34,7 +32,6 @@
 
 
 
-int fnmatch (const char *, const char *, int flags);
 void doDelUser (const char *, int);
 
 
@@ -98,7 +95,7 @@ AddUser (const char *nick, const char *user, const char *host, const char *serve
 	u->Smode = 0;
 #endif
 	u->chans = list_create (MAXJOINCHANS);
-	strcpy (u->modes, "");
+	u->modes[0]= '\0';
 	u->ipaddr.s_addr = htonl (ipaddr);
 	u->TS = TS;
 	

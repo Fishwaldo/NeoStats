@@ -57,7 +57,8 @@ static config_option options[] = {
 	{"LOAD_MODULE", ARG_STR, cb_Module, 0},
 	{"ONLY_OPERS", ARG_STR, cb_Server, 11},
 	{"NO_LOAD", ARG_STR, cb_Server, 12},
-	{"BINDTO", ARG_STR, cb_Server, 13}
+	{"BINDTO", ARG_STR, cb_Server, 13},
+	{"LOGFILENAMEFORMAT", ARG_STR, cb_Server, 14}
 };
 
 
@@ -105,7 +106,7 @@ ConfLoad ()
 {
 	/* Read in the Config File */
 	printf ("Reading the Config File. Please wait.....\n");
-	if (!config_read ("neostats.cfg", options) == 0) {
+	if (!config_read (CONFIG_NAME, options) == 0) {
 		printf ("***************************************************\n");
 		printf ("*                  Error!                         *\n");
 		printf ("*                                                 *\n");
@@ -114,7 +115,6 @@ ConfLoad ()
 		printf ("*                                                 *\n");
 		printf ("*             NeoStats NOT Started                *\n");
 		printf ("***************************************************\n");
-		/* no need to call do_exit, we havn't even started! */
 		return -1;
 	}
 	printf ("Sucessfully Loaded Config File, Now Booting NeoStats\n");
@@ -238,6 +238,8 @@ cb_Server (char *arg, int configtype)
 		me.die = 1;
 	} else if (configtype == 13) {
 		memcpy (me.local, arg, sizeof (me.local));
+	} else if (configtype == 14) {
+		strncpy(LogFileNameFormat,arg,MAX_LOGFILENAME);
 	}
 
 }

@@ -354,42 +354,42 @@ int
 sjoin_cmd (const char *who, const char *chan, unsigned long chflag)
 {
 	char flag;
-	char mode[2];
+	char mode;
 	char **av;
 	int ac;
 	char tmp[512];
 	switch (chflag) {
 	case MODE_CHANOP:
 		flag = '@';
-		strcpy (mode, "0");
+		mode= '0';
 		break;
 	case MODE_HALFOP:
 		flag = '%';
-		strcpy (mode, "h");
+		mode= 'h';
 		break;
 	case MODE_VOICE:
 		flag = '+';
-		strcpy (mode, "v");
+		mode= 'v';
 		break;
 	case MODE_CHANADMIN:
 		flag = '!';
-		strcpy (mode, "a");
+		mode= 'a';
 		break;
 	case MODE_VIP:
 		flag = '=';
-		strcpy (mode, "V");
+		mode= 'V';
 		break;
 	case MODE_SILENCE:
 		flag = '-';
-		strcpy (mode, "d");
+		mode= 'd';
 		break;
 	default:
 		flag = ' ';
-		strcpy (mode, "");
+		mode= '\0';
 	}
 	sts (":%s %s 0 %s + :%c%s", me.name, MSG_SJOIN, chan, flag, who);
 	join_chan (finduser (who), (char *) chan);
-	snprintf (tmp, 512, "%s +%s %s", chan, mode, who);
+	snprintf (tmp, 512, "%s +%c %s", chan, mode, who);
 	ac = split_buf (tmp, &av, 0);
 	ChanMode (me.name, av, ac);
 	free (av);
