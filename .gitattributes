@@ -47,6 +47,7 @@ data/tlds.nfo -text
 /dl.h -text
 dl/Makefile -text
 dl/README -text
+dl/cs/.indent.pro -text
 dl/cs/ChangeLog -text
 dl/cs/Makefile -text
 dl/cs/cs.c -text
