@@ -1456,7 +1456,7 @@ do_svsmode_user (const char* targetnick, const char* modes, const char* ts)
 
 		SetUserServicesTS (targetnick, ts);
 		/* If only setting TS, we do not need further mode processing */
-		if(strcasecmp(modes, "+d") == 0) {
+		if(ircstrcasecmp(modes, "+d") == 0) {
 			dlog(DEBUG3, "dropping modes since this is a services TS %s", modes);
 			return;
 		}

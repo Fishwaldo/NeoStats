@@ -232,11 +232,11 @@ static int AccessList(CmdParams* cmdparams)
 static int ea_cmd_access(CmdParams* cmdparams)
 {
 	SET_SEGV_LOCATION();
-	if (!strcasecmp(cmdparams->av[0], "add")) {
+	if (!ircstrcasecmp(cmdparams->av[0], "add")) {
 		return AccessAdd(cmdparams);
-	} else if (!strcasecmp(cmdparams->av[0], "del")) {
+	} else if (!ircstrcasecmp(cmdparams->av[0], "del")) {
 		return AccessDel(cmdparams);
-	} else if (!strcasecmp(cmdparams->av[0], "list")) {
+	} else if (!ircstrcasecmp(cmdparams->av[0], "list")) {
 		return AccessList(cmdparams);
 	}
 	irc_prefmsg(NULL, cmdparams->source, "Invalid Syntax.");

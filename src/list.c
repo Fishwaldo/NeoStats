@@ -841,7 +841,7 @@ list_verify (list_t * list)
 int
 comparef (const void *key1, const void *key2)
 {
-	return strcasecmp (key1, key2);
+	return ircstrcasecmp (key1, key2);
 }
 
 /*
