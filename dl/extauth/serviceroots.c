@@ -33,7 +33,7 @@
 
 static int new_m_version(char *origin, char **av, int ac);
 void sr_cb_config(char *arg, int configtype);
-extern void ext_auth_list(User *u, char **av, int ac);
+static int ext_auth_list(User *u, char **av, int ac);
 
 const char *sr_help_list[] = {
 	"Syntax: \2SRLIST\2",
