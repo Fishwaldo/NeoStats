@@ -323,7 +323,10 @@ void save_chan(CStats *c) {
 
 	SET_SEGV_LOCATION();
 
-	ircsnprintf(data, BUFSIZE, "%d %d %d %d %d %d %d %d %d", c->topics, c->totmem, c->kicks, c->maxmems, c->t_maxmems, c->maxkicks, c->t_maxkicks, c->maxjoins, c->t_maxjoins);
+	ircsnprintf(data, BUFSIZE, "%d %d %d %d %d %d %d %d %d", 
+		(int)c->topics, (int)c->totmem, (int)c->kicks, 
+		(int)c->maxmems, (int)c->t_maxmems, (int)c->maxkicks, 
+		(int)c->t_maxkicks, (int)c->maxjoins, (int)c->t_maxjoins);
 	SetData((void *)data, CFGSTR, "ChanStats", c->name, "ChanData");
 	/* we keep this seperate so we can easily delete old channels */
 	SetData((void *)c->lastseen, CFGINT, "ChanStats", c->name, "LastSeen");
@@ -380,7 +383,7 @@ void DelOldChan()
 		}
 	}
 	free(row);
-	nlog(LOG_INFO, LOG_MOD, "Took %d seconds to clean %d channel stats", time(NULL) - start, count);
+	nlog(LOG_INFO, LOG_MOD, "Took %d seconds to clean %d channel stats", (int)(time(NULL) - start), count);
 }
 
 

@@ -549,13 +549,14 @@ int pong(char **av, int ac)
 }
 
 extern bot_cmd ss_commands[];
+extern bot_setting ss_settings[];
 ModUser *ss_bot;
 
 int Online(char **av, int ac)
 {
 	SET_SEGV_LOCATION();
 	ss_bot = init_mod_bot(s_StatServ, StatServ.user, StatServ.host, StatServ.rname,
-		 services_bot_modes, BOT_FLAG_ONLY_OPERS, ss_commands, NULL, __module_info.module_name);
+		 services_bot_modes, BOT_FLAG_ONLY_OPERS, ss_commands, ss_settings, __module_info.module_name);
 
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */

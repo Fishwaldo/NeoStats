@@ -55,15 +55,15 @@ TLD *tldhead;
 list_t *Vhead;
 
 struct stats_network_ {
-	int opers;
-	int chans;
-	int maxopers;
+	long opers;
+	long chans;
+	long maxopers;
 	long users;
 	long totusers;
 	long maxusers;
 	long away;
-	int servers;
-	int maxservers;
+	long servers;
+	long maxservers;
 	time_t t_maxopers;
 	time_t t_maxusers;
 	time_t t_maxservers;
@@ -91,8 +91,8 @@ struct server_stats {
 	char name[MAXHOST];
 	unsigned int users;
 	int opers;
-	int lowest_ping;
-	int highest_ping;
+	long lowest_ping;
+	long highest_ping;
 	time_t t_lowest_ping;
 	time_t t_highest_ping;
 	int numsplits;
@@ -144,7 +144,7 @@ struct daily_ {
 	int opers;
 	time_t t_opers;
 	int tot_users;
-	long chans;
+	int chans;
 	time_t t_chans;
 } daily;
 

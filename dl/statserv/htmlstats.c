@@ -292,7 +292,7 @@ void get_srvlistdet()
 			s->serverkills);
 		fprintf(opf,
 			"<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>",
-			s->highest_ping, sftime(s->t_highest_ping));
+			(int)s->highest_ping, sftime(s->t_highest_ping));
 		if (ss)
 			fprintf(opf,
 				"<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
@@ -320,19 +320,19 @@ void get_netstats()
 		"<tr><td colspan=2>Total Users Ever Connected</td><td colspan=2>%ld</td></tr>",
 		stats_network.totusers);
 	fprintf(opf, "<tr><td>Current Channels: </td>\n");
-	fprintf(opf, "<td> %i </td>\n", stats_network.chans);
+	fprintf(opf, "<td> %i </td>\n", (int)stats_network.chans);
 	fprintf(opf, "<td>Maximum Channels: </td>\n");
 	fprintf(opf, "<td> %ld [%s] </td></tr>\n", stats_network.maxchans,
 		sftime(stats_network.t_chans));
 	fprintf(opf, "<tr><td>Current Opers: </td>\n");
-	fprintf(opf, "<td> %i </td>\n", stats_network.opers);
+	fprintf(opf, "<td> %i </td>\n", (int)stats_network.opers);
 	fprintf(opf, "<td>Maximum Opers: </td>\n");
-	fprintf(opf, "<td> %i [%s] </td></tr>\n", stats_network.maxopers,
+	fprintf(opf, "<td> %i [%s] </td></tr>\n", (int)stats_network.maxopers,
 		sftime(stats_network.t_maxopers));
 	fprintf(opf, "<td>Current Servers: </td>\n");
-	fprintf(opf, "<td> %d </td>\n", stats_network.servers);
+	fprintf(opf, "<td> %d </td>\n", (int)stats_network.servers);
 	fprintf(opf, "<td>Maximum Servers: </td>\n");
-	fprintf(opf, "<td> %d [%s] </td>\n", stats_network.maxservers,
+	fprintf(opf, "<td> %d [%s] </td>\n", (int)stats_network.maxservers,
 		sftime(stats_network.t_maxservers));
 	fprintf(opf, "<tr><td colspan=\"2\">Users Set Away: </td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %ld </td></tr></table>\n",
@@ -356,7 +356,7 @@ void get_dailystats()
 	fprintf(opf,
 		"<tr><td colspan=\"2\">Max Channels:</td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %-2ld</td></tr>\n",
-		daily.chans);
+		(long)daily.chans);
 	fprintf(opf, "<tr><td colspan=\"2\">Max Daily Opers: </td>\n");
 	fprintf(opf, "<td colspan=\"2\"> %-2d %s </td></tr>\n",
 		daily.opers, sftime(daily.t_opers));
@@ -589,7 +589,7 @@ void get_map(char *uplink, int level)
 				"<tr><td>%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, ss->users, ss->maxusers,
 				ss->opers, ss->maxopers, s->ping,
-				ss->highest_ping);
+				(int)ss->highest_ping);
 			get_map(s->name, level + 1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
 			/* its not the root server */
@@ -603,7 +603,7 @@ void get_map(char *uplink, int level)
 				"<tr><td>%s\\_%s</td><td>%d/%ld</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				buf, ss->name, ss->users, ss->maxusers,
 				ss->opers, ss->maxopers, s->ping,
-				ss->highest_ping);
+				(int)ss->highest_ping);
 			get_map(s->name, level + 1);
 		}
 	}

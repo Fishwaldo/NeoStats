@@ -44,7 +44,6 @@ static int ss_about(User * u, char **av, int ac);
 static int ss_server(User * u, char **av, int ac);
 static int ss_map(User *u, char **av, int ac);
 static int ss_netstats(User *u, char **av, int ac);
-static int ss_set(User *u, char **av, int ac);
 static int ss_clientversions(User * u, char **av, int ac);
 static int ss_forcehtml(User * u, char **av, int ac);
 
@@ -262,132 +261,19 @@ bot_cmd ss_commands[]=
 	{"BOTLIST",			ss_botlist,		0, 	NS_ULEVEL_OPER,		ss_help_botlist, 	 	ss_help_botlist_oneline},
 #endif																						
 	{"CLIENTVERSIONS",	ss_clientversions,0,NS_ULEVEL_OPER,		ss_help_clientversions, ss_help_clientversions_oneline},
-	{"SET",				ss_set,			1, 	NS_ULEVEL_ADMIN,	ss_help_set, 			ss_help_set_oneline},
 	{"FORCEHTML",		ss_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml, 		ss_help_forcehtml_oneline},
 	{"STATS",			ss_stats,		1, 	NS_ULEVEL_ADMIN,	ss_help_stats, 			ss_help_stats_oneline},
 	{NULL,				NULL,			0, 	0,					NULL, 					NULL}
 };
 
-static int ss_set(User * u, char **av, int ac)
+bot_setting ss_settings[]=
 {
-	if (!strcasecmp(av[2], "LIST")) {
-		prefmsg(u->nick, s_StatServ, "Current Settings are:");
-		prefmsg(u->nick, s_StatServ, "HTML Statistics: %s",
-			StatServ.html > 0 ? "Enabled" : "Disabled");
-		if (StatServ.html > 0)
-			prefmsg(u->nick, s_StatServ, "HTML Path: %s",
-				StatServ.htmlpath);
-		prefmsg(u->nick, s_StatServ,
-			"Wallop Throttling: %d (0 = Disabled)",
-			StatServ.interval);
-		prefmsg(u->nick, s_StatServ,
-			"Lag Warnings: %d (0 = Disabled)", StatServ.lag);
-		return 0;
-	} else if (!strcasecmp(av[2], "HTML")) {
-		if (StatServ.html == 0) {
-			/* its disabled, enable it */
-			if (strlen(StatServ.htmlpath) > 0) {
-				StatServ.html = 1;
-				chanalert(s_StatServ, "%s Enabled HTML output",
-					  u->nick);
-				prefmsg(u->nick, s_StatServ,
-					"HTML output is now enabled to: %s",
-					StatServ.htmlpath);
-				SetConf((void *) 1, CFGINT,
-					"HTML_Enabled");
-			} else {
-				prefmsg(u->nick, s_StatServ,
-					"Error, No Path Defined for HTML output, can not enable");
-				prefmsg(u->nick, s_StatServ, "Please see /msg %s help set",
-					s_StatServ);
-			}
-		} else {
-			/* its enabled, disable it */
-			StatServ.html = 0;
-			chanalert(s_StatServ, "%s Disabled HTML output", u->nick);
-			prefmsg(u->nick, s_StatServ, "HTML output is now disabled");
-			SetConf((void *) 0, CFGINT, "HTML_Enabled");
-		}
-		return 0;
-	} else if (!strcasecmp(av[2], "MSGTHROTTLE")) {
-		if (ac != 4) {
-			/* wrong number of arguments */
-			prefmsg(u->nick, s_StatServ,
-				"Invalid Syntax. /msg %s help set for more info",
-				s_StatServ);
-			return 0;
-		}
-		if (!strcasecmp(av[3], "off")) {
-			prefmsg(u->nick, s_StatServ, "Record Yelling is Now Disabled. ");
-			chanalert(s_StatServ, "%s disabled Record Broadcasts", u->nick);
-			StatServ.interval = -1;
-		} else {
-			StatServ.interval = atoi(av[3]);
-			/* atoi will = 0 if av[3] != isnumeric */
-			if (StatServ.interval <= 0) {
-				prefmsg(u->nick, s_StatServ, "Wallop Throttles are disabled");
-				chanalert(s_StatServ, "%s disabled Wallop Throttling",
-					  u->nick);
-				StatServ.interval = 0;
-			} else {
-				prefmsg(u->nick, s_StatServ,
-					"Wallop Throttle is now set to 5 messages per %d Seconds",
-					StatServ.interval);
-				chanalert(s_StatServ,
-					  "%s set Wallop Throttle to 5 messages per %d Seconds",
-					  u->nick, StatServ.interval);
-			}
-		}
-		SetConf((void *) StatServ.interval, CFGINT, "Wallop_Throttle");
-		return 0;
-	} else if (!strcasecmp(av[2], "HTMLPATH")) {
-		if (ac != 4) {
-			/* wrong number of params */
-			prefmsg(u->nick, s_StatServ,
-				"Invalid Syntax. /msg %s help set for more info",
-				s_StatServ);
-			return 0;
-		}
-		strlcpy(StatServ.htmlpath, av[3], 255);
-		prefmsg(u->nick, s_StatServ, "HTML path now set to %s",
-			StatServ.htmlpath);
-		chanalert(s_StatServ, "%s changed the HTML path to %s",
-			  u->nick, StatServ.htmlpath);
-		SetConf((void *) StatServ.htmlpath, CFGSTR, "HTML_Path");
-		return 0;
-	} else if (!strcasecmp(av[2], "LAGWALLOP")) {
-		if (ac != 4) {
-			/* wrong number of params */
-			prefmsg(u->nick, s_StatServ,
-				"Invalid Syntax. /msg %s help set for more info",
-				s_StatServ);
-			return 0;
-		}
-		StatServ.lag = atoi(av[3]);
-		if (StatServ.lag <= 0) {
-			prefmsg(u->nick, s_StatServ,
-				"Lag Warnings are now disabled");
-			chanalert(s_StatServ, "%s Disabled Lag Warnings",
-				  u->nick);
-		} else {
-			prefmsg(u->nick, s_StatServ,
-				"Server Lag Warnings now set to %d seconds",
-				StatServ.lag);
-			chanalert(u->nick, s_StatServ,
-				  "%s changed Server Lag Warning threshold to %d",
-				  u->nick, StatServ.lag);
-		}
-		SetConf((void *) StatServ.lag, CFGINT, "Lag");
-		return 0;
-	} else {
-		prefmsg(u->nick, s_StatServ,
-			"Invalid Syntax. /msg %s help set for more info",
-			s_StatServ);
-		return 0;
-	}
-	return 1;
-}
-
+	{"HTML",		&StatServ.html,		SET_TYPE_BOOLEAN,	0, 0,	"HTML_Enabled",		NULL,		ss_help_set },
+	{"HTMLPATH",	&StatServ.htmlpath,	SET_TYPE_STRING,	0, 0,	"HTML_Path",		NULL,		NULL },
+	{"MSGTHROTTLE",	&StatServ.interval,	SET_TYPE_INT,		1, 99,	"Wallop_Throttle",	"seconds",	NULL },
+	{"LAGWALLOP",	&StatServ.lag,		SET_TYPE_INT,		1, 99,	"Lag",				"seconds",	NULL },
+	{NULL,			NULL,				0,					0, 0,	NULL,				NULL,		NULL },
+};
 
 int topchan(const void *key1, const void *key2)
 {
@@ -702,11 +588,11 @@ static int ss_netstats(User * u, char **av, int ac)
 		stats_network.opers);
 	prefmsg(u->nick, s_StatServ, "Maximum Opers: %ld [%s]",
 		stats_network.maxopers, sftime(stats_network.t_maxopers));
-	prefmsg(u->nick, s_StatServ, "Users Set Away: %d",
+	prefmsg(u->nick, s_StatServ, "Users Set Away: %ld",
 		stats_network.away);
-	prefmsg(u->nick, s_StatServ, "Current Servers: %d",
+	prefmsg(u->nick, s_StatServ, "Current Servers: %ld",
 		stats_network.servers);
-	prefmsg(u->nick, s_StatServ, "Maximum Servers: %d [%s]",
+	prefmsg(u->nick, s_StatServ, "Maximum Servers: %ld [%s]",
 		stats_network.maxservers,
 		sftime(stats_network.t_maxservers));
 	prefmsg(u->nick, s_StatServ, "--- End of List ---");
@@ -749,8 +635,8 @@ static void makemap(char *uplink, User * u, int level)
 			/* its the root server */
 			prefmsg(u->nick, s_StatServ,
 				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
-				ss->name, ss->users, ss->maxusers,
-				ss->opers, ss->maxopers, s->ping,
+				ss->name, ss->users, (int)ss->maxusers,
+				ss->opers, ss->maxopers, (long)s->ping,
 				ss->highest_ping);
 			makemap(s->name, u, level + 1);
 		} else if ((level > 0) && !strcasecmp(uplink, s->uplink)) {
@@ -761,8 +647,8 @@ static void makemap(char *uplink, User * u, int level)
 			}
 			prefmsg(u->nick, s_StatServ,
 				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %ld/%ld ]",
-				buf, ss->name, ss->users, ss->maxusers,
-				ss->opers, ss->maxopers, s->ping,
+				buf, ss->name, ss->users, (int)ss->maxusers,
+				ss->opers, ss->maxopers, (long)s->ping,
 				ss->highest_ping);
 			makemap(s->name, u, level + 1);
 		}
@@ -828,7 +714,7 @@ static int ss_server(User * u, char **av, int ac)
 			sftime(ss->lastseen));
 	if (s)
 		prefmsg(u->nick, s_StatServ,
-			"Current Users: %-3ld (%2.0f%%)", ss->users,
+			"Current Users: %-3ld (%2.0f%%)", (long)ss->users,
 			(float) ss->users / (float) stats_network.users *
 			100);
 	prefmsg(u->nick, s_StatServ, "Maximum Users: %-3ld at %s",
@@ -837,15 +723,15 @@ static int ss_server(User * u, char **av, int ac)
 		ss->totusers);
 	if (s)
 		prefmsg(u->nick, s_StatServ, "Current Opers: %-3ld",
-			ss->opers);
+			(long)ss->opers);
 	prefmsg(u->nick, s_StatServ, "Maximum Opers: %-3ld at %s",
-		ss->maxopers, sftime(ss->t_maxopers));
+		(long)ss->maxopers, sftime(ss->t_maxopers));
 	prefmsg(u->nick, s_StatServ, "IRCop Kills: %d", ss->operkills);
 	prefmsg(u->nick, s_StatServ, "Server Kills: %d", ss->serverkills);
 	prefmsg(u->nick, s_StatServ, "Lowest Ping: %-3d at %s",
-		ss->lowest_ping, sftime(ss->t_lowest_ping));
+		(int)ss->lowest_ping, sftime(ss->t_lowest_ping));
 	prefmsg(u->nick, s_StatServ, "Higest Ping: %-3d at %s",
-		ss->highest_ping, sftime(ss->t_highest_ping));
+		(int)ss->highest_ping, sftime(ss->t_highest_ping));
 	if (s)
 		prefmsg(u->nick, s_StatServ, "Current Ping: %-3d",
 			s->ping);
@@ -904,21 +790,16 @@ static int ss_operlist(User * u, char **av, int ac)
 	char *server;
 
 	SET_SEGV_LOCATION();
-	if (ac < 2) {
-		prefmsg(u->nick, s_StatServ, "OperList Syntax Not Valid");
-		prefmsg(u->nick, s_StatServ, "For Help: /msg %s HELP OPERLIST", s_StatServ);
-		return 0;
-	}
-	flags = av[2];
-	server = av[3];
 
-	if (!flags) {
+	if (ac == 2) {
 		prefmsg(u->nick, s_StatServ, "On-Line IRCops:");
 		prefmsg(u->nick, s_StatServ, "ID  %-15s %-15s %-10s", "Nick", "Server",
 			"Level");
 		chanalert(s_StatServ, "%s Requested OperList", u->nick);
 	}
 
+	flags = av[2];
+	server = av[3];
 	if (flags && !strcasecmp(flags, "NOAWAY")) {
 		away = 1;
 		flags = NULL;
@@ -1005,11 +886,6 @@ static int ss_stats(User * u, char **av, int ac)
 	cmd = av[2];
 	arg = av[3]; 
 	arg2 = av[4];
-	if (!cmd) {
-		prefmsg(u->nick, s_StatServ, "Syntax: /msg %s STATS [DEL|LIST|COPY]", s_StatServ);
-		prefmsg(u->nick, s_StatServ, "For additional help, /msg %s HELP", s_StatServ);
-		return 0;
-	}
 	if (!strcasecmp(cmd, "LIST")) {
 		int i = 1;
 		prefmsg(u->nick, s_StatServ, "Statistics Database:");
