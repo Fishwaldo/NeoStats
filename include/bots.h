@@ -35,5 +35,6 @@ EXPORTFUNC void bot_private (char *origin, char **av, int ac);
 EXPORTFUNC void bot_notice (char *origin, char **av, int ac);
 EXPORTFUNC void bot_chan_private (char *origin, char **av, int ac);
 EXPORTFUNC void bot_chan_notice (char *origin, char **av, int ac);
+void handle_dead_channel (Channel *c);
 
 #endif /* _BOTS_H_ */

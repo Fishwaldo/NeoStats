@@ -200,7 +200,7 @@ void del_chan_user (Channel *c, Client *u)
 	} else {
 		lnode_destroy (list_delete (u->user->chans, un));
 	}
-	dlog(DEBUG3, "del_chan_user: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+	dlog(DEBUG3, "del_chan_user: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 	if (c->users <= 0) {
 		del_chan (c);
 	}
@@ -428,7 +428,7 @@ join_chan (const char* nick, const char *chan)
 	}
 	SendAllModuleEvent (EVENT_JOIN, cmdparams);
 	ns_free (cmdparams);
-	dlog(DEBUG3, "join_chan: cur users %s %ld (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
+	dlog(DEBUG3, "join_chan: cur users %s %d (list %d)", c->name, c->users, (int)list_count (c->chanmembers));
 }
 
 /** @brief Dump Channel information
