@@ -182,25 +182,6 @@ send_cmode (const char *source, const char *who, const char *chan, const char *m
 	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
 }
 
-/* m_nick
- *  argv[0] = nickname
- * if from new client
- *  argv[1] = nick password
- * if from server:
- *  argv[1] = hopcount
- *  argv[2] = timestamp
- *  argv[3] = username
- *  argv[4] = hostname
- *  argv[5] = servername
- * if NICK version 1:
- *  argv[6] = servicestamp
- *  argv[7] = info
- * if NICK version 2:
- *  argv[6] = servicestamp
- *  argv[7] = umodes
- *  argv[8] = virthost, * if none
- *  argv[9] = info
- */
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
@@ -229,12 +210,6 @@ void
 send_pong (const char *reply)
 {
 	send_cmd ("%s %s", MSG_PONG, reply);
-}
-
-void
-send_netinfo (const char* from, const int prot, const char* cloak, const char* netname, const unsigned long ts)
-{
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", from, MSG_NETINFO, ts, prot, cloak, netname);
 }
 
 void 
@@ -331,49 +306,21 @@ m_vhost (char *origin, char **argv, int argc, int srv)
 	do_vhost (origin, argv[0]);
 }
 
-/* m_nick
- *  argv[0] = nickname
- * if from new client
- *  argv[1] = nick password
- * if from server:
- *  argv[1] = hopcount
- *  argv[2] = timestamp
- *  argv[3] = username
- *  argv[4] = hostname
- *  argv[5] = servername
- * if NICK version 1:
- *  argv[6] = servicestamp
- *  argv[7] = info
- * if NICK version 2:
- *  argv[6] = servicestamp
- *  argv[7] = umodes
- *  argv[8] = virthost, * if none
- *  argv[9] = info
- */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
-	if(!srv) {
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			NULL, argv[6], NULL, NULL, argv[9], NULL, NULL);
-	} else {
-		do_nickchange (origin, argv[0], NULL);
-	}
+	do_nickchange (origin, argv[0], NULL);
 }
 
 /* m_topic
- *  argv[0] = topic text
- * For servers using TS:
  *  argv[0] = channel name
- *  argv[1] = topic nickname
- *  argv[2] = topic time
- *  argv[3] = topic text
+ *  argv[1] = topic text
  */
-/* TOPIC #channel owner TS :topic */
+/* TOPIC #channel :topic */
 static void
 m_topic (char *origin, char **argv, int argc, int srv)
 {
-	do_topic (argv[0], argv[1], argv[2], argv[3]);
+	do_topic (argv[0], NULL, NULL, argv[1]);
 }
 
 /* m_kick
