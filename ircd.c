@@ -1730,12 +1730,12 @@ do_svinfo (void)
 void 
 do_vctrl (const char* uprot, const char* nicklen, const char* modex, const char* gc, const char* netname)
 {
-	ircd_srv.uprot = uprot;
-	ircd_srv.nicklen = nicklen;
-	ircd_srv.modex = modex;
-	ircd_srv.gc = gc;
+	ircd_srv.uprot = atoi(uprot);
+	ircd_srv.nicklen = atoi(nicklen);
+	ircd_srv.modex = atoi(modex);
+	ircd_srv.gc = atoi(gc);
 	strlcpy (me.netname, netname, MAXPASS);
-	send_vctrl (ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc);
+	send_vctrl (ircd_srv.uprot, ircd_srv.nicklen, ircd_srv.modex, ircd_srv.gc, me.netname);
 }
 #endif
 
