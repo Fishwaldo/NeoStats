@@ -40,58 +40,56 @@ typedef struct htmlfunc {
 	htmlhandler handler;
 }htmlfunc;
 
-FILE *opf;
+static void html_map (void);
+static void html_srvlist (void);
+static void html_srvlistdet (void);
+static void html_netstats (void);
+static void html_dailystats (void);
+static void html_weeklystats (void);
+static void html_monthlystats (void);
+static void html_chantop10 (void);
+static void html_chantop10eva (void);
+static void html_unwelcomechan (void);
+static void html_chantops (void);
+static void html_tldmap (void);
+static void html_version (void);
+static void html_title (void);
+static void html_clientstats (void);
 
-const char html_template[]="data/index.tpl";
+static FILE *opf;
+static const char html_template[]="data/index.tpl";
 
-void html_map (void);
-void get_srvlist (void);
-void get_srvlistdet (void);
-void get_netstats (void);
-void get_dailystats (void);
-void get_weeklystats (void);
-void get_monthlystats (void);
-void get_chantop10 (void);
-void get_chantop10eva (void);
-void get_unwelcomechan (void);
-void get_chantops (void);
-void HTMLTLDMap (void);
-void get_version (void);
-void get_title (void);
-void get_clientstats (void);
-
-
-htmlfunc htmlfuncs[]=
+static htmlfunc htmlfuncs[]=
 {
 	{"!MAP!", html_map},
-	{"!SRVLIST!", get_srvlist},
-	{"!SRVLISTDET!", get_srvlistdet},
-	{"!NETSTATS!", get_netstats},
-	{"!DAILYSTATS!", get_dailystats},
-	{"!WEEKLYSTATS!", get_weeklystats},
-	{"!MONTHLYSTATS!", get_monthlystats},
-	{"!DAILYTOPCHAN!", get_chantop10},
-	{"!TOP10CHAN!", get_chantop10eva},
-	{"!TOP10KICKS!", get_unwelcomechan},
-	{"!TOP10TOPICS!", get_chantops},
-	{"!TLDMAP!", HTMLTLDMap},
-	{"!VERSION!", get_version},
-	{"!TITLE!", get_title},
-	{"!CLIENTSTATS!", get_clientstats},
+	{"!SRVLIST!", html_srvlist},
+	{"!SRVLISTDET!", html_srvlistdet},
+	{"!NETSTATS!", html_netstats},
+	{"!DAILYSTATS!", html_dailystats},
+	{"!WEEKLYSTATS!", html_weeklystats},
+	{"!MONTHLYSTATS!", html_monthlystats},
+	{"!DAILYTOPCHAN!", html_chantop10},
+	{"!TOP10CHAN!", html_chantop10eva},
+	{"!TOP10KICKS!", html_unwelcomechan},
+	{"!TOP10TOPICS!", html_chantops},
+	{"!TLDMAP!", html_tldmap},
+	{"!VERSION!", html_version},
+	{"!TITLE!", html_title},
+	{"!CLIENTSTATS!", html_clientstats},
 	{NULL, NULL},
 };
 
-void get_title()
+static void html_title (void)
 {
 	fprintf (opf, "Network Statistics for %s", me.netname);
 }
 
-void get_version()
+static void html_version (void)
 {
 	fputs (me.version, opf);
 }
 
-void put_copyright()
+void put_copyright (void)
 {
 	fprintf (opf, "<br><br><center>Statistics last updated at %s<br>", sftime(time(NULL)));
 	fprintf (opf, "<b>StatServ Information:</b>\n");
@@ -102,7 +100,7 @@ void put_copyright()
 	fprintf (opf, "</center></html>\n");
 }
 
-void get_srvlist()
+static void html_srvlist (void)
 {
 	serverstat *ss;
 	hscan_t hs;
@@ -119,7 +117,7 @@ void get_srvlist()
 	fprintf (opf, "</table>");
 }
 
-void get_srvlistdet()
+static void html_srvlistdet (void)
 {
 	serverstat *ss;
 	hscan_t hs;
@@ -159,7 +157,7 @@ void get_srvlistdet()
 	fprintf (opf, "</table>");
 }
 
-void get_netstats()
+static void html_netstats (void)
 {
 
 	fprintf (opf, "<table border = 0>");
@@ -196,7 +194,7 @@ void get_netstats()
 	fprintf (opf, "<td colspan=\"3\">%ld</td></tr></table>\n", me.awaycount);
 }
 
-void get_dailystats()
+static void html_dailystats (void)
 {
 	fprintf (opf, "<table border = 0>");
 	fprintf (opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n");
@@ -231,7 +229,7 @@ void get_dailystats()
 	fprintf (opf, "</tr></table>\n");
 }
 
-void get_weeklystats()
+static void html_weeklystats (void)
 {
 	fprintf (opf, "<table border = 0>");
 	fprintf (opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n");
@@ -266,7 +264,7 @@ void get_weeklystats()
 	fprintf (opf, "</tr></table>\n");
 }
 
-void get_monthlystats()
+static void html_monthlystats (void)
 {
 	fprintf (opf, "<table border = 0>");
 	fprintf (opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n");
@@ -301,7 +299,7 @@ void get_monthlystats()
 	fprintf (opf, "</tr></table>\n");
 }
 
-void get_chantop10()
+static void html_chantop10 (void)
 {
 	channelstat *cs;
 	lnode_t *cn;
@@ -327,7 +325,7 @@ void get_chantop10()
 	fprintf (opf, "</table>");
 }
 
-void get_chantop10eva()
+static void html_chantop10eva (void)
 {
 	channelstat *cs;
 	lnode_t *cn;
@@ -351,7 +349,7 @@ void get_chantop10eva()
 	}
 	fprintf (opf, "</table>");
 }
-void get_clientstats()
+static void html_clientstats (void)
 {
 	ctcpversionstat *cv;
 	lnode_t *cn;
@@ -376,14 +374,14 @@ void HTMLTLDReport (TLD *tld, void *v)
 		tld->tld, tld->country, tld->users.current, tld->users.daily.runningtotal, tld->users.weekly.runningtotal, tld->users.monthly.runningtotal, tld->users.alltime.runningtotal);
 }
 
-void HTMLTLDMap (void)
+static void html_tldmap (void)
 {
 	fprintf (opf, "<table border = 0><tr><th>tld</th><th>Country</th><th>Current</th><th>Day</th><th>Week</th><th>Month</th><th>All Time</th></tr>");
 	GetTLDStats (HTMLTLDReport, NULL);
 	fprintf (opf, "</table>");
 }
 
-void get_unwelcomechan()
+static void html_unwelcomechan (void)
 {
 	channelstat *cs;
 	lnode_t *cn;
@@ -402,14 +400,14 @@ void get_unwelcomechan()
 			continue;
 		}
 		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
-			cs->name, cs->kicks);
+			cs->name, cs->kicks.alltime.runningtotal);
 		cn = list_next(channelstatlist, cn);
 	}
 	fprintf (opf, "</table>");
 
 }
 
-void get_chantops()
+static void html_chantops (void)
 {
 	channelstat *cs;
 	lnode_t *cn;
@@ -428,7 +426,7 @@ void get_chantops()
 			continue;
 		}
 		fprintf (opf, "<tr><td>%s</td><td align=right>%ld</td></tr>\n",
-			cs->name, cs->topics);
+			cs->name, cs->topics.alltime.runningtotal);
 		cn = list_next(channelstatlist, cn);
 	}
 	fprintf (opf, "</table>");
@@ -471,7 +469,7 @@ void get_map(char *uplink, int level)
 	}
 }
 
-void html_map()
+static void html_map (void)
 {
 	get_map("", 0);
 	fputs ("</TABLE>\n", opf);
