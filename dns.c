@@ -13,7 +13,9 @@
 /* this file does the dns checking for adns. it provides a callback mechinism for dns lookups
 ** so that DNS lookups will not block. It uses the adns libary (installed in the adns directory
 */
-
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "stats.h"
 #include <adns.h>
 
@@ -44,6 +46,7 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 	lnode_t *dnsnode;
 	DnsLookup *dnsdata;
 	int status;
+	struct sockaddr_in sa;
 
 	if (list_isfull(dnslist)) {
 #ifdef DEBUG
@@ -58,7 +61,13 @@ int dns_lookup(char *str, adns_rrtype type,  void (*callback)(char *data, adns_a
 	}
 	strncpy(dnsdata->data, data, 254);
 	dnsdata->callback = callback;
-	status = adns_submit(ads, str, type, adns_qf_owner|adns_qf_usevc|adns_qf_cname_loose, NULL, &dnsdata->q);
+	if (type == adns_r_ptr) {
+		sa.sin_family = AF_INET;
+		sa.sin_addr.s_addr = inet_addr(str);
+		status = adns_submit_reverse(ads, (const struct sockaddr*)&sa, type, adns_qf_owner|adns_qf_usevc|adns_qf_cname_loose, NULL, &dnsdata->q);
+	} else {
+		status = adns_submit(ads, str, type, adns_qf_owner|adns_qf_usevc|adns_qf_cname_loose, NULL, &dnsdata->q);
+	}
 	if (status) {
 #ifdef DEBUG
 		log("DNS: adns_submit error: %s", strerror(status));
