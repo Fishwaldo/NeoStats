@@ -4,6 +4,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Fix up a problem with exclude lists (F)
  - Fix up a problem with NICKIP issues on Unreal 3.2.0 (BugID 180) (F)
  - Fix up server admin flag for Bahamut reported by Ashen (F)
+ - Display full path to config file when a error occurs (F)
 
 * NeoStats * Fish (F) * Version 2.5.18
  - Fix a crash in message parsing functions (F)
