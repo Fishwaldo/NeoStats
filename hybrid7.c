@@ -62,7 +62,7 @@ static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(H)";
 const char services_bot_modes[]= "+o";
-static const long services_bot_umode= 0;
+static long services_bot_umode= 0;
 
 /* this is the command list and associated functions to run */
 IntCommands cmd_list[] = {

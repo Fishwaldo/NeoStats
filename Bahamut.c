@@ -67,7 +67,7 @@ static char ircd_buf[BUFSIZE];
 
 const char ircd_version[] = "(B)";
 const char services_bot_modes[]= "+oS";
-static const long services_bot_umode= 0;
+static long services_bot_umode= 0;
 
 IntCommands cmd_list[] = {
 	/* Command      Function                srvmsg */

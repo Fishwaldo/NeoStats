@@ -85,7 +85,7 @@ const char services_bot_modes[]= "+oS";
 const char ircd_version[] = "(UL3)";
 const char services_bot_modes[]= "+oS";
 #endif
-static const long services_bot_umode= 0;
+static long services_bot_umode= 0;
 
 IntCommands cmd_list[] = {
 	/* Command      Token          Function       srvmsg */
