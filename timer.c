@@ -70,7 +70,7 @@ is_midnight (void)
 {
 	struct tm *ltm = localtime (&me.now);
 
-	if (ltm->tm_hour == 0)
+	if (ltm->tm_hour == 0 && ltm->tm_min == 0)
 		return 1;
 
 	return 0;
