@@ -246,7 +246,7 @@
 #define UMODE_EXTERNAL     0x1000 /* show servers introduced and splitting */
 #define UMODE_CALLERID     0x4000 /* block unless caller id's */
 #define UMODE_UNAUTH       0x8000 /* show unauth connects here */
-#define UMODE_LOCOPS       0x10000 /* show locops */
+#define UMODE_LOCOP       0x10000 /* show locops */
 #define UMODE_OPER         0x20000 /* Operator */
 #define UMODE_ADMIN        0x40000 /* Admin on server */
  

@@ -240,7 +240,7 @@
 #define UMODE_CALLERID	0x0040	/* client has callerid enabled */
 #define UMODE_INVISIBLE 0x0080	/* client has +i flag */
 #define UMODE_SKILL	0x0100	/* client see's server kills */
-#define UMODE_LOCOPS	0x0200	/* client is localop */
+#define UMODE_LOCOP	0x0200	/* client is localop */
 #define UMODE_NCHANGE	0x0400	/* client can see nick change notices */
 #define UMODE_REJ	0x0800	/* client is registered */
 #define UMODE_SERVNOTICE	0x1000	/* client can see server notices */

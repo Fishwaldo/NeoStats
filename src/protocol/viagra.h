@@ -197,8 +197,8 @@
 #define	UMODE_OPER       	0x0002	/* Operator */
 #define UMODE_REGONLY		0x0010	/* only registered nicks may PM */
 #define UMODE_REGNICK	 	0x0020	/* Nick set by services as registered */
-#define UMODE_SERVADMIN		0x0040	/* server admin */
-#define UMODE_SERVICESADMIN	0x0080	/* Marks the client as a Services Administrator */
+#define UMODE_ADMIN		0x0040	/* server admin */
+#define UMODE_SADMIN	0x0080	/* Marks the client as a Services Administrator */
 #define UMODE_HIDE              0x8000  /* cloak host*/
 #define	UMODE_WALLOP     	0x0004	/* send wallops to them */
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */

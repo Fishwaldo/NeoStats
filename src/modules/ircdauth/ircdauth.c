@@ -62,14 +62,48 @@ ModuleInfo module_info = {
 };
 
 UserAuthModes user_auth_modes[] = {
+#ifdef UMODE_DEBUG
+	{"Debug",			UMODE_DEBUG, NS_ULEVEL_ROOT},
+#endif
+#ifdef UMODE_TECHADMIN
+	{"Technical admin",	UMODE_TECHADMIN, NS_ULEVEL_ADMIN},
+#endif
+#ifdef UMODE_SERVICESOPER
+	{"Services operator",	UMODE_SERVICESOPER, NS_ULEVEL_OPER},
+#endif
+#ifdef UMODE_IRCADMIN
+	{"IRC admin",		UMODE_IRCADMIN, NS_ULEVEL_OPER},
+#endif
+#ifdef UMODE_SUPER
+	{"Super",			UMODE_SUPER, NS_ULEVEL_OPER},
+#endif
+#ifdef UMODE_SRA
+	{"Services root",	UMODE_SRA, NS_ULEVEL_ROOT},
+#endif
+#ifdef UMODE_SERVICES
 	{"Services",		UMODE_SERVICES,	NS_ULEVEL_ROOT},
+#endif
+#ifdef UMODE_NETADMIN
 	{"Network admin",	UMODE_NETADMIN,	NS_ULEVEL_ADMIN},
+#endif
+#ifdef UMODE_SADMIN
 	{"Services admin",	UMODE_SADMIN,	NS_ULEVEL_ADMIN},
+#endif
+#ifdef UMODE_ADMIN
 	{"Server admin",	UMODE_ADMIN,	NS_ULEVEL_OPER},
+#endif
+#ifdef UMODE_COADMIN
 	{"Co-admin",		UMODE_COADMIN,	NS_ULEVEL_OPER},
+#endif
+#ifdef UMODE_OPER
 	{"IRC operator",	UMODE_OPER,		NS_ULEVEL_OPER},
+#endif
+#ifdef UMODE_LOCOP
 	{"Local operator",	UMODE_LOCOP,	NS_ULEVEL_LOCOPER},
+#endif
+#ifdef UMODE_REGNICK
 	{"Registered nick",	UMODE_REGNICK,	NS_ULEVEL_REG},
+#endif
 };
 
 const int user_auth_mode_count = ((sizeof (user_auth_modes) / sizeof (user_auth_modes[0])));

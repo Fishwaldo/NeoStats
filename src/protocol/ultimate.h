@@ -483,7 +483,7 @@
 #define UMODE_SADMIN	0x2000000	/* Marks the client as a Services Administrator */
 #define UMODE_WATCHER		0x4000000	/* Recive Monitor Globals */
 #define UMODE_NETMON		0x8000000	/* Marks the client as an Network Monitor */
-#define UMODE_SERVADMIN		0x10000000	/* Marks the client as a Server Admin */
+#define UMODE_SADMIN		0x10000000	/* Marks the client as a Server Admin */
 #define UMODE_TECHADMIN		0x20000000	/* Marks the client as a Technical Admin */
 #endif
 

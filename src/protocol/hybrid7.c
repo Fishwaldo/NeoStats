@@ -105,7 +105,7 @@ UserModes user_umodes[] = {
 	{UMODE_DEBUG, 'd', NS_ULEVEL_ROOT},
 	{UMODE_ADMIN, 'a', NS_ULEVEL_ADMIN},
 	{UMODE_OPER, 'o', NS_ULEVEL_OPER},
-	{UMODE_LOCOPS, 'l', NS_ULEVEL_OPER},
+	{UMODE_LOCOP, 'l', NS_ULEVEL_OPER},
 	{UMODE_BOTS, 'b', 0},
 	{UMODE_CCONN, 'c', 0},
 	{UMODE_FULL, 'f', 0},
