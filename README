@@ -683,14 +683,21 @@ fixed or your suggestion implemented in the latest version. We are not
 able to provide support for older versions of NeoStats than the current 
 release. 
 
-We provide no support for CVS snapshots whether released on the web site 
-or not. If you have downloaded a CVS snapshot and are having problems, 
+We provide no support for SVN snapshots whether released on the web site 
+or not. If you have downloaded a SVN snapshot and are having problems, 
 you should revert back to your previous working version or if this is 
 your first installation, the current release build as indicated on the 
-web site. Please do not contact us about problems with CVS versions. We 
-will advise users occasionally to try a CVS snapshot to fix a problem, 
-but as we do not put our CVS versions through extensive testing, there 
+web site. Please do not contact us about problems with SVN versions. We 
+will advise users occasionally to try a SVN snapshot to fix a problem, 
+but as we do not put our SVN versions through extensive testing, there 
 might be new bugs or problems. 
+
+We may occasionally provide a custom modification to resolve a problem. 
+Other than in this event, we provide no support for modified versions of 
+NeoStats. If you have modified NeoStats in any way and experience problems, 
+you should only contact us if you can reproduce the problem with an
+unmodified version. We are not able to support modifications to NeoStats
+made by others. 
 
 Before contacting us with a problem or a bug, please make sure you have 
 read all the documentation provided. You should then check the web site 
