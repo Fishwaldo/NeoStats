@@ -369,7 +369,7 @@ struct me {
  *  
  */
 typedef struct Ban {
-	char type;
+	char type[8];
 	char user[MAXUSER];
 	char host[MAXHOST];
 	char mask[MAXHOST];

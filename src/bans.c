@@ -57,7 +57,8 @@ void AddBan(const char* type, const char* user, const char* host, const char* ma
 	if(!ban) {
 		return;
 	}
-	ban->type = type[0];
+	ban->type[0] = type[0];
+	ban->type[1] = 0;
 	strlcpy(ban->user, user, MAXUSER);
 	strlcpy(ban->host, host, MAXHOST);
 	strlcpy(ban->mask, mask, MAXHOST);
@@ -155,7 +156,7 @@ COLDEF neo_banscols[] = {
 		"bans",
 		"type",
 		RTA_STR,
-		1,
+		8,
 		offsetof(struct Ban, type),
 		RTA_READONLY,
 		NULL,
