@@ -2,8 +2,8 @@ include ../../Makefile.inc
 
 INCLUDES = -I../.. -Iares/ -I../../adns
 
-SOURCES= opsb.c
-OBJECTS= opsb.o 
+SOURCES= opsb.c proxy.c
+OBJECTS= opsb.o proxy.o
 TARGET= opsb.so
 
 all:	opsb
@@ -27,4 +27,5 @@ install: spam
 
 
 $(OBJECTS): Makefile
-opsb.o:		opsb.c	
+opsb.o:		opsb.c		opsb.h
+proxy.o:	proxy.c		opsb.h

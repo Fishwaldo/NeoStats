@@ -1,3 +1,11 @@
+/* NetStats - IRC Statistical Services Copyright (c) 1999 Adam Rutter,
+** Justin Hammond http://codeworks.kamserve.com
+*
+** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
+*
+** NetStats CVS Identification
+** $Id: opsb.c,v 1.8 2002/08/22 07:57:37 fishwaldo Exp $
+*/
 
 
 #include <stdio.h>
@@ -9,6 +17,8 @@
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
 
+const char opsbversion_date[] = __DATE__;
+const char opsbversion_time[] = __TIME__;
 
 
 
@@ -16,13 +26,13 @@
 void reportdns(char *data, adns_answer *a);
 void dnsblscan(char *data, adns_answer *a);
 
+int startscan(scaninfo *scandata);
 void do_ban(scaninfo *scandata);
-void start_proxy_scan(lnode_t *scannode);
 
 Module_Info my_info[] = { {
 	"OPSB",
 	"A Open Proxy Scanning Bot",
-	"$Revision: 1.7 $"
+	"$Revision: 1.8 $"
 } };
 
 
@@ -375,14 +385,17 @@ void _init() {
 
 	/* we don't want to use more than half the available socks */
 	if (MAX_SCANS > me.maxsocks / 2)
-		opsbl = list_create(maxsocks /2);
+		opsbl = list_create(me.maxsocks /2);
 	else 
 		opsbl = list_create(MAX_SCANS);
 	
 	/* queue can be anything we want */
 	opsbq = list_create(MAX_QUEUE);
 	sprintf(opsb.opmdomain, "%s", "opm.blitzed.org");
-
+	sprintf(opsb.targethost, "%s", "202.56.138.231");
+	opsb.targetport = 6667;
+	opsb.maxbytes = 500;
+	snprintf(opsb.lookforstring, 512, "*** Looking up your hostname...");
 }
 
 
@@ -393,7 +406,4 @@ void _fini() {
 
 void do_ban(scaninfo *scandata) {
 	chanalert(s_opsb, "Banning %s", scandata->who);
-}
-void start_proxy_scan(lnode_t *scannode) {
-	chanalert(s_opsb, "Starting proxy scan on");
 }
