@@ -128,9 +128,6 @@ UserModes user_umodes[] = {
 	{UMODE_HIDE,		'x', 0},
 #ifdef NEFARIOUS
 	{UMODE_SETHOST,		'h', 0},
-#else
-	/* Afternet extension */
-	{UMODE_HELPER,		'h', 0},
 #endif
 };
 
