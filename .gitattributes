@@ -73,6 +73,11 @@ dl/operlog/ChangeLog -text
 dl/operlog/Makefile -text
 dl/operlog/ol_help.c -text
 dl/operlog/operlog.c -text
+dl/operme/ChangeLog -text
+dl/operme/Makefile -text
+dl/operme/README -text
+dl/operme/om_help.c -text
+dl/operme/operme.c -text
 dl/spam/Makefile -text
 dl/spam/spam.c -text
 dl/statserv/ChangeLog -text
