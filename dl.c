@@ -821,22 +821,6 @@ bot_message (char *origin, char **av, int ac)
 		return;
 	}
 
-#if 0
-	/* Trap CTCP commands and silently drop them to avoid unknown command errors 
-	 * Why bother? Well we might be able to use some of them in the future
-	 * so this is mainly a test and we may want to pass some of this onto
-	 * SecureServ for a quick trojan check so log attempts to give an indication 
-	 * of usage.
-	 */
-	if (av[1][0] == '\1') {
-		char* buf;
-		buf = joinbuf(av, ac, 1);
-		nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", origin, buf);
-		free(buf);
-		return;
-	}
-#endif
-
 	u = finduser (origin);
 
 	if (flood (u)) {
@@ -858,6 +842,19 @@ bot_message (char *origin, char **av, int ac)
 			mod_usr->function (origin, av, ac);
 		}
 		else {
+			/* Trap CTCP commands and silently drop them to avoid unknown command errors 
+			* Why bother? Well we might be able to use some of them in the future
+			* so this is mainly a test and we may want to pass some of this onto
+			* SecureServ for a quick trojan check so log attempts to give an indication 
+			* of usage.
+			*/
+			if (av[1][0] == '\1') {
+				char* buf;
+				buf = joinbuf(av, ac, 1);
+				nlog (LOG_NORMAL, LOG_MOD, "%s requested CTCP %s", origin, buf);
+				free(buf);
+				return;
+			}
 			if (!u) {
 				nlog (LOG_WARNING, LOG_CORE, "Unable to finduser %s (%s)", origin, mod_usr->nick);
 			} else {
