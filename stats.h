@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.h,v 1.69 2003/03/06 11:18:12 fishwaldo Exp $
+** $Id: stats.h,v 1.70 2003/04/03 14:36:37 fishwaldo Exp $
 */
 
 #ifndef STATS_H
@@ -59,6 +59,7 @@
 #else
 #error Error, you must select a IRCD to use. See ./configure --help for more information
 #endif
+
 
 
 /* Define this to enable Recived Line Logging - Only enable if Coders ask you to! */

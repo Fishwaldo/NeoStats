@@ -10,8 +10,7 @@ Shmad:
 
 Fish:
 -----
-
-Somehow connectserv on NeoIRCd thinks people are opering up (0.9.6) but not
+Bind sockets to a IP address
 
 
 fnmatch is Baaaad news... find a good ircmatch function and port it over... 

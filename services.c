@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: services.c,v 1.49 2003/01/30 11:49:55 fishwaldo Exp $
+** $Id: services.c,v 1.50 2003/04/03 14:36:36 fishwaldo Exp $
 */
  
 #include "stats.h"
@@ -343,9 +343,9 @@ static void ns_logs(User *u)
 
 	strcpy(segv_location, "ns_logs");
 
-	fp = fopen("logs/stats.log", "r");
+	fp = fopen("logs/neostats.log", "r");
 	if (!fp) {
-		prefmsg(u->nick, s_Services, "Unable to open stats.log");
+		prefmsg(u->nick, s_Services, "Unable to open neostats.log");
 		return;
 	}
 	while (fgets(buf, sizeof(buf), fp)) {
@@ -470,7 +470,7 @@ static void ns_version(User *u)
 {
 	strcpy(segv_location, "ns_version");
 		prefmsg(u->nick, s_Services, "\2NeoStats Version Information\2");
-		prefmsg(u->nick, s_Services, "NeoStats Version: %s", version);
+		prefmsg(u->nick, s_Services, "NeoStats Version: %d.%d.%d%s", MAJOR, MINOR, REV, version);
 		prefmsg(u->nick, s_Services, "http://www.neostats.net");
 }
 

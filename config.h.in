@@ -134,5 +134,11 @@
 /* define if you want to enable Raw */
 #undef USE_RAW
 
-/* define if you want to use bignet support */
-#undef BIGNET
+/* Major Version */
+#undef MAJOR
+
+/* Minor Version */
+#undef MINOR
+
+/* Revision Version */
+#undef REV

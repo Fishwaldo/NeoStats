@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.113 2003/03/06 11:18:12 fishwaldo Exp $
+** $Id: ircd.c,v 1.114 2003/04/03 14:36:36 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -888,7 +888,7 @@ void Usr_Stats(char *origin, char **argv, int argc) {
 }
 
 void Usr_Version(char *origin, char **argv, int argc) {
-	snumeric_cmd(351, origin, "%s :%s -> %s %s", version, me.name, version_date, version_time); 
+	snumeric_cmd(351, origin, "%d.%d.%d%s :%s -> %s %s", MAJOR, MINOR, REV, version, me.name, version_date, version_time); 
 }
 void Usr_ShowMOTD(char *origin, char **argv, int argc) {
 	ShowMOTD(origin);
@@ -1342,7 +1342,7 @@ static void ShowMOTD(char *nick)
     char buf[BUFSIZE];
 
     snumeric_cmd(375, nick, ":- %s Message of the Day -", me.name);
-    snumeric_cmd(372, nick, ":- %s. Copyright (c) 1999 - 2002 The NeoStats Group", version);
+    snumeric_cmd(372, nick, ":- %d.%d.%d%s. Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
     snumeric_cmd(372, nick, ":-");
 
     fp = fopen ("neostats.motd", "r");
@@ -1367,7 +1367,7 @@ static void ShowADMIN(char *nick)
     char buf[BUFSIZE];
 
     snumeric_cmd(256, nick, ":- %s NeoStats Admins -", me.name);
-    snumeric_cmd(256, nick, ":- %s.  Copyright (c) 1999 - 2002 The NeoStats Group", version);
+    snumeric_cmd(256, nick, ":- %d.%d.%d%s.  Copyright (c) 1999 - 2002 The NeoStats Group", MAJOR, MINOR, REV, version);
 
     fp = fopen ("stats.admin", "r");
 
@@ -1386,7 +1386,7 @@ static void ShowADMIN(char *nick)
 
 static void Showcredits(char *nick)
 {
-	snumeric_cmd(351, nick, ":- %s Credits ",version);
+	snumeric_cmd(351, nick, ":- NeoStats %d.%d.%d%s Credits ",MAJOR, MINOR, REV, version);
 	snumeric_cmd(351, nick, ":- Now Maintained by Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)");
 	snumeric_cmd(351, nick, ":- For Support, you can find ^Enigma^ or Shmad at");
 	snumeric_cmd(351, nick, ":- irc.irc-chat.net #NeoStats");

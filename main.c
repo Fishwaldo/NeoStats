@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c,v 1.80 2003/03/04 12:50:08 fishwaldo Exp $
+** $Id: main.c,v 1.81 2003/04/03 14:36:36 fishwaldo Exp $
 */
 
 #include <setjmp.h>
@@ -40,15 +40,15 @@ char s_Services[MAXNICK] = "NeoStats";
 
 /*! depending on what IRCD is selected, we change the version string */
 #ifdef UNREAL
-const char version[] = "NeoStats-2.5.1";
+const char version[] = "(U)";
 #elif ULTIMATE3
-const char version[] = "NeoStats-2.5.1";
+const char version[] = "(UL3)";
 #elif ULTIMATE
-const char version[] = "NeoStats-2.5.1";
+const char version[] = "(UL)";
 #elif HYBRID7
-const char version[] = "NeoStats-2.5.1";
+const char version[] = "(H)";
 #elif NEOIRCD
-const char version[] = "NeoStats-2.5.1";
+const char version[] = "(N)";
 #endif
 
 
@@ -86,7 +86,7 @@ int main()
 	me.onchan = 0;
 	if (usr_mds)
 	printf("\n\n");
-	printf("%s Loading...\n", version);
+	printf("NeoStats %d.%d.%d%s Loading...\n", MAJOR, MINOR, REV, version);
 	printf("-----------------------------------------------\n");
 	printf("Copyright: NeoStats Group. 2000-2002\n");
 	printf("Justin Hammond (fish@neostats.net)\n");
@@ -143,7 +143,7 @@ int main()
 		fprintf(fp, "%i", forked);
 		fclose(fp);
 		printf("\n");
-		printf("%s Successfully Launched into Background\n", version);
+		printf("NeoStats %d.%d.%d%s Successfully Launched into Background\n", MAJOR, MINOR, REV, version);
 		printf("PID: %i - Wrote to neostats.pid\n",forked);
 
 		return 0;
@@ -154,7 +154,7 @@ int main()
 	}
 		
 #endif
-	log("Statistics Started (%s).", version);
+	log("Statistics Started (NeoStats %d.%d.%d%s).", MAJOR, MINOR, REV, version);
 	start();
 
 	return 1;
@@ -265,7 +265,7 @@ RETSIGTYPE serv_segv() {
 		log("Approx Location: %s Backtrace:", segv_location);
 		/* Broadcast it out! */
 		globops(me.name,"Ohhh Crap, Server Terminating, Segmentation Fault. Buffer: %s, Approx Location %s", recbuf, segv_location);
-		chanalert(s_Services, "Damn IT, Server Terminating (%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", version, recbuf, segv_location);
+		chanalert(s_Services, "Damn IT, Server Terminating (%d%d%d%s), Segmentation Fault. Buffer: %s, Approx Location: %s Backtrace:", MAJOR, MINOR, REV, version, recbuf, segv_location);
 #ifdef HAVE_BACKTRACE
 		for (i = 1; i < size; i++) {
 			chanalert(s_Services, "Backtrace(%d): %s", i, strings[i]);
