@@ -221,7 +221,10 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}	
 
 	/* setup any params we must post to the server */
+#if 0
 	if (params[0] != 0) {
+#endif
+    if (params) {
 		strlcpy(newtrans->params, params, MAXURL);
 		if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_POSTFIELDS, newtrans->params)) != 0) {
 			nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);

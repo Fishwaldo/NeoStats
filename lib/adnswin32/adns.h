@@ -363,9 +363,15 @@ typedef struct {
  *  0, otherwise it will be >0.  type will always be the type
  *  requested.
  */
+/* this is called when there is a update for a socket */
+typedef void (*fd_update) (int fd, short what);
+ADNS_API void set_fdupdate(adns_state ads, fd_update func);
+
+
+
 
 ADNS_API int adns_init(adns_state *newstate_r, adns_initflags flags,
-	      FILE *diagfile /*0=>stderr*/);
+	      FILE *diagfile /*0=>stderr*/, fd_update func);
 
 ADNS_API int adns_init_strcfg(adns_state *newstate_r, adns_initflags flags,
 		     FILE *diagfile /*0=>discard*/, const char *configtext);
@@ -852,6 +858,9 @@ ADNS_API const char *adns_errtypeabbrev(adns_status st);
  * string XXX.  You MUST NOT call these functions with status values
  * not returned by the same adns library.
  */
+
+
+
 
 #ifdef __cplusplus
 } /* end of extern "C" */

@@ -273,7 +273,6 @@ int os_write( int fd, const void *buffer, unsigned int count )
 	int retval;
 
 	retval = write( fd, buffer, count );
-	printf( strerror( errno ) );
 	os_errno = errno;
 	return retval;
 }

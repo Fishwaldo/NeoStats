@@ -135,6 +135,13 @@ bufferevent_readcb(int fd, short event, void *arg)
 	(*bufev->errorcb)(bufev, what, bufev->cbarg);
 }
 
+#ifdef WIN32
+#ifndef EINPROGRESS
+#define EINPROGRESS WSAEWOULDBLOCK
+#endif
+#endif
+
+
 static void
 bufferevent_writecb(int fd, short event, void *arg)
 {

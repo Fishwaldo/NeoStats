@@ -91,6 +91,12 @@
 #ifdef HAVE_ASSERT_H
 #include <assert.h>
 #endif /* HAVE_ASSERT_H */
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif
 
 /* These macros handle DLL imports and exports for win32 module support */
 #ifdef WIN32
@@ -348,6 +354,12 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 
 #define BUFSIZE			512
 
+/* this is like a recvq setting. Going over this, we are getting flooded */
+#define LINEBUFSIZE		2048 
+
+/* this is the max data we read from a sock at once */
+#define	READBUFSIZE		4096
+
 #define MAXHOST			(128 + 1)
 #define MAXPASS			(32 + 1)
 #define MAXNICK			(32 + 1)
@@ -495,6 +507,9 @@ EXPORTVAR extern const char version_time[];
 typedef struct _Module Module;
 typedef struct _Bot Bot;
 
+/* to avoid warnings for Sock */
+struct Sock;
+
 /** @brief Server structure
  *  Client extension structure for server specifics
  */
@@ -554,7 +569,9 @@ typedef struct Client {
 	void *modvalue[NUM_MODULES];
 	int fd;
 	int port;
+	struct Sock *sock;
 } Client; 
+
 
 /** @brief me structure
  *  structure containing information about the neostats core
@@ -587,6 +604,7 @@ typedef struct tme {
 	char serviceschan[MAXCHANLEN];
 	unsigned int synched:1;
 	Client *s;
+	struct Sock *servsock;
 	int requests;
 	long SendM;
 	long SendBytes;
@@ -789,17 +807,6 @@ typedef struct bot_setting {
  */
 typedef int (*timer_handler) ( void );
 
-/** @brief Socket function types
- * 
- */
-typedef int (*sock_func) ( int sock_no, char *name );
-typedef int (*before_poll_func) ( void *data, struct pollfd * );
-typedef void (*after_poll_func) ( void *data, struct pollfd *, unsigned int );
-
-/* socket interface type */
-#define SOCK_POLL 1
-#define SOCK_STANDARD 2
-
 /* Event system flags */
 #define	EVENT_FLAG_DISABLED			0x00000001	/* Event is disabled */
 #define	EVENT_FLAG_IGNORE_SYNCH		0x00000002	/* Event triggers even if not synched */
@@ -916,6 +923,29 @@ EXPORTVAR extern int RunLevel;
 #define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
 #define GET_CUR_MODVERSION() RunModule[RunLevel]->info->version
 
+
+
+/** @brief Socket function types
+ * 
+ */
+#if 0
+typedef int (*sock_func) ( int sock_no, char *name );
+#endif
+
+/* socket interface type */
+#define SOCK_STANDARD 1
+#define SOCK_BUFFERED 2
+#define SOCK_LINEMODE 3
+#define SOCK_LISTEN 4
+#define SOCK_NATIVE 5
+
+
+#if 0
+typedef void (*linemodecb)(char *);
+#endif
+typedef int (*sockcb)(int, void *data);
+typedef int (*sockfunccb)(void *, void *, size_t);
+
 /** @brief Module socket list structure
  * 
  */
@@ -928,24 +958,46 @@ typedef struct Sock {
 	char name[MAX_MOD_NAME];
 	/** socket interface (poll or standard) type */
 	int socktype;
-	/** if socktype = SOCK_POLL, before poll function */
-	/** Socket before poll function */
-	before_poll_func beforepoll;
-	/** Socket after poll function */
-	after_poll_func afterpoll;
 	/** data */
 	void *data;
 	/* if socktype = SOCK_STANDARD, function calls */
 	/** Socket read function */
+#if 0
 	sock_func readfnc;
 	/** Socket write function */
 	sock_func writefnc;
 	/** Socket error function */
 	sock_func errfnc;
+#endif
 	/** rmsgs */
 	long rmsgs;
 	/** rbytes */
 	long rbytes;
+	/** smsgs */
+	long smsgs;
+	/** sbytes */
+	long sbytes;
+	union {
+		struct bufferevent *buffered;
+		struct event *event;
+	} event;
+	union {
+		struct linemode {
+			char *readbuf;
+			size_t readbufsize;
+			sockfunccb funccb;
+			sockcb errcb;
+			size_t recvq;
+		} linemode;
+		struct listenmode {
+			int port;
+			sockcb funccb;
+		} listenmode;
+		struct standmode {
+			sockfunccb readfunc;
+			sockcb writefunc;
+		} standmode;
+	} sfunc;		
 } Sock;
 
 typedef enum TIMER_TYPE {
@@ -1038,12 +1090,15 @@ EXPORTFUNC int SetTimerInterval( const char *timer_name, int interval );
 /* Find timer from name */
 EXPORTFUNC Timer *FindTimer( const char *timer_name );
 
-EXPORTFUNC int add_sock( const char *sock_name, int socknum, sock_func readfunc, sock_func writefunc, sock_func errfunc );
-EXPORTFUNC int add_sockpoll( const char *sock_name, void *data, before_poll_func beforepoll, after_poll_func afterpoll );
-EXPORTFUNC int del_sock( const char *sock_name );
+EXPORTFUNC Sock *add_sock (const char *sock_name, int socknum, sockfunccb readfunc, sockcb writefunc, short what, void *data, struct timeval *tv, int type);
+EXPORTFUNC int update_sock(Sock *sock, short what, short reset, struct timeval *tv);
+EXPORTFUNC int del_sock(Sock *sock);
 EXPORTFUNC Sock *find_sock( const char *sock_name );
-EXPORTFUNC int sock_connect( int socktype, unsigned long ipaddr, int port, const char *name, sock_func func_read, sock_func func_write, sock_func func_error );
+EXPORTFUNC int sock_connect (int socktype, struct in_addr ip, int port);
 EXPORTFUNC int sock_disconnect( const char *name );
+EXPORTFUNC Sock *add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb, void *data);
+EXPORTFUNC Sock *add_linemode_socket(const char *sock_name, int socknum, sockfunccb readcb, sockcb errcb, void *arg);
+EXPORTFUNC int send_to_sock(Sock *sock, const char *buf, const int buflen);
 
 /* Add a new bot to NeoStats */
 EXPORTFUNC Bot *AddBot( BotInfo *botinfo );
@@ -1188,7 +1243,7 @@ EXPORTVAR unsigned char UmodeChRegNick;
 EXPORTFUNC int IsBotMode( const char mode );
 
 /* dns.c */
-EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( char *data, adns_answer * a), char *data );
+EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void *data, adns_answer * a), void *data );
 
 /* services.c */
 EXPORTFUNC int add_services_cmd_list( bot_cmd *bot_cmd_list );

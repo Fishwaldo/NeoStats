@@ -64,7 +64,7 @@ static Client *new_user (const char *nick)
 	return u;
 }
 
-static void lookupnickip (char *data, adns_answer *a) 
+static void lookupnickip (void *data, adns_answer *a) 
 {
 	CmdParams *cmdparams;
 	Client *u;
@@ -72,13 +72,14 @@ static void lookupnickip (char *data, adns_answer *a)
 	u = FindUser ((char *)data);
 	if (a && a->nrrs > 0 && u && a->status == adns_s_ok) {
 		u->ip.s_addr = a->rrs.addr->addr.inet.sin_addr.s_addr;
+		strlcpy (u->hostip, inet_ntoa (u->ip), HOSTIPLEN);
 		if (u->ip.s_addr > 0) {
 			cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 			cmdparams->source = u;	
 			SendAllModuleEvent (EVENT_NICKIP, cmdparams);
 			ns_free (cmdparams);
 		}
-	}
+	} 
 }
 
 static int process_ip (const char *nick, const char *host)
@@ -116,16 +117,17 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 		nlog (LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick);
 		return NULL;
 	}
-	if (ip) {
-		ipaddress = strtoul (ip, NULL, 10);
-	} else if (!(ircd_srv.protocol&PROTOCOL_NICKIP) && me.want_nickip == 1) {
-		ipaddress = process_ip (nick, host);
-	}
 	dlog (DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, (int)htonl (ipaddress), server, TS);
 	u = new_user (nick);
 	if (!u) {
 		return NULL;
 	}
+	if (ip) {
+		ipaddress = strtoul (ip, NULL, 10);
+	} else if (!(ircd_srv.protocol&PROTOCOL_NICKIP) && me.want_nickip == 1) {
+		ipaddress = process_ip (u->name, host);
+	}
+
 	u->tsconnect = TS ? strtoul (TS, NULL, 10) : me.now;
 	if (time(NULL) - u->tsconnect > nsconfig.splittime) {
 		u->flags |= NS_FLAGS_NETJOIN;

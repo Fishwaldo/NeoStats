@@ -180,13 +180,11 @@ static int InitMe( void )
 	/* Default reconnect time */
 	nsconfig.r_time = 10;
 	/* Debug mode overrides */
-#ifndef NDEBUG
 #ifdef DEBUG
 	nsconfig.debug = 1;
 	nsconfig.loglevel = LOG_INFO;
 	nsconfig.debuglevel = DEBUG10;
 	nsconfig.foreground = 1;
-#endif /* DEBUG */
 #endif /* DEBUG */
 	/* default debugmodule to all */
 	strlcpy( nsconfig.debugmodule, "all", MAX_MOD_NAME );

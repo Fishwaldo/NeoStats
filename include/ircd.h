@@ -240,8 +240,7 @@ int irc_smo(  const char *source, const char *umodetarget, const char *msg  );
 
 EXPORTFUNC void send_cmd( char *fmt, ... )__attribute__( ( format( printf,1,2 ) ) ); /* 2=format 3=params */
 
-MODULEFUNC void parse( char *line );
-
-void( *irc_parse )(  char *line  );
+MODULEFUNC int parse (void *notused, void *rline, size_t len);
+int (*irc_parse) (void *notused, void *rline, size_t len);
 
 #endif

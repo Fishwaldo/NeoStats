@@ -429,8 +429,8 @@ static void html_map( void )
 
 int ss_html( void )
 {
-#define READBUFSIZE 512
-	static char buf[READBUFSIZE];
+#define HTMLREADBUFSIZE 512
+	static char buf[HTMLREADBUFSIZE];
 	FILE *tpl;
 	char *buftemp;
 	char *bufptr;
@@ -448,7 +448,7 @@ int ss_html( void )
 		irc_chanalert( ss_bot, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
 		return NS_SUCCESS;
 	}
-	while( os_fgets( buf, READBUFSIZE, tpl ) ) {
+	while( os_fgets( buf, HTMLREADBUFSIZE, tpl ) ) {
 		bufptr = buf;
 		htmlfuncptr = htmlfuncs;
 		while( htmlfuncptr->directive ) {

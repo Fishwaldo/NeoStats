@@ -36,6 +36,13 @@
 
 #include "tvarith.h"
 
+/* socket monitoring managemnet */
+void set_fdupdate(adns_state ads, fd_update myfdfunc) {
+    ads->fdfunc = myfdfunc;
+}
+
+
+
 /* TCP connection management. */
 
 static void tcp_close(adns_state ads)
@@ -43,6 +50,11 @@ static void tcp_close(adns_state ads)
 	int serv;
 
 	serv = ads->tcpserver;
+
+/* EVNT: Delsock */
+    if (ads->fdfunc) 
+      ads->fdfunc(ads->tcpsocket, -1);
+      
 	close(ads->tcpsocket);
 	ads->tcpsocket = -1;
 	ads->tcprecv.used = ads->tcprecv_skip = ads->tcpsend.used = 0;
@@ -77,6 +89,9 @@ static void tcp_connected(adns_state ads, struct timeval now)
 
 	adns__debug(ads, ads->tcpserver, 0, "TCP connected");
 	ads->tcpstate = server_ok;
+/* EVNT Read */
+    if (ads->fdfunc)
+      ads->fdfunc(ads->tcpsocket, POLLIN);
 	for (qu = ads->tcpw.head; qu && ads->tcpstate == server_ok;
 	     qu = nqu) {
 		nqu = qu->next;
@@ -142,6 +157,9 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 		}
 		if (errno == EWOULDBLOCK || errno == EINPROGRESS) {
 			ads->tcptimeout = now;
+/* EVNT addsock write */
+            if (ads->fdfunc)
+              ads->fdfunc(ads->tcpsocket, POLLOUT);
 			timevaladd(&ads->tcptimeout, TCPCONNMS);
 			return;
 		}

@@ -28865,6 +28865,8 @@ echo "${ECHO_T}\"None\"" >&6
 fi;
 
 
+CFLAGS="$CFLAGS -fno-strict-aliasing"
+
 
 
 

@@ -4,6 +4,14 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Tidy up the new socket code (F)
+ - Fix bug with ordering of process_ip in AddUser. nick variable isn't
+   static, and usually is gone when we callback (F)
+ - DCC Partyline support added (F)
+ - replace socket/select code with a libevent based implementation (F)
+ - Provide a "buffered" socket implementation for network communications (F)
+ - Provide a "newline terminated protocol" socket implementation to handle
+   IRCd and DCC Chat communications (F)
  - Add ability to exclude nick!user@host masks. (M)
  - Add nick!user@host and nick!user@vhost mask generation to core. (M)
  - DBA layer will now pass size of data fetched in FetchRows. (M)

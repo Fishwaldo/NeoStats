@@ -885,22 +885,23 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char* origin, char **av
  *  @return none
  */
 
-void parse( char *line )
+int parse(void *arg,  void *rline, size_t len )
 {
 	char origin[64], cmd[64], *coreLine;
+	char *line = (char *)rline;
 	int cmdptr = 0;
 	int ac = 0;
 	char **av = NULL;
 
 	SET_SEGV_LOCATION();
 	if( !( *line ) )
-		return;
+		return NS_FAILURE;
 	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
 	dlog( DEBUGRX, "RX: %s", line );
 	if( *line == ':' ) {
 		coreLine = strpbrk( line, " " );
 		if( !coreLine )
-			return;
+			return NS_FAILURE;
 		*coreLine = 0;
 		while( isspace( *++coreLine ) );
 		strlcpy( origin, line + 1, sizeof( origin ) );
@@ -911,7 +912,7 @@ void parse( char *line )
 		*origin = 0;
 	}
 	if( !*line )
-		return;
+		return NS_FAILURE;
 	coreLine = strpbrk( line, " " );
 	if( coreLine ) {
 		*coreLine = 0;
@@ -927,6 +928,7 @@ void parse( char *line )
 	process_ircd_cmd( cmdptr, cmd, origin, av, ac );
 	ns_free( av );
 	dlog( DEBUG1, "-------------------------END PARSE--------------------------" );
+	return NS_SUCCESS;
 }
 
 /** @brief unsupported_cmd
@@ -2785,7 +2787,7 @@ void send_cmd( char *fmt, ... )
 		buf[BUFSIZE - 2] = '\n';
 	}
 	buflen = strnlen( buf, BUFSIZE );
-	send_to_socket( buf, buflen );
+	send_to_ircd_socket( buf, buflen );
 }
 
 /** @brief HaveFeature

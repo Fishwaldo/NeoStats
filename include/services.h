@@ -65,6 +65,7 @@ typedef struct config {
 	unsigned int cmdreport;
 	unsigned int unauthreport;
 	unsigned char cmdchar[2];
+	size_t recvq;
 } config;
 
 extern config nsconfig;

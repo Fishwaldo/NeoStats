@@ -347,6 +347,8 @@ AC_MSG_RESULT($withval),
 AC_MSG_RESULT("None"))
 
 
+CFLAGS="$CFLAGS -fno-strict-aliasing"
+
 AC_SUBST(PROTOCOL)
 AC_SUBST(SED)
 AC_SUBST(LIBTOOL_DEPS)
