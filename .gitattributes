@@ -1,5 +1,6 @@
 * text=auto !eol
 /.indent.pro -text
+/AAA-NO-LONGER-USE-SOURCEFORGE -text
 /AUTHORS -text
 /BUGS -text
 /Bahamut.c -text
