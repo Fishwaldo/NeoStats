@@ -350,9 +350,9 @@ send_wallops (const char *who, const char *buf)
 }
 
 void
-send_end_of_burst(void)
+send_end_of_burst_ack(void)
 {
-	send_cmd ("%c %s", convert2y[neonumeric], TOK_END_OF_BURST);
+	send_cmd ("%c %s", convert2y[neonumeric], MSG_END_OF_BURST_ACK);
 }
 
 void
@@ -588,7 +588,7 @@ m_pass (char *origin, char **argv, int argc, int srv)
 static void
 m_burst (char *origin, char **argv, int argc, int srv)
 {
-	send_end_of_burst();
+	send_end_of_burst_ack();
 }
 
 /* Override the core splitbuf and parse functions until 
