@@ -291,9 +291,6 @@ typedef enum NS_TRANSFER {
 #define SET_SEGV_INMODULE(module_name) strlcpy(segv_inmodule,(module_name),SEGV_INMODULE_BUFSIZE);
 #define CLEAR_SEGV_INMODULE() segv_inmodule[0]='\0';
 
-/* temporary define while module settings are ported to macro system */
-#define segvinmodule segv_inmodule
-
 /* macros to provide a couple missing string functions for code legibility 
  * and to ensure we perform these operations in a standard and optimal manner
  */
@@ -307,7 +304,6 @@ typedef enum NS_TRANSFER {
 extern int servsock;
 extern char recbuf[BUFSIZE];
 extern char s_Services[MAXNICK];
-extern const char ircd_version[];
 extern const char services_bot_modes[];
 extern char segv_location[SEGV_LOCATION_BUFSIZE];
 extern char segv_inmodule[SEGV_INMODULE_BUFSIZE];

@@ -151,11 +151,11 @@ nlog (int level, int scope, char *fmt, ...)
 	if (level <= config.debug) {
 		/* if scope is > 0, then log to a diff file */
 		if (scope > 0) {
-			if (segvinmodule[0] != 0) {
-				hn = hash_lookup (logs, segvinmodule);
+			if (segv_inmodule[0] != 0) {
+				hn = hash_lookup (logs, segv_inmodule);
 			} else {
 #if 0
-				nlog (LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segvinmodule is blank! Logging to Core");
+				nlog (LOG_ERROR, LOG_CORE, "Warning, nlog called with LOG_MOD, but segv_inmodule is blank! Logging to Core");
 #endif
 				hn = hash_lookup (logs, CoreLogFileName);
 			}
@@ -169,15 +169,15 @@ nlog (int level, int scope, char *fmt, ...)
 				logentry->logfile = fopen (logentry->logname, "a");
 		} else {
 			/* log file not found */
-			if (segvinmodule[0] == 0 && (scope > 0)) {
+			if (segv_inmodule[0] == 0 && (scope > 0)) {
 #ifdef DEBUG
-				printf ("segvinmodule is blank, but scope is for Modules!\n");
+				printf ("segv_inmodule is blank, but scope is for Modules!\n");
 #endif
 				/* bad, but hey ! */
 				scope = 0;
 			}
 			logentry = malloc (sizeof (struct logs_));
-			strlcpy (logentry->name, scope > 0 ? segvinmodule : CoreLogFileName, MAX_MOD_NAME);
+			strlcpy (logentry->name, scope > 0 ? segv_inmodule : CoreLogFileName, MAX_MOD_NAME);
 			make_log_filename(logentry->name, logentry->logname);
 			logentry->logfile = fopen (logentry->logname, "a");
 			logentry->flush = 0;
@@ -199,12 +199,12 @@ nlog (int level, int scope, char *fmt, ...)
 		ircvsnprintf (log_buf, BUFSIZE, fmt, ap);
 		va_end (ap);
 
-		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", log_buf);
+		fprintf (logentry->logfile, "(%s) %s %s - %s\n", log_fmttime, loglevels[level - 1], scope > 0 ? segv_inmodule : "CORE", log_buf);
 		logentry->flush = 1;
 #ifndef DEBUG
 		if (config.foreground)
 #endif
-			printf ("%s %s - %s\n", loglevels[level - 1], scope > 0 ? segvinmodule : "CORE", log_buf);
+			printf ("%s %s - %s\n", loglevels[level - 1], scope > 0 ? segv_inmodule : "CORE", log_buf);
 	}
 }
 

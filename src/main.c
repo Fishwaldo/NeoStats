@@ -424,20 +424,20 @@ serv_segv ()
 	 *  the stack to where we were before we jumped into the module
 	 *  and continue on
 	 */
-	if (segvinmodule[0] != 0) {
-		globops (me.name, "Segmentation Fault in %s. Refer to log file for details.", segvinmodule);
-		chanalert (s_Services, "Segmentation Fault in %s. Refer to log file for details.", segvinmodule);
+	if (segv_inmodule[0] != 0) {
+		globops (me.name, "Segmentation Fault in %s. Refer to log file for details.", segv_inmodule);
+		chanalert (s_Services, "Segmentation Fault in %s. Refer to log file for details.", segv_inmodule);
 		nlog (LOG_CRITICAL, LOG_CORE, "------------------------SEGFAULT REPORT-------------------------");
 		nlog (LOG_CRITICAL, LOG_CORE, "Please view the README for how to submit a bug report");
 		nlog (LOG_CRITICAL, LOG_CORE, "and include this segfault report in your submission.");
-		nlog (LOG_CRITICAL, LOG_CORE, "Module:   %s", segvinmodule);
+		nlog (LOG_CRITICAL, LOG_CORE, "Module:   %s", segv_inmodule);
 		nlog (LOG_CRITICAL, LOG_CORE, "Location: %s", segv_location);
 		nlog (LOG_CRITICAL, LOG_CORE, "recbuf:   %s", recbuf);
 		nlog (LOG_CRITICAL, LOG_CORE, "Unloading Module and restoring stacks. Backtrace:");
 		chanalert (s_Services, "Location *could* be %s.", segv_location);
 		do_backtrace();
 		nlog (LOG_CRITICAL, LOG_CORE, "-------------------------END OF REPORT--------------------------");
-		strlcpy (name, segvinmodule, MAX_MOD_NAME);
+		strlcpy (name, segv_inmodule, MAX_MOD_NAME);
 		CLEAR_SEGV_INMODULE();
 		unload_module (name, NULL);
 		chanalert (s_Services, "Restoring Stack to before Crash");

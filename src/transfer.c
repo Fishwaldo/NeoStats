@@ -198,7 +198,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}	
 
 	/* setup the user agent */
-	ircsnprintf(newtrans->useragent, MAXURL, "NeoStats %s (%s)", me.versionfull, segvinmodule); 
+	ircsnprintf(newtrans->useragent, MAXURL, "NeoStats %s (%s)", me.versionfull, segv_inmodule); 
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_USERAGENT, newtrans->useragent)) != 0) {
 		nlog(LOG_WARNING, LOG_CORE, "Curl Set useragent failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, LOG_CORE, "Error Was: %s", newtrans->curlerror);

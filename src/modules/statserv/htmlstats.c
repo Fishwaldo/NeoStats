@@ -172,7 +172,7 @@ void ss_html()
 		if (buf1) {
 			startstr = strlen(buf) - strlen(buf1);
 			fwrite(buf, startstr, 1, opf);
-			fputs(ircd_version, opf);
+			fputs(me.versionfull, opf);
 			buf = buf1 + strlen("!VERSION!");
 		}
 		buf1 = strstr(buf, "!TITLE!");

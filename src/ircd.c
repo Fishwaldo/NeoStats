@@ -1130,8 +1130,8 @@ numeric (const int numeric, const char *target, const char *data, ...)
 void
 unsupported_cmd(const char* cmd)
 {
-	chanalert (s_Services, "Warning, %s tried to %s which is not supported", ((segvinmodule[0] != 0)? segvinmodule : ""), cmd);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning, %s tried to %s, which is not supported", ((segvinmodule[0] != 0)? segvinmodule : ""), cmd);
+	chanalert (s_Services, "Warning, %s tried to %s which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning, %s tried to %s, which is not supported", ((segv_inmodule[0] != 0)? segv_inmodule : ""), cmd);
 }
 
 int
@@ -1332,8 +1332,8 @@ ssvsnick_cmd (const char *target, const char *newnick)
 #ifdef GOTSVSNICK
 	send_svsnick (me.name, target, newnick, me.now);
 #else
-	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segvinmodule);
-	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported", segvinmodule);
+	notice (s_Services, "Warning Module %s tried to SVSNICK, which is not supported", segv_inmodule);
+	nlog (LOG_NOTICE, LOG_CORE, "Warning. Module %s tried to SVSNICK, which is not supported", segv_inmodule);
 #endif
 	return NS_SUCCESS;
 }

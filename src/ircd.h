@@ -66,6 +66,7 @@ extern UserModes user_umodes[];
 extern UserModes user_smodes[];
 #endif
 
+extern const char ircd_version[];
 extern ircd_server ircd_srv;
 extern ircd_cmd cmd_list[];
 extern ChanModes chan_modes[];

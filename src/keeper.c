@@ -36,8 +36,8 @@ GetConf (void **data, int type, const char *item)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
 	} else {
 		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
@@ -77,8 +77,8 @@ GetDir (char *item, char ***data)
 	char **data1;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
 	} else {
 		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
@@ -104,8 +104,8 @@ SetConf (void *data, int type, char *item)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
 	} else {
 		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
@@ -148,8 +148,8 @@ DelConf (char *item)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "g/%s:/%s", segvinmodule, item);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "g/%s:/%s", segv_inmodule, item);
 	} else {
 		ircsnprintf (keypath, 255, "g/core:/%s", item);
 	}
@@ -172,8 +172,8 @@ GetData (void **data, int type, const char *table, const char *row, const char *
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segv_inmodule, table, row, field);
 	} else {
 		ircsnprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
 	}
@@ -212,8 +212,8 @@ GetTableData (char *table, char ***data)
 	char **data1;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s", segv_inmodule, table);
 	} else {
 		ircsnprintf (keypath, 255, "l/core:/%s", table);
 	}
@@ -239,8 +239,8 @@ SetData (void *data, int type, char *table, char *row, char *field)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segvinmodule, table, row, field);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s/%s/%s", segv_inmodule, table, row, field);
 	} else {
 		ircsnprintf (keypath, 255, "l/core:/%s/%s/%s", table, row, field);
 	}
@@ -282,8 +282,8 @@ DelRow (char *table, char *row)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s/%s", segvinmodule, table, row);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s/%s", segv_inmodule, table, row);
 	} else {
 		ircsnprintf (keypath, 255, "l/core:/%s/%s", table, row);
 	}
@@ -305,8 +305,8 @@ DelTable (char *table)
 	int i = 0;
 
 	/* determine if its a module setting */
-	if (segvinmodule[0] != 0) {
-		ircsnprintf (keypath, 255, "l/%s:/%s", segvinmodule, table);
+	if (segv_inmodule[0] != 0) {
+		ircsnprintf (keypath, 255, "l/%s:/%s", segv_inmodule, table);
 	} else {
 		ircsnprintf (keypath, 255, "l/core:/%s", table);
 	}
