@@ -464,18 +464,20 @@ init_services_bot (void)
 	return NS_SUCCESS;
 }
 
-/** @brief dopong
+/** @brief ns_usr_pong
  *
  * 
  *
  * @return none
  */
 void
-dopong (Server * s)
+ns_usr_pong (char *origin, char **argv, int argc)
 {
+	Server *s;
 	char **av;
 	int ac = 0;
-	
+
+	s = findserver (argv[0]);
 	if (s) {
 		s->ping = me.now - ping.last_sent;
 		if (ping.ulag > 1)
@@ -486,7 +488,7 @@ dopong (Server * s)
 		ModuleEvent (EVENT_PONG, av, ac);
 		free (av);
 	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", recbuf);
+		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", argv[0]);
 	}
 }
 
@@ -529,7 +531,7 @@ flood (User * u)
  * @return 
  */
 void
-ns_motd (char *nick)
+ns_usr_motd (char *nick, char **argv, int argc)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -560,7 +562,7 @@ ns_motd (char *nick)
  * @return 
  */
 void
-ns_admin (char *nick)
+ns_usr_admin (char *nick, char **argv, int argc)
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -588,7 +590,7 @@ ns_admin (char *nick)
  * @return 
  */
 void
-ns_credits (char *nick)
+ns_usr_credits (char *nick, char **argv, int argc)
 {
 	SET_SEGV_LOCATION();
 	snumeric_cmd (RPL_VERSION, nick, ":- NeoStats %d.%d.%d%s Credits ", MAJOR, MINOR, REV, ircd_version);
@@ -621,20 +623,25 @@ ns_credits (char *nick)
  * @return 
  */
 void
-ns_stats (char *what, User * u)
+ns_usr_stats (char *origin, char **argv, int argc)
 {
 	time_t tmp;
 	time_t tmp2;
-	int I;
+	int i;
 #ifdef EXTAUTH
 	int dl;
 	int (*listauth) (User * u);
 #endif
+	User *u;
+	char *what;
 
+	SET_SEGV_LOCATION();
+	u = finduser (origin);
 	if (!u) {
+		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
 		return;
 	}
-	SET_SEGV_LOCATION();
+	what = argv[0];
 	if (!strcasecmp (what, "u")) {
 		/* server uptime - Shmad */
 		int uptime = me.now - me.t_start;
@@ -661,9 +668,9 @@ ns_stats (char *what, User * u)
 		snumeric_cmd (RPL_STATSLINKINFO, u->nick, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE");
 		snumeric_cmd (RPL_STATSLLINE, u->nick, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, me.SendM, me.SendBytes, me.RcveM, me.RcveBytes, tmp2, tmp);
 	} else if (!strcasecmp (what, "M")) {
-		for (I = 0; I < ircd_srv.cmdcount; I++) {
-			if (cmd_list[I].usage > 0)
-				snumeric_cmd (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", cmd_list[I].name, cmd_list[I].usage);
+		for (i = 0; i < ircd_srv.cmdcount; i++) {
+			if (cmd_list[i].usage > 0)
+				snumeric_cmd (RPL_STATSCOMMANDS, u->nick, "Command %s Usage %d", cmd_list[i].name, cmd_list[i].usage);
 		}
 	}
 	snumeric_cmd (RPL_ENDOFSTATS, u->nick, "%s :End of /STATS report", what);

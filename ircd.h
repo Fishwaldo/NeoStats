@@ -44,11 +44,11 @@ extern IntCommands cmd_list[];
 extern aCtab cFlagTab[33];
 
 int init_services_bot (void);
-void ns_motd (char *nick);
-void ns_admin (char *nick);
-void ns_credits (char *nick);
-void ns_stats (char * what, User *u);
-void dopong (Server *s);
+void ns_usr_motd (char *nick, char **argv, int argc);
+void ns_usr_admin (char *nick, char **argv, int argc);
+void ns_usr_credits (char *nick, char **argv, int argc);
+void ns_usr_stats (char *origin, char **argv, int argc);
+void ns_usr_pong (char *origin, char **argv, int argc);
 
 /* Defined in ircd specific files but common to all */
 int SignOn_NewBot (const char *nick, const char *user, const char *host, const char *rname, long Umode);

@@ -780,7 +780,7 @@ Srv_Burst (char *origin, char **argv, int argc)
 			sburst_cmd (0);
 			ircd_srv.burst = 0;
 			me.synced = 1;
-			init_ServBot ();
+			init_services_bot ();
 		}
 	} else {
 		ircd_srv.burst = 1;
@@ -795,13 +795,7 @@ Srv_Connect (char *origin, char **argv, int argc)
 void
 Usr_Stats (char *origin, char **argv, int argc)
 {
-	User *u;
-	u = finduser (origin);
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
-		return;
-	}
-	ShowStats (argv[0], u);
+	ns_usr_stats (origin, argv, argc);
 }
 
 void
@@ -813,19 +807,19 @@ Usr_Version (char *origin, char **argv, int argc)
 void
 Usr_ShowMOTD (char *origin, char **argv, int argc)
 {
-	ShowMOTD (origin);
+	ns_usr_motd (origin, argv, argc);
 }
 
 void
 Usr_ShowADMIN (char *origin, char **argv, int argc)
 {
-	ShowADMIN (origin);
+	ns_usr_admin (origin, argv, argc);
 }
 
 void
 Usr_Showcredits (char *origin, char **argv, int argc)
 {
-	Showcredits (origin);
+	ns_usr_credits (origin, argv, argc);
 }
 
 void
@@ -890,13 +884,7 @@ Usr_Vhost (char *origin, char **argv, int argc)
 void
 Usr_Pong (char *origin, char **argv, int argc)
 {
-	Server *s;
-	s = findserver (argv[0]);
-	if (s) {
-		dopong (s);
-	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", argv[0]);
-	}
+	ns_usr_pong (origin, argv, argc);
 }
 void
 Usr_Away (char *origin, char **argv, int argc)

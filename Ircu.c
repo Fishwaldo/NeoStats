@@ -719,13 +719,7 @@ Srv_Connect (char *origin, char **argv, int argc)
 void
 Usr_Stats (char *origin, char **argv, int argc)
 {
-	User *u;
-
-	u = finduser (origin);
-	if (!u) {
-		nlog (LOG_WARNING, LOG_CORE, "Received a Message from an Unknown User! (%s)", origin);
-	}
-	ns_stats (argv[0], u);
+	ns_usr_stats (origin, argv, argc);
 }
 
 void
@@ -737,19 +731,19 @@ Usr_Version (char *origin, char **argv, int argc)
 void
 Usr_ShowMOTD (char *origin, char **argv, int argc)
 {
-	ns_motd (origin);
+	ns_usr_motd (origin, argv, argc);
 }
 
 void
 Usr_ShowADMIN (char *origin, char **argv, int argc)
 {
-	ns_admin (origin);
+	ns_usr_admin (origin, argv, argc);
 }
 
 void
 Usr_Showcredits (char *origin, char **argv, int argc)
 {
-	ns_credits (origin);
+	ns_usr_credits (origin, argv, argc);
 }
 
 void
@@ -814,13 +808,7 @@ Usr_Vhost (char *origin, char **argv, int argc)
 void
 Usr_Pong (char *origin, char **argv, int argc)
 {
-	Server *s;
-	s = findserver (argv[0]);
-	if (s) {
-		dopong (s);
-	} else {
-		nlog (LOG_NOTICE, LOG_CORE, "Received PONG from unknown server: %s", argv[0]);
-	}
+	ns_usr_pong (origin, argv, argc);
 }
 void
 Usr_Away (char *origin, char **argv, int argc)
