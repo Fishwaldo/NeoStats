@@ -1628,7 +1628,12 @@ do_netinfo(const char* maxglobalcnt, const char* tsendsync, const char* prot, co
 	ircd_srv.uprot = atoi (prot);
 	strlcpy (ircd_srv.cloak, cloak, 10);
 	strlcpy (me.netname, netname, MAXPASS);
+#if 0
+/* whats going on? */
 	send_netinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+#else 
+	send_snetinfo (me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname);
+#endif
 	init_services_bot ();
 	globops (me.name, "Link with Network \2Complete!\2");
 	ModuleEvent (EVENT_NETINFO, NULL, 0);

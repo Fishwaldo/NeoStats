@@ -319,7 +319,11 @@ send_pong (const char *reply)
 	sts ("%s %s", (me.token ? TOK_PONG : MSG_PONG), reply);
 }
 
-#ifndef ULTIMATE3
+
+/* I'm not sure what marks upto atm */
+
+/* #ifndef ULTIMATE3  */
+#if 1
 void
 send_snetinfo (const char* from, const int prot, const char* cloak, const char* netname)
 {

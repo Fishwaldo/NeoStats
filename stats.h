@@ -99,17 +99,18 @@
 #define	TS_CURRENT	3	/* current TS protocol version */
 #endif
 
-#endif
+#endif /* TS_CURRENT */
 
-#ifndef TS_CURRENT	/* Allow IRCd to overide */
-/* #define TS5_ONLY */
+#ifndef TS_MIN	/* Allow IRCd to overide */
+#define TS5_ONLY 
 
 #ifdef TS5_ONLY
 #define TS_MIN          5
 #else
 #define TS_MIN          3       /* minimum supported TS protocol version */
 #endif
-#endif
+
+#endif /* TS_CURRENT */
 
 /* SecureServ wants CHANADMIN but only a few ircds support it so we have to "fake" it */
 #ifndef CMODE_CHANADMIN
