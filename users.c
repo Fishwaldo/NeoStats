@@ -333,6 +333,9 @@ finduserbase64 (const char *num)
 	while ((un = hash_scan_next (&us)) != NULL) {
 		u = hnode_get (un);
 		if(strncmp(u->nick64, num, 5) == 0) {
+			/* Horrible hack until actual bug is found */
+			if(strlen(num) > 5 && num[5] != ":")
+				continue;
 			nlog (LOG_DEBUG1, LOG_CORE, "finduserbase64: %s -> %s", num, u->nick);
 			return u;
 		}

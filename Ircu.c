@@ -594,6 +594,10 @@ m_away (char *origin, char **argv, int argc, int srv)
 /* R: AB N Mark 1 1076011621 a xxx.xxx.xxx.xxx DAqO4N ABAAB :M */
 /* R: AB N TheEggMan 1 1076104492 ~eggy 64.XX.XXX.XXX +oiwg BAFtnj ABAAA :eggy */
 /* R: ABAAH N m2 1076077934 */
+/*
+<reed> in a generated burst message, the users must be sorted by the modes: first users w/o modes, then users with voice, then with op, then with op+voice: num,num:v,num:o,num:ov
+*/
+
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
@@ -601,10 +605,6 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		char IPAddress[32]; /* argv[argc-3] */
 		char *realname;
 		unsigned long IP = base64toint(argv[argc-3]);
-#if 0		
-		ircsnprintf( IPAddress, 32, "%lu.%lu.%lu.%lu", 
-			(IP >> 24) & 255, (IP >> 16) & 255, (IP >> 8) & 255, IP & 255 );
-#endif
 		ircsnprintf( IPAddress, 32, "%lu", IP);
 
 		realname = joinbuf (argv, argc, (argc - 1));
