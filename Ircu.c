@@ -338,8 +338,7 @@ send_part (const char *who, const char *chan)
 void
 send_join (const char *sender, const char *who, const char *chan, const unsigned long ts)
 {
-//	send_cmd (":%s %s 0 %s + :%s", sender, TOK_JOIN, chan, who);
-	send_cmd (":%s %s %s %lu :%s", who, TOK_JOIN, chan, (unsigned long)me.now, who);
+	send_cmd (":%s %s %s %lu :%s", who, TOK_JOIN, chan, ts, who);
 }
 
 void 
@@ -407,7 +406,7 @@ send_sjoin (const char *sender, const char *who, const char *chan, const char fl
 void 
 send_kick (const char *who, const char *chan, const char *target, const char *reason)
 {
-	send_cmd (":%s %s %s %s :%s", who, TOK_KICK, chan, target, (reason ? reason : "No Reason Given"));
+	send_cmd ("%s %s %s %s :%s", getnumfromnick(who), TOK_KICK, chan, getnumfromnick(target), (reason ? reason : "No Reason Given"));
 }
 
 void 
@@ -611,10 +610,11 @@ m_away (char *origin, char **argv, int argc, int srv)
 -1 <fullname>
 */
 /* R: AB N Mark 1 1076011621 a xxx.xxx.xxx.xxx DAqO4N ABAAB :M */
+/* R: ABAAH N m2 1076077934 */
 static void
 m_nick (char *origin, char **argv, int argc, int srv)
 {
-	if(!srv) {
+	if(argc > 2) {
 		char *realname;
 		char buf[4];
 		buf[0] = argv[6][0];
@@ -630,7 +630,12 @@ m_nick (char *origin, char **argv, int argc, int srv)
 		nlog (LOG_DEBUG1, LOG_CORE, "adding %s %s", nicknum[numnicks].nick, nicknum[numnicks].numeric);
 		numnicks++;
 	} else {
-		do_nickchange (origin, argv[0], NULL);
+		int i;
+		do_nickchange (getnickfromnum(origin), argv[0], NULL);
+		for(i = 0; i < numnicks; i++) {
+			if(strncmp(nicknum[i].numeric, origin, 5) == 0)
+				strlcpy(nicknum[i].nick, argv[0], MAXNICK);
+		}
 	}
 }
 static void
@@ -647,7 +652,7 @@ m_kick (char *origin, char **argv, int argc, int srv)
 {
 	char *tmpbuf;
 	tmpbuf = joinbuf(argv, argc, 2);
-	do_kick (origin, argv[0], argv[1], tmpbuf);
+	do_kick (getnickfromnum(origin), argv[0], getnickfromnum(argv[1]), tmpbuf);
 	free(tmpbuf);
 }
 
