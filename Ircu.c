@@ -893,9 +893,6 @@ Srv_Netinfo (char *origin, char **argv, int argc)
 	strncpy (me.netname, argv[7], MAXPASS);
 	init_ServBot ();
 	globops (me.name, "Link with Network \2Complete!\2");
-	if (ircd_srv.uprot == 2109) {
-		me.usesmo = 1;
-	}
 	Module_Event ("NETINFO", NULL, 0);
 	me.synced = 1;
 }
