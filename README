@@ -305,34 +305,9 @@ SERVER_NUMERIC <numeric> [RECOMMENDED]
     
         SERVER_NUMERIC 1
 
-STATSERV_NETNAME <network name> [REQUIRED]
-    Your network name, if unknown refer to your network file. Does not 
-    apply to all IRCDs e.g. 
-    
-        STATSERV_NETNAME neostats
-        
-    For irc.neostats.net
-
 NeoStats Configuration options
 ------------------------------
     
-NEOSTAT_HOST <host> [REQUIRED]
-    Specifies the Hostname that NeoStats comes from Some people like to 
-    make it the same as the Services host (e.g., services.neostats.net) 
-    or one just for NeoStats (e.g., stats.neostats.net) e.g.
-    
-        NEOSTATS_HOST stats.neostats.net    
-    
-    The bot will appear as NeoStats!user@stats.neostats.net
-    
-NEOSTAT_USER <user> [REQUIRED]
-    Specifies the User/ident of the NeoStats Bot (the part before the 
-    @host) e.g.
-    
-        NEOSTATS_USER neo    
-            
-    The bot will apear as NeoStats!neo@Host
-
 SERVICES_CHAN #<channel name> [REQUIRED]
     Specify the channel that all bots on NeoStats
     will automatically join, and echo out any

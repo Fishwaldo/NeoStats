@@ -1,5 +1,5 @@
 #!/bin/sh
-# makeconf $Id
+# makeconf $Id$
 
 TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`

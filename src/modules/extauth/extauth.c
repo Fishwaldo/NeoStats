@@ -226,7 +226,7 @@ static int ea_event_mode(CmdParams* cmdparams)
 	int add = 0;
 	char *modes;
 
-	/* bail if we are not synced */
+	/* bail if we are not synched */
 	if (!is_synched)
 		return 0;
 		

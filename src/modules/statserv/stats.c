@@ -45,7 +45,7 @@ static int check_interval()
 	static int lasttime;
 	static int count;
 
-	if (!StatServ.onchan || !me.synced) {
+	if (!StatServ.onchan || !me.synched) {
 		return -1;
 	}
 	if ((me.now - lasttime) < StatServ.msginterval ) {
