@@ -34,12 +34,10 @@
 static void Usr_Version (char *origin, char **argv, int argc);
 static void Usr_MOTD (char *origin, char **argv, int argc);
 static void Usr_Admin (char *origin, char **argv, int argc);
-static void Usr_Credits (char *origin, char **argv, int argc);
 static void Usr_Server (char *origin, char **argv, int argc);
 static void Usr_Squit (char *origin, char **argv, int argc);
 static void Usr_Quit (char *origin, char **argv, int argc);
 static void Usr_Mode (char *origin, char **argv, int argc);
-static void Usr_Smode (char *origin, char **argv, int argc);
 static void Usr_Kill (char *origin, char **argv, int argc);
 static void Usr_Pong (char *origin, char **argv, int argc);
 static void Usr_Away (char *origin, char **argv, int argc);
@@ -49,18 +47,14 @@ static void Usr_Kick (char *origin, char **argv, int argc);
 static void Usr_Join (char *origin, char **argv, int argc);
 static void Usr_Part (char *origin, char **argv, int argc);
 static void Usr_Stats (char *origin, char **argv, int argc);
-static void Usr_Vhost (char *origin, char **argv, int argc);
 static void Srv_Ping (char *origin, char **argv, int argc);
-static void Srv_Netinfo (char *origin, char **argv, int argc);
 static void Srv_Pass (char *origin, char **argv, int argc);
 static void Srv_Server (char *origin, char **argv, int argc);
 static void Srv_Squit (char *origin, char **argv, int argc);
 static void Srv_Nick (char *origin, char **argv, int argc);
 static void Srv_Kill (char *origin, char **argv, int argc);
 static void Srv_Protocol (char *origin, char **argv, int argc);
-static void Srv_Svinfo (char *origin, char **argv, int argc);
 static void Srv_Burst (char *origin, char **argv, int argc);
-static void Srv_Sjoin (char *origin, char **argv, int argc);
 
 static struct ircd_srv_ {
 	int uprot;
@@ -78,7 +72,6 @@ IntCommands cmd_list[] = {
 	{MSG_VERSION, Usr_Version, 1, 0},
 	{MSG_MOTD, Usr_MOTD, 1, 0},
 	{MSG_ADMIN, Usr_Admin, 1, 0},
-	{MSG_CREDITS, Usr_Credits, 1, 0},
 	{MSG_SERVER, Usr_Server, 1, 0},
 	{MSG_SQUIT, Usr_Squit, 1, 0},
 	{MSG_QUIT, Usr_Quit, 1, 0},
@@ -93,14 +86,11 @@ IntCommands cmd_list[] = {
 	{MSG_JOIN, Usr_Join, 1, 0},
 	{MSG_PART, Usr_Part, 1, 0},
 	{MSG_PING, Srv_Ping, 0, 0},
-	{MSG_SVINFO, Srv_Svinfo, 0, 0},
 	{MSG_PASS, Srv_Pass, 0, 0},
 	{MSG_SERVER, Srv_Server, 0, 0},
 	{MSG_SQUIT, Srv_Squit, 0, 0},
 	{MSG_NICK, Srv_Nick, 0, 0},
 	{MSG_KILL, Srv_Kill, 0, 0},
-	{MSG_EOB, Srv_Burst, 1, 0},
-	{MSG_SJOIN, Srv_Sjoin, 1, 0},
 };
 
 ChanModes chan_modes[] = {
@@ -148,12 +138,6 @@ const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void
-send_eob (const char *server)
-{
-	sts (":%s %s", server, MSG_EOB);
-}
-
-void
 send_server (const char *name, const int numeric, const char *infoline)
 {
 	sts (":%s %s %s %d :%s", me.name, MSG_SERVER, name, numeric, infoline);
@@ -163,7 +147,7 @@ void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass)
 {
 	sts ("%s %s :TS", MSG_PASS, pass);
-	sts ("CAPAB :TS EX CHW IE EOB KLN GLN KNOCK HOPS HUB AOPS MX");
+	sts ("CAPAB :TS EX CHW IE KLN GLN KNOCK HOPS HUB AOPS MX");
 	sts ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
 }
 
@@ -188,7 +172,7 @@ send_part (const char *who, const char *chan)
 void
 send_join (const char *who, const char *chan)
 {
-	sts (":%s %s 0 %s + :%s", me.name, MSG_SJOIN, chan, who);
+	sts (":%s %s 0 %s + :%s", me.name, MSG_JOIN, chan, who);
 }
 
 void 
@@ -261,12 +245,6 @@ void send_wallops (char *who, char *buf)
 }
 
 void
-send_svinfo (void)
-{
-	sts ("SVINFO 5 3 0 :%d", (int) me.now);
-}
-
-void
 send_burst (int b)
 {
 	if (b == 0) {
@@ -287,7 +265,7 @@ send_akill (const char *host, const char *ident, const char *setby, const int le
 	hash_scan_begin (&ss, sh);
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
-		sts (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, (unsigned long)length, ident, host, reason);
+		//sts (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, (unsigned long)length, ident, host, reason);
 	}
 }
 
@@ -312,32 +290,9 @@ send_notice (char *to, const char *from, char *buf)
 void
 send_globops (char *from, char *buf)
 {
-	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
+//	sts (":%s %s :%s", from, MSG_GLOBOPS, buf);
 }
 
-
-static void
-Srv_Sjoin (char *origin, char **argv, int argc)
-{
-	handle_sjoin (argv[1], argv[0], ((argc <= 2) ? argv[1] : argv[2]), 3, argv[4], argv, argc);	
-}
-
-static void
-Srv_Burst (char *origin, char **argv, int argc)
-{
-	if (argc > 0) {
-		if (ircd_srv.burst == 1) {
-			send_burst (0);
-			ircd_srv.burst = 0;
-			me.synced = 1;
-			init_services_bot ();
-		}
-	} else {
-		ircd_srv.burst = 1;
-	}
-	send_eob (me.name);
-	init_services_bot ();
-}
 
 static void
 Srv_Protocol (char *origin, char **argv, int argc)
@@ -371,12 +326,6 @@ Usr_Admin (char *origin, char **argv, int argc)
 }
 
 static void
-Usr_Credits (char *origin, char **argv, int argc)
-{
-	ns_usr_credits (origin, argv, argc);
-}
-
-static void
 Usr_Server (char *origin, char **argv, int argc)
 {
 	AddServer (argv[0], origin, atoi (argv[1]));
@@ -398,17 +347,6 @@ Usr_Quit (char *origin, char **argv, int argc)
 }
 
 static void
-Usr_Smode (char *origin, char **argv, int argc)
-{
-	if (!strchr (argv[0], '#')) {
-		/* its user svsmode change */
-		UserMode (argv[0], argv[1]);
-	} else {
-		/* its a channel svsmode change */
-		ChanMode (origin, argv, argc);
-	}
-}
-static void
 Usr_Mode (char *origin, char **argv, int argc)
 {
 	if (!strchr (argv[0], '#')) {
@@ -425,11 +363,6 @@ Usr_Kill (char *origin, char **argv, int argc)
 	tmpbuf = joinbuf(argv, argc, 1);
 	KillUser (argv[0], tmpbuf);
 	free(tmpbuf);
-}
-static void
-Usr_Vhost (char *origin, char **argv, int argc)
-{
-	SetUserVhost(origin, argv[0]);
 }
 static void
 Usr_Pong (char *origin, char **argv, int argc)
@@ -490,24 +423,6 @@ static void
 Srv_Ping (char *origin, char **argv, int argc)
 {
 	send_pong (argv[0]);
-}
-
-static void
-Srv_Svinfo (char *origin, char **argv, int argc)
-{
-	send_svinfo ();
-}
-
-static void
-Srv_Netinfo (char *origin, char **argv, int argc)
-{
-	ircd_srv.uprot = atoi (argv[2]);
-	strlcpy (ircd_srv.cloak, argv[3], 10);
-	strlcpy (me.netname, argv[7], MAXPASS);
-	init_services_bot ();
-	globops (me.name, "Link with Network \2Complete!\2");
-	ModuleEvent (EVENT_NETINFO, NULL, 0);
-	me.synced = 1;
 }
 
 static void
