@@ -70,13 +70,13 @@ static int hs_sign_on(char **av, int ac) {
 
         User *u;
         u = finduser(av[0]);
-        if (!u) return 0;
+        if (!u) return 1;
 
-        if (u->server->name == me.name) return 0;
+        if (u->server->name == me.name) return 1;
 
         strcpy(segv_location, "HostServ-hs_signon");
 
-    Loadhosts();
+/*    Loadhosts(); */
 
     if (findbot(u->nick)) return 1;
     if (!load_synch) return 1;
@@ -296,16 +296,17 @@ static void hs_add(User *u, char *cmd, char *m, char *h) {
     strcpy(segv_location, "hs_add");
     hsdat(":%s %s %s", cmd, m, h);
     prefmsg(u->nick, s_HostServ, "%s has sucessfuly been registered under realhost: %s and vhost: %s",cmd, m, h);
-
     /* Apply The New Hostname If The User Is Online */        
     if (finduser(cmd)) {
           u = finduser(cmd);
           if (findbot(u->nick)) return;
           if (fnmatch(m, strlower(u->hostname), 0) == 0) {
               ssvshost_cmd(u->nick, h);
+	    Loadhosts();
               return;
           }
     }
+    Loadhosts();
 }
 
 
@@ -452,6 +453,7 @@ static void hs_del(User *u, int tmpint)
 		prefmsg(u->nick, s_HostServ, "The following line was removed from the Vhosts Database");
 	        prefmsg(u->nick, s_HostServ, "\2%s\2", buf);
 		hslog("%s removed the VHOST: %s", u->nick, buf);
+		Loadhosts();
 	    }
 	i++;
     }
