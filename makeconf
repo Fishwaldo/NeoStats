@@ -3,13 +3,14 @@
 
 TIME=`date +"%H:%M:%S %Z"`
 DATE=`date +"%a, %b %e %Y"`
-STATSCONF="neostats.conf"
+NEOSTATSCONF="neostats.conf"
 SERVNAME="stats.somenet.net"
+ROOTNICK="NeoStats"
 SERVNUMERIC="1"
-COMMENT="NeoStats 3.0 IRC Services"
+INFOLINE="NeoStats 3.0 IRC Services"
 LINKPORT="6667"
 LINKSERVER="127.0.0.1"
-LINKPASS="LinkPass"
+LINKPASS="linkpassword"
 NEOCHAN="#services"
 NEOCONN="10"
 BINDIP="127.0.0.1"
@@ -28,8 +29,8 @@ rm -f mkconf.tmp
 # make a quick script for replacing one line with another
 
 cat > repl_str << __EOF__
-sed -e "s@^$dlrsgn$uno\(.*\)@$dlrsgn$dos" $STATSCONF > mkconf.tmp
-cp mkconf.tmp $STATSCONF
+sed -e "s@^$dlrsgn$uno\(.*\)@$dlrsgn$dos" $NEOSTATSCONF > mkconf.tmp
+cp mkconf.tmp $NEOSTATSCONF
 rm mkconf.tmp
 __EOF__
 
@@ -49,36 +50,37 @@ fi
 # If Settings exist, load the info, otherwise tell them to run configure.
 
 if [ -r config.h ]; then
-	echo "Lets configure this baby.. "
+	echo "Starting configuration.. "
 else if [ -r include/config.h ]; then
-	echo "Lets configure this baby.. "
+	echo "Starting configuration.. "
 else
-	echo ""
-	echo "It appears you haven't ran configure yet!"
+	echo "Configuration failed!"
+	echo "You have not run configure yet!"
 	echo "You probably should read the README file too"
 	echo ""
-	echo "Type ./configure (If you need help read the README before asking us)"
+	echo "Type ./configure"
+	echo "(If you need help read the README before asking us)"
 	echo ""
 	exit 1
 fi
 fi
-CONF=$STATSCONF
+CONF=$NEOSTATSCONF
 
 if [ -r "$CONF" ]; then
-	echo "$STATSCONF found"
+	echo "$NEOSTATSCONF found"
 	echo " "
-	echo "   You already have ran 'makeconf'  I really would suggest"
-	echo "against running it again since you WILL LOSE all the data"
-	echo "that is already in your config file!"
+	echo "You already have a configuration file. This script is just for"
+	echo "creating the configuration file. If you continue you WILL LOSE"
+	echo "all the data that is already in your configuration file!"
 	echo ""
-	echo "This script is just for creating one. If you want to recreate"
-	echo "your config file, type 'recreate'."
+	echo "If you are sure you want to recreate your configuration file"
+	echo "type 'recreate'."
 	echo $n " [exit] -> $c"
 	read cc
 
 	if [ "$cc" != "recreate" ]; then
 		echo " "
-		echo "   OK, do you want to edit $STATSCONF using an editor?"
+		echo "Do you want to edit $NEOSTATSCONF using an editor?"
 		echo "If so, specify the editor you want to use. Otherwise,"
 		echo "type 'exit'."
 		EDITFND="not found"
@@ -108,7 +110,7 @@ if [ -r "$CONF" ]; then
 			fi
 
 			if [ "$EDITOR" = "exit" ]; then
-				echo "Have a nice day."
+				echo "Done."
 				exit 1
 			fi
 
@@ -122,7 +124,7 @@ if [ -r "$CONF" ]; then
 				exit 1
 			fi
 
-			echo "   Editor not found. Specify a valid editor or"
+			echo "Editor not found. Specify a valid editor or"
 			echo "type 'exit' to quit this script."
 		done
 
@@ -130,9 +132,9 @@ if [ -r "$CONF" ]; then
 
 	mv $CONF "$CONF.saved"
 	rm $CONF
-	echo "$STATSCONF has been renamed to ircd.conf.saved"
+	echo "$NEOSTATSCONF has been renamed to $CONF.saved"
 else
-	echo "$STATSCONF is not found. (good)"
+	echo "$NEOSTATSCONF is not found. (good)"
 fi
 
 clear
@@ -140,8 +142,133 @@ echo ""
 echo "Thanks for Choosing NeoStats!"
 echo ""
 echo "*----------------------------------------*"
-echo "| Welcome to the $STATSCONF generator. |"
+echo "| Welcome to the $NEOSTATSCONF generator. |"
 echo "*----------------------------------------*"
+
+###########################################################################
+# select IRCd
+IRCD_DEFAULT="no default"
+IRCD=
+validselection=0
+echo "Which IRC server do you use?"
+echo "     1) Unreal 3.1.x"
+echo "     2) Unreal 3.2.x"
+echo "     3) Ultimate 2.x.x"
+echo "     4) Ultimate 3.x.x"
+echo "     5) Hybrid7"
+echo "     6) NeoIRCd"
+echo "     7) Bahamut"
+echo "     8) Mystic"
+echo "     9) Quantum"
+echo "     10) Viagra"
+echo "     11) IRCu P10"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$IRCD_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$IRCD_DEFAULT
+	fi
+	case $INPUT in
+		no\ default)
+			echo "You must specify your IRC server type in order for NeoStats to function"
+			echo "correctly."
+			;;
+		1)
+ 			IRCD="unreal31"
+			validselection=1
+			;;
+		2)
+ 			IRCD="unreal32"
+			validselection=1
+			;;
+		3)
+			IRCD="ultimate2"
+			validselection=1
+			;;
+		4)
+			IRCD="ultimate3"
+			validselection=1
+			;;
+		5)
+			IRCD="hybrid7"
+			MEXTAUTHALLOWED=0
+			validselection=1
+			;;
+		6)
+			IRCD="neoircd"
+			validselection=1
+			;;
+		7)
+			IRCD="bahamut"
+			validselection=1
+			;;
+		8)
+			IRCD="mystic"
+			validselection=1
+			;;
+		9)
+			IRCD="quantum"
+			validselection=1
+			;;
+		10)
+			IRCD="viagra"
+			validselection=1
+			;;
+		11)
+			IRCD="ircup10"
+			validselection=1
+			;;
+		*)
+			echo "Please enter a valid option number."
+			;;
+	esac
+done
+IRCD_DEFAULT=$INPUT
+echo ""
+
+###########################################################################
+# select IRCd
+DATABASE_DEFAULT="gdbm"
+DATABASE=
+validselection=0
+echo "Which datbase storage do you wish to use?"
+echo "     1) GDBM"
+echo "     2) Berkeley DB"
+while [ $validselection -eq 0 ] ; do
+	echo_no_lf "[$IRCD_DEFAULT] "
+	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
+	if [ ! "$INPUT" ] ; then
+		INPUT=$IRCD_DEFAULT
+	fi
+	case $INPUT in
+		no\ default)
+			echo "You must specify your IRC server type in order for NeoStats to function"
+			echo "correctly."
+			;;
+		1)
+ 			DATABASE="gdbm"
+			validselection=1
+			;;
+		2)
+ 			DATABASE="bdb"
+			validselection=1
+			;;
+		*)
+			echo "Please enter a valid option number."
+			;;
+	esac
+done
+DATABASE_DEFAULT=$INPUT
+echo ""
+
+echo " "
+echo "What will your root nickname be? (ie: $ROOTNICK)"
+echo $n " [$ROOTNICK] -> $c"
+read cc
+if [ ! -z "$cc" ]; then
+	ROOTNICK="$cc"
+fi
+
 echo " "
 echo "What will your server name be? (ie: $SERVNAME)"
 echo $n " [$SERVNAME] -> $c"
@@ -176,10 +303,10 @@ fi
 
 echo " "
 echo "NeoStats Server comment?"
-echo $n " [$COMMENT] -> $c"
+echo $n " [$INFOLINE] -> $c"
 read cc
 if [ ! -z "$cc" ]; then
-	COMMENT="$cc"
+	INFOLINE="$cc"
 fi
 
 echo " "
@@ -241,7 +368,7 @@ cat > $CONF << __EOF__
 #          PROTOCOL "unreal32"
 #      
 
-#PROTOCOL "unreal32"
+PROTOCOL "$IRCD"
 
 # DBM <dbm> [REQUIRED]
 #    Specifies the database manager module to use.
@@ -252,6 +379,16 @@ cat > $CONF << __EOF__
 #      
 
 DBM "gdbm"
+
+# ROOT_NICK <nick> [REQUIRED]
+#    Specifies the nick of the NeoStats root bot
+#    e.g. 
+#      
+#          ROOT_NICK NeoStats
+#      
+#    When NeoStats links, it create a root bot with nick NeoStats
+
+ROOT_NICK "$ROOTNICK"
 
 # SERVER_NAME <hostname> [REQUIRED]
 #    Specifies the name of the NeoStats Server as it will appear on 
@@ -297,13 +434,12 @@ CONNECT_PASS $LINKPASS
 #    
 #        SERVER_INFOLINE Network Auxiliary Services    
 
-SERVER_INFOLINE "$COMMENT"
+SERVER_INFOLINE "$INFOLINE"
 
 # SERVER_NUMERIC <numeric> [RECOMMENDED]
 #    Specify the numeric of the server to send on connect.
 #    This must be a value between 1 and 254, and must not be in use by
 #    any other IRC server on the network.  
-#    Currently only Unreal IRCd uses this option.
 #    
 #        SERVER_NUMERIC 1
 
@@ -445,6 +581,9 @@ SET_SERVER_TIMES 24
 #    Will load up StatServ at boot
 #    
 #    Multiple instances of LOAD_MODULE may be specified 
+#    We have provided example lines for convenience for 
+#    official modules but you must download and install
+#    external modules before trying to load them.
 
 # StatServ, maintain and report various networks statistics
 #LOAD_MODULE statserv
@@ -468,18 +607,32 @@ SET_SERVER_TIMES 24
 # Extauth, authenticate users based on nick!user@host access lists
 #LOAD_MODULE extauth
 
+# SecureServ. You must download and install SecureServ first.
+#LOAD_MODULE secureserv
+
+# OPSB. You must download and install OPSB first.
+#LOAD_MODULE opsb
+
+# LogServ. You must download and install LogServ first.
+#LOAD_MODULE logserv
+
+# TriviaServ. You must download and install TriviaServ first.
+#LOAD_MODULE triviaserv
+
 ########################################
 # NeoStats ROOT user                   #
 ########################################
 
-#SERVICE_ROOT <nick!user@host> [REQUIRED]
-#    Set who should get master access to manage NeoStats regardless of 
+#SERVICE_ROOT <nick!ident@host> [REQUIRED]
+#    Who should get master access to manage NeoStats regardless of 
 #    authentication systems. Only one entry allowed. e.g.
 #    
 #        SERVICE_ROOT fish!?Fish@*.neostats.net
 #        
 #    Will give "fish" complete access to NeoStats if fish has 
 #    umode +r and comes from the specified hostname and ident. 
+
+#SERVICE_ROOT nick!ident@host
 
 ###############################################################################
 ## End of Configuration                                                      ##
@@ -489,9 +642,8 @@ SET_SERVER_TIMES 24
 __EOF__
 
 
-
 # Make it so ONLY the one who created the conf can read or write.
-chmod 700 $STATSCONF
+chmod 700 $NEOSTATSCONF
 
 echo ""
 echo "*------------------------------------------------*"
@@ -503,7 +655,8 @@ echo "| you do not edit this file.                     |"
 echo "*------------------------------------------------*"
 echo "| Check any external and third party modules you |"
 echo "| wish to use (e.g. SecureServ) are compiled and |"
-echo "| listed in neostats.conf for them to work.      |"
+echo "| installed then add them to $NEOSTATSCONF for   |"
+echo "| them to load.                                  |"
 echo "*------------------------------------------------*"
 echo "| **I CANT STRESS THIS ENOUGH, PLEASE READ THE** |"
 echo "| **README FILE BEFORE ASKING FOR HELP!!!!!   ** |"

@@ -63,6 +63,7 @@ static config_option options[] = {
 	{"SERVICE_ROOT", ARG_STR, cb_Server, 17},
 	{"PROTOCOL", ARG_STR, cb_Server, 18},
 	{"DBM", ARG_STR, cb_Server, 19},
+	{"ROOT_NICK", ARG_STR, cb_Server, 20},
 };
 
 /** @brief Load configuration file
@@ -228,7 +229,7 @@ cb_Server (char *arg, int configtype)
 
 		if (strstr(arg, "!")&& !strstr(arg, "@")) {
 			nlog(LOG_WARNING, 
-				"Invalid SERVICEROOT. Must be of the form nick!user@host, was %s",
+				"Invalid SERVICEROOT. Must be of the form nick!ident@host, was %s",
 				arg);
 			nsconfig.error = 1;
 		} else {
@@ -244,5 +245,7 @@ cb_Server (char *arg, int configtype)
 		strlcpy(me.protocol,arg,MAXHOST);
 	} else if (configtype == 19) {
 		strlcpy(me.dbm,arg,MAXHOST);
+	} else if (configtype == 20) {
+		strlcpy(me.rootnick,arg,MAXNICK);
 	}
 }

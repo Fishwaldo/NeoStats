@@ -577,6 +577,7 @@ typedef struct tme {
 	char name[MAXHOST];
 	int numeric; 
 	char protocol[MAXHOST];
+	char rootnick[MAXNICK];
 	char dbm[MAXHOST];
 	char uplink[MAXHOST];
 	char infoline[MAXHOST];

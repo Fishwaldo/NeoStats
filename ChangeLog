@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha3-dev
+ - Change NeoStats root user to use a config file nickname. This is for future
+   use in multiple NeoStats incarnations running in a shared environment. (M)
  - Add module exclusion API so modules can use a local exclusion system without
    having to code and maintain one locally. (M)
  - Add WEEKLY and MONTHLY options to timer API. (M)
