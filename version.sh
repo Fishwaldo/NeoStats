@@ -7,7 +7,7 @@ id=`echo $id |sed 's/.* Revision: \(.*\) .* Exp .*/\1/'`
 #echo "$id"
 
 # Variable to hold status of current version.h
-# 0 : OK, 1 : needs update, 2 : needs creating
+# 0  OK, 1  needs update, 2  needs creating
 versionok=0
 
 # Test current version header against the current revision
