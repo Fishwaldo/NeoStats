@@ -101,7 +101,9 @@ IntCommands cmd_list[] = {
 	{MSG_KICK, TOK_KICK, Usr_Kick, 1, 0},
 	{MSG_JOIN, TOK_JOIN, Usr_Join, 1, 0},
 	{MSG_PART, TOK_PART, Usr_Part, 1, 0},
+#ifdef UNREAL32
 	{MSG_EOS, TOK_EOS, Usr_Eos, 0, 0},
+#endif
 	{MSG_PING, TOK_PING, Srv_Ping, 0, 0},
 	{MSG_NETINFO, TOK_NETINFO, Srv_Netinfo, 0, 0},
 	{MSG_SJOIN, TOK_SJOIN, Srv_Sjoin, 1, 0},
