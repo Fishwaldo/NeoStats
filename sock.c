@@ -344,7 +344,7 @@ sts (char *fmt, ...)
 	strcat (buf, "\n");
 	sent = write (servsock, buf, strlen (buf));
 	if (sent == -1) {
-		nlog (LOG_CRITICAL, LOG_CORE, "Write error.");
+		nlog (LOG_CRITICAL, LOG_CORE, "Write error: %s", strerror(errno));
 		do_exit (0);
 	}
 	me.SendM++;
