@@ -50,7 +50,6 @@ static int ss_forcehtml(User * u, char **av, int ac);
 void ss_html(void);
 
 static void ss_Config();
-static int new_m_version(char *origin, char **av, int ac);
 
 char s_StatServ[MAXNICK];
 
@@ -60,14 +59,6 @@ ModuleInfo __module_info = {
 	 "$Rev$",
 	__DATE__,
 	__TIME__
-};
-
-Functions __module_functions[] = {
-	{MSG_VERSION, new_m_version, 1},
-#ifdef GOTTOKENSUPPORT
-	{TOK_VERSION, new_m_version, 1},
-#endif
-	{NULL, NULL, 0}
 };
 
 EventFnList __module_events[] = {
@@ -139,19 +130,6 @@ void ss_Config()
 	    < 0) {
 		StatServ.interval = 0;
 	}
-}
-
-
-
-
-int new_m_version(char *origin, char **av, int ac)
-{
-	SET_SEGV_LOCATION();
-	snumeric_cmd(RPL_VERSION, origin,
-		     "Module StatServ Loaded, Version: %s %s %s",
-			 __module_info.module_version, __module_info.module_build_date,
-			 __module_info.module_build_time);
-	return 0;
 }
 
 int __ModInit(int modnum, int apiver)

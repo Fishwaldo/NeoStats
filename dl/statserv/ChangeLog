@@ -8,6 +8,7 @@ Shmad & ^Enigma & Fish^
  - change SSMNAME to __module_info.module_name to be consistent with other modules (M)
  - Use core bot message handler to process commands (M)
  - Changed SET command so SET LIST displays current settings and SET alone will error (M)
+ - Removed local module_function table to use core for /VERSION replies (M)
 
 * Revision 791 * Oct 30th, 2003 (F)
  - Channel stats are now dynamically loaded, and saved as needed. Not loaded into
