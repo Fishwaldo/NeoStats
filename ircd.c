@@ -239,7 +239,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #elif ULTIMATE
 #ifdef ULTIMATE3
 	snewnick_cmd(nick, user, host, rname, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
-#elif
+#else
 	snewnick_cmd(nick, user, host, rname);
 	sumode_cmd(nick, nick, UMODE_SERVICES | UMODE_DEAF | UMODE_SBOT);
 #endif

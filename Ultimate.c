@@ -72,6 +72,7 @@ Oper_Modes usr_mds[] = {
                                  {0, 0, 0 }
 };
 #elif ULTIMATE
+Oper_Modes usr_mds[] = {
                                  {UMODE_OPER, 'o', 50},
                                  {UMODE_LOCOP, 'O', 40},
                                  {UMODE_INVISIBLE, 'i', 0},
@@ -98,6 +99,7 @@ Oper_Modes usr_mds[] = {
                                  {UMODE_IRCADMIN, 'Z', 100},
                                  {UMODE_DEAF, 'd', 0},
                                  {0, 0, 0 }
+};
 #endif
 
 
