@@ -153,9 +153,6 @@
 /* enable Viagra support */
 #undef VIAGRA
 
-/* Version number of package */
-#undef VERSION
-
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
@@ -167,6 +164,9 @@
 
 /* define if you want to enable Raw */
 #undef USE_RAW
+
+/* Version number of package */
+#undef NEOSTATS_VERSION
 
 /* Major Version */
 #undef MAJOR
