@@ -668,6 +668,7 @@ typedef enum SET_REASON {
 	SET_LOAD = 0,
 	SET_LIST,
 	SET_CHANGE,
+	SET_VALIDATE,
 } SET_REASON;
 
 typedef int (*bot_cmd_handler) ( CmdParams* cmdparams );

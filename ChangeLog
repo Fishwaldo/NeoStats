@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M)
 ===============================================================================
 * NeoStats * Version 3.0.prealpha3-dev
+ - Add SET_VALIDATE stage to allow a module to override core SET validation and
+   to potentially react to the previous setting prior to SET_CHANGE. (M)
  - Command processor code split up. (M)
  - Add API for IRCd specific host cloaking. (M)
  - ConnectServ: Add option to watch AWAY events. (M)

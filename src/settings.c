@@ -170,23 +170,32 @@ static int bot_cmd_set_report( CmdParams *cmdparams, bot_setting* set_ptr, char 
 
 static int bot_cmd_set_boolean( CmdParams *cmdparams, bot_setting* set_ptr )
 {
-	if( !ircstrcasecmp( cmdparams->av[1], "ON" ) ) {
-		*( int* )set_ptr->varptr = 1;
-		if( set_ptr->fieldname ) {
-			DBAStoreConfigBool( set_ptr->fieldname, set_ptr->varptr );
-		}
-		bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
-		return NS_SUCCESS;
-	} else if( !ircstrcasecmp( cmdparams->av[1], "OFF" ) ) {
-		*( int* )set_ptr->varptr = 0;
-		if( set_ptr->fieldname ) {
-			DBAStoreConfigBool( set_ptr->fieldname, set_ptr->varptr );
-		}
-		bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
-		return NS_SUCCESS;
+	int newsetting;
+
+	if( !ircstrcasecmp( cmdparams->av[1], "ON" ) ) 
+	{
+		newsetting = 1;
+	} 
+	else if( !ircstrcasecmp( cmdparams->av[1], "OFF" ) ) 
+	{
+		newsetting = 0;
 	}
-	msg_syntax_error( cmdparams );
-	return NS_ERR_SYNTAX_ERROR;
+	else
+	{
+		msg_syntax_error( cmdparams );
+		return NS_ERR_SYNTAX_ERROR;
+	}
+	/* Module specific handling */
+	if( set_ptr->handler ) {
+		if( set_ptr->handler( cmdparams, SET_VALIDATE ) != NS_SUCCESS )
+			return NS_FAILURE;
+	}
+	*( int* )set_ptr->varptr = newsetting;
+	if( set_ptr->fieldname ) {
+		DBAStoreConfigBool( set_ptr->fieldname, set_ptr->varptr );
+	}
+	bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
+	return NS_SUCCESS;
 }
 
 /** @brief bot_cmd_set_int
@@ -221,6 +230,11 @@ static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting* set_ptr )
 			__( "Valid values are %d to %d", cmdparams->source ), set_ptr->min, set_ptr->max );
 		return NS_ERR_SYNTAX_ERROR;
 	}
+	/* Module specific handling */
+	if( set_ptr->handler ) {
+		if( set_ptr->handler( cmdparams, SET_VALIDATE ) != NS_SUCCESS )
+			return NS_FAILURE;
+	}
 	/* Set the new value */
 	*( int* )set_ptr->varptr = intval;
 	if( set_ptr->fieldname ) {
@@ -243,6 +257,11 @@ static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting* set_ptr )
 
 static int bot_cmd_set_string( CmdParams *cmdparams, bot_setting* set_ptr )
 {
+	/* Module specific handling */
+	if( set_ptr->handler ) {
+		if( set_ptr->handler( cmdparams, SET_VALIDATE ) != NS_SUCCESS )
+			return NS_FAILURE;
+	}
 	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	if( set_ptr->fieldname ) {
 		DBAStoreConfigStr( set_ptr->fieldname, cmdparams->av[1], set_ptr->max );
@@ -268,6 +287,11 @@ static int bot_cmd_set_channel( CmdParams *cmdparams, bot_setting* set_ptr )
 		irc_prefmsg( cmdparams->bot, cmdparams->source, 
 			__( "%s contains invalid characters", cmdparams->source ), cmdparams->av[1] );
 		return NS_ERR_SYNTAX_ERROR;
+	}
+	/* Module specific handling */
+	if( set_ptr->handler ) {
+		if( set_ptr->handler( cmdparams, SET_VALIDATE ) != NS_SUCCESS )
+			return NS_FAILURE;
 	}
 	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	if( set_ptr->fieldname ) {
@@ -494,7 +518,7 @@ int bot_cmd_set( CmdParams *cmdparams )
 			return NS_ERR_NO_PERMISSION;
 		}
 		set_handler = bot_cmd_set_handlers[set_ptr->type];
-		if( set_handler( cmdparams, set_ptr )!=NS_SUCCESS ) {
+		if( set_handler( cmdparams, set_ptr ) != NS_SUCCESS ) {
 			return NS_FAILURE;
 		}
 		/* Call back after SET so that a module can "react" to a change in a setting */
