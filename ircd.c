@@ -810,8 +810,9 @@ void Usr_Topic(char *origin, char **argv, int argc) {
 }
 
 void Usr_Kick(char *origin, char **argv, int argc) {
+	Module_Event("KICK", findchan(argv[0]));
 	part_chan(finduser(argv[1]), argv[0]);
-
+	
 }
 void Usr_Join(char *origin, char **argv, int argc) {
 	char *s, *t;
