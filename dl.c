@@ -1029,11 +1029,16 @@ ModUser *
 findbot (char *bot_name)
 {
 	hnode_t *bn;
+	User* u;
 
 	SET_SEGV_LOCATION();
-	bn = hash_lookup (bh, bot_name);
-	if (bn) {
-		return (ModUser *) hnode_get (bn);
+
+	u = finduser(bot_name);
+	if(u) {
+		bn = hash_lookup (bh, u->nick);
+		if (bn) {
+			return (ModUser *) hnode_get (bn);
+		}
 	}
 	return NULL;
 }
