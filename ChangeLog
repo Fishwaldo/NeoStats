@@ -14,6 +14,7 @@ NeoStats ChangeLog - Anything we add/remove/fix/change is in here (even our rant
  - Add BanDump command to NeoStats bot to help debug Bans (F)
  - Fix a obscure bug with recv.log that IRCu triggered with Bans (partly with BUGID 160) (F)
  - Fix a bug with SecureServ not seeing Channel Messages - bug 164 (F)
+ - IRCu: Fix for numeric collisions - Bug 159 (F)
 
 * NeoStats * Mark (M) * Version 2.5.16
  - Fix problem with Unreal SVSMODE services TS processing (M)

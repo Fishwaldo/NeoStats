@@ -159,7 +159,8 @@ const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
 char neostatsbase64[3] = "\0";
-int neonickcount = 0;
+/* Flags for numeric usage; limits to 64 clients */
+char neonicknumerics[64][MAXNICK];
 
 /*
  * Numeric nicks are new as of version ircu2.10.00beta1.
@@ -308,6 +309,8 @@ send_server (const char *sender, const char *name, const int numeric, const char
 void
 send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink)
 {
+	/* Reset our numeric buffer */
+	memset(neonicknumerics, 0 , sizeof(neonicknumerics));
 	inttobase64(neostatsbase64, numeric, 2);
 	send_cmd ("%s %s", MSG_PASS, pass);
     send_cmd ("%s %s 1 %lu %lu J10 %s]]] +s :%s", MSG_SERVER, name, tsboot, tslink, neostatsbase64, infoline);
@@ -323,6 +326,17 @@ send_squit (const char *server, const char *quitmsg)
 void 
 send_quit (const char *who, const char *quitmsg)
 {
+	int i;
+
+	/* Clear numeric */
+	for(i = 0; i < 64; i++)
+	{
+		if(strcmp(neonicknumerics[i], who)==0)
+		{
+			neonicknumerics[i][0] = 0;
+			break;
+		}
+	}
 	send_cmd ("%s %s :%s", nicktobase64 (who), TOK_QUIT, quitmsg);
 }
 
@@ -354,12 +368,19 @@ send_cmode (const char *sender, const char *who, const char *chan, const char *m
 void
 send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
 {
+	int i;
 	char nicknumbuf[6];
 
-	send_cmd ("%s %s %s 1 %lu %s %s %s AAAAAA %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, neostatsbase64, (neonickcount+'A'), realname);
-	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (neonickcount+'A'));
+	for(i = 0; i < 64; i++)
+	{
+		/* Reserve numeric */
+		if(neonicknumerics[i]==0)
+			break;
+	}
+	strlcpy(neonicknumerics[i], nick, MAXNICK);
+	send_cmd ("%s %s %s 1 %lu %s %s %s AAAAAA %sAA%c :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, neostatsbase64, (i+'A'), realname);
+	snprintf(nicknumbuf, 6, "%sAA%c", neostatsbase64, (i+'A'));
 	setnickbase64 (nick, nicknumbuf);
-	neonickcount ++;
 }
 
 void
