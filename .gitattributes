@@ -78,6 +78,7 @@ dl/spam/spam.c -text
 dl/statserv/ChangeLog -text
 dl/statserv/Makefile -text
 dl/statserv/database.c -text
+dl/statserv/html/index.tpl -text
 dl/statserv/htmlstats.c -text
 dl/statserv/m_stats.h -text
 dl/statserv/ss_help.c -text

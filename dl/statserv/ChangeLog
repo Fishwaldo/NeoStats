@@ -1,10 +1,14 @@
 StatServ Module for NeoStats 2.x ChangeLog
-Shmad & ^Enigma^
+Shmad & ^Enigma & Fish^
 (S) denotes Shmad  (E) denotes ^Enigma^
+(F) denotes Fish
 
-* Version 3.1 * February 8th, 2002
+* Version 3.1 * February 8th, 2002 (F)
  - Code overhauls for NeoStats-2.5 Core
-
+ - Added Channel Statistics for overall time, and daily stats
+ - updated HTML stats to use templates
+ - fixed a few innocent bugs (setting daily uses to Max? hu, Crackhead code (S) :) )
+ - split up statserv into a few diff files, as it was getting un-manageable :)
 
 * Version 3.0 * January 2nd, 2001
  - Removed Echos to the shell when starting Neo with SS loaded.. now the rest of the modules.. ugh (S)
