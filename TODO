@@ -15,3 +15,24 @@ HostServ TODO:
 Syntax: /msg HostServ CHPASS NICK OLDPASS NEWPASS
 
 
+Fish:
+-----
+
+UserLvl sucks.... comput it only once, and store it in the users struct.
+Only re-compute when they change nick (if extauth is compiled), or
+change modes (in fact, u can move the stuff into the umode function,
+save u 3x a table lookup)
+
+fnmatch is Baaaad news... find a good ircmatch function and port it over... 
+
+
+2.6.0 Series - Yep, I'm already thinking about this....
+------------
+
+Channel Based Logging... Means we can get rid of the #ifdef DEBUG, log(... 
+stuff, and define what gets logged when.
+
+Module Config File Support improvements. (I got ideas :)
+
+Re-Do the send/recv code... Its Horrible..
+
