@@ -678,9 +678,9 @@ static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( cs_cfg.away_watch ) {
-		EnableEvent( EVENT_NICK );
+		EnableEvent( EVENT_AWAY );
 	} else {
-		DisableEvent( EVENT_NICK );
+		DisableEvent( EVENT_AWAY );
 	}
 	return NS_SUCCESS;
 }
