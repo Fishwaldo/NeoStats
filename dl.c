@@ -102,7 +102,7 @@ new_timer (char *timer_name)
  * 
  * @return pointer to timer if found, NULL if not found
 */
-static Mod_Timer *
+Mod_Timer *
 findtimer (char *timer_name)
 {
 	hnode_t *tn;

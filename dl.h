@@ -197,6 +197,7 @@ int add_mod_user (char *nick, char *mod_name);
 int del_mod_user (char *nick);
 int add_mod_timer (char *func_name, char *timer_name, char *mod_name, int interval);
 int del_mod_timer (char *timer_name);
+Mod_Timer *findtimer(char *timer_name);
 void list_module_timer (User * u);
 int add_socket (char *readfunc, char *writefunc, char *errfunc, char *sock_name, int socknum, char *mod_name);
 int del_socket (char *sockname);

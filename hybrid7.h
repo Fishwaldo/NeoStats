@@ -230,7 +230,7 @@ struct ircd_srv_ {
 	int nicklg;
 	int gc;
 	char cloak[25];
-	int burst;
+	int unkline;
 	int cmdcount;
 } ircd_srv;
 

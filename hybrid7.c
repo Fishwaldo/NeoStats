@@ -429,11 +429,6 @@ ssvinfo_cmd ()
 int
 sburst_cmd (int b)
 {
-	if (b == 0) {
-		sts ("BURST 0");
-	} else {
-		sts ("BURST");
-	}
 	return 1;
 }
 
@@ -441,8 +436,6 @@ int
 sakill_cmd (const char *host, const char *ident, const char *setby, const int length, const char *reason, ...)
 {
 	/* there isn't an akill on Hybrid, so we send a kline to all servers! */
-	hscan_t ss;
-	hnode_t *sn;
 	Server *s;
 
 	va_list ap;
@@ -450,11 +443,7 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 	va_start (ap, reason);
 	vsnprintf (buf, 512, reason, ap);
 
-	hash_scan_begin (&ss, sh);
-	while ((sn = hash_scan_next (&ss)) != NULL) {
-		s = hnode_get (sn);
-		sts (":%s %s %s %lu %s %s :%s", setby, MSG_KLINE, s->name, length, ident, host, buf);
-	}
+	sts (":%s %s * %lu %s %s :%s", setby, MSG_KLINE, length, ident, host, buf);
 	va_end (ap);
 	return 1;
 }
@@ -462,7 +451,11 @@ sakill_cmd (const char *host, const char *ident, const char *setby, const int le
 int
 srakill_cmd (const char *host, const char *ident)
 {
-	chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
+	if (ircd_srv.unkline) {
+		sts(":%s %s %s %s", me.name, MSG_UNKLINE, ident, host);
+	} else {
+		chanalert (s_Services, "Please Manually remove KLINES using /unkline on each server");
+	}
 	return 1;
 }
 
@@ -568,7 +561,7 @@ globops (char *from, char *fmt, ...)
 
 /* Fish - now that was crackhead coding! */
 	if (me.onchan) {
-		snprintf (buf, 512, ":%s GLOBOPS :%s", from, buf2);
+		snprintf (buf, 512, ":%s WALLOPS :%s", from, buf2);
 		sts ("%s", buf);
 	} else {
 		nlog (LOG_NORMAL, LOG_CORE, "%s", buf2);
@@ -660,32 +653,20 @@ Srv_Sjoin (char *origin, char **argv, int argc)
 	}
 	list_destroy (tl);
 }
-
 void
 Srv_Burst (char *origin, char **argv, int argc)
 {
-	if (argc > 0) {
-		if (ircd_srv.burst == 1) {
-			sburst_cmd (0);
-			ircd_srv.burst = 0;
-			me.synced = 1;
-			init_ServBot ();
-		}
-	} else {
-		ircd_srv.burst = 1;
-	}
 	seob_cmd (me.name);
 	init_ServBot ();
 }
-
 void
 Srv_Connect (char *origin, char **argv, int argc)
 {
 	int i;
-
+	ircd_srv.unkline = 0;
 	for (i = 0; i < argc; i++) {
-		if (!strcasecmp ("TOKEN", argv[i])) {
-			me.token = 1;
+		if (!strcasecmp ("UNKLN", argv[i])) {
+			ircd_srv.unkline = 1;
 		}
 	}
 }
