@@ -262,7 +262,35 @@ int ssvshost_cmd(const char *who, const char *vhost) {
 	}
 }
 
+int ssvsmode_cmd(const char *target, const char *modes) {
+	User *u;
+	u = finduser(target);
+	if (!u) {
+		log("Can't find user %s for ssvsmode_cmd", target);
+		return 0;
+	} else {
+		sts(":%s %s %s %s", me.name, (me.token ? TOK_SVSMODE : MSG_SVSMODE), target, modes);
+		UserMode(target, modes);
+	}
+}
 
+int ssvskill_cmd(const char *target, const char *reason, ...) {
+	User *u;
+	va_list ap;
+	char buf[512];
+	u = finduser(target);
+	if (!u) {
+		log("Cant find user %s for ssvskill_cmd", target);
+		return 0;
+	} else {
+		va_start(ap, reason);
+		vsnprintf(buf, 512, reason, ap);
+		sts(":%s %s %s :%s", me.name, (me.token ? TOK_SVSKILL : MSG_SVSKILL), target, buf);
+		Module_Event("KILL", u);
+		DelUser(target);
+		va_end(ap);
+	}
+}
 
 
 
@@ -315,6 +343,7 @@ void notice(char *who, char *buf,...)
 	}
 	va_end (ap);
 }
+
 void privmsg(char *to, const char *from, char *fmt, ...)
 {
 	va_list ap;

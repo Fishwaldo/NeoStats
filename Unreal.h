@@ -18,7 +18,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: Unreal.h,v 1.15 2002/03/28 05:29:36 fishwaldo Exp $
+ *   $Id: Unreal.h,v 1.16 2002/04/05 05:28:14 fishwaldo Exp $
  */
 
 
@@ -443,5 +443,9 @@ extern int ssvsjoin_cmd(const char *target, const char *chan);
 extern int ssvspart_cmd(const char *target, const char *chan);
 extern int skick_cmd(const char *who, const char *target, const char *chan, const char *reason);
 extern int swallops_cmd(const char *who, const char *msg,...);
+extern int ssvsmode_cmd(const char *target, const char *modes);
+extern int ssvshost_cmd(const char *who, const char *vhost);
+extern int ssvskill_cmd(const char *target, const char *reason, ...);
+
 #endif  /* UNREAL_H Define */
 
