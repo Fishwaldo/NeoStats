@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: sock.c,v 1.34 2003/04/30 15:00:28 fishwaldo Exp $
+** $Id: sock.c,v 1.35 2003/05/07 09:29:27 fishwaldo Exp $
 */
 
 #include <fcntl.h>
@@ -152,6 +152,7 @@ void read_loop()
 					hash_scan_begin(&ss, sockh);
 					while ((sn = hash_scan_next(&ss)) != NULL) {
 						mod_sock = hnode_get(sn);
+						strcpy(segvinmodule, mod_sock->modname);
 						if (FD_ISSET(mod_sock->sock_no, &readfds)) {
 							nlog(LOG_DEBUG3, LOG_CORE, "Running module %s readsock function for %s", mod_sock->modname, mod_sock->sockname);
 							if (mod_sock->readfnc(mod_sock->sock_no, mod_sock->sockname) < 0)
@@ -168,6 +169,7 @@ void read_loop()
 							break;
 						}
 					}
+					strcpy(segvinmodule, "");
 					break;
 				}
 			}

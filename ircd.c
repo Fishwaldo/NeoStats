@@ -22,7 +22,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: ircd.c,v 1.117 2003/04/21 10:30:37 fishwaldo Exp $
+** $Id: ircd.c,v 1.118 2003/05/07 09:29:27 fishwaldo Exp $
 */
  
 #include <setjmp.h>
@@ -284,7 +284,9 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 {
 	User *u;
 #ifndef ULTIMATE3
+#ifndef HYBRID7
 	char cmd[63];
+#endif
 #endif
 	char **av;
 	int ac = 0;
@@ -351,7 +353,11 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 		sjoin_cmd(nick, me.chan, MODE_CHANADMIN);
 #else /* ulitmate3 */
 		sjoin_cmd(nick, me.chan);
+#ifndef HYBRID7
 		snprintf(cmd, 63, "%s %s", nick, nick);
+#else 
+		schmode_cmd(me.name, me.chan, "+o", nick);
+#endif
 #ifndef HYBRID7
 #ifdef NEOIRCD
 		schmode_cmd(me.name, me.chan, "+a", cmd);
@@ -360,7 +366,7 @@ int init_bot(char *nick, char *user, char *host, char *rname, char *modes, char 
 #endif /* neoircd */
 #endif /* hybrid7 */
 #endif /* ultimate3 */
-#ifndef HYRBID7
+#ifndef HYBRID7
 	/* all bots join */
 	}
 #endif
