@@ -81,7 +81,8 @@ AC_PROG_LEX
 AC_PATH_PROG( SED, sed, , $PATH:/usr/bin:/usr/local/bin)
 
 # Checks for libraries.
-dnl AC_LIB_LTDL
+# AC_LIB_LTDL
+AC_CHECK_LIB(dl, dlopen)
 
 # Checks for header files.
 AC_HEADER_STDC
