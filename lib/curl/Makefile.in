@@ -187,7 +187,6 @@ am__untar = @am__untar@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
-build_configtool = @build_configtool@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
@@ -279,7 +278,7 @@ urldata.h cookie.h mprintf.h curl.h types.h easy.h multi.h
 
 noinst_HEADERS = setup.h transfer.h
 BUILT_SOURCES = $(srcdir)/getdate.c $(srcdir)/ca-bundle.h
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 all: $(BUILT_SOURCES)

@@ -169,7 +169,6 @@ am__untar = @am__untar@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
-build_configtool = @build_configtool@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
@@ -202,7 +201,7 @@ libkeeper_a_SOURCES = keeper.h kp_cache.c kp_dir.c kp_enum.c kp_get.c \
 			kp_util.h
 
 AM_CFLAGS = -I../pcre -I../adns -I../curl 
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 all: all-am

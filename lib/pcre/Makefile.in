@@ -182,7 +182,6 @@ am__untar = @am__untar@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
-build_configtool = @build_configtool@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
@@ -216,7 +215,7 @@ dftables_DEPENDENCES = maketables.c
 noinst_HEADERS = maketables.c
 include_HEADERS = pcre.h
 AM_CFLAGS = @PCRE_CFLAGS@
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 all: all-am

@@ -220,7 +220,6 @@ am__untar = @am__untar@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
-build_configtool = @build_configtool@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
@@ -266,7 +265,7 @@ unreal32_la_SOURCES = unreal32.c unreal32.h
 viagra_la_SOURCES = viagra.c viagra.h
 AM_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = -I$(top_srcdir)/lib/adns/ -I$(top_srcdir)/lib/keeper @PCRE_CFLAGS@ @CURL_CFLAGS@
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 all: all-am

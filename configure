@@ -464,7 +464,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE wi_PWD build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED LIBOBJS ALLOCA POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE PROTOCOL LIBTOOL_DEPS MODULES LIBDB LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED LIBOBJS ALLOCA POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE wi_PWD PROTOCOL LIBTOOL_DEPS MODULES LIBDB LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1028,7 +1028,6 @@ Optional Features:
 			  (and sometimes confusing) to the casual installer
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --disable-ccdv          disable use of ccdv program in Makefiles
   --enable-shared[=PKGS]
                           build shared libraries [default=yes]
   --enable-static[=PKGS]
@@ -1040,6 +1039,7 @@ Optional Features:
   --enable-autodebug - Enable AutoTools Debug
   --enable-raw - Enable Raw command
   --disable-largefile     omit support for large files
+  --disable-ccdv          disable use of ccdv program in Makefiles
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3127,558 +3127,6 @@ else
 fi
 
 
-
-# Check whether --enable-ccdv or --disable-ccdv was given.
-if test "${enable_ccdv+set}" = set; then
-  enableval="$enable_ccdv"
-  use_ccdv="$enableval"
-else
-  use_ccdv=yes
-fi;
-
-
-# Extract the first word of ""pwd"", so it can be a program name with args.
-set dummy "pwd"; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_wi_PWD+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $wi_PWD in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_wi_PWD="$wi_PWD" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_wi_PWD="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_path_wi_PWD" && ac_cv_path_wi_PWD=""pwd""
-  ;;
-esac
-fi
-wi_PWD=$ac_cv_path_wi_PWD
-
-if test -n "$wi_PWD"; then
-  echo "$as_me:$LINENO: result: $wi_PWD" >&5
-echo "${ECHO_T}$wi_PWD" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-
-
-if test "x$use_ccdv" = "xno" ; then
-	echo "$as_me:$LINENO: checking for ccdv" >&5
-echo $ECHO_N "checking for ccdv... $ECHO_C" >&6
-	echo "$as_me:$LINENO: result: (disabled)" >&5
-echo "${ECHO_T}(disabled)" >&6
-else
-unset wi_cv_path_ccdv	# can't use cache if it was a temp prog last time
-wi_used_cache_path_ccdv="yes"
-echo "$as_me:$LINENO: checking for ccdv" >&5
-echo $ECHO_N "checking for ccdv... $ECHO_C" >&6
-if test "${wi_cv_path_ccdv+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-
-wi_used_cache_path_ccdv="no"
-for CCDV in /usr/bin/ccdv /usr/local/bin/ccdv /usr/ccs/bin/ccdv NONE
-do
-	if test "$CCDV" = NONE ; then CCDV="" ; break ; fi
-	$CCDV >/dev/null 2>&1
-	if test $? -eq 96 ; then
-		break
-	fi
-done
-if test "x$CCDV" = "x" ; then
-		cat > ccdv.c << 'EOF'
-/* ccdv.c
- *
- * Copyright (C) 2002-2003, by Mike Gleason, NcFTP Software.
- * All Rights Reserved.
- *
- * Licensed under the GNU Public License.
- */
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-
-#define SETCOLOR_SUCCESS	(gANSIEscapes ? "\033\1331;32m" : "")
-#define SETCOLOR_FAILURE	(gANSIEscapes ? "\033\1331;31m" : "")
-#define SETCOLOR_WARNING	(gANSIEscapes ? "\033\1331;33m" : "")
-#define SETCOLOR_NORMAL		(gANSIEscapes ? "\033\1330;39m" : "")
-
-#define TEXT_BLOCK_SIZE 8192
-#define INDENT 2
-
-#define TERMS "vt100:vt102:vt220:vt320:xterm:xterm-color:ansi:linux:scoterm:scoansi:dtterm:cons25:cygwin"
-
-size_t gNBufUsed = 0, gNBufAllocated = 0;
-char *gBuf = NULL;
-int gCCPID;
-char gAction[64] = "";
-char gTarget[64] = "";
-char gAr[32] = "";
-char gArLibraryTarget[64] = "";
-int gDumpCmdArgs = 0;
-char gArgsStr[800];
-int gColumns = 80;
-int gANSIEscapes = 0;
-int gExitStatus = 95;
-
-static void
-DumpFormattedOutput(void)
-{
-	char *cp;
-	char spaces[8 + 1] = "        ";
-	char *saved;
-	int curcol;
-	int i;
-
-	curcol = 0;
-	saved = NULL;
-	for (cp = gBuf + ((gDumpCmdArgs == 0) ? strlen(gArgsStr) : 0); ; cp++) {
-		if (*cp == '\0') {
-			if (saved != NULL) {
-				cp = saved;
-				saved = NULL;
-			} else break;
-		}
-		if (*cp == '\r')
-			continue;
-		if (*cp == '\t') {
-			saved = cp + 1;
-			cp = spaces + 8 - (8 - ((curcol - INDENT - 1) % 8));
-		}
-		if (curcol == 0) {
-			for (i = INDENT; --i >= 0; )
-				putchar(' ');
-			curcol = INDENT;
-		}
-		putchar(*cp);
-		if (++curcol == (gColumns - 1)) {
-			putchar('\n');
-			curcol = 0;
-		} else if (*cp == '\n')
-			curcol = 0;
-	}
-	free(gBuf);
-}	/* DumpFormattedOutput */
-
-
-
-/* Difftime(), only for timeval structures.  */
-static void TimeValSubtract(struct timeval *tdiff, struct timeval *t1, struct timeval *t0)
-{
-	tdiff->tv_sec = t1->tv_sec - t0->tv_sec;
-	tdiff->tv_usec = t1->tv_usec - t0->tv_usec;
-	if (tdiff->tv_usec < 0) {
-		tdiff->tv_sec--;
-		tdiff->tv_usec += 1000000;
-	}
-}	/* TimeValSubtract */
-
-
-
-static void
-Wait(void)
-{
-	int pid2, status;
-
-	do {
-		status = 0;
-		pid2 = (int) waitpid(gCCPID, &status, 0);
-	} while (((pid2 >= 0) && (! WIFEXITED(status))) || ((pid2 < 0) && (errno == EINTR)));
-	if (WIFEXITED(status))
-		gExitStatus = WEXITSTATUS(status);
-}	/* Wait */
-
-
-
-static int
-SlurpProgress(int fd)
-{
-	char s1[71];
-	char *newbuf;
-	int nready;
-	size_t ntoread;
-	ssize_t nread;
-	struct timeval now, tnext, tleft;
-	fd_set ss;
-	fd_set ss2;
-	const char *trail = "/-\\|", *trailcp;
-
-	trailcp = trail;
-	snprintf(s1, sizeof(s1), "%s%s%s... ", gAction, gTarget[0] ? " " : "", gTarget);
-	printf("\r%-70s%-9s", s1, "");
-	fflush(stdout);
-
-	gettimeofday(&now, NULL);
-	tnext = now;
-	tnext.tv_sec++;
-	tleft.tv_sec = 1;
-	tleft.tv_usec = 0;
-	FD_ZERO(&ss2);
-	FD_SET(fd, &ss2);
-	for(;;) {
-		if (gNBufUsed == (gNBufAllocated - 1)) {
-			if ((newbuf = (char *) realloc(gBuf, gNBufAllocated + TEXT_BLOCK_SIZE)) == NULL) {
-				perror("ccdv: realloc");
-				return (-1);
-			}
-			gNBufAllocated += TEXT_BLOCK_SIZE;
-			gBuf = newbuf;
-		}
-		for (;;) {
-			ss = ss2;
-			nready = select(fd + 1, &ss, NULL, NULL, &tleft);
-			if (nready == 1)
-				break;
-			if (nready < 0) {
-				if (errno != EINTR) {
-					perror("ccdv: select");
-					return (-1);
-				}
-				continue;
-			}
-			gettimeofday(&now, NULL);
-			if ((now.tv_sec > tnext.tv_sec) || ((now.tv_sec == tnext.tv_sec) && (now.tv_usec >= tnext.tv_usec))) {
-				tnext = now;
-				tnext.tv_sec++;
-				tleft.tv_sec = 1;
-				tleft.tv_usec = 0;
-				printf("\r%-71s%c%-7s", s1, *trailcp, "");
-				fflush(stdout);
-				if (*++trailcp == '\0')
-					trailcp = trail;
-			} else {
-				TimeValSubtract(&tleft, &tnext, &now);
-			}
-		}
-		ntoread = (gNBufAllocated - gNBufUsed - 1);
-		nread = read(fd, gBuf + gNBufUsed, ntoread);
-		if (nread < 0) {
-			if (errno == EINTR)
-				continue;
-			perror("ccdv: read");
-			return (-1);
-		} else if (nread == 0) {
-			break;
-		}
-		gNBufUsed += nread;
-		gBuf[gNBufUsed] = '\0';
-	}
-	snprintf(s1, sizeof(s1), "%s%s%s: ", gAction, gTarget[0] ? " " : "", gTarget);
-	Wait();
-	if (gExitStatus == 0) {
-		printf("\r%-70s", s1);
-		printf("[%s%s%s]", ((gNBufUsed - strlen(gArgsStr)) < 4) ? SETCOLOR_SUCCESS : SETCOLOR_WARNING, "OK", SETCOLOR_NORMAL);
-		printf("%-5s\n", " ");
-	} else {
-		printf("\r%-70s", s1);
-		printf("[%s%s%s]", SETCOLOR_FAILURE, "ERROR", SETCOLOR_NORMAL);
-		printf("%-2s\n", " ");
-		gDumpCmdArgs = 1;	/* print cmd when there are errors */
-	}
-	fflush(stdout);
-	return (0);
-}	/* SlurpProgress */
-
-
-
-static int
-SlurpAll(int fd)
-{
-	char *newbuf;
-	size_t ntoread;
-	ssize_t nread;
-
-	printf("%s%s%s.\n", gAction, gTarget[0] ? " " : "", gTarget);
-	fflush(stdout);
-
-	for(;;) {
-		if (gNBufUsed == (gNBufAllocated - 1)) {
-			if ((newbuf = (char *) realloc(gBuf, gNBufAllocated + TEXT_BLOCK_SIZE)) == NULL) {
-				perror("ccdv: realloc");
-				return (-1);
-			}
-			gNBufAllocated += TEXT_BLOCK_SIZE;
-			gBuf = newbuf;
-		}
-		ntoread = (gNBufAllocated - gNBufUsed - 1);
-		nread = read(fd, gBuf + gNBufUsed, ntoread);
-		if (nread < 0) {
-			if (errno == EINTR)
-				continue;
-			perror("ccdv: read");
-			return (-1);
-		} else if (nread == 0) {
-			break;
-		}
-		gNBufUsed += nread;
-		gBuf[gNBufUsed] = '\0';
-	}
-	Wait();
-	gDumpCmdArgs = (gExitStatus != 0);	/* print cmd when there are errors */
-	return (0);
-}	/* SlurpAll */
-
-
-
-static const char *
-Basename(const char *path)
-{
-	const char *cp;
-	cp = strrchr(path, '/');
-	if (cp == NULL)
-		return (path);
-	return (cp + 1);
-}	/* Basename */
-
-
-
-static const char *
-Extension(const char *path)
-{
-	const char *cp = path;
-	cp = strrchr(path, '.');
-	if (cp == NULL)
-		return ("");
-	return (cp);
-}	/* Extension */
-
-
-
-static void
-Usage(void)
-{
-	fprintf(stderr, "Usage: ccdv /path/to/cc CFLAGS...\n\n");
-	fprintf(stderr, "I wrote this to reduce the deluge Make output to make finding actual problems\n");
-	fprintf(stderr, "easier.  It is intended to be invoked from Makefiles, like this.  Instead of:\n\n");
-	fprintf(stderr, "\t.c.o:\n");
-	fprintf(stderr, "\t\t$(CC) $(CFLAGS) $(DEFS) $(CPPFLAGS) $< -c\n");
-	fprintf(stderr, "\nRewrite your rule so it looks like:\n\n");
-	fprintf(stderr, "\t.c.o:\n");
-	fprintf(stderr, "\t\t@ccdv $(CC) $(CFLAGS) $(DEFS) $(CPPFLAGS) $< -c\n\n");
-	fprintf(stderr, "ccdv 1.1.0 is Free under the GNU Public License.  Enjoy!\n");
-	fprintf(stderr, "  -- Mike Gleason, NcFTP Software <http://www.ncftp.com>\n");
-	exit(96);
-}	/* Usage */
-
-
-
-int
-main(int argc, char **argv)
-{
-	int pipe1[2];
-	int devnull;
-	char emerg[256];
-	int fd;
-	int nread;
-	int i;
-	int cc = 0, pch = 0;
-	const char *quote;
-
-	if (argc < 2)
-		Usage();
-
-	snprintf(gAction, sizeof(gAction), "Running %s", Basename(argv[1]));
-	memset(gArgsStr, 0, sizeof(gArgsStr));
-	for (i = 1; i < argc; i++) {
-		quote = (strchr(argv[i], ' ') != NULL) ? "\"" : "";
-		snprintf(gArgsStr + strlen(gArgsStr), sizeof(gArgsStr) - strlen(gArgsStr), "%s%s%s%s%s", (i == 1) ? "" : " ", quote, argv[i], quote, (i == (argc - 1)) ? "\n" : "");
-		if ((strcmp(argv[i], "-o") == 0) && ((i + 1) < argc)) {
-			if (strcasecmp(Extension(argv[i + 1]), ".o") != 0) {
-				strcpy(gAction, "Linking");
-				snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i + 1]));
-			}
-		} else if (strchr("-+/", (int) argv[i][0]) != NULL) {
-			continue;
-		} else if (strncasecmp(Extension(argv[i]), ".c", 2) == 0) {
-			cc++;
-			snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i]));
-		} else if ((strncasecmp(Extension(argv[i]), ".h", 2) == 0) && (cc == 0)) {
-			pch++;
-			snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i]));
-		} else if ((i == 1) && (strcmp(Basename(argv[i]), "ar") == 0)) {
-			snprintf(gAr, sizeof(gAr), "%s", Basename(argv[i]));
-		} else if ((gArLibraryTarget[0] == '\0') && (strcasecmp(Extension(argv[i]), ".a") == 0)) {
-			snprintf(gArLibraryTarget, sizeof(gArLibraryTarget), "%s", Basename(argv[i]));
-		}
-	}
-	if ((gAr[0] != '\0') && (gArLibraryTarget[0] != '\0')) {
-		strcpy(gAction, "Creating library");
-		snprintf(gTarget, sizeof(gTarget), "%s", gArLibraryTarget);
-	} else if (pch > 0) {
-		strcpy(gAction, "Precompiling");
-	} else if (cc > 0) {
-		strcpy(gAction, "Compiling");
-	}
-
-	if (pipe(pipe1) < 0) {
-		perror("ccdv: pipe");
-		exit(97);
-	}
-
-	(void) close(0);
-	devnull = open("/dev/null", O_RDWR, 00666);
-	if ((devnull != 0) && (dup2(devnull, 0) == 0))
-		close(devnull);
-
-	gCCPID = (int) fork();
-	if (gCCPID < 0) {
-		(void) close(pipe1[0]);
-		(void) close(pipe1[1]);
-		perror("ccdv: fork");
-		exit(98);
-	} else if (gCCPID == 0) {
-		/* Child */
-		(void) close(pipe1[0]);		/* close read end */
-		if (pipe1[1] != 1) {		/* use write end on stdout */
-			(void) dup2(pipe1[1], 1);
-			(void) close(pipe1[1]);
-		}
-		(void) dup2(1, 2);		/* use write end on stderr */
-		execvp(argv[1], argv + 1);
-		perror(argv[1]);
-		exit(99);
-	}
-
-	/* parent */
-	(void) close(pipe1[1]);		/* close write end */
-	fd = pipe1[0];			/* use read end */
-
-	gColumns = (getenv("COLUMNS") != NULL) ? atoi(getenv("COLUMNS")) : 80;
-	gANSIEscapes = (getenv("TERM") != NULL) && (strstr(TERMS, getenv("TERM")) != NULL);
-	gBuf = (char *) malloc(TEXT_BLOCK_SIZE);
-	if (gBuf == NULL)
-		goto panic;
-	gNBufUsed = 0;
-	gNBufAllocated = TEXT_BLOCK_SIZE;
-	if (strlen(gArgsStr) < (gNBufAllocated - 1)) {
-		strcpy(gBuf, gArgsStr);
-		gNBufUsed = strlen(gArgsStr);
-	}
-
-	if (isatty(1)) {
-		if (SlurpProgress(fd) < 0)
-			goto panic;
-	} else {
-		if (SlurpAll(fd) < 0)
-			goto panic;
-	}
-	DumpFormattedOutput();
-	exit(gExitStatus);
-
-panic:
-	gDumpCmdArgs = 1;	/* print cmd when there are errors */
-	DumpFormattedOutput();
-	while ((nread = read(fd, emerg, (size_t) sizeof(emerg))) > 0)
-		(void) write(2, emerg, (size_t) nread);
-	Wait();
-	exit(gExitStatus);
-}	/* main */
-/* eof ccdv.c */
-EOF
-		${CC-cc} $DEFS $CPPFLAGS $CFLAGS "ccdv.c" -o "ccdv" >/dev/null 2>&1
-	/bin/rm -f ccdv.c ccdv.o ccdv.c.gz.uu ccdv.c.gz
-	strip ./ccdv >/dev/null 2>&1
-	./ccdv >/dev/null 2>&1
-	if test $? -eq 96 ; then
-		CCDV="./ccdv"
-	else
-		/bin/rm -f ccdv
-	fi
-fi
-if test "x$CCDV" != x ; then
-
-
-wi_path="$CCDV"
-if test -d "$wi_path" ; then
-	wi_resolved_path=`cd "$wi_path" ; $wi_PWD 2>/dev/null`
-elif test ! -f "$wi_path" ; then
-	wi_resolved_path="$wi_path"
-else
-	wi_parent_dir="$wi_path"
-	wi_file_name="$wi_path"
-
-wi_parent_dir=`echo "$wi_parent_dir" | sed -n '
-s-//*-/-g
-s-/*$--
-/^\/\/*[^/]*$/{
-	c\\
-/
-	p
-	q
-}
-/^[^/]*$/{
-	c\\
-.
-	p
-	q
-}
-/./{
-	s-/[^/]*$--
-	p
-	q
-}'`
-
-wi_file_name=`echo "$wi_file_name" | sed -n '
-s-//*-/-g
-s-/*$--
-s-^/$--
-s-^.*/--
-p
-q'`
-	wi_resolved_path=`cd "$wi_parent_dir" ; $wi_PWD 2>/dev/null`
-	if test "x$wi_resolved_path" != x ; then
-		wi_resolved_path="$wi_resolved_path/$wi_file_name"
-	fi
-	unset wi_parent_dir wi_file_name
-fi
-if test "x$wi_resolved_path" = x ; then
-	CCDV="$$CCDV"
-else
-	CCDV="$wi_resolved_path"
-fi
-unset wi_resolved_path wi_path
-
-	wi_cv_path_ccdv="$CCDV"
-	CC="$CCDV $CC"	# trailing space needed
-else
-	wi_cv_path_ccdv=""
-fi
-
-fi
-echo "$as_me:$LINENO: result: $wi_cv_path_ccdv" >&5
-echo "${ECHO_T}$wi_cv_path_ccdv" >&6
-if test "$wi_used_cache_path_ccdv" = yes ; then
-	CCDV="$wi_cv_path_ccdv"
-	if test "x$CCDV" != x ; then
-		CC="$CCDV $CC"	# trailing space needed
-	fi
-fi
-
-fi
-
 # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
@@ -4304,7 +3752,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4307 "configure"' > conftest.$ac_ext
+  echo '#line 3755 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5876,7 +5324,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5879:" \
+echo "$as_me:5327:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6903,11 +6351,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6906: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6354: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6910: \$? = $ac_status" >&5
+   echo "$as_me:6358: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7135,11 +6583,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7138: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6586: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7142: \$? = $ac_status" >&5
+   echo "$as_me:6590: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -7202,11 +6650,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7205: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6653: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:7209: \$? = $ac_status" >&5
+   echo "$as_me:6657: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8587,7 +8035,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 8590 "configure"' > conftest.$ac_ext
+    echo '#line 8038 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9369,7 +8817,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9372 "configure"
+#line 8820 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9467,7 +8915,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9470 "configure"
+#line 8918 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11619,11 +11067,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11622: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11070: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11626: \$? = $ac_status" >&5
+   echo "$as_me:11074: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11686,11 +11134,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11689: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11137: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11693: \$? = $ac_status" >&5
+   echo "$as_me:11141: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12257,7 +11705,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 12260 "configure"' > conftest.$ac_ext
+    echo '#line 11708 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -13039,7 +12487,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13042 "configure"
+#line 12490 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13137,7 +12585,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 13140 "configure"
+#line 12588 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13959,11 +13407,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13962: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13410: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13966: \$? = $ac_status" >&5
+   echo "$as_me:13414: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -14026,11 +13474,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14029: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13477: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14033: \$? = $ac_status" >&5
+   echo "$as_me:13481: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15391,7 +14839,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 15394 "configure"' > conftest.$ac_ext
+    echo '#line 14842 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -16037,11 +15485,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16040: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15488: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16044: \$? = $ac_status" >&5
+   echo "$as_me:15492: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16269,11 +15717,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16272: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15720: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:16276: \$? = $ac_status" >&5
+   echo "$as_me:15724: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -16336,11 +15784,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:16339: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15787: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:16343: \$? = $ac_status" >&5
+   echo "$as_me:15791: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17721,7 +17169,7 @@ linux*)
   libsuff=
   case "$host_cpu" in
   x86_64*|s390x*|powerpc64*)
-    echo '#line 17724 "configure"' > conftest.$ac_ext
+    echo '#line 17172 "configure"' > conftest.$ac_ext
     if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -18503,7 +17951,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18506 "configure"
+#line 17954 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18601,7 +18049,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18604 "configure"
+#line 18052 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -31261,6 +30709,560 @@ _ACEOF
 
 
 
+# Check whether --enable-ccdv or --disable-ccdv was given.
+if test "${enable_ccdv+set}" = set; then
+  enableval="$enable_ccdv"
+  use_ccdv="$enableval"
+else
+  use_ccdv=yes
+fi;
+
+
+# Extract the first word of ""pwd"", so it can be a program name with args.
+set dummy "pwd"; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_wi_PWD+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $wi_PWD in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_wi_PWD="$wi_PWD" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_wi_PWD="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_wi_PWD" && ac_cv_path_wi_PWD=""pwd""
+  ;;
+esac
+fi
+wi_PWD=$ac_cv_path_wi_PWD
+
+if test -n "$wi_PWD"; then
+  echo "$as_me:$LINENO: result: $wi_PWD" >&5
+echo "${ECHO_T}$wi_PWD" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+
+
+if test "x$use_ccdv" = "xno" ; then
+	echo "$as_me:$LINENO: checking for ccdv" >&5
+echo $ECHO_N "checking for ccdv... $ECHO_C" >&6
+	echo "$as_me:$LINENO: result: (disabled)" >&5
+echo "${ECHO_T}(disabled)" >&6
+else
+unset wi_cv_path_ccdv	# can't use cache if it was a temp prog last time
+wi_used_cache_path_ccdv="yes"
+echo "$as_me:$LINENO: checking for ccdv" >&5
+echo $ECHO_N "checking for ccdv... $ECHO_C" >&6
+if test "${wi_cv_path_ccdv+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+wi_used_cache_path_ccdv="no"
+for CCDV in /usr/bin/ccdv /usr/local/bin/ccdv /usr/ccs/bin/ccdv NONE
+do
+	if test "$CCDV" = NONE ; then CCDV="" ; break ; fi
+	$CCDV >/dev/null 2>&1
+	if test $? -eq 96 ; then
+		break
+	fi
+done
+if test "x$CCDV" = "x" ; then
+		cat > ccdv.c << 'EOF'
+/* ccdv.c
+ *
+ * Copyright (C) 2002-2003, by Mike Gleason, NcFTP Software.
+ * All Rights Reserved.
+ *
+ * Licensed under the GNU Public License.
+ */
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
+
+#define SETCOLOR_SUCCESS	(gANSIEscapes ? "\033\1331;32m" : "")
+#define SETCOLOR_FAILURE	(gANSIEscapes ? "\033\1331;31m" : "")
+#define SETCOLOR_WARNING	(gANSIEscapes ? "\033\1331;33m" : "")
+#define SETCOLOR_NORMAL		(gANSIEscapes ? "\033\1330;39m" : "")
+
+#define TEXT_BLOCK_SIZE 8192
+#define INDENT 2
+
+#define TERMS "vt100:vt102:vt220:vt320:xterm:xterm-color:ansi:linux:scoterm:scoansi:dtterm:cons25:cygwin"
+
+size_t gNBufUsed = 0, gNBufAllocated = 0;
+char *gBuf = NULL;
+int gCCPID;
+char gAction[64] = "";
+char gTarget[64] = "";
+char gAr[32] = "";
+char gArLibraryTarget[64] = "";
+int gDumpCmdArgs = 0;
+char gArgsStr[800];
+int gColumns = 80;
+int gANSIEscapes = 0;
+int gExitStatus = 95;
+
+static void
+DumpFormattedOutput(void)
+{
+	char *cp;
+	char spaces[8 + 1] = "        ";
+	char *saved;
+	int curcol;
+	int i;
+
+	curcol = 0;
+	saved = NULL;
+	for (cp = gBuf + ((gDumpCmdArgs == 0) ? strlen(gArgsStr) : 0); ; cp++) {
+		if (*cp == '\0') {
+			if (saved != NULL) {
+				cp = saved;
+				saved = NULL;
+			} else break;
+		}
+		if (*cp == '\r')
+			continue;
+		if (*cp == '\t') {
+			saved = cp + 1;
+			cp = spaces + 8 - (8 - ((curcol - INDENT - 1) % 8));
+		}
+		if (curcol == 0) {
+			for (i = INDENT; --i >= 0; )
+				putchar(' ');
+			curcol = INDENT;
+		}
+		putchar(*cp);
+		if (++curcol == (gColumns - 1)) {
+			putchar('\n');
+			curcol = 0;
+		} else if (*cp == '\n')
+			curcol = 0;
+	}
+	free(gBuf);
+}	/* DumpFormattedOutput */
+
+
+
+/* Difftime(), only for timeval structures.  */
+static void TimeValSubtract(struct timeval *tdiff, struct timeval *t1, struct timeval *t0)
+{
+	tdiff->tv_sec = t1->tv_sec - t0->tv_sec;
+	tdiff->tv_usec = t1->tv_usec - t0->tv_usec;
+	if (tdiff->tv_usec < 0) {
+		tdiff->tv_sec--;
+		tdiff->tv_usec += 1000000;
+	}
+}	/* TimeValSubtract */
+
+
+
+static void
+Wait(void)
+{
+	int pid2, status;
+
+	do {
+		status = 0;
+		pid2 = (int) waitpid(gCCPID, &status, 0);
+	} while (((pid2 >= 0) && (! WIFEXITED(status))) || ((pid2 < 0) && (errno == EINTR)));
+	if (WIFEXITED(status))
+		gExitStatus = WEXITSTATUS(status);
+}	/* Wait */
+
+
+
+static int
+SlurpProgress(int fd)
+{
+	char s1[71];
+	char *newbuf;
+	int nready;
+	size_t ntoread;
+	ssize_t nread;
+	struct timeval now, tnext, tleft;
+	fd_set ss;
+	fd_set ss2;
+	const char *trail = "/-\\|", *trailcp;
+
+	trailcp = trail;
+	snprintf(s1, sizeof(s1), "%s%s%s... ", gAction, gTarget[0] ? " " : "", gTarget);
+	printf("\r%-70s%-9s", s1, "");
+	fflush(stdout);
+
+	gettimeofday(&now, NULL);
+	tnext = now;
+	tnext.tv_sec++;
+	tleft.tv_sec = 1;
+	tleft.tv_usec = 0;
+	FD_ZERO(&ss2);
+	FD_SET(fd, &ss2);
+	for(;;) {
+		if (gNBufUsed == (gNBufAllocated - 1)) {
+			if ((newbuf = (char *) realloc(gBuf, gNBufAllocated + TEXT_BLOCK_SIZE)) == NULL) {
+				perror("ccdv: realloc");
+				return (-1);
+			}
+			gNBufAllocated += TEXT_BLOCK_SIZE;
+			gBuf = newbuf;
+		}
+		for (;;) {
+			ss = ss2;
+			nready = select(fd + 1, &ss, NULL, NULL, &tleft);
+			if (nready == 1)
+				break;
+			if (nready < 0) {
+				if (errno != EINTR) {
+					perror("ccdv: select");
+					return (-1);
+				}
+				continue;
+			}
+			gettimeofday(&now, NULL);
+			if ((now.tv_sec > tnext.tv_sec) || ((now.tv_sec == tnext.tv_sec) && (now.tv_usec >= tnext.tv_usec))) {
+				tnext = now;
+				tnext.tv_sec++;
+				tleft.tv_sec = 1;
+				tleft.tv_usec = 0;
+				printf("\r%-71s%c%-7s", s1, *trailcp, "");
+				fflush(stdout);
+				if (*++trailcp == '\0')
+					trailcp = trail;
+			} else {
+				TimeValSubtract(&tleft, &tnext, &now);
+			}
+		}
+		ntoread = (gNBufAllocated - gNBufUsed - 1);
+		nread = read(fd, gBuf + gNBufUsed, ntoread);
+		if (nread < 0) {
+			if (errno == EINTR)
+				continue;
+			perror("ccdv: read");
+			return (-1);
+		} else if (nread == 0) {
+			break;
+		}
+		gNBufUsed += nread;
+		gBuf[gNBufUsed] = '\0';
+	}
+	snprintf(s1, sizeof(s1), "%s%s%s: ", gAction, gTarget[0] ? " " : "", gTarget);
+	Wait();
+	if (gExitStatus == 0) {
+		printf("\r%-70s", s1);
+		printf("[%s%s%s]", ((gNBufUsed - strlen(gArgsStr)) < 4) ? SETCOLOR_SUCCESS : SETCOLOR_WARNING, "OK", SETCOLOR_NORMAL);
+		printf("%-5s\n", " ");
+	} else {
+		printf("\r%-70s", s1);
+		printf("[%s%s%s]", SETCOLOR_FAILURE, "ERROR", SETCOLOR_NORMAL);
+		printf("%-2s\n", " ");
+		gDumpCmdArgs = 1;	/* print cmd when there are errors */
+	}
+	fflush(stdout);
+	return (0);
+}	/* SlurpProgress */
+
+
+
+static int
+SlurpAll(int fd)
+{
+	char *newbuf;
+	size_t ntoread;
+	ssize_t nread;
+
+	printf("%s%s%s.\n", gAction, gTarget[0] ? " " : "", gTarget);
+	fflush(stdout);
+
+	for(;;) {
+		if (gNBufUsed == (gNBufAllocated - 1)) {
+			if ((newbuf = (char *) realloc(gBuf, gNBufAllocated + TEXT_BLOCK_SIZE)) == NULL) {
+				perror("ccdv: realloc");
+				return (-1);
+			}
+			gNBufAllocated += TEXT_BLOCK_SIZE;
+			gBuf = newbuf;
+		}
+		ntoread = (gNBufAllocated - gNBufUsed - 1);
+		nread = read(fd, gBuf + gNBufUsed, ntoread);
+		if (nread < 0) {
+			if (errno == EINTR)
+				continue;
+			perror("ccdv: read");
+			return (-1);
+		} else if (nread == 0) {
+			break;
+		}
+		gNBufUsed += nread;
+		gBuf[gNBufUsed] = '\0';
+	}
+	Wait();
+	gDumpCmdArgs = (gExitStatus != 0);	/* print cmd when there are errors */
+	return (0);
+}	/* SlurpAll */
+
+
+
+static const char *
+Basename(const char *path)
+{
+	const char *cp;
+	cp = strrchr(path, '/');
+	if (cp == NULL)
+		return (path);
+	return (cp + 1);
+}	/* Basename */
+
+
+
+static const char *
+Extension(const char *path)
+{
+	const char *cp = path;
+	cp = strrchr(path, '.');
+	if (cp == NULL)
+		return ("");
+	return (cp);
+}	/* Extension */
+
+
+
+static void
+Usage(void)
+{
+	fprintf(stderr, "Usage: ccdv /path/to/cc CFLAGS...\n\n");
+	fprintf(stderr, "I wrote this to reduce the deluge Make output to make finding actual problems\n");
+	fprintf(stderr, "easier.  It is intended to be invoked from Makefiles, like this.  Instead of:\n\n");
+	fprintf(stderr, "\t.c.o:\n");
+	fprintf(stderr, "\t\t$(CC) $(CFLAGS) $(DEFS) $(CPPFLAGS) $< -c\n");
+	fprintf(stderr, "\nRewrite your rule so it looks like:\n\n");
+	fprintf(stderr, "\t.c.o:\n");
+	fprintf(stderr, "\t\t@ccdv $(CC) $(CFLAGS) $(DEFS) $(CPPFLAGS) $< -c\n\n");
+	fprintf(stderr, "ccdv 1.1.0 is Free under the GNU Public License.  Enjoy!\n");
+	fprintf(stderr, "  -- Mike Gleason, NcFTP Software <http://www.ncftp.com>\n");
+	exit(96);
+}	/* Usage */
+
+
+
+int
+main(int argc, char **argv)
+{
+	int pipe1[2];
+	int devnull;
+	char emerg[256];
+	int fd;
+	int nread;
+	int i;
+	int cc = 0, pch = 0;
+	const char *quote;
+
+	if (argc < 2)
+		Usage();
+
+	snprintf(gAction, sizeof(gAction), "Running %s", Basename(argv[1]));
+	memset(gArgsStr, 0, sizeof(gArgsStr));
+	for (i = 1; i < argc; i++) {
+		quote = (strchr(argv[i], ' ') != NULL) ? "\"" : "";
+		snprintf(gArgsStr + strlen(gArgsStr), sizeof(gArgsStr) - strlen(gArgsStr), "%s%s%s%s%s", (i == 1) ? "" : " ", quote, argv[i], quote, (i == (argc - 1)) ? "\n" : "");
+		if ((strcmp(argv[i], "-o") == 0) && ((i + 1) < argc)) {
+			if (strcasecmp(Extension(argv[i + 1]), ".o") != 0) {
+				strcpy(gAction, "Linking");
+				snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i + 1]));
+			}
+		} else if (strchr("-+/", (int) argv[i][0]) != NULL) {
+			continue;
+		} else if (strncasecmp(Extension(argv[i]), ".c", 2) == 0) {
+			cc++;
+			snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i]));
+		} else if ((strncasecmp(Extension(argv[i]), ".h", 2) == 0) && (cc == 0)) {
+			pch++;
+			snprintf(gTarget, sizeof(gTarget), "%s", Basename(argv[i]));
+		} else if ((i == 1) && (strcmp(Basename(argv[i]), "ar") == 0)) {
+			snprintf(gAr, sizeof(gAr), "%s", Basename(argv[i]));
+		} else if ((gArLibraryTarget[0] == '\0') && (strcasecmp(Extension(argv[i]), ".a") == 0)) {
+			snprintf(gArLibraryTarget, sizeof(gArLibraryTarget), "%s", Basename(argv[i]));
+		}
+	}
+	if ((gAr[0] != '\0') && (gArLibraryTarget[0] != '\0')) {
+		strcpy(gAction, "Creating library");
+		snprintf(gTarget, sizeof(gTarget), "%s", gArLibraryTarget);
+	} else if (pch > 0) {
+		strcpy(gAction, "Precompiling");
+	} else if (cc > 0) {
+		strcpy(gAction, "Compiling");
+	}
+
+	if (pipe(pipe1) < 0) {
+		perror("ccdv: pipe");
+		exit(97);
+	}
+
+	(void) close(0);
+	devnull = open("/dev/null", O_RDWR, 00666);
+	if ((devnull != 0) && (dup2(devnull, 0) == 0))
+		close(devnull);
+
+	gCCPID = (int) fork();
+	if (gCCPID < 0) {
+		(void) close(pipe1[0]);
+		(void) close(pipe1[1]);
+		perror("ccdv: fork");
+		exit(98);
+	} else if (gCCPID == 0) {
+		/* Child */
+		(void) close(pipe1[0]);		/* close read end */
+		if (pipe1[1] != 1) {		/* use write end on stdout */
+			(void) dup2(pipe1[1], 1);
+			(void) close(pipe1[1]);
+		}
+		(void) dup2(1, 2);		/* use write end on stderr */
+		execvp(argv[1], argv + 1);
+		perror(argv[1]);
+		exit(99);
+	}
+
+	/* parent */
+	(void) close(pipe1[1]);		/* close write end */
+	fd = pipe1[0];			/* use read end */
+
+	gColumns = (getenv("COLUMNS") != NULL) ? atoi(getenv("COLUMNS")) : 80;
+	gANSIEscapes = (getenv("TERM") != NULL) && (strstr(TERMS, getenv("TERM")) != NULL);
+	gBuf = (char *) malloc(TEXT_BLOCK_SIZE);
+	if (gBuf == NULL)
+		goto panic;
+	gNBufUsed = 0;
+	gNBufAllocated = TEXT_BLOCK_SIZE;
+	if (strlen(gArgsStr) < (gNBufAllocated - 1)) {
+		strcpy(gBuf, gArgsStr);
+		gNBufUsed = strlen(gArgsStr);
+	}
+
+	if (isatty(1)) {
+		if (SlurpProgress(fd) < 0)
+			goto panic;
+	} else {
+		if (SlurpAll(fd) < 0)
+			goto panic;
+	}
+	DumpFormattedOutput();
+	exit(gExitStatus);
+
+panic:
+	gDumpCmdArgs = 1;	/* print cmd when there are errors */
+	DumpFormattedOutput();
+	while ((nread = read(fd, emerg, (size_t) sizeof(emerg))) > 0)
+		(void) write(2, emerg, (size_t) nread);
+	Wait();
+	exit(gExitStatus);
+}	/* main */
+/* eof ccdv.c */
+EOF
+		${CC-cc} $DEFS $CPPFLAGS $CFLAGS "ccdv.c" -o "ccdv" >/dev/null 2>&1
+	/bin/rm -f ccdv.c ccdv.o ccdv.c.gz.uu ccdv.c.gz
+	strip ./ccdv >/dev/null 2>&1
+	./ccdv >/dev/null 2>&1
+	if test $? -eq 96 ; then
+		CCDV="./ccdv"
+	else
+		/bin/rm -f ccdv
+	fi
+fi
+if test "x$CCDV" != x ; then
+
+
+wi_path="$CCDV"
+if test -d "$wi_path" ; then
+	wi_resolved_path=`cd "$wi_path" ; $wi_PWD 2>/dev/null`
+elif test ! -f "$wi_path" ; then
+	wi_resolved_path="$wi_path"
+else
+	wi_parent_dir="$wi_path"
+	wi_file_name="$wi_path"
+
+wi_parent_dir=`echo "$wi_parent_dir" | sed -n '
+s-//*-/-g
+s-/*$--
+/^\/\/*[^/]*$/{
+	c\\
+/
+	p
+	q
+}
+/^[^/]*$/{
+	c\\
+.
+	p
+	q
+}
+/./{
+	s-/[^/]*$--
+	p
+	q
+}'`
+
+wi_file_name=`echo "$wi_file_name" | sed -n '
+s-//*-/-g
+s-/*$--
+s-^/$--
+s-^.*/--
+p
+q'`
+	wi_resolved_path=`cd "$wi_parent_dir" ; $wi_PWD 2>/dev/null`
+	if test "x$wi_resolved_path" != x ; then
+		wi_resolved_path="$wi_resolved_path/$wi_file_name"
+	fi
+	unset wi_parent_dir wi_file_name
+fi
+if test "x$wi_resolved_path" = x ; then
+	CCDV="$$CCDV"
+else
+	CCDV="$wi_resolved_path"
+fi
+unset wi_resolved_path wi_path
+
+	wi_cv_path_ccdv="$CCDV"
+	CC="$CCDV $CC"	# trailing space needed
+else
+	wi_cv_path_ccdv=""
+fi
+
+fi
+echo "$as_me:$LINENO: result: $wi_cv_path_ccdv" >&5
+echo "${ECHO_T}$wi_cv_path_ccdv" >&6
+if test "$wi_used_cache_path_ccdv" = yes ; then
+	CCDV="$wi_cv_path_ccdv"
+	if test "x$CCDV" != x ; then
+		CC="$CCDV $CC"	# trailing space needed
+	fi
+fi
+
+fi
+
+
+
+
 
 
 
@@ -32097,7 +32099,6 @@ s,@AMDEPBACKSLASH@,$AMDEPBACKSLASH,;t t
 s,@CCDEPMODE@,$CCDEPMODE,;t t
 s,@am__fastdepCC_TRUE@,$am__fastdepCC_TRUE,;t t
 s,@am__fastdepCC_FALSE@,$am__fastdepCC_FALSE,;t t
-s,@wi_PWD@,$wi_PWD,;t t
 s,@build@,$build,;t t
 s,@build_cpu@,$build_cpu,;t t
 s,@build_vendor@,$build_vendor,;t t
@@ -32141,6 +32142,7 @@ s,@CURL_LIBS@,$CURL_LIBS,;t t
 s,@CURL_CFLAGS@,$CURL_CFLAGS,;t t
 s,@BUILD_CURL_TRUE@,$BUILD_CURL_TRUE,;t t
 s,@BUILD_CURL_FALSE@,$BUILD_CURL_FALSE,;t t
+s,@wi_PWD@,$wi_PWD,;t t
 s,@PROTOCOL@,$PROTOCOL,;t t
 s,@LIBTOOL_DEPS@,$LIBTOOL_DEPS,;t t
 s,@MODULES@,$MODULES,;t t

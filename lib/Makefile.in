@@ -155,7 +155,6 @@ am__untar = @am__untar@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
-build_configtool = @build_configtool@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
@@ -187,7 +186,7 @@ wi_PWD = @wi_PWD@
 @BUILD_CURL_FALSE@CURLDIR = 
 @BUILD_CURL_TRUE@CURLDIR = curl
 SUBDIRS = adns rta gdbm $(CURLDIR) $(PCREDIR)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 all: all-recursive

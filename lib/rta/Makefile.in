@@ -171,7 +171,6 @@ am__untar = @am__untar@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
-build_configtool = @build_configtool@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
@@ -202,7 +201,7 @@ noinst_LIBRARIES = librtadb.a
 noinst_HEADERS = do_sql.h parse.tab.h rta.h
 librtadb_a_SOURCES = parse.tab.c token.l api.c do_sql.c rtatables.c 
 AM_CFLAGS = -I../pcre -I../adns -I../curl 
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 all: all-am
