@@ -74,8 +74,6 @@ typedef void (*after_poll_function) (void *data, struct pollfd *, unsigned int);
  * 
  */
 typedef struct ModSock {
-	/** Hash code */
-	long hash;					
 	/** Socket number */
 	int sock_no;
 	/** Socket name */
@@ -108,8 +106,6 @@ typedef struct ModSock {
  * 
  */
 typedef struct ModTimer {
-	/** Hash code */
-	long hash;
 	/** Module name */
 	char modname[MAX_MOD_NAME];
 	/** Timer name */
@@ -126,8 +122,6 @@ typedef struct ModTimer {
  * 
  */
 typedef struct ModUser {
-	/** Hash code */
-	long hash;
 	/** Nick */
 	char nick[MAXNICK];
 	/** Module name */

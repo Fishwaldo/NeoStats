@@ -224,7 +224,6 @@ extern const char version_date[], version_time[];
 typedef struct Server {
 	char name[MAXHOST];
 	int hops;
-	long hash;
 	time_t connected_since;
 	int ping;
 	char uplink[MAXHOST];
@@ -298,7 +297,6 @@ typedef struct User {
 	int flood;
 	int is_away;
 	time_t t_flood;
-	long hash;
 	char modes[MODESIZE];
 	int ulevel;
 	long Umode;
@@ -359,6 +357,8 @@ typedef struct bot_cmd {
 	int 			internal;	/* is this a internal function? */
 	const char* 	onelinehelp;	/* single line help for generic help function */
 }bot_cmd;
+
+#include "dl.h"
 
 /* sock.c */
 int sock_connect (int socktype, unsigned long ipaddr, int port, char *sockname, char *module, char *func_read, char *func_write, char *func_error);
