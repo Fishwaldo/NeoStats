@@ -3,6 +3,7 @@ Shmad <shmad@neostats.net>
 ^Enigma^ <enigma@neostats.net>
 
 * Version 2.0 * Shmad * July 24, 2002
++ Fixed misc. bug with hs_signon (slaps himself)
 + Updated all HELPFILES.
 + Added an ERRORmsg to VIEW/DEL if the access # doesnt exist.
 + Fixed a segfault bug if av[2] was null (cant convert to int obviously)

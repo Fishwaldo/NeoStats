@@ -27,7 +27,7 @@ HS_Map *nnickmap;
 char nnick[255];
 
 extern const char *hs_help[];
-static int hs_sign_on(User *);
+static int hs_sign_on(char **av, int ac);
 
 static void hs_add(User *u, char *cmd, char *m, char *h);
 static void hs_list(User *u);
@@ -62,24 +62,32 @@ int new_m_version(char *av, char *tmp) {
 
 
 /* Routine For Setting the Virtual Host */
-static int hs_sign_on(User *u) {
+static int hs_sign_on(char **av, int ac) {
     char *tmp = NULL;
-	HS_Map *map;
+        HS_Map *map;
+
+        User *u;
+        u = finduser(av[0]);
+        if (!u) return 0;
+
+        if (u->server->name == me.name) return 0;
+
+        strcpy(segv_location, "HostServ-hs_signon");
 
     Loadhosts();
 
     if (findbot(u->nick)) return 1;
     if (!load_synch) return 1;
-
     /* Check HostName Against Data Contained in vhosts.data */        
       for (map = nnickmap; map; map = map->next) {
 	   if (!strcasecmp(map->nnick, u->nick)) {
           tmp = map->host;
 		  if (fnmatch(strlower(tmp), strlower(u->hostname), 0) == 0) {
-              ssvshost_cmd(u->nick, map->vhost); 
+              ssvshost_cmd(u->nick, map->vhost);
               return 1;
            }
        }
+hslog("end of routine");
     }
 
 
