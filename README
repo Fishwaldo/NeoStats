@@ -162,6 +162,12 @@ please see the Support section for how to contact us for help.
 
 		    --enable-neoircd - enable NeoIRCd IRCD Support
 
+                    --enable-bahamut - enable Bahamut IRCd Support
+
+                    --enable-mystic  - enable Mystic IRCd support
+
+                    --enable-quantum - enable Quantum IRCd support
+
 		    (Note, at the time of release of this version of NeoStats
 		    Ultimate 3.x.x was still in alpha, it is possible that 
 		    Ultimate3 compatibility might break in future releases 

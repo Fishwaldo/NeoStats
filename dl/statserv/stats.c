@@ -20,7 +20,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: stats.c,v 1.46 2003/09/12 04:36:18 fishwaldo Exp $
+** $Id: stats.c,v 1.47 2003/09/12 17:28:27 fishwaldo Exp $
 */
 
 #include "statserv.h"
@@ -634,7 +634,7 @@ int Online(char **av, int ac)
 		 "+oS", SSMNAME);
 	StatServ.onchan = 1;
 	/* now that we are online, setup the timer to save the Stats database every so often */
-	add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 600);
+	add_mod_timer("SaveStats", "Save_Stats_DB", SSMNAME, 28800);
 
 	add_mod_timer("ss_html", "TimerWeb", SSMNAME, 3600);
 
