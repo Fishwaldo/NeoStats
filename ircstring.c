@@ -28,6 +28,15 @@
  * than lib functions
  */
 
+/* Temp disable for upcoming release until all external modules 
+ * have been released with warnings fixed
+ */
+#if 0
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#define __attribute__(x)  /* NOTHING */
+#endif
+#endif
 #include "ircstring.h"
 
 /* buffer for itoa conversion 
