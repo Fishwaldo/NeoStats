@@ -331,7 +331,6 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_WALLOP		0x00000004	/* send wallops to them */
 #define UMODE_FAILOP		0x00000008	/* Shows some global messages */
 #define UMODE_HELPOP		0x00000010	/* Help system operator */
 #define UMODE_REGNICK		0x00000020	/* Nick set by services as registered */

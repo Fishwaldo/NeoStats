@@ -349,8 +349,7 @@
 #define SMODE_CH_TECHADMIN 'T'		/* Set to a number as we dont use */
 
 /* Umodes */
-#define UMODE_LOCOP     	0x00000004	/* umode +O - Local Oper */
-#define UMODE_WALLOP     	0x00000008	/* umode +w - Get wallops */
+#define UMODE_LOCOP     	0x00000008	/* umode +O - Local Oper */
 #define UMODE_SERVNOTICE     	0x00000010	/* umode +s - Server notices */
 #define UMODE_CLIENT     	0x00000020	/* umode +c - Client connections/exits */
 #define UMODE_REGNICK     	0x00000040	/* umode +r - registered nick - Should be moved to smode if possible without breaking services compat*/

@@ -175,7 +175,6 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_WALLOP		0x00000004	
 #define UMODE_FAILOP		0x00000008	
 #define UMODE_HELPOP		0x00000010	
 #define UMODE_REGNICK		0x00000020	

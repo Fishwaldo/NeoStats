@@ -200,7 +200,7 @@
 
 /* Umodes */
 #define UMODE_ADMIN	0x0080	/* admin flag */
-#define UMODE_BOTS	0x0004	/* shows bots */
+#define UMODE_BOTS	0x4000	/* shows bots */
 #define UMODE_CCONN	0x0008	/* shows client connections */
 #define UMODE_DEBUG	0x0010	/* show debug info */
 #define UMODE_FULL	0x0020	/* show full messages */
@@ -211,7 +211,6 @@
 #define UMODE_REJ	0x0800	/* client is registered */
 #define UMODE_SERVNOTICE	0x1000	/* client can see server notices */
 #define UMODE_UNAUTH	0x2000	/* client can see unauthd connections */
-#define UMODE_WALLOP	0x4000	/* client can get wallop messages */
 #define UMODE_EXTERNAL	0x8000	/* client can see server joins/splits */
 #define UMODE_SPY	0x10000	/* client can spy on user commands */
 #define UMODE_OPERWALL	0x20000	/* client gets operwalls */

@@ -197,13 +197,12 @@
 /* Umodes */
 #define UMODE_SERVNOTICE   0x0400 /* server notices such as kill */
 #define UMODE_CCONN        0x20000 /* Client Connections */
-#define UMODE_REJ          0x0004 /* Bot Rejections */
+#define UMODE_REJ          0x0100 /* Bot Rejections */
 #define UMODE_SKILL        0x0008 /* Server Killed */
 #define UMODE_FULL         0x0010 /* Full messages */
 #define UMODE_SPY          0x0020 /* see STATS / LINKS */
 #define UMODE_DEBUG        0x0040 /* 'debugging' info */
 #define UMODE_NCHANGE      0x0080 /* Nick change notice */
-#define UMODE_WALLOP       0x0100 /* send wallops to them */
 #define UMODE_OPERWALL     0x0200 /* Operwalls */
 #define UMODE_BOTS         0x0800 /* shows bots */
 #define UMODE_EXTERNAL     0x1000 /* show servers introduced and splitting */

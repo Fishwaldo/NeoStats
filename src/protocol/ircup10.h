@@ -219,8 +219,7 @@
 #define UMODE_CH_OPER 'o'
 
  /* User modes: */
-#define UMODE_LOCOP				0x0004	/* Local oper */
-#define UMODE_WALLOP            0x0008	/* see wallops */
+#define UMODE_LOCOP				0x0008	/* Local oper */
 #define UMODE_SERVNOTICE        0x0010	/* See server notices */
 #define UMODE_DEAF              0x0020	/* Dont see chan msgs */
 #define UMODE_CHSERV            0x0040	/* Unkickable/-o able */

@@ -172,7 +172,6 @@
 #define UMODE_ADMIN		0x0040	/* server admin */
 #define UMODE_SADMIN	0x0080	/* Marks the client as a Services Administrator */
 #define UMODE_HIDE              0x8000  /* cloak host*/
-#define UMODE_WALLOP     	0x0004	/* send wallops to them */
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
 #define UMODE_ALTADMIN	 	0x0080	/* Admin */
 #define UMODE_NETADMIN  	0x10000	/* Network Admin */

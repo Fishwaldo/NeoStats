@@ -166,8 +166,7 @@
 #define UMODE_CH_BOT 'B'
 
 /* Umodes */
-#define UMODE_LOCOP     0x00004	/* umode +O - Local Oper */
-#define UMODE_WALLOP     0x00008	/* umode +w - Get wallops */
+#define UMODE_LOCOP     0x00008	/* umode +O - Local Oper */
 #define UMODE_SERVNOTICE     0x00010	/* umode +s - Server notices */
 #define UMODE_CLIENT     0x00020	/* umode +c - Client connections/exits */
 #define UMODE_REGNICK     0x00040	/* umode +r - registered nick */
