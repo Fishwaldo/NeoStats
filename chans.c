@@ -652,7 +652,7 @@ join_chan (User * u, char *chan)
 	if (!strcasecmp ("0", chan)) {
 		/* join 0 is actually part all chans */
 		nlog (LOG_DEBUG2, LOG_CORE, "join_chan() -> Parting all chans %s", u->nick);
-		list_process (u->chans, u, part_u_chan);
+		list_process (u->chans, u, UserPart);
 		return;
 	}
 	c = findchan (chan);

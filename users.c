@@ -104,10 +104,9 @@ AddUser (const char *nick, const char *user, const char *host, const char *realn
 }
 
 void
-part_u_chan (list_t * list, lnode_t * node, void *v)
+UserPart (list_t * list, lnode_t * node, void *v)
 {
-	User *u = v;
-	part_chan (u, lnode_get (node));
+	part_chan ((User *)v, lnode_get (node));
 }
 
 void
@@ -140,9 +139,7 @@ doDelUser (const char *nick, int killflag)
 	}
 	u = hnode_get (un);
 
-	list_process (u->chans, u, part_u_chan);
-
-
+	list_process (u->chans, u, UserPart);
 
 	/* run the event to delete a user */
 	AddStringToList (&av, u->nick, &ac);
@@ -185,21 +182,26 @@ UserAway (User * u, const char *awaymsg)
 	}
 }
 
-void
-Change_User (User * u, const char *newnick)
+int 
+UserNick (const char * oldnick, const char *newnick)
 {
 	hnode_t *un;
 	lnode_t *cm;
 	char **av;
 	int ac = 0;
-	char *oldnick;
+	User * u;
 
 	SET_SEGV_LOCATION();
-	nlog (LOG_DEBUG2, LOG_CORE, "Change_User(%s, %s)", u->nick, newnick);
+	u = finduser (oldnick);
+	if (!u) {
+		nlog (LOG_WARNING, LOG_CORE, "UserNick: can't find user %s", oldnick);
+		return NS_FAILURE;
+	}
+	nlog (LOG_DEBUG2, LOG_CORE, "UserNick(%s, %s)", u->nick, newnick);
 	un = hash_lookup (uh, u->nick);
 	if (!un) {
-		nlog (LOG_WARNING, LOG_CORE, "ChangeUser(%s) Failed!", u->nick);
-		return;
+		nlog (LOG_WARNING, LOG_CORE, "UserNick(%s) Failed!", u->nick);
+		return NS_FAILURE;
 	}
 	cm = list_first (u->chans);
 	while (cm) {
@@ -208,8 +210,6 @@ Change_User (User * u, const char *newnick)
 	}
 	SET_SEGV_LOCATION();
 	hash_delete (uh, un);
-	oldnick = malloc (MAXNICK);
-	strlcpy (oldnick, u->nick, MAXNICK);
 	AddStringToList (&av, oldnick, &ac);
 	strlcpy (u->nick, newnick, MAXNICK);
 	hash_insert (uh, un, u->nick);
@@ -217,7 +217,7 @@ Change_User (User * u, const char *newnick)
 	AddStringToList (&av, u->nick, &ac);
 	ModuleEvent (EVENT_NICKCHANGE, av, ac);
 	free (av);
-	free (oldnick);
+	return NS_SUCCESS;
 }
 
 User *

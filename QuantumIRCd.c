@@ -577,7 +577,7 @@ ssmo_cmd (const char *from, const char *umodetarget, const char *msg)
 int
 snick_cmd (const char *oldnick, const char *newnick)
 {
-	Change_User (finduser (oldnick), newnick);
+	UserNick (oldnick, newnick);
 	sts (":%s %s %s %d", oldnick, (me.token ? TOK_NICK : MSG_NICK), newnick, (int)me.now);
 	return 1;
 }
@@ -1023,10 +1023,7 @@ Usr_Away (char *origin, char **argv, int argc)
 void
 Usr_Nick (char *origin, char **argv, int argc)
 {
-	User *u = finduser (origin);
-	if (u) {
-		Change_User (u, argv[0]);
-	}
+	UserNick (origin, argv[0]);
 }
 void
 Usr_Topic (char *origin, char **argv, int argc)
@@ -1167,12 +1164,8 @@ Srv_Smode (char *origin, char **argv, int argc)
 void
 Srv_Svsnick (char *origin, char **argv, int argc)
 {
-	User *u;
-	u = finduser (argv[0]);
-	if (u) {
-		Change_User (u, argv[1]);
-	} else {
-		nlog (LOG_WARNING, LOG_CORE, "Warning, Can't find user %s for SVSNICK", argv[0]);
+	if(UserNick (argv[0], argv[1]) == NS_FAILURE) {
+		nlog (LOG_WARNING, LOG_CORE, "Warning, SVSNICK for %s failed", argv[0]);
 	}
 
 }

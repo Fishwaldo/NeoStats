@@ -26,9 +26,9 @@
 
 void AddUser (const char *nick, const char *user, const char *host, const char *realname, const char *server, const unsigned long ip, const unsigned long TS);
 void DelUser (const char *nick);
-void Change_User (User *u, const char * newnick);
+int UserNick (const char * oldnick, const char * newnick);
 void UserDump (char *nick);
-void part_u_chan (list_t *list, lnode_t *node, void *v);
+void UserPart (list_t *list, lnode_t *node, void *v);
 void UserMode (const char *nick, const char *modes);
 #ifdef GOTUSERSMODES
 void UserSMode (const char *nick, const char *modes);
