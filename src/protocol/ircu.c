@@ -154,8 +154,13 @@ UserModes user_umodes[] = {
 #endif
 };
 
+UserModes user_smodes[] = {
+	{0, '0'},
+};
+
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
+const int ircd_smodecount = 0;
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 /* Temporary buffers for numeric conversion */
@@ -479,6 +484,18 @@ send_globops (const char *from, const char *buf)
 
 void 
 send_svstime (const char *sender, const unsigned long ts)
+{
+}
+void 
+send_swhois (const char *sender, const char *target, const char *swhois)
+{
+}
+void 
+send_smo (const char *from, const char *umodetarget, const char *msg)
+{
+}
+void 
+send_svsmode (const char *sender, const char *target, const char *modes)
 {
 }
 

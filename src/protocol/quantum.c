@@ -169,7 +169,7 @@ UserModes user_smodes[] = {
 	{SMODE_SERVADMIN, 'A'},
 	{SMODE_GUEST, 'G'},
 	{SMODE_COADMIN, 'a'},
-	{SMODE_SSL, 's',
+	{SMODE_SSL, 's'},
 };
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
@@ -384,6 +384,18 @@ send_globops (const char *from, const char *buf)
 
 void 
 send_svstime (const char *sender, const unsigned long ts)
+{
+}
+void 
+send_swhois (const char *sender, const char *target, const char *swhois)
+{
+}
+void 
+send_smo (const char *from, const char *umodetarget, const char *msg)
+{
+}
+void 
+send_svsmode (const char *sender, const char *target, const char *modes)
 {
 }
 

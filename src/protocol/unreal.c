@@ -185,9 +185,13 @@ UserModes user_umodes[] = {
 	{UMODE_VICTIM, 'v'},	
 };
 
+UserModes user_smodes[] = {
+	{0, '0'},
+};
 
 const int ircd_cmdcount = ((sizeof (cmd_list) / sizeof (cmd_list[0])));
 const int ircd_umodecount = ((sizeof (user_umodes) / sizeof (user_umodes[0])));
+const int ircd_smodecount = 0;
 const int ircd_cmodecount = ((sizeof (chan_modes) / sizeof (chan_modes[0])));
 
 void

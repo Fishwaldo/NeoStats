@@ -352,6 +352,18 @@ void
 send_svstime (const char *sender, const unsigned long ts)
 {
 }
+void 
+send_swhois (const char *sender, const char *target, const char *swhois)
+{
+}
+void 
+send_smo (const char *from, const char *umodetarget, const char *msg)
+{
+}
+void 
+send_svsmode (const char *sender, const char *target, const char *modes)
+{
+}
 
 static void
 m_sjoin (char *origin, char **argv, int argc, int srv)

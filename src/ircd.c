@@ -40,13 +40,6 @@
 
 ircd_server ircd_srv;
 
-#if !(FEATURES&FEATURE_SMODES)
-const int ircd_smodecount = 0;
-UserModes user_smodes[] = {
-	{0, '0'},
-};
-#endif
-
 static char ircd_buf[BUFSIZE];
 static char UmodeStringBuf[64];
 static char SmodeStringBuf[64];

@@ -176,7 +176,7 @@
 #define UMODE_HIDE              0x8000  /* cloak host*/
 #define UMODE_WALLOP     	0x0004	/* send wallops to them */
 #define UMODE_HELPOP	 	0x0010	/* Help system operator */
-#define UMODE_ADMIN	 	0x0080	/* Admin */
+#define UMODE_ALTADMIN	 	0x0080	/* Admin */
 #define UMODE_NETADMIN  	0x10000	/* Network Admin */
 #define UMODE_TECHADMIN		0x80000000	/* Marks the client as a Technical Admin */
 #define UMODE_DEAF			0x10000000	/* client is deaf on channels */
