@@ -285,7 +285,7 @@ int del_mod_user(char *bot_name) {
 int bot_nick_change(char *oldnick, char *newnick)
 {
 	User *u;
-	Mod_User *mod_tmp, *mod_ptr = NULL;
+	Mod_User *mod_tmp, *mod_ptr;
 
 	strcpy(segv_location, "bot_nick_change");
 
@@ -327,7 +327,7 @@ int bot_nick_change(char *oldnick, char *newnick)
 
 
 void list_module_bots(User *u) {
-	Mod_User *mod_ptr = NULL;
+	Mod_User *mod_ptr;
 	hnode_t *bn;
 	hscan_t bs;
 	strcpy(segv_location, "list_module_bots");
@@ -350,9 +350,9 @@ int load_module(char *path1, User *u) {
 #ifndef HAVE_LIBDL
 	const char *dl_error;
 #else 
-	char *dl_error = NULL;
+	char *dl_error;
 #endif
-	void *dl_handle = NULL;
+	void *dl_handle;
 	int do_msg;
 	char *path = NULL;
 	char p[255];

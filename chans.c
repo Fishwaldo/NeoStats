@@ -5,7 +5,7 @@
 ** Based from GeoStats 1.1.0 by Johnathan George net@lite.net
 *
 ** NetStats CVS Identification
-** $Id: chans.c,v 1.7 2002/03/11 06:55:04 fishwaldo Exp $
+** $Id: chans.c,v 1.8 2002/03/11 08:02:40 fishwaldo Exp $
 */
 
 #include <fnmatch.h>
@@ -81,7 +81,7 @@ void ChangeChanUserMode(Chans *c, User *u, int add, long mode) {
 	cmn = list_find(c->chanmembers, u->nick, comparef);
 	if (!cmn) {
 		if (me.coder_debug) {
-			notice("ChangeChanUserMode() %s doesn't seem to be in the Chan %s", u->nick, c->name);
+			notice(s_Services, "ChangeChanUserMode() %s doesn't seem to be in the Chan %s", u->nick, c->name);
 			chandump(c->name);
 			UserDump(u->nick);
 		}
@@ -134,10 +134,13 @@ void part_chan(User *u, char *chan) {
 	Chans *c;
 	lnode_t *un;
 	strcpy(segv_location, "part_chan");
+#ifdef DEBUG
+	log("Parting %s from %s", u->nick, chan);
+#endif
 	if (!u) {
 		log("Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
 		if (me.coder_debug) {
-			notice("Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
+			notice(s_Services, "Ehh, Parting a Unknown User %s from Chan %s: %s", u->nick, chan, recbuf);
 			chandump(chan);
 			UserDump(u->nick);
 		}
@@ -152,7 +155,7 @@ void part_chan(User *u, char *chan) {
 		if (!un) {
 			log("hu, User %s isn't a member of this channel %s", u->nick, chan);
 			if (me.coder_debug) {
-				notice("hu, User %s isn't a member of this channel %s", u->nick, chan);
+				notice(s_Services, "hu, User %s isn't a member of this channel %s", u->nick, chan);
 				chandump(c->name);
 				UserDump(u->nick);
 			}
@@ -167,7 +170,7 @@ void part_chan(User *u, char *chan) {
 		if (!un) {
 			log("Hu, User %s claims not to be part of Chan %s", u->nick, chan);
 			if (me.coder_debug) {
-				notice("Hu, User %s claims not to be part of Chan %s", u->nick, chan);
+				notice(s_Services, "Hu, User %s claims not to be part of Chan %s", u->nick, chan);
 				chandump(c->name);
 				UserDump(u->nick);
 			}
@@ -184,7 +187,7 @@ void change_user_nick(Chans *c, char *newnick, char *oldnick) {
 	if (!cm) {
 		log("change_user_nick() %s isn't a member of %s", oldnick, c->name);
 		if (me.coder_debug) {
-			notice("change_user_nick() %s isn't a member of %s", oldnick, c->name);
+			notice(s_Services, "change_user_nick() %s isn't a member of %s", oldnick, c->name);
 			chandump(c->name);
 			UserDump(oldnick);
 		}
@@ -229,16 +232,24 @@ void join_chan(User *u, char *chan) {
 	if (list_find(c->chanmembers, u->nick, comparef)) {
 		log("Adding %s to Chan %s when he is already a member?", u->nick, chan);
 		if (me.coder_debug) {
-			notice("Adding %s to Chan %s when he is already a member?", u->nick, chan);
+			notice(s_Services, "Adding %s to Chan %s when he is already a member?", u->nick, chan);
 			chandump(c->name);
 			UserDump(u->nick);
 		}
 		return;
 	}
-	list_prepend(c->chanmembers, un);
+	if (list_isfull(c->chanmembers)) {
+		log("ekk, Channel %s Members list is full", c->name);
+	} else {
+		list_append(c->chanmembers, un);
+	}
 	c->cur_users++;
 	un = lnode_create(c->name);
-	list_prepend(u->chans, un); 
+	if (list_isfull(c->chanmembers)) {
+		log("eek, User %s members list is full", u->nick);
+	} else {
+		list_append(u->chans, un); 
+	}
 }
 
 void chandump(char *chan) {
