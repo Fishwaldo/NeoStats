@@ -1392,7 +1392,12 @@ void cfg_opt_nprint_var(cfg_opt_t *opt, unsigned int index, FILE *fp)
             fprintf(fp, "%ld", cfg_opt_getnint(opt, index));
             break;
         case CFGT_FLOAT:
+#if 0
+/* till I can figure out a autoconf check for "long floats" (is there such a thing?)*/
             fprintf(fp, "%lf", cfg_opt_getnfloat(opt, index));
+#else 
+            fprintf(fp, "%f", cfg_opt_getnfloat(opt, index));
+#endif
             break;
         case CFGT_STR:
             str = cfg_opt_getnstr(opt, index);
