@@ -104,12 +104,56 @@ static BotInfo ts_botinfo =
 
 /** @brief BuildBot
  *
- *  load dbentry
+ *  populate botinfo structure
  *
  *  @param none
  *
  *  @return none
  */
+void BuildBot( dbbot *db )
+{
+	strlcpy( db->botinfo.nick, db->database.nick, MAXNICK );
+	strlcpy( db->botinfo.user, "ts", MAXUSER );
+	strlcpy( db->botinfo.realname, db->database.name, MAXREALNAME );
+	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
+	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
+	db->botinfo.flags = BOT_FLAG_SERVICEBOT;
+}
+
+/** @brief JoinBot
+ *
+ *  Join bot to IRC
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void JoinBot( dbbot *db )
+{
+	db->botptr = AddBot( &db->botinfo );
+	if( *db->database.channel )
+		irc_join( db->botptr, db->database.channel, NULL );
+}
+
+/** @brief PartBot
+ *
+ *  Part bot from IRC
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void PartBot( dbbot *db )
+{
+	if( db->botptr )
+	{
+		if( *db->database.channel )
+			irc_part( db->botptr, db->database.channel, "" );
+		irc_quit( db->botptr, "" );
+	}
+}
 
 /** @brief load_dbentry
  *
@@ -127,6 +171,7 @@ static int load_dbentry( void *data, int size )
 	db = ns_calloc( sizeof( dbbot ) );
 	os_memcpy( &db->database, data, sizeof( dbentry ) );
 	hnode_create_insert( tshash, db, db->database.name );
+	BuildBot( db );
 	return NS_FALSE;
 }
 
@@ -163,10 +208,19 @@ int ModInit( void )
 
 int ModSynch( void )
 {
+	dbbot *db;
+	hnode_t *hn;
+	hscan_t hs;
+
 	ts_bot = AddBot( &ts_botinfo );
 	if( !ts_bot ) 
 	{
 		return NS_FAILURE;
+	}
+	hash_scan_begin( &hs, tshash );
+	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+		db =( ( dbbot * )hnode_get( hn ) );
+		JoinBot( db );
 	}
 	return NS_SUCCESS;
 }
@@ -190,6 +244,7 @@ int ModFini( void )
 	hash_scan_begin( &hs, tshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		db =( ( dbbot * )hnode_get( hn ) );
+		PartBot( db );
 		hash_delete( tshash, hn );
 		hnode_destroy( hn );
 		ns_free( db );
@@ -212,12 +267,21 @@ int ModFini( void )
 
 static int ts_cmd_add( CmdParams *cmdparams )
 {
+	FILE *fp;
 	dbbot *db;
 
 	SET_SEGV_LOCATION();
-	if( hash_lookup( tshash, cmdparams->av[0] ) != NULL ) {
+	if( hash_lookup( tshash, cmdparams->av[0] ) != NULL ) 
+	{
 		irc_prefmsg( ts_bot, cmdparams->source, 
 			"%s already exists in the database list", cmdparams->av[0] );
+		return NS_SUCCESS;
+	}
+	fp = os_fopen( cmdparams->av[0], "r" );
+	if( !fp )
+	{
+		irc_prefmsg( ts_bot, cmdparams->source, 
+			"%s not found", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
 	if( cmdparams->ac > 1 && ValidateNick( cmdparams->av[1] ) != NS_SUCCESS )
@@ -242,6 +306,9 @@ static int ts_cmd_add( CmdParams *cmdparams )
 		strlcpy( db->database.channel, cmdparams->av[2], MAXCHANLEN );
 	hnode_create_insert( tshash, db, db->database.name );
 	DBAStore( "databases", db->database.name,( void * )db, sizeof( dbentry ) );
+	BuildBot( db );
+	JoinBot( db );
+	os_fclose( fp );
 	return NS_SUCCESS;
 }
 
@@ -298,6 +365,7 @@ static int ts_cmd_del( CmdParams *cmdparams )
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		db =( dbbot * )hnode_get( hn );
 		if( ircstrcasecmp( db->database.name, cmdparams->av[0] ) == 0 ) {
+			PartBot( db );
 			hash_scan_delete( tshash, hn );
 			irc_prefmsg( ts_bot, cmdparams->source, 
 				"Deleted %s from the database list", cmdparams->av[0] );
@@ -311,6 +379,6 @@ static int ts_cmd_del( CmdParams *cmdparams )
 			return NS_SUCCESS;
 		}
 	}
-	irc_prefmsg( ts_bot, cmdparams->source, "No entry for %s", cmdparams->av[1] );
+	irc_prefmsg( ts_bot, cmdparams->source, "No entry for %s", cmdparams->av[0] );
 	return NS_SUCCESS;
 }
