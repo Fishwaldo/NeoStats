@@ -175,7 +175,6 @@ dl/Makefile -text
 dl/Makefile.inc.in -text
 dl/README -text
 dl/cs/.indent.pro -text
-dl/cs/ChangeLog -text
 dl/cs/Makefile -text
 dl/cs/cs.c -text
 dl/cs/cs.h -text
@@ -246,6 +245,7 @@ doc/README.french -text
 doc/README.sqlsrv -text
 doc/USERMAN -text
 doc/USERMAN.xml -text
+doc/old/ChangeLog.connectserv.old -text
 doc/old/FAQ.pt -text
 doc/old/INSTALL.pt -text
 doc/old/README.pt -text
