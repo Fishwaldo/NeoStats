@@ -203,7 +203,7 @@ wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = connectserv.la
 connectserv_la_SOURCES = cs.c cs.h cs_help.c
 connectserv_la_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 

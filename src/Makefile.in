@@ -69,11 +69,13 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	timer.$(OBJEXT) transfer.$(OBJEXT) users.$(OBJEXT) \
 	modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) \
 	nsmemory.$(OBJEXT) base64.$(OBJEXT) numerics.$(OBJEXT) \
-	settings.$(OBJEXT) botinfo.$(OBJEXT) oscalls.$(OBJEXT) \
+	settings.$(OBJEXT) botinfo.$(OBJEXT) adnscheck.$(OBJEXT) \
+	adnsevent.$(OBJEXT) adnsgeneral.$(OBJEXT) adnsparse.$(OBJEXT) \
+	adnsquery.$(OBJEXT) adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) \
+	adnstransmit.$(OBJEXT) adnstypes.$(OBJEXT) oscalls.$(OBJEXT) \
 	ossocket.$(OBJEXT) osfile.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
-neostats_DEPENDENCIES = $(top_srcdir)/lib/adns/libadns.la \
-	$(top_srcdir)/lib/event/libevent.a
+neostats_DEPENDENCIES = $(top_srcdir)/lib/event/libevent.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -225,14 +227,14 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
 		base64.c numerics.c settings.c botinfo.c \
+		adnscheck.c adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c \
+		adnsreply.c adnssetup.c adnstransmit.c adnstypes.c \
 		oscalls.c ossocket.c osfile.c 
 
-AM_CFLAGS = -I$(top_srcdir)/lib/adns \
-		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
 		-I$(top_srcdir)/lib/event
 
-neostats_LDADD = $(top_srcdir)/lib/adns/libadns.la \
-		@PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
+neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
 		$(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
@@ -298,6 +300,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnscheck.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsevent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsgeneral.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsparse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsquery.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsreply.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnssetup.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnstransmit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnstypes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/auth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bans.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base64.Po@am__quote@

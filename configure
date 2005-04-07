@@ -28324,7 +28324,7 @@ CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 
 
-                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile src/dbm/bdb/Makefile src/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/adns/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/operlog/Makefile neostats"
+                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile src/dbm/bdb/Makefile src/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/operlog/Makefile neostats"
 
 
 cat >confcache <<\_ACEOF
@@ -28967,7 +28967,6 @@ do
   "src/dbm/gdbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/dbm/gdbm/Makefile" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "lib/curl/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/curl/Makefile" ;;
-  "lib/adns/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/adns/Makefile" ;;
   "lib/pcre/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/pcre/Makefile" ;;
   "lib/event/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/event/Makefile" ;;
   "modules/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/Makefile" ;;
