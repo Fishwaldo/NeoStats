@@ -30,7 +30,7 @@
  * - vbuf handling
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif

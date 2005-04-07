@@ -31,11 +31,11 @@
  * - user-visible check/wait and event-loop-related functions
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#include "tvarith.h"
+#include "adnstvarith.h"
 
 /* socket monitoring managemnet */
 void set_fdupdate(adns_state ads, fd_update myfdfunc) 

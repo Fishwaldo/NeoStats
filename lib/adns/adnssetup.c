@@ -30,7 +30,7 @@
  * - management of global state
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 #ifdef WIN32
 #include <iphlpapi.h>
 #else

@@ -27,7 +27,7 @@
 *  Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. 
 */
 
-#include "internal.h"
+#include "adnsinternal.h"
 
 int adns_writev(int FileDescriptor, const struct iovec * iov, int iovCount)
 {

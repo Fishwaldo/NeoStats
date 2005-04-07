@@ -1,7 +1,7 @@
 lib_LTLIBRARIES		= libadns.la
-libadns_la_SOURCES	= adns.h check.c dlist.h event.c general.c internal.h \
-			parse.c query.c reply.c setup.c transmit.c tvarith.h \
-			types.c
+libadns_la_SOURCES	= adns.h adnscheck.c adnsdlist.h adnsevent.c adnsgeneral.c \
+			adnsinternal.h adnsparse.c adnsquery.c adnsreply.c adnssetup.c \
+			adnstransmit.c adnstvarith.h adnstypes.c
 include_HEADERS		=	adns.h
 
 AM_CFLAGS 	= -I../pcre

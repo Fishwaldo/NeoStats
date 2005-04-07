@@ -29,7 +29,7 @@
  * - main handling and parsing routine for received datagrams
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 
 void adns__procdgram(adns_state ads, const byte * dgram, int dglen,
 		     int serv, int viatcp, struct timeval now)

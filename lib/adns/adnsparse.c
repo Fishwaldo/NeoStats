@@ -29,7 +29,7 @@
  * - parsing assistance functions (mainly for domains inside datagrams)
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 
 int vbuf__append_quoted1035(vbuf * vb, const byte * buf, int len)
 {

@@ -25,7 +25,7 @@
 ** $Id$
 */
 /*
- * internal.h
+ * adnsinternal.h
  * - declarations of private objects with external linkage (adns__*)
  * - definitons of internal macros
  * - comments regarding library data structures
@@ -44,7 +44,7 @@ typedef unsigned char byte;
 #endif
 
 #include "adns.h"
-#include "dlist.h"
+#include "adnsdlist.h"
 
 /* GNU C attributes. */
 #ifndef FUNCATTR

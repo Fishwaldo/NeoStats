@@ -29,7 +29,7 @@
  * - consistency checks
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 
 void adns_checkconsistency(adns_state ads, adns_query qu)
 {

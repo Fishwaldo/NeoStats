@@ -30,11 +30,11 @@
  * - send queries
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 #ifndef WIN32
 #include <sys/uio.h>
 #endif
-#include "tvarith.h"
+#include "adnstvarith.h"
 
 #define MKQUERY_START(vb) (rqp= (vb)->buf+(vb)->used)
 #define MKQUERY_ADDB(b) *rqp++= (b)

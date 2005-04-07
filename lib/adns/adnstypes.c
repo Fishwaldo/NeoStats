@@ -29,7 +29,7 @@
  * - RR-type-specific code, and the machinery to call it
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>

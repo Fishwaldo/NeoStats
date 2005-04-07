@@ -63,8 +63,9 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libadns_la_LIBADD =
-am_libadns_la_OBJECTS = check.lo event.lo general.lo parse.lo query.lo \
-	reply.lo setup.lo transmit.lo types.lo
+am_libadns_la_OBJECTS = adnscheck.lo adnsevent.lo adnsgeneral.lo \
+	adnsparse.lo adnsquery.lo adnsreply.lo adnssetup.lo \
+	adnstransmit.lo adnstypes.lo
 libadns_la_OBJECTS = $(am_libadns_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -205,9 +206,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 lib_LTLIBRARIES = libadns.la
-libadns_la_SOURCES = adns.h check.c dlist.h event.c general.c internal.h \
-			parse.c query.c reply.c setup.c transmit.c tvarith.h \
-			types.c
+libadns_la_SOURCES = adns.h adnscheck.c adnsdlist.h adnsevent.c adnsgeneral.c \
+			adnsinternal.h adnsparse.c adnsquery.c adnsreply.c adnssetup.c \
+			adnstransmit.c adnstvarith.h adnstypes.c
 
 include_HEADERS = adns.h
 AM_CFLAGS = -I../pcre
@@ -273,15 +274,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/general.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reply.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/setup.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transmit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/types.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnscheck.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsevent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsgeneral.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsparse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsquery.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsreply.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnssetup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnstransmit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnstypes.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -31,7 +31,7 @@
  * - query submission and cancellation (user-visible and internal)
  */
 
-#include "internal.h"
+#include "adnsinternal.h"
 
 static adns_query query_alloc(adns_state ads, const typeinfo * typei,
 			      adns_queryflags flags, struct timeval now)
