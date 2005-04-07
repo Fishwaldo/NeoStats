@@ -705,17 +705,17 @@ Client *GetRandomChannelMember(int uge, Channel *c)
 	}
 	randno = hrand( (listco - excludeno), 1 );	
 	ln = list_first(c->members);
-	while( ln && curno < randno ) {
-		cm = lnode_get(ln);
+	while( cm = lnode_get(ln) ) {
 		if (!IsExcluded(cm->u) || !uge) {
 			curno++;
 		}
+		if( curno >= randno )
+			break;
 		ln = list_next(c->members, ln);
 	}
-	if (!ln) {
+	if (!cm) {
 		return NULL;
 	}
-	cm = lnode_get(ln);
 	return cm->u;
 }
 
