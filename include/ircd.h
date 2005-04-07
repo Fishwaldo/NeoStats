@@ -225,6 +225,7 @@ MODULEFUNC void send_svstime( const char *source, const unsigned long ts );
 MODULEFUNC void send_setname( const char *nick, const char *realname );
 MODULEFUNC void send_sethost( const char *nick, const char *host );
 MODULEFUNC void send_setident( const char *nick, const char *ident );
+MODULEFUNC void send_serverrequptime( const char *source, const char *target );
 
 MODULEFUNC void cloakhost(  char *host  );
 

@@ -119,6 +119,7 @@ static void( *irc_send_svstime )( const char *source, const unsigned long ts );
 static void( *irc_send_setname )( const char* nick, const char* realname );
 static void( *irc_send_sethost )( const char* nick, const char* host );
 static void( *irc_send_setident )( const char* nick, const char* ident );
+static void( *irc_send_serverrequptime )( const char *source, const char *target );
 
 static void( *irc_send_cloakhost )( char* host );
 
@@ -181,6 +182,7 @@ static ircd_sym ircd_sym_table[] =
 	{( void * )&irc_send_sethost, "send_sethost", 0, 0},
 	{( void * )&irc_send_setident, "send_setident", 0, 0},
 	{( void * )&irc_send_cloakhost, "cloakhost", 0, 0},
+	{( void * )&irc_send_serverrequptime, "send_serverrequptime", 0, 0},
 	{NULL, NULL, 0, 0},
 };
 
@@ -1840,6 +1842,21 @@ int irc_server( const char *name, const int numeric, const char *infoline )
 	irc_send_server( me.name, name, numeric, infoline );
 	return NS_SUCCESS;
 }
+
+/** @brief irc_serverrequptime
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_serverrequptime( const char *source, const char *target )
+{
+	if( irc_send_serverrequptime )
+		irc_serverrequptime( source, target );
+	else
+		send_cmd(":%s STATS u %s", source, target );
+	return NS_SUCCESS;
+}
+
 
 /** @brief irc_squit
  *
