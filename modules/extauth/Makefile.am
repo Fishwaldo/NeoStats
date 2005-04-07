@@ -1,5 +1,5 @@
 pkglib_LTLIBRARIES		= extauth.la
 extauth_la_SOURCES	= extauth.c 
 extauth_la_LDFLAGS	= -module -avoid-version -no-undefined
-AM_CFLAGS		= @PCRE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/lib/keeper/ -I$(top_srcdir)/lib/adns/
+AM_CFLAGS		= @PCRE_CFLAGS@ @CURL_CFLAGS@
 include $(top_srcdir)/autotools/rules.mk

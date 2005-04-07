@@ -12,10 +12,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libevent", "lib\event\WIN32
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "adns", "lib\adns\adns.vcproj", "{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcredftables", "lib\pcre\pcredftables.vcproj", "{310EA68C-162C-4C51-803D-32F800E6F311}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -38,10 +34,6 @@ Global
 		{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}.Debug.Build.0 = Debug|Win32
 		{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}.Release.ActiveCfg = Release|Win32
 		{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}.Release.Build.0 = Release|Win32
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.ActiveCfg = Debug|Win32
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Debug.Build.0 = Debug|Win32
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.ActiveCfg = Release|Win32
-		{C41CD6E3-30A4-4BB9-BA51-F97B2CD77D56}.Release.Build.0 = Release|Win32
 		{310EA68C-162C-4C51-803D-32F800E6F311}.Debug.ActiveCfg = Debug|Win32
 		{310EA68C-162C-4C51-803D-32F800E6F311}.Debug.Build.0 = Debug|Win32
 		{310EA68C-162C-4C51-803D-32F800E6F311}.Release.ActiveCfg = Release|Win32

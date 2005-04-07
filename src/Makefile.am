@@ -8,12 +8,12 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		ns_help.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
 		base64.c numerics.c settings.c botinfo.c \
+		adnscheck.c adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c \
+		adnsreply.c adnssetup.c adnstransmit.c adnstypes.c \
 		oscalls.c ossocket.c osfile.c 
-AM_CFLAGS = 	-I$(top_srcdir)/lib/adns \
-		@PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
 		-I$(top_srcdir)/lib/event
-neostats_LDADD = $(top_srcdir)/lib/adns/libadns.la \
-		@PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
+neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
 		$(top_srcdir)/lib/event/libevent.a
 neostats_LDFLAGS = --export-dynamic -rdynamic
 noinst_HEADERS          =       confuselexer.l
