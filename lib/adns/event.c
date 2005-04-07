@@ -131,21 +131,19 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 			adns__diag(ads,-1,0,"unable to find protocol no. for TCP !"); 
 			return; 
 		}
-		ADNS_CLEAR_ERRNO;
-		fd = socket(AF_INET, SOCK_STREAM, proto->p_proto);
-		ADNS_CAPTURE_ERRNO;
-		if (fd < 0) 
+		fd = os_sock_socket(AF_INET, SOCK_STREAM, proto->p_proto);
+		if( fd < 0 ) 
 		{
-			adns__diag(ads, -1, 0, "cannot create TCP socket: %s", strerror(errno));
+			adns__diag( ads, -1, 0, "cannot create TCP socket: %s", os_sock_getlasterrorstring() );
 			return;
 		}
 		if( os_sock_set_nonblocking( fd ) < 0 )
 		{
-			adns__diag(ads, -1, 0, "cannot make TCP socket nonblocking: %s", strerror(r));
-			os_sock_close(fd);
+			adns__diag( ads, -1, 0, "cannot make TCP socket nonblocking: %s", os_sock_getlasterrorstring() );
+			os_sock_close( fd );
 			return;
 		}
-		memset(&addr, 0, sizeof(addr));
+		os_memset(&addr, 0, sizeof(addr));
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(DNS_PORT);
 		addr.sin_addr = ads->servers[ads->tcpserver].addr;

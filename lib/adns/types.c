@@ -327,7 +327,7 @@ static adns_status pa_addr(const parseinfo * pai, int cbyte, int max,
 	if (max - cbyte != 4)
 		return adns_s_invaliddata;
 	storeto->len = sizeof(storeto->addr.inet);
-	memset(&storeto->addr, 0, sizeof(storeto->addr.inet));
+	os_memset(&storeto->addr, 0, sizeof(storeto->addr.inet));
 	storeto->addr.inet.sin_family = AF_INET;
 	memcpy(&storeto->addr.inet.sin_addr, dgram + cbyte, 4);
 	return adns_s_ok;
@@ -919,7 +919,7 @@ static adns_status pa_ptr(const parseinfo * pai, int dmstart, int max,
 			return adns_s_querydomainwrong;
 
 		ap->len = sizeof(struct sockaddr_in);
-		memset(&ap->addr, 0, sizeof(ap->addr.inet));
+		os_memset(&ap->addr, 0, sizeof(ap->addr.inet));
 		ap->addr.inet.sin_family = AF_INET;
 		ap->addr.inet.sin_addr.s_addr =
 		    htonl((ipv[0] << 24) | (ipv[1] << 16) | (ipv[2] << 8) |
@@ -934,7 +934,7 @@ static adns_status pa_ptr(const parseinfo * pai, int dmstart, int max,
 
 	ctx.ext = 0;
 	ctx.callback = icb_ptr;
-	memset(&ctx.info, 0, sizeof(ctx.info));
+	os_memset(&ctx.info, 0, sizeof(ctx.info));
 	st = adns__internal_submit(pai->ads, &nqu,
 				   adns__findtype(adns_r_addr),
 				   &pai->qu->vb, id, adns_qf_quoteok_query,

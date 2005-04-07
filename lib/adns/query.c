@@ -77,7 +77,7 @@ static adns_query query_alloc(adns_state ads, const typeinfo * typei,
 	timerclear(&qu->timeout);
 	qu->expires = now.tv_sec + MAXTTLBELIEVE;
 
-	memset(&qu->ctx, 0, sizeof(qu->ctx));
+	os_memset(&qu->ctx, 0, sizeof(qu->ctx));
 
 	qu->answer->status = adns_s_ok;
 	qu->answer->cname = qu->answer->owner = 0;
@@ -248,7 +248,7 @@ int adns_submit(adns_state ads,
 
 	qu->ctx.ext = context;
 	qu->ctx.callback = 0;
-	memset(&qu->ctx.info, 0, sizeof(qu->ctx.info));
+	os_memset(&qu->ctx.info, 0, sizeof(qu->ctx.info));
 
 	*query_r = qu;
 

@@ -1471,6 +1471,7 @@ EXPORTFUNC int os_sock_listen( OS_SOCKET s, int backlog );
 EXPORTFUNC int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval, int optlen );
 EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp );
 EXPORTVAR int os_sock_errno;
+EXPORTFUNC char *os_sock_getlasterrorstring( void );
 
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );

@@ -587,3 +587,16 @@ int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
 	return ioctl( s, cmd, argp );
 #endif
 }
+
+/*
+ *  
+ */
+
+char *os_sock_getlasterrorstring( void )
+{
+#ifdef WIN32
+	return WinSockErrToString( WSAGetLastError() );
+#else
+	return strerror( errno );
+#endif
+}

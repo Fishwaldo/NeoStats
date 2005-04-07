@@ -286,7 +286,7 @@ void adns__query_send(adns_query qu, struct timeval now)
 	}
 
 	serv = qu->udpnextserver;
-	memset(&servaddr, 0, sizeof(servaddr));
+	os_memset(&servaddr, 0, sizeof(servaddr));
 
 	ads = qu->ads;
 	servaddr.sin_family = AF_INET;
