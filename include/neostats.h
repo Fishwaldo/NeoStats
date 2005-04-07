@@ -1241,6 +1241,7 @@ EXPORTFUNC int CheckChanMode( Channel *c, const unsigned int mode );
 EXPORTFUNC int IsChannelMember( Channel *c, Client *u );
 EXPORTFUNC int test_cumode( char *chan, char *nick, int flag );
 EXPORTFUNC Channel *GetRandomChannel( void );
+EXPORTFUNC Client *GetRandomChannelMember(int uge, Channel *c);
 EXPORTFUNC char *GetRandomChannelKey( int length );
 
 #define IsChanOp( chan, nick ) test_cumode(chan, nick, CUMODE_CHANOP)

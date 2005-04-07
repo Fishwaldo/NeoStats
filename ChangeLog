@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - add random channel member funtion (D)
  - Fix Win32 text output for log files. (M)
  - ADNS now uses neostats memory management. (M)
  - Merge gdbm lib and gdbm DBM module. (M)
