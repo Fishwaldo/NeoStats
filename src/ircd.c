@@ -1851,7 +1851,7 @@ int irc_server( const char *name, const int numeric, const char *infoline )
 int irc_serverrequptime( const char *source, const char *target )
 {
 	if( irc_send_serverrequptime )
-		irc_serverrequptime( source, target );
+		irc_send_serverrequptime( source, target );
 	else
 		send_cmd(":%s STATS u %s", source, target );
 	return NS_SUCCESS;
