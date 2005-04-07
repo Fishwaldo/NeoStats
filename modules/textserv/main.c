@@ -277,7 +277,7 @@ static int ts_cmd_add( CmdParams *cmdparams )
 			"%s already exists in the database list", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	fp = os_fopen( cmdparams->av[0], "r" );
+	fp = os_fopen( cmdparams->av[0], "rt" );
 	if( !fp )
 	{
 		irc_prefmsg( ts_bot, cmdparams->source, 

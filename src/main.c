@@ -377,7 +377,7 @@ int main( int argc, char *argv[] )
 		/* we are the parent */ 
 		if( forked > 0 ) { 
 			/* write out our PID */
-			fp = fopen( PID_FILENAME, "w" );
+			fp = fopen( PID_FILENAME, "wt" );
 			fprintf( fp, "%i", forked );
 			fclose( fp );
 			if( !nsconfig.quiet ) {

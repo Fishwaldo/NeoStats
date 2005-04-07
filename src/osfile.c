@@ -96,10 +96,6 @@ FILE* os_fopen( const char *filename, const char *filemode )
 
 	retval = fopen( filename, filemode );
 	os_errno = errno;
-	/* magically fix win32 text outputs... */
-#ifdef WIN32
-	_setmode( _fileno( retval ), _O_TEXT );
-#endif
 	return retval;
 }
 

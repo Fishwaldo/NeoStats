@@ -149,7 +149,7 @@ int ConfLoad( void )
 printf("%d %s\n", i, arg_validate[i].name);
         cfg_set_validate_func(cfg, arg_validate[i].name, arg_validate[i].cb);
     } 
-    fp = fopen("neostats.conf.out", "w");
+    fp = fopen("neostats.conf.out", "wt");
     cfg_print(cfg, fp);
     fclose(fp);
 	if((ret =  cfg_parse(cfg, CONFIG_NAME)) != 0 ) {

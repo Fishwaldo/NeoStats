@@ -127,7 +127,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 				return NS_FAILURE;
 			}
 			
-			newtrans->savefile = fopen(filename, "w");
+			newtrans->savefile = fopen(filename, "wt");
 			if (!newtrans->savefile) {
 				nlog(LOG_WARNING, "Error Opening file for writting in new_transfer: %s", strerror(errno));
 				ns_free(newtrans);

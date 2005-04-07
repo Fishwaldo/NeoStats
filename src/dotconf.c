@@ -376,7 +376,7 @@ config_read (char *fname, config_option * options)
 	config_register_options (dotconf_options);	/* internal options */
 	config_register_options (options);	/* register main options */
 
-	config = fopen (dotconf_file, "r");
+	config = fopen (dotconf_file, "rt");
 	config_parse (config);	/* fire off parser */
 	fclose (config);
 
@@ -414,7 +414,7 @@ dotconf_cb_include (char *str)
 		return;
 	}
 
-	config = fopen (dotconf_file, "r");
+	config = fopen (dotconf_file, "rt");
 	config_parse (config);
 	fclose (config);
 	strlcpy (dotconf_file, old_fname, CFG_MAX_FILENAME);

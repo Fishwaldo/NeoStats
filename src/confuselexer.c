@@ -2030,7 +2030,7 @@ int cfg_lexer_include(cfg_t *cfg, const char *filename)
 
     xfilename = cfg_tilde_expand(filename);
 
-    cfg_yyin = fopen(xfilename, "r");
+    cfg_yyin = fopen(xfilename, "rt");
 
     if(!cfg_yyin) {
         cfg_error(cfg, "%s: %s", xfilename, strerror(errno));

@@ -2042,7 +2042,7 @@ void do_motd( const char* nick, const char *remoteserver )
 	char buf[BUFSIZE];
 
 	SET_SEGV_LOCATION();
-	fp = fopen( MOTD_FILENAME, "r" );
+	fp = fopen( MOTD_FILENAME, "rt" );
 	if( !fp ) {
 		irc_numeric( ERR_NOMOTD, nick, _( ":- MOTD file Missing" ) );
 	} else {
@@ -2074,7 +2074,7 @@ void do_admin( const char* nick, const char *remoteserver )
 	char buf[BUFSIZE];
 	SET_SEGV_LOCATION();
 
-	fp = fopen( ADMIN_FILENAME, "r" );
+	fp = fopen( ADMIN_FILENAME, "rt" );
 	if( !fp ) {
 		irc_numeric( ERR_NOADMININFO, nick, _( "%s :No administrative info available" ), me.name );
 	} else {

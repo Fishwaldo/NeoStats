@@ -253,7 +253,7 @@ static int ss_set_htmlpath_cb (CmdParams *cmdparams, SET_REASON reason)
 
 	if( reason == SET_CHANGE )
 	{
-		opf = fopen (StatServ.htmlpath, "w");
+		opf = fopen (StatServ.htmlpath, "wt");
 		if (!opf) {
 			irc_prefmsg (ss_bot, cmdparams->source, 
 				"Failed to open HTML output file %s. Check file permissions. HTML output disabled.", StatServ.htmlpath);

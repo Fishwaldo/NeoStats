@@ -112,7 +112,7 @@ void report_segfault( const char* modulename )
 {
 	static char segfault_fmttime[TIMEBUFSIZE];
 
-	segfault = fopen( "segfault.log", "a" );
+	segfault = fopen( "segfault.log", "at" );
 	if( modulename ) {
 		irc_globops( NULL, _( "Segmentation fault in %s. Refer to segfault.log for details." ), GET_CUR_MODNAME() );
 		nlog( LOG_CRITICAL, "Segmentation fault in %s. Refer to segfault.log for details.", GET_CUR_MODNAME() );

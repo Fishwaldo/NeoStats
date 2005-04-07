@@ -436,13 +436,13 @@ int ss_html( void )
 	char *bufptr;
 	htmlfunc* htmlfuncptr;
 
-	tpl = os_fopen( html_template, "r" );
+	tpl = os_fopen( html_template, "rt" );
 	if( !tpl ) {
 		nlog( LOG_WARNING, "Failed to open StatServ HTML template %s.", html_template );
 		irc_chanalert( ss_bot, "Failed to open StatServ HTML template %s.", html_template );
 		return NS_SUCCESS;
 	}
-	opf = os_fopen( StatServ.htmlpath, "w" );
+	opf = os_fopen( StatServ.htmlpath, "wt" );
 	if( !opf ) {
 		nlog( LOG_WARNING, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
 		irc_chanalert( ss_bot, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );

@@ -25,6 +25,9 @@
  */
 
 #include "neostats.h"
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h> 
+#endif
 
 #ifdef WIN32
 char *WinSockErrToString( int errno )
@@ -263,17 +266,12 @@ char *WinSockErrToString( int errno )
 }
 #endif /* WIN32 */
 
+/* local errno implementation */
+int os_sock_errno = 0;
+
 /*
  *  Wrapper function for sock_close
  */
-
-#include "neostats.h"
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h> 
-#endif
-
-/* local errno implementation */
-int os_sock_errno = 0;
 
 int os_sock_close( OS_SOCKET sock )
 {

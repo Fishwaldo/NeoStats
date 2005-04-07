@@ -1024,7 +1024,7 @@ int cfg_parse(cfg_t *cfg, const char *filename)
 
     free(cfg->filename);
     cfg->filename = cfg_tilde_expand(filename);
-    fp = fopen(cfg->filename, "r");
+    fp = fopen(cfg->filename, "rt");
     if(fp == 0)
         return CFG_FILE_ERROR;
     ret = cfg_parse_fp(cfg, fp);
