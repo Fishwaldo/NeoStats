@@ -67,7 +67,7 @@ ModuleInfo module_info =
 	"IRCDAuth",
 	"IRCD User Mode Authentication Module",
 	ircdauth_copyright,
-	NULL,
+	ircdauth_about,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
 	__DATE__,

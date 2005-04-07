@@ -74,7 +74,7 @@ ModuleInfo module_info =
 	"ExtAuth",
 	"Access List Authentication Module",
 	extauth_copyright,
-	NULL,
+	extauth_about,
 	NEOSTATS_VERSION,
 	CORE_MODULE_VERSION,
 	__DATE__,
