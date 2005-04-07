@@ -43,7 +43,7 @@ int adns_writev(int FileDescriptor, const struct iovec * iov, int iovCount)
 	
 	for(; i < iovCount; i++)
 	{
-		memcpy(p, iov[i].iov_base, iov[i].iov_len);
+		os_memcpy(p, iov[i].iov_base, iov[i].iov_len);
 		p += iov[i].iov_len;
 	}
 	

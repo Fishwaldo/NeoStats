@@ -1479,6 +1479,14 @@ EXPORTFUNC void *os_memcpy( void *dest, const void *src, size_t count );
 EXPORTFUNC void *os_malloc( size_t size );
 EXPORTFUNC void os_free( void *ptr );
 
+#ifdef WIN32
+#define OS_SOCK_EMSGSIZE                WSAEMSGSIZE
+#define OS_SOCK_EAGAIN                  WSAEPROCLIM
+#else
+#define OS_SOCK_EMSGSIZE                EMSGSIZE
+#define OS_SOCK_EAGAIN                  EAGAIN
+#endif
+
 /* 
  * Module Interface 
  */

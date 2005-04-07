@@ -138,7 +138,7 @@ int adns__vbuf_ensure(vbuf * vb, int want)
 
 void adns__vbuf_appendq(vbuf * vb, const byte * data, int len)
 {
-	memcpy(vb->buf + vb->used, data, len);
+	os_memcpy(vb->buf + vb->used, data, len);
 	vb->used += len;
 }
 
@@ -257,30 +257,30 @@ static const struct sinfo {
 	const char *abbrev;
 	const char *string;
 } sinfos[] = {
-		SINFO(ok, "OK"),
-	    SINFO(nomemory, "Out of memory"),
-	    SINFO(unknownrrtype, "Query not implemented in DNS library"),
-	    SINFO(systemfail, "General resolver or system failure"),
-	    SINFO(timeout, "DNS query timed out"),
-	    SINFO(allservfail, "All nameservers failed"),
-	    SINFO(norecurse, "Recursion denied by nameserver"),
-	    SINFO(invalidresponse, "Nameserver sent bad response"),
-	    SINFO(unknownformat, "Nameserver used unknown format"),
-	    SINFO(rcodeservfail, "Nameserver reports failure"),
-	    SINFO(rcodeformaterror, "Query not understood by nameserver"),
-		SINFO(  rcodenotimplemented, "Query not implemented by nameserver"           ),
-	    SINFO(rcoderefused, "Query refused by nameserver"),
-	    SINFO(rcodeunknown, "Nameserver sent unknown response code"),
-	    SINFO(inconsistent, "Inconsistent resource records in DNS"),
-		SINFO(  prohibitedcname,     "DNS alias found where canonical name wanted"   ),
-		SINFO(  answerdomaininvalid, "Found syntactically invalid domain name"       ),
-	    SINFO(answerdomaintoolong, "Found overly-long domain name"),
-	    SINFO(invaliddata, "Found invalid DNS data"),
-		SINFO(  querydomainwrong,    "Domain invalid for particular DNS query type"  ),
-		SINFO(  querydomaininvalid,  "Domain name is syntactically invalid"          ),
-		SINFO(  querydomaintoolong,  "Domain name or component is too long"          ),
-		SINFO(  nxdomain,            "No such domain"                                ),
-	    SINFO(nodata, "No such data")
+	SINFO(ok,					"OK"),
+	SINFO(nomemory,				"Out of memory"),
+	SINFO(unknownrrtype,		"Query not implemented in DNS library"),
+	SINFO(systemfail,			"General resolver or system failure"),
+	SINFO(timeout,				"DNS query timed out"),
+	SINFO(allservfail,			"All nameservers failed"),
+	SINFO(norecurse,			"Recursion denied by nameserver"),
+	SINFO(invalidresponse,		"Nameserver sent bad response"),
+	SINFO(unknownformat,		"Nameserver used unknown format"),
+	SINFO(rcodeservfail,		"Nameserver reports failure"),
+	SINFO(rcodeformaterror,		"Query not understood by nameserver"),
+	SINFO(rcodenotimplemented,	"Query not implemented by nameserver"),
+	SINFO(rcoderefused,			"Query refused by nameserver"),
+	SINFO(rcodeunknown,			"Nameserver sent unknown response code"),
+	SINFO(inconsistent,			"Inconsistent resource records in DNS"),
+	SINFO(prohibitedcname,		"DNS alias found where canonical name wanted"),
+	SINFO(answerdomaininvalid,	"Found syntactically invalid domain name"),
+	SINFO(answerdomaintoolong,	"Found overly-long domain name"),
+	SINFO(invaliddata,			"Found invalid DNS data"),
+	SINFO(querydomainwrong,		"Domain invalid for particular DNS query type"),
+	SINFO(querydomaininvalid,	"Domain name is syntactically invalid"),
+	SINFO(querydomaintoolong,	"Domain name or component is too long"),
+	SINFO(nxdomain,				"No such domain"),
+	SINFO(nodata,				"No such data")
 };
 
 static int si_compar(const void *key, const void *elem)
@@ -366,9 +366,9 @@ void adns__isort(void *array, int nobjs, int sz, void *tempbuf,
 		     && needswap(context, data + (place - 1) * sz,
 				 data + i * sz); place--);
 		if (place != i) {
-			memcpy(tempbuf, data + i * sz, sz);
+			os_memcpy(tempbuf, data + i * sz, sz);
 			memmove(data + (place + 1) * sz, data + place * sz, (i - place) * sz);
-			memcpy(data + place * sz, tempbuf, sz);
+			os_memcpy(data + place * sz, tempbuf, sz);
 		}
 	}
 }

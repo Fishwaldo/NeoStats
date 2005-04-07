@@ -46,10 +46,6 @@ typedef unsigned char byte;
 #include "adns.h"
 #include "dlist.h"
 
-#ifdef ADNS_REGRESS_TEST
-#include "hredirect.h"
-#endif
-
 /* GNU C attributes. */
 #ifndef FUNCATTR
 #ifdef HAVE_GNUC25_ATTRIB
@@ -151,7 +147,7 @@ typedef struct {
 	 * and will not be null-terminated by convstring.
 	 */
 
-  adns_status (*parse)(const parseinfo *pai, int cbyte, int max, void *store_r);
+	adns_status (*parse)(const parseinfo *pai, int cbyte, int max, void *store_r);
 	/* Parse one RR, in dgram of length dglen, starting at cbyte and
 	 * extending until at most max.
 	 *
@@ -163,7 +159,7 @@ typedef struct {
 	 * nsstart is the offset of the authority section.
 	 */
 
-  int (*diff_needswap)(adns_state ads, const void *datap_a, const void *datap_b);
+	int (*diff_needswap)(adns_state ads, const void *datap_a, const void *datap_b);
 	/* Returns !0 if RR a should be strictly after RR b in the sort order,
 	 * 0 otherwise.  Must not fail.
 	 */
@@ -349,12 +345,9 @@ struct adns__state {
 void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
 		 int serv, adns_query qu, const char *fmt, va_list al);
 
-void adns__debug(adns_state ads, int serv, adns_query qu,
-		 const char *fmt, ...) PRINTFFORMAT(4, 5);
-void adns__warn(adns_state ads, int serv, adns_query qu,
-		const char *fmt, ...) PRINTFFORMAT(4, 5);
-void adns__diag(adns_state ads, int serv, adns_query qu,
-		const char *fmt, ...) PRINTFFORMAT(4, 5);
+void adns__debug(adns_state ads, int serv, adns_query qu, const char *fmt, ...) PRINTFFORMAT(4, 5);
+void adns__warn(adns_state ads, int serv, adns_query qu, const char *fmt, ...) PRINTFFORMAT(4, 5);
+void adns__diag(adns_state ads, int serv, adns_query qu, const char *fmt, ...) PRINTFFORMAT(4, 5);
 
 int adns__vbuf_ensure(vbuf * vb, int want);
 int adns__vbuf_appendstr(vbuf * vb, const char *data);	/* does not include nul */

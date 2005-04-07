@@ -113,9 +113,9 @@ void adns__procdgram(adns_state ads, const byte * dgram, int dglen,
 		if (qu) {
 			/* We're definitely going to do something with this query now */
 			if (viatcp)
-				LIST_UNLINK(ads->tcpw, qu);
+				ALIST_UNLINK(ads->tcpw, qu);
 			else
-				LIST_UNLINK(ads->udpw, qu);
+				ALIST_UNLINK(ads->udpw, qu);
 		}
 	}
 
@@ -274,9 +274,9 @@ void adns__procdgram(adns_state ads, const byte * dgram, int dglen,
 
 				qu->cname_dgram =
 				    adns__alloc_mine(qu, dglen);
-				memcpy(qu->cname_dgram, dgram, dglen);
+				os_memcpy(qu->cname_dgram, dgram, dglen);
 
-				memcpy(qu->answer->cname, qu->vb.buf, l);
+				os_memcpy(qu->answer->cname, qu->vb.buf, l);
 				cname_here = 1;
 				adns__update_expires(qu, ttl, now);
 				/* If we find the answer section truncated after this point we restart
@@ -430,7 +430,7 @@ void adns__procdgram(adns_state ads, const byte * dgram, int dglen,
 	/* This may have generated some child queries ... */
 	if (qu->children.head) {
 		qu->state = query_childw;
-		LIST_LINK_TAIL(ads->childw, qu);
+		ALIST_LINK_TAIL(ads->childw, qu);
 		return;
 	}
 	adns__query_done(qu);
@@ -466,7 +466,7 @@ void adns__procdgram(adns_state ads, const byte * dgram, int dglen,
 
 		qu->query_dgram = newquery;
 		qu->query_dglen = qu->vb.used;
-		memcpy(newquery, qu->vb.buf, qu->vb.used);
+		os_memcpy(newquery, qu->vb.buf, qu->vb.used);
 	}
 
 	if (qu->state == query_tcpw)

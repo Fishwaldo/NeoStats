@@ -102,7 +102,7 @@ static adns_status pap_qstring(const parseinfo * pai, int *cbyte_io,
 		R_NOMEM;
 
 	str[l] = 0;
-	memcpy(str, dgram + cbyte, l);
+	os_memcpy(str, dgram + cbyte, l);
 
 	*len_r = l;
 	*str_r = str;
@@ -267,7 +267,7 @@ static adns_status pa_inaddr(const parseinfo * pai, int cbyte, int max,
 
 	if (max - cbyte != 4)
 		return adns_s_invaliddata;
-	memcpy(storeto, pai->dgram + cbyte, 4);
+	os_memcpy(storeto, pai->dgram + cbyte, 4);
 	return adns_s_ok;
 }
 
@@ -329,7 +329,7 @@ static adns_status pa_addr(const parseinfo * pai, int cbyte, int max,
 	storeto->len = sizeof(storeto->addr.inet);
 	os_memset(&storeto->addr, 0, sizeof(storeto->addr.inet));
 	storeto->addr.inet.sin_family = AF_INET;
-	memcpy(&storeto->addr.inet.sin_addr, dgram + cbyte, 4);
+	os_memcpy(&storeto->addr.inet.sin_addr, dgram + cbyte, 4);
 	return adns_s_ok;
 }
 
@@ -403,7 +403,7 @@ static adns_status pap_domain(const parseinfo * pai, int *cbyte_io,
 		R_NOMEM;
 
 	dm[pai->qu->vb.used] = 0;
-	memcpy(dm, pai->qu->vb.buf, pai->qu->vb.used);
+	os_memcpy(dm, pai->qu->vb.buf, pai->qu->vb.used);
 
 	*domain_r = dm;
 	return adns_s_ok;
@@ -507,7 +507,7 @@ static adns_status pap_findaddrs(const parseinfo * pai,
 					naddrs * sizeof(adns_rr_addr));
 		if (!ha->addrs)
 			R_NOMEM;
-		memcpy(ha->addrs, pai->qu->vb.buf,
+		os_memcpy(ha->addrs, pai->qu->vb.buf,
 		       naddrs * sizeof(adns_rr_addr));
 		ha->naddrs = naddrs;
 		ha->astatus = adns_s_ok;
@@ -534,7 +534,7 @@ static void icb_hostaddr(adns_query parent, adns_query child)
 			       rrp->naddrs * sizeof(adns_rr_addr));
 
 	if (parent->children.head) {
-		LIST_LINK_TAIL(ads->childw, parent);
+		ALIST_LINK_TAIL(ads->childw, parent);
 	} else {
 		adns__query_done(parent);
 	}
@@ -598,7 +598,7 @@ static adns_status pap_hostaddr(const parseinfo * pai, int *cbyte_io,
 		return st;
 
 	nqu->parent = pai->qu;
-	LIST_LINK_TAIL_PART(pai->qu->children, nqu, siblings.);
+	ALIST_LINK_TAIL_PART(pai->qu->children, nqu, siblings.);
 
 	return adns_s_ok;
 }
@@ -843,7 +843,7 @@ static void icb_ptr(adns_query parent, adns_query child)
 				adns__query_done(parent);
 				return;
 			} else {
-				LIST_LINK_TAIL(ads->childw, parent);
+				ALIST_LINK_TAIL(ads->childw, parent);
 				return;
 			}
 		}
@@ -891,7 +891,7 @@ static adns_status pa_ptr(const parseinfo * pai, int dmstart, int max,
 			assert(!st);
 			if (lablen <= 0 || lablen > 3)
 				return adns_s_querydomainwrong;
-			memcpy(labbuf, pai->qu->query_dgram + labstart,
+			os_memcpy(labbuf, pai->qu->query_dgram + labstart,
 			       lablen);
 			labbuf[lablen] = 0;
 			ipv[3 - i] = strtoul(labbuf, &ep, 10);
@@ -943,7 +943,7 @@ static adns_status pa_ptr(const parseinfo * pai, int dmstart, int max,
 		return st;
 
 	nqu->parent = pai->qu;
-	LIST_LINK_TAIL_PART(pai->qu->children, nqu, siblings.);
+	ALIST_LINK_TAIL_PART(pai->qu->children, nqu, siblings.);
 	return adns_s_ok;
 }
 
@@ -1067,7 +1067,7 @@ static adns_status pap_mailbox822(const parseinfo * pai, int *cbyte_io,
 	str = adns__alloc_interim(pai->qu, vb->used + 1);
 	if (!str)
 		R_NOMEM;
-	memcpy(str, vb->buf, vb->used);
+	os_memcpy(str, vb->buf, vb->used);
 	str[vb->used] = 0;
 	*mb_r = str;
 	return adns_s_ok;

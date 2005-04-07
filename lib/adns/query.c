@@ -109,7 +109,7 @@ static void query_submit(adns_state ads, adns_query qu,
 
 	qu->id = id;
 	qu->query_dglen = qu->vb.used;
-	memcpy(qu->query_dgram, qu->vb.buf, qu->vb.used);
+	os_memcpy(qu->query_dgram, qu->vb.buf, qu->vb.used);
 
 	adns__query_send(qu, now);
 }
@@ -128,7 +128,7 @@ adns_status adns__internal_submit(adns_state ads, adns_query * query_r,
 	}
 	*query_r = qu;
 
-	memcpy(&qu->ctx, ctx, sizeof(qu->ctx));
+	os_memcpy(&qu->ctx, ctx, sizeof(qu->ctx));
 	query_submit(ads, qu, typei, qumsg_vb, id, flags, now);
 
 	return adns_s_ok;
@@ -216,7 +216,7 @@ static int save_owner(adns_query qu, const char *owner, int ol)
 	if (!ans->owner)
 		return 0;
 
-	memcpy(ans->owner, owner, ol);
+	os_memcpy(ans->owner, owner, ol);
 	ans->owner[ol] = 0;
 	return 1;
 }
@@ -385,7 +385,7 @@ static void *alloc_common(adns_query qu, size_t sz)
 	an = ns_malloc(MEM_ROUND(MEM_ROUND(sizeof(*an)) + sz));
 	if (!an)
 		return 0;
-	LIST_LINK_TAIL(qu->allocations, an);
+	ALIST_LINK_TAIL(qu->allocations, an);
 	return (byte *) an + MEM_ROUND(sizeof(*an));
 }
 
@@ -430,8 +430,8 @@ void adns__transfer_interim(adns_query from, adns_query to, void *block,
 	assert(!to->final_allocspace);
 	assert(!from->final_allocspace);
 
-	LIST_UNLINK(from->allocations, an);
-	LIST_LINK_TAIL(to->allocations, an);
+	ALIST_UNLINK(from->allocations, an);
+	ALIST_LINK_TAIL(to->allocations, an);
 
 	sz = MEM_ROUND(sz);
 	from->interim_allocd -= sz;
@@ -500,19 +500,19 @@ void adns_cancel(adns_query qu)
 	ads = qu->ads;
 	adns__consistency(ads, qu, cc_entex);
 	if (qu->parent)
-		LIST_UNLINK_PART(qu->parent->children, qu, siblings.);
+		ALIST_UNLINK_PART(qu->parent->children, qu, siblings.);
 	switch (qu->state) {
 	case query_tosend:
-		LIST_UNLINK(ads->udpw, qu);
+		ALIST_UNLINK(ads->udpw, qu);
 		break;
 	case query_tcpw:
-		LIST_UNLINK(ads->tcpw, qu);
+		ALIST_UNLINK(ads->tcpw, qu);
 		break;
 	case query_childw:
-		LIST_UNLINK(ads->childw, qu);
+		ALIST_UNLINK(ads->childw, qu);
 		break;
 	case query_done:
-		LIST_UNLINK(ads->output, qu);
+		ALIST_UNLINK(ads->output, qu);
 		break;
 	default:
 		abort();
@@ -611,15 +611,15 @@ void adns__query_done(adns_query qu)
 	ans->expires = qu->expires;
 	parent = qu->parent;
 	if (parent) {
-		LIST_UNLINK_PART(parent->children, qu, siblings.);
-		LIST_UNLINK(qu->ads->childw, parent);
+		ALIST_UNLINK_PART(parent->children, qu, siblings.);
+		ALIST_UNLINK(qu->ads->childw, parent);
 		qu->ctx.callback(parent, qu);
 		free_query_allocs(qu);
 		ns_free(qu->answer);
 		ns_free(qu);
 	} else {
 		makefinal_query(qu);
-		LIST_LINK_TAIL(qu->ads->output, qu);
+		ALIST_LINK_TAIL(qu->ads->output, qu);
 		qu->state = query_done;
 	}
 }
@@ -641,7 +641,7 @@ void adns__makefinal_str(adns_query qu, char **strp)
 		return;
 	l = strlen(before) + 1;
 	after = adns__alloc_final(qu, l);
-	memcpy(after, before, l);
+	os_memcpy(after, before, l);
 	*strp = after;
 }
 
@@ -653,6 +653,6 @@ void adns__makefinal_block(adns_query qu, void **blpp, size_t sz)
 	if (!before)
 		return;
 	after = adns__alloc_final(qu, sz);
-	memcpy(after, before, sz);
+	os_memcpy(after, before, sz);
 	*blpp = after;
 }

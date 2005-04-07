@@ -169,7 +169,7 @@ static void ccf_search(adns_state ads, const char *fn, int lno,
 	pp = newptrs;
 	while (nextword(&bufp, &word, &l)) {
 		*pp++ = newchars;
-		memcpy(newchars, word, l);
+		os_memcpy(newchars, word, l);
 		newchars += l;
 		*newchars++ = 0;
 	}
@@ -206,7 +206,7 @@ static void ccf_sortlist(adns_state ads, const char *fn, int lno, const char *bu
 			continue;
 		}
 
-		memcpy(tbuf, word, l);
+		os_memcpy(tbuf, word, l);
 		tbuf[l] = 0;
 		slash = strchr(tbuf, '/');
 		if (slash)
@@ -425,7 +425,7 @@ static int gl_text(adns_state ads, getline_ctx * src_io,
 		return -2;
 	}
 
-	memcpy(buf, cp, l);
+	os_memcpy(buf, cp, l);
 	buf[l] = 0;
 	return l;
 }

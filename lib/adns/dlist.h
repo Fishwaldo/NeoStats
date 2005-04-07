@@ -35,7 +35,7 @@
 #define ALIST_INIT(list) ((list).head= (list).tail= 0)
 #define ALINK_INIT(link) ((link).next= (link).back= 0)
 
-#define LIST_UNLINK_PART(list,node,part) \
+#define ALIST_UNLINK_PART(list,node,part) \
   do { \
     if ((node)->part back) (node)->part back->part next= (node)->part next; \
       else                                  (list).head= (node)->part next; \
@@ -43,7 +43,7 @@
       else                                  (list).tail= (node)->part back; \
   } while(0)
 
-#define LIST_LINK_TAIL_PART(list,node,part) \
+#define ALIST_LINK_TAIL_PART(list,node,part) \
   do { \
     (node)->part next= 0; \
     (node)->part back= (list).tail; \
@@ -51,7 +51,7 @@
     (list).tail= (node); \
   } while(0)
 
-#define LIST_UNLINK(list,node) LIST_UNLINK_PART(list,node,)
-#define LIST_LINK_TAIL(list,node) LIST_LINK_TAIL_PART(list,node,)
+#define ALIST_UNLINK(list,node) ALIST_UNLINK_PART(list,node,)
+#define ALIST_LINK_TAIL(list,node) ALIST_LINK_TAIL_PART(list,node,)
 
 #endif
