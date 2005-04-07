@@ -132,6 +132,9 @@ int GeoIP_db_avail(int type) {
 	if (type < 0 || type >= NUM_DB_TYPES) {
 		return 0;
 	}
+	if (NULL == GeoIPDBFileName)
+		_setup_dbfilename();
+
 	filePath = GeoIPDBFileName[type];
 	if (NULL == filePath) {
 		return 0;
