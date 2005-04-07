@@ -172,9 +172,6 @@ include/users.h eol=lf
 include/version.sh -text
 lib/Makefile.am -text
 lib/Makefile.in -text
-lib/adns/.indent.pro -text
-lib/adns/Makefile.am -text
-lib/adns/Makefile.in -text
 lib/curl/COPYING -text
 lib/curl/Makefile.am -text
 lib/curl/Makefile.in -text

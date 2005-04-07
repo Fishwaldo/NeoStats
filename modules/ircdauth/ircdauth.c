@@ -43,6 +43,13 @@ static const char *ircdauth_copyright[] =
 	NULL
 };
 
+/** About info */
+static const char *ircdauth_about[] = 
+{
+	"\2IRCDAuth\2 authorises users based on their ircd mode flags.",
+	NULL
+};
+
 /** Help text */
 const char *auth_help_authmodelist[] = 
 {

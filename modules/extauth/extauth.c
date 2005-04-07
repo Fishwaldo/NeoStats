@@ -46,6 +46,13 @@ static const char *extauth_copyright[] =
 	NULL
 };
 
+/** About info */
+static const char *extauth_about[] = 
+{
+	"\2ExtAuth\2 authorises users based on an access list.",
+	NULL
+};
+
 /** Help text */
 const char *ea_help_access[] = 
 {
