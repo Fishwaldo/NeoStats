@@ -51,7 +51,7 @@ void ResetNetworkStatistics (void)
 void AddNetworkServer (void)
 {
 	if (IncStatistic (&networkstats.servers)) {
-		announce_record ("\2NEW NETWORK RECORD\2 %ld servers on the network",
+		announce_record ("\2NEW NETWORK RECORD\2 %d servers on the network",
 			networkstats.servers.current);
 	}
 }
@@ -64,7 +64,7 @@ void DelNetworkServer (void)
 void AddNetworkChannel (void)
 {
 	if (IncStatistic (&networkstats.channels)) {
-		announce_record ("\2NEW NETWORK RECORD\2 %ld channels on the network",
+		announce_record ("\2NEW NETWORK RECORD\2 %d channels on the network",
 		    networkstats.channels.current);
 	}
 }
@@ -77,7 +77,7 @@ void DelNetworkChannel (void)
 void AddNetworkUser (void)
 {
 	if (IncStatistic (&networkstats.users)) {
-		announce_record ("\2NEW NETWORK RECORD!\2 %ld users on the network",
+		announce_record ("\2NEW NETWORK RECORD!\2 %d users on the network",
 			networkstats.users.current);
 	}
 }
@@ -111,20 +111,20 @@ int ss_cmd_netstats (CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg(ss_bot, cmdparams->source, "Network Statistics:-----");
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Users: %ld", networkstats.users.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Users: %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source, "Current Users: %d", networkstats.users.current);
+	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Users: %d [%s]",
 		networkstats.users.alltime.max, sftime(networkstats.users.alltime.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Total Users Connected: %ld",
+	irc_prefmsg(ss_bot, cmdparams->source, "Total Users Connected: %d",
 		networkstats.users.alltime.runningtotal);
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Channels %ld", networkstats.channels.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Channels %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source, "Current Channels %d", networkstats.channels.current);
+	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Channels %d [%s]",
 		networkstats.channels.alltime.max, sftime(networkstats.channels.alltime.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Opers: %ld", networkstats.opers.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Opers: %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source, "Current Opers: %d", networkstats.opers.current);
+	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Opers: %d [%s]",
 		networkstats.opers.alltime.max, sftime(networkstats.opers.alltime.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Users Set Away: %ld", me.awaycount);
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Servers: %ld", networkstats.servers.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Servers: %ld [%s]",
+	irc_prefmsg(ss_bot, cmdparams->source, "Users Set Away: %d", me.awaycount);
+	irc_prefmsg(ss_bot, cmdparams->source, "Current Servers: %d", networkstats.servers.current);
+	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Servers: %d [%s]",
 		networkstats.servers.alltime.max, sftime(networkstats.servers.alltime.ts_max));
 	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
 	return NS_SUCCESS;
