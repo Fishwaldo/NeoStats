@@ -326,7 +326,6 @@ static void
 run_mod_timers (int ismidnight)
 {
 	struct tm *ts;
-	int deleteme = 0;
 	Timer *timer = NULL;
 	hscan_t tscan;
 	hnode_t *tn;
@@ -369,7 +368,6 @@ run_mod_timers (int ismidnight)
 						timer->lastrun = me.now;
  						continue;
 					}
-					deleteme = 1;
 					break;
 			}
 			if (setjmp (sigvbuf) == 0) {
@@ -384,7 +382,7 @@ run_mod_timers (int ismidnight)
 					timer->lastrun = (int) me.now;
 				}
 				RESET_RUN_LEVEL();
-				if (deleteme) {
+				if (timer->type == TIMER_TYPE_COUNTDOWN) {
 					hash_scan_delete (timerhash, tn);
 					hnode_destroy (tn);
 					ns_free (timer);

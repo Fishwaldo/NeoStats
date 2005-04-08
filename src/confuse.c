@@ -19,27 +19,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "neostats.h"
 
 #ifdef HAVE_STRING_H
 # define _GNU_SOURCE    /* FIXME! */
 # include <string.h>
 #endif
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
-#include <assert.h>
-#include <errno.h>
 #ifndef _WIN32
-# include <pwd.h>
+#include <pwd.h>
 #endif
-#include <sys/types.h>
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-#include <ctype.h>
 
 #include "confuse.h"
 
