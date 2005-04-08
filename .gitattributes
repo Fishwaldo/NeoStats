@@ -123,7 +123,6 @@ graveyard/src/rtausers.c -text
 include/Makefile.am -text
 include/Makefile.in -text
 include/adns.h -text
-include/adns_win32.h -text
 include/adnsdlist.h -text
 include/adnsinternal.h -text
 include/adnstvarith.h -text
