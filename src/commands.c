@@ -401,6 +401,20 @@ run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
 	return NS_FAILURE;
 }
 
+/** @brief run_cmd
+ *
+ *  process bot command
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int run_cmd( bot_cmd *cmd_ptr )
+{
+	if( setjmp( sigvbuf ) == 0 )
+		return cmd_ptr->handler( cmdparams );
+	return NS_FAILURE;
+}
+
 /** @brief run_bot_cmd
  *
  *  process bot command list
@@ -474,8 +488,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 					/* Log command message */
 					nlog( LOG_NORMAL, "%s used %s", cmdparams->source->name, cmdparams->param );
 					/* call handler */
-					if( setjmp( sigvbuf ) == 0 )
-						cmdret = cmd_ptr->handler( cmdparams );
+					cmdret = run_cmd( cmd_ptr );
 					check_cmd_result( cmdparams, cmdret, NULL );
 					RESET_RUN_LEVEL();
 				}

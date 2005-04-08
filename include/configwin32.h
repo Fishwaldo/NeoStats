@@ -199,6 +199,9 @@
 /* Define to 1 if you have the `signal' function. */
 #define HAVE_SIGNAL 1
 
+/* Define to 1 if you have the <signal.h> header file. */
+#define HAVE_SIGNAL_H 1
+
 /* Define to 1 if you have the `sigsetjmp' function. */
 /* #undef HAVE_SIGSETJMP */
 
