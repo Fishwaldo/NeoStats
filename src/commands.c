@@ -408,7 +408,7 @@ run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int run_cmd( bot_cmd *cmd_ptr )
+static int run_cmd( CmdParams *cmdparams, bot_cmd *cmd_ptr )
 {
 	if( setjmp( sigvbuf ) == 0 )
 		return cmd_ptr->handler( cmdparams );
@@ -488,7 +488,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 					/* Log command message */
 					nlog( LOG_NORMAL, "%s used %s", cmdparams->source->name, cmdparams->param );
 					/* call handler */
-					cmdret = run_cmd( cmd_ptr );
+					cmdret = run_cmd( cmdparams, cmd_ptr );
 					check_cmd_result( cmdparams, cmdret, NULL );
 					RESET_RUN_LEVEL();
 				}
