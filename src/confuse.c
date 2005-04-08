@@ -33,6 +33,7 @@
 
 #define is_set(f, x) (((f) & (x)) == (f))
 
+#undef _
 #if defined(ENABLE_NLS) && defined(HAVE_GETTEXT)
 # include <libintl.h>
 # define _(str) dgettext(PACKAGE, str)
