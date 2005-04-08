@@ -39,5 +39,17 @@ EXPORTFUNC char *strndup( const char *src, size_t count );
 #ifndef HAVE_INET_NTOP
 EXPORTFUNC char *inet_ntop( int af, const unsigned char *src, char *dst, size_t size ); 
 #endif /* HAVE_INET_NTOP */
+#ifndef HAVE_INET_ATON
+EXPORTFUNC int inet_aton( const char *name, struct in_addr *addr ); 
+#endif /* HAVE_INET_ATON */
+#ifndef HAVE_GETTIMEOFDAY
+struct timezone {
+	int tz_minuteswest;
+	int tz_dsttime;
+};
+
+int gettimeofday(struct timeval *tv, struct timezone *tz);
+#endif /* HAVE_GETTIMEOFDAY */
+
 
 #endif /* _SUPPORT_H_ */

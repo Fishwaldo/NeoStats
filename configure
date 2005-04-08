@@ -22386,6 +22386,7 @@ rm -f conftest*
 
 
 
+
 for ac_func in socket \
                 select \
                 strdup \
@@ -22400,6 +22401,7 @@ for ac_func in socket \
                 gettimeofday \
                 inet_addr \
                 inet_ntoa \
+                inet_aton \
                 inet_pton \
                 inet_ntop \
                 tcsetattr \

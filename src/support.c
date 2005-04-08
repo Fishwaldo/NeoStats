@@ -193,3 +193,14 @@ char *inet_ntop(int af, const unsigned char *src, char *dst, size_t size)
 	return dst;
 }
 #endif
+
+#ifndef HAVE_INET_ATON
+/* Convert from "a.b.c.d" IP address string into an in_addr structure.  
+ * Return 0 on failure, 1 on success.
+ */
+int inet_aton( const char *name, struct in_addr *addr )
+{
+    addr->s_addr = inet_addr(name);
+    return ( addr->s_addr == INADDR_NONE ) ? 0 : 1;
+}
+#endif

@@ -33,15 +33,69 @@
 #ifndef ADNS_H_INCLUDED
 #define ADNS_H_INCLUDED
 
+#define ADNS_API EXPORTFUNC
+
 #ifdef WIN32
-#include "adns_win32.h"
+#if defined (_MSC_VER)
+#pragma warning(disable:4003)
+#endif /* _MSC_VER */
+
+/* ---------------- START OF C HEADER -------------- */
+
+#include <Winsock2.h>
+#include <windows.h>
+#include <limits.h>
+#include <malloc.h>
+#include <signal.h>
+
+#define adns_socket_read(sck, data, len) recv(sck, (char *)data, len, 0)
+#define adns_socket_write(sck, data, len) send(sck, (char *)data, len, 0)
+
+/* Win32 does not set errno on Winsock errors(!) 
+ * We have to map the winsock errors to errno manually
+ * in order to support the original UNIX error hadnlig
+ */
+#define ADNS_CAPTURE_ERRNO {errno = WSAGetLastError(); WSASetLastError(errno);}
+#define ADNS_CLEAR_ERRNO {WSASetLastError(errno = 0);}
+
+#define ENOBUFS WSAENOBUFS 
+#define EWOULDBLOCK WSAEWOULDBLOCK
+#define EINPROGRESS WSAEINPROGRESS
+#define EMSGSIZE WSAEMSGSIZE
+#define ENOPROTOOPT WSAENOPROTOOPT
+
+ /*
+  * UNIX system API for Win32
+  * The following is a quick and dirty implementation of
+  * some UNIX API calls in Win32. 
+  * They are used in the dll, but if your project have
+  * it's own implementation of these system calls, simply
+  * undefine ADNS_MAP_UNIXAPI.
+  */
+
+struct iovec 
+{
+    char  *iov_base;
+    int  iov_len; 
+};
+
+/* 
+ * Undef ADNS_MAP_UNIXAPI in the calling code to use natve calls 
+ */
+ADNS_API int adns_writev (int FileDescriptor, const struct iovec * iov, int iovCount);
+ADNS_API int adns_getpid();
+
+#define writev(FileDescriptor, iov, iovCount) adns_writev(FileDescriptor, iov, iovCount)
+#define getpid() adns_getpid()
+
+/* ---------------- END OF C HEADER -------------- */
 #else
-# define ADNS_API
 # define adns_socket_read(sck, data, len) read(sck, data, len)
 # define adns_socket_write(sck, data, len) write(sck, data, len)
 # define ADNS_CAPTURE_ERRNO {}
 # define ADNS_CLEAR_ERRNO {}
 #endif
+
 
 #ifdef __cplusplus
 extern "C" {			/* I really dislike this - iwj. */

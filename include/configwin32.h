@@ -83,7 +83,7 @@
 #define HAVE_GETPWUID 1
 
 /* Define to 1 if you have the `gettimeofday' function. */
-#define HAVE_GETTIMEOFDAY 1
+/* #undef HAVE_GETTIMEOFDAY 1 */
 
 /* HAVE_GNUC25_ATTRIB */
 /* #undef HAVE_GNUC25_ATTRIB */
@@ -102,6 +102,9 @@
 
 /* Define to 1 if you have the `inet_ntoa' function. */
 #define HAVE_INET_NTOA 1
+
+/* Define to 1 if you have the `inet_aton' function. */
+/* #undef HAVE_INET_ATON */
 
 /* Define to 1 if you have the `inet_pton' function. */
 /* #undef HAVE_INET_PTON */

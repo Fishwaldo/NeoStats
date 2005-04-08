@@ -53,39 +53,7 @@ int adns_writev(int FileDescriptor, const struct iovec * iov, int iovCount)
 	return r;
 }
 
-int adns_inet_aton(const char *cp, struct in_addr *inp)
-{
-	inp->s_addr = inet_addr(cp);
-	return inp->s_addr != INADDR_ANY;
-}
-
 int adns_getpid()
 {
 	return GetCurrentProcessId();
-}
-
-int gettimeofday(struct timeval *tv, struct timezone *tz)
-{
-	static __int64 Adjustment;
-	__int64 now = 0;
-	
-	if (!Adjustment)
-	{
-		SYSTEMTIME st = {1970,1,0,1,0,0,0};
-		SystemTimeToFileTime(&st, (LPFILETIME)&Adjustment);
-	}
-	
-	if (tz)
-	{
-		errno = EINVAL;
-		return -1;
-	}
-	
-	GetSystemTimeAsFileTime((LPFILETIME)&now);
-	now -= Adjustment;
-	
-	tv->tv_sec = (long)(now / 10000000);
-	tv->tv_usec = (long)((now % 10000000) / 10); 
-
-	return 0;
 }
