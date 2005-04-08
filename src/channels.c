@@ -681,7 +681,6 @@ Channel *GetRandomChannel( void )
 Client *GetRandomChannelMember(int uge, Channel *c) 
 {
 	ChannelMember *cm;
-	Client *u;
 	lnode_t *ln;
 	int randno, curno, excludeno, listco;
 	
@@ -707,6 +706,7 @@ Client *GetRandomChannelMember(int uge, Channel *c)
 	randno = hrand( (listco - excludeno), 1 );	
 	ln = list_first(c->members);
 	while (curno < randno && ln) {
+		cm = lnode_get(ln);
 		if (!IsExcluded(cm->u) || !uge) {
 			curno++;
 		}
