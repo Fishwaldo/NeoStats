@@ -678,46 +678,30 @@ Channel *GetRandomChannel( void )
  *
  *  @return Client pointer selected or NULL if none
  */
+
 Client *GetRandomChannelMember(int uge, Channel *c) 
 {
 	ChannelMember *cm;
 	lnode_t *ln;
-	int randno, curno, excludeno, listco;
+	int randno;
+	int curno = 0;
 	
-	curno = 1;
-	excludeno = 0;
-	listco = (int)list_count(c->members);
-	if (listco < 1) {
-		return NULL;
-	}
-	if (uge) {
-		ln = list_first(c->members);
-		while (ln) {
-			cm = lnode_get(ln);
-			if (IsExcluded(cm->u)) {
-				excludeno++;
-			}
-			ln = list_next(c->members, ln);
-		}
-	}
-	if (excludeno >= listco) {
-		return NULL;
-	}
-	randno = hrand( (listco - excludeno), 1 );	
-	ln = list_first(c->members);
-	while (curno < randno && ln) {
+	randno = hrand( ( ( int )list_count( c->members ) ), 1 );	
+	ln = list_first( c->members );
+	while( ln ) 
+	{
 		cm = lnode_get(ln);
-		if (!IsExcluded(cm->u) || !uge) {
-			curno++;
+		if( !uge || !IsExcluded( cm->u ) )
+		{
+			if( curno == randno )
+				return cm->u;
 		}
+		curno++;
 		ln = list_next(c->members, ln);
 	}
-	if (!ln) {
-		return NULL;
-	}
-	cm = lnode_get(ln);
-	return cm->u;
+	return NULL;
 }
+
 
 char *GetRandomChannelKey( int length ) 
 {
