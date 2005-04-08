@@ -182,8 +182,7 @@ static void mf_manyistr(adns_query qu, void *datap)
  * _txt   (pa,cs)
  */
 
-static adns_status pa_txt(const parseinfo * pai, int cbyte, int max,
-			  void *datap)
+static adns_status pa_txt(const parseinfo * pai, int cbyte, int max, void *datap)
 {
 	adns_rr_intstr **rrp = datap, *table, *te;
 	const byte *dgram = pai->dgram;
@@ -260,8 +259,7 @@ static adns_status cs_hinfo(vbuf * vb, const void *datap)
  * _inaddr   (pa,dip,di)
  */
 
-static adns_status pa_inaddr(const parseinfo * pai, int cbyte, int max,
-			     void *datap)
+static adns_status pa_inaddr(const parseinfo * pai, int cbyte, int max, void *datap)
 {
 	struct in_addr *storeto = datap;
 
@@ -295,8 +293,7 @@ static int dip_inaddr(adns_state ads, struct in_addr a, struct in_addr b)
 	return bi < ai;
 }
 
-static int di_inaddr(adns_state ads, const void *datap_a,
-		     const void *datap_b)
+static int di_inaddr(adns_state ads, const void *datap_a, const void *datap_b)
 {
 	const struct in_addr *ap = datap_a, *bp = datap_b;
 
@@ -318,8 +315,7 @@ static adns_status cs_inaddr(vbuf * vb, const void *datap)
  * _addr   (pa,di,csp,cs)
  */
 
-static adns_status pa_addr(const parseinfo * pai, int cbyte, int max,
-			   void *datap)
+static adns_status pa_addr(const parseinfo * pai, int cbyte, int max, void *datap)
 {
 	adns_rr_addr *storeto = datap;
 	const byte *dgram = pai->dgram;
@@ -333,8 +329,7 @@ static adns_status pa_addr(const parseinfo * pai, int cbyte, int max,
 	return adns_s_ok;
 }
 
-static int di_addr(adns_state ads, const void *datap_a,
-		   const void *datap_b)
+static int di_addr(adns_state ads, const void *datap_a, const void *datap_b)
 {
 	const adns_rr_addr *ap = datap_a, *bp = datap_b;
 
@@ -343,8 +338,7 @@ static int di_addr(adns_state ads, const void *datap_a,
 			  bp->addr.inet.sin_addr);
 }
 
-static int div_addr(void *context, const void *datap_a,
-		    const void *datap_b)
+static int div_addr(void *context, const void *datap_a, const void *datap_b)
 {
 	const adns_state ads = context;
 
@@ -384,8 +378,7 @@ static adns_status cs_addr(vbuf * vb, const void *datap)
  */
 
 static adns_status pap_domain(const parseinfo * pai, int *cbyte_io,
-			      int max, char **domain_r,
-			      parsedomain_flags flags)
+			      int max, char **domain_r, parsedomain_flags flags)
 {
 	adns_status st;
 	char *dm;
@@ -423,8 +416,7 @@ static adns_status cs_domain(vbuf * vb, const void *datap)
 	return csp_domain(vb, *domainp);
 }
 
-static adns_status pa_dom_raw(const parseinfo * pai, int cbyte, int max,
-			      void *datap)
+static adns_status pa_dom_raw(const parseinfo * pai, int cbyte, int max, void *datap)
 {
 	char **rrp = datap;
 	adns_status st;
@@ -442,8 +434,7 @@ static adns_status pa_dom_raw(const parseinfo * pai, int cbyte, int max,
  * _host_raw   (pa)
  */
 
-static adns_status pa_host_raw(const parseinfo * pai, int cbyte, int max,
-			       void *datap)
+static adns_status pa_host_raw(const parseinfo * pai, int cbyte, int max, void *datap)
 {
 	char **rrp = datap;
 	adns_status st;
@@ -463,9 +454,8 @@ static adns_status pa_host_raw(const parseinfo * pai, int cbyte, int max,
  * _hostaddr   (pap,pa,dip,di,mfp,mf,csp,cs +icb_hostaddr, pap_findaddrs)
  */
 
-static adns_status pap_findaddrs(const parseinfo * pai,
-				 adns_rr_hostaddr * ha, int *cbyte_io,
-				 int count, int dmstart)
+static adns_status pap_findaddrs(const parseinfo * pai, adns_rr_hostaddr * ha, 
+				int *cbyte_io, int count, int dmstart)
 {
 	int rri, naddrs;
 	int type, class, rdlen, rdstart, ownermatched;
@@ -603,8 +593,7 @@ static adns_status pap_hostaddr(const parseinfo * pai, int *cbyte_io,
 	return adns_s_ok;
 }
 
-static adns_status pa_hostaddr(const parseinfo * pai, int cbyte, int max,
-			       void *datap)
+static adns_status pa_hostaddr(const parseinfo * pai, int cbyte, int max, void *datap)
 {
 	adns_rr_hostaddr *rrp = datap;
 	adns_status st;

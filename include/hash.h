@@ -44,7 +44,9 @@
 #ifndef HASH_H
 #define HASH_H
 
+#ifdef HAVE_LIMITS_H
 #include <limits.h>
+#endif /* HAVE_LIMITS_H */
 #ifdef KAZLIB_SIDEEFFECT_DEBUG
 #include "sfx.h"
 #endif

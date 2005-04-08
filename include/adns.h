@@ -44,9 +44,12 @@
 
 #include <Winsock2.h>
 #include <windows.h>
+#ifdef HAVE_LIMITS_H
 #include <limits.h>
+#endif /* HAVE_LIMITS_H */
+#ifdef HAVE_MALLOC_H
 #include <malloc.h>
-#include <signal.h>
+#endif /* HAVE_MALLOC_H */
 
 #define adns_socket_read(sck, data, len) recv(sck, (char *)data, len, 0)
 #define adns_socket_write(sck, data, len) send(sck, (char *)data, len, 0)

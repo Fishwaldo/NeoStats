@@ -44,8 +44,9 @@
 #ifndef LIST_H
 #define LIST_H
 
+#ifdef HAVE_LIMITS_H
 #include <limits.h>
-
+#endif /* HAVE_LIMITS_H */
 #ifdef KAZLIB_SIDEEFFECT_DEBUG
 #include "sfx.h"
 #define LIST_SFX_CHECK(E) SFX_CHECK(E)

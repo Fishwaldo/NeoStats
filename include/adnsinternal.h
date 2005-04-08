@@ -38,7 +38,9 @@
 
 typedef unsigned char byte;
 
+#ifdef HAVE_SIGNAL_H
 #include <signal.h>
+#endif /* HAVE_SIGNAL_H */
 #ifdef HAVE_POLL_H
 #include <poll.h>
 #endif

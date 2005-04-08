@@ -33,9 +33,10 @@
 #include "adnsinternal.h"
 #ifdef WIN32
 #include <iphlpapi.h>
-#else
-#include <limits.h>
 #endif
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif /* HAVE_LIMITS_H */
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h> 
 #endif
@@ -83,8 +84,7 @@ static void saveerr(adns_state ads, int en)
 		ads->configerrno = en;
 }
 
-static void configparseerr(adns_state ads, const char *fn, int lno,
-			   const char *fmt, ...)
+static void configparseerr(adns_state ads, const char *fn, int lno, const char *fmt, ...)
 {
 	va_list al;
 
@@ -135,8 +135,7 @@ static void ccf_nameserver(adns_state ads, const char *fn, int lno, const char *
 	addserver(ads, ia);
 }
 
-static void ccf_search(adns_state ads, const char *fn, int lno,
-		       const char *buf)
+static void ccf_search(adns_state ads, const char *fn, int lno, const char *buf)
 {
 	const char *bufp, *word;
 	char *newchars, **newptrs, **pp;
@@ -491,8 +490,7 @@ static const char *instrum_getenv(adns_state ads, const char *envvar)
 	return value;
 }
 
-static void readconfig(adns_state ads, const char *filename,
-		       int warnmissing)
+static void readconfig(adns_state ads, const char *filename, int warnmissing)
 {
 	getline_ctx gl_ctx;
 
@@ -517,8 +515,7 @@ static void readconfig(adns_state ads, const char *filename,
 	fclose(gl_ctx.file);
 }
 
-static void readconfigtext(adns_state ads, const char *text,
-			   const char *showname)
+static void readconfigtext(adns_state ads, const char *text, const char *showname)
 {
 	getline_ctx gl_ctx;
 
@@ -561,7 +558,9 @@ static int init_begin(adns_state * ads_r, adns_initflags flags, FILE * diagfile)
 {
 	adns_state ads;
 
-	ads= ns_malloc(sizeof(*ads)); if (!ads) return errno;
+	ads= ns_malloc( sizeof( *ads ) ); 
+	if( !ads ) 
+		return errno;
 
 	ads->iflags = flags;
 	ads->diagfile = diagfile;
@@ -779,11 +778,10 @@ void adns_finish(adns_state ads)
 		else
 			break;
 	}
-/* EVNT delsocket */
+	/* EVNT delsocket */
     if (ads->fdfunc) 
-      ads->fdfunc(ads->udpsocket, -1);
-
-  os_sock_close(ads->udpsocket);
+		ads->fdfunc(ads->udpsocket, -1);
+	os_sock_close(ads->udpsocket);
 	if (ads->tcpsocket >= 0) {
       
 	    if (ads->fdfunc) 
@@ -793,8 +791,7 @@ void adns_finish(adns_state ads)
 	adns__vbuf_free(&ads->tcpsend);
 	adns__vbuf_free(&ads->tcprecv);
 	freesearchlist(ads);
-  ns_free(ads);
-
+	ns_free(ads);
 }
 
 void adns_forallqueries_begin(adns_state ads)

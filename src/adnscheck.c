@@ -36,20 +36,6 @@ void adns_checkconsistency(adns_state ads, adns_query qu)
 	adns__consistency(ads, qu, cc_user);
 }
 
-/* The original macro. Too gnuish for other compilers */
-#if 0
-#define DLIST_CHECK(list, nodevar, part, body)					\
-  if ((list).head) {								\
-    assert(! (list).head->part back);						\
-    for ((nodevar)= (list).head; (nodevar); (nodevar)= (nodevar)->part next) {	\
-      assert((nodevar)->part next						\
-	     ? (nodevar) == (nodevar)->part next->part back			\
-	     : (nodevar) == (list).tail);					\
-      body									\
-    }										\
-  }
-#endif /* 0 */
-
 #define DLIST_CHECK1(list, nodevar, body)					\
   if ((list).head) {								\
     assert(! (list).head->back);						\
