@@ -163,7 +163,7 @@ echo "     5) Hybrid7"
 echo "     6) Bahamut 1.4"
 echo "     7) Bahamut 1.8"
 echo "     8) Plexus"
-echo "     9) IRCu P10 (Experimental)"
+echo "     9) IRCu P10"
 while [ $validselection -eq 0 ] ; do
 	echo $n " [$IRCD_DEFAULT] -> $c"
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
