@@ -25,9 +25,6 @@
 #include "ircd.h"
 #include "numerics.h"
 
-static void m_numeric242( char *origin, char **argv, int argc, int srv );
-static void m_numeric351( char *origin, char **argv, int argc, int srv );
-
 ircd_cmd numeric_cmd_list[] = {
 	/*Message	Token	handler	usage */
 	{"351", "351", m_numeric351, 0},
@@ -52,7 +49,7 @@ ircd_cmd numeric_cmd_list[] = {
  *  @return none
  */
 
-static void m_numeric351( char *origin, char **argv, int argc, int srv )
+void m_numeric351( char *origin, char **argv, int argc, int srv )
 {
 	Client *s;
 
@@ -75,7 +72,7 @@ static void m_numeric351( char *origin, char **argv, int argc, int srv )
  *  @return none
  */
 
-static void m_numeric242( char *origin, char **argv, int argc, int srv )
+void m_numeric242( char *origin, char **argv, int argc, int srv )
 {
 	Client *s;
 

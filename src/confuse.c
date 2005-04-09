@@ -82,21 +82,6 @@ static char *strdup(const char *s)
 # endif
 #endif
 
-#ifndef HAVE_STRNDUP
-static char *strndup(const char *s, size_t n)
-{
-    char *r;
-
-    if(s == 0)
-        return 0;
-
-    r = (char *)malloc(n + 1);
-    strncpy(r, s, n);
-    r[n] = 0;
-    return r;
-}
-#endif
-
 cfg_opt_t *cfg_getopt(cfg_t *cfg, const char *name)
 {
     unsigned int i;

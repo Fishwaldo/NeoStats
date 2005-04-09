@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add support for IRCd protocol modules to call core numeric reply 
+   handlers. (M)
  - Add support for IRCd protocol modules to control server uptime requests. (M)
  - Merge ADNS lib into core. (M)
  - add random channel member funtion (D)

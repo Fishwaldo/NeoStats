@@ -26,4 +26,7 @@
 
 extern ircd_cmd numeric_cmd_list[];
 
+void m_numeric242( char *origin, char **argv, int argc, int srv );
+void m_numeric351( char *origin, char **argv, int argc, int srv );
+
 #endif /* _NUMERICS_H_ */
