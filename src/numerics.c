@@ -29,11 +29,12 @@ ircd_cmd numeric_cmd_list[] = {
 	/*Message	Token	handler	usage */
 	{"351", "351", m_numeric351, 0},
 	{"242", "242", m_numeric242, 0},
+/*  RX: :irc.foo.com 219 NeoStats u :End of /STATS report */
+	{"219", "219", m_numericdefault, 0},
 	{0, 0, 0, 0},
 };
 
 /*  RX: :irc.foo.com 250 NeoStats :Highest connection count: 3( 2 clients )
- *  RX: :irc.foo.com 219 NeoStats u :End of /STATS report
  */
 
 /** @brief m_numeric351
@@ -78,28 +79,28 @@ void m_numeric242( char *origin, char **argv, int argc, int srv )
 
 	s = FindServer( origin );
 	if( s ) {
-		/* Convert "Server Up 6 days, 23:52:55" to seconds*/
+		/* Convert "Server Up d days, hh:mm:ss" to seconds*/
 		char *ptr;
 		time_t secs;
 
-		/* Server Up 6 days, 23:52:55 */
+		/* current string: "Server Up d days, hh:mm:ss" */
 		strtok( argv[argc-1], " " );
-		/* Up 6 days, 23:52:55 */
+		/* current string: "Up d days, hh:mm:ss" */
 		strtok( NULL, " " );
-		/* 6 days, 23:52:55 */
+		/* current string: "d days, hh:mm:ss" */
 		ptr = strtok( NULL, " " );
 		secs = atoi( ptr ) * 86400;
-		/* days, 23:52:55 */
+		/* current string: "days, hh:mm:ss" */
 		strtok( NULL, " " );
-		/* , 23:52:55 */
+		/* current string: ", hh:mm:ss" */
 		ptr = strtok( NULL, "" );
-		/* 23:52:55 */
+		/* current string: "hh:mm:ss" */
 		ptr = strtok( ptr , ":" );
 		secs += atoi( ptr )*3600;
-		/* 52:55 */
+		/* current string: "mm:ss" */
 		ptr = strtok( NULL, ":" );
 		secs += atoi( ptr )*60;
-		/* 55 */
+		/* current string: "ss" */
 		ptr = strtok( NULL, "" );
 		secs += atoi( ptr );
 
@@ -107,3 +108,21 @@ void m_numeric242( char *origin, char **argv, int argc, int srv )
 	}
 }
 
+/** @brief m_numericdefault
+ *
+ *  dummy routine to "process" a numeric and avoid warnings for 
+ *  unprocessed numerics. This mainly allows us to ignore end
+ *  of list type numerics without having to specficially code them
+ *  RX: :irc.foo.com nnn to :message
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void m_numericdefault( char *origin, char **argv, int argc, int srv )
+{
+}

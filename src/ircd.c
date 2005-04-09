@@ -120,6 +120,7 @@ static void( *irc_send_setname )( const char* nick, const char* realname );
 static void( *irc_send_sethost )( const char* nick, const char* host );
 static void( *irc_send_setident )( const char* nick, const char* ident );
 static void( *irc_send_serverrequptime )( const char *source, const char *target );
+static void( *irc_send_serverreqversion )( const char *source, const char *target );
 
 static void( *irc_send_cloakhost )( char* host );
 
@@ -183,6 +184,7 @@ static ircd_sym ircd_sym_table[] =
 	{( void * )&irc_send_setident, "send_setident", 0, 0},
 	{( void * )&irc_send_cloakhost, "cloakhost", 0, 0},
 	{( void * )&irc_send_serverrequptime, "send_serverrequptime", 0, 0},
+	{( void * )&irc_send_serverreqversion, "send_serverreqversion", 0, 0},
 	{NULL, NULL, 0, 0},
 };
 
@@ -1857,6 +1859,19 @@ int irc_serverrequptime( const char *source, const char *target )
 	return NS_SUCCESS;
 }
 
+/** @brief irc_serverreqversion
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_serverreqversion( const char *source, const char *target )
+{
+	if( irc_send_serverreqversion )
+		irc_send_serverreqversion( source, target );
+	else
+		send_cmd( ":%s VERSION %s", source, target );
+	return NS_SUCCESS;
+}
 
 /** @brief irc_squit
  *
@@ -2662,7 +2677,7 @@ void do_server( const char *name, const char *uplink, const char* hops, const ch
 	} else {
 		AddServer( name, uplink, hops, numeric, infoline );
 	}
-	send_cmd( ":%s VERSION %s", me.name, name );
+	irc_serverreqversion( me.name, name );
 }
 
 /** @brief 
