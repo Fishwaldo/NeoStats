@@ -409,13 +409,22 @@ void get_map( char *uplink, int level )
 				get_map( s->name, level );
 			}
 			/* its not the root server */
-			buf[0]='\0';
-			for( i = 1; i < level; i++ ) {
-				ircsnprintf( buf, MAPBUFSIZE, "%s&nbsp&nbsp&nbsp&nbsp&nbsp|", buf );
+			if( StatServ.flatmap )
+			{
+				os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+					ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
+					s->server->ping,( int )ss->highest_ping );
 			}
-			os_fprintf( opf, "<tr><td>%s\\_%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
-				buf, ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-				s->server->ping,( int )ss->highest_ping );
+			else
+			{
+				buf[0]='\0';
+				for( i = 1; i < level; i++ ) {
+					ircsnprintf( buf, MAPBUFSIZE, "%s&nbsp&nbsp&nbsp&nbsp&nbsp|", buf );
+				}
+				os_fprintf( opf, "<tr><td>%s\\_%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+					buf, ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
+					s->server->ping,( int )ss->highest_ping );
+			}
 			get_map( s->name, level + 1 );
 		}
 	}

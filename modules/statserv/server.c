@@ -222,14 +222,24 @@ static void makemap(char *uplink, Client * u, int level)
 				makemap(s->name, u, level);
 			}
 			/* its not the root server */
-			buf[0]='\0';
-			for (i = 1; i < level; i++) {
-				strlcat (buf, "     |", 256);
+			if( StatServ.flatmap )
+			{
+				irc_prefmsg (ss_bot, u,
+					"\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]", 
+					ss->name, s->server->users, (int)ss->users.alltime.max,
+					ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
 			}
-			irc_prefmsg (ss_bot, u,
-				"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
-				buf, ss->name, s->server->users, (int)ss->users.alltime.max,
-				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
+			else
+			{
+				buf[0]='\0';
+				for (i = 1; i < level; i++) {
+					strlcat (buf, "     |", 256);
+				}
+				irc_prefmsg (ss_bot, u,
+					"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
+					buf, ss->name, s->server->users, (int)ss->users.alltime.max,
+					ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
+			}
 			makemap(s->name, u, level + 1);
 		}
 	}

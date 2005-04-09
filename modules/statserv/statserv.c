@@ -118,6 +118,7 @@ static bot_setting ss_settings[]=
 	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_lagalert, NULL, (void *)1},
 	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_recordalert, NULL, (void *)1},
 	{"EXCLUSIONS",	&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_exclusions, ss_set_exclusions_cb, (void *)0},
+	{"FLATMAP",		&StatServ.flatmap,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_flatmap, NULL, (void *)0},
 	{NULL,			NULL,					0,					0, 0,			0,				 NULL,		NULL, NULL, (void *)0},
 };
 

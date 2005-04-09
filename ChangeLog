@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - StatServ: Add FLATMAP option to prevent display of network layout in MAP
+   command and HTML output (Bug 220). (M)
  - Add support for IRCd protocol modules to make server version requests. (M)
  - Add support for IRCd protocol modules to call core numeric reply 
    handlers. (M)

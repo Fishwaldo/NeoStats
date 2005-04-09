@@ -63,6 +63,12 @@ const char *ss_help_set_exclusions[] = {
 	NULL
 };
 
+const char *ss_help_set_flatmap[] = {
+	"\2FLATMAP <ON|OFF>\2",
+	"Whether StatServ shows map with links or as flat list",
+	NULL
+};
+
 const char *ss_help_set_html[] = {
 	"\2HTML <ON|OFF>\2",
 	"Enable or disable HTML statistics generation.",

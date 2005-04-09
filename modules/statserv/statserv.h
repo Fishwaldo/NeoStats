@@ -48,6 +48,7 @@ struct StatServ {
 	int msglimit; 
 	int shutdown; 
 	int exclusions; 
+	int flatmap; 
 } StatServ;
 
 /* ss_help.c */
@@ -65,6 +66,7 @@ extern const char *ss_help_channel[];
 extern const char *ss_help_set_htmlpath[];
 extern const char *ss_help_set_html[];
 extern const char *ss_help_set_exclusions[];
+extern const char *ss_help_set_flatmap[];
 extern const char *ss_help_set_msginterval[];
 extern const char *ss_help_set_msglimit[];
 extern const char *ss_help_set_lagtime[];
