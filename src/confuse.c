@@ -22,10 +22,10 @@
 #include "neostats.h"
 
 #ifdef HAVE_STRING_H
-# define _GNU_SOURCE    /* FIXME! */
-# include <string.h>
+#define _GNU_SOURCE    /* FIXME! */
+#include <string.h>
 #endif
-#ifndef _WIN32
+#ifdef HAVE_PWD_H
 #include <pwd.h>
 #endif
 
@@ -64,30 +64,12 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value);
 #define STATE_EOF -1
 #define STATE_ERROR 1
 
-#ifndef HAVE_STRDUP
-# ifdef HAVE__STRDUP
-#  define strdup _strdup
-# else
-static char *strdup(const char *s)
-{
-    char *r;
-
-    if(s == 0 || *s == 0)
-        return 0;
-
-    r = (char *)malloc(strlen(s) + 1);
-    strcpy(r, s);
-    return r;
-}
-# endif
-#endif
-
 cfg_opt_t *cfg_getopt(cfg_t *cfg, const char *name)
 {
     unsigned int i;
     cfg_t *sec = cfg;
 
-    assert(cfg && cfg->name && name);
+    nassert(cfg && cfg->name && name);
 
     while(name && *name)
     {
@@ -162,7 +144,7 @@ unsigned int cfg_size(cfg_t *cfg, const char *name)
 
 signed long cfg_opt_getnint(cfg_opt_t *opt, unsigned int index)
 {
-    assert(opt && opt->type == CFGT_INT);
+    nassert(opt && opt->type == CFGT_INT);
     if(opt->values && index < opt->nvalues)
         return opt->values[index]->number;
     else if(opt->simple_value)
@@ -171,8 +153,7 @@ signed long cfg_opt_getnint(cfg_opt_t *opt, unsigned int index)
         return 0;
 }
 
-signed long cfg_getnint(cfg_t *cfg, const char *name,
-                                  unsigned int index)
+signed long cfg_getnint(cfg_t *cfg, const char *name, unsigned int index)
 {
     return cfg_opt_getnint(cfg_getopt(cfg, name), index);
 }
@@ -184,7 +165,7 @@ signed long cfg_getint(cfg_t *cfg, const char *name)
 
 double cfg_opt_getnfloat(cfg_opt_t *opt, unsigned int index)
 {
-    assert(opt && opt->type == CFGT_FLOAT);
+    nassert(opt && opt->type == CFGT_FLOAT);
     if(opt->values && index < opt->nvalues)
         return opt->values[index]->fpnumber;
     else if(opt->simple_value)
@@ -193,8 +174,7 @@ double cfg_opt_getnfloat(cfg_opt_t *opt, unsigned int index)
         return 0;
 }
 
-double cfg_getnfloat(cfg_t *cfg, const char *name,
-                               unsigned int index)
+double cfg_getnfloat(cfg_t *cfg, const char *name, unsigned int index)
 {
     return cfg_opt_getnfloat(cfg_getopt(cfg, name), index);
 }
@@ -206,7 +186,7 @@ double cfg_getfloat(cfg_t *cfg, const char *name)
 
 cfg_bool_t cfg_opt_getnbool(cfg_opt_t *opt, unsigned int index)
 {
-    assert(opt && opt->type == CFGT_BOOL);
+    nassert(opt && opt->type == CFGT_BOOL);
     if(opt->values && index < opt->nvalues)
         return opt->values[index]->boolean;
     else if(opt->simple_value)
@@ -215,8 +195,7 @@ cfg_bool_t cfg_opt_getnbool(cfg_opt_t *opt, unsigned int index)
         return cfg_false;
 }
 
-cfg_bool_t cfg_getnbool(cfg_t *cfg, const char *name,
-                                  unsigned int index)
+cfg_bool_t cfg_getnbool(cfg_t *cfg, const char *name, unsigned int index)
 {
     return cfg_opt_getnbool(cfg_getopt(cfg, name), index);
 }
@@ -228,7 +207,7 @@ cfg_bool_t cfg_getbool(cfg_t *cfg, const char *name)
 
 char *cfg_opt_getnstr(cfg_opt_t *opt, unsigned int index)
 {
-    assert(opt && opt->type == CFGT_STR);
+    nassert(opt && opt->type == CFGT_STR);
     if(opt->values && index < opt->nvalues)
         return opt->values[index]->string;
     else if(opt->simple_value)
@@ -249,7 +228,7 @@ char *cfg_getstr(cfg_t *cfg, const char *name)
 
 void *cfg_opt_getnptr(cfg_opt_t *opt, unsigned int index)
 {
-    assert(opt && opt->type == CFGT_PTR);
+    nassert(opt && opt->type == CFGT_PTR);
     if(opt->values && index < opt->nvalues)
         return opt->values[index]->ptr;
     else if(opt->simple_value)
@@ -270,7 +249,7 @@ void *cfg_getptr(cfg_t *cfg, const char *name)
 
 cfg_t *cfg_opt_getnsec(cfg_opt_t *opt, unsigned int index)
 {
-    assert(opt && opt->type == CFGT_SEC);
+    nassert(opt && opt->type == CFGT_SEC);
     if(opt->values && index < opt->nvalues)
         return opt->values[index]->section;
     return 0;
@@ -285,14 +264,14 @@ cfg_t *cfg_opt_gettsec(cfg_opt_t *opt, const char *title)
 {
     unsigned int i, n;
 
-    assert(opt && title);
+    nassert(opt && title);
     if(!is_set(CFGF_TITLE, opt->flags))
         return 0;
     n = cfg_opt_size(opt);
     for(i = 0; i < n; i++)
     {
         cfg_t *sec = cfg_opt_getnsec(opt, i);
-        assert(sec && sec->title);
+        nassert(sec && sec->title);
         if(is_set(CFGF_NOCASE, opt->flags))
         {
             if(ircstrcasecmp(title, sec->title) == 0)
@@ -321,7 +300,7 @@ static cfg_value_t *cfg_addval(cfg_opt_t *opt)
 {
     opt->values = (cfg_value_t **)realloc(opt->values,
                                   (opt->nvalues+1) * sizeof(cfg_value_t *));
-    assert(opt->values);
+    nassert(opt->values);
     opt->values[opt->nvalues] = (cfg_value_t *)malloc(sizeof(cfg_value_t));
     os_memset(opt->values[opt->nvalues], 0, sizeof(cfg_value_t));
     return opt->values[opt->nvalues++];
@@ -492,11 +471,11 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value)
     void *p;
     char *endptr;
 
-    assert(cfg && opt);
+    nassert(cfg && opt);
 
     if(opt->simple_value)
     {
-        assert(opt->type != CFGT_SEC);
+        nassert(opt->type != CFGT_SEC);
         val = (cfg_value_t *)opt->simple_value;
     }
     else
@@ -517,7 +496,7 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value)
 
                 /* check if there already is a section with the same title
                  */
-                assert(value);
+                nassert(value);
                 for(i = 0; i < opt->nvalues; i++)
                 {
                     cfg_t *sec = opt->values[i]->section;
@@ -613,7 +592,7 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value)
             {
                 cfg_free(val->section);
                 val->section = (cfg_t *)malloc(sizeof(cfg_t));
-                assert(val->section);
+                nassert(val->section);
                 os_memset(val->section, 0, sizeof(cfg_t));
                 val->section->name = strdup(opt->name);
                 val->section->opts = cfg_dupopt_array(opt->subopts);
@@ -647,7 +626,7 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value)
             break;
 
         case CFGT_PTR:
-            assert(opt->parsecb);
+            nassert(opt->parsecb);
             if((*opt->parsecb)(cfg, opt, value, &p) != 0)
                 return 0;
             val->ptr = p;
@@ -656,18 +635,17 @@ static cfg_value_t *cfg_setopt(cfg_t *cfg, cfg_opt_t *opt, char *value)
         default:
             cfg_error(cfg, "internal error in cfg_setopt(%s, %s)",
                       opt->name, value);
-            assert(0);
+            nassert(0);
             break;
     }
     return val;
 }
 
-cfg_errfunc_t cfg_set_error_function(cfg_t *cfg,
-                                               cfg_errfunc_t errfunc)
+cfg_errfunc_t cfg_set_error_function(cfg_t *cfg, cfg_errfunc_t errfunc)
 {
     cfg_errfunc_t old;
 
-    assert(cfg);
+    nassert(cfg);
     old = cfg->errfunc;
     cfg->errfunc = errfunc;
     return old;
@@ -703,8 +681,7 @@ static int call_function(cfg_t *cfg, cfg_opt_t *opt, cfg_opt_t *funcopt)
     /* create a regular argv string vector and call
      * the registered function
      */
-    argv = (const char **)malloc(funcopt->nvalues *
-                                 sizeof(char *));
+    argv = (const char **)malloc(funcopt->nvalues * sizeof(char *));
     for(i = 0; i < funcopt->nvalues; i++)
         argv[i] = funcopt->values[i]->string;
     ret = (*opt->func)(cfg, opt, funcopt->nvalues, argv);
@@ -713,8 +690,7 @@ static int call_function(cfg_t *cfg, cfg_opt_t *opt, cfg_opt_t *funcopt)
     return ret;
 }
 
-static int cfg_parse_internal(cfg_t *cfg, int level,
-                              int force_state, cfg_opt_t *force_opt)
+static int cfg_parse_internal(cfg_t *cfg, int level, int force_state, cfg_opt_t *force_opt)
 {
     int state = 0;
     char *opttitle = 0;
@@ -964,7 +940,7 @@ static int cfg_parse_internal(cfg_t *cfg, int level,
 
             default:
                 /* missing state, internal error, abort */
-                assert(0);
+                nassert(0);
         }
     }
 
@@ -974,7 +950,7 @@ static int cfg_parse_internal(cfg_t *cfg, int level,
 int cfg_parse_fp(cfg_t *cfg, FILE *fp)
 {
     int ret;
-    assert(cfg && fp);
+    nassert(cfg && fp);
 
     if(cfg->filename == 0)
         cfg->filename = strdup("FILE");
@@ -994,7 +970,7 @@ int cfg_parse(cfg_t *cfg, const char *filename)
     int ret;
     FILE *fp;
 
-    assert(cfg && filename);
+    nassert(cfg && filename);
 
     free(cfg->filename);
     cfg->filename = cfg_tilde_expand(filename);
@@ -1010,7 +986,7 @@ int cfg_parse_buf(cfg_t *cfg, const char *buf)
 {
     int ret;
 
-    assert(cfg);
+    nassert(cfg);
     if(buf == 0)
         return CFG_SUCCESS;
 
@@ -1031,7 +1007,7 @@ cfg_t *cfg_init(cfg_opt_t *opts, cfg_flag_t flags)
     cfg_t *cfg;
 
     cfg = (cfg_t *)malloc(sizeof(cfg_t));
-    assert(cfg);
+    nassert(cfg);
     os_memset(cfg, 0, sizeof(cfg_t));
 
     cfg->name = strdup("root");
@@ -1158,8 +1134,7 @@ void cfg_free(cfg_t *cfg)
     free(cfg);
 }
 
-int cfg_include(cfg_t *cfg, cfg_opt_t *opt, int argc,
-                          const char **argv)
+int cfg_include(cfg_t *cfg, cfg_opt_t *opt, int argc, const char **argv)
 {
     if(argc != 1)
     {
@@ -1173,7 +1148,7 @@ static cfg_value_t *cfg_opt_getval(cfg_opt_t *opt, unsigned int index)
 {
     cfg_value_t *val = 0;
 
-    assert(index == 0 || is_set(CFGF_LIST, opt->flags));
+    nassert(index == 0 || is_set(CFGF_LIST, opt->flags));
 
     if(opt->simple_value)
         val = (cfg_value_t *)opt->simple_value;
@@ -1193,17 +1168,15 @@ static cfg_value_t *cfg_opt_getval(cfg_opt_t *opt, unsigned int index)
     return val;
 }
 
-void cfg_opt_setnint(cfg_opt_t *opt, long int value,
-                               unsigned int index)
+void cfg_opt_setnint(cfg_opt_t *opt, long int value, unsigned int index)
 {
     cfg_value_t *val;
-    assert(opt && opt->type == CFGT_INT);
+    nassert(opt && opt->type == CFGT_INT);
     val = cfg_opt_getval(opt, index);
     val->number = value;
 }
 
-void cfg_setnint(cfg_t *cfg, const char *name,
-                     long int value, unsigned int index)
+void cfg_setnint(cfg_t *cfg, const char *name, long int value, unsigned int index)
 {
     cfg_opt_setnint(cfg_getopt(cfg, name), value, index);
 }
@@ -1213,17 +1186,15 @@ void cfg_setint(cfg_t *cfg, const char *name, long int value)
     cfg_setnint(cfg, name, value, 0);
 }
 
-void cfg_opt_setnfloat(cfg_opt_t *opt, double value,
-                                 unsigned int index)
+void cfg_opt_setnfloat(cfg_opt_t *opt, double value, unsigned int index)
 {
     cfg_value_t *val;
-    assert(opt && opt->type == CFGT_FLOAT);
+    nassert(opt && opt->type == CFGT_FLOAT);
     val = cfg_opt_getval(opt, index);
     val->fpnumber = value;
 }
 
-void cfg_setnfloat(cfg_t *cfg, const char *name,
-                   double value, unsigned int index)
+void cfg_setnfloat(cfg_t *cfg, const char *name, double value, unsigned int index)
 {
     cfg_opt_setnfloat(cfg_getopt(cfg, name), value, index);
 }
@@ -1233,17 +1204,15 @@ void cfg_setfloat(cfg_t *cfg, const char *name, double value)
     cfg_setnfloat(cfg, name, value, 0);
 }
 
-void cfg_opt_setnbool(cfg_opt_t *opt, cfg_bool_t value,
-                                unsigned int index)
+void cfg_opt_setnbool(cfg_opt_t *opt, cfg_bool_t value, unsigned int index)
 {
     cfg_value_t *val;
-    assert(opt && opt->type == CFGT_BOOL);
+    nassert(opt && opt->type == CFGT_BOOL);
     val = cfg_opt_getval(opt, index);
     val->boolean = value;
 }
 
-void cfg_setnbool(cfg_t *cfg, const char *name,
-                            cfg_bool_t value, unsigned int index)
+void cfg_setnbool(cfg_t *cfg, const char *name, cfg_bool_t value, unsigned int index)
 {
     cfg_opt_setnbool(cfg_getopt(cfg, name), value, index);
 }
@@ -1253,18 +1222,16 @@ void cfg_setbool(cfg_t *cfg, const char *name, cfg_bool_t value)
     cfg_setnbool(cfg, name, value, 0);
 }
 
-void cfg_opt_setnstr(cfg_opt_t *opt, const char *value,
-                               unsigned int index)
+void cfg_opt_setnstr(cfg_opt_t *opt, const char *value, unsigned int index)
 {
     cfg_value_t *val;
-    assert(opt && opt->type == CFGT_STR);
+    nassert(opt && opt->type == CFGT_STR);
     val = cfg_opt_getval(opt, index);
     free(val->string);
     val->string = value ? strdup(value) : 0;
 }
 
-void cfg_setnstr(cfg_t *cfg, const char *name,
-                           const char *value, unsigned int index)
+void cfg_setnstr(cfg_t *cfg, const char *name, const char *value, unsigned int index)
 {
     cfg_opt_setnstr(cfg_getopt(cfg, name), value, index);
 }
@@ -1274,8 +1241,7 @@ void cfg_setstr(cfg_t *cfg, const char *name, const char *value)
     cfg_setnstr(cfg, name, value, 0);
 }
 
-static void cfg_addlist_internal(cfg_opt_t *opt,
-                                 unsigned int nvalues, va_list ap)
+static void cfg_addlist_internal(cfg_opt_t *opt, unsigned int nvalues, va_list ap)
 {
     unsigned int i;
 
@@ -1305,13 +1271,12 @@ static void cfg_addlist_internal(cfg_opt_t *opt,
     }
 }
 
-void cfg_setlist(cfg_t *cfg, const char *name,
-                           unsigned int nvalues, ...)
+void cfg_setlist(cfg_t *cfg, const char *name, unsigned int nvalues, ...)
 {
     va_list ap;
     cfg_opt_t *opt = cfg_getopt(cfg, name);
 
-    assert(opt && is_set(CFGF_LIST, opt->flags));
+    nassert(opt && is_set(CFGF_LIST, opt->flags));
 
     cfg_free_value(opt);
     va_start(ap, nvalues);
@@ -1325,7 +1290,7 @@ void cfg_addlist(cfg_t *cfg, const char *name,
     va_list ap;
     cfg_opt_t *opt = cfg_getopt(cfg, name);
 
-    assert(opt && is_set(CFGF_LIST, opt->flags));
+    nassert(opt && is_set(CFGF_LIST, opt->flags));
 
     va_start(ap, nvalues);
     cfg_addlist_internal(opt, nvalues, ap);
@@ -1336,7 +1301,7 @@ void cfg_opt_nprint_var(cfg_opt_t *opt, unsigned int index, FILE *fp)
 {
     const char *str;
 
-    assert(opt && fp);
+    nassert(opt && fp);
     switch(opt->type)
     {
         case CFGT_INT:
@@ -1373,7 +1338,7 @@ static void cfg_indent(FILE *fp, int indent)
 
 void cfg_opt_print_indent(cfg_opt_t *opt, FILE *fp, int indent)
 {
-    assert(opt && fp);
+    nassert(opt && fp);
 
     if(opt->type == CFGT_SEC)
     {
@@ -1471,20 +1436,18 @@ void cfg_print(cfg_t *cfg, FILE *fp)
     cfg_print_indent(cfg, fp, 0);
 }
 
-cfg_print_func_t cfg_opt_set_print_func(cfg_opt_t *opt,
-                                                  cfg_print_func_t pf)
+cfg_print_func_t cfg_opt_set_print_func(cfg_opt_t *opt, cfg_print_func_t pf)
 {
     cfg_print_func_t oldpf;
 
-    assert(opt);
+    nassert(opt);
     oldpf = opt->pf;
     opt->pf = pf;
 
     return oldpf;
 }
 
-cfg_print_func_t cfg_set_print_func(cfg_t *cfg, const char *name,
-                                              cfg_print_func_t pf)
+cfg_print_func_t cfg_set_print_func(cfg_t *cfg, const char *name, cfg_print_func_t pf)
 {
     return cfg_opt_set_print_func(cfg_getopt(cfg, name), pf);
 }
@@ -1494,7 +1457,7 @@ static cfg_opt_t *cfg_getopt_array(cfg_opt_t *rootopts, int cfg_flags, const cha
     unsigned int i;
     cfg_opt_t *opts = rootopts;
 
-    assert(rootopts && name);
+    nassert(rootopts && name);
 
     while(name && *name)
     {
@@ -1550,15 +1513,12 @@ static cfg_opt_t *cfg_getopt_array(cfg_opt_t *rootopts, int cfg_flags, const cha
     return 0;
 }
 
-cfg_validate_callback_t cfg_set_validate_func(cfg_t *cfg,
-                                                        const char *name,
-                                                        cfg_validate_callback_t vf)
+cfg_validate_callback_t cfg_set_validate_func(cfg_t *cfg, const char *name, cfg_validate_callback_t vf)
 {
     cfg_opt_t *opt = cfg_getopt_array(cfg->opts, cfg->flags, name);
     cfg_validate_callback_t oldvf;
-    assert(opt);
+    nassert(opt);
     oldvf = opt->validcb;
     opt->validcb = vf;
     return oldvf;
 }
-

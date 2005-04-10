@@ -299,15 +299,6 @@ char *CmodeMaskToPrefixString (const unsigned int mask)
 	return PrefixStringBuf;
 }
 
-
-int IsBotMode (const char mode)
-{
-	if(ircd_umodes[(int)mode].mask & UMODE_BOT) {
-		return NS_TRUE;
-	}
-	return NS_FALSE;
-}
-
 int UmodeCharToMask (const char mode)
 {
 	return ircd_umodes[(int)mode].mask;
@@ -428,13 +419,13 @@ const char *GetSmodeDesc (const unsigned int mask)
  *
 */
 int
-CheckChanMode (Channel *c, const unsigned int mask)
+test_cmode (Channel *c, const unsigned int mask)
 {
 	ModesParm *m;
 	lnode_t *mn;
 
 	if (!c) {
-		nlog (LOG_WARNING, "CheckChanMode: tied to check modes of empty channel");
+		nlog (LOG_WARNING, "test_cmode: tied to check modes of empty channel");
 		return -1;
 	}
 	if (c->modes & mask) {

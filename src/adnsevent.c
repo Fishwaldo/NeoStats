@@ -842,7 +842,7 @@ int adns__internal_check(adns_state ads,
 		if (ads->output.head) {
 			qu = ads->output.head;
 		} else if (ads->udpw.head || ads->tcpw.head) {
-			return EAGAIN;
+			return WSA;
 		} else {
 			return ESRCH;
 		}
@@ -869,8 +869,7 @@ int adns_wait(adns_state ads,
 
 	adns__consistency(ads, *query_io, cc_entex);
 	for (;;) {
-		r = adns__internal_check(ads, query_io, answer_r,
-					 context_r);
+		r = adns__internal_check(ads, query_io, answer_r, context_r);
 		if (r != EAGAIN)
 			break;
 		maxfd = 0;

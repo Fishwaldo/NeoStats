@@ -247,8 +247,8 @@ char *LANGgettext( const char *string, int mylang );
 
 /* Cmode macros */
 #define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY) || CheckChanMode(x, CMODE_KEY)))
+#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_KEY)))
+#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_KEY)))
 
 /* User modes available on all IRCds */
 #define UMODE_INVISIBLE		0x00000001	/* makes user invisible */
@@ -303,12 +303,6 @@ EXPORTVAR extern unsigned int ircd_supported_cumodes;
 #define IsOper(x) ( ( x ) && ( (x->user->Umode & (UMODE_OPER|UMODE_LOCOP ) ) ) )
 #define IsBot(x) ( ( x ) && ( x->user->Umode & UMODE_BOT ) )
 
-#define BOTMODE		0x00000001
-#define OPERMODE	0x00000002
-
-EXPORTFUNC int IsOperMode( const char mode );
-EXPORTFUNC int IsOperSMode( const char mode );
-EXPORTFUNC int IsBotMode( const char mode );
 EXPORTFUNC int UmodeCharToMask( const char mode );
 EXPORTFUNC const char *GetUmodeDesc( const unsigned int mask );
 EXPORTFUNC int SmodeCharToMask( const char mode );
@@ -1241,7 +1235,7 @@ EXPORTFUNC Client *FindServer( const char *name );
 
 /* chans.c */
 EXPORTFUNC Channel *FindChannel( const char *chan );
-EXPORTFUNC int CheckChanMode( Channel *c, const unsigned int mode );
+EXPORTFUNC int test_cmode( Channel *c, const unsigned int mode );
 EXPORTFUNC int IsChannelMember( Channel *c, Client *u );
 EXPORTFUNC int test_cumode( char *chan, char *nick, int flag );
 EXPORTFUNC Channel *GetRandomChannel( void );
@@ -1256,8 +1250,6 @@ EXPORTFUNC char *GetRandomChannelKey( int length );
 #define IsChanAdmin( chan, nick ) test_cumode(chan, nick, CUMODE_CHANADMIN)
 
 EXPORTVAR unsigned char UmodeChRegNick;
-
-EXPORTFUNC int IsBotMode( const char mode );
 
 /* dns.c */
 EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void *data, adns_answer * a), void *data );

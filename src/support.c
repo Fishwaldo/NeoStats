@@ -32,20 +32,16 @@
  * @return length of string excluding NULL or count if longer
  *
  */
-inline size_t strnlen(const char * src, size_t count)
+size_t strnlen( const char * src, size_t count )
 {
 	size_t len;
 
 	/* Run through the string until we find NULL or reach count */
-	for(len = 0; len < count; len++,src++) {
-		if(*src == 0){
+	for( len = 0; len < count; len++, src++ ) {
+		if( *src == 0 ){
 			return len;
 		}
 	}
-#ifdef DEBUG
-	printf("strnlen: len at max\n");
-#endif
-
 	/* src is longer or equal to count so return count */
 	return count;
 }
@@ -57,93 +53,63 @@ inline size_t strnlen(const char * src, size_t count)
  * @return total characters written to string.
  *
  */
-size_t
-strlcpy(char *dst, const char *src, size_t size)
+size_t strlcpy( char *dst, const char *src, size_t size )
 {
 	size_t copycount;
 
     /* check size is safe */
-	if (size <= 0) {
-#ifdef DEBUG
-		printf("strlcpy: size <= 0\n");
-#endif
+	if ( size <= 0 )
 		return 0;
-	}
-
 	/* NULL pointer checks */
-	if(!dst || !src) {
-#ifdef DEBUG
-		printf("strlcpy: dst (%p) or src (%p) is NULL\n", dst, src);
-#endif
+	if( !dst || !src )
 		return 0;
-	}
-
 	/* use strnlen so huge strings do not hold us up */
-	for(copycount = 0; copycount < size-1 && *src!=0 ; copycount++) {
+	for( copycount = 0; copycount < size-1 && *src!=0 ; copycount++ )
 		*dst++=*src++;
-	}
-
     /* Always null terminate */
 	*dst = 0;
-
     /* count of characters written excluding NULL terminator */
 	return copycount;
 }
 #endif /* HAVE_STRLCPY */
 
 #ifndef HAVE_STRLCAT
-/* @brief append at most size-len(dst)-1 chars from src to dst and NULL terminate
+/* @brief append at most size-len( dst )-1 chars from src to dst and NULL terminate
  *
  * @return total characters written to string.
  *
  */
-size_t
-strlcat(char *dst, const char *src, size_t size)
+size_t strlcat( char *dst, const char *src, size_t size )
 {
 	size_t lendst;
 	size_t copycount;
 
     /* check size is safe */
-	if (size <= 0) {
-#ifdef DEBUG
-		printf("strlcat: size <= 0\n");
-#endif
+	if ( size <= 0 )
 		return 0;
-	}
-
 	/* NULL pointer checks */
-	if(!dst || !src) {
-#ifdef DEBUG
-		printf("strlcat: dst (%p) or src (%p) is NULL\n", dst, src);
-#endif
+	if( !dst || !src )
 		return 0;
-	}
-
 	/* if src contains NULL just NULL dst then quit to save a little CPU */
-	if(*src == '\0') {
-#ifdef DEBUG
-		printf("strlcat: src is pointer to NULL\n");
-#endif
-		lendst = strnlen(dst, size);
+	if( *src == '\0' )
+	{
+		lendst = strnlen( dst, size );
 		dst[lendst] = '\0';
 		return 0;
 	}
-
 	/* use strnlen so huge strings do not hold us up */
-	lendst = strnlen(dst, size);
-	copycount = strnlen(src, size);
-
+	lendst = strnlen( dst, size );
+	copycount = strnlen( src, size );
 	/* bound copy size */
-	if (lendst + copycount >= size) {
+	if ( lendst + copycount >= size )
 		copycount = size - lendst;
-	}
-
 	/* memcpy the desired amount */
-	if (copycount > 0) {
+	if ( copycount > 0 ) 
+	{
 		os_memcpy( ( dst + lendst ), src, copycount );
 		dst[lendst + copycount] = 0;
 	}
-	
+
     /* count of characters written excluding NULL terminator */
 	return copycount;
 }
@@ -158,38 +124,54 @@ strlcat(char *dst, const char *src, size_t size)
  * @return pointer to new string or NULL if failed to allocate
  *
  */
-char *strndup(const char *src, size_t count)
+char *strndup( const char *src, size_t count )
 {
 	char *dup;
 	
 	/* validate inputs */
-	if ((src == NULL) || (count < 0)) {
+	if ( ( src == NULL ) || ( count < 0 ) )
 		return NULL;
-	}
-	
 	/* Allocate count plus one for trailing NULL */
-	dup = (char*)ns_malloc(count+1);
-	
+	dup = ( char* ) ns_malloc( count + 1 );
 	/* Copy string into created buffer */
 	os_memcpy( dup, src, count );
 	dup[count] = 0;
+	/* Return pointer to duplicated string */
+	return dup;
+}
+#endif
+
+#ifndef HAVE_STRDUP
+/* @brief allocate RAM and duplicate the passed string into the created buffer. 
+ *
+ * @return pointer to new string or NULL if failed to allocate
+ *
+ */
+char *strdup( const char *src )
+{
+	char *dup;
 	
+	/* validate inputs */
+	if ( src == NULL )
+		return NULL;
+	/* Allocate count plus one for trailing NULL */
+	dup = ( char* )ns_malloc( strlen( src ) + 1 );
+	/* Copy string into created buffer */
+	strcpy( dup, src );
 	/* Return pointer to duplicated string */
 	return dup;
 }
 #endif
 
 #ifndef HAVE_INET_NTOP
-char *inet_ntop(int af, const unsigned char *src, char *dst, size_t size)
+char *inet_ntop( int af, const unsigned char *src, char *dst, size_t size )
 { 
 	static const char *fmt = "%u.%u.%u.%u";
-	char tmp[sizeof ("255.255.255.255")];
+	char tmp[sizeof ( "255.255.255.255" )];
 
-	if ((size_t)sprintf(tmp, fmt, src[0], src[1], src[2], src[3]) >= size)
-	{
-		return (NULL);
-	}
-	strlcpy (dst, tmp, size);
+	if ( ( size_t ) sprintf( tmp, fmt, src[0], src[1], src[2], src[3] ) >= size )
+		return NULL;
+	strlcpy( dst, tmp, size );
 	return dst;
 }
 #endif
@@ -200,7 +182,7 @@ char *inet_ntop(int af, const unsigned char *src, char *dst, size_t size)
  */
 int inet_aton( const char *name, struct in_addr *addr )
 {
-    addr->s_addr = inet_addr(name);
-    return ( addr->s_addr == INADDR_NONE ) ? 0 : 1;
+    addr->s_addr = inet_addr( name );
+    return ( addr->s_addr == INADDR_NONE  ? 0 : 1 );
 }
 #endif
