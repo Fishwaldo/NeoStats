@@ -842,7 +842,7 @@ int adns__internal_check(adns_state ads,
 		if (ads->output.head) {
 			qu = ads->output.head;
 		} else if (ads->udpw.head || ads->tcpw.head) {
-			return WSA;
+			return EAGAIN;
 		} else {
 			return ESRCH;
 		}
