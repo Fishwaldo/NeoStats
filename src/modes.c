@@ -104,8 +104,7 @@ static ModeDesc SmodeDesc[] = {
  *
  * @return 
  */
-unsigned int
-BuildModeTable (char *mode_char_map, mode_data * dest, const mode_init * src, unsigned int flagall)
+unsigned int BuildModeTable (mode_data * dest, const mode_init * src, unsigned int flagall)
 {
 	unsigned int maskall = 0;
 
@@ -136,19 +135,19 @@ InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const
 	/* build cmode lookup table */
 	os_memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
 	dlog(DEBUG4, "Build channel mode table...");
-	ircd_supported_cmodes = BuildModeTable (ircd_cmode_char_map, ircd_cmodes, chan_modes, 0);
+	ircd_supported_cmodes = BuildModeTable( ircd_cmodes, chan_modes, 0 );
 	/* build cumode lookup table */
 	dlog(DEBUG4, "Build channel user mode table...");
-	ircd_supported_cumodes = BuildModeTable (ircd_cmode_char_map, ircd_cmodes, chan_umodes, NICKPARAM);
+	ircd_supported_cumodes = BuildModeTable( ircd_cmodes, chan_umodes, NICKPARAM );
 	/* build umode lookup table */
 	os_memset(&ircd_umodes, 0, sizeof(ircd_umodes));
 	dlog(DEBUG4, "Build user mode table...");
-	ircd_supported_umodes = BuildModeTable (ircd_umode_char_map, ircd_umodes, user_umodes, 0);
+	ircd_supported_umodes = BuildModeTable( ircd_umodes, user_umodes, 0 );
 	/* build smode lookup table */
 	if (user_smodes) {
 		os_memset(&ircd_smodes, 0, sizeof(ircd_smodes));
 		dlog(DEBUG4, "Build user smode table...");
-		ircd_supported_smodes = BuildModeTable (ircd_smode_char_map, ircd_smodes, user_smodes, 0);
+		ircd_supported_smodes = BuildModeTable( ircd_smodes, user_smodes, 0 );
 	}
 	/* Check for registered nick support */
 	if(ircd_supported_umodes & UMODE_REGNICK) {
@@ -159,21 +158,22 @@ InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const
 	return NS_SUCCESS;
 };
 
-/** @brief UmodeMaskToString
+/** @brief ModeMaskToString
  *
  *  Translate a mode mask to the string equivalent
  *
- * @return 
+ *  @return 
  */
-char *
-ModeMaskToString (mode_data* mode_table, const long mask) 
+static char *ModeMaskToString( mode_data* mode_table, const long mask ) 
 {
 	int i, j;
 
 	ModeStringBuf[0] = '+';
 	j = 1;
-	for (i = 0; i < MODE_TABLE_SIZE; i++) {
-		if (mask & mode_table[i].mask) {
+	for( i = 0; i < MODE_TABLE_SIZE; i++ )
+	{
+		if( mask & mode_table[i].mask )
+		{
 			ModeStringBuf[j] = i;
 			j++;
 		}
@@ -182,37 +182,35 @@ ModeMaskToString (mode_data* mode_table, const long mask)
 	return ModeStringBuf;
 }
 
-/** @brief UmodeStringToMask
+/** @brief ModeStringToMask
  *
  *  Translate a mode string to the mask equivalent
  *
- * @return 
+ *  @return 
  */
-unsigned int 
-ModeStringToMask (mode_data* mode_table, const char *ModeString)
+static unsigned int ModeStringToMask( mode_data* mode_table, const char *ModeString )
 {
 	unsigned int Umode = 0;
 	int add = 0;
 	char *tmpmode;
 
 	/* Walk through mode string and convert to mask */
-	tmpmode = (char*)ModeString;
-	while (*tmpmode) {
-		switch (*tmpmode) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		default:
-			if (add) {
-				Umode |= mode_table[(int)*tmpmode].mask;
+	tmpmode = ( char * ) ModeString;
+	while( *tmpmode )
+	{
+		switch( *tmpmode )
+		{
+			case '+':
+				add = 1;
 				break;
-			} else {
-				Umode &= ~mode_table[(int)*tmpmode].mask;
+			case '-':
+				add = 0;
 				break;
-			}
+			default:
+				if( add ) 
+					Umode |= mode_table[( int )*tmpmode].mask;
+				else
+					Umode &= ~mode_table[( int )*tmpmode].mask;
 		}
 		tmpmode++;
 	}
@@ -225,10 +223,9 @@ ModeStringToMask (mode_data* mode_table, const char *ModeString)
  *
  * @return 
  */
-char *
-UmodeMaskToString(const unsigned int Umode) 
+char * UmodeMaskToString( const unsigned int Umode ) 
 {
-	return ModeMaskToString(ircd_umodes, Umode);
+	return ModeMaskToString( ircd_umodes, Umode );
 }
 
 /** @brief UmodeStringToMask
@@ -237,10 +234,9 @@ UmodeMaskToString(const unsigned int Umode)
  *
  * @return 
  */
-unsigned int
-UmodeStringToMask(const char *UmodeString)
+unsigned int UmodeStringToMask( const char *UmodeString )
 {
-	return ModeStringToMask (ircd_umodes, UmodeString);
+	return ModeStringToMask( ircd_umodes, UmodeString );
 }
 
 /** @brief SmodeMaskToString
@@ -249,10 +245,9 @@ UmodeStringToMask(const char *UmodeString)
  *
  * @return 
  */
-char *
-SmodeMaskToString(const unsigned int Smode) 
+char * SmodeMaskToString( const unsigned int Smode ) 
 {
-	return ModeMaskToString(ircd_smodes, Smode);
+	return ModeMaskToString( ircd_smodes, Smode );
 }
 
 /** @brief SmodeStringToMask
@@ -261,10 +256,9 @@ SmodeMaskToString(const unsigned int Smode)
  *
  * @return 
  */
-unsigned int
-SmodeStringToMask (const char *SmodeString)
+unsigned int SmodeStringToMask( const char *SmodeString )
 {
-	return ModeStringToMask (ircd_smodes, SmodeString);
+	return ModeStringToMask( ircd_smodes, SmodeString );
 }
 
 /** @brief CmodeStringToMask
@@ -273,15 +267,14 @@ SmodeStringToMask (const char *SmodeString)
  *
  * @return 
  */
-unsigned int
-CmodeStringToMask (const char *UmodeString)
+unsigned int CmodeStringToMask( const char *UmodeString )
 {
-	return ModeStringToMask (ircd_cmodes, UmodeString);
+	return ModeStringToMask( ircd_cmodes, UmodeString );
 }
 
-char *CmodeMaskToString (const unsigned int mask)
+char *CmodeMaskToString( const unsigned int mask )
 {
-	return ModeMaskToString (ircd_cmodes, mask);
+	return ModeMaskToString( ircd_cmodes, mask );
 }
 
 char *CmodeMaskToPrefixString (const unsigned int mask)
@@ -319,32 +312,31 @@ int CmodeCharToFlags (const char mode)
 	return ircd_cmodes[(int)mode].flags;
 }
 
-char ModeMaskToChar (char *mode_char_map, unsigned int mask)
+static char ModeMaskToChar( char *mode_char_map, unsigned int mask )
 {
     int bitcount = 0;
 	
-	while (mask >>= 1) {
+	while (mask >>= 1) 
 		bitcount ++;
-	}
     return mode_char_map[bitcount];
 }
 
-char UmodeMaskToChar (const unsigned int mask)
+char UmodeMaskToChar( const unsigned int mask )
 {
-	return ModeMaskToChar (ircd_umode_char_map, mask);
+	return ModeMaskToChar( ircd_umode_char_map, mask );
 }
 
-char SmodeMaskToChar (const unsigned int mask)
+char SmodeMaskToChar( const unsigned int mask )
 {
-	return ModeMaskToChar (ircd_smode_char_map, mask);
+	return ModeMaskToChar( ircd_smode_char_map, mask );
 }
 
-char CmodeMaskToChar (const unsigned int mask)
+char CmodeMaskToChar( const unsigned int mask )
 {
-	return ModeMaskToChar (ircd_cmode_char_map, mask);
+	return ModeMaskToChar( ircd_cmode_char_map, mask );
 }
 
-unsigned int CmodePrefixToMask (const char prefix)
+unsigned int CmodePrefixToMask( const char prefix )
 {
 	int i;
 
