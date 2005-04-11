@@ -518,10 +518,8 @@ void ListChannels( CmdParams * cmdparams, const char *chan )
 	hscan_t sc;
 	Channel *c;
 
-#ifndef DEBUG
 	if( !nsconfig.debug )
 		return;
-#endif
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "================CHANLIST================",cmdparams->source ) );
 	if( !chan ) {

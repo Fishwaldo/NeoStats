@@ -131,7 +131,7 @@ int AddAuthModule( Module *mod_ptr )
 	mod_auth auth;
 
 	/* Check module has the auth function */
-	auth = ns_dlsym( mod_ptr->dl_handle, "ModAuthUser" );
+	auth = ns_dlsym( mod_ptr->handle, "ModAuthUser" );
 	if( auth ) 
 	{
 		/* Find free slot for module */

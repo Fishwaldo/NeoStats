@@ -95,10 +95,12 @@ int InitModExcludes(Module *mod_ptr)
 {
 	SET_SEGV_LOCATION();
 	/* init the exclusions list */
+	SET_RUN_LEVEL(mod_ptr);
 	excludelists[mod_ptr->modnum] = list_create(MAX_MOD_EXCLUDES);
 	bot_cmd_lists[mod_ptr->modnum] = ns_malloc( sizeof( mod_exclude_commands ) );
 	os_memcpy( bot_cmd_lists[mod_ptr->modnum], mod_exclude_commands, sizeof( mod_exclude_commands ) );
 	DBAFetchRows ("exclusions", new_mod_exclude);
+	RESET_RUN_LEVEL();
 	return NS_SUCCESS;
 }
 

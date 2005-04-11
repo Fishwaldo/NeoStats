@@ -898,9 +898,9 @@ typedef int (*userauthfunc) ( Client *u );
 typedef struct _Module {
 	ModuleInfo *info;
 	ModuleEvent **event_list;
-	mod_auth mod_auth_cb;
+	mod_auth authcb;
 	mod_auth userauth;
-	void *dl_handle;
+	void *handle;
 	unsigned int modnum;
 	unsigned int insynch;
 	unsigned int synched;
@@ -1403,10 +1403,10 @@ EXPORTFUNC hash_t *GetModuleHash( void );
 
 EXPORTFUNC int HaveFeature( int mask );
 
-EXPORTFUNC void AddEvent( ModuleEvent *event );
-EXPORTFUNC void AddEventList( ModuleEvent *event );
+EXPORTFUNC void AddEvent( ModuleEvent *eventptr );
+EXPORTFUNC void AddEventList( ModuleEvent *eventlistptr );
 EXPORTFUNC void DeleteEvent( Event event );
-EXPORTFUNC void DeleteEventList( ModuleEvent *event );
+EXPORTFUNC void DeleteEventList( ModuleEvent *eventlistptr );
 EXPORTFUNC void SetAllEventFlags( unsigned int flag, unsigned int enable );
 EXPORTFUNC void SetEventFlags( Event event, unsigned int flag, unsigned int enable );
 EXPORTFUNC void EnableEvent( Event event );

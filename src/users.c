@@ -436,10 +436,8 @@ void ListUsers (CmdParams *cmdparams, const char *nick)
 {
 	Client *u;
 
-#ifndef DEBUG
 	if (!nsconfig.debug)
 		return;
-#endif
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ns_botptr, cmdparams->source, __("================USERLIST================", cmdparams->source));
 	if (!nick) {

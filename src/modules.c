@@ -86,7 +86,7 @@ int SynchModule (Module* module_ptr)
 	int (*ModSynch) (void);
 
 	module_ptr->insynch = 1;
-	ModSynch = ns_dlsym ((int *) module_ptr->dl_handle, "ModSynch");
+	ModSynch = ns_dlsym ((int *) module_ptr->handle, "ModSynch");
 	if (ModSynch) {
 		SET_RUN_LEVEL(module_ptr);
 		err = (*ModSynch) (); 
@@ -249,12 +249,12 @@ Module *
 load_module (const char *modfilename, Client * u)
 {
 	int err;
-	void *dl_handle;
+	void *handle;
 	char path[255];
 	char loadmodname[255];
 	int moduleindex = 0;
-	ModuleInfo *info_ptr = NULL;
-	ModuleEvent *event_ptr = NULL;
+	ModuleInfo *infoptr = NULL;
+	ModuleEvent *eventlistptr = NULL;
 	Module *mod_ptr = NULL;
 	int (*ModInit) (void);
 	CmdParams *cmdparams;
@@ -267,78 +267,78 @@ load_module (const char *modfilename, Client * u)
 	strlcpy (loadmodname, modfilename, 255);
 	strlwr (loadmodname);
 	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_EXT);
-	dl_handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
-	if (!dl_handle) {
+	handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
+	if (!handle) {
 		load_module_error (u, __("Unable to load module: %s %s", u), ns_dlerrormsg, path);
 		return NULL;
 	}
-	info_ptr = ns_dlsym (dl_handle, "module_info");
-	if(info_ptr == NULL) {
+	infoptr = ns_dlsym (handle, "module_info");
+	if(infoptr == NULL) {
 		load_module_error (u, __("Unable to load module: %s missing module_info", u), path);
-		ns_dlclose (dl_handle);
+		ns_dlclose (handle);
 		return NULL;
 	}
 	/* Check module was built for this version of NeoStats */
-	if( ircstrncasecmp (NEOSTATS_VERSION, info_ptr->neostats_version, VERSIONSIZE) !=0 ) {
+	if( ircstrncasecmp (NEOSTATS_VERSION, infoptr->neostats_version, VERSIONSIZE) !=0 ) {
 		load_module_error (u, __("Unable to load module: %s was built with an old version of NeoStats and must be rebuilt.", u), modfilename);
-		ns_dlclose (dl_handle);
+		ns_dlclose (handle);
 		return NULL;
 	}
-	if( !info_ptr->copyright || ircstrcasecmp (info_ptr->copyright[0], "Copyright (c) <year>, <your name>") ==0 ) {
+	if( !infoptr->copyright || ircstrcasecmp (infoptr->copyright[0], "Copyright (c) <year>, <your name>") ==0 ) {
 		load_module_error (u, __("Unable to load module: missing copyright text.", u), modfilename);
-		ns_dlclose (dl_handle);
+		ns_dlclose (handle);
 		return NULL;
 	}	
-	if( !info_ptr->about_text || ircstrcasecmp (info_ptr->about_text[0], "About your module") ==0 ) {
+	if( !infoptr->about_text || ircstrcasecmp (infoptr->about_text[0], "About your module") ==0 ) {
 		load_module_error (u, __("Unable to load module: missing about text.", u), modfilename);
-		ns_dlclose (dl_handle);
+		ns_dlclose (handle);
 		return NULL;
 	}	
 	/* Check that the Module hasn't already been loaded */
-	if (hash_lookup (modulehash, info_ptr->name)) {
-		ns_dlclose (dl_handle);
-		load_module_error (u, __("Unable to load module: %s already loaded", u), info_ptr->name);
+	if (hash_lookup (modulehash, infoptr->name)) {
+		ns_dlclose (handle);
+		load_module_error (u, __("Unable to load module: %s already loaded", u), infoptr->name);
 		return NULL;
 	}
 	/* Check we have require PROTOCOL/FEATURE support for module */
-	if((info_ptr->features & ircd_srv.features) != info_ptr->features) {
+	if((infoptr->features & ircd_srv.features) != infoptr->features) {
 		load_module_error (u, __("Unable to load module: %s Required module features not available on this IRCd.", u), modfilename);
-		ns_dlclose (dl_handle);
+		ns_dlclose (handle);
 		return NULL;
 	}
 	/* Lookup ModInit (replacement for library __init() call */
-	ModInit = ns_dlsym ((int *) dl_handle, "ModInit");
+	ModInit = ns_dlsym ((int *) handle, "ModInit");
 	if (!ModInit) {
 		load_module_error (u, __("Unable to load module: %s missing ModInit.", u), mod_ptr->info->name);
-		ns_dlclose (dl_handle);
+		ns_dlclose (handle);
 		return NULL;
 	}
 	/* Allocate module */
 	mod_ptr = (Module *) ns_calloc (sizeof (Module));
-	hnode_create_insert (modulehash, mod_ptr, info_ptr->name);
-	dlog(DEBUG1, "Module internal name: %s", info_ptr->name);
-	dlog(DEBUG1, "Module description: %s", info_ptr->description);
-	mod_ptr->info = info_ptr;
-	mod_ptr->dl_handle = dl_handle;
+	hnode_create_insert (modulehash, mod_ptr, infoptr->name);
+	dlog(DEBUG1, "Module internal name: %s", infoptr->name);
+	dlog(DEBUG1, "Module description: %s", infoptr->description);
+	mod_ptr->info = infoptr;
+	mod_ptr->handle = handle;
 	/* Extract pointer to event list */
-	event_ptr = ns_dlsym (dl_handle, "module_events");
-	if(event_ptr) {
+	eventlistptr = ns_dlsym (handle, "module_events");
+	if(eventlistptr) {
 		SET_RUN_LEVEL(mod_ptr);
-		AddEventList (event_ptr);
+		AddEventList (eventlistptr);
 		RESET_RUN_LEVEL();
 	}
     /* For Auth modules, register auth function */
-	if (info_ptr->flags & MODULE_FLAG_AUTH) {
+	if (infoptr->flags & MODULE_FLAG_AUTH) {
 		if (AddAuthModule (mod_ptr) != NS_SUCCESS) {
-			load_module_error (u, __("Unable to load auth module: %s missing ModAuthUser function",u), info_ptr->name);
+			load_module_error (u, __("Unable to load auth module: %s missing ModAuthUser function",u), infoptr->name);
 			unload_module(mod_ptr->info->name, NULL);
 			return NULL;
 		}
 	}
     /* Module side user authentication for e.g. SecureServ helpers 
      * Not available on auth modules */
-	if (!(info_ptr->flags & MODULE_FLAG_AUTH)) {
-		mod_ptr->mod_auth_cb = ns_dlsym ((int *) dl_handle, "ModAuthUser");
+	if (!(infoptr->flags & MODULE_FLAG_AUTH)) {
+		mod_ptr->authcb = ns_dlsym ((int *) handle, "ModAuthUser");
 	}
 	/* assign a module number to this module */
 	while (ModList[moduleindex] != NULL)
@@ -357,13 +357,10 @@ load_module (const char *modfilename, Client * u)
 		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
 	}
-	SET_SEGV_LOCATION();
-	SET_RUN_LEVEL(mod_ptr);
-	if (info_ptr->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
+	if (infoptr->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
 	{
 		InitModExcludes(mod_ptr);
 	}
-	RESET_RUN_LEVEL();
 	SET_SEGV_LOCATION();
 
 	/* Let this module know we are online if we are! */
@@ -376,12 +373,12 @@ load_module (const char *modfilename, Client * u)
 		}
 	}
 	cmdparams = ns_calloc (sizeof(CmdParams));
-	cmdparams->param = (char*)info_ptr->name;
+	cmdparams->param = (char*)infoptr->name;
 	SendAllModuleEvent(EVENT_MODULELOAD, cmdparams);
 	ns_free(cmdparams);
 	if (u) {
-		irc_prefmsg (ns_botptr, u, __("Module %s loaded, %s",u), info_ptr->name, info_ptr->description);
-		irc_globops (NULL, _("Module %s loaded"), info_ptr->name);
+		irc_prefmsg (ns_botptr, u, __("Module %s loaded, %s",u), infoptr->name, infoptr->description);
+		irc_globops (NULL, _("Module %s loaded"), infoptr->name);
 	}
 	return mod_ptr;
 }
@@ -459,7 +456,7 @@ unload_module (const char *modname, Client * u)
 	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
 	hash_delete (modulehash, modnode);		
 	/* call ModFini (replacement for library __fini() call */
-	ModFini = ns_dlsym ((int *) mod_ptr->dl_handle, "ModFini");
+	ModFini = ns_dlsym ((int *) mod_ptr->handle, "ModFini");
 	if (ModFini) {
 		SET_RUN_LEVEL(mod_ptr);
 		(*ModFini) ();
@@ -482,7 +479,7 @@ unload_module (const char *modname, Client * u)
 #ifndef VALGRIND
 	SET_RUN_LEVEL(mod_ptr);
 	DBACloseDatabase ();
-	ns_dlclose (mod_ptr->dl_handle);
+	ns_dlclose (mod_ptr->handle);
 	RESET_RUN_LEVEL();
 #endif
 	ns_free (mod_ptr);
@@ -621,7 +618,7 @@ void AddEvent (ModuleEvent* event)
  *
  * @return none
  */
-void AddEventList (ModuleEvent *event_ptr)
+void AddEventList (ModuleEvent *eventlistptr)
 {
 	Module* mod_ptr;
 
@@ -629,9 +626,9 @@ void AddEventList (ModuleEvent *event_ptr)
 	if (!mod_ptr->event_list) {
 		mod_ptr->event_list = ns_calloc ( sizeof(ModuleEvent*) * EVENT_COUNT );
 	}
-	while (event_ptr->event != EVENT_NULL) {
-		mod_ptr->event_list[event_ptr->event] = event_ptr;
-		event_ptr ++;
+	while (eventlistptr->event != EVENT_NULL) {
+		mod_ptr->event_list[eventlistptr->event] = eventlistptr;
+		eventlistptr ++;
 	}
 }
 
@@ -657,16 +654,16 @@ void DeleteEvent (Event event)
  *
  * @return none
  */
-void DeleteEventList (ModuleEvent *event_ptr)
+void DeleteEventList (ModuleEvent *eventlistptr)
 {
 	Module* mod_ptr;
 
 	mod_ptr = GET_CUR_MODULE();
-	while (event_ptr->event) {
-		if (mod_ptr->event_list[event_ptr->event]) {
-			mod_ptr->event_list[event_ptr->event] = NULL;
+	while (eventlistptr->event) {
+		if (mod_ptr->event_list[eventlistptr->event]) {
+			mod_ptr->event_list[eventlistptr->event] = NULL;
 		}
-		event_ptr++;
+		eventlistptr++;
 	}
 }
 
@@ -679,16 +676,16 @@ void DeleteEventList (ModuleEvent *event_ptr)
 void SetAllEventFlags (unsigned int flag, unsigned int enable)
 {
 	int i;
-	ModuleEvent** eventptr;
+	ModuleEvent** eventlistptr;
 
-	eventptr = GET_CUR_MODULE()->event_list;
-	if (eventptr) {
+	eventlistptr = GET_CUR_MODULE()->event_list;
+	if (eventlistptr) {
 		for (i = 0; i < EVENT_COUNT; i++) {
-			if (eventptr[i]) {
+			if (eventlistptr[i]) {
 				if (enable) {
-					eventptr[i]->flags |= flag;
+					eventlistptr[i]->flags |= flag;
 				} else {
-					eventptr[i]->flags &= ~flag;
+					eventlistptr[i]->flags &= ~flag;
 				}
 			}
 		}
@@ -703,14 +700,14 @@ void SetAllEventFlags (unsigned int flag, unsigned int enable)
  */
 void SetEventFlags (Event event, unsigned int flag, unsigned int enable)
 {
-	ModuleEvent** eventptr;
+	ModuleEvent** eventlistptr;
 
-	eventptr = GET_CUR_MODULE()->event_list;
-	if (eventptr) {
+	eventlistptr = GET_CUR_MODULE()->event_list;
+	if (eventlistptr) {
 		if (enable) {
-			eventptr[event]->flags |= flag;
+			eventlistptr[event]->flags |= flag;
 		} else {
-			eventptr[event]->flags &= ~flag;
+			eventlistptr[event]->flags &= ~flag;
 		}
 	}
 }

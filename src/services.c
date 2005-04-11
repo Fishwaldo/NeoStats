@@ -139,7 +139,9 @@ static bot_setting ns_settings[]=
 
 static bot_setting ns_debugsettings[]=
 {
+#ifndef DEBUG
 	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, NULL,( void* )0 },
+#endif
 	{"DEBUGMODULE",		nsconfig.debugmodule,		SET_TYPE_STRING,	0, MAX_MOD_NAME,NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugmodule, NULL,( void* )"all" },
 	{"DEBUGLEVEL",		&nsconfig.debuglevel,		SET_TYPE_INT,		1, 10, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debuglevel, NULL,( void* )0 },
 	{"DEBUGTOCHAN",		&nsconfig.debugtochan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugtochan, NULL,( void* )0 },
@@ -302,12 +304,10 @@ static int ns_cmd_jupe( CmdParams *cmdparams )
 static int ns_cmd_userlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-#ifndef DEBUG
 	if( !nsconfig.debug ) {
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
-#endif
 	ListUsers( cmdparams,( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
@@ -322,12 +322,10 @@ static int ns_cmd_userlist( CmdParams *cmdparams )
 static int ns_cmd_serverlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-#ifndef DEBUG
 	if( !nsconfig.debug ) {
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
-#endif
 	ListServers(( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
@@ -342,12 +340,10 @@ static int ns_cmd_serverlist( CmdParams *cmdparams )
 static int ns_cmd_channellist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-#ifndef DEBUG
 	if( !nsconfig.debug ) {
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
-#endif
 	ListChannels( cmdparams,( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
@@ -362,12 +358,10 @@ static int ns_cmd_channellist( CmdParams *cmdparams )
 static int ns_cmd_banlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-#ifndef DEBUG
 	if( !nsconfig.debug ) {
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
-#endif
 	ListBans();
    	return NS_SUCCESS;
 }
