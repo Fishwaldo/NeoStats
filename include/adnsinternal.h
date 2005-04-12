@@ -731,7 +731,7 @@ static inline int ctype_domainunquoted(int c)
 
 static inline int errno_resources(int e)
 {
-	return e == ENOMEM || e == ENOBUFS;
+	return e == ENOMEM || e == OS_SOCK_ENOBUFS;
 }
 
 /* Useful macros */

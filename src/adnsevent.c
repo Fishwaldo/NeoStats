@@ -157,7 +157,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 			tcp_connected(ads, now);
 			return;
 		}
-		if (errno == EWOULDBLOCK || errno == EINPROGRESS) 
+		if (errno == OS_SOCK_EWOULDBLOCK || errno == OS_SOCK_EINPROGRESS) 
 		{
 			ads->tcptimeout = now;
 			/* EVNT addsock write */
@@ -468,11 +468,11 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 				} else {
 					if (r) {
 						if (errno == EAGAIN
-							|| errno == EWOULDBLOCK) {
+							|| errno == OS_SOCK_EWOULDBLOCK) {
 							r = 0;
 							goto xit;
 						}
-						if (errno == EINTR)
+						if (errno == OS_SOCK_EINTR)
 							continue;
 						if (errno_resources(errno)) {
 							r = errno;
@@ -498,11 +498,11 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 			ADNS_CAPTURE_ERRNO;
 			if (r < 0) {
 				if (errno == EAGAIN
-				    || errno == EWOULDBLOCK) {
+				    || errno == OS_SOCK_EWOULDBLOCK) {
 					r = 0;
 					goto xit;
 				}
-				if (errno == EINTR)
+				if (errno == OS_SOCK_EINTR)
 					continue;
 				if (errno_resources(errno)) {
 					r = errno;
@@ -575,7 +575,7 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *no
 			ADNS_CLEAR_ERRNO;
 			r = adns_socket_read(ads->tcpsocket, &ads->tcprecv.buf, 1);
 			ADNS_CAPTURE_ERRNO;
-			if (r==0 || (r<0 && (errno==EAGAIN || errno==EWOULDBLOCK))) {
+			if (r==0 || (r<0 && (errno==EAGAIN || errno==OS_SOCK_EWOULDBLOCK))) {
 				tcp_connected(ads, *now);
 				r = 0;
 				goto xit;
@@ -586,7 +586,7 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *no
 				r = 0;
 				goto xit;
 			}
-			if (errno == EINTR)
+			if (errno == OS_SOCK_EINTR)
 				continue;
 			if (errno_resources(errno)) {
 				r = errno;
@@ -607,10 +607,10 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *no
 			ADNS_CAPTURE_ERRNO;
 			adns__sigpipe_unprotect(ads);
 			if (r < 0) {
-				if (errno == EINTR)
+				if (errno == OS_SOCK_EINTR)
 					continue;
 				if (errno == EAGAIN
-				    || errno == EWOULDBLOCK) {
+				    || errno == OS_SOCK_EWOULDBLOCK) {
 					r = 0;
 					goto xit;
 				}
@@ -884,9 +884,9 @@ int adns_wait(adns_state ads,
 		rsel = select(maxfd, &readfds, &writefds, &exceptfds, tvp);
 		ADNS_CAPTURE_ERRNO;
 		if (rsel == -1) {
-			if (errno == EINTR) {
+			if (errno == OS_SOCK_EINTR) {
 				if (ads->iflags & adns_if_eintr) {
-					r = EINTR;
+					r = OS_SOCK_EINTR;
 					break;
 				}
 			} else {

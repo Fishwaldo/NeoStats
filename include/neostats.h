@@ -1478,9 +1478,17 @@ EXPORTFUNC void os_free( void *ptr );
 #ifdef WIN32
 #define OS_SOCK_EMSGSIZE                WSAEMSGSIZE
 #define OS_SOCK_EAGAIN                  WSAEPROCLIM
+#define OS_SOCK_ENOBUFS					WSAENOBUFS 
+#define OS_SOCK_EWOULDBLOCK				WSAEWOULDBLOCK
+#define OS_SOCK_EINPROGRESS				WSAEINPROGRESS
+#define OS_SOCK_EINTR					WSAEINTR
 #else
 #define OS_SOCK_EMSGSIZE                EMSGSIZE
 #define OS_SOCK_EAGAIN                  EAGAIN
+#define OS_SOCK_ENOBUFS					ENOBUFS 
+#define OS_SOCK_EWOULDBLOCK				EWOULDBLOCK
+#define OS_SOCK_EINPROGRESS				EINPROGRESS
+#define OS_SOCK_EINTR					EINTR
 #endif
 
 /* 

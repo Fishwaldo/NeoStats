@@ -230,8 +230,8 @@ void adns__querysend_tcp(adns_query qu, struct timeval now)
 		adns__sigpipe_unprotect(qu->ads);
 		if (wr < 0) {
 			if (!
-			    (errno == EAGAIN || errno == EINTR
-			     || errno == ENOSPC || errno == ENOBUFS
+			    (errno == EAGAIN || errno == OS_SOCK_EINTR
+			     || errno == ENOSPC || errno == OS_SOCK_ENOBUFS
 			     || errno == ENOMEM)) {
 				adns__tcp_broken(ads, "write",
 						 strerror(errno));

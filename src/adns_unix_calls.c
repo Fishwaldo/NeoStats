@@ -52,8 +52,3 @@ int adns_writev(int FileDescriptor, const struct iovec * iov, int iovCount)
 	ADNS_CAPTURE_ERRNO;
 	return r;
 }
-
-int adns_getpid()
-{
-	return GetCurrentProcessId();
-}

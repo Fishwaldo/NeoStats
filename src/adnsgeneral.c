@@ -43,14 +43,12 @@ void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
 	const char *bef, *aft;
 	vbuf vb;
 
-	if (!ads->diagfile ||
-	    (!(ads->iflags & adns_if_debug)
+	if (!ads->diagfile || (!(ads->iflags & adns_if_debug)
 	     && (!prevent || (ads->iflags & prevent))))
 		return;
 
 	if (ads->iflags & adns_if_logpid) {
-		fprintf(ads->diagfile, "adns%s [%ld]: ", pfx,
-			(long) getpid());
+		fprintf(ads->diagfile, "adns%s [%ld]: ", pfx, (long) getpid());
 	} else {
 		fprintf(ads->diagfile, "adns%s: ", pfx);
 	}

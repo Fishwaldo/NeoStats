@@ -532,6 +532,7 @@
 #define vsnprintf _vsnprintf
 #include <io.h>
 #define access _access
+#define getpid GetCurrentProcessId
 #include <direct.h>
 //#define S_IWUSR _S_IWRITE
 //#define S_IRUSR _S_IREAD

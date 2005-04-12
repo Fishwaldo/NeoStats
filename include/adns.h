@@ -33,8 +33,6 @@
 #ifndef ADNS_H_INCLUDED
 #define ADNS_H_INCLUDED
 
-#define ADNS_API EXPORTFUNC
-
 #ifdef WIN32
 #if defined (_MSC_VER)
 #pragma warning(disable:4003)
@@ -61,10 +59,6 @@
 #define ADNS_CAPTURE_ERRNO {errno = WSAGetLastError(); WSASetLastError(errno);}
 #define ADNS_CLEAR_ERRNO {WSASetLastError(errno = 0);}
 
-#define ENOBUFS WSAENOBUFS 
-#define EWOULDBLOCK WSAEWOULDBLOCK
-#define EINPROGRESS WSAEINPROGRESS
-#define EMSGSIZE WSAEMSGSIZE
 #define ENOPROTOOPT WSAENOPROTOOPT
 
  /*
@@ -85,11 +79,9 @@ struct iovec
 /* 
  * Undef ADNS_MAP_UNIXAPI in the calling code to use natve calls 
  */
-ADNS_API int adns_writev (int FileDescriptor, const struct iovec * iov, int iovCount);
-ADNS_API int adns_getpid();
+EXPORTFUNC int adns_writev (int FileDescriptor, const struct iovec * iov, int iovCount);
 
 #define writev(FileDescriptor, iov, iovCount) adns_writev(FileDescriptor, iov, iovCount)
-#define getpid() adns_getpid()
 
 /* ---------------- END OF C HEADER -------------- */
 #else
@@ -387,15 +379,12 @@ extern "C" {			/* I really dislike this - iwj. */
  */
 /* this is called when there is a update for a socket */
 typedef void (*fd_update) (int fd, short what);
-ADNS_API void set_fdupdate(adns_state ads, fd_update func);
+EXPORTFUNC void set_fdupdate(adns_state ads, fd_update func);
 
-
-
-
-ADNS_API int adns_init(adns_state *newstate_r, adns_initflags flags,
+EXPORTFUNC int adns_init(adns_state *newstate_r, adns_initflags flags,
 		      FILE * diagfile /*0=>stderr */, fd_update func );
 
-ADNS_API int adns_init_strcfg(adns_state *newstate_r, adns_initflags flags,
+EXPORTFUNC int adns_init_strcfg(adns_state *newstate_r, adns_initflags flags,
 		     FILE *diagfile /*0=>discard*/, const char *configtext);
 
 /* Configuration:
@@ -498,43 +487,36 @@ ADNS_API int adns_init_strcfg(adns_state *newstate_r, adns_initflags flags,
  *   line in resolv.conf.
  */
 
-ADNS_API int adns_synchronous(adns_state ads,
-			     const char *owner,
-			     adns_rrtype type,
-			     adns_queryflags flags,
-			     adns_answer ** answer_r);
+EXPORTFUNC int adns_synchronous(adns_state ads,
+			    const char *owner, adns_rrtype type,
+			    adns_queryflags flags, adns_answer ** answer_r);
 
 /* NB: if you set adns_if_noautosys then _submit and _check do not
  * make any system calls; you must use some of the asynch-io event
  * processing functions to actually get things to happen.
  */
 
-ADNS_API int adns_submit(adns_state ads,
-			const char *owner,
-			adns_rrtype type,
-			adns_queryflags flags,
-		void *context,
-		adns_query *query_r);
+EXPORTFUNC int adns_submit(adns_state ads,
+				const char *owner, adns_rrtype type,
+				adns_queryflags flags, void *context,
+				adns_query *query_r);
 
 /* The owner should be quoted in master file format. */
 
-ADNS_API int adns_check(adns_state ads,
-		       adns_query * query_io,
-	       adns_answer **answer_r,
-	       void **context_r);
+EXPORTFUNC int adns_check(adns_state ads,
+				adns_query * query_io, adns_answer **answer_r,
+				void **context_r);
 
-ADNS_API int adns_wait(adns_state ads,
-		      adns_query * query_io,
-	      adns_answer **answer_r,
-	      void **context_r);
+EXPORTFUNC int adns_wait(adns_state ads,
+				adns_query * query_io, adns_answer **answer_r,
+				void **context_r);
 
 /* same as adns_wait but uses poll(2) internally */
-ADNS_API int adns_wait_poll(adns_state ads,
-			   adns_query * query_io,
-		   adns_answer **answer_r,
-		   void **context_r);
+EXPORTFUNC int adns_wait_poll(adns_state ads,
+				adns_query * query_io, adns_answer **answer_r,
+				void **context_r);
 
-ADNS_API void adns_cancel(adns_query query);
+EXPORTFUNC void adns_cancel(adns_query query);
 
 /* The adns_query you get back from _submit is valid (ie, can be
  * legitimately passed into adns functions) until it is returned by
@@ -548,37 +530,32 @@ ADNS_API void adns_cancel(adns_query query);
  * query type.
  */
 
-ADNS_API int adns_submit_reverse(adns_state ads,
-				const struct sockaddr *addr,
-				adns_rrtype type,
-				adns_queryflags flags,
-			void *context,
-			adns_query *query_r);
+EXPORTFUNC int adns_submit_reverse(adns_state ads,
+				const struct sockaddr *addr, adns_rrtype type,
+				adns_queryflags flags, void *context,
+				adns_query *query_r);
 /* type must be _r_ptr or _r_ptr_raw.  _qf_search is ignored.
  * addr->sa_family must be AF_INET or you get ENOSYS.
  */
 
-ADNS_API int adns_submit_reverse_any(adns_state ads,
-				    const struct sockaddr *addr,
-				    const char *rzone,
-				    adns_rrtype type,
-				    adns_queryflags flags,
-			    void *context,
-			    adns_query *query_r);
+EXPORTFUNC int adns_submit_reverse_any(adns_state ads,
+				const struct sockaddr *addr, const char *rzone,
+				adns_rrtype type, adns_queryflags flags,
+			    void *context, adns_query *query_r);
 /* For RBL-style reverse `zone's; look up
  *   <reversed-address>.<zone>
  * Any type is allowed.  _qf_search is ignored.
  * addr->sa_family must be AF_INET or you get ENOSYS.
  */
 
-ADNS_API void adns_finish(adns_state ads);
+EXPORTFUNC void adns_finish(adns_state ads);
 /* You may call this even if you have queries outstanding;
  * they will be cancelled.
  */
 
 
-ADNS_API void adns_forallqueries_begin(adns_state ads);
-ADNS_API adns_query adns_forallqueries_next(adns_state ads, void **context_r);
+EXPORTFUNC void adns_forallqueries_begin(adns_state ads);
+EXPORTFUNC adns_query adns_forallqueries_next(adns_state ads, void **context_r);
 /* Iterator functions, which you can use to loop over the outstanding
  * (submitted but not yet successfuly checked/waited) queries.
  *
@@ -594,7 +571,7 @@ ADNS_API adns_query adns_forallqueries_next(adns_state ads, void **context_r);
  * context_r may be 0.  *context_r may not be set when _next returns 0.
  */
 
-ADNS_API  void adns_checkconsistency(adns_state ads, adns_query qu);
+EXPORTFUNC  void adns_checkconsistency(adns_state ads, adns_query qu);
 /* Checks the consistency of adns's internal data structures.
  * If any error is found, the program will abort().
  * You may pass 0 for qu; if you pass non-null then additional checks
@@ -626,16 +603,16 @@ ADNS_API  void adns_checkconsistency(adns_state ads, adns_query qu);
  * blocking, or you may not have an up-to-date list of it's fds.
  */
 
-ADNS_API int adns_processany(adns_state ads);
+EXPORTFUNC int adns_processany(adns_state ads);
 /* Gives adns flow-of-control for a bit.  This will never block, and
  * can be used with any threading/asynch-io model.  If some error
  * occurred which might cause an event loop to spin then the errno
  * value is returned.
  */
 
-ADNS_API int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now);
-ADNS_API int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *now);
-ADNS_API int adns_processexceptional(adns_state ads, OS_SOCKET fd, const struct timeval *now);
+EXPORTFUNC int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now);
+EXPORTFUNC int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *now);
+EXPORTFUNC int adns_processexceptional(adns_state ads, OS_SOCKET fd, const struct timeval *now);
 /* Gives adns flow-of-control so that it can process incoming data
  * from, or send outgoing data via, fd.  Very like _processany.  If it
  * returns zero then fd will no longer be readable or writeable
@@ -654,7 +631,7 @@ ADNS_API int adns_processexceptional(adns_state ads, OS_SOCKET fd, const struct 
  * then the errno value is returned.
  */
 
-ADNS_API void adns_processtimeouts(adns_state ads, const struct timeval *now);
+EXPORTFUNC void adns_processtimeouts(adns_state ads, const struct timeval *now);
 /* Gives adns flow-of-control so that it can process any timeouts
  * which might have happened.  Very like _processreadable/writeable.
  *
@@ -662,7 +639,7 @@ ADNS_API void adns_processtimeouts(adns_state ads, const struct timeval *now);
  * obtained from gettimeofday.
  */
 
-ADNS_API void adns_firsttimeout(adns_state ads,
+EXPORTFUNC void adns_firsttimeout(adns_state ads,
 		       struct timeval **tv_mod, struct timeval *tv_buf,
 		       struct timeval now);
 /* Asks adns when it would first like the opportunity to time
@@ -681,7 +658,7 @@ ADNS_API void adns_firsttimeout(adns_state ads,
  * is using.  It always succeeds and never blocks.
  */
 
-ADNS_API void adns_globalsystemfailure(adns_state ads);
+EXPORTFUNC void adns_globalsystemfailure(adns_state ads);
 /* If serious problem(s) happen which globally affect your ability to
  * interact properly with adns, or adns's ability to function
  * properly, you or adns can call this function.
@@ -700,7 +677,7 @@ ADNS_API void adns_globalsystemfailure(adns_state ads);
  * Entrypoints for select-loop based asynch io:
  */
 
-ADNS_API void adns_beforeselect(adns_state ads, int *maxfd, fd_set *readfds,
+EXPORTFUNC void adns_beforeselect(adns_state ads, int *maxfd, fd_set *readfds,
 		       fd_set *writefds, fd_set *exceptfds,
 		       struct timeval **tv_mod, struct timeval *tv_buf,
 			       const struct timeval *now);
@@ -716,9 +693,8 @@ ADNS_API void adns_beforeselect(adns_state ads, int *maxfd, fd_set *readfds,
  * finishes in _beforeselect.
  */
 
-ADNS_API void adns_afterselect(adns_state ads, int maxfd, const fd_set *readfds,
-		      const fd_set *writefds, const fd_set *exceptfds,
-			      const struct timeval *now);
+EXPORTFUNC void adns_afterselect(adns_state ads, int maxfd, const fd_set *readfds,
+		      const fd_set *writefds, const fd_set *exceptfds, const struct timeval *now);
 /* Gives adns flow-of-control for a bit; intended for use after
  * select.  This is just a fancy way of calling adns_processreadable/
  * writeable/timeouts as appropriate, as if select had returned the
@@ -743,14 +719,14 @@ ADNS_API void adns_afterselect(adns_state ads, int maxfd, const fd_set *readfds,
  * Entrypoints for poll-loop based asynch io:
  */
 
-	struct pollfd;
+struct pollfd;
 /* In case your system doesn't have it or you forgot to include
  * <sys/poll.h>, to stop the following declarations from causing
  * problems.  If your system doesn't have poll then the following
  * entrypoints will not be defined in libadns.  Sorry !
  */
 
-ADNS_API int adns_beforepoll(adns_state ads, struct pollfd *fds, int *nfds_io, int *timeout_io,
+EXPORTFUNC int adns_beforepoll(adns_state ads, struct pollfd *fds, int *nfds_io, int *timeout_io,
 			    const struct timeval *now);
 /* Finds out which fd's adns is interested in, and when it would like
  * to be able to time things out.  This is in a form suitable for use
@@ -802,7 +778,7 @@ ADNS_API int adns_beforepoll(adns_state ads, struct pollfd *fds, int *nfds_io, i
  * require more space than this.
  */
 
-ADNS_API void adns_afterpoll(adns_state ads, const struct pollfd *fds, int nfds,
+EXPORTFUNC void adns_afterpoll(adns_state ads, const struct pollfd *fds, int nfds,
 		    const struct timeval *now);
 /* Gives adns flow-of-control for a bit; intended for use after
  * poll(2).  fds and nfds should be the results from poll().  pollfd
@@ -810,10 +786,9 @@ ADNS_API void adns_afterpoll(adns_state ads, const struct pollfd *fds, int nfds,
  */
 
 
-ADNS_API adns_status adns_rr_info(adns_rrtype type,
+EXPORTFUNC adns_status adns_rr_info(adns_rrtype type,
 			 const char **rrtname_r, const char **fmtname_r,
-			 int *len_r,
-				 const void *datap, char **data_r);
+			 int *len_r, const void *datap, char **data_r);
 /*
  * Get information about a query type, or convert reply data to a
  * textual form.  type must be specified, and the official name of the
@@ -870,9 +845,9 @@ ADNS_API adns_status adns_rr_info(adns_rrtype type,
  *  dns2.spong.dyn.ml.org timeout "DNS query timed out" ?
  */
 
-ADNS_API const char *adns_strerror(adns_status st);
-ADNS_API const char *adns_errabbrev(adns_status st);
-ADNS_API const char *adns_errtypeabbrev(adns_status st);
+EXPORTFUNC const char *adns_strerror(adns_status st);
+EXPORTFUNC const char *adns_errabbrev(adns_status st);
+EXPORTFUNC const char *adns_errtypeabbrev(adns_status st);
 /* Like strerror but for adns_status values.  adns_errabbrev returns
  * the abbreviation of the error - eg, for adns_s_timeout it returns
  * "timeout".  adns_errtypeabbrev returns the abbreviation of the
