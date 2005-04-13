@@ -61,28 +61,6 @@
 
 #define ENOPROTOOPT WSAENOPROTOOPT
 
- /*
-  * UNIX system API for Win32
-  * The following is a quick and dirty implementation of
-  * some UNIX API calls in Win32. 
-  * They are used in the dll, but if your project have
-  * it's own implementation of these system calls, simply
-  * undefine ADNS_MAP_UNIXAPI.
-  */
-
-struct iovec 
-{
-    char  *iov_base;
-    int  iov_len; 
-};
-
-/* 
- * Undef ADNS_MAP_UNIXAPI in the calling code to use natve calls 
- */
-EXPORTFUNC int adns_writev (int FileDescriptor, const struct iovec * iov, int iovCount);
-
-#define writev(FileDescriptor, iov, iovCount) adns_writev(FileDescriptor, iov, iovCount)
-
 /* ---------------- END OF C HEADER -------------- */
 #else
 # define adns_socket_read(sck, data, len) read(sck, data, len)

@@ -454,7 +454,6 @@ modules/textserv/textserv.vcproj -text
 /neostatslibs.sln -text
 src/Makefile.am -text
 src/Makefile.in -text
-src/adns_unix_calls.c -text
 src/adnscheck.c -text
 src/adnsevent.c -text
 src/adnsgeneral.c -text
