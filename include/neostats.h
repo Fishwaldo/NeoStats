@@ -1465,6 +1465,7 @@ EXPORTFUNC int os_sock_close( OS_SOCKET sock );
 EXPORTFUNC int os_sock_write( OS_SOCKET s, const char *buf, int len );
 EXPORTFUNC int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen );
 EXPORTFUNC int os_sock_read( OS_SOCKET s, char *buf, int len );
+EXPORTFUNC int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int* fromlen );
 EXPORTFUNC int os_sock_set_nonblocking( OS_SOCKET s );
 EXPORTFUNC int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen );
 EXPORTFUNC OS_SOCKET os_sock_socket( int socket_family, int socket_type, int protocol );

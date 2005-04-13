@@ -226,7 +226,7 @@ void adns__querysend_tcp(adns_query qu, struct timeval now)
 		buf = (char *)ns_malloc((2 + qu->query_dglen));
 		os_memcpy(buf, length, 2);
 		os_memcpy((buf + 2), qu->query_dgram, qu->query_dglen);
-		wr = os_sock_write(qu->ads->tcpsocket, buf, (2 + qu->query_dglen), 0);
+		wr = os_sock_write(qu->ads->tcpsocket, buf, (2 + qu->query_dglen));
 		errno = os_sock_errno;
 		ns_free(buf);
 #else
