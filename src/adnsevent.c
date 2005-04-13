@@ -37,12 +37,6 @@
 #endif
 #include "adnstvarith.h"
 
-/* socket monitoring managemnet */
-void set_fdupdate(adns_state ads, fd_update myfdfunc) 
-{
-    ads->fdfunc = myfdfunc;
-}
-
 /* TCP connection management. */
 
 static void tcp_close(adns_state ads)
@@ -65,8 +59,7 @@ void adns__tcp_broken(adns_state ads, const char *what, const char *why)
 	int serv;
 	adns_query qu;
 
-	assert(ads->tcpstate == server_connecting
-	       || ads->tcpstate == server_ok);
+	assert(ads->tcpstate == server_connecting || ads->tcpstate == server_ok);
 	serv = ads->tcpserver;
 	if (what)
 		adns__warn(ads, serv, 0, "TCP connection failed: %s: %s", what, why);
@@ -131,7 +124,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 			adns__diag(ads,-1,0,"unable to find protocol no. for TCP !"); 
 			return; 
 		}
-		fd = os_sock_socket(AF_INET, SOCK_STREAM, proto->p_proto);
+		fd = os_sock_socket( AF_INET, SOCK_STREAM, proto->p_proto );
 		if( fd < 0 ) 
 		{
 			adns__diag( ads, -1, 0, "cannot create TCP socket: %s", os_sock_getlasterrorstring() );
@@ -147,9 +140,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(DNS_PORT);
 		addr.sin_addr = ads->servers[ads->tcpserver].addr;
-		ADNS_CLEAR_ERRNO;
-		r= connect(fd,(const struct sockaddr*)&addr,sizeof(addr));
-		ADNS_CAPTURE_ERRNO;
+		r = os_sock_connect( fd, ( const struct sockaddr* ) &addr, sizeof( addr ) );
 		ads->tcpsocket = fd;
 		ads->tcpstate = server_connecting;
 		if (r == 0) 
@@ -157,7 +148,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 			tcp_connected(ads, now);
 			return;
 		}
-		if (errno == OS_SOCK_EWOULDBLOCK || errno == OS_SOCK_EINPROGRESS) 
+		if( os_sock_errno == OS_SOCK_EWOULDBLOCK && os_sock_errno == OS_SOCK_EINPROGRESS )
 		{
 			ads->tcptimeout = now;
 			/* EVNT addsock write */
@@ -166,7 +157,7 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 			timevaladd(&ads->tcptimeout, TCPCONNMS);
 			return;
 		}
-		adns__tcp_broken(ads, "connect", strerror(errno));
+		adns__tcp_broken( ads, "connect", os_sock_getlasterrorstring() );
 		ads->tcpstate = server_disconnected;
 	}
 }

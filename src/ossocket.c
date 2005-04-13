@@ -29,9 +29,18 @@
 #include <fcntl.h> 
 #endif
 
+/* local errno implementation */
+int os_sock_errno = 0;
+
 #ifdef WIN32
-char *WinSockErrToString( int errno )
+#define OS_SOCK_SET_ERRNO()	os_sock_errno = WSAGetLastError();
+#else /* WIN32 */
+#define OS_SOCK_SET_ERRNO() os_sock_errno = errno;
+#endif /* WIN32 */
+
+char *os_sock_strerror( const int sockerrno )
 {
+#ifdef WIN32
 	switch( errno )
 	{
 		case WSAEINTR:
@@ -263,11 +272,10 @@ char *WinSockErrToString( int errno )
 			break;
 	}
 	return "No Error";
-}
+#else /* WIN32 */
+	return strerror( sockerrno );
 #endif /* WIN32 */
-
-/* local errno implementation */
-int os_sock_errno = 0;
+}
 
 /*
  *  Wrapper function for sock_close
@@ -294,19 +302,14 @@ int os_sock_write( OS_SOCKET s, const char* buf, int len )
 	os_sock_errno = 0;
 #ifdef WIN32
 	ret = send( s, buf, len, 0 );
-	if( ret == SOCKET_ERROR )
-	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_ERROR, "os_sock_write: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
-	}
 #else
 	ret = write( s, buf, len );
-	if( ret < 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_ERROR, "os_sock_write: failed for socket %d with error %s", s, strerror( errno ) );
-	}
 #endif
+	if( ret == SOCKET_ERROR )
+	{
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_ERROR, "os_sock_write: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
+	}
 	return ret;
 }
 
@@ -321,19 +324,11 @@ int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const stru
 	/* reset local errno implementation */
 	os_sock_errno = 0;
 	ret = sendto( s, buf, len, flags, to, tolen );
-#ifdef WIN32
 	if( ret == SOCKET_ERROR )
 	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_ERROR, "os_sock_sendto: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_ERROR, "os_sock_sendto: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
 	}
-#else
-	if( ret < 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_ERROR, "os_sock_sendto: failed for socket %d with error %s", s, strerror( errno ) );
-	}
-#endif
 	return ret;
 }
 
@@ -349,19 +344,14 @@ int os_sock_read( OS_SOCKET s, char* buf, int len )
 	os_sock_errno = 0;
 #ifdef WIN32
 	ret = recv( s, buf, len, 0 );
-	if( ret == SOCKET_ERROR )
-	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
-	}
 #else
 	ret = read( s, buf, len );
-	if( ret < 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %s", s, strerror( errno ) );
-	}
 #endif
+	if( ret == SOCKET_ERROR )
+	{
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
+	}
 	return ret;
 }
 
@@ -376,19 +366,11 @@ int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockadd
 	/* reset local errno implementation */
 	os_sock_errno = 0;
 	ret = recvfrom( s, buf, len, flags, from, fromlen );
-#ifdef WIN32
 	if( ret == SOCKET_ERROR )
 	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_ERROR, "os_sock_recvfrom: failed for socket %d with error %d %s", s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_ERROR, "os_sock_recvfrom: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
 	}
-#else
-	if( ret < 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_ERROR, "os_sock_recvfrom: failed for socket %d with error %s", s, strerror( errno ) );
-	}
-#endif
 	return ret;
 }
 
@@ -406,21 +388,16 @@ int os_sock_set_nonblocking( OS_SOCKET s )
 #ifdef WIN32
 	flags = 1;
 	ret = ioctlsocket( s, FIONBIO, &flags );
-	if( ret == SOCKET_ERROR )
-	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_ERROR, "os_sock_set_nonblocking: unable to set socket %d for %s non-blocking %d %s", s, GET_CUR_MODNAME(), os_sock_errno, WinSockErrToString( os_sock_errno ) );
-	}
 #else
 	flags = fcntl( s, F_GETFL, 0 );
 	flags |= O_NONBLOCK;
 	ret = fcntl( s, F_SETFL, flags );
-	if( ret < 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_CRITICAL, "os_sock_set_nonblocking: unable to set socket %d for %s non-blocking: %s", s, GET_CUR_MODNAME(), strerror( os_sock_errno ) );
-	}
 #endif
+	if( ret == SOCKET_ERROR )
+	{
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_ERROR, "os_sock_set_nonblocking: unable to set socket %d for %s non-blocking %s", s, GET_CUR_MODNAME(), os_sock_strerror( os_sock_errno ) );
+	}
 	return ret;
 }
 
@@ -435,35 +412,19 @@ int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen )
 	/* reset local errno implementation */
 	os_sock_errno = 0;
 	ret = connect( s, name, namelen );
-#ifdef WIN32
-	/*  For nonblocking sockets, connection attempts cannot be completed 
-	 *	immediately. connect will return SOCKET_ERROR, and WSAGetLastError 
-	 *	will return WSAEWOULDBLOCK.
-	 */
 	if( ret == SOCKET_ERROR )
 	{
-		os_sock_errno = WSAGetLastError();
+		OS_SOCK_SET_ERRNO();
 		switch( os_sock_errno )
 		{
-			case WSAEWOULDBLOCK:
-			case WSAEINPROGRESS:
-				return 0;
-		}
-		nlog( LOG_ERROR, "os_sock_connect: %s failed for socket %d with error %d %s", GET_CUR_MODNAME(), s, os_sock_errno, WinSockErrToString( os_sock_errno ) );
-	}
-#else
-	if( ret != 0 )
-	{
-		os_sock_errno = errno;
-		switch( os_sock_errno )
-		{
-			case EINPROGRESS:
-			case EWOULDBLOCK:
-				return 0;
+			case OS_SOCK_EWOULDBLOCK:
+			case OS_SOCK_EINPROGRESS:
+				/* don't log */
+				break;
+			default:
+				nlog( LOG_ERROR, "os_sock_connect: %s failed for socket %d with error %s", GET_CUR_MODNAME(), s, os_sock_strerror( os_sock_errno ) );
 		}	
-		nlog( LOG_ERROR, "os_sock_connect: %s failed for socket %d with error %s", GET_CUR_MODNAME(), s, strerror( errno ) );
 	}
-#endif
 	return ret;
 }
 
@@ -478,19 +439,11 @@ OS_SOCKET os_sock_socket(int socket_family, int socket_type, int protocol )
 	/* reset local errno implementation */
 	os_sock_errno = 0;
 	s = socket( socket_family, socket_type, protocol );
-#ifdef WIN32
 	if( s == INVALID_SOCKET )
 	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_ERROR, "os_sock_socket: %s failed with error %d %s", GET_CUR_MODNAME(), os_sock_errno, WinSockErrToString( os_sock_errno ) );
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_ERROR, "os_sock_socket: %s failed with error %s", GET_CUR_MODNAME(), os_sock_strerror( os_sock_errno ) );
 	}
-#else
-	if( s < 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_ERROR, "os_sock_socket: %s failed with error %s", GET_CUR_MODNAME(), strerror( errno ) );
-	}
-#endif
 	return s;
 }
 
@@ -505,19 +458,11 @@ int os_sock_bind( OS_SOCKET s, const struct sockaddr* name, int namelen )
 	/* reset local errno implementation */
 	os_sock_errno = 0;
 	ret = bind( s, name, namelen );
-#ifdef WIN32
 	if( ret == SOCKET_ERROR )
 	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_WARNING, "os_sock_bind: Unable to bind to IP address %d %s", os_sock_errno, WinSockErrToString( os_sock_errno ) );
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_WARNING, "os_sock_bind: Unable to bind to IP address %s", os_sock_strerror( os_sock_errno ) );
 	}
-#else
-	if( ret != 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_WARNING, "os_sock_bind: Unable to bind to IP address %s", strerror( errno ) );
-	}
-#endif
 	return ret;
 }
 
@@ -532,19 +477,11 @@ int os_sock_listen( OS_SOCKET s, int backlog )
 	/* reset local errno implementation */
 	os_sock_errno = 0;
 	ret = listen( s, backlog );
-#ifdef WIN32
 	if( ret == SOCKET_ERROR )
 	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_WARNING, "os_sock_listen: Unable to listen %d %s", os_sock_errno, WinSockErrToString( os_sock_errno ) );
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_WARNING, "os_sock_listen: Unable to listen %s", os_sock_strerror( os_sock_errno ) );
 	}
-#else
-	if( ret != 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_WARNING, "os_sock_listen: Unable to listen %s", strerror( errno ) );
-	}
-#endif
 	return ret;
 }
 
@@ -559,19 +496,11 @@ int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval,
 	/* reset local errno implementation */
 	os_sock_errno = 0;
 	ret = setsockopt( s, level, optname, optval, optlen );
-#ifdef WIN32
 	if( ret == SOCKET_ERROR )
 	{
-		os_sock_errno = WSAGetLastError();
-		nlog( LOG_WARNING, "setsockopt: failed %d %s", os_sock_errno, WinSockErrToString( os_sock_errno ) );
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_WARNING, "setsockopt: failed %s", os_sock_strerror( os_sock_errno ) );
 	}
-#else
-	if( ret != 0 )
-	{
-		os_sock_errno = errno;
-		nlog( LOG_WARNING, "setsockopt: failed %s", strerror( errno ) );
-	}
-#endif
 	return ret;	
 }
 
@@ -594,9 +523,5 @@ int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
 
 char *os_sock_getlasterrorstring( void )
 {
-#ifdef WIN32
-	return WinSockErrToString( WSAGetLastError() );
-#else
-	return strerror( errno );
-#endif
+	return os_sock_strerror( os_sock_errno );
 }

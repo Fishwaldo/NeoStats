@@ -602,28 +602,31 @@ static int init_finish(adns_state ads)
 	proto = getprotobyname("udp");
 	if (!proto) {
 		r = ENOPROTOOPT;
-		goto x_free;
 	}
-	ADNS_CLEAR_ERRNO;
-	ads->udpsocket = socket(AF_INET, SOCK_DGRAM, proto->p_proto);
-	ADNS_CAPTURE_ERRNO;
-	if (ads->udpsocket < 0) {
-		r = errno;
-		goto x_free;
-	}
-
-	if( os_sock_set_nonblocking( ads->udpsocket ) < 0 )
+	else
 	{
-		r = errno;
-		os_sock_close(ads->udpsocket);
-		goto x_free;
+		ads->udpsocket = os_sock_socket(AF_INET, SOCK_DGRAM, proto->p_proto);
+		if (ads->udpsocket < 0) 
+		{
+			r = os_sock_errno;
+		}
+		else 
+		{
+			if( os_sock_set_nonblocking( ads->udpsocket ) < 0 )
+			{
+				r = os_sock_errno;
+				os_sock_close(ads->udpsocket);
+			}
+			else
+			{
+				if (ads->fdfunc)
+					ads->fdfunc(ads->udpsocket, POLLIN);
+				/* EVNT read */
+				return 0;
+			}
+		}
 	}
-    if (ads->fdfunc)
-		ads->fdfunc(ads->udpsocket, POLLIN);
-	/* EVNT read */
-	return 0;
 	
-x_free:
 	ns_free(ads);
 	return r;
 }

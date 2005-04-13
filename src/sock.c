@@ -274,8 +274,11 @@ OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port )
 	os_sock_setsockopt( s, SOL_SOCKET, SO_REUSEADDR, (char *)&flags, sizeof( flags ) );
 	if( os_sock_connect( s, ( struct sockaddr * ) &sa, sizeof( sa ) ) != 0 ) 
 	{
-		os_sock_close (s);
-		return NS_FAILURE;
+		if( os_sock_errno != OS_SOCK_EWOULDBLOCK && os_sock_errno != OS_SOCK_EINPROGRESS )
+		{
+			os_sock_close (s);
+			return NS_FAILURE;
+		}
 	}
 	return s;
 }

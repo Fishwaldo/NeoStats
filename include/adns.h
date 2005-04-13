@@ -357,7 +357,6 @@ extern "C" {			/* I really dislike this - iwj. */
  */
 /* this is called when there is a update for a socket */
 typedef void (*fd_update) (int fd, short what);
-EXPORTFUNC void set_fdupdate(adns_state ads, fd_update func);
 
 EXPORTFUNC int adns_init(adns_state *newstate_r, adns_initflags flags,
 		      FILE * diagfile /*0=>stderr */, fd_update func );
