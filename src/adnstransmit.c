@@ -226,9 +226,8 @@ void adns__querysend_tcp(adns_query qu, struct timeval now)
 		buf = (char *)ns_malloc((2 + qu->query_dglen));
 		os_memcpy(buf, length, 2);
 		os_memcpy((buf + 2), qu->query_dgram, qu->query_dglen);
-		ADNS_CLEAR_ERRNO;
-		wr = send(qu->ads->tcpsocket, buf, (2 + qu->query_dglen), 0);
-		ADNS_CAPTURE_ERRNO;
+		wr = os_sock_write(qu->ads->tcpsocket, buf, (2 + qu->query_dglen), 0);
+		errno = os_sock_errno;
 		ns_free(buf);
 #else
 		iov[0].iov_base = length;
@@ -236,10 +235,8 @@ void adns__querysend_tcp(adns_query qu, struct timeval now)
 		iov[1].iov_base = qu->query_dgram;
 		iov[1].iov_len = qu->query_dglen;
 		adns__sigpipe_protect(qu->ads);
-		ADNS_CLEAR_ERRNO;
 		wr = writev(qu->ads->tcpsocket, iov, 2);
 #endif
-		ADNS_CAPTURE_ERRNO;
 		adns__sigpipe_unprotect(qu->ads);
 		if (wr < 0) {
 			if (!

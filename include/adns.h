@@ -49,9 +49,6 @@
 #include <malloc.h>
 #endif /* HAVE_MALLOC_H */
 
-#define adns_socket_read(sck, data, len) recv(sck, (char *)data, len, 0)
-#define adns_socket_write(sck, data, len) send(sck, (char *)data, len, 0)
-
 /* Win32 does not set errno on Winsock errors(!) 
  * We have to map the winsock errors to errno manually
  * in order to support the original UNIX error hadnlig
@@ -63,8 +60,6 @@
 
 /* ---------------- END OF C HEADER -------------- */
 #else
-# define adns_socket_read(sck, data, len) read(sck, data, len)
-# define adns_socket_write(sck, data, len) write(sck, data, len)
 # define ADNS_CAPTURE_ERRNO {}
 # define ADNS_CLEAR_ERRNO {}
 #endif

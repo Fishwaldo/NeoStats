@@ -450,29 +450,25 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 				assert(ads->tcprecv.used <= ads->tcprecv.avail);
 				if (ads->tcprecv.used == ads->tcprecv.avail)
 					continue;
-				r = adns_socket_read(ads->tcpsocket,
+				r = os_sock_read(ads->tcpsocket,
 					ads->tcprecv.buf + ads->tcprecv.used,
 					ads->tcprecv.avail - ads->tcprecv.used);
-				ADNS_CAPTURE_ERRNO;
 				if (r > 0) {
 					ads->tcprecv.used += r;
 				} else {
 					if (r) {
-						if (errno == EAGAIN
-							|| errno == OS_SOCK_EWOULDBLOCK) {
+						if (os_sock_errno == EAGAIN || os_sock_errno == OS_SOCK_EWOULDBLOCK) {
 							r = 0;
 							goto xit;
 						}
-						if (errno == OS_SOCK_EINTR)
+						if (os_sock_errno == OS_SOCK_EINTR)
 							continue;
-						if (errno_resources(errno)) {
-							r = errno;
+						if (errno_resources(os_sock_errno)) {
+							r = os_sock_errno;
 							goto xit;
 						}
 					}
-					adns__tcp_broken(ads, "read",
-							r ? strerror(errno) :
-							"closed");
+					adns__tcp_broken(ads, "read", r ? os_sock_getlasterrorstring() : "closed");
 				}
 			} while (ads->tcpstate == server_ok);
 			r = 0;
@@ -483,25 +479,21 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 	if (fd == ads->udpsocket) {
 		for (;;) {
 			udpaddrlen = sizeof(udpaddr);
-			ADNS_CLEAR_ERRNO;
-			r= recvfrom(ads->udpsocket,udpbuf,sizeof(udpbuf),0,
-				(struct sockaddr*)&udpaddr,&udpaddrlen);
-			ADNS_CAPTURE_ERRNO;
+			r = os_sock_recvfrom( ads->udpsocket, udpbuf, sizeof( udpbuf ), 0,
+				( struct sockaddr* ) &udpaddr, &udpaddrlen );
 			if (r < 0) {
-				if (errno == EAGAIN
-				    || errno == OS_SOCK_EWOULDBLOCK) {
+				if (os_sock_errno == EAGAIN || os_sock_errno == OS_SOCK_EWOULDBLOCK) 
+				{
 					r = 0;
 					goto xit;
 				}
-				if (errno == OS_SOCK_EINTR)
+				if (os_sock_errno == OS_SOCK_EINTR)
 					continue;
-				if (errno_resources(errno)) {
-					r = errno;
+				if (errno_resources(os_sock_errno)) {
+					r = os_sock_errno;
 					goto xit;
 				}
-				adns__warn(ads, -1, 0,
-					   "datagram receive error: %s",
-					   strerror(errno));
+				adns__warn(ads, -1, 0, "datagram receive error: %s", os_sock_getlasterrorstring() );
 				r = 0;
 				goto xit;
 			}
@@ -541,7 +533,7 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 		}
 	}
 	r = 0;
-      xit:
+xit:
 	adns__consistency(ads, 0, cc_entex);
 	return r;
 }
@@ -562,29 +554,29 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *no
 		assert(ads->tcprecv.used == 0);
 		assert(ads->tcprecv_skip == 0);
 		for (;;) {
-			if (!adns__vbuf_ensure(&ads->tcprecv,1)) { r= ENOMEM; goto xit; }
-			ADNS_CLEAR_ERRNO;
-			r = adns_socket_read(ads->tcpsocket, &ads->tcprecv.buf, 1);
-			ADNS_CAPTURE_ERRNO;
-			if (r==0 || (r<0 && (errno==EAGAIN || errno==OS_SOCK_EWOULDBLOCK))) {
+			if (!adns__vbuf_ensure(&ads->tcprecv,1))
+			{ 
+				r= ENOMEM; 
+				goto xit; 
+			}
+			r = os_sock_read(ads->tcpsocket, &ads->tcprecv.buf, 1);
+			if (r==0 || (r<0 && (os_sock_errno==EAGAIN || os_sock_errno==OS_SOCK_EWOULDBLOCK))) {
 				tcp_connected(ads, *now);
 				r = 0;
 				goto xit;
 			}
 			if (r > 0) {
-				adns__tcp_broken(ads, "connect/read",
-						 "sent data before first request");
+				adns__tcp_broken(ads, "connect/read", "sent data before first request");
 				r = 0;
 				goto xit;
 			}
-			if (errno == OS_SOCK_EINTR)
+			if (os_sock_errno == OS_SOCK_EINTR)
 				continue;
-			if (errno_resources(errno)) {
-				r = errno;
+			if (errno_resources(os_sock_errno)) {
+				r = os_sock_errno;
 				goto xit;
 			}
-			adns__tcp_broken(ads, "connect/read",
-					 strerror(errno));
+			adns__tcp_broken( ads, "connect/read", os_sock_getlasterrorstring() );
 			r = 0;
 			goto xit;
 		}		/* not reached */
@@ -593,24 +585,22 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *no
 			break;
 		while (ads->tcpsend.used) {
 			adns__sigpipe_protect(ads);
-			ADNS_CLEAR_ERRNO;
-			r= adns_socket_write(ads->tcpsocket,ads->tcpsend.buf,ads->tcpsend.used);
-			ADNS_CAPTURE_ERRNO;
+			r = os_sock_write(ads->tcpsocket,ads->tcpsend.buf,ads->tcpsend.used);
 			adns__sigpipe_unprotect(ads);
 			if (r < 0) {
-				if (errno == OS_SOCK_EINTR)
+				if (os_sock_errno == OS_SOCK_EINTR)
 					continue;
-				if (errno == EAGAIN
-				    || errno == OS_SOCK_EWOULDBLOCK) {
+				if (os_sock_errno == EAGAIN || os_sock_errno == OS_SOCK_EWOULDBLOCK) 
+				{
 					r = 0;
 					goto xit;
 				}
-				if (errno_resources(errno)) {
-					r = errno;
+				if (errno_resources(os_sock_errno)) 
+				{
+					r = os_sock_errno;
 					goto xit;
 				}
-				adns__tcp_broken(ads, "write",
-						 strerror(errno));
+				adns__tcp_broken( ads, "write", os_sock_getlasterrorstring() );
 				r = 0;
 				goto xit;
 			} else if (r > 0) {
@@ -670,9 +660,7 @@ static void fd_event(adns_state ads, OS_SOCKET fd,
 		if (r_r) {
 			*r_r = r;
 		} else {
-			adns__diag(ads, -1, 0,
-				   "process fd failed after select: %s",
-				   strerror(errno));
+			adns__diag(ads, -1, 0, "process fd failed after select: %s", strerror(errno));
 			adns_globalsystemfailure(ads);
 		}
 	}
