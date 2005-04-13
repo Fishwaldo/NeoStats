@@ -64,7 +64,7 @@ gettimeofday (struct timeval *tp, void *nothing)
   tp->tv_sec = Sec;
   tp->tv_usec = Usec;
 #endif
-  return 1;
+  return 0;
 }
 #define HAVE_GETTIMEOFDAY
 #endif
