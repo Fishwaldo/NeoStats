@@ -559,7 +559,7 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *no
 				r= ENOMEM; 
 				goto xit; 
 			}
-			r = os_sock_read(ads->tcpsocket, ads->tcprecv.buf, 1);
+			r = os_sock_read(ads->tcpsocket, &ads->tcprecv.buf, 1);
 			if (r==0 || (r<0 && (os_sock_errno==EAGAIN || os_sock_errno==OS_SOCK_EWOULDBLOCK))) {
 				tcp_connected(ads, *now);
 				r = 0;
