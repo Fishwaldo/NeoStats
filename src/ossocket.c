@@ -41,8 +41,12 @@ int os_sock_errno = 0;
 char *os_sock_strerror( const int sockerrno )
 {
 #ifdef WIN32
-	switch( errno )
+	static char unknown[256];
+
+	switch( sockerrno )
 	{
+		case 0:
+			return "No Error";
 		case WSAEINTR:
 			/* 10004 */
 			return "Interrupted function call.";
@@ -271,14 +275,24 @@ char *os_sock_strerror( const int sockerrno )
 		default:
 			break;
 	}
-	return "No Error";
+	sprintf( unknown, "Unknown error %d", sockerrno );
+	return unknown;
 #else /* WIN32 */
 	return strerror( sockerrno );
 #endif /* WIN32 */
 }
 
 /*
- *  Wrapper function for sock_close
+ *  
+ */
+
+char *os_sock_getlasterrorstring( void )
+{
+	return os_sock_strerror( os_sock_errno );
+}
+
+/*
+ *  Wrapper function for close
  */
 
 int os_sock_close( OS_SOCKET sock )
@@ -291,7 +305,7 @@ int os_sock_close( OS_SOCKET sock )
 }
 
 /*
- *  Wrapper function for sock_write
+ *  Wrapper function for write
  */
 
 int os_sock_write( OS_SOCKET s, const char* buf, int len )
@@ -333,7 +347,7 @@ int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const stru
 }
 
 /*
- *  Wrapper function for sock_read
+ *  Wrapper function for read
  */
 
 int os_sock_read( OS_SOCKET s, char* buf, int len )
@@ -375,7 +389,7 @@ int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockadd
 }
 
 /*
- *  Wrapper function for sock_set_nonblocking
+ *  Wrapper function for set_nonblocking
  */
 
 int os_sock_set_nonblocking( OS_SOCKET s )
@@ -518,10 +532,21 @@ int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
 }
 
 /*
- *  
+ *  Wrapper function for select
  */
 
-char *os_sock_getlasterrorstring( void )
+int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const struct timeval* timeout )
 {
-	return os_sock_strerror( os_sock_errno );
+	int ret;
+
+	/* reset local errno implementation */
+	os_sock_errno = 0;
+	ret = select( nfds, readfds, writefds, exceptfds, timeout );
+	if( ret == SOCKET_ERROR )
+	{
+		OS_SOCK_SET_ERRNO();
+		nlog( LOG_WARNING, "os_sock_select: select failed %s", os_sock_strerror( os_sock_errno ) );
+	}
+	return ret;
 }
+

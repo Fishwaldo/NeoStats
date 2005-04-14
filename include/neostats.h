@@ -1435,7 +1435,6 @@ EXPORTFUNC int match( const char *mask, const char *name );
  *  Portability wrapper functions
  */
 
-EXPORTVAR int os_errno;
 /* File system functions */
 EXPORTFUNC int os_mkdir( const char *filename, mode_t mode );
 EXPORTFUNC int os_check_create_dir( const char *dirname );
@@ -1456,8 +1455,10 @@ EXPORTFUNC int os_write( int fd, const void *buffer, unsigned int count );
 EXPORTFUNC int os_close( int fd );
 EXPORTFUNC int os_mkstemp( char *ftemplate );
 EXPORTFUNC int os_write_temp_file( char *ftemplate, const void *buffer, unsigned int count );
-EXPORTFUNC char *os_strerror( void );
 EXPORTFUNC int os_file_get_size( const char *filename );
+EXPORTVAR int os_file_errno;
+
+EXPORTFUNC char *os_strerror( void );
 EXPORTFUNC size_t os_strftime( char *strDest, size_t maxsize, const char *format, const struct tm *timeptr );
 EXPORTFUNC struct tm* os_localtime( const time_t *timer );
 /* Socket functions */
@@ -1476,6 +1477,7 @@ EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp );
 EXPORTVAR int os_sock_errno;
 EXPORTFUNC char *os_sock_getlasterrorstring( void );
 EXPORTFUNC char *os_sock_strerror( const int sockerrno );
+EXPORTFUNC int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const struct timeval* timeout );
 
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );

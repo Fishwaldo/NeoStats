@@ -221,9 +221,7 @@ static int save_owner(adns_query qu, const char *owner, int ol)
 	return 1;
 }
 
-int adns_submit(adns_state ads,
-		const char *owner,
-		adns_rrtype type,
+int adns_submit(adns_state ads, const char *owner, adns_rrtype type,
 		adns_queryflags flags, void *context, adns_query * query_r)
 {
 	int r, ol, ndots;
@@ -306,11 +304,8 @@ int adns_submit(adns_state ads,
 	return r;
 }
 
-int adns_submit_reverse_any(adns_state ads,
-			    const struct sockaddr *addr,
-			    const char *zone,
-			    adns_rrtype type,
-			    adns_queryflags flags,
+int adns_submit_reverse_any(adns_state ads, const struct sockaddr *addr,
+			    const char *zone, adns_rrtype type, adns_queryflags flags,
 			    void *context, adns_query * query_r)
 {
 	const unsigned char *iaddr;
@@ -322,9 +317,8 @@ int adns_submit_reverse_any(adns_state ads,
 
 	if (addr->sa_family != AF_INET)
 		return ENOSYS;
-	iaddr =
-	    (const unsigned char *) &(((const struct sockaddr_in *) addr)->
-				      sin_addr);
+	iaddr = (const unsigned char *) 
+		&(((const struct sockaddr_in *) addr)->sin_addr);
 
 	lreq = strlen(zone) + 4 * 4 + 1;
 	if (lreq > sizeof(shortbuf)) {
@@ -336,18 +330,14 @@ int adns_submit_reverse_any(adns_state ads,
 		buf = shortbuf;
 		buf_free = 0;
 	}
-	sprintf(buf, "%d.%d.%d.%d.%s", iaddr[3], iaddr[2], iaddr[1],
-		iaddr[0], zone);
-
+	sprintf(buf, "%d.%d.%d.%d.%s", iaddr[3], iaddr[2], iaddr[1], iaddr[0], zone);
 	r = adns_submit(ads, buf, type, flags, context, query_r);
 	ns_free(buf_free);
 	return r;
 }
 
-int adns_submit_reverse(adns_state ads,
-			const struct sockaddr *addr,
-			adns_rrtype type,
-			adns_queryflags flags,
+int adns_submit_reverse(adns_state ads, const struct sockaddr *addr,
+			adns_rrtype type, adns_queryflags flags,
 			void *context, adns_query * query_r)
 {
 	if (type != adns_r_ptr && type != adns_r_ptr_raw)
@@ -356,9 +346,7 @@ int adns_submit_reverse(adns_state ads,
 				       flags, context, query_r);
 }
 
-int adns_synchronous(adns_state ads,
-		     const char *owner,
-		     adns_rrtype type,
+int adns_synchronous(adns_state ads, const char *owner, adns_rrtype type,
 		     adns_queryflags flags, adns_answer ** answer_r)
 {
 	adns_query qu;
@@ -418,8 +406,7 @@ void *adns__alloc_mine(adns_query qu, size_t sz)
 	return alloc_common(qu, MEM_ROUND(sz));
 }
 
-void adns__transfer_interim(adns_query from, adns_query to, void *block,
-			    size_t sz)
+void adns__transfer_interim(adns_query from, adns_query to, void *block, size_t sz)
 {
 	allocnode *an;
 
@@ -523,8 +510,7 @@ void adns_cancel(adns_query qu)
 	adns__consistency(ads, 0, cc_entex);
 }
 
-void adns__update_expires(adns_query qu, unsigned long ttl,
-			  struct timeval now)
+void adns__update_expires(adns_query qu, unsigned long ttl, struct timeval now)
 {
 	time_t max;
 

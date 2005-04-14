@@ -331,7 +331,7 @@ void do_dns (int notused, short event, void *arg)
 		}
 		/* there was an error */
 		if (status) {
-			nlog (LOG_CRITICAL, "DNS: Baaaad error on adns_check: %s. Please report to NeoStats Group", strerror (status));
+			nlog (LOG_CRITICAL, "DNS: Bad error on adns_check: %s. Please report to NeoStats", strerror (status));
 			irc_chanalert (ns_botptr, "Bad Error on DNS lookup. Please check logfile");
 			DNSStats.failure++;
 			/* call the callback function with answer set to NULL */

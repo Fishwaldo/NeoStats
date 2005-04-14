@@ -646,9 +646,8 @@ int adns_processexceptional(adns_state ads, OS_SOCKET fd,
 	return 0;
 }
 
-static void fd_event(adns_state ads, OS_SOCKET fd,
-		     int revent, int pollflag,
-		     int maxfd, const fd_set * fds,
+static void fd_event(adns_state ads, OS_SOCKET fd, int revent, int pollflag,
+		     int maxfd, const fd_set * fds, 
 		     int (*func)(adns_state, OS_SOCKET fd, const struct timeval *now),
 		     struct timeval now, int *r_r) 
 {
@@ -669,11 +668,9 @@ static void fd_event(adns_state ads, OS_SOCKET fd,
 	}
 }
 
-void adns__fdevents(adns_state ads,
-		    const struct pollfd *pollfds, int npollfds,
-		    int maxfd, const fd_set * readfds,
-		    const fd_set * writefds, const fd_set * exceptfds,
-		    struct timeval now, int *r_r) 
+void adns__fdevents(adns_state ads, const struct pollfd *pollfds, int npollfds,
+		    int maxfd, const fd_set * readfds, const fd_set * writefds, 
+			const fd_set * exceptfds, struct timeval now, int *r_r) 
 {
 	int i, revents;
 	OS_SOCKET fd;
@@ -813,8 +810,7 @@ void adns__autosys(adns_state ads, struct timeval now)
 	adns_processany(ads);
 }
 
-int adns__internal_check(adns_state ads,
-			 adns_query * query_io,
+int adns__internal_check(adns_state ads, adns_query * query_io,
 			 adns_answer ** answer, void **context_r)
 {
 	adns_query qu;
@@ -862,19 +858,15 @@ int adns_wait(adns_state ads,
 		adns_beforeselect(ads, &maxfd, &readfds, &writefds,
 				  &exceptfds, &tvp, &tvbuf, 0);
 		assert(tvp);
-		ADNS_CLEAR_ERRNO;
-		rsel = select(maxfd, &readfds, &writefds, &exceptfds, tvp);
-		ADNS_CAPTURE_ERRNO;
+		rsel = os_sock_select(maxfd, &readfds, &writefds, &exceptfds, tvp);
 		if (rsel == -1) {
-			if (errno == OS_SOCK_EINTR) {
+			if (os_sock_errno == OS_SOCK_EINTR) {
 				if (ads->iflags & adns_if_eintr) {
-					r = OS_SOCK_EINTR;
+					r = os_sock_errno;
 					break;
 				}
 			} else {
-				adns__diag(ads, -1, 0,
-					   "select failed in wait: %s",
-					   strerror(errno));
+				adns__diag(ads, -1, 0, "select failed in wait: %s", os_sock_getlasterrorstring());
 				adns_globalsystemfailure(ads);
 			}
 		} else {

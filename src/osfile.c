@@ -33,7 +33,7 @@
 #include <fcntl.h> 
 #endif
 
-int os_errno;
+int os_file_errno;
 static char tempbuf[BUFSIZE*2];
 
 /*
@@ -49,7 +49,7 @@ int os_mkdir( const char *filename, mode_t mode )
 #else
 	retval = mkdir( filename, mode );
 #endif
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -95,7 +95,7 @@ FILE* os_fopen( const char *filename, const char *filemode )
 	FILE *retval;
 
 	retval = fopen( filename, filemode );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -108,7 +108,7 @@ int os_fclose( FILE *handle )
 	int retval;
 
 	retval = fclose( handle );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -121,7 +121,7 @@ int os_fseek( FILE *handle, long offset, int origin )
 	int retval;
 
 	retval = fseek( handle, offset, origin );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -134,7 +134,7 @@ long os_ftell( FILE *handle )
 	int retval;
 
 	retval = ftell( handle );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -151,7 +151,7 @@ int os_fprintf( FILE *handle, char *fmt, ... )
 	ircvsnprintf( tempbuf, BUFSIZE*2, fmt, ap );
 	va_end( ap );
 	retval = fprintf( handle, "%s", tempbuf );	
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -164,7 +164,7 @@ int os_fputs( const char *string, FILE *handle )
 	int retval;
 
 	retval = fputs( string, handle );	
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -177,7 +177,7 @@ int os_fread( void *buffer, size_t size, size_t count, FILE* handle )
 	int retval;
 
 	retval = fread( buffer, size, count, handle );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -190,7 +190,7 @@ char *os_fgets( char *string, int n, FILE* handle )
 	char *retval;
 
 	retval = fgets( string, n, handle );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -203,7 +203,7 @@ int os_fwrite( const void *buffer, size_t size, size_t count, FILE* handle )
 	int retval;
 
 	retval = fwrite( buffer, size, count, handle );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -216,7 +216,7 @@ int os_fflush( FILE *handle )
 	int retval;
 
 	retval = fflush( handle );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -234,7 +234,7 @@ int os_rename( const char* oldname, const char* newname )
 	 */
 	remove( newname );
 	retval = rename( oldname, newname );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -247,7 +247,7 @@ int os_stat( const char *path, struct stat *buffer )
 	int retval;
 
 	retval = stat( path, buffer );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -260,7 +260,7 @@ int os_access( const char *path, int mode )
 	int retval;
 
 	retval = access( path, mode );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -273,7 +273,7 @@ int os_write( int fd, const void *buffer, unsigned int count )
 	int retval;
 
 	retval = write( fd, buffer, count );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -286,7 +286,7 @@ int os_close( int fd )
 	int retval;
 
 	retval = close( fd );
-	os_errno = errno;
+	os_file_errno = errno;
 	return retval;
 }
 
@@ -304,8 +304,7 @@ int os_mkstemp( char *ftemplate )
 	if( name )
 	{
 		retval = open( name, _O_CREAT, _S_IREAD | _S_IWRITE );
-		os_errno = errno;
-		printf( strerror( errno ) );
+		os_file_errno = errno;
 		return retval;
 	}
 	return -1;
