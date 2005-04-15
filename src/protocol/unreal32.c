@@ -40,9 +40,6 @@ static void m_whois (char *origin, char **argv, int argc, int srv);
 static void m_smo (char *origin, char **argv, int argc, int srv);
 static void m_swhois (char *origin, char **argv, int argc, int srv);
 static void m_tkl (char *origin, char **argv, int argc, int srv);
-static void m_setname (char *origin, char **argv, int argc, int srv);
-static void m_sethost (char *origin, char **argv, int argc, int srv);
-static void m_setident (char *origin, char **argv, int argc, int srv);
 
 /* buffer sizes */
 const int proto_maxhost		= (128 + 1);
