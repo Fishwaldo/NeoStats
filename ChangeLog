@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - LEVEL command now resets user level so that users can cause NeoStats to
+   recheck their access rights after any settings changes. (M).
  - Prevent ability to disable debug mode if DEBUG enabled to avoid all the 
    overrides necessary in code. (M)
  - StatServ: Add FLATMAP option to prevent display of network layout in MAP

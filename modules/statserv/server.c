@@ -292,7 +292,7 @@ static int ss_server_del (CmdParams *cmdparams)
 	}
 	node = hash_lookup(serverstathash, cmdparams->av[1]);
 	if (node) {
-		ss = (serverstat *ss)hnode_get( node );
+		ss = (serverstat *)hnode_get( node );
 		hash_delete (serverstathash, node);
 		hnode_destroy (node);
 		ns_free (ss);
