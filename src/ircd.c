@@ -793,6 +793,99 @@ void _m_mode( char *origin, char **argv, int argc, int srv )
 	}
 }
 
+/** @brief _m_setname
+ *
+ *  process SETNAME command
+ *	argv[0] = name
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_setname( char *origin, char **argv, int argc, int srv )
+{
+	do_setname( origin, argv[0] );
+}
+
+/** @brief _m_sethost
+ *
+ *  process SETHOST command
+ *	argv[0] = host
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_sethost( char *origin, char **argv, int argc, int srv )
+{
+	do_sethost( origin, argv[0] );
+}
+
+/** @brief _m_setident
+ *
+ *  process SETIDENT command
+ *	argv[0] = ident
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_setident( char *origin, char **argv, int argc, int srv )
+{
+	do_setident( origin, argv[0] );
+}
+
+/** @brief _m_svsjoin
+ *
+ *  process SVSJOIN command
+ *	argv[0] = nick
+ *	argv[1] = channel
+ *	argv[2] = key
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_svsjoin( char *origin, char **argv, int argc, int srv )
+{
+	do_join( argv[0], argv[1], argv[2] );
+}
+
+/** @brief _m_svspart
+ *
+ *  process SVSPART command
+ *	argv[0] = nick
+ *	argv[1] = channel
+ *	argv[2] = reason
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_svspart( char *origin, char **argv, int argc, int srv )
+{
+	do_part( argv[0], argv[1], argv[2] );
+}
 
 /** @brief _m_notice
  *

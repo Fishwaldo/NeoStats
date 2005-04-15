@@ -81,6 +81,8 @@ ircd_cmd cmd_list[] = {
 	{MSG_UMODE2, TOK_UMODE2, m_umode2, 0},
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
+	{MSG_SVSJOIN, TOK_SVSJOIN, _m_svsjoin, 0},
+	{MSG_SVSPART, TOK_SVSPART, _m_svspart, 0},
 	{MSG_KILL, TOK_KILL, _m_kill, 0},
 	{MSG_PONG, TOK_PONG, _m_pong, 0},
 	{MSG_AWAY, TOK_AWAY, _m_away, 0},
@@ -100,9 +102,9 @@ ircd_cmd cmd_list[] = {
 	{MSG_SMO, TOK_SMO, m_smo, 0},
 	{MSG_EOS, TOK_EOS, m_eos, 0},
 	{MSG_TKL, TOK_TKL, m_tkl, 0},
-	{MSG_SETNAME, TOK_SETNAME, m_setname, 0},
-	{MSG_SETHOST, TOK_SETHOST, m_sethost, 0},
-	{MSG_SETIDENT, TOK_SETIDENT, m_setident, 0},
+	{MSG_SETNAME, TOK_SETNAME, _m_setname, 0},
+	{MSG_SETHOST, TOK_SETHOST, _m_sethost, 0},
+	{MSG_SETIDENT, TOK_SETIDENT, _m_setident, 0},
 	{MSG_GLOBOPS, TOK_GLOBOPS, _m_globops, 0},
 	{MSG_WALLOPS, TOK_WALLOPS, _m_wallops, 0},
 	{MSG_CHATOPS, TOK_CHATOPS, _m_chatops, 0},
@@ -783,17 +785,3 @@ static void m_tkl (char *origin, char **argv, int argc, int srv)
 	do_tkl(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7]);
 }
 
-static void m_setname (char *origin, char **argv, int argc, int srv)
-{
-	do_setname(origin, argv[0]);
-}
-
-static void m_sethost (char *origin, char **argv, int argc, int srv)
-{
-	do_sethost(origin, argv[0]);
-}
-
-static void m_setident (char *origin, char **argv, int argc, int srv)
-{
-	do_setident(origin, argv[0]);
-}

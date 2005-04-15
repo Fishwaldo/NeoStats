@@ -79,6 +79,8 @@ ircd_cmd cmd_list[] = {
 	{MSG_UMODE2, TOK_UMODE2, m_umode2, 0},
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
+	{MSG_SVSJOIN, TOK_SVSJOIN, _m_svsjoin, 0},
+	{MSG_SVSPART, TOK_SVSPART, _m_svspart, 0},
 	{MSG_KILL, TOK_KILL, _m_kill, 0},
 	{MSG_PONG, TOK_PONG, _m_pong, 0},
 	{MSG_AWAY, TOK_AWAY, _m_away, 0},
