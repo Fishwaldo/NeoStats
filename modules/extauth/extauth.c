@@ -195,9 +195,10 @@ static int AccessDel( CmdParams *cmdparams )
 	node = hash_lookup( accesshash, cmdparams->av[1] );
 	if( node ) 
 	{
-		ns_free( hnode_get( node ) );
+		AccessEntry *access =( AccessEntry * )hnode_get( node );
 		hash_delete( accesshash, node );
 		hnode_destroy( node );
+		ns_free( access );
 		DBADelete( "AccessList", cmdparams->av[1] );
 		irc_prefmsg( NULL, cmdparams->source, "Deleted %s from access list", cmdparams->av[1] );
 	} 
