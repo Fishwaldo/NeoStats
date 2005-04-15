@@ -25,279 +25,279 @@
 #define UNREAL_H
 
 /* Messages/Tokens */
-#define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
-#define TOK_PRIVATE	"!"	/* 33 */
-#define MSG_WHOIS	"WHOIS"	/* WHOI */
-#define TOK_WHOIS	"#"	/* 35 */
-#define MSG_WHOWAS	"WHOWAS"	/* WHOW */
-#define TOK_WHOWAS	"$"	/* 36 */
-#define MSG_USER	"USER"	/* USER */
-#define TOK_USER	"%"	/* 37 */
-#define MSG_NICK	"NICK"	/* NICK */
-#define TOK_NICK	"&"	/* 38 */
-#define MSG_SERVER	"SERVER"	/* SERV */
-#define TOK_SERVER	"'"	/* 39 */
-#define MSG_LIST	"LIST"	/* LIST */
-#define TOK_LIST	"("	/* 40 */
-#define MSG_TOPIC	"TOPIC"	/* TOPI */
-#define TOK_TOPIC	")"	/* 41 */
-#define MSG_INVITE	"INVITE"	/* INVI */
-#define TOK_INVITE	"*"	/* 42 */
-#define MSG_VERSION	"VERSION"	/* VERS */
-#define TOK_VERSION	"+"	/* 43 */
-#define MSG_QUIT	"QUIT"	/* QUIT */
-#define TOK_QUIT	","	/* 44 */
-#define MSG_SQUIT	"SQUIT"	/* SQUI */
-#define TOK_SQUIT	"-"	/* 45 */
-#define MSG_KILL	"KILL"	/* KILL */
-#define TOK_KILL	"."	/* 46 */
-#define MSG_INFO	"INFO"	/* INFO */
-#define TOK_INFO	"/"	/* 47 */
-#define MSG_LINKS	"LINKS"	/* LINK */
-#define TOK_LINKS	"0"	/* 48 */
-#define MSG_SUMMON	"SUMMON"	/* SUMM */
-#define TOK_SUMMON	"1"	/* 49 */
-#define MSG_STATS	"STATS"	/* STAT */
-#define TOK_STATS	"2"	/* 50 */
-#define MSG_USERS	"USERS"	/* USER -> USRS */
-#define TOK_USERS	"3"	/* 51 */
-#define MSG_HELP	"HELP"	/* HELP */
-#define MSG_HELPOP	"HELPOP"	/* HELP */
-#define TOK_HELP	"4"	/* 52 */
-#define MSG_ERROR	"ERROR"	/* ERRO */
-#define TOK_ERROR	"5"	/* 53 */
-#define MSG_AWAY	"AWAY"	/* AWAY */
-#define TOK_AWAY	"6"	/* 54 */
-#define MSG_CONNECT	"CONNECT"	/* CONN */
-#define TOK_CONNECT	"7"	/* 55 */
-#define MSG_PING	"PING"	/* PING */
-#define TOK_PING	"8"	/* 56 */
-#define MSG_PONG	"PONG"	/* PONG */
-#define TOK_PONG	"9"	/* 57 */
-#define MSG_OPER	"OPER"	/* OPER */
-#define TOK_OPER	";"	/* 59 */
-#define MSG_PASS	"PASS"	/* PASS */
-#define TOK_PASS	"<"	/* 60 */
-#define MSG_WALLOPS	"WALLOPS"	/* WALL */
-#define TOK_WALLOPS	"="	/* 61 */
-#define MSG_TIME	"TIME"	/* TIME */
-#define TOK_TIME	">"	/* 62 */
-#define MSG_NAMES	"NAMES"	/* NAME */
-#define TOK_NAMES	"?"	/* 63 */
-#define MSG_ADMIN	"ADMIN"	/* ADMI */
-#define TOK_ADMIN	"@"	/* 64 */
-#define MSG_NOTICE	"NOTICE"	/* NOTI */
-#define TOK_NOTICE	"B"	/* 66 */
-#define MSG_JOIN	"JOIN"	/* JOIN */
-#define TOK_JOIN	"C"	/* 67 */
-#define MSG_PART	"PART"	/* PART */
-#define TOK_PART	"D"	/* 68 */
-#define MSG_LUSERS	"LUSERS"	/* LUSE */
-#define TOK_LUSERS	"E"	/* 69 */
-#define MSG_MOTD	"MOTD"	/* MOTD */
-#define TOK_MOTD	"F"	/* 70 */
-#define MSG_MODE	"MODE"	/* MODE */
-#define TOK_MODE	"G"	/* 71 */
-#define MSG_KICK	"KICK"	/* KICK */
-#define TOK_KICK	"H"	/* 72 */
-#define MSG_SERVICE	"SERVICE"	/* SERV -> SRVI */
-#define TOK_SERVICE	"I"	/* 73 */
-#define MSG_USERHOST	"USERHOST"	/* USER -> USRH */
-#define TOK_USERHOST	"J"	/* 74 */
-#define MSG_ISON	"ISON"	/* ISON */
-#define TOK_ISON	"K"	/* 75 */
-#define MSG_REHASH	"REHASH"	/* REHA */
-#define TOK_REHASH	"O"	/* 79 */
-#define MSG_RESTART	"RESTART"	/* REST */
-#define TOK_RESTART	"P"	/* 80 */
-#define MSG_CLOSE	"CLOSE"	/* CLOS */
-#define TOK_CLOSE	"Q"	/* 81 */
-#define MSG_DIE		"DIE"	/* DIE */
-#define TOK_DIE		"R"	/* 82 */
-#define MSG_HASH	"HASH"	/* HASH */
-#define TOK_HASH	"S"	/* 83 */
-#define MSG_DNS		"DNS"	/* DNS  -> DNSS */
-#define TOK_DNS		"T"	/* 84 */
-#define MSG_SILENCE	"SILENCE"	/* SILE */
-#define TOK_SILENCE	"U"	/* 85 */
-#define MSG_AKILL	"AKILL"	/* AKILL */
-#define TOK_AKILL	"V"	/* 86 */
-#define MSG_KLINE	"KLINE"	/* KLINE */
-#define TOK_KLINE	"W"	/* 87 */
-#define MSG_UNKLINE     "UNKLINE"	/* UNKLINE */
-#define TOK_UNKLINE	"X"	/* 88 */
-#define MSG_RAKILL	"RAKILL"	/* RAKILL */
-#define TOK_RAKILL	"Y"	/* 89 */
-#define MSG_GNOTICE	"GNOTICE"	/* GNOTICE */
-#define TOK_GNOTICE	"Z"	/* 90 */
-#define MSG_GOPER	"GOPER"	/* GOPER */
-#define TOK_GOPER	"["	/* 91 */
-#define MSG_GLOBOPS	"GLOBOPS"	/* GLOBOPS */
-#define TOK_GLOBOPS	"]"	/* 93 */
-#define MSG_LOCOPS	"LOCOPS"	/* LOCOPS */
-#define TOK_LOCOPS	"^"	/* 94 */
-#define MSG_PROTOCTL	"PROTOCTL"	/* PROTOCTL */
-#define TOK_PROTOCTL	"_"	/* 95 */
-#define MSG_WATCH	"WATCH"	/* WATCH */
-#define TOK_WATCH	"`"	/* 96 */
-#define MSG_TRACE	"TRACE"	/* TRAC */
-#define TOK_TRACE	"b"	/* 97 */
-#define MSG_SQLINE	"SQLINE"	/* SQLINE */
-#define TOK_SQLINE	"c"	/* 98 */
-#define MSG_UNSQLINE	"UNSQLINE"	/* UNSQLINE */
-#define TOK_UNSQLINE	"d"	/* 99 */
-#define MSG_SVSNICK	"SVSNICK"	/* SVSNICK */
-#define TOK_SVSNICK	"e"	/* 100 */
-#define MSG_SVSNOOP	"SVSNOOP"	/* SVSNOOP */
-#define TOK_SVSNOOP	"f"	/* 101 */
-#define MSG_IDENTIFY	"IDENTIFY"	/* IDENTIFY */
-#define TOK_IDENTIFY	"g"	/* 102 */
-#define MSG_SVSKILL	"SVSKILL"	/* SVSKILL */
-#define TOK_SVSKILL	"h"	/* 103 */
-#define MSG_NICKSERV	"NICKSERV"	/* NICKSERV */
-#define MSG_NS		"NS"
-#define TOK_NICKSERV	"i"	/* 104 */
-#define MSG_CHANSERV	"CHANSERV"	/* CHANSERV */
-#define MSG_CS		"CS"
-#define TOK_CHANSERV	"j"	/* 105 */
-#define MSG_OPERSERV	"OPERSERV"	/* OPERSERV */
-#define MSG_OS		"OS"
-#define TOK_OPERSERV	"k"	/* 106 */
-#define MSG_MEMOSERV	"MEMOSERV"	/* MEMOSERV */
-#define MSG_MS		"MS"
-#define TOK_MEMOSERV	"l"	/* 107 */
-#define MSG_SERVICES	"SERVICES"	/* SERVICES */
-#define TOK_SERVICES	"m"	/* 108 */
-#define MSG_SVSMODE	"SVSMODE"	/* SVSMODE */
-#define TOK_SVSMODE	"n"	/* 109 */
-#define MSG_SAMODE	"SAMODE"	/* SAMODE */
-#define TOK_SAMODE	"o"	/* 110 */
-#define MSG_CHATOPS	"CHATOPS"	/* CHATOPS */
-#define TOK_CHATOPS	"p"	/* 111 */
-#define MSG_ZLINE    	"ZLINE"	/* ZLINE */
-#define TOK_ZLINE	"q"	/* 112 */
-#define MSG_UNZLINE  	"UNZLINE"	/* UNZLINE */
-#define TOK_UNZLINE	"r"	/* 113 */
-#define MSG_HELPSERV    "HELPSERV"	/* HELPSERV */
-#define MSG_HS		"HS"
-#define TOK_HELPSERV    "s"	/* 114 */
-#define MSG_RULES       "RULES"	/* RULES */
-#define TOK_RULES       "t"	/* 115 */
-#define MSG_MAP         "MAP"	/* MAP */
-#define TOK_MAP         "u"	/* 117 */
-#define MSG_SVS2MODE    "SVS2MODE"	/* SVS2MODE */
-#define TOK_SVS2MODE	"v"	/* 118 */
-#define MSG_DALINFO     "DALINFO"	/* dalinfo */
-#define TOK_DALINFO     "w"	/* 119 */
-#define MSG_ADMINCHAT   "ADCHAT"	/* Admin chat */
-#define TOK_ADMINCHAT   "x"	/* 120 */
-#define MSG_MKPASSWD	"MKPASSWD"	/* MKPASSWD */
-#define TOK_MKPASSWD	"y"	/* 121 */
-#define MSG_ADDLINE     "ADDLINE"	/* ADDLINE */
-#define TOK_ADDLINE     "z"	/* 122 */
-#define MSG_GLINE	"GLINE"	/* The awesome g-line */
-#define TOK_GLINE	"}"	/* 125 */
-#define MSG_SJOIN	"SJOIN"
-#define TOK_SJOIN	"~"
-#define MSG_SETHOST 	"SETHOST"	/* sethost */
-#define TOK_SETHOST 	"AA"	/* 127 4ever !;) */
-#define MSG_NACHAT  	"NACHAT"	/* netadmin chat */
-#define TOK_NACHAT  	"AC"	/* *beep* */
-#define MSG_SETIDENT    "SETIDENT"
-#define TOK_SETIDENT    "AD"
-#define MSG_SETNAME	"SETNAME"	/* set GECOS */
-#define TOK_SETNAME	"AE"	/* its almost unreeaaall... */
-#define MSG_LAG		"LAG"	/* Lag detect */
-#define TOK_LAG		"AF"	/* a or ? */
-#define MSG_STATSERV	"STATSERV"	/* alias */
-#define TOK_STATSERV	"AH"
-#define MSG_KNOCK	"KNOCK"
-#define TOK_KNOCK	"AI"
-#define MSG_CREDITS 	"CREDITS"
-#define TOK_CREDITS 	"AJ"
-#define MSG_LICENSE 	"LICENSE"
-#define TOK_LICENSE 	"AK"
-#define MSG_CHGHOST 	"CHGHOST"
-#define TOK_CHGHOST 	"AL"
-#define MSG_RPING   	"RPING"
-#define TOK_RPING	"AM"
-#define MSG_RPONG   	"RPONG"
-#define TOK_RPONG	"AN"
-#define MSG_NETINFO 	"NETINFO"
-#define TOK_NETINFO 	"AO"
-#define MSG_SENDUMODE 	"SENDUMODE"
-#define TOK_SENDUMODE 	"AP"
-#define MSG_ADDMOTD 	"ADDMOTD"
-#define TOK_ADDMOTD	"AQ"
-#define MSG_ADDOMOTD	"ADDOMOTD"
-#define TOK_ADDOMOTD	"AR"
-#define MSG_SVSMOTD	"SVSMOTD"
-#define TOK_SVSMOTD	"AS"
-#define MSG_SMO 	"SMO"
-#define TOK_SMO 	"AU"
-#define MSG_OPERMOTD 	"OPERMOTD"
-#define TOK_OPERMOTD 	"AV"
-#define MSG_TSCTL 	"TSCTL"
-#define TOK_TSCTL 	"AW"
-#define MSG_SVSJOIN 	"SVSJOIN"
-#define TOK_SVSJOIN 	"BR"
-#define MSG_SAJOIN 	"SAJOIN"
-#define TOK_SAJOIN 	"AX"
-#define MSG_SVSPART 	"SVSPART"
-#define TOK_SVSPART 	"BT"
-#define MSG_SAPART 	"SAPART"
-#define TOK_SAPART 	"AY"
-#define MSG_CHGIDENT 	"CHGIDENT"
-#define TOK_CHGIDENT 	"AZ"
-#define MSG_SWHOIS 	"SWHOIS"
-#define TOK_SWHOIS 	"BA"
-#define MSG_SVSO 	"SVSO"
-#define TOK_SVSO 	"BB"
-#define MSG_SVSFLINE 	"SVSFLINE"
-#define TOK_SVSFLINE 	"BC"
-#define MSG_TKL		"TKL"
-#define TOK_TKL 	"BD"
-#define MSG_VHOST 	"VHOST"
-#define TOK_VHOST 	"BE"
-#define MSG_BOTMOTD 	"BOTMOTD"
-#define TOK_BOTMOTD 	"BF"
-#define MSG_REMGLINE	"REMGLINE"	/* remove g-line */
-#define TOK_REMGLINE	"BG"
-#define MSG_HTM		"HTM"
-#define TOK_HTM		"BH"
-#define MSG_UMODE2	"UMODE2"
-#define TOK_UMODE2	"|"
-#define MSG_DCCDENY	"DCCDENY"
-#define TOK_DCCDENY	"BI"
-#define MSG_UNDCCDENY   "UNDCCDENY"
-#define TOK_UNDCCDENY   "BJ"
-#define MSG_CHGNAME	"CHGNAME"
-#define MSG_SVSNAME	"SVSNAME"
-#define TOK_CHGNAME	"BK"
-#define MSG_SHUN	"SHUN"
-#define TOK_SHUN	"BL"
-#define MSG_NEWJOIN 	"NEWJOIN"	/* For CR Java Chat */
-#define MSG_POST	"POST"
-#define TOK_POST	"BN"
-#define MSG_INFOSERV 	"INFOSERV"
-#define MSG_IS		"IS"
-#define TOK_INFOSERV	"BO"
+MODULEVAR const char MSG_PRIVATE[] = "PRIVMSG";/* PRIV */
+MODULEVAR const char TOK_PRIVATE[] = "!";/* 33 */
+MODULEVAR const char MSG_WHOIS[] = "WHOIS";/* WHOI */
+MODULEVAR const char TOK_WHOIS[] = "#";/* 35 */
+MODULEVAR const char MSG_WHOWAS[] = "WHOWAS";/* WHOW */
+MODULEVAR const char TOK_WHOWAS[] = "$";/* 36 */
+MODULEVAR const char MSG_USER[] = "USER";/* USER */
+MODULEVAR const char TOK_USER[] = "%";/* 37 */
+MODULEVAR const char MSG_NICK[] = "NICK";/* NICK */
+MODULEVAR const char TOK_NICK[] = "&";/* 38 */
+MODULEVAR const char MSG_SERVER[] = "SERVER";/* SERV */
+MODULEVAR const char TOK_SERVER[] = "'";/* 39 */
+MODULEVAR const char MSG_LIST[] = "LIST";/* LIST */
+MODULEVAR const char TOK_LIST[] = "(";/* 40 */
+MODULEVAR const char MSG_TOPIC[] = "TOPIC";/* TOPI */
+MODULEVAR const char TOK_TOPIC[] = ")";/* 41 */
+MODULEVAR const char MSG_INVITE[] = "INVITE";/* INVI */
+MODULEVAR const char TOK_INVITE[] = "*";/* 42 */
+MODULEVAR const char MSG_VERSION[] = "VERSION";/* VERS */
+MODULEVAR const char TOK_VERSION[] = "+";/* 43 */
+MODULEVAR const char MSG_QUIT[] = "QUIT";/* QUIT */
+MODULEVAR const char TOK_QUIT[] = ",";/* 44 */
+MODULEVAR const char MSG_SQUIT[] = "SQUIT";/* SQUI */
+MODULEVAR const char TOK_SQUIT[] = "-";/* 45 */
+MODULEVAR const char MSG_KILL[] = "KILL";/* KILL */
+MODULEVAR const char TOK_KILL[] = ".";/* 46 */
+MODULEVAR const char MSG_INFO[] = "INFO";/* INFO */
+MODULEVAR const char TOK_INFO[] = "/";/* 47 */
+MODULEVAR const char MSG_LINKS[] = "LINKS";/* LINK */
+MODULEVAR const char TOK_LINKS[] = "0";/* 48 */
+MODULEVAR const char MSG_SUMMON[] = "SUMMON";/* SUMM */
+MODULEVAR const char TOK_SUMMON[] = "1";/* 49 */
+MODULEVAR const char MSG_STATS[] = "STATS";/* STAT */
+MODULEVAR const char TOK_STATS[] = "2";/* 50 */
+MODULEVAR const char MSG_USERS[] = "USERS";/* USER -> USRS */
+MODULEVAR const char TOK_USERS[] = "3";/* 51 */
+MODULEVAR const char MSG_HELP[] = "HELP";/* HELP */
+MODULEVAR const char MSG_HELPOP[] = "HELPOP";/* HELP */
+MODULEVAR const char TOK_HELP[] = "4";/* 52 */
+MODULEVAR const char MSG_ERROR[] = "ERROR";/* ERRO */
+MODULEVAR const char TOK_ERROR[] = "5";/* 53 */
+MODULEVAR const char MSG_AWAY[] = "AWAY";/* AWAY */
+MODULEVAR const char TOK_AWAY[] = "6";/* 54 */
+MODULEVAR const char MSG_CONNECT[] = "CONNECT";/* CONN */
+MODULEVAR const char TOK_CONNECT[] = "7";/* 55 */
+MODULEVAR const char MSG_PING[] = "PING";/* PING */
+MODULEVAR const char TOK_PING[] = "8";/* 56 */
+MODULEVAR const char MSG_PONG[] = "PONG";/* PONG */
+MODULEVAR const char TOK_PONG[] = "9";/* 57 */
+MODULEVAR const char MSG_OPER[] = "OPER";/* OPER */
+MODULEVAR const char TOK_OPER[] = ";";/* 59 */
+MODULEVAR const char MSG_PASS[] = "PASS";/* PASS */
+MODULEVAR const char TOK_PASS[] = "<";/* 60 */
+MODULEVAR const char MSG_WALLOPS[] = "WALLOPS";/* WALL */
+MODULEVAR const char TOK_WALLOPS[] = "=";/* 61 */
+MODULEVAR const char MSG_TIME[] = "TIME";/* TIME */
+MODULEVAR const char TOK_TIME[] = ">";/* 62 */
+MODULEVAR const char MSG_NAMES[] = "NAMES";/* NAME */
+MODULEVAR const char TOK_NAMES[] = "?";/* 63 */
+MODULEVAR const char MSG_ADMIN[] = "ADMIN";/* ADMI */
+MODULEVAR const char TOK_ADMIN[] = "@";/* 64 */
+MODULEVAR const char MSG_NOTICE[] = "NOTICE";/* NOTI */
+MODULEVAR const char TOK_NOTICE[] = "B";/* 66 */
+MODULEVAR const char MSG_JOIN[] = "JOIN";/* JOIN */
+MODULEVAR const char TOK_JOIN[] = "C";/* 67 */
+MODULEVAR const char MSG_PART[] = "PART";/* PART */
+MODULEVAR const char TOK_PART[] = "D";/* 68 */
+MODULEVAR const char MSG_LUSERS[] = "LUSERS";/* LUSE */
+MODULEVAR const char TOK_LUSERS[] = "E";/* 69 */
+MODULEVAR const char MSG_MOTD[] = "MOTD";/* MOTD */
+MODULEVAR const char TOK_MOTD[] = "F";/* 70 */
+MODULEVAR const char MSG_MODE[] = "MODE";/* MODE */
+MODULEVAR const char TOK_MODE[] = "G";/* 71 */
+MODULEVAR const char MSG_KICK[] = "KICK";/* KICK */
+MODULEVAR const char TOK_KICK[] = "H";/* 72 */
+MODULEVAR const char MSG_SERVICE[] = "SERVICE";/* SERV -> SRVI */
+MODULEVAR const char TOK_SERVICE[] = "I";/* 73 */
+MODULEVAR const char MSG_USERHOST[] = "USERHOST";/* USER -> USRH */
+MODULEVAR const char TOK_USERHOST[] = "J";/* 74 */
+MODULEVAR const char MSG_ISON[] = "ISON";/* ISON */
+MODULEVAR const char TOK_ISON[] = "K";/* 75 */
+MODULEVAR const char MSG_REHASH[] = "REHASH";/* REHA */
+MODULEVAR const char TOK_REHASH[] = "O";/* 79 */
+MODULEVAR const char MSG_RESTART[] = "RESTART";/* REST */
+MODULEVAR const char TOK_RESTART[] = "P";/* 80 */
+MODULEVAR const char MSG_CLOSE[] = "CLOSE";/* CLOS */
+MODULEVAR const char TOK_CLOSE[] = "Q";/* 81 */
+MODULEVAR const char MSG_DIE[] = "DIE";/* DIE */
+MODULEVAR const char TOK_DIE[] = "R";/* 82 */
+MODULEVAR const char MSG_HASH[] = "HASH";/* HASH */
+MODULEVAR const char TOK_HASH[] = "S";/* 83 */
+MODULEVAR const char MSG_DNS[] = "DNS";/* DNS -> DNSS */
+MODULEVAR const char TOK_DNS[] = "T";/* 84 */
+MODULEVAR const char MSG_SILENCE[] = "SILENCE";/* SILE */
+MODULEVAR const char TOK_SILENCE[] = "U";/* 85 */
+MODULEVAR const char MSG_AKILL[] = "AKILL";/* AKILL */
+MODULEVAR const char TOK_AKILL[] = "V";/* 86 */
+MODULEVAR const char MSG_KLINE[] = "KLINE";/* KLINE */
+MODULEVAR const char TOK_KLINE[] = "W";/* 87 */
+MODULEVAR const char MSG_UNKLINE[] = "UNKLINE";/* UNKLINE */
+MODULEVAR const char TOK_UNKLINE[] = "X";/* 88 */
+MODULEVAR const char MSG_RAKILL[] = "RAKILL";/* RAKILL */
+MODULEVAR const char TOK_RAKILL[] = "Y";/* 89 */
+MODULEVAR const char MSG_GNOTICE[] = "GNOTICE";/* GNOTICE */
+MODULEVAR const char TOK_GNOTICE[] = "Z";/* 90 */
+MODULEVAR const char MSG_GOPER[] = "GOPER";/* GOPER */
+MODULEVAR const char TOK_GOPER[] = "[";/* 91 */
+MODULEVAR const char MSG_GLOBOPS[] = "GLOBOPS";/* GLOBOPS */
+MODULEVAR const char TOK_GLOBOPS[] = "]";/* 93 */
+MODULEVAR const char MSG_LOCOPS[] = "LOCOPS";/* LOCOPS */
+MODULEVAR const char TOK_LOCOPS[] = "^";/* 94 */
+MODULEVAR const char MSG_PROTOCTL[] = "PROTOCTL";/* PROTOCTL */
+MODULEVAR const char TOK_PROTOCTL[] = "_";/* 95 */
+MODULEVAR const char MSG_WATCH[] = "WATCH";/* WATCH */
+MODULEVAR const char TOK_WATCH[] = "`";/* 96 */
+MODULEVAR const char MSG_TRACE[] = "TRACE";/* TRAC */
+MODULEVAR const char TOK_TRACE[] = "b";/* 97 */
+MODULEVAR const char MSG_SQLINE[] = "SQLINE";/* SQLINE */
+MODULEVAR const char TOK_SQLINE[] = "c";/* 98 */
+MODULEVAR const char MSG_UNSQLINE[] = "UNSQLINE";/* UNSQLINE */
+MODULEVAR const char TOK_UNSQLINE[] = "d";/* 99 */
+MODULEVAR const char MSG_SVSNICK[] = "SVSNICK";/* SVSNICK */
+MODULEVAR const char TOK_SVSNICK[] = "e";/* 100 */
+MODULEVAR const char MSG_SVSNOOP[] = "SVSNOOP";/* SVSNOOP */
+MODULEVAR const char TOK_SVSNOOP[] = "f";/* 101 */
+MODULEVAR const char MSG_IDENTIFY[] = "IDENTIFY";/* IDENTIFY */
+MODULEVAR const char TOK_IDENTIFY[] = "g";/* 102 */
+MODULEVAR const char MSG_SVSKILL[] = "SVSKILL";/* SVSKILL */
+MODULEVAR const char TOK_SVSKILL[] = "h";/* 103 */
+MODULEVAR const char MSG_NICKSERV[] = "NICKSERV";/* NICKSERV */
+MODULEVAR const char MSG_NS[] = "NS";
+MODULEVAR const char TOK_NICKSERV[] = "i";/* 104 */
+MODULEVAR const char MSG_CHANSERV[] = "CHANSERV";/* CHANSERV */
+MODULEVAR const char MSG_CS[] = "CS";
+MODULEVAR const char TOK_CHANSERV[] = "j";/* 105 */
+MODULEVAR const char MSG_OPERSERV[] = "OPERSERV";/* OPERSERV */
+MODULEVAR const char MSG_OS[] = "OS";
+MODULEVAR const char TOK_OPERSERV[] = "k";/* 106 */
+MODULEVAR const char MSG_MEMOSERV[] = "MEMOSERV";/* MEMOSERV */
+MODULEVAR const char MSG_MS[] = "MS";
+MODULEVAR const char TOK_MEMOSERV[] = "l";/* 107 */
+MODULEVAR const char MSG_SERVICES[] = "SERVICES";/* SERVICES */
+MODULEVAR const char TOK_SERVICES[] = "m";/* 108 */
+MODULEVAR const char MSG_SVSMODE[] = "SVSMODE";/* SVSMODE */
+MODULEVAR const char TOK_SVSMODE[] = "n";/* 109 */
+MODULEVAR const char MSG_SAMODE[] = "SAMODE";/* SAMODE */
+MODULEVAR const char TOK_SAMODE[] = "o";/* 110 */
+MODULEVAR const char MSG_CHATOPS[] = "CHATOPS";/* CHATOPS */
+MODULEVAR const char TOK_CHATOPS[] = "p";/* 111 */
+MODULEVAR const char MSG_ZLINE[] = "ZLINE";/* ZLINE */
+MODULEVAR const char TOK_ZLINE[] = "q";/* 112 */
+MODULEVAR const char MSG_UNZLINE[] = "UNZLINE";/* UNZLINE */
+MODULEVAR const char TOK_UNZLINE[] = "r";/* 113 */
+MODULEVAR const char MSG_HELPSERV[] = "HELPSERV";/* HELPSERV */
+MODULEVAR const char MSG_HS[] = "HS";
+MODULEVAR const char TOK_HELPSERV[] = "s";/* 114 */
+MODULEVAR const char MSG_RULES[] = "RULES";/* RULES */
+MODULEVAR const char TOK_RULES[] = "t";/* 115 */
+MODULEVAR const char MSG_MAP[] = "MAP";/* MAP */
+MODULEVAR const char TOK_MAP[] = "u";/* 117 */
+MODULEVAR const char MSG_SVS2MODE[] = "SVS2MODE";/* SVS2MODE */
+MODULEVAR const char TOK_SVS2MODE[] = "v";/* 118 */
+MODULEVAR const char MSG_DALINFO[] = "DALINFO";/* dalinfo */
+MODULEVAR const char TOK_DALINFO[] = "w";/* 119 */
+MODULEVAR const char MSG_ADMINCHAT[] = "ADCHAT";/* Admin chat */
+MODULEVAR const char TOK_ADMINCHAT[] = "x";/* 120 */
+MODULEVAR const char MSG_MKPASSWD[] = "MKPASSWD";/* MKPASSWD */
+MODULEVAR const char TOK_MKPASSWD[] = "y";/* 121 */
+MODULEVAR const char MSG_ADDLINE[] = "ADDLINE";/* ADDLINE */
+MODULEVAR const char TOK_ADDLINE[] = "z";/* 122 */
+MODULEVAR const char MSG_GLINE[] = "GLINE";/* The awesome g-line */
+MODULEVAR const char TOK_GLINE[] = "}";/* 125 */
+MODULEVAR const char MSG_SJOIN[] = "SJOIN";
+MODULEVAR const char TOK_SJOIN[] = "~";
+MODULEVAR const char MSG_SETHOST[] = "SETHOST";/* sethost */
+MODULEVAR const char TOK_SETHOST[] = "AA";/* 127 4ever !;) */
+MODULEVAR const char MSG_NACHAT[] = "NACHAT";/* netadmin chat */
+MODULEVAR const char TOK_NACHAT[] = "AC";/* *beep* */
+MODULEVAR const char MSG_SETIDENT[] = "SETIDENT";
+MODULEVAR const char TOK_SETIDENT[] = "AD";
+MODULEVAR const char MSG_SETNAME[] = "SETNAME";/* set GECOS */
+MODULEVAR const char TOK_SETNAME[] = "AE";/* its almost unreeaaall... */
+MODULEVAR const char MSG_LAG[] = "LAG";/* Lag detect */
+MODULEVAR const char TOK_LAG[] = "AF";/* a or ? */
+MODULEVAR const char MSG_STATSERV[] = "STATSERV";/* alias */
+MODULEVAR const char TOK_STATSERV[] = "AH";
+MODULEVAR const char MSG_KNOCK[] = "KNOCK";
+MODULEVAR const char TOK_KNOCK[] = "AI";
+MODULEVAR const char MSG_CREDITS[] = "CREDITS";
+MODULEVAR const char TOK_CREDITS[] = "AJ";
+MODULEVAR const char MSG_LICENSE[] = "LICENSE";
+MODULEVAR const char TOK_LICENSE[] = "AK";
+MODULEVAR const char MSG_CHGHOST[] = "CHGHOST";
+MODULEVAR const char TOK_CHGHOST[] = "AL";
+MODULEVAR const char MSG_RPING[] = "RPING";
+MODULEVAR const char TOK_RPING[] = "AM";
+MODULEVAR const char MSG_RPONG[] = "RPONG";
+MODULEVAR const char TOK_RPONG[] = "AN";
+MODULEVAR const char MSG_NETINFO[] = "NETINFO";
+MODULEVAR const char TOK_NETINFO[] = "AO";
+MODULEVAR const char MSG_SENDUMODE[] = "SENDUMODE";
+MODULEVAR const char TOK_SENDUMODE[] = "AP";
+MODULEVAR const char MSG_ADDMOTD[] = "ADDMOTD";
+MODULEVAR const char TOK_ADDMOTD[] = "AQ";
+MODULEVAR const char MSG_ADDOMOTD[] = "ADDOMOTD";
+MODULEVAR const char TOK_ADDOMOTD[] = "AR";
+MODULEVAR const char MSG_SVSMOTD[] = "SVSMOTD";
+MODULEVAR const char TOK_SVSMOTD[] = "AS";
+MODULEVAR const char MSG_SMO[] = "SMO";
+MODULEVAR const char TOK_SMO[] = "AU";
+MODULEVAR const char MSG_OPERMOTD[] = "OPERMOTD";
+MODULEVAR const char TOK_OPERMOTD[] = "AV";
+MODULEVAR const char MSG_TSCTL[] = "TSCTL";
+MODULEVAR const char TOK_TSCTL[] = "AW";
+MODULEVAR const char MSG_SVSJOIN[] = "SVSJOIN";
+MODULEVAR const char TOK_SVSJOIN[] = "BR";
+MODULEVAR const char MSG_SAJOIN[] = "SAJOIN";
+MODULEVAR const char TOK_SAJOIN[] = "AX";
+MODULEVAR const char MSG_SVSPART[] = "SVSPART";
+MODULEVAR const char TOK_SVSPART[] = "BT";
+MODULEVAR const char MSG_SAPART[] = "SAPART";
+MODULEVAR const char TOK_SAPART[] = "AY";
+MODULEVAR const char MSG_CHGIDENT[] = "CHGIDENT";
+MODULEVAR const char TOK_CHGIDENT[] = "AZ";
+MODULEVAR const char MSG_SWHOIS[] = "SWHOIS";
+MODULEVAR const char TOK_SWHOIS[] = "BA";
+MODULEVAR const char MSG_SVSO[] = "SVSO";
+MODULEVAR const char TOK_SVSO[] = "BB";
+MODULEVAR const char MSG_SVSFLINE[] = "SVSFLINE";
+MODULEVAR const char TOK_SVSFLINE[] = "BC";
+MODULEVAR const char MSG_TKL[] = "TKL";
+MODULEVAR const char TOK_TKL[] = "BD";
+MODULEVAR const char MSG_VHOST[] = "VHOST";
+MODULEVAR const char TOK_VHOST[] = "BE";
+MODULEVAR const char MSG_BOTMOTD[] = "BOTMOTD";
+MODULEVAR const char TOK_BOTMOTD[] = "BF";
+MODULEVAR const char MSG_REMGLINE[] = "REMGLINE";/* remove g-line */
+MODULEVAR const char TOK_REMGLINE[] = "BG";
+MODULEVAR const char MSG_HTM[] = "HTM";
+MODULEVAR const char TOK_HTM[] = "BH";
+MODULEVAR const char MSG_UMODE2[] = "UMODE2";
+MODULEVAR const char TOK_UMODE2[] = "|";
+MODULEVAR const char MSG_DCCDENY[] = "DCCDENY";
+MODULEVAR const char TOK_DCCDENY[] = "BI";
+MODULEVAR const char MSG_UNDCCDENY[] = "UNDCCDENY";
+MODULEVAR const char TOK_UNDCCDENY[] = "BJ";
+MODULEVAR const char MSG_CHGNAME[] = "CHGNAME";
+MODULEVAR const char MSG_SVSNAME[] = "SVSNAME";
+MODULEVAR const char TOK_CHGNAME[] = "BK";
+MODULEVAR const char MSG_SHUN[] = "SHUN";
+MODULEVAR const char TOK_SHUN[] = "BL";
+MODULEVAR const char MSG_NEWJOIN[] = "NEWJOIN";/* For CR Java Chat */
+MODULEVAR const char MSG_POST[] = "POST";
+MODULEVAR const char TOK_POST[] = "BN";
+MODULEVAR const char MSG_INFOSERV[] = "INFOSERV";
+MODULEVAR const char MSG_IS[] = "IS";
+MODULEVAR const char TOK_INFOSERV[] = "BO";
 
-#define MSG_BOTSERV	"BOTSERV"
-#define TOK_BOTSERV	"BS"
+MODULEVAR const char MSG_BOTSERV[] = "BOTSERV";
+MODULEVAR const char TOK_BOTSERV[] = "BS";
 
-#define MSG_CYCLE	"CYCLE"
-#define TOK_CYCLE	"BP"
+MODULEVAR const char MSG_CYCLE[] = "CYCLE";
+MODULEVAR const char TOK_CYCLE[] = "BP";
 
-#define MSG_MODULE	"MODULE"
-#define TOK_MODULE	"BQ"
+MODULEVAR const char MSG_MODULE[] = "MODULE";
+MODULEVAR const char TOK_MODULE[] = "BQ";
 /* BR and BT are in use */
 
-#define MSG_SENDSNO	"SENDSNO"
-#define TOK_SENDSNO	"Ss"
+MODULEVAR const char MSG_SENDSNO[] = "SENDSNO";
+MODULEVAR const char TOK_SENDSNO[] = "Ss";
 
-#define MSG_EOS		"EOS"
-#define TOK_EOS		"ES"
+MODULEVAR const char MSG_EOS[] = "EOS";
+MODULEVAR const char TOK_EOS[] = "ES";
 
 /* Umodes */				
 #define UMODE_FAILOP		0x00200000

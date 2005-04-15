@@ -50,12 +50,24 @@
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
 
-typedef struct ircd_sym {
-	void **ptr;
+typedef struct ircd_sym 
+{
+	void **handler;
 	char *sym;
 	unsigned int required;
 	unsigned int feature;
 } ircd_sym;
+
+typedef struct msgtok_sym 
+{
+	void **handler;
+	char **msgptr;
+	char *msgsym;
+	char **tokptr;
+	char *toksym;
+	void *defaulthandler;
+	unsigned int feature;
+} msgtok_sym;
 
 typedef struct protocol_entry {
 	char *token;
@@ -72,6 +84,9 @@ static ProtocolInfo *protocol_info;
 static ircd_cmd *cmd_list;
 
 static void *protocol_module_handle;
+
+static void _send_join( const char *source, const char *chan, const char *key, const unsigned long ts );
+static void _send_part( const char *source, const char *chan, const char *reason );
 
 static void( *irc_send_privmsg )( const char *source, const char *to, const char *buf );
 static void( *irc_send_notice )( const char *source, const char *to, const char *buf );
@@ -121,8 +136,19 @@ static void( *irc_send_sethost )( const char* nick, const char* host );
 static void( *irc_send_setident )( const char* nick, const char* ident );
 static void( *irc_send_serverrequptime )( const char *source, const char *target );
 static void( *irc_send_serverreqversion )( const char *source, const char *target );
-
 static void( *irc_send_cloakhost )( char* host );
+
+static char *MSG_JOIN;
+static char *TOK_JOIN;
+static char *MSG_PART;
+static char *TOK_PART;
+
+msgtok_sym msgtok_sym_table[] =
+{
+	{( void * )&irc_send_join, &MSG_JOIN, "MSG_JOIN", &TOK_JOIN, "TOK_JOIN", _send_join, 0 },
+	{( void * )&irc_send_part, &MSG_PART, "MSG_PART", &TOK_PART, "TOK_PART", _send_part, 0 },
+	NULL, NULL,
+};
 
 protocol_entry protocol_list[] =
 {
@@ -241,19 +267,30 @@ static int InitIrcdProtocol( void )
 
 static int InitIrcdSymbols( void )
 {
-	ircd_sym * pircd_sym;
+	void **protocol_handler;
+	msgtok_sym *pmsgtok_sym;
+	ircd_sym *pircd_sym;
 
-	pircd_sym = ircd_sym_table;
-	while( pircd_sym->ptr )
+	/* Build up core supported message and function table */
+	pmsgtok_sym = msgtok_sym_table;
+	while( pmsgtok_sym->msgptr )
 	{
-		*pircd_sym->ptr = ns_dlsym( protocol_module_handle, pircd_sym->sym );
-		if( pircd_sym->required ) 
+		*pmsgtok_sym->msgptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->msgsym );
+		if( pmsgtok_sym->tokptr )
+			*pmsgtok_sym->tokptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->toksym );
+		pmsgtok_sym ++;
+	}
+	/* Build up protocol module overrides */
+	pircd_sym = ircd_sym_table;
+	while( pircd_sym->handler )
+	{
+		protocol_handler = ns_dlsym( protocol_module_handle, pircd_sym->sym );
+		if( protocol_handler )
+			*pircd_sym->handler = protocol_handler;
+		if( pircd_sym->required && !*pircd_sym->handler ) 
 		{
-			if( !*pircd_sym->ptr ) 
-			{
-				IrcdError( pircd_sym->sym );
-				return NS_FAILURE;	
-			}
+			IrcdError( pircd_sym->sym );
+			return NS_FAILURE;	
 		}
 		ircd_srv.features |= pircd_sym->feature;
 		pircd_sym ++;
@@ -2911,6 +2948,16 @@ void do_setident( const char* nick, const char* ident )
 		nlog( LOG_WARNING, "do_setident: user %s not found", nick );
 	}
 }
+
+static void _send_join( const char *source, const char *chan, const char *key, const unsigned long ts )
+{
+}
+
+static void _send_part( const char *source, const char *chan, const char *reason )
+{
+	send_cmd (":%s %s %s :%s", source, MSGTOK(PART), chan, reason);
+}
+
 
 /** @brief send_cmd
  *
