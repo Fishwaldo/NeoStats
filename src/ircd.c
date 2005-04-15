@@ -278,20 +278,8 @@ static int InitIrcdModes( void )
 	mode_init *user_smodes;
 
 	chan_umodes = ns_dlsym( protocol_module_handle, "chan_umodes" );
-	if( !chan_umodes ) {
-		IrcdError( "channel umode table" );
-		return NS_FAILURE;	
-	}
 	chan_modes  = ns_dlsym( protocol_module_handle, "chan_modes" );
-	if( !chan_modes ) {
-		IrcdError( "channel mode table" );
-		return NS_FAILURE;	
-	}
 	user_umodes = ns_dlsym( protocol_module_handle, "user_umodes" );
-	if( !user_umodes ) {
-		IrcdError( "user mode table" );
-		return NS_FAILURE;	
-	}
 	/* Not required */
 	user_smodes = ns_dlsym( protocol_module_handle, "user_smodes" );
 	if( user_smodes ) {

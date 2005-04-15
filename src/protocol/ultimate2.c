@@ -95,26 +95,15 @@ ircd_cmd cmd_list[] = {
 };
 
 mode_init chan_umodes[] = {
-	{'o', CUMODE_CHANOP, 0, '@'},
 	{'h', CUMODE_HALFOP, 0, '%'},
 	{'a', CUMODE_CHANADMIN, 0, '!'},
-	{'v', CUMODE_VOICE, 0, '+'},
 	{0, 0, 0},
 };
 
 mode_init chan_modes[] = {
-	{'b', CMODE_BAN, MODEPARAM},
 	{'e', CMODE_EXCEPT, MODEPARAM},
 	{'f', CMODE_FLOODLIMIT, MODEPARAM},
-	{'i', CMODE_INVITEONLY, 0},
-	{'k', CMODE_KEY, MODEPARAM},
-	{'l', CMODE_LIMIT, MODEPARAM},
-	{'m', CMODE_MODERATED, 0},
-	{'n', CMODE_NOPRIVMSGS, 0},
-	{'p', CMODE_PRIVATE, 0},
 	{'r', CMODE_RGSTR, 0},
-	{'s', CMODE_SECRET, 0},
-	{'t', CMODE_TOPICLIMIT, 0},
 	{'x', CMODE_NOCOLOR, 0},
 	{'A', CMODE_ADMONLY, 0},
 	{'I', CMODE_NOINVITE, 0},
@@ -135,11 +124,9 @@ mode_init user_umodes[] = {
 	{'Z', UMODE_IRCADMIN},
 	{'z', UMODE_ADMIN},
 	{'i', UMODE_ALTADMIN},
-	{'o', UMODE_OPER},
 	{'p', UMODE_SUPER},
 	{'O', UMODE_LOCOP},
 	{'r', UMODE_REGNICK},
-	{'i', UMODE_INVISIBLE},
 	{'w', UMODE_WALLOP},
 	{'g', UMODE_FAILOP},
 	{'h', UMODE_HELPOP},

@@ -112,21 +112,10 @@ ircd_cmd cmd_list[] = {
 };
 
 mode_init chan_umodes[] = {
-	{'o', CUMODE_CHANOP, 0, '@'},
-	{'v', CUMODE_VOICE, 0, '+'},
 	{0, 0, 0},
 };
 
 mode_init chan_modes[] = {
-	{'s', CMODE_SECRET, 0},
-	{'p', CMODE_PRIVATE, 0},
-	{'m', CMODE_MODERATED, 0},
-	{'t', CMODE_TOPICLIMIT, 0},
-	{'i', CMODE_INVITEONLY, 0},
-	{'n', CMODE_NOPRIVMSGS, 0},
-	{'l', CMODE_LIMIT, 1},
-	{'k', CMODE_KEY, 1},
-	{'b', CMODE_BAN, 1},
 	/*{'b', CMODE_SENDTS, 1},*/
 #if ( defined NEFARIOUS ) || (defined ASUKA )
 	{'c', CMODE_NOCOLOR, 0},
@@ -152,10 +141,8 @@ mode_init chan_modes[] = {
 };
 
 mode_init user_umodes[] = {
-	{'o', UMODE_OPER},
 	{'O', UMODE_LOCOP},
 	{'g', UMODE_DEBUG},
-	{'i', UMODE_INVISIBLE},
 	{'w', UMODE_WALLOP},
 	{'s', UMODE_SERVNOTICE},
 	{'d', UMODE_DEAF},

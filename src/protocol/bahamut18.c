@@ -89,21 +89,10 @@ ircd_cmd cmd_list[] = {
 };
 
 mode_init chan_umodes[] = {
-	{'o', CUMODE_CHANOP, 0, '@'},
-	{'v', CUMODE_VOICE, 0, '+'},
 	{0, 0, 0},
 };
 
 mode_init chan_modes[] = {
- 	{'p', CMODE_PRIVATE, 0},
-	{'s', CMODE_SECRET, 0},
-	{'m', CMODE_MODERATED, 0},
-	{'t', CMODE_TOPICLIMIT, 0},
-	{'i', CMODE_INVITEONLY, 0},
-	{'n', CMODE_NOPRIVMSGS, 0},
-	{'k', CMODE_KEY, MODEPARAM},
-	{'b', CMODE_BAN, MODEPARAM},
-	{'l', CMODE_LIMIT, MODEPARAM},
 	{'r', CMODE_RGSTR, 0},
 	{'R', CMODE_RGSTRONLY, 0},
 	{'x', CMODE_NOCOLOR, 0},
@@ -116,10 +105,8 @@ mode_init chan_modes[] = {
 mode_init user_umodes[] = {
 	{'a', UMODE_SADMIN},
 	{'A', UMODE_ADMIN},
-	{'o', UMODE_OPER},
-	{'o', UMODE_LOCOP},
+	{'O', UMODE_LOCOP},
 	{'r', UMODE_REGNICK},
-	{'i', UMODE_INVISIBLE},
 	{'w', UMODE_WALLOP},
 	{'s', UMODE_SERVNOTICE},
 	{'c', UMODE_CLIENT},

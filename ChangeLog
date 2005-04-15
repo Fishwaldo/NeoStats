@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add default modes to ircd layer to further reduce overhead of protocol 
+   modules. (M)
  - Add support for SVSJOIN and SVSPART. (M)
  - LEVEL command now resets user level so that users can cause NeoStats to
    recheck their access rights after any settings changes. (M).

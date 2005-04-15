@@ -52,6 +52,31 @@ static char ircd_cmode_char_map[32];
 static char ircd_umode_char_map[32];
 static char ircd_smode_char_map[32];
 
+static mode_init chan_umodes_default[] = {
+	{'v', CUMODE_VOICE, 0, '+'},
+	{'o', CUMODE_CHANOP, 0, '@'},
+	{0, 0, 0},
+};
+
+static mode_init chan_modes_default[] = {
+	{'l', CMODE_LIMIT, MODEPARAM},
+	{'k', CMODE_KEY, MODEPARAM},
+	{'b', CMODE_BAN, MODEPARAM},
+ 	{'p', CMODE_PRIVATE, 0},
+	{'s', CMODE_SECRET, 0},
+	{'m', CMODE_MODERATED, 0},
+	{'t', CMODE_TOPICLIMIT, 0},
+	{'n', CMODE_NOPRIVMSGS, 0},
+	{'i', CMODE_INVITEONLY, 0},
+	{0, 0},
+};
+
+static mode_init user_umodes_default[] = {
+	{'o', UMODE_OPER},
+	{'i', UMODE_INVISIBLE},
+	{0, 0},
+};
+
 typedef struct ModeDesc {
 	unsigned int mask;
 	const char *desc;
@@ -135,14 +160,20 @@ InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const
 	/* build cmode lookup table */
 	os_memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
 	dlog(DEBUG4, "Build channel mode table...");
-	ircd_supported_cmodes = BuildModeTable( ircd_cmodes, chan_modes, 0 );
+	ircd_supported_cmodes |= BuildModeTable( ircd_cmodes, chan_modes_default, 0 );
+	if( chan_modes )
+		ircd_supported_cmodes |= BuildModeTable( ircd_cmodes, chan_modes, 0 );
 	/* build cumode lookup table */
 	dlog(DEBUG4, "Build channel user mode table...");
-	ircd_supported_cumodes = BuildModeTable( ircd_cmodes, chan_umodes, NICKPARAM );
+	ircd_supported_cumodes |= BuildModeTable( ircd_cmodes, chan_umodes_default, NICKPARAM );
+	if( chan_umodes )
+		ircd_supported_cumodes |= BuildModeTable( ircd_cmodes, chan_umodes, NICKPARAM );
 	/* build umode lookup table */
 	os_memset(&ircd_umodes, 0, sizeof(ircd_umodes));
 	dlog(DEBUG4, "Build user mode table...");
-	ircd_supported_umodes = BuildModeTable( ircd_umodes, user_umodes, 0 );
+	ircd_supported_umodes |= BuildModeTable( ircd_umodes, user_umodes_default, 0 );
+	if( user_umodes )
+		ircd_supported_umodes |= BuildModeTable( ircd_umodes, user_umodes, 0 );
 	/* build smode lookup table */
 	if (user_smodes) {
 		os_memset(&ircd_smodes, 0, sizeof(ircd_smodes));
