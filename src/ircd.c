@@ -147,7 +147,7 @@ msgtok_sym msgtok_sym_table[] =
 {
 	{( void * )&irc_send_join, &MSG_JOIN, "MSG_JOIN", &TOK_JOIN, "TOK_JOIN", _send_join, 0 },
 	{( void * )&irc_send_part, &MSG_PART, "MSG_PART", &TOK_PART, "TOK_PART", _send_part, 0 },
-	NULL, NULL,
+	{NULL, NULL, NULL, NULL, NULL, NULL, 0},
 };
 
 protocol_entry protocol_list[] =
