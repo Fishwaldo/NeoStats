@@ -24,28 +24,29 @@
 */
 
 #include "neostats.h"
-#include "ultimate2.h"
 #include "ircd.h"
+#include "ultimate2.h"
 #include "services.h"
 
-static void m_server (char *origin, char **argv, int argc, int srv);
-static void m_svsmode (char *origin, char **argv, int argc, int srv);
-static void m_nick (char *origin, char **argv, int argc, int srv);
-static void m_vhost (char *origin, char **argv, int argc, int srv);
-static void m_svsnick (char *origin, char **argv, int argc, int srv);
-static void m_snetinfo (char *origin, char **argv, int argc, int srv);
-static void m_vctrl (char *origin, char **argv, int argc, int srv);
+static void m_server( char *origin, char **argv, int argc, int srv );
+static void m_svsmode( char *origin, char **argv, int argc, int srv );
+static void m_nick( char *origin, char **argv, int argc, int srv );
+static void m_vhost( char *origin, char **argv, int argc, int srv );
+static void m_svsnick( char *origin, char **argv, int argc, int srv );
+static void m_snetinfo( char *origin, char **argv, int argc, int srv );
+static void m_vctrl( char *origin, char **argv, int argc, int srv );
 
 /* buffer sizes */
-const int proto_maxhost		= (128 + 1);
-const int proto_maxpass		= (32 + 1);
-const int proto_maxnick		= (32 + 1);
-const int proto_maxuser		= (15 + 1);
-const int proto_maxrealname	= (50 + 1);
-const int proto_chanlen		= (50 + 1);
-const int proto_topiclen	= (512 + 1);
+const int proto_maxhost		=( 128 + 1 );
+const int proto_maxpass		=( 32 + 1 );
+const int proto_maxnick		=( 32 + 1 );
+const int proto_maxuser		=( 15 + 1 );
+const int proto_maxrealname	=( 50 + 1 );
+const int proto_chanlen		=( 50 + 1 );
+const int proto_topiclen	=( 512 + 1 );
 
-ProtocolInfo protocol_info = {
+ProtocolInfo protocol_info = 
+{
 	/* Protocol options required by this IRCd */
 	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
@@ -56,7 +57,8 @@ ProtocolInfo protocol_info = {
 	"+a",
 };
 
-ircd_cmd cmd_list[] = {
+ircd_cmd cmd_list[] = 
+{
 	/* Command Token Function usage */
 	{MSG_PRIVATE,	0,		_m_private,	0},
 	{MSG_NOTICE,	0,		_m_notice,	0},
@@ -94,13 +96,15 @@ ircd_cmd cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
-mode_init chan_umodes[] = {
+mode_init chan_umodes[] = 
+{
 	{'h', CUMODE_HALFOP, 0, '%'},
 	{'a', CUMODE_CHANADMIN, 0, '!'},
 	{0, 0, 0},
 };
 
-mode_init chan_modes[] = {
+mode_init chan_modes[] = 
+{
 	{'e', CMODE_EXCEPT, MODEPARAM},
 	{'f', CMODE_FLOODLIMIT, MODEPARAM},
 	{'r', CMODE_RGSTR, 0},
@@ -115,7 +119,8 @@ mode_init chan_modes[] = {
 	{0, 0, 0},
 };
 
-mode_init user_umodes[] = {
+mode_init user_umodes[] = 
+{
 	{'S', UMODE_SERVICES},
 	{'P', UMODE_SADMIN},
 	{'T', UMODE_TECHADMIN},
@@ -141,256 +146,126 @@ mode_init user_umodes[] = {
 	{0, 0},
 };
 
-void
-send_server (const char *source, const char *name, const int numeric, const char *infoline)
+void send_server( const char *source, const char *name, const int numeric, const char *infoline )
 {
-	send_cmd (":%s %s %s %d :%s", source, MSG_SERVER, name, numeric, infoline);
+	send_cmd( ":%s %s %s %d :%s", source, MSG_SERVER, name, numeric, infoline );
 }
 
-void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
+void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
-	send_cmd ("%s %s", MSG_PASS, pass);
-	send_cmd ("%s %s %d :%s", MSG_SERVER, name, numeric, infoline);
-	send_cmd ("%s TOKEN CLIENT", MSG_PROTOCTL);
+	send_cmd( "%s %s", MSG_PASS, pass );
+	send_cmd( "%s %s %d :%s", MSG_SERVER, name, numeric, infoline );
+	send_cmd( "%s TOKEN CLIENT", MSG_PROTOCTL );
 }
 
-void
-send_squit (const char *server, const char *quitmsg)
+void send_cmode( const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts )
 {
-	send_cmd ("%s %s :%s", MSG_SQUIT, server, quitmsg);
+	send_cmd( ":%s %s %s %s %s %lu", who, MSGTOK( MODE ), chan, mode, args, ts );
 }
 
-void 
-send_quit (const char *source, const char *quitmsg)
+void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
-	send_cmd (":%s %s :%s", source, MSG_QUIT, quitmsg);
+	send_cmd( "%s %s 1 %lu %s %s %s 0 :%s", MSGTOK( NICK ), nick, ts, ident, host, server, realname );
+	send_umode( nick, nick, newmode );
 }
 
-void 
-send_part (const char *source, const char *chan, const char *reason)
+void send_umode( const char *source, const char *target, const char *mode )
 {
-	send_cmd (":%s %s %s :%s", source, MSG_PART, chan, reason);
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( MODE ), target, mode );
 }
 
-void 
-send_join (const char *source, const char *chan, const char *key, const unsigned long ts)
+void send_snetinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
 {
-	send_cmd (":%s %s %s", source, MSG_JOIN, chan);
+	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_SNETINFO, ts, prot, cloak, netname );
 }
 
-void 
-send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
+void send_netinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
 {
-	send_cmd (":%s %s %s %s %s %lu", who, MSGTOK(MODE), chan, mode, args, ts);
+	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_NETINFO, ts, prot, cloak, netname );
 }
 
-void
-send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
+void send_vctrl( const int uprot, const int nicklen, const int modex, const int gc, const char* netname )
 {
-	send_cmd ("%s %s 1 %lu %s %s %s 0 :%s", MSGTOK(NICK), nick, ts, ident, host, server, realname);
-	send_umode (nick, nick, newmode);
+	send_cmd( "%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname );
 }
 
-void
-send_ping (const char *source, const char *reply, const char *target)
+void send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
 {
-	send_cmd (":%s %s %s :%s", source, MSG_PING, reply, target);
+	send_cmd( ":%s %s %s %lu", oldnick, MSGTOK( NICK ), newnick, ts );
 }
 
-void 
-send_umode (const char *source, const char *target, const char *mode)
+void send_svshost( const char *source, const char *target, const char *vhost )
 {
-	send_cmd (":%s %s %s :%s", source, MSGTOK(MODE), target, mode);
+	send_cmd( ":%s %s %s %s", source, MSG_CHGHOST, target, vhost );
 }
 
-void 
-send_numeric (const char *source, const int numeric, const char *target, const char *buf)
+void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
-	send_cmd (":%s %d %s :%s", source, numeric, target, buf);
+	send_cmd( ":%s %s %s@%s %lu %lu %s :%s", source, MSG_GLINE, ident, host,( ts + length ), ts, setby, reason );
 }
 
-void
-send_pong (const char *reply)
-{
-	send_cmd ("%s %s", MSG_PONG, reply);
-}
-
-void
-send_snetinfo (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts)
-{
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_SNETINFO, ts, prot, cloak, netname);
-}
-
-void
-send_netinfo (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts)
-{
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_NETINFO, ts, prot, cloak, netname);
-}
-
-void
-send_vctrl (const int uprot, const int nicklen, const int modex, const int gc, const char* netname)
-{
-	send_cmd ("%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname);
-}
-
-void 
-send_kill (const char *source, const char *target, const char *reason)
-{
-	send_cmd (":%s %s %s :%s", source, MSG_KILL, target, reason);
-}
-
-void 
-send_svskill (const char *source, const char *target, const char *reason)
-{
-	send_cmd (":%s %s %s :%s", source, MSG_SVSKILL, target, reason);
-}
-
-void 
-send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
-{
-	send_cmd (":%s %s %s %lu", oldnick, MSGTOK(NICK), newnick, ts);
-}
-
-void 
-send_svsnick (const char *source, const char *target, const char *newnick, const unsigned long ts)
-{
-	send_cmd ("%s %s %s :%lu", MSG_SVSNICK, target, newnick, ts);
-}
-
-void
-send_svsjoin (const char *source, const char *target, const char *chan)
-{
-	send_cmd ("%s %s %s", MSG_SVSJOIN, target, chan);
-}
-
-void
-send_svspart (const char *source, const char *target, const char *chan)
-{
-	send_cmd ("%s %s %s", MSG_SVSPART, target, chan);
-}
-
-void 
-send_kick (const char *source, const char *chan, const char *target, const char *reason)
-{
-	send_cmd (":%s %s %s %s :%s", source, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
-}
-
-void 
-send_wallops (const char *source, const char *buf)
-{
-	send_cmd (":%s %s :%s", source, MSG_WALLOPS, buf);
-}
-
-void
-send_svshost (const char *source, const char *target, const char *vhost)
-{
-	send_cmd (":%s %s %s %s", source, MSG_CHGHOST, target, vhost);
-}
-
-void
-send_invite (const char *source, const char *target, const char *chan) 
-{
-	send_cmd (":%s %s %s %s", source, MSG_INVITE, target, chan);
-}
-
-void 
-send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
-{
-	send_cmd (":%s %s %s@%s %lu %lu %s :%s", source, MSG_GLINE, ident, host, (ts + length), ts, setby, reason);
-}
-
-void 
-send_rakill (const char *source, const char *host, const char *ident)
+void send_rakill( const char *source, const char *host, const char *ident )
 {
 	/* ultimate2 needs an oper to remove */
-	send_cmd (":%s %s :%s@%s", ns_botptr->name, MSG_REMGLINE, host, ident);
+	send_cmd( ":%s %s :%s@%s", ns_botptr->name, MSG_REMGLINE, host, ident );
 }
 
-void
-send_svinfo (const int tscurrent, const int tsmin, const unsigned long tsnow)
+void send_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow )
 {
-	send_cmd ("%s %d %d 0 :%lu", MSG_SVINFO, tscurrent, tsmin, tsnow);
+	send_cmd( "%s %d %d 0 :%lu", MSG_SVINFO, tscurrent, tsmin, tsnow );
 }
 
-void
-send_burst (int b)
+void send_burst( int b )
 {
-	if (b == 0) {
-		send_cmd ("BURST 0");
+	if( b == 0 ) {
+		send_cmd( "BURST 0" );
 	} else {
-		send_cmd ("BURST");
+		send_cmd( "BURST" );
 	}
 }
 
-void
-send_privmsg (const char *source, const char *target, const char *buf)
+static void m_server( char *origin, char **argv, int argc, int srv )
 {
-	send_cmd (":%s %s %s :%s", source, MSG_PRIVATE, target, buf);
-}
-
-void
-send_notice (const char *source, const char *target, const char *buf)
-{
-	send_cmd (":%s %s %s :%s", source, MSG_NOTICE, target, buf);
-}
-
-void
-send_globops (const char *source, const char *buf)
-{
-	send_cmd (":%s %s :%s", source, MSG_GLOBOPS, buf);
-}
-
-static void
-m_server (char *origin, char **argv, int argc, int srv)
-{
-	if(argc > 2) {
-		do_server (argv[0], origin, argv[1], argv[2], NULL, srv);
+	if( argc > 2 ) {
+		do_server( argv[0], origin, argv[1], argv[2], NULL, srv );
 	} else {
-		do_server (argv[0], origin, NULL, argv[1], NULL, srv);
+		do_server( argv[0], origin, NULL, argv[1], NULL, srv );
 	}
 }
 
-static void
-m_svsmode (char *origin, char **argv, int argc, int srv)
+static void m_svsmode( char *origin, char **argv, int argc, int srv )
 {
-	if (argv[0][0] == '#') {
-		do_svsmode_channel (origin, argv, argc);
+	if( argv[0][0] == '#' ) {
+		do_svsmode_channel( origin, argv, argc );
 	} else {
-		do_svsmode_user (argv[0], argv[1], NULL);
+		do_svsmode_user( argv[0], argv[1], NULL );
 	}
 }
-static void
-m_vhost (char *origin, char **argv, int argc, int srv)
+static void m_vhost( char *origin, char **argv, int argc, int srv )
 {
-	do_vhost (origin, argv[0]);
+	do_vhost( origin, argv[0] );
 }
 
-static void
-m_nick (char *origin, char **argv, int argc, int srv)
+static void m_nick( char *origin, char **argv, int argc, int srv )
 {
-	if(!srv) {
-		do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			NULL, NULL, NULL, NULL, argv[7], NULL, NULL);
-	} else {
-		do_nickchange (origin, argv[0], NULL);
-	}
+	if( !srv )
+		do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+			NULL, NULL, NULL, NULL, argv[7], NULL, NULL );
+	else
+		do_nickchange( origin, argv[0], NULL );
 }
 
-static void
-m_vctrl (char *origin, char **argv, int argc, int srv)
+static void m_vctrl( char *origin, char **argv, int argc, int srv )
 {
-	do_vctrl (argv[0], argv[1], argv[2], argv[3], argv[14]);
+	do_vctrl( argv[0], argv[1], argv[2], argv[3], argv[14] );
 }
 
-static void
-m_snetinfo (char *origin, char **argv, int argc, int srv)
+static void m_snetinfo( char *origin, char **argv, int argc, int srv )
 {
-	do_snetinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
+	do_snetinfo( argv[0], argv[1], argv[2], argv[3], argv[7] );
 }
 
-static void
-m_svsnick (char *origin, char **argv, int argc, int srv)
+static void m_svsnick( char *origin, char **argv, int argc, int srv )
 {
-	do_nickchange (argv[0], argv[1], NULL);
+	do_nickchange( argv[0], argv[1], NULL );
 }

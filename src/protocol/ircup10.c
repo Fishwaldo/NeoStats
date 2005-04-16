@@ -21,8 +21,9 @@
 ** $Id$
 */
 
-#include "ircup10.h"
 #include "neostats.h"
+#define IGNORECOREMESSAGEDEFS
+#include "ircup10.h"
 #include "ircd.h"
 #include "base64.h"
 #ifdef HAVE_ARPA_INET_H

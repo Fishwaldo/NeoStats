@@ -53,6 +53,7 @@
 typedef struct ircd_sym 
 {
 	void **handler;
+	void *defaulthandler;
 	char *sym;
 	unsigned int required;
 	unsigned int feature;
@@ -85,8 +86,28 @@ static ircd_cmd *cmd_list;
 
 static void *protocol_module_handle;
 
+static void _send_numeric( const char *source, const int numeric, const char *target, const char *buf );
+static void _send_privmsg( const char *source, const char *target, const char *buf );
+static void _send_notice( const char *source, const char *target, const char *buf );
+static void _send_wallops( const char *source, const char *buf );
+static void _send_globops( const char *source, const char *buf );
 static void _send_join( const char *source, const char *chan, const char *key, const unsigned long ts );
 static void _send_part( const char *source, const char *chan, const char *reason );
+static void _send_kick( const char *source, const char *chan, const char *target, const char *reason );
+static void _send_invite( const char *source, const char *target, const char *chan );
+static void _send_quit( const char *source, const char *quitmsg );
+static void _send_ping( const char *source, const char *reply, const char *target );
+static void _send_pong( const char *reply );
+static void _send_squit( const char *server, const char *quitmsg );
+static void _send_kill( const char *source, const char *target, const char *reason );
+static void _send_setname( const char *nick, const char *realname );
+static void _send_sethost( const char *nick, const char *host );
+static void _send_setident( const char *nick, const char *ident );
+static void _send_svsnick( const char *source, const char *target, const char *newnick, const unsigned long ts );
+static void _send_svsjoin( const char *source, const char *target, const char *chan );
+static void _send_svspart( const char *source, const char *target, const char *chan );
+static void _send_svsmode( const char *source, const char *target, const char *modes );
+static void _send_svskill( const char *source, const char *target, const char *reason );
 
 static void( *irc_send_privmsg )( const char *source, const char *to, const char *buf );
 static void( *irc_send_notice )( const char *source, const char *to, const char *buf );
@@ -138,15 +159,72 @@ static void( *irc_send_serverrequptime )( const char *source, const char *target
 static void( *irc_send_serverreqversion )( const char *source, const char *target );
 static void( *irc_send_cloakhost )( char* host );
 
+static char *MSG_PRIVATE;
+static char *TOK_PRIVATE;
+static char *MSG_NOTICE;
+static char *TOK_NOTICE;
+static char *MSG_WALLOPS;
+static char *TOK_WALLOPS;
+static char *MSG_GLOBOPS;
+static char *TOK_GLOBOPS;
+static char *MSG_QUIT;
+static char *TOK_QUIT;
 static char *MSG_JOIN;
 static char *TOK_JOIN;
 static char *MSG_PART;
 static char *TOK_PART;
+static char *MSG_KICK;
+static char *TOK_KICK;
+static char *MSG_INVITE;
+static char *TOK_INVITE;
+static char *MSG_PING;
+static char *TOK_PING;
+static char *MSG_PONG;
+static char *TOK_PONG;
+static char *MSG_SQUIT;
+static char *TOK_SQUIT;
+static char *MSG_KILL;
+static char *TOK_KILL;
+static char *MSG_SETNAME;
+static char *TOK_SETNAME;
+static char *MSG_SETHOST;
+static char *TOK_SETHOST;
+static char *MSG_SETIDENT;
+static char *TOK_SETIDENT;
+static char *MSG_SVSNICK;
+static char *TOK_SVSNICK;
+static char *MSG_SVSJOIN;
+static char *TOK_SVSJOIN;
+static char *MSG_SVSPART;
+static char *TOK_SVSPART;
+static char *MSG_SVSMODE;
+static char *TOK_SVSMODE;
+static char *MSG_SVSKILL;
+static char *TOK_SVSKILL;
 
 msgtok_sym msgtok_sym_table[] =
 {
+	{( void * )&irc_send_privmsg, &MSG_PRIVATE, "MSG_PRIVATE", &TOK_PRIVATE, "TOK_PRIVATE", _send_privmsg, 0 },
+	{( void * )&irc_send_notice, &MSG_NOTICE, "MSG_NOTICE", &TOK_NOTICE, "TOK_NOTICE", _send_notice, 0 },
+	{( void * )&irc_send_wallops, &MSG_WALLOPS, "MSG_WALLOPS", &TOK_WALLOPS, "TOK_WALLOPS", _send_wallops, 0 },
+	{( void * )&irc_send_globops, &MSG_GLOBOPS, "MSG_GLOBOPS", &TOK_GLOBOPS, "TOK_GLOBOPS", _send_globops, 0 },
 	{( void * )&irc_send_join, &MSG_JOIN, "MSG_JOIN", &TOK_JOIN, "TOK_JOIN", _send_join, 0 },
 	{( void * )&irc_send_part, &MSG_PART, "MSG_PART", &TOK_PART, "TOK_PART", _send_part, 0 },
+	{( void * )&irc_send_kick, &MSG_KICK, "MSG_KICK", &TOK_KICK, "TOK_KICK", _send_kick, 0 },
+	{( void * )&irc_send_invite, &MSG_INVITE, "MSG_INVITE", &TOK_INVITE, "TOK_INVITE", _send_invite, 0 },
+	{( void * )&irc_send_quit, &MSG_QUIT, "MSG_QUIT", &TOK_QUIT, "TOK_QUIT", _send_quit, 0 },
+	{( void * )&irc_send_ping, &MSG_PING, "MSG_PING", &TOK_PING, "TOK_PING", _send_ping, 0 },
+	{( void * )&irc_send_pong, &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", _send_pong, 0 },
+	{( void * )&irc_send_squit, &MSG_SQUIT, "MSG_SQUIT", &TOK_SQUIT, "TOK_SQUIT", _send_squit, 0 },
+	{( void * )&irc_send_kill, &MSG_KILL, "MSG_KILL", &TOK_KILL, "TOK_KILL", _send_kill, 0 },
+	{( void * )&irc_send_setname, &MSG_SETNAME, "MSG_SETNAME", &TOK_SETNAME, "TOK_SETNAME", _send_setname, 0 },
+	{( void * )&irc_send_sethost, &MSG_SETHOST, "MSG_SETHOST", &TOK_SETHOST, "TOK_SETHOST", _send_sethost, 0 },
+	{( void * )&irc_send_setident, &MSG_SETIDENT, "MSG_SETIDENT", &TOK_SETIDENT, "TOK_SETIDENT", _send_setident, 0 },
+	{( void * )&irc_send_svsnick, &MSG_SVSNICK, "MSG_SVSNICK", &TOK_SVSNICK, "TOK_SVSNICK", _send_svsnick, 0 },
+	{( void * )&irc_send_svsjoin, &MSG_SVSJOIN, "MSG_SVSJOIN", &TOK_SVSJOIN, "TOK_SVSJOIN", _send_svsjoin, 0 },
+	{( void * )&irc_send_svspart, &MSG_SVSPART, "MSG_SVSPART", &TOK_SVSPART, "TOK_SVSPART", _send_svspart, 0 },
+	{( void * )&irc_send_svsmode, &MSG_SVSMODE, "MSG_SVSMODE", &TOK_SVSMODE, "TOK_SVSMODE", _send_svsmode, 0 },
+	{( void * )&irc_send_svskill, &MSG_SVSKILL, "MSG_SVSKILL", &TOK_SVSKILL, "TOK_SVSKILL", _send_svskill, 0 },
 	{NULL, NULL, NULL, NULL, NULL, NULL, 0},
 };
 
@@ -164,54 +242,54 @@ protocol_entry protocol_list[] =
 
 static ircd_sym ircd_sym_table[] = 
 {
-	{( void * )&irc_send_privmsg, "send_privmsg", 1, 0},
-	{( void * )&irc_send_notice, "send_notice", 1, 0},
-	{( void * )&irc_send_globops, "send_globops", 0, 0},
-	{( void * )&irc_send_wallops, "send_wallops", 0, 0},
-	{( void * )&irc_send_numeric, "send_numeric", 0, 0},
-	{( void * )&irc_send_umode, "send_umode", 1, 0},
-	{( void * )&irc_send_join, "send_join", 1, 0},
-	{( void * )&irc_send_sjoin, "send_sjoin", 0, 0},
-	{( void * )&irc_send_part, "send_part", 1, 0},
-	{( void * )&irc_send_nickchange, "send_nickchange", 1, 0},
-	{( void * )&irc_send_cmode, "send_cmode", 1, 0},
-	{( void * )&irc_send_quit, "send_quit", 1, 0},
-	{( void * )&irc_send_kill, "send_kill", 0, 0},
-	{( void * )&irc_send_kick, "send_kick", 0, 0},
-	{( void * )&irc_send_invite, "send_invite", 0, 0},
-	{( void * )&irc_send_svskill, "send_svskill", 0, FEATURE_SVSKILL},
-	{( void * )&irc_send_svsmode, "send_svsmode", 0, FEATURE_SVSMODE},
-	{( void * )&irc_send_svshost, "send_svshost", 0, FEATURE_SVSHOST},
-	{( void * )&irc_send_svsjoin, "send_svsjoin", 0, FEATURE_SVSJOIN},
-	{( void * )&irc_send_svspart, "send_svspart", 0, FEATURE_SVSPART},
-	{( void * )&irc_send_svsnick, "send_svsnick", 0, FEATURE_SVSNICK},
-	{( void * )&irc_send_swhois, "send_swhois", 0, FEATURE_SWHOIS},
-	{( void * )&irc_send_smo, "send_smo", 0, FEATURE_SMO},
-	{( void * )&irc_send_svstime, "send_svstime", 0, FEATURE_SVSTIME},
-	{( void * )&irc_send_akill, "send_akill", 0, 0},
-	{( void * )&irc_send_sqline, "send_sqline", 0, 0},
-	{( void * )&irc_send_unsqline, "send_unsqline", 0, 0},
-	{( void * )&irc_send_zline, "send_zline", 0, 0},
-	{( void * )&irc_send_unzline, "send_unzline", 0, 0},
-	{( void * )&irc_send_rakill, "send_rakill", 0, 0},
-	{( void * )&irc_send_ping, "send_ping", 0, 0},
-	{( void * )&irc_send_pong, "send_pong", 0, 0},
-	{( void * )&irc_send_server, "send_server", 0, 0},
-	{( void * )&irc_send_squit, "send_squit", 0, 0},
-	{( void * )&irc_send_nick, "send_nick", 1, 0},
-	{( void * )&irc_send_server_connect, "send_server_connect", 1, 0},
-	{( void * )&irc_send_netinfo, "send_netinfo", 0, 0},
-	{( void * )&irc_send_snetinfo, "send_snetinfo", 0, 0},
-	{( void * )&irc_send_svinfo, "send_svinfo", 0, 0},
-	{( void * )&irc_send_vctrl, "send_vctrl", 0, 0},
-	{( void * )&irc_send_burst, "send_burst", 0, 0},
-	{( void * )&irc_send_setname, "send_setname", 0, 0},
-	{( void * )&irc_send_sethost, "send_sethost", 0, 0},
-	{( void * )&irc_send_setident, "send_setident", 0, 0},
-	{( void * )&irc_send_cloakhost, "cloakhost", 0, 0},
-	{( void * )&irc_send_serverrequptime, "send_serverrequptime", 0, 0},
-	{( void * )&irc_send_serverreqversion, "send_serverreqversion", 0, 0},
-	{NULL, NULL, 0, 0},
+	{( void * )&irc_send_privmsg, NULL, "send_privmsg", 1, 0},
+	{( void * )&irc_send_notice, NULL, "send_notice", 1, 0},
+	{( void * )&irc_send_globops, NULL, "send_globops", 0, 0},
+	{( void * )&irc_send_wallops, NULL, "send_wallops", 0, 0},
+	{( void * )&irc_send_numeric, _send_numeric, "send_numeric", 0, 0},
+	{( void * )&irc_send_umode, NULL, "send_umode", 1, 0},
+	{( void * )&irc_send_join, NULL, "send_join", 1, 0},
+	{( void * )&irc_send_sjoin, NULL, "send_sjoin", 0, 0},
+	{( void * )&irc_send_part, NULL, "send_part", 1, 0},
+	{( void * )&irc_send_nickchange, NULL, "send_nickchange", 1, 0},
+	{( void * )&irc_send_cmode, NULL, "send_cmode", 1, 0},
+	{( void * )&irc_send_quit, NULL, "send_quit", 1, 0},
+	{( void * )&irc_send_kill, NULL, "send_kill", 0, 0},
+	{( void * )&irc_send_kick, NULL, "send_kick", 0, 0},
+	{( void * )&irc_send_invite, NULL, "send_invite", 0, 0},
+	{( void * )&irc_send_svskill, NULL, "send_svskill", 0, FEATURE_SVSKILL},
+	{( void * )&irc_send_svsmode, NULL, "send_svsmode", 0, FEATURE_SVSMODE},
+	{( void * )&irc_send_svshost, NULL, "send_svshost", 0, FEATURE_SVSHOST},
+	{( void * )&irc_send_svsjoin, NULL, "send_svsjoin", 0, FEATURE_SVSJOIN},
+	{( void * )&irc_send_svspart, NULL, "send_svspart", 0, FEATURE_SVSPART},
+	{( void * )&irc_send_svsnick, NULL, "send_svsnick", 0, FEATURE_SVSNICK},
+	{( void * )&irc_send_swhois, NULL, "send_swhois", 0, FEATURE_SWHOIS},
+	{( void * )&irc_send_smo, NULL, "send_smo", 0, FEATURE_SMO},
+	{( void * )&irc_send_svstime, NULL, "send_svstime", 0, FEATURE_SVSTIME},
+	{( void * )&irc_send_akill, NULL, "send_akill", 0, 0},
+	{( void * )&irc_send_sqline, NULL, "send_sqline", 0, 0},
+	{( void * )&irc_send_unsqline, NULL, "send_unsqline", 0, 0},
+	{( void * )&irc_send_zline, NULL, "send_zline", 0, 0},
+	{( void * )&irc_send_unzline, NULL, "send_unzline", 0, 0},
+	{( void * )&irc_send_rakill, NULL, "send_rakill", 0, 0},
+	{( void * )&irc_send_ping, NULL, "send_ping", 0, 0},
+	{( void * )&irc_send_pong, NULL, "send_pong", 0, 0},
+	{( void * )&irc_send_server, NULL, "send_server", 0, 0},
+	{( void * )&irc_send_squit, NULL, "send_squit", 0, 0},
+	{( void * )&irc_send_nick, NULL, "send_nick", 1, 0},
+	{( void * )&irc_send_server_connect, NULL, "send_server_connect", 1, 0},
+	{( void * )&irc_send_netinfo, NULL, "send_netinfo", 0, 0},
+	{( void * )&irc_send_snetinfo, NULL, "send_snetinfo", 0, 0},
+	{( void * )&irc_send_svinfo, NULL, "send_svinfo", 0, 0},
+	{( void * )&irc_send_vctrl, NULL, "send_vctrl", 0, 0},
+	{( void * )&irc_send_burst, NULL, "send_burst", 0, 0},
+	{( void * )&irc_send_setname, NULL, "send_setname", 0, 0},
+	{( void * )&irc_send_sethost, NULL, "send_sethost", 0, 0},
+	{( void * )&irc_send_setident, NULL, "send_setident", 0, 0},
+	{( void * )&irc_send_cloakhost, NULL, "cloakhost", 0, 0},
+	{( void * )&irc_send_serverrequptime, NULL, "send_serverrequptime", 0, 0},
+	{( void * )&irc_send_serverreqversion, NULL, "send_serverreqversion", 0, 0},
+	{NULL, NULL, NULL, 0, 0},
 };
 
 static void IrcdError( char* err )
@@ -278,6 +356,8 @@ static int InitIrcdSymbols( void )
 		*pmsgtok_sym->msgptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->msgsym );
 		if( pmsgtok_sym->tokptr )
 			*pmsgtok_sym->tokptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->toksym );
+		if( pmsgtok_sym->msgptr )
+			*pmsgtok_sym->handler = pmsgtok_sym->defaulthandler;
 		pmsgtok_sym ++;
 	}
 	/* Build up protocol module overrides */
@@ -287,6 +367,8 @@ static int InitIrcdSymbols( void )
 		protocol_handler = ns_dlsym( protocol_module_handle, pircd_sym->sym );
 		if( protocol_handler )
 			*pircd_sym->handler = protocol_handler;
+		if( !pircd_sym->handler ) 
+			*pircd_sym->handler = pircd_sym->defaulthandler;
 		if( pircd_sym->required && !*pircd_sym->handler ) 
 		{
 			IrcdError( pircd_sym->sym );
@@ -912,6 +994,26 @@ void _m_svspart( char *origin, char **argv, int argc, int srv )
 	do_part( argv[0], argv[1], argv[2] );
 }
 
+/** @brief _m_svinfo
+ *
+ *  process SVINFO command
+ *  RX: 
+ *  SVINFO
+ *	argv[0]
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_svinfo( char *origin, char **argv, int argc, int srv )
+{
+	do_svinfo();
+}
+
 /** @brief _m_notice
  *
  *  process NOTICE command
@@ -948,7 +1050,7 @@ void _m_notice( char* origin, char **argv, int argc, int cmdptr )
 
 /** @brief _m_private
  *
- *  process PRIVMSG command
+ *  process PRIVATE command
  *
  *  @param origin source of message (user/server)
  *  @param av list of message parameters
@@ -2949,15 +3051,115 @@ void do_setident( const char* nick, const char* ident )
 	}
 }
 
+static void _send_numeric( const char *source, const int numeric, const char *target, const char *buf )
+{
+	send_cmd( ":%s %d %s :%s", source, numeric, target, buf );
+}
+
+static void _send_privmsg( const char *source, const char *target, const char *buf )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( PRIVATE ), target, buf );
+}
+
+static void _send_notice( const char *source, const char *target, const char *buf )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( NOTICE ), target, buf );
+}
+
+static void _send_wallops( const char *source, const char *buf )
+{
+	send_cmd( ":%s %s :%s", source, MSGTOK( WALLOPS ), buf );
+}
+
+static void _send_globops( const char *source, const char *buf )
+{
+	send_cmd( ":%s %s :%s", source, MSGTOK( GLOBOPS ), buf );
+}
+
 static void _send_join( const char *source, const char *chan, const char *key, const unsigned long ts )
 {
+	send_cmd( ":%s %s %s", source, MSGTOK( JOIN ), chan );
 }
 
 static void _send_part( const char *source, const char *chan, const char *reason )
 {
-	send_cmd (":%s %s %s :%s", source, MSGTOK(PART), chan, reason);
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( PART ), chan, reason );
 }
 
+static void _send_kick( const char *source, const char *chan, const char *target, const char *reason )
+{
+	send_cmd( ":%s %s %s %s :%s", source, MSGTOK( KICK ), chan, target, ( reason ? reason : "No Reason Given" ) );
+}
+
+static void _send_invite( const char *source, const char *target, const char *chan )
+{
+	send_cmd( ":%s %s %s %s", source, MSGTOK( INVITE ), target, chan );
+}
+
+static void _send_quit( const char *source, const char *quitmsg )
+{
+	send_cmd( ":%s %s :%s", source, MSGTOK( QUIT ), quitmsg );
+}
+
+static void _send_ping( const char *source, const char *reply, const char *target )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( PING ), reply, target );
+}
+
+static void _send_pong( const char *reply )
+{
+	send_cmd( "%s %s", MSGTOK( PONG ), reply );
+}
+
+static void _send_squit( const char *server, const char *quitmsg )
+{
+	send_cmd( "%s %s :%s", MSGTOK( SQUIT ), server, quitmsg );
+}
+
+static void _send_kill( const char *source, const char *target, const char *reason )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK(KILL), target, reason );
+}
+
+static void _send_setname( const char *nick, const char *realname )
+{
+	send_cmd( ":%s %s :%s", nick, MSGTOK( SETNAME ), realname );
+}
+
+static void _send_sethost( const char *nick, const char *host )
+{
+	send_cmd( ":%s %s :%s", nick, MSGTOK( SETHOST ), host );
+}
+
+static void _send_setident( const char *nick, const char *ident )
+{
+	send_cmd( ":%s %s :%s", nick, MSGTOK( SETIDENT ), ident );
+}
+
+static void _send_svsnick( const char *source, const char *target, const char *newnick, const unsigned long ts )
+{
+	send_cmd( "%s %s %s :%lu", MSGTOK( SVSNICK ), target, newnick, ts );
+}
+
+static void _send_svsjoin( const char *source, const char *target, const char *chan )
+{
+	send_cmd( "%s %s %s", MSGTOK( SVSJOIN ), target, chan);
+}
+
+static void _send_svspart( const char *source, const char *target, const char *chan )
+{
+	send_cmd( "%s %s %s", MSGTOK( SVSPART ), target, chan );
+}
+
+static void _send_svsmode( const char *source, const char *target, const char *modes )
+{
+	send_cmd( ":%s %s %s %s", source, MSGTOK( SVSMODE ), target, modes );
+}
+
+static void _send_svskill( const char *source, const char *target, const char *reason )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( SVSKILL ), target, reason );
+}
 
 /** @brief send_cmd
  *

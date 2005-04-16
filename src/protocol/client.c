@@ -22,31 +22,31 @@
 */
 
 #include "neostats.h"
+#include "ircd.h"
 #include "client.h"
 #include "bots.h"
 #include "users.h"
-#include "ircd.h"
 
-static void m_private (char* origin, char **av, int ac, int cmdptr);
-static void m_notice (char* origin, char **av, int ac, int cmdptr);
-static void m_nick (char *origin, char **argv, int argc, int srv);
-static void m_topic (char *origin, char **argv, int argc, int srv);
-static void m_kick (char *origin, char **argv, int argc, int srv);
-static void m_join (char *origin, char **argv, int argc, int srv);
-static void m_part (char *origin, char **argv, int argc, int srv);
-static void m_vhost (char *origin, char **argv, int argc, int srv);
-static void m_emotd (char *origin, char **argv, int argc, int srv);
+static void m_private( char* origin, char **av, int ac, int cmdptr );
+static void m_nick( char *origin, char **argv, int argc, int srv );
+static void m_topic( char *origin, char **argv, int argc, int srv );
+static void m_kick( char *origin, char **argv, int argc, int srv );
+static void m_join( char *origin, char **argv, int argc, int srv );
+static void m_part( char *origin, char **argv, int argc, int srv );
+static void m_vhost( char *origin, char **argv, int argc, int srv );
+static void m_emotd( char *origin, char **argv, int argc, int srv );
 
 /* buffer sizes */
-const int proto_maxhost		= (128 + 1);
-const int proto_maxpass		= (32 + 1);
-const int proto_maxnick		= (30 + 1);
-const int proto_maxuser		= (10 + 1);
-const int proto_maxrealname	= (50 + 1);
-const int proto_chanlen		= (32 + 1);
-const int proto_topiclen	= (307 + 1);
+const int proto_maxhost		=( 128 + 1 );
+const int proto_maxpass		=( 32 + 1 );
+const int proto_maxnick		=( 30 + 1 );
+const int proto_maxuser		=( 10 + 1 );
+const int proto_maxrealname	=( 50 + 1 );
+const int proto_chanlen		=( 32 + 1 );
+const int proto_topiclen	=( 307 + 1 );
 
-ProtocolInfo protocol_info = {
+ProtocolInfo protocol_info = 
+{
 	/* Protocol options required by this IRCd */
 	PROTOCOL_CLIENTMODE,
 	/* Protocol options negotiated at link by this IRCd */
@@ -57,10 +57,11 @@ ProtocolInfo protocol_info = {
 	"+o",
 };
 
-ircd_cmd cmd_list[] = {
+ircd_cmd cmd_list[] = 
+{
 	/*Message	Token	Function	usage */
 	{MSG_PRIVATE, 0, m_private, 0},
-	{MSG_NOTICE, 0, m_notice, 0},
+	{MSG_NOTICE, 0, _m_notice, 0},
 	{"376", 0, m_emotd, 0},
 	{MSG_SETHOST, 0, m_vhost, 0},
 	{MSG_QUIT, 0, _m_quit, 0},
@@ -81,14 +82,16 @@ ircd_cmd cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
-mode_init chan_umodes[] = {
+mode_init chan_umodes[] = 
+{
 	{'h', CUMODE_HALFOP, 0, '%'},
 	{'a', CUMODE_CHANPROT, 0, '*'},
 	{'q', CUMODE_CHANOWNER, 0, '~'},
 	{0, 0, 0},
 };
 
-mode_init chan_modes[] = {
+mode_init chan_modes[] = 
+{
 	{'r', CMODE_RGSTR, 0},
 	{'R', CMODE_RGSTRONLY, 0},
 	{'c', CMODE_NOCOLOR, 0},
@@ -110,7 +113,8 @@ mode_init chan_modes[] = {
 	{0, 0},
 };
 
-mode_init user_umodes[] = {
+mode_init user_umodes[] = 
+{
 	{'S', UMODE_SERVICES},
 	{'N', UMODE_NETADMIN},
 	{'a', UMODE_SADMIN},
@@ -140,145 +144,57 @@ mode_init user_umodes[] = {
 	{0, 0},
 };
 
-void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
+void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
-	send_cmd ("%s %s", MSG_PASS, pass);
-	send_cmd ("%s %s", MSG_NICK, "NeoStats");
-	send_cmd ("%s %s %d %d :%s", MSG_USER, "user", (int) me.now, (int) me.now, "real name");
+	send_cmd( "%s %s", MSG_PASS, pass );
+	send_cmd( "%s %s", MSG_NICK, "NeoStats" );
+	send_cmd( "%s %s %d %d :%s", MSG_USER, "user",( int ) me.now,( int ) me.now, "real name" );
 }
 
-void 
-send_quit (const char *source, const char *quitmsg)
+void send_cmode( const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts )
 {
-	send_cmd (":%s %s :%s", source, MSG_QUIT, quitmsg);
+	send_cmd( ":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts );
 }
 
-void 
-send_part (const char *source, const char *chan, const char *reason)
+void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
-	send_cmd (":%s %s %s :%s", source, MSG_PART, chan, reason);
+	send_cmd( "%s %s", MSG_NICK, nick );
 }
 
-void 
-send_join (const char *source, const char *chan, const char *key, const unsigned long ts)
+void send_umode( const char *source, const char *target, const char *mode )
 {
-	send_cmd (":%s %s %s", source, MSG_JOIN, chan);
+	send_cmd( ":%s %s %s :%s", source, MSG_MODE, target, mode );
 }
 
-void 
-send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
+void send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
 {
-	send_cmd (":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts);
+	send_cmd( ":%s %s %s", oldnick, MSG_NICK, newnick );
 }
 
-void
-send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
+void send_swhois( const char *source, const char *target, const char *swhois )
 {
-	send_cmd ("%s %s", MSG_NICK, nick);
-}
-
-void
-send_ping (const char *from, const char *reply, const char *target)
-{
-	send_cmd (":%s %s %s :%s", from, MSG_PING, reply, target);
-}
-
-void 
-send_umode (const char *source, const char *target, const char *mode)
-{
-	send_cmd (":%s %s %s :%s", source, MSG_MODE, target, mode);
-}
-
-void 
-send_numeric (const char *from, const int numeric, const char *target, const char *buf)
-{
-	send_cmd (":%s %d %s :%s", from, numeric, target, buf);
-}
-
-void
-send_pong (const char *reply)
-{
-	send_cmd ("%s %s", MSG_PONG, reply);
-}
-
-void 
-send_kill (const char *from, const char *target, const char *reason)
-{
-	send_cmd (":%s %s %s :%s", from, MSG_KILL, target, reason);
-}
-
-void 
-send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
-{
-	send_cmd (":%s %s %s", oldnick, MSG_NICK, newnick);
-}
-
-void
-send_swhois (const char *source, const char *target, const char *swhois)
-{
-	send_cmd ("%s %s :%s", MSG_SWHOIS, target, swhois);
-}
-
-void 
-send_kick (const char *source, const char *chan, const char *target, const char *reason)
-{
-	send_cmd (":%s %s %s %s :%s", source, MSG_KICK, chan, target, (reason ? reason : "No Reason Given"));
-}
-
-void 
-send_wallops (const char *source, const char *buf)
-{
-	send_cmd (":%s %s :%s", source, MSG_WALLOPS, buf);
-}
-
-void
-send_invite (const char *from, const char *target, const char *chan) 
-{
-	send_cmd (":%s %s %s %s", from, MSG_INVITE, target, chan);
+	send_cmd( "%s %s :%s", MSG_SWHOIS, target, swhois );
 }
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
-void 
-send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
+void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
-	send_cmd (":%s %s + G %s %s %s %lu %lu :%s", source, MSG_TKL, ident, host, setby, (ts + length), ts, reason);
+	send_cmd( ":%s %s + G %s %s %s %lu %lu :%s", source, MSG_TKL, ident, host, setby,( ts + length ), ts, reason );
 }
 
-void 
-send_rakill (const char *source, const char *host, const char *ident)
+void send_rakill( const char *source, const char *host, const char *ident )
 {
-	send_cmd (":%s %s - G %s %s %s", source, MSG_TKL, ident, host, source);
+	send_cmd( ":%s %s - G %s %s %s", source, MSG_TKL, ident, host, source );
 }
 
-void
-send_privmsg (const char *source, const char *target, const char *buf)
+static void m_vhost( char *origin, char **argv, int argc, int srv )
 {
-	send_cmd (":%s %s %s :%s", source, MSG_PRIVATE, target, buf);
+	do_vhost( origin, argv[0] );
 }
 
-void
-send_notice (const char *source, const char *target, const char *buf)
+static void m_nick( char *origin, char **argv, int argc, int srv )
 {
-	send_cmd (":%s %s %s :%s", source, MSG_NOTICE, target, buf);
-}
-
-void
-send_globops (const char *source, const char *buf)
-{
-	send_cmd (":%s %s :%s", source, MSG_GLOBOPS, buf);
-}
-
-static void
-m_vhost (char *origin, char **argv, int argc, int srv)
-{
-	do_vhost (origin, argv[0]);
-}
-
-static void
-m_nick (char *origin, char **argv, int argc, int srv)
-{
-	do_nickchange (origin, argv[0], NULL);
+	do_nickchange( origin, argv[0], NULL );
 }
 
 /* m_topic
@@ -286,10 +202,9 @@ m_nick (char *origin, char **argv, int argc, int srv)
  *  argv[1] = topic text
  */
 /* TOPIC #channel :topic */
-static void
-m_topic (char *origin, char **argv, int argc, int srv)
+static void m_topic( char *origin, char **argv, int argc, int srv )
 {
-	do_topic (argv[0], NULL, NULL, argv[1]);
+	do_topic( argv[0], NULL, NULL, argv[1] );
 }
 
 /* m_kick
@@ -297,42 +212,27 @@ m_topic (char *origin, char **argv, int argc, int srv)
  *	argv[1] = client to kick
  *	argv[2] = kick comment
  */
-static void
-m_kick (char *origin, char **argv, int argc, int srv)
+static void m_kick( char *origin, char **argv, int argc, int srv )
 {
-	do_kick (origin, argv[0], argv[1], argv[2]);
+	do_kick( origin, argv[0], argv[1], argv[2] );
 }
 
 /* m_join
  *	argv[0] = channel
- *	argv[1] = channel password (key)
+ *	argv[1] = channel password( key )
  */
-static void
-m_join (char *origin, char **argv, int argc, int srv)
+static void m_join( char *origin, char **argv, int argc, int srv )
 {
-	do_join (origin, argv[0], argv[1]);
+	do_join( origin, argv[0], argv[1] );
 }
 
 /* m_part
  *	argv[0] = channel
  *	argv[1] = comment
  */
-static void
-m_part (char *origin, char **argv, int argc, int srv)
+static void m_part( char *origin, char **argv, int argc, int srv )
 {
-	do_part (origin, argv[0], argv[1]);
-}
-
-/** @brief process privmsg
- *
- * 
- *
- * @return none
- */
-void 
-m_notice (char* origin, char **av, int ac, int cmdptr)
-{
-	_m_notice (origin, av, ac, cmdptr);
+	do_part( origin, argv[0], argv[1] );
 }
 
 /** @brief process privmsg
@@ -342,21 +242,21 @@ m_notice (char* origin, char **av, int ac, int cmdptr)
  * @return none
  */
 
-void m_private (char* origin, char **av, int ac, int cmdptr)
+static void m_private( char* origin, char **av, int ac, int cmdptr )
 {
 	char *p;
 	char nick[MAXNICK];
 	
-	strlcpy(nick, origin, MAXNICK);
-	p = strchr(nick, '!');
+	strlcpy( nick, origin, MAXNICK );
+	p = strchr( nick, '!' );
 	*p = 0;
-	AddFakeUser(origin);
-	_m_private (nick, av, ac, cmdptr);
-	DelFakeUser(origin);
+	AddFakeUser( origin );
+	_m_private( nick, av, ac, cmdptr );
+	DelFakeUser( origin );
 }
 
-static void m_emotd (char *origin, char **argv, int argc, int srv)
+static void m_emotd( char *origin, char **argv, int argc, int srv )
 {
-	send_cmd ("%s mark mark", MSG_OPER);
-	do_synch_neostats ();
+	send_cmd( "%s mark mark", MSG_OPER );
+	do_synch_neostats(  );
 }

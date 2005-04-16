@@ -24,33 +24,34 @@
 */
 
 #include "neostats.h"
-#include "unreal32.h"
 #include "ircd.h"
+#include "unreal32.h"
 
-static void m_server (char *origin, char **argv, int argc, int srv);
-static void m_umode2 (char *origin, char **argv, int argc, int srv);
-static void m_svsmode (char *origin, char **argv, int argc, int srv);
-static void m_nick (char *origin, char **argv, int argc, int srv);
-static void m_vhost (char *origin, char **argv, int argc, int srv);
-static void m_eos (char *origin, char **argv, int argc, int srv);
-static void m_netinfo (char *origin, char **argv, int argc, int srv);
-static void m_sjoin (char *origin, char **argv, int argc, int srv);
-static void m_svsnick (char *origin, char **argv, int argc, int srv);
-static void m_whois (char *origin, char **argv, int argc, int srv);
-static void m_smo (char *origin, char **argv, int argc, int srv);
-static void m_swhois (char *origin, char **argv, int argc, int srv);
-static void m_tkl (char *origin, char **argv, int argc, int srv);
+static void m_server( char *origin, char **argv, int argc, int srv );
+static void m_umode2( char *origin, char **argv, int argc, int srv );
+static void m_svsmode( char *origin, char **argv, int argc, int srv );
+static void m_nick( char *origin, char **argv, int argc, int srv );
+static void m_vhost( char *origin, char **argv, int argc, int srv );
+static void m_eos( char *origin, char **argv, int argc, int srv );
+static void m_netinfo( char *origin, char **argv, int argc, int srv );
+static void m_sjoin( char *origin, char **argv, int argc, int srv );
+static void m_svsnick( char *origin, char **argv, int argc, int srv );
+static void m_whois( char *origin, char **argv, int argc, int srv );
+static void m_smo( char *origin, char **argv, int argc, int srv );
+static void m_swhois( char *origin, char **argv, int argc, int srv );
+static void m_tkl( char *origin, char **argv, int argc, int srv );
 
 /* buffer sizes */
-const int proto_maxhost		= (128 + 1);
-const int proto_maxpass		= (32 + 1);
-const int proto_maxnick		= (30 + 1);
-const int proto_maxuser		= (10 + 1);
-const int proto_maxrealname	= (50 + 1);
-const int proto_chanlen		= (32 + 1);
-const int proto_topiclen	= (307 + 1);
+const int proto_maxhost		= ( 128 + 1 );
+const int proto_maxpass		= ( 32 + 1 );
+const int proto_maxnick		= ( 30 + 1 );
+const int proto_maxuser		= ( 10 + 1 );
+const int proto_maxrealname	= ( 50 + 1 );
+const int proto_chanlen		= ( 32 + 1 );
+const int proto_topiclen	= ( 307 + 1 );
 
-ProtocolInfo protocol_info = {
+ProtocolInfo protocol_info = 
+{
 	/* Protocol options required by this IRCd */
 	PROTOCOL_SJOIN,
 	/* Protocol options negotiated at link by this IRCd */
@@ -61,7 +62,8 @@ ProtocolInfo protocol_info = {
 	"+o",
 };
 
-ircd_cmd cmd_list[] = {
+ircd_cmd cmd_list[] = 
+{
 	/*Message	Token	Function	usage */
 	{MSG_PRIVATE, TOK_PRIVATE, _m_private, 0},
 	{MSG_NOTICE, TOK_NOTICE, _m_notice, 0},
@@ -109,14 +111,16 @@ ircd_cmd cmd_list[] = {
 	{0, 0, 0, 0},
 };
 
-mode_init chan_umodes[] = {
+mode_init chan_umodes[] = 
+{
 	{'h', CUMODE_HALFOP, 0, '%'},
 	{'a', CUMODE_CHANPROT, 0, '*'},
 	{'q', CUMODE_CHANOWNER, 0, '~'},
 	{0, 0, 0},
 };
 
-mode_init chan_modes[] = {
+mode_init chan_modes[] = 
+{
 	{'r', CMODE_RGSTR, 0},
 	{'R', CMODE_RGSTRONLY, 0},
 	{'c', CMODE_NOCOLOR, 0},
@@ -172,7 +176,7 @@ static const char Base64[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
 
-int b64_decode(char const *src, unsigned char *target, int targsize)
+int b64_decode( char const *src, unsigned char *target, int targsize )
 {
 	int tarindex, state, ch;
 	char *pos;
@@ -180,53 +184,53 @@ int b64_decode(char const *src, unsigned char *target, int targsize)
 	state = 0;
 	tarindex = 0;
 
-	while ((ch = *src++) != '\0') {
-		if (isspace(ch))	/* Skip whitespace anywhere. */
+	while( ( ch = *src++ ) != '\0' ) {
+		if( isspace( ch ) )	/* Skip whitespace anywhere. */
 			continue;
 
-		if (ch == Pad64)
+		if( ch == Pad64 )
 			break;
 
-		pos = strchr(Base64, ch);
-		if (pos == 0) 		/* A non-base64 character. */
-			return (-1);
+		pos = strchr( Base64, ch );
+		if( pos == 0 ) 		/* A non-base64 character. */
+			return( -1 );
 
-		switch (state) {
+		switch( state ) {
 		case 0:
-			if (target) {
-				if (tarindex >= targsize)
-					return (-1);
-				target[tarindex] = (unsigned char)(pos - Base64) << 2;
+			if( target ) {
+				if( tarindex >= targsize )
+					return( -1 );
+				target[tarindex] =( unsigned char )( pos - Base64 ) << 2;
 			}
 			state = 1;
 			break;
 		case 1:
-			if (target) {
-				if (tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex]   |=  (pos - Base64) >> 4;
-				target[tarindex+1]  = (unsigned char)((pos - Base64) & 0x0f)
+			if( target ) {
+				if( tarindex + 1 >= targsize )
+					return( -1 );
+				target[tarindex]   |= ( pos - Base64 ) >> 4;
+				target[tarindex+1]  =( unsigned char )( ( pos - Base64 ) & 0x0f )
 							<< 4 ;
 			}
 			tarindex++;
 			state = 2;
 			break;
 		case 2:
-			if (target) {
-				if (tarindex + 1 >= targsize)
-					return (-1);
-				target[tarindex]   |=  (pos - Base64) >> 2;
-				target[tarindex+1]  = (unsigned char)((pos - Base64) & 0x03)
+			if( target ) {
+				if( tarindex + 1 >= targsize )
+					return( -1 );
+				target[tarindex]   |= ( pos - Base64 ) >> 2;
+				target[tarindex+1]  =( unsigned char )( ( pos - Base64 ) & 0x03 )
 							<< 6;
 			}
 			tarindex++;
 			state = 3;
 			break;
 		case 3:
-			if (target) {
-				if (tarindex >= targsize)
-					return (-1);
-				target[tarindex] |= (pos - Base64);
+			if( target ) {
+				if( tarindex >= targsize )
+					return( -1 );
+				target[tarindex] |=( pos - Base64 );
 			}
 			tarindex++;
 			state = 0;
@@ -241,21 +245,21 @@ int b64_decode(char const *src, unsigned char *target, int targsize)
 	 * on a byte boundary, and/or with erroneous trailing characters.
 	 */
 
-	if (ch == Pad64) {		/* We got a pad char. */
+	if( ch == Pad64 ) {		/* We got a pad char. */
 		ch = *src++;		/* Skip it, get next. */
-		switch (state) {
+		switch( state ) {
 		case 0:		/* Invalid = in first position */
 		case 1:		/* Invalid = in second position */
-			return (-1);
+			return( -1 );
 
 		case 2:		/* Valid, means one byte of info */
 			/* Skip any number of spaces. */
-			for ((void)NULL; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
+			for( ( void )NULL; ch != '\0'; ch = *src++ )
+				if( !isspace( ch ) )
 					break;
 			/* Make sure there is another trailing = sign. */
-			if (ch != Pad64)
-				return (-1);
+			if( ch != Pad64 )
+				return( -1 );
 			ch = *src++;		/* Skip the = */
 			/* Fall through to "single trailing =" case. */
 			/* FALLTHROUGH */
@@ -265,9 +269,9 @@ int b64_decode(char const *src, unsigned char *target, int targsize)
 			 * We know this char is an =.  Is there anything but
 			 * whitespace after it?
 			 */
-			for ((void)NULL; ch != '\0'; ch = *src++)
-				if (!isspace(ch))
-					return (-1);
+			for( ( void )NULL; ch != '\0'; ch = *src++ )
+				if( !isspace( ch ) )
+					return( -1 );
 
 			/*
 			 * Now make sure for cases 2 and 3 that the "extra"
@@ -275,70 +279,42 @@ int b64_decode(char const *src, unsigned char *target, int targsize)
 			 * zeros.  If we don't check them, they become a
 			 * subliminal channel.
 			 */
-			if (target && target[tarindex] != 0)
-				return (-1);
+			if( target && target[tarindex] != 0 )
+				return( -1 );
 		}
 	} else {
 		/*
 		 * We ended by seeing the end of the string.  Make sure we
 		 * have no partial bytes lying around.
 		 */
-		if (state != 0)
-			return (-1);
+		if( state != 0 )
+			return( -1 );
 	}
 
-	return (tarindex);
+	return( tarindex );
 }
 
-void
-send_server (const char *source, const char *name, const int numeric, const char *infoline)
+void send_server( const char *source, const char *name, const int numeric, const char *infoline )
 {
-	send_cmd (":%s %s %s %d :%s", source, MSGTOK(SERVER), name, numeric, infoline);
+	send_cmd( ":%s %s %s %d :%s", source, MSGTOK( SERVER ), name, numeric, infoline );
 }
 
-void
-send_server_connect (const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink)
+void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 TKLEXT NICKIP CHANMODES=be,kfL,l,psmntirRcOAQKVGCuzNSMT */
-	send_cmd ("%s TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NICKIP VHP", MSGTOK(PROTOCTL));
-	send_cmd ("%s %s", MSGTOK(PASS), pass);
-	send_cmd ("%s %s %d :U0-*-%d %s", MSGTOK(SERVER), name, 1, numeric, infoline);
+	send_cmd( "%s TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NICKIP VHP", MSGTOK( PROTOCTL ) );
+	send_cmd( "%s %s", MSGTOK( PASS ), pass );
+	send_cmd( "%s %s %d :U0-*-%d %s", MSGTOK( SERVER ), name, 1, numeric, infoline );
 }
 
-void
-send_squit (const char *server, const char *quitmsg)
+void send_sjoin( const char *source, const char *target, const char *chan, const unsigned long ts )
 {
-	send_cmd ("%s %s :%s", MSGTOK(SQUIT), server, quitmsg);
+	send_cmd( ":%s %s %lu %s + :%s", source, MSGTOK( SJOIN ), ts, chan, target );
 }
 
-void 
-send_quit (const char *source, const char *quitmsg)
+void send_cmode( const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts )
 {
-	send_cmd (":%s %s :%s", source, MSGTOK(QUIT), quitmsg);
-}
-
-void 
-send_part (const char *source, const char *chan, const char *reason)
-{
-	send_cmd (":%s %s %s :%s", source, MSGTOK(PART), chan, reason);
-}
-
-void 
-send_join (const char *source, const char *chan, const char *key, const unsigned long ts)
-{
-	send_cmd (":%s %s %s", source, MSGTOK(JOIN), chan);
-}
-
-void 
-send_sjoin (const char *source, const char *target, const char *chan, const unsigned long ts)
-{
-	send_cmd (":%s %s %lu %s + :%s", source, MSGTOK(SJOIN), ts, chan, target);
-}
-
-void 
-send_cmode (const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts)
-{
-	send_cmd (":%s %s %s %s %s %lu", source, MSGTOK(MODE), chan, mode, args, ts);
+	send_cmd( ":%s %s %s %s %s %lu", source, MSGTOK( MODE ), chan, mode, args, ts );
 }
 
 /* m_nick
@@ -367,173 +343,55 @@ send_cmode (const char *source, const char *who, const char *chan, const char *m
 RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP fwAAAQ== :Mark
 RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP :Mark
 */
-void
-send_nick (const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname)
+void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
-	send_cmd ("%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK(NICK), nick, ts, ident, host, server, newmode, realname);
+	send_cmd( "%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK( NICK ), nick, ts, ident, host, server, newmode, realname );
 }
 
-void
-send_ping (const char *source, const char *reply, const char *target)
+void send_umode( const char *source, const char *target, const char *mode )
 {
-	send_cmd (":%s %s %s :%s", source, MSGTOK(PING), reply, target);
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( MODE ), target, mode );
 }
 
-void 
-send_umode (const char *source, const char *target, const char *mode)
+void send_netinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
 {
-	send_cmd (":%s %s %s :%s", source, MSGTOK(MODE), target, mode);
+	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSGTOK( NETINFO ), ts, prot, cloak, netname );
 }
 
-void 
-send_numeric (const char *source, const int numeric, const char *target, const char *buf)
+void send_smo( const char *source, const char *umodetarget, const char *msg )
 {
-	send_cmd (":%s %d %s :%s", source, numeric, target, buf);
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( SMO ), umodetarget, msg );
 }
 
-void
-send_pong (const char *reply)
+void send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
 {
-	send_cmd ("%s %s", MSGTOK(PONG), reply);
+	send_cmd( ":%s %s %s %lu", oldnick, MSGTOK( NICK ), newnick, ts );
 }
 
-void
-send_netinfo (const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts)
+void send_swhois( const char *source, const char *target, const char *swhois )
 {
-	send_cmd (":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSGTOK(NETINFO), ts, prot, cloak, netname);
+	send_cmd( "%s %s :%s", MSGTOK( SWHOIS ), target, swhois );
 }
 
-void 
-send_kill (const char *source, const char *target, const char *reason)
+void send_svshost( const char *source, const char *target, const char *vhost )
 {
-	send_cmd (":%s %s %s :%s", source, MSGTOK(KILL), target, reason);
-}
-
-void 
-send_smo (const char *source, const char *umodetarget, const char *msg)
-{
-	send_cmd (":%s %s %s :%s", source, MSGTOK(SMO), umodetarget, msg);
-}
-
-void 
-send_nickchange (const char *oldnick, const char *newnick, const unsigned long ts)
-{
-	send_cmd (":%s %s %s %lu", oldnick, MSGTOK(NICK), newnick, ts);
-}
-
-void 
-send_setname (const char *nick, const char *realname)
-{
-	send_cmd (":%s %s :%s", nick, MSGTOK(SETNAME), realname);
-}
-
-void 
-send_sethost (const char *nick, const char *host)
-{
-	send_cmd (":%s %s :%s", nick, MSGTOK(SETHOST), host);
-}
-
-void 
-send_setident (const char *nick, const char *ident)
-{
-	send_cmd (":%s %s :%s", nick, MSGTOK(SETIDENT), ident);
-}
-
-void
-send_swhois (const char *source, const char *target, const char *swhois)
-{
-	send_cmd ("%s %s :%s", MSGTOK(SWHOIS), target, swhois);
-}
-
-void 
-send_svsnick (const char *source, const char *target, const char *newnick, const unsigned long ts)
-{
-	send_cmd ("%s %s %s :%lu", MSGTOK(SVSNICK), target, newnick, ts);
-}
-
-void
-send_svsjoin (const char *source, const char *target, const char *chan)
-{
-	send_cmd ("%s %s %s", MSGTOK(SVSJOIN), target, chan);
-}
-
-void
-send_svspart (const char *source, const char *target, const char *chan)
-{
-	send_cmd ("%s %s %s", MSGTOK(SVSPART), target, chan);
-}
-
-void 
-send_kick (const char *source, const char *chan, const char *target, const char *reason)
-{
-	send_cmd (":%s %s %s %s :%s", source, MSGTOK(KICK), chan, target, (reason ? reason : "No Reason Given"));
-}
-
-void 
-send_wallops (const char *source, const char *buf)
-{
-	send_cmd (":%s %s :%s", source, MSGTOK(WALLOPS), buf);
-}
-
-void
-send_svshost (const char *source, const char *target, const char *vhost)
-{
-	send_cmd (":%s %s %s %s", source, MSGTOK(CHGHOST), target, vhost);
-}
-
-void
-send_invite (const char *source, const char *target, const char *chan) 
-{
-	send_cmd (":%s %s %s %s", source, MSGTOK(INVITE), target, chan);
-}
-
-void
-send_svsmode (const char *source, const char *target, const char *modes)
-{
-	send_cmd (":%s %s %s %s", source, MSGTOK(SVSMODE), target, modes);
-}
-
-void 
-send_svskill (const char *source, const char *target, const char *reason)
-{
-	send_cmd (":%s %s %s :%s", source, MSGTOK(SVSKILL), target, reason);
+	send_cmd( ":%s %s %s %s", source, MSGTOK( CHGHOST ), target, vhost );
 }
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
-void 
-send_akill (const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts)
+void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
-	send_cmd (":%s %s + G %s %s %s %lu %lu :%s", source, MSGTOK(TKL), ident, host, setby, (ts + length), ts, reason);
+	send_cmd( ":%s %s + G %s %s %s %lu %lu :%s", source, MSGTOK( TKL ), ident, host, setby,( ts + length ), ts, reason );
 }
 
-void 
-send_rakill (const char *source, const char *host, const char *ident)
+void send_rakill( const char *source, const char *host, const char *ident )
 {
-	send_cmd (":%s %s - G %s %s %s", source, MSGTOK(TKL), ident, host, source);
+	send_cmd( ":%s %s - G %s %s %s", source, MSGTOK( TKL ), ident, host, source );
 }
 
-void
-send_privmsg (const char *source, const char *target, const char *buf)
+void send_svstime( const char *source, const unsigned long ts )
 {
-	send_cmd (":%s %s %s :%s", source, MSGTOK(PRIVATE), target, buf);
-}
-
-void
-send_notice (const char *source, const char *target, const char *buf)
-{
-	send_cmd (":%s %s %s :%s", source, MSGTOK(NOTICE), target, buf);
-}
-
-void
-send_globops (const char *source, const char *buf)
-{
-	send_cmd (":%s %s :%s", source, MSGTOK(GLOBOPS), buf);
-}
-
-void 
-send_svstime (const char *source, const unsigned long ts)
-{
-	send_cmd (":%s %s SVSTIME %lu", source, MSGTOK(TSCTL), ts);
+	send_cmd( ":%s %s SVSTIME %lu", source, MSGTOK( TSCTL ), ts );
 }
 
 /* m_server
@@ -544,23 +402,22 @@ send_svstime (const char *source, const unsigned long ts)
  * on old protocols, serverinfo is argv[2], and numeric is left out
  */
 /*SERVER servername hopcount :U<protocol>-flags-numeric serverdesc*/
-static void
-m_server (char *origin, char **argv, int argc, int srv)
+static void m_server( char *origin, char **argv, int argc, int srv )
 {
 	char* s = argv[argc-1];
-	if (*origin== 0) {
+	if( *origin== 0 ) {
 		/* server desc from uplink includes extra info so we need to 
 		   strip protocol, flags and numeric. We can use the first
 		   space to do this*/
-		while(*s != ' ')
+		while( *s != ' ' )
 			s++;
 		/* Strip the now leading space */
 		s++;
 	}
-	if(argc > 3) {
-		do_server (argv[0], origin, argv[1], argv[2], s, srv);
+	if( argc > 3 ) {
+		do_server( argv[0], origin, argv[1], argv[2], s, srv );
 	} else {
-		do_server (argv[0], origin, argv[1], NULL, s, srv);
+		do_server( argv[0], origin, argv[1], NULL, s, srv );
 	}
 	
 }
@@ -568,31 +425,28 @@ m_server (char *origin, char **argv, int argc, int srv)
 /* m_svsmode
  *  argv[0] - username to change mode for
  *  argv[1] - modes to change
- *  argv[2] - Service Stamp (if mode == d)
+ *  argv[2] - Service Stamp( if mode == d )
  */
-static void
-m_svsmode (char *origin, char **argv, int argc, int srv)
+static void m_svsmode( char *origin, char **argv, int argc, int srv )
 {
-	if (argv[0][0] == '#') {
-		do_svsmode_channel (origin, argv, argc);
+	if( argv[0][0] == '#' ) {
+		do_svsmode_channel( origin, argv, argc );
 	} else {
-		do_svsmode_user (argv[0], argv[1], argv[2]);
+		do_svsmode_user( argv[0], argv[1], argv[2] );
 	}
 }
 
 /* m_umode2
  * argv[0] - modes to change
  */
-static void
-m_umode2 (char *origin, char **argv, int argc, int srv)
+static void m_umode2( char *origin, char **argv, int argc, int srv )
 {
-	do_mode_user (origin, argv[0]);
+	do_mode_user( origin, argv[0] );
 }
 
-static void
-m_vhost (char *origin, char **argv, int argc, int srv)
+static void m_vhost( char *origin, char **argv, int argc, int srv )
 {
-	do_vhost (origin, argv[0]);
+	do_vhost( origin, argv[0] );
 }
 
 /* m_nick
@@ -618,72 +472,69 @@ m_vhost (char *origin, char **argv, int argc, int srv)
  *  argv[10] = info
  */
 
-int decode_ip(char *buf)
+int decode_ip( char *buf )
 {
-	int len = strlen(buf);
+	int len = strlen( buf );
 	char targ[25];
 	struct in_addr ia;
 
-	b64_decode(buf, targ, 25);
-	ia = *( struct in_addr *)targ;
-	if (len == 8)  /* IPv4 */
+	b64_decode( buf, targ, 25 );
+	ia = *( struct in_addr * )targ;
+	if( len == 8 )  /* IPv4 */
 		return ia.s_addr;
 	return 0;
 }
 
-static void
-m_nick (char *origin, char **argv, int argc, int srv)
+static void m_nick( char *origin, char **argv, int argc, int srv )
 {
-	if(!srv) {
-		if (ircd_srv.protocol&PROTOCOL_NICKv2)
+	if( !srv ) {
+		if( ircd_srv.protocol & PROTOCOL_NICKv2 )
 		{
-			if (ircd_srv.protocol&PROTOCOL_NICKIP)
+			if( ircd_srv.protocol & PROTOCOL_NICKIP )
 			{
 				char ip[25];
 
-				ircsnprintf(ip, 25, "%d", ntohl (decode_ip(argv[9])));
-				do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-					ip, argv[6], argv[7], argv[8], argv[10], NULL, NULL);
+				ircsnprintf( ip, 25, "%d", ntohl( decode_ip( argv[9] ) ) );
+				do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+					ip, argv[6], argv[7], argv[8], argv[10], NULL, NULL );
 			}
 			else
 			{
-				do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-					NULL, argv[6], argv[7], argv[8], argv[9], NULL, NULL);
+				do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+					NULL, argv[6], argv[7], argv[8], argv[9], NULL, NULL );
 			}
 		}
 		else
 		{
-			do_nick (argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-				NULL, argv[6], NULL, NULL, argv[9], NULL, NULL);
+			do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+				NULL, argv[6], NULL, NULL, argv[9], NULL, NULL );
 		}
 	} else {
-		do_nickchange (origin, argv[0], NULL);
+		do_nickchange( origin, argv[0], NULL );
 	}
 }
 
 /* m_netinfo
  *  argv[0] = max global count
  *  argv[1] = time of end sync
- *  argv[2] = unreal protocol using (numeric)
- *  argv[3] = cloak-crc (> u2302)
- *  argv[4] = free(**)
- *  argv[5] = free(**)
- *  argv[6] = free(**)
+ *  argv[2] = unreal protocol using( numeric )
+ *  argv[3] = cloak-crc( > u2302 )
+ *  argv[4] = free( ** )
+ *  argv[5] = free( ** )
+ *  argv[6] = free( ** )
  *  argv[7] = ircnet
  */
-static void
-m_netinfo (char *origin, char **argv, int argc, int srv)
+static void m_netinfo( char *origin, char **argv, int argc, int srv )
 {
-	do_netinfo(argv[0], argv[1], argv[2], argv[3], argv[7]);
+	do_netinfo( argv[0], argv[1], argv[2], argv[3], argv[7] );
 }
 
 /*  EOS
  *  :servername EOS
  */
-static void 
-m_eos (char *origin, char **argv, int argc, int srv)
+static void m_eos( char *origin, char **argv, int argc, int srv )
 {
-	do_eos (origin);
+	do_eos( origin );
 }
     
 /* m_sjoin  
@@ -691,15 +542,15 @@ m_eos (char *origin, char **argv, int argc, int srv)
  *    char *argv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
  *  argv[1] = channel name
  *  "ts chname :"
- * if (argc == 3) 
+ * if( argc == 3 ) 
  *  argv[2] = nick names + modes - all in one parameter
  *  "ts chname modebuf :"
  *  "ts chname :"@/"""name"	OPT_SJ3
- * if (argc == 4)
+ * if( argc == 4 )
  *  argv[2] = channel modes
  *  argv[3] = nick names + modes - all in one parameter
  *  "ts chname modebuf parabuf :"
- * if (argc > 4)
+ * if( argc > 4 )
  *  argv[2] = channel modes
  *  argv[3 to argc - 2] = mode parameters
  *  argv[argc - 1] = nick names + modes
@@ -707,10 +558,9 @@ m_eos (char *origin, char **argv, int argc, int srv)
  */
 /*    MSG_SJOIN creationtime chname    modebuf parabuf :member list */
 /* R: ~         1073861298   #services +       <none>  :Mark */
-static void
-m_sjoin (char *origin, char **argv, int argc, int srv)
+static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
-	do_sjoin (argv[0], argv[1], ((argc >= 4) ? argv[2] : ""), origin, argv, argc);
+	do_sjoin( argv[0], argv[1],( ( argc >= 4 ) ? argv[2] : "" ), origin, argv, argc );
 }
 
 /* m_svsnick
@@ -718,17 +568,15 @@ m_sjoin (char *origin, char **argv, int argc, int srv)
  *  argv[1] = new nickname
  *  argv[2] = timestamp
  */
-static void
-m_svsnick (char *origin, char **argv, int argc, int srv)
+static void m_svsnick( char *origin, char **argv, int argc, int srv )
 {
-	do_nickchange (argv[0], argv[1], argv[2]);
+	do_nickchange( argv[0], argv[1], argv[2] );
 }
 
 /* m_whois
  *	argv[0] = nickname masklist
  */
-static void
-m_whois (char *origin, char **argv, int argc, int srv)
+static void m_whois( char *origin, char **argv, int argc, int srv )
 {
 	/* TODO */
 }
@@ -737,14 +585,12 @@ m_whois (char *origin, char **argv, int argc, int srv)
  *  argv[0] = nickname
  *  argv[1] = new swhois
  */
-static void
-m_swhois (char *origin, char **argv, int argc, int srv)
+static void m_swhois( char *origin, char **argv, int argc, int srv )
 {
-	do_swhois (argv[0], argv[1]);
+	do_swhois( argv[0], argv[1] );
 }
 
-static void
-m_smo (char *origin, char **argv, int argc, int srv)
+static void m_smo( char *origin, char **argv, int argc, int srv )
 {
 	/* TODO */
 }
@@ -764,8 +610,8 @@ R: :server BD + Z * mask setter 0 1070062390 :reason
 R: :server c dos_bot* :Reserved nickname: Dosbot
 */
 
-static void m_tkl (char *origin, char **argv, int argc, int srv)
+static void m_tkl( char *origin, char **argv, int argc, int srv )
 {
-	do_tkl(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7]);
+	do_tkl( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7] );
 }
 
