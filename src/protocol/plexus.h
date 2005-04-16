@@ -25,153 +25,153 @@
 #define PLEXUS_H
 
 /* Messages/Tokens */
-#define MSG_EOB		"EOB"	/* end of burst */
-#define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
-#define MSG_WHO		"WHO"	/* WHO  -> WHOC */
-#define MSG_WHOIS	"WHOIS"	/* WHOI */
-#define MSG_WHOWAS	"WHOWAS"	/* WHOW */
-#define MSG_USER	"USER"	/* USER */
-#define MSG_NICK	"NICK"	/* NICK */
-#define MSG_SERVER	"SERVER"	/* SERV */
-#define MSG_LIST	"LIST"	/* LIST */
-#define MSG_TOPIC	"TOPIC"	/* TOPI */
-#define MSG_INVITE	"INVITE"	/* INVI */
-#define MSG_VERSION	"VERSION"	/* VERS */
-#define MSG_QUIT	"QUIT"	/* QUIT */
-#define MSG_SQUIT	"SQUIT"	/* SQUI */
-#define MSG_KILL	"KILL"	/* KILL */
-#define MSG_INFO	"INFO"	/* INFO */
-#define MSG_LINKS	"LINKS"	/* LINK */
-#define MSG_WATCH	"WATCH"	/* WATCH */
-#define MSG_STATS	"STATS"	/* STAT */
-#define MSG_HELP	"HELP"	/* HELP */
-#define MSG_HELPOP	"HELPOP"	/* HELP */
-#define MSG_ERROR	"ERROR"	/* ERRO */
-#define MSG_AWAY	"AWAY"	/* AWAY */
-#define MSG_CONNECT	"CONNECT"	/* CONN */
-#define MSG_PING	"PING"	/* PING */
-#define MSG_PONG	"PONG"	/* PONG */
-#define MSG_OPER	"OPER"	/* OPER */
-#define MSG_PASS	"PASS"	/* PASS */
-#define MSG_WALLOPS	"WALLOPS"	/* WALL */
-#define MSG_TIME	"TIME"	/* TIME */
-#define MSG_NAMES	"NAMES"	/* NAME */
-#define MSG_ADMIN	"ADMIN"	/* ADMI */
-#define MSG_NOTICE	"NOTICE"	/* NOTI */
-#define MSG_JOIN	"JOIN"	/* JOIN */
-#define MSG_PART	"PART"	/* PART */
-#define MSG_LUSERS	"LUSERS"	/* LUSE */
-#define MSG_MOTD	"MOTD"	/* MOTD */
-#define MSG_MODE	"MODE"	/* MODE */
-#define MSG_KICK	"KICK"	/* KICK */
-#define MSG_SERVICE	"SERVICE"	/* SERV -> SRVI */
-#define MSG_USERHOST	"USERHOST"	/* USER -> USRH */
-#define MSG_ISON	"ISON"	/* ISON */
-#define MSG_SQUERY	"SQUERY"	/* SQUE */
-#define MSG_SERVLIST	"SERVLIST"	/* SERV -> SLIS */
-#define MSG_SERVSET	"SERVSET"	/* SERV -> SSET */
-#define MSG_REHASH	"REHASH"	/* REHA */
-#define MSG_RESTART	"RESTART"	/* REST */
-#define MSG_CLOSE	"CLOSE"	/* CLOS */
-#define MSG_DIE		"DIE"	/* DIE */
-#define MSG_HASH	"HASH"	/* HASH */
-#define MSG_DNS		"DNS"	/* DNS  -> DNSS */
-#define MSG_SILENCE	"SILENCE"	/* SILE */
-#define MSG_AKILL	"AKILL"	/* AKILL */
-#define MSG_KLINE	"KLINE"	/* KLINE */
-#define MSG_UNKLINE     "UNKLINE"	/* UNKLINE */
-#define MSG_RAKILL	"RAKILL"	/* RAKILL */
-#define MSG_GNOTICE	"GNOTICE"	/* GNOTICE */
-#define MSG_GOPER	"GOPER"	/* GOPER */
-#define MSG_LOCOPS	"LOCOPS"	/* LOCOPS */
-#define MSG_PROTOCTL	"PROTOCTL"	/* PROTOCTL */
-#define MSG_TRACE	"TRACE"	/* TRAC */
-#define MSG_SQLINE	"SQLINE"	/* SQLINE */
-#define MSG_UNSQLINE	"UNSQLINE"	/* UNSQLINE */
-#define MSG_SVSNICK	"SVSNICK"	/* SVSNICK */
-#define MSG_SVSNOOP	"SVSNOOP"	/* SVSNOOP */
-#define MSG_IDENTIFY	"IDENTIFY"	/* IDENTIFY */
-#define MSG_SVSKILL	"SVSKILL"	/* SVSKILL */
-#define MSG_NICKSERV	"NICKSERV"	/* NICKSERV */
-#define MSG_NS		"NS"
-#define MSG_CHANSERV	"CHANSERV"	/* CHANSERV */
-#define MSG_CS		"CS"
-#define MSG_OPERSERV	"OPERSERV"	/* OPERSERV */
-#define MSG_OS		"OS"
-#define MSG_MEMOSERV	"MEMOSERV"	/* MEMOSERV */
-#define MSG_MS		"MS"
-#define MSG_SERVICES	"SERVICES"	/* SERVICES */
-#define MSG_SVSMODE	"SVSMODE"	/* SVSMODE */
-#define MSG_SAMODE	"SAMODE"	/* SAMODE */
-#define MSG_CHATOPS	"CHATOPS"	/* CHATOPS */
-#define MSG_HELPSERV    "HELPSERV"	/* HELPSERV */
-#define MSG_ZLINE    	"ZLINE"	/* ZLINE */
-#define MSG_UNZLINE  	"UNZLINE"	/* UNZLINE */
-#define MSG_NETINFO	"NETINFO"	/* NETINFO */
-#define MSG_RULES       "RULES"	/* RULES */
-#define MSG_MAP         "MAP"	/* MAP */
-#define MSG_NETG	"NETG"	/* NETG */
-#define MSG_ADCHAT   	"ADCHAT"	/* Adchat */
-#define MSG_MAKEPASS	"MAKEPASS"	/* MAKEPASS */
-#define MSG_ADDHUB   	"ADDHUB"	/* ADDHUB */
-#define MSG_DELHUB   	"DELHUB"	/* DELHUB */
-#define MSG_ADDCNLINE  	"ADDCNLINE"	/* ADDCNLINE */
-#define MSG_DELCNLINE  	"DELCNLINE"	/* DELCNLINE */
-#define MSG_ADDOPER   	"ADDOPER"	/* ADDOPER */
-#define MSG_DELOPER   	"DELOPER"	/* DELOPER */
-#define MSG_ADDQLINE   	"ADDQLINE"	/* ADDQLINE */
-#define MSG_DELQLINE   	"DELQLINE"	/* DELQLINE */
-#define MSG_GSOP    	"GSOP"	/* GSOP */
-#define MSG_ISOPER	"ISOPER"	/* ISOPER */
-#define MSG_ADG	    	"ADG"	/* ADG */
-#define MSG_NMON	"NMON"	/* NMON */
-#define MSG_DALINFO	"DALINFO"	/* DALnet Credits */
-#define MSG_CREDITS	"CREDITS"	/* UltimateIRCd Credits and "Thanks To" */
-#define MSG_OPERMOTD    "OPERMOTD"	/* OPERMOTD */
-#define MSG_REMREHASH	"REMREHASH"	/* Remote Rehash */
-#define MSG_MONITOR	"MONITOR"	/* MONITOR */
-#define MSG_GLINE	"GLINE"	/* The awesome g-line */
-#define MSG_REMGLINE	"REMGLINE"	/* remove g-line */
-#define MSG_STATSERV	"STATSERV"	/* StatServ */
-#define MSG_RULESERV	"RULESERV"	/* RuleServ */
-#define MSG_SNETINFO	"SNETINFO"	/* SNetInfo */
-#define MSG_TSCTL 	"TSCTL"	/* TSCTL */
-#define MSG_SVSJOIN 	"SVSJOIN"	/* SVSJOIN */
-#define MSG_SAJOIN 	"SAJOIN"	/* SAJOIN */
-#define MSG_SDESC       "SDESC"	/* SDESC */
-#define MSG_UNREALINFO	"UNREALINFO"	/* Unreal Info */
-#define MSG_SETHOST 	"SETHOST"	/* sethost */
-#define MSG_SETIDENT 	"SETIDENT"	/* set ident */
-#define MSG_SETNAME 	"SETNAME"	/* set Realname */
-#define MSG_CHGHOST 	"CHGHOST"	/* Changehost */
-#define MSG_CHGIDENT 	"CHGIDENT"	/* Change Ident */
-#define MSG_RANDQUOTE	"RANDQUOTE"	/* Random Quote */
-#define MSG_ADDQUOTE	"ADDQUOTE"	/* Add Quote */
-#define MSG_ADDGQUOTE	"ADDGQUOTE"	/* Add Global Quote */
-#define MSG_ADDULINE	"ADDULINE"	/* Adds an U Line to ircd.conf file */
-#define MSG_DELULINE	"DELULINE"	/* Removes an U line from the ircd.conf */
-#define MSG_KNOCK	"KNOCK"	/* Knock Knock - Who's there? */
-#define MSG_SETTINGS	"SETTINGS"	/* Settings */
-#define MSG_IRCOPS	"IRCOPS"	/* Shows Online IRCOps */
-#define MSG_SVSPART	"SVSPART"	/* SVSPART */
-#define MSG_SAPART	"SAPART"	/* SAPART */
+MODULEVAR const char MSG_EOB[] = "EOB";	/* end of burst */
+MODULEVAR const char MSG_PRIVATE[] = "PRIVMSG";	/* PRIV */
+MODULEVAR const char MSG_WHO[] = "WHO";	/* WHO  -> WHOC */
+MODULEVAR const char MSG_WHOIS[] = "WHOIS";	/* WHOI */
+MODULEVAR const char MSG_WHOWAS[] = "WHOWAS";	/* WHOW */
+MODULEVAR const char MSG_USER[] = "USER";	/* USER */
+MODULEVAR const char MSG_NICK[] = "NICK";	/* NICK */
+MODULEVAR const char MSG_SERVER[] = "SERVER";	/* SERV */
+MODULEVAR const char MSG_LIST[] = "LIST";	/* LIST */
+MODULEVAR const char MSG_TOPIC[] = "TOPIC";	/* TOPI */
+MODULEVAR const char MSG_INVITE[] = "INVITE";	/* INVI */
+MODULEVAR const char MSG_VERSION[] = "VERSION";	/* VERS */
+MODULEVAR const char MSG_QUIT[] = "QUIT";	/* QUIT */
+MODULEVAR const char MSG_SQUIT[] = "SQUIT";	/* SQUI */
+MODULEVAR const char MSG_KILL[] = "KILL";	/* KILL */
+MODULEVAR const char MSG_INFO[] = "INFO";	/* INFO */
+MODULEVAR const char MSG_LINKS[] = "LINKS";	/* LINK */
+MODULEVAR const char MSG_WATCH[] = "WATCH";	/* WATCH */
+MODULEVAR const char MSG_STATS[] = "STATS";	/* STAT */
+MODULEVAR const char MSG_HELP[] = "HELP";	/* HELP */
+MODULEVAR const char MSG_HELPOP[] = "HELPOP";	/* HELP */
+MODULEVAR const char MSG_ERROR[] = "ERROR";	/* ERRO */
+MODULEVAR const char MSG_AWAY[] = "AWAY";	/* AWAY */
+MODULEVAR const char MSG_CONNECT[] = "CONNECT";	/* CONN */
+MODULEVAR const char MSG_PING[] = "PING";	/* PING */
+MODULEVAR const char MSG_PONG[] = "PONG";	/* PONG */
+MODULEVAR const char MSG_OPER[] = "OPER";	/* OPER */
+MODULEVAR const char MSG_PASS[] = "PASS";	/* PASS */
+MODULEVAR const char MSG_WALLOPS[] = "WALLOPS";	/* WALL */
+MODULEVAR const char MSG_TIME[] = "TIME";	/* TIME */
+MODULEVAR const char MSG_NAMES[] = "NAMES";	/* NAME */
+MODULEVAR const char MSG_ADMIN[] = "ADMIN";	/* ADMI */
+MODULEVAR const char MSG_NOTICE[] = "NOTICE";	/* NOTI */
+MODULEVAR const char MSG_JOIN[] = "JOIN";	/* JOIN */
+MODULEVAR const char MSG_PART[] = "PART";	/* PART */
+MODULEVAR const char MSG_LUSERS[] = "LUSERS";	/* LUSE */
+MODULEVAR const char MSG_MOTD[] = "MOTD";	/* MOTD */
+MODULEVAR const char MSG_MODE[] = "MODE";	/* MODE */
+MODULEVAR const char MSG_KICK[] = "KICK";	/* KICK */
+MODULEVAR const char MSG_SERVICE[] = "SERVICE";	/* SERV -> SRVI */
+MODULEVAR const char MSG_USERHOST[] = "USERHOST";	/* USER -> USRH */
+MODULEVAR const char MSG_ISON[] = "ISON";	/* ISON */
+MODULEVAR const char MSG_SQUERY[] = "SQUERY";	/* SQUE */
+MODULEVAR const char MSG_SERVLIST[] = "SERVLIST";	/* SERV -> SLIS */
+MODULEVAR const char MSG_SERVSET[] = "SERVSET";	/* SERV -> SSET */
+MODULEVAR const char MSG_REHASH[] = "REHASH";	/* REHA */
+MODULEVAR const char MSG_RESTART[] = "RESTART";	/* REST */
+MODULEVAR const char MSG_CLOSE[] = "CLOSE";	/* CLOS */
+MODULEVAR const char MSG_DIE[] = "DIE";	/* DIE */
+MODULEVAR const char MSG_HASH[] = "HASH";	/* HASH */
+MODULEVAR const char MSG_DNS[] = "DNS";	/* DNS  -> DNSS */
+MODULEVAR const char MSG_SILENCE[] = "SILENCE";	/* SILE */
+MODULEVAR const char MSG_AKILL[] = "AKILL";	/* AKILL */
+MODULEVAR const char MSG_KLINE[] = "KLINE";	/* KLINE */
+MODULEVAR const char MSG_UNKLINE[] = "UNKLINE";	/* UNKLINE */
+MODULEVAR const char MSG_RAKILL[] = "RAKILL";	/* RAKILL */
+MODULEVAR const char MSG_GNOTICE[] = "GNOTICE";	/* GNOTICE */
+MODULEVAR const char MSG_GOPER[] = "GOPER";	/* GOPER */
+MODULEVAR const char MSG_LOCOPS[] = "LOCOPS";	/* LOCOPS */
+MODULEVAR const char MSG_PROTOCTL[] = "PROTOCTL";	/* PROTOCTL */
+MODULEVAR const char MSG_TRACE[] = "TRACE";	/* TRAC */
+MODULEVAR const char MSG_SQLINE[] = "SQLINE";	/* SQLINE */
+MODULEVAR const char MSG_UNSQLINE[] = "UNSQLINE";	/* UNSQLINE */
+MODULEVAR const char MSG_SVSNICK[] = "SVSNICK";	/* SVSNICK */
+MODULEVAR const char MSG_SVSNOOP[] = "SVSNOOP";	/* SVSNOOP */
+MODULEVAR const char MSG_IDENTIFY[] = "IDENTIFY";	/* IDENTIFY */
+MODULEVAR const char MSG_SVSKILL[] = "SVSKILL";	/* SVSKILL */
+MODULEVAR const char MSG_NICKSERV[] = "NICKSERV";	/* NICKSERV */
+MODULEVAR const char MSG_NS[] = "NS";
+MODULEVAR const char MSG_CHANSERV[] = "CHANSERV";	/* CHANSERV */
+MODULEVAR const char MSG_CS[] = "CS";
+MODULEVAR const char MSG_OPERSERV[] = "OPERSERV";	/* OPERSERV */
+MODULEVAR const char MSG_OS[] = "OS";
+MODULEVAR const char MSG_MEMOSERV[] = "MEMOSERV";	/* MEMOSERV */
+MODULEVAR const char MSG_MS[] = "MS";
+MODULEVAR const char MSG_SERVICES[] = "SERVICES";	/* SERVICES */
+MODULEVAR const char MSG_SVSMODE[] = "SVSMODE";	/* SVSMODE */
+MODULEVAR const char MSG_SAMODE[] = "SAMODE";	/* SAMODE */
+MODULEVAR const char MSG_CHATOPS[] = "CHATOPS";	/* CHATOPS */
+MODULEVAR const char MSG_HELPSERV[] = "HELPSERV";	/* HELPSERV */
+MODULEVAR const char MSG_ZLINE[] = "ZLINE";	/* ZLINE */
+MODULEVAR const char MSG_UNZLINE[] = "UNZLINE";	/* UNZLINE */
+MODULEVAR const char MSG_NETINFO[] = "NETINFO";	/* NETINFO */
+MODULEVAR const char MSG_RULES[] = "RULES";	/* RULES */
+MODULEVAR const char MSG_MAP [] = "MAP";	/* MAP */
+MODULEVAR const char MSG_NETG[] = "NETG";	/* NETG */
+MODULEVAR const char MSG_ADCHAT[] = "ADCHAT";	/* Adchat */
+MODULEVAR const char MSG_MAKEPASS[] = "MAKEPASS";	/* MAKEPASS */
+MODULEVAR const char MSG_ADDHUB[] = "ADDHUB";	/* ADDHUB */
+MODULEVAR const char MSG_DELHUB[] = "DELHUB";	/* DELHUB */
+MODULEVAR const char MSG_ADDCNLINE[] = "ADDCNLINE";	/* ADDCNLINE */
+MODULEVAR const char MSG_DELCNLINE[] = "DELCNLINE";	/* DELCNLINE */
+MODULEVAR const char MSG_ADDOPER[] = "ADDOPER";	/* ADDOPER */
+MODULEVAR const char MSG_DELOPER[] = "DELOPER";	/* DELOPER */
+MODULEVAR const char MSG_ADDQLINE[] = "ADDQLINE";	/* ADDQLINE */
+MODULEVAR const char MSG_DELQLINE[] = "DELQLINE";	/* DELQLINE */
+MODULEVAR const char MSG_GSOP[] = "GSOP";	/* GSOP */
+MODULEVAR const char MSG_ISOPER[] = "ISOPER";	/* ISOPER */
+MODULEVAR const char MSG_ADG[] = "ADG";	/* ADG */
+MODULEVAR const char MSG_NMON[] = "NMON";	/* NMON */
+MODULEVAR const char MSG_DALINFO[] = "DALINFO";	/* DALnet Credits */
+MODULEVAR const char MSG_CREDITS[] = "CREDITS";	/* UltimateIRCd Credits and "Thanks To" */
+MODULEVAR const char MSG_OPERMOTD[] = "OPERMOTD";	/* OPERMOTD */
+MODULEVAR const char MSG_REMREHASH[] = "REMREHASH";	/* Remote Rehash */
+MODULEVAR const char MSG_MONITOR[] = "MONITOR";	/* MONITOR */
+MODULEVAR const char MSG_GLINE[] = "GLINE";	/* The awesome g-line */
+MODULEVAR const char MSG_REMGLINE[] = "REMGLINE";	/* remove g-line */
+MODULEVAR const char MSG_STATSERV[] = "STATSERV";	/* StatServ */
+MODULEVAR const char MSG_RULESERV[] = "RULESERV";	/* RuleServ */
+MODULEVAR const char MSG_SNETINFO[] = "SNETINFO";	/* SNetInfo */
+MODULEVAR const char MSG_TSCTL[] = "TSCTL";	/* TSCTL */
+MODULEVAR const char MSG_SVSJOIN[] = "SVSJOIN";	/* SVSJOIN */
+MODULEVAR const char MSG_SAJOIN[] = "SAJOIN";	/* SAJOIN */
+MODULEVAR const char MSG_SDESC[] = "SDESC";	/* SDESC */
+MODULEVAR const char MSG_UNREALINFO[] = "UNREALINFO";	/* Unreal Info */
+MODULEVAR const char MSG_SETHOST[] = "SETHOST";	/* sethost */
+MODULEVAR const char MSG_SETIDENT[] = "SETIDENT";	/* set ident */
+MODULEVAR const char MSG_SETNAME[] = "SETNAME";	/* set Realname */
+MODULEVAR const char MSG_CHGHOST[] = "CHGHOST";	/* Changehost */
+MODULEVAR const char MSG_CHGIDENT[] = "CHGIDENT";	/* Change Ident */
+MODULEVAR const char MSG_RANDQUOTE[] = "RANDQUOTE";	/* Random Quote */
+MODULEVAR const char MSG_ADDQUOTE[] = "ADDQUOTE";	/* Add Quote */
+MODULEVAR const char MSG_ADDGQUOTE[] = "ADDGQUOTE";	/* Add Global Quote */
+MODULEVAR const char MSG_ADDULINE[] = "ADDULINE";	/* Adds an U Line to ircd.conf file */
+MODULEVAR const char MSG_DELULINE[] = "DELULINE";	/* Removes an U line from the ircd.conf */
+MODULEVAR const char MSG_KNOCK[] = "KNOCK";	/* Knock Knock - Who's there? */
+MODULEVAR const char MSG_SETTINGS[] = "SETTINGS";	/* Settings */
+MODULEVAR const char MSG_IRCOPS[] = "IRCOPS";	/* Shows Online IRCOps */
+MODULEVAR const char MSG_SVSPART[] = "SVSPART";	/* SVSPART */
+MODULEVAR const char MSG_SAPART[] = "SAPART";	/* SAPART */
 /*#define MSG_VCTRL	"VCTRL"	*//* VCTRL */
-#define MSG_GCLIENT	"GCLIENT"	/* GLIENT */
-#define MSG_CHANNEL	"CHANNEL"	/* CHANNEL */
-#define MSG_UPTIME	"UPTIME"	/* UPTIME */
-#define MSG_FAILOPS	"FAILOPS"	/* FAILOPS */
-#define MSG_RPING	"RPING"	/* RPING */
-#define MSG_RPONG       "RPONG"	/* RPONG */
-#define MSG_UPING       "UPING"	/* UPING */
-#define MSG_COPYRIGHT	"COPYRIGHT"	/* Copyright */
-#define MSG_BOTSERV	"BOTSERV"	/* BOTSERV */
-#define MSG_BS		"BS"
-#define MSG_ROOTSERV	"ROOTSERV"	/* ROOTSERV */
-#define MSG_SVINFO	"SVINFO"
-#define MSG_CAPAB	"CAPAB"
-#define MSG_BURST	"BURST"
-#define MSG_SJOIN	"SJOIN"
-#define MSG_TBURST	"TBURST"
+MODULEVAR const char MSG_GCLIENT[] = "GCLIENT";	/* GLIENT */
+MODULEVAR const char MSG_CHANNEL[] = "CHANNEL";	/* CHANNEL */
+MODULEVAR const char MSG_UPTIME[] = "UPTIME";	/* UPTIME */
+MODULEVAR const char MSG_FAILOPS[] = "FAILOPS";	/* FAILOPS */
+MODULEVAR const char MSG_RPING[] = "RPING";	/* RPING */
+MODULEVAR const char MSG_RPONG[] = "RPONG";	/* RPONG */
+MODULEVAR const char MSG_UPING[] = "UPING";	/* UPING */
+MODULEVAR const char MSG_COPYRIGHT[] = "COPYRIGHT";	/* Copyright */
+MODULEVAR const char MSG_BOTSERV[] = "BOTSERV";	/* BOTSERV */
+MODULEVAR const char MSG_BS[] = "BS";
+MODULEVAR const char MSG_ROOTSERV[] = "ROOTSERV";	/* ROOTSERV */
+MODULEVAR const char MSG_SVINFO[] = "SVINFO";
+MODULEVAR const char MSG_CAPAB[] = "CAPAB";
+MODULEVAR const char MSG_BURST[] = "BURST";
+MODULEVAR const char MSG_SJOIN[] = "SJOIN";
+MODULEVAR const char MSG_TBURST[] = "TBURST";
 
 /* Umodes */
 #define UMODE_SERVNOTICE   0x00100000 /* server notices such as kill */

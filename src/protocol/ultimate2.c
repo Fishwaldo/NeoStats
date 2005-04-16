@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#include "ultimate2.h"
 #include "neostats.h"
+#include "ultimate2.h"
 #include "ircd.h"
 #include "services.h"
 

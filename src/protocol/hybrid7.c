@@ -21,8 +21,8 @@
 ** $Id$
 */
 
-#include "hybrid7.h"
 #include "neostats.h"
+#include "hybrid7.h"
 #include "ircd.h"
 #include "services.h"
 

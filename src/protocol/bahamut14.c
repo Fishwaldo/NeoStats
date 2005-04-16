@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#include "bahamut14.h"
 #include "neostats.h"
+#include "bahamut14.h"
 #include "ircd.h"
 
 static void m_server (char *origin, char **argv, int argc, int srv);

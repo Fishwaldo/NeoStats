@@ -21,8 +21,8 @@
 ** $Id$
 */
 
-#include "client.h"
 #include "neostats.h"
+#include "client.h"
 #include "bots.h"
 #include "users.h"
 #include "ircd.h"

@@ -21,8 +21,8 @@
 ** $Id$
 */
 
-#include "plexus.h"
 #include "neostats.h"
+#include "plexus.h"
 #include "ircd.h"
 #include "services.h"
 

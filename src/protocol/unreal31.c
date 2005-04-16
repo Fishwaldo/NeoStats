@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#include "unreal31.h"
 #include "neostats.h"
+#include "unreal31.h"
 #include "ircd.h"
 
 static void m_server (char *origin, char **argv, int argc, int srv);
