@@ -80,6 +80,50 @@ MODULEVAR extern mode_init chan_modes[];
 MODULEVAR extern mode_init user_umodes[];
 MODULEVAR extern mode_init user_smodes[];
 MODULEVAR extern ProtocolInfo protocol_info;
+#ifndef IGNORECOREMESSAGEDEFS
+MODULEVAR extern const char MSG_PRIVATE[];
+MODULEVAR extern const char TOK_PRIVATE[];
+MODULEVAR extern const char MSG_NOTICE[];
+MODULEVAR extern const char TOK_NOTICE[];
+MODULEVAR extern const char MSG_WALLOPS[];
+MODULEVAR extern const char TOK_WALLOPS[];
+MODULEVAR extern const char MSG_GLOBOPS[];
+MODULEVAR extern const char TOK_GLOBOPS[];
+MODULEVAR extern const char MSG_QUIT[];
+MODULEVAR extern const char TOK_QUIT[];
+MODULEVAR extern const char MSG_JOIN[];
+MODULEVAR extern const char TOK_JOIN[];
+MODULEVAR extern const char MSG_PART[];
+MODULEVAR extern const char TOK_PART[];
+MODULEVAR extern const char MSG_KICK[];
+MODULEVAR extern const char TOK_KICK[];
+MODULEVAR extern const char MSG_INVITE[];
+MODULEVAR extern const char TOK_INVITE[];
+MODULEVAR extern const char MSG_PING[];
+MODULEVAR extern const char TOK_PING[];
+MODULEVAR extern const char MSG_PONG[];
+MODULEVAR extern const char TOK_PONG[];
+MODULEVAR extern const char MSG_SQUIT[];
+MODULEVAR extern const char TOK_SQUIT[];
+MODULEVAR extern const char MSG_KILL[];
+MODULEVAR extern const char TOK_KILL[];
+MODULEVAR extern const char MSG_SETNAME[];
+MODULEVAR extern const char TOK_SETNAME[];
+MODULEVAR extern const char MSG_SETHOST[];
+MODULEVAR extern const char TOK_SETHOST[];
+MODULEVAR extern const char MSG_SETIDENT[];
+MODULEVAR extern const char TOK_SETIDENT[];
+MODULEVAR extern const char MSG_SVSNICK[];
+MODULEVAR extern const char TOK_SVSNICK[];
+MODULEVAR extern const char MSG_SVSJOIN[];
+MODULEVAR extern const char TOK_SVSJOIN[];
+MODULEVAR extern const char MSG_SVSPART[];
+MODULEVAR extern const char TOK_SVSPART[];
+MODULEVAR extern const char MSG_SVSMODE[];
+MODULEVAR extern const char TOK_SVSMODE[];
+MODULEVAR extern const char MSG_SVSKILL[];
+MODULEVAR extern const char TOK_SVSKILL[];
+#endif /* IGNORECOREMESSAGEDEFS */
 #endif
 
 EXPORTVAR extern ircd_server ircd_srv;
@@ -125,6 +169,7 @@ EXPORTFUNC void _m_svspart( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_globops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_wallops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_chatops( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_svinfo( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_error( char *origin, char **argv, int argc, int srv );
 
 EXPORTFUNC void do_synch_neostats( void );
