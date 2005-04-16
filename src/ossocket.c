@@ -383,7 +383,15 @@ int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockadd
 	if( ret == SOCKET_ERROR )
 	{
 		OS_SOCK_SET_ERRNO();
-		nlog( LOG_ERROR, "os_sock_recvfrom: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
+		switch( os_sock_errno )
+		{
+			case OS_SOCK_EWOULDBLOCK:
+			case OS_SOCK_EINPROGRESS:
+				/* don't log */
+				break;
+			default:
+				nlog( LOG_ERROR, "os_sock_recvfrom: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
+		}	
 	}
 	return ret;
 }
