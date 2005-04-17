@@ -30,7 +30,7 @@
  * To enable support uncomment the appropriate line below.
  */
 /* Nefarious IRCu - http://evilnet.sourceforge.net */
-#define NEFARIOUS
+/* #define NEFARIOUS */
 /* ...... */
 /* Nefarious IRCu with F:HOST_HIDING_STYLE:2 */
 /* #define NEFARIOUS_CLOAKHOST */
