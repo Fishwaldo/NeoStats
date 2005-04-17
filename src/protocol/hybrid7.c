@@ -23,8 +23,60 @@
 
 #include "neostats.h"
 #include "ircd.h"
-#include "hybrid7.h"
 #include "services.h"
+
+/* Messages/Tokens */
+const char MSG_EOB[] = "EOB";	/* end of burst */
+const char MSG_PRIVATE[] = "PRIVMSG";	/* PRIV */
+const char MSG_NICK[] = "NICK";	/* NICK */
+const char MSG_SERVER[] = "SERVER";	/* SERV */
+const char MSG_TOPIC[] = "TOPIC";	/* TOPI */
+const char MSG_INVITE[] = "INVITE";	/* INVI */
+const char MSG_VERSION[] = "VERSION";	/* VERS */
+const char MSG_QUIT[] = "QUIT";	/* QUIT */
+const char MSG_SQUIT[] = "SQUIT";	/* SQUI */
+const char MSG_KILL[] = "KILL";	/* KILL */
+const char MSG_STATS[] = "STATS";	/* STAT */
+const char MSG_ERROR[] = "ERROR";	/* ERRO */
+const char MSG_AWAY[] = "AWAY";	/* AWAY */
+const char MSG_PING[] = "PING";	/* PING */
+const char MSG_PONG[] = "PONG";	/* PONG */
+const char MSG_PASS[] = "PASS";	/* PASS */
+const char MSG_WALLOPS[] = "WALLOPS";	/* WALL */
+const char MSG_ADMIN[] = "ADMIN";	/* ADMI */
+const char MSG_NOTICE[] = "NOTICE";	/* NOTI */
+const char MSG_JOIN[] = "JOIN";	/* JOIN */
+const char MSG_PART[] = "PART";	/* PART */
+const char MSG_MOTD[] = "MOTD";	/* MOTD */
+const char MSG_MODE[] = "MODE";	/* MODE */
+const char MSG_KICK[] = "KICK";	/* KICK */
+const char MSG_KLINE[] = "KLINE";	/* KLINE */
+const char MSG_UNKLINE[] = "UNKLINE";	/* UNKLINE */
+const char MSG_CHATOPS[] = "CHATOPS";	/* CHATOPS */
+const char MSG_NETINFO[] = "NETINFO";	/* NETINFO */
+const char MSG_CREDITS[] = "CREDITS";
+const char MSG_SNETINFO[] = "SNETINFO";	/* SNetInfo */
+const char MSG_SVINFO[] = "SVINFO";
+const char MSG_CAPAB[] = "CAPAB";
+const char MSG_SJOIN[] = "SJOIN";
+
+/* Umodes */
+#define UMODE_SERVNOTICE   0x00100000 /* server notices such as kill */
+#define UMODE_REJ          0x00200000 /* Bot Rejections */
+#define UMODE_SKILL        0x00400000 /* Server Killed */
+#define UMODE_FULL         0x00800000 /* Full messages */
+#define UMODE_SPY          0x01000000 /* see STATS / LINKS */
+#define UMODE_DEBUG        0x02000000 /* 'debugging' info */
+#define UMODE_NCHANGE      0x04000000 /* Nick change notice */
+#define UMODE_OPERWALL     0x08000000 /* Operwalls */
+#define UMODE_BOTS         0x10000000 /* shows bots */
+#define UMODE_EXTERNAL     0x20000000 /* show servers introduced and splitting */
+#define UMODE_CALLERID     0x40000000 /* block unless caller id's */
+#define UMODE_UNAUTH       0x80000000 /* show unauth connects here */
+ 
+/* Channel Visibility macros */
+#define CMODE_INVEX		0x02000000
+#define CMODE_HIDEOPS	0x04000000
 
 static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
