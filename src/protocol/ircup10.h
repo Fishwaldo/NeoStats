@@ -29,7 +29,13 @@
  * Currently we only support modifications for Nefarious and Asuka
  * To enable support uncomment the appropriate line below.
  */
-/* #define NEFARIOUS */
+/* Nefarious IRCu - http://evilnet.sourceforge.net */
+#define NEFARIOUS
+/* ...... */
+/* Nefarious IRCu with F:HOST_HIDING_STYLE:2 */
+/* #define NEFARIOUS_CLOAKHOST */
+/* ...... */
+/* QuakeNet Asuka - http://dev.quakenet.org */
 /* #define ASUKA */
 
 /* Messages/Tokens */
@@ -46,6 +52,8 @@
 #define TOK_USER                "USER"
 #define MSG_NICK                "NICK"          /* NICK */
 #define TOK_NICK                "N"
+#define MSG_SVSNICK             "SVSNICK"       /* SVNI */
+#define TOK_SVSNICK             "SN"
 #define MSG_SERVER              "SERVER"        /* SERV */
 #define TOK_SERVER              "S"
 #define MSG_LIST                "LIST"          /* LIST */
@@ -110,16 +118,22 @@
 #define TOK_NOTICE              "O"
 #define MSG_WALLCHOPS           "WALLCHOPS"     /* WC */
 #define TOK_WALLCHOPS           "WC"
-#define MSG_WALLVOICES           "WALLVOICES"     /* WV */
-#define TOK_WALLVOICES           "WV"
+#define MSG_WALLVOICES          "WALLVOICES"    /* WV */
+#define TOK_WALLVOICES          "WV"
+#define MSG_WALLHOPS            "WALLHOPS"      /* WH */
+#define TOK_WALLHOPS            "WH"
 #define MSG_CPRIVMSG            "CPRIVMSG"      /* CPRI */
 #define TOK_CPRIVMSG            "CP"
 #define MSG_CNOTICE             "CNOTICE"       /* CNOT */
 #define TOK_CNOTICE             "CN"
 #define MSG_JOIN                "JOIN"          /* JOIN */
 #define TOK_JOIN                "J"
+#define MSG_SVSJOIN             "SVSJOIN"       /* SVJO */
+#define TOK_SVSJOIN             "SJ"
 #define MSG_PART                "PART"          /* PART */
 #define TOK_PART                "L"
+#define MSG_SVSPART             "SVSPART"       /* SVPA */
+#define TOK_SVSPART             "SP"
 #define MSG_LUSERS              "LUSERS"        /* LUSE */
 #define TOK_LUSERS              "LU"
 #define MSG_MOTD                "MOTD"          /* MOTD */
@@ -140,6 +154,8 @@
 #define TOK_SERVLIST            "SERVSET"
 #define MSG_SERVSET             "SERVSET"       /* SERV -> SSET */
 #define TOK_SERVSET             "SERVSET"
+#define MSG_CHECK               "CHECK"         /* CHEC */
+#define TOK_CHECK               "CC"
 #define MSG_REHASH              "REHASH"        /* REHA */
 #define TOK_REHASH              "REHASH"
 #define MSG_RESTART             "RESTART"       /* REST */
@@ -154,6 +170,8 @@
 #define TOK_DNS                 "DNS"
 #define MSG_SILENCE             "SILENCE"       /* SILE */
 #define TOK_SILENCE             "U"
+#define MSG_EXEMPT              "EXEMPT"       /* EXEM */
+#define TOK_EXEMPT              "EX"
 #define MSG_GLINE               "GLINE"         /* GLIN */
 #define TOK_GLINE               "GL"
 #define MSG_BURST               "BURST"         /* BURS */
@@ -180,6 +198,8 @@
 #define TOK_ACCOUNT		"AC"
 #define MSG_ASLL		"ASLL"		/* ASLL */
 #define TOK_ASLL		"LL"
+#define MSG_MKPASSWD            "MKPASSWD"      /* MKPA */
+#define TOK_MKPASSWD            "MKPASSWD"
 #define MSG_POST                "POST"          /* POST */
 #define TOK_POST                "POST"
 #define MSG_SET			"SET"		/* SET */
@@ -190,36 +210,50 @@
 #define TOK_GET			"GET"
 #define MSG_PRIVS		"PRIVS"		/* PRIV */
 #define TOK_PRIVS		"PRIVS"
+#define MSG_SETHOST             "SETHOST"       /* SETH */
+#define TOK_SETHOST             "SH"
+#define MSG_FAKEHOST            "FAKE"          /* FAKE */
+#define TOK_FAKEHOST            "FA"
+#define MSG_OPERMOTD            "OPERMOTD"      /* OPMO */
+#define TOK_OPERMOTD            "OPM"
+#define MSG_RULES               "RULES"         /* RULE */
+#define TOK_RULES               "RL"
+#define MSG_SVSNOOP             "SVSNOOP"       /* SVNO */
+#define TOK_SVSNOOP             "SO"
+#define MSG_SWHOIS              "SWHOIS"        /* SWHO */
+#define TOK_SWHOIS              "SW"
+#define MSG_MARK                "MARK"          /* MARK */
+#define TOK_MARK                "MK"
 
  /* User modes: */
 #define UMODE_SERVNOTICE        0x00800000	/* See server notices */
-#define UMODE_CHSERV            0x01000000	/* Unkickable/-o able */
-#define UMODE_DEBUG             0x02000000	/* See hack notices */
-#define UMODE_ACCOUNT			0x04000000	/* */
+#define UMODE_DEBUG             0x01000000	/* See hack notices */
+#ifdef NEFARIOUS
+#define UMODE_FAKEHOST		0x02000000	/* */
+#define UMODE_WHOIS		0x04000000	/* */
+#endif
 #if ( defined NEFARIOUS ) || (defined ASUKA )
-#define UMODE_SETHOST			0x08000000	/* */
-#define UMODE_ACCOUNTONLY		0x10000000	/* */
-#define UMODE_XTRAOP			0x20000000	/* */
-#define UMODE_NOCHAN			0x40000000	/* */
-#define UMODE_NOIDLE			0x80000000	/* */
+#define UMODE_SETHOST		0x08000000	/* */
+#define UMODE_NOCHAN		0x10000000	/* */
+#define UMODE_NOIDLE		0x20000000	/* */
+#define UMODE_XTRAOP		0x40000000	/* */
 #endif
 
 /* Cmodes */
-#define CMODE_SENDTS		0x02000000
-#ifdef ASUKA
-#define CMODE_DELJOINS		0x04000000
-#define CMODE_WASDELJOIN	0x08000000
-#endif
-#define CMODE_LISTED		0x10000000
 #if ( defined NEFARIOUS ) || (defined ASUKA )
-#define CMODE_NOCTCP		0x20000000
-#define CMODE_NONOTICE		0x40000000
-#define CMODE_NOQUITPARTS	0x80000000
+#define CMODE_NOCTCP		0x02000000
+#define CMODE_NONOTICE		0x04000000
+#define CMODE_NOQUITPARTS	0x08000000
+#endif
+#ifdef ASUKA
+#define CMODE_DELJOINS		0x10000000
 #endif
 #ifdef NEFARIOUS
-#define CMODE_ONLYSECURE 0x800000
-#define CMODE_ACCONLY	0x1000000
-#define CMODE_NOAMSG	0x8000000
+#define CMODE_PERSIST		0x20000000
+#define CMODE_NOLISTMODES	0x40000000
+#define CMODE_MODREG		0x80000000
+#define CMODE_NOAMSG		0x100000000
+#define CMODE_ONLYSECURE	0x200000000
 #endif
 
 #endif
