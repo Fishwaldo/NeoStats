@@ -547,7 +547,6 @@ src/protocol/client.vcproj -text
 src/protocol/hybrid7.c eol=lf
 src/protocol/hybrid7.vcproj -text
 src/protocol/ircup10.c eol=lf
-src/protocol/ircup10.h eol=lf
 src/protocol/ircup10.vcproj -text
 src/protocol/plexus.c -text
 src/protocol/plexus.vcproj -text
