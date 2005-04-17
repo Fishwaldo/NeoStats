@@ -1014,9 +1014,9 @@ m_nick (char *origin, char **argv, int argc, int srv)
 					break;
 				default:
 					break;
-				} // switch(*modeptr)
-			} // for()
-		} // if (modes)
+				} /* switch(*modeptr) */
+			} /* for() */
+		} /* if (modes) */
 
 		IP = htonl(base64toIP(argv[argc-3]));
 		ircsnprintf( IPAddress, 32, "%lu", IP);
