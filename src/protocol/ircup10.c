@@ -682,31 +682,31 @@ send_kick (const char *source, const char *chan, const char *target, const char 
 void
 send_swhois (const char *source, const char *target, const char *swhois)
 {
-        send_cmd ("%s %s %s :%s", neostatsbase64, TOK_SWHOIS, nick_to_base64 (target), swhois);
+	send_cmd ("%s %s %s :%s", neostatsbase64, TOK_SWHOIS, nick_to_base64 (target), swhois);
 }
 
 void
 send_svsnick (const char *source, const char *target, const char *newnick, const unsigned long ts)
 {
-        send_cmd ("%s %s %s %s :%lu", neostatsbase64, TOK_SVSNICK, nick_to_base64 (target), newnick, ts);
+	send_cmd ("%s %s %s %s :%lu", neostatsbase64, TOK_SVSNICK, nick_to_base64 (target), newnick, ts);
 }
 
 void
 send_svsjoin (const char *source, const char *target, const char *chan)
 {
-        send_cmd ("%s %s %s %s", neostatsbase64, TOK_SVSJOIN, nick_to_base64 (target), chan);
+	send_cmd ("%s %s %s %s", neostatsbase64, TOK_SVSJOIN, nick_to_base64 (target), chan);
 }
 
 void
 send_svspart (const char *source, const char *target, const char *chan)
 {
-        send_cmd ("%s %s %s %s", neostatsbase64, TOK_SVSPART, nick_to_base64 (target), chan);
+	send_cmd ("%s %s %s %s", neostatsbase64, TOK_SVSPART, nick_to_base64 (target), chan);
 }
 
 void
 send_svshost (const char *source, const char *who, const char *vhost)
 {
-        send_cmd ("%s %s %s %s", neostatsbase64, TOK_FAKEHOST, nick_to_base64 (who), vhost);
+	send_cmd ("%s %s %s %s", neostatsbase64, TOK_FAKEHOST, nick_to_base64 (who), vhost);
 }
 
 void 
@@ -1259,19 +1259,19 @@ static void m_wallops (char *origin, char **argv, int argc, int srv)
 static void
 m_svsnick (char *origin, char **argv, int argc, int srv)
 {
-        do_nickchange (base64_to_nick(argv[0]), argv[1], argv[2]);
+	do_nickchange (base64_to_nick(argv[0]), argv[1], argv[2]);
 }
 
 static void
 m_svsjoin (char *origin, char **argv, int argc, int srv)
 {
-        do_join (base64_to_nick(argv[0]), argv[1], argv[2]);
+	do_join (base64_to_nick(argv[0]), argv[1], argv[2]);
 }
 
 static void
 m_svspart (char *origin, char **argv, int argc, int srv)
 {
-        do_part (base64_to_nick(argv[0]), argv[1], argv[2]);
+	do_part (base64_to_nick(argv[0]), argv[1], argv[2]);
 }
 
 /* m_whois
@@ -1280,7 +1280,7 @@ m_svspart (char *origin, char **argv, int argc, int srv)
 static void
 m_whois (char *origin, char **argv, int argc, int srv)
 {
-        /* TODO */
+	/* TODO */
 }
 
 /* m_swhois
@@ -1290,7 +1290,7 @@ m_whois (char *origin, char **argv, int argc, int srv)
 static void
 m_swhois (char *origin, char **argv, int argc, int srv)
 {
-        do_swhois (base64_to_nick(argv[0]), argv[1]);
+	do_swhois (base64_to_nick(argv[0]), argv[1]);
 }
 
 static void
