@@ -1685,7 +1685,7 @@ int irc_setname( const Bot *botptr, const char* realname )
 int irc_sethost( const Bot *botptr, const char* host )
 {
 	if( !irc_send_sethost ) {
-		unsupported_cmd( "SETNAME" );
+		unsupported_cmd( "SETHOST" );
 		return NS_FAILURE;
 	}
 	irc_send_sethost( botptr->name, host );
@@ -1701,7 +1701,7 @@ int irc_sethost( const Bot *botptr, const char* host )
 int irc_setident( const Bot *botptr, const char* ident )
 {
 	if( !irc_send_setident ) {
-		unsupported_cmd( "SETNAME" );
+		unsupported_cmd( "SETIDENT" );
 		return NS_FAILURE;
 	}
 	irc_send_setident( botptr->name, ident );
