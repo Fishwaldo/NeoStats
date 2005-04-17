@@ -33,7 +33,7 @@
 
 typedef void( *ircd_cmd_handler )( char *origin, char **argv, int argc, int srv );
 
-typedef struct ircd_cmd{
+typedef struct ircd_cmd {
 	const char *name;
 	const char *token;
 	ircd_cmd_handler handler;
@@ -89,6 +89,16 @@ MODULEVAR extern const char MSG_WALLOPS[];
 MODULEVAR extern const char TOK_WALLOPS[];
 MODULEVAR extern const char MSG_GLOBOPS[];
 MODULEVAR extern const char TOK_GLOBOPS[];
+MODULEVAR extern const char MSG_STATS[];
+MODULEVAR extern const char TOK_STATS[];
+MODULEVAR extern const char MSG_VERSION[];
+MODULEVAR extern const char TOK_VERSION[];
+MODULEVAR extern const char MSG_MOTD[];
+MODULEVAR extern const char TOK_MOTD[];
+MODULEVAR extern const char MSG_ADMIN[];
+MODULEVAR extern const char TOK_ADMIN[];
+MODULEVAR extern const char MSG_CREDITS[];
+MODULEVAR extern const char TOK_CREDITS[];
 MODULEVAR extern const char MSG_NICK[];
 MODULEVAR extern const char TOK_NICK[];
 MODULEVAR extern const char MSG_MODE[];

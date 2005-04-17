@@ -172,6 +172,16 @@ static char *MSG_WALLOPS;
 static char *TOK_WALLOPS;
 static char *MSG_GLOBOPS;
 static char *TOK_GLOBOPS;
+static char *MSG_STATS;
+static char *TOK_STATS;
+static char *MSG_VERSION;
+static char *TOK_VERSION;
+static char *MSG_MOTD;
+static char *TOK_MOTD;
+static char *MSG_ADMIN;
+static char *TOK_ADMIN;
+static char *MSG_CREDITS;
+static char *TOK_CREDITS;
 static char *MSG_NICK;
 static char *TOK_NICK;
 static char *MSG_MODE;
@@ -221,6 +231,11 @@ msgtok_sym msgtok_sym_table[] =
 	{( void * )&irc_send_notice, &MSG_NOTICE, "MSG_NOTICE", &TOK_NOTICE, "TOK_NOTICE", _send_notice, 0 },
 	{( void * )&irc_send_wallops, &MSG_WALLOPS, "MSG_WALLOPS", &TOK_WALLOPS, "TOK_WALLOPS", _send_wallops, 0 },
 	{( void * )&irc_send_globops, &MSG_GLOBOPS, "MSG_GLOBOPS", &TOK_GLOBOPS, "TOK_GLOBOPS", _send_globops, 0 },
+	{( void * )NULL, &MSG_STATS, "MSG_STATS", &TOK_STATS, "TOK_STATS", NULL, 0 },
+	{( void * )NULL, &MSG_VERSION, "MSG_VERSION", &TOK_VERSION, "TOK_VERSION", NULL, 0 },
+	{( void * )NULL, &MSG_MOTD, "MSG_MOTD", &TOK_MOTD, "TOK_MOTD", NULL, 0 },
+	{( void * )NULL, &MSG_ADMIN, "MSG_ADMIN", &TOK_ADMIN, "TOK_ADMIN", NULL, 0 },
+	{( void * )NULL, &MSG_CREDITS, "MSG_CREDITS", &TOK_CREDITS, "TOK_CREDITS", NULL, 0 },
 	{( void * )&irc_send_nickchange, &MSG_NICK, "MSG_NICK", &TOK_NICK, "TOK_NICK", _send_nickchange, 0 },
 	{( void * )&irc_send_umode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_umode, 0 },
 	{( void * )&irc_send_cmode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_cmode, 0 },
@@ -310,6 +325,40 @@ static ircd_sym ircd_sym_table[] =
 	{NULL, NULL, NULL, 0, 0},
 };
 
+typedef struct ircd_cmd_intrinsic {
+	const char **name;
+	const char **token;
+	ircd_cmd_handler handler;
+	unsigned int usage;
+}ircd_cmd_intrinsic;
+
+ircd_cmd_intrinsic intrinsic_cmd_list[] = 
+{
+	{&MSG_PRIVATE, &TOK_PRIVATE, _m_private, 0},
+	{&MSG_NOTICE, &TOK_NOTICE, _m_notice, 0},
+	{&MSG_STATS, &TOK_STATS, _m_stats, 0},
+	{&MSG_VERSION, &TOK_VERSION, _m_version, 0},
+	{&MSG_MOTD, &TOK_MOTD, _m_motd, 0},
+	{&MSG_ADMIN, &TOK_ADMIN, _m_admin, 0},
+	{&MSG_CREDITS, &TOK_CREDITS, _m_credits, 0},
+	{&MSG_SQUIT, &TOK_SQUIT, _m_squit, 0},
+	{&MSG_QUIT, &TOK_QUIT, _m_quit, 0},
+	{&MSG_MODE, &TOK_MODE, _m_mode, 0},
+	{&MSG_SVSJOIN, &TOK_SVSJOIN, _m_svsjoin, 0},
+	{&MSG_SVSPART, &TOK_SVSPART, _m_svspart, 0},
+	{&MSG_KILL, &TOK_KILL, _m_kill, 0},
+	{&MSG_PING, &TOK_PING, _m_ping, 0},
+	{&MSG_PONG, &TOK_PONG, _m_pong, 0},
+	{&MSG_JOIN, &TOK_JOIN, _m_join, 0},
+	{&MSG_PART, &TOK_PART, _m_part, 0},
+	{&MSG_KICK, &TOK_KICK, _m_kick, 0},
+	{&MSG_GLOBOPS, &TOK_GLOBOPS, _m_globops, 0},
+	{&MSG_WALLOPS, &TOK_WALLOPS, _m_wallops, 0},
+	{&MSG_SVINFO, &TOK_SVINFO, _m_svinfo, 0},
+	{0, 0, 0, 0},
+};
+
+
 static void IrcdError( char* err )
 {
 	nlog( LOG_CRITICAL, "Unable to find %s in selected IRCd module", err );
@@ -374,7 +423,7 @@ static int InitIrcdSymbols( void )
 		*pmsgtok_sym->msgptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->msgsym );
 		if( pmsgtok_sym->tokptr )
 			*pmsgtok_sym->tokptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->toksym );
-		if( pmsgtok_sym->msgptr )
+		if( pmsgtok_sym->msgptr && pmsgtok_sym->handler )
 			*pmsgtok_sym->handler = pmsgtok_sym->defaulthandler;
 		pmsgtok_sym ++;
 	}
@@ -385,7 +434,7 @@ static int InitIrcdSymbols( void )
 		protocol_handler = ns_dlsym( protocol_module_handle, pircd_sym->sym );
 		if( protocol_handler )
 			*pircd_sym->handler = protocol_handler;
-		if( !pircd_sym->handler ) 
+		if( !*pircd_sym->handler ) 
 			*pircd_sym->handler = pircd_sym->defaulthandler;
 		if( pircd_sym->required && !*pircd_sym->handler ) 
 		{
@@ -1114,7 +1163,8 @@ void _m_private( char* origin, char **argv, int argc, int cmdptr )
 
 EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char* origin, char **av, int ac )
 {
-	ircd_cmd* ircd_cmd_ptr;
+	ircd_cmd *ircd_cmd_ptr;
+	ircd_cmd_intrinsic *intrinsic_cmd_ptr;
 
 	SET_SEGV_LOCATION();
 	ircd_cmd_ptr = cmd_list;
@@ -1132,7 +1182,17 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char* origin, char **av
 		}
 		ircd_cmd_ptr ++;
 	}
-	
+	intrinsic_cmd_ptr = intrinsic_cmd_list;
+	while( intrinsic_cmd_ptr->handler ) {
+		if( !ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) || 
+		 ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && *intrinsic_cmd_ptr->token && !ircstrcasecmp( *intrinsic_cmd_ptr->token, cmd ) ) ) {
+			dlog( DEBUG3, "process_ircd_cmd: running command %s", *intrinsic_cmd_ptr->name );
+			intrinsic_cmd_ptr->handler( origin, av, ac, cmdptr );
+			intrinsic_cmd_ptr->usage++;
+			return;
+		}
+		intrinsic_cmd_ptr ++;
+	}
 	ircd_cmd_ptr = numeric_cmd_list;	
 	/* Process numeric replies */
 	while( ircd_cmd_ptr->name ) {
