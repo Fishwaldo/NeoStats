@@ -326,8 +326,8 @@ static ircd_sym ircd_sym_table[] =
 };
 
 typedef struct ircd_cmd_intrinsic {
-	const char **name;
-	const char **token;
+	char **name;
+	char **token;
 	ircd_cmd_handler handler;
 	unsigned int usage;
 }ircd_cmd_intrinsic;
