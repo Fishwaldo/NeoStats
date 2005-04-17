@@ -31,32 +31,42 @@ included.
 -----------------------------------<>-----------------------------------
 Messages and Tokens
 
-IRC messages are specifically formatted with the command embedded in the
-string in the form of a specific message or token. Many of these are 
-specific to a particular IRCd so must be provided by the module. You can
-usually find the messages in the IRCd source code in the file msg.h or 
-similar.
+IRC messages are formatted with the command embedded in the string in 
+the form of a specific message or token. Many of these are specific to a
+particular IRCd so must be provided by the module. You can usually find 
+the messages in the IRCd source code in the file msg.h or similar.
 
 An example is:
-#define MSG_PRIVATE	"PRIVMSG"	/* PRIV */
-#define TOK_PRIVATE	"!"	/* 33 */
+#define MSG_PRIVATE	"PRIVMSG"
+#define TOK_PRIVATE	"!"
 
-These are usually placed in a protocol specific header file.
+For NeoStats use you can cut and paste these defines into your protocol
+source file but you should format them as:
+
+const char MSG_PRIVATE[] = "PRIVMSG";
+const char TOK_PRIVATE[] = "!";
+
+This allows NeoStats to access the messages and tokens used when your
+module loads and allows NeoStats to provide default handlers for many
+common commands.
 
 -----------------------------------<>-----------------------------------
 Modes
 
 NeoStats provides a set of defines for common user and channel modes 
 supported by NeoStats. Those not supported must be provided by the 
-module. 
+module. You should create these for all modes not supported by NeoStats 
+that are supported by your IRCd. The defines must follow a bit mask.
+
+NeoStats reserves user mode bitmasks up to 0x01000000 and channel mode
+bitmasks up to 0x00040000 so you must start custom masks at 0x02000000
+and 0x00080000 respectively.
 
 An example user mode is:
 #define UMODE_FAILOP		0x00200000
 
 An example channel mode is:
 #define CMODE_NOCTCP		0x10000000
-
-These are usually placed in a protocol specific header file.
 
 -----------------------------------<>-----------------------------------
 ProtocolInfo definition
@@ -65,20 +75,22 @@ This is required to instruct NeoStats how to use certain elements of the
 protocol module. An example follows:
 
 ProtocolInfo protocol_info = {
-	/* Protocol options required by this IRCd */
+	/* Required protocol options */
 	PROTOCOL_SJOIN,
-	/* Protocol options negotiated at link by this IRCd */
+	/* Protocol options negotiated at link */
 	PROTOCOL_TOKEN,
-	/* Features supported by this IRCd */
+	/* Features supported */
 	FEATURE_UMODECLOAK,
+	/* Default operator modes for NeoStats service bots */
 	"+oSq",
+	/* Default channel mode for NeoStats service bots */
 	"+o",
 };
 
 -----------------------------------<>-----------------------------------
 Command list
 
-This is parsed by NeoStats when we receive a message from an IRCd server
+This is parsed by NeoStats when we receive a message from an IRC server
 in order to handle the message and is formatted as follows.
 
 ircd_cmd cmd_list[] = {
@@ -86,6 +98,12 @@ ircd_cmd cmd_list[] = {
 	{MSG_PRIVATE, TOK_PRIVATE, _m_private, 0},
 	{0, 0, 0, 0},
 };
+
+NeoStats provides some basic handlers for IRCds which follow common
+formats for commands and you can direct many of these messages to these
+basic handlers. If your IRCd uses a different format, you must provide
+your own function to parse the message and then pass to NeoStats. This
+is discussed later in this file.
 
 -----------------------------------<>-----------------------------------
 Mode tables
@@ -121,6 +139,10 @@ mode_init user_smodes[] = {
 	{0, 0, 0},
 };
 
+NeoStats provides default mode tables for modes supported by all ircds
+e.g. channel operators and user invisible mode so you need only list
+the modes that are not in the default list.
+
 -----------------------------------<>-----------------------------------
 Command processing functions
 
@@ -137,9 +159,9 @@ to find.
 
 An example follows.
 
-static void m_sethost (char *origin, char **argv, int argc, int srv)
+static void m_sethost( char *origin, char **argv, int argc, int srv )
 {
-	do_sethost(origin, argv[0]);
+	do_sethost( origin, argv[0] );
 }
 
 -----------------------------------<>-----------------------------------
@@ -153,8 +175,7 @@ NeoStats.
 
 An example follows:
 
-void 
-send_part (const char *source, const char *chan)
+void send_part (const char *source, const char *chan)
 {
 	send_cmd (":%s %s %s", source, MSG_PART, chan);
 }
@@ -162,14 +183,18 @@ send_part (const char *source, const char *chan)
 If your IRCd supports tokens, we provide a helper macro to choose
 the message or token when appropriate which is used as follows:
 
-void 
-send_part (const char *source, const char *chan)
+void send_part (const char *source, const char *chan)
 {
 	send_cmd (":%s %s %s", source, MSGTOK(PART), chan);
 }
 
+NeoStats provides some common handlers for basic functions that are
+similar across all ircds. If your ircd uses a different format for a
+command, you must provide this handler or NeoStats will try to use it's
+internal handler which may cause problems on the network. 
+
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on August 27th, 2004 by M           **
+** This document was last updated on April 17th, 2005 by M            **
 ************************************************************************

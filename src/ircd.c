@@ -91,6 +91,9 @@ static void _send_privmsg( const char *source, const char *target, const char *b
 static void _send_notice( const char *source, const char *target, const char *buf );
 static void _send_wallops( const char *source, const char *buf );
 static void _send_globops( const char *source, const char *buf );
+static void _send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts );
+static void _send_umode( const char *source, const char *target, const char *mode );
+static void _send_cmode( const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, const unsigned long ts );
 static void _send_join( const char *source, const char *chan, const char *key, const unsigned long ts );
 static void _send_part( const char *source, const char *chan, const char *reason );
 static void _send_kick( const char *source, const char *chan, const char *target, const char *reason );
@@ -98,7 +101,9 @@ static void _send_invite( const char *source, const char *target, const char *ch
 static void _send_quit( const char *source, const char *quitmsg );
 static void _send_ping( const char *source, const char *reply, const char *target );
 static void _send_pong( const char *reply );
+static void _send_server( const char *source, const char *name, const int numeric, const char *infoline );
 static void _send_squit( const char *server, const char *quitmsg );
+static void _send_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow );
 static void _send_kill( const char *source, const char *target, const char *reason );
 static void _send_setname( const char *nick, const char *realname );
 static void _send_sethost( const char *nick, const char *host );
@@ -114,13 +119,13 @@ static void( *irc_send_notice )( const char *source, const char *to, const char 
 static void( *irc_send_globops )( const char *source, const char *buf );
 static void( *irc_send_wallops )( const char *source, const char *buf );
 static void( *irc_send_numeric )( const char *source, const int numeric, const char *target, const char *buf );
+static void( *irc_send_quit )( const char *source, const char *quitmsg );
 static void( *irc_send_umode )( const char *source, const char *target, const char *mode );
 static void( *irc_send_join )( const char *source, const char *chan, const char *key, const unsigned long ts );
 static void( *irc_send_sjoin )( const char *source, const char *who, const char *chan, const unsigned long ts );
 static void( *irc_send_part )( const char *source, const char *chan, const char *reason );
 static void( *irc_send_nickchange )( const char *oldnick, const char *newnick, const unsigned long ts );
-static void( *irc_send_cmode )( const char *source, const char *who, const char *chan, const char *mode, const char *args, unsigned long ts );
-static void( *irc_send_quit )( const char *source, const char *quitmsg );
+static void( *irc_send_cmode )( const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, unsigned long ts );
 static void( *irc_send_kill )( const char *source, const char *target, const char *reason );
 static void( *irc_send_kick )( const char *source, const char *chan, const char *target, const char *reason );
 static void( *irc_send_invite )( const char *source, const char *to, const char *chan );
@@ -167,6 +172,10 @@ static char *MSG_WALLOPS;
 static char *TOK_WALLOPS;
 static char *MSG_GLOBOPS;
 static char *TOK_GLOBOPS;
+static char *MSG_NICK;
+static char *TOK_NICK;
+static char *MSG_MODE;
+static char *TOK_MODE;
 static char *MSG_QUIT;
 static char *TOK_QUIT;
 static char *MSG_JOIN;
@@ -181,8 +190,12 @@ static char *MSG_PING;
 static char *TOK_PING;
 static char *MSG_PONG;
 static char *TOK_PONG;
+static char *MSG_SERVER;
+static char *TOK_SERVER;
 static char *MSG_SQUIT;
 static char *TOK_SQUIT;
+static char *MSG_SVINFO;
+static char *TOK_SVINFO;
 static char *MSG_KILL;
 static char *TOK_KILL;
 static char *MSG_SETNAME;
@@ -208,14 +221,19 @@ msgtok_sym msgtok_sym_table[] =
 	{( void * )&irc_send_notice, &MSG_NOTICE, "MSG_NOTICE", &TOK_NOTICE, "TOK_NOTICE", _send_notice, 0 },
 	{( void * )&irc_send_wallops, &MSG_WALLOPS, "MSG_WALLOPS", &TOK_WALLOPS, "TOK_WALLOPS", _send_wallops, 0 },
 	{( void * )&irc_send_globops, &MSG_GLOBOPS, "MSG_GLOBOPS", &TOK_GLOBOPS, "TOK_GLOBOPS", _send_globops, 0 },
+	{( void * )&irc_send_nickchange, &MSG_NICK, "MSG_NICK", &TOK_NICK, "TOK_NICK", _send_nickchange, 0 },
+	{( void * )&irc_send_umode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_umode, 0 },
+	{( void * )&irc_send_cmode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_cmode, 0 },
+	{( void * )&irc_send_quit, &MSG_QUIT, "MSG_QUIT", &TOK_QUIT, "TOK_QUIT", _send_quit, 0 },
 	{( void * )&irc_send_join, &MSG_JOIN, "MSG_JOIN", &TOK_JOIN, "TOK_JOIN", _send_join, 0 },
 	{( void * )&irc_send_part, &MSG_PART, "MSG_PART", &TOK_PART, "TOK_PART", _send_part, 0 },
 	{( void * )&irc_send_kick, &MSG_KICK, "MSG_KICK", &TOK_KICK, "TOK_KICK", _send_kick, 0 },
 	{( void * )&irc_send_invite, &MSG_INVITE, "MSG_INVITE", &TOK_INVITE, "TOK_INVITE", _send_invite, 0 },
-	{( void * )&irc_send_quit, &MSG_QUIT, "MSG_QUIT", &TOK_QUIT, "TOK_QUIT", _send_quit, 0 },
 	{( void * )&irc_send_ping, &MSG_PING, "MSG_PING", &TOK_PING, "TOK_PING", _send_ping, 0 },
 	{( void * )&irc_send_pong, &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", _send_pong, 0 },
+	{( void * )&irc_send_server, &MSG_SERVER, "MSG_SERVER", &TOK_SERVER, "TOK_SERVER", _send_server, 0 },
 	{( void * )&irc_send_squit, &MSG_SQUIT, "MSG_SQUIT", &TOK_SQUIT, "TOK_SQUIT", _send_squit, 0 },
+	{( void * )&irc_send_svinfo, &MSG_SVINFO, "MSG_SVINFO", &TOK_SVINFO, "TOK_SVINFO", _send_svinfo, 0 },
 	{( void * )&irc_send_kill, &MSG_KILL, "MSG_KILL", &TOK_KILL, "TOK_KILL", _send_kill, 0 },
 	{( void * )&irc_send_setname, &MSG_SETNAME, "MSG_SETNAME", &TOK_SETNAME, "TOK_SETNAME", _send_setname, 0 },
 	{( void * )&irc_send_sethost, &MSG_SETHOST, "MSG_SETHOST", &TOK_SETHOST, "TOK_SETHOST", _send_sethost, 0 },
@@ -3096,6 +3114,21 @@ static void _send_invite( const char *source, const char *target, const char *ch
 	send_cmd( ":%s %s %s %s", source, MSGTOK( INVITE ), target, chan );
 }
 
+static void _send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
+{
+	send_cmd( ":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts );
+}
+
+static void _send_umode( const char *source, const char *target, const char *mode )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( MODE ), target, mode );
+}
+
+static void _send_cmode( const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, const unsigned long ts )
+{
+	send_cmd( ":%s %s %s %s %s %lu", sourceserver, MSGTOK( MODE ), chan, mode, args, ts );
+}
+
 static void _send_quit( const char *source, const char *quitmsg )
 {
 	send_cmd( ":%s %s :%s", source, MSGTOK( QUIT ), quitmsg );
@@ -3111,9 +3144,19 @@ static void _send_pong( const char *reply )
 	send_cmd( "%s %s", MSGTOK( PONG ), reply );
 }
 
+static void _send_server( const char *source, const char *name, const int numeric, const char *infoline )
+{
+	send_cmd( ":%s %s %s %d :%s", source, MSGTOK( SERVER ), name, numeric, infoline );
+}
+
 static void _send_squit( const char *server, const char *quitmsg )
 {
 	send_cmd( "%s %s :%s", MSGTOK( SQUIT ), server, quitmsg );
+}
+
+static void _send_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow )
+{
+	send_cmd( "%s %d %d 0 :%lu", MSGTOK( SVINFO ), tscurrent, tsmin, tsnow );
 }
 
 static void _send_kill( const char *source, const char *target, const char *reason )

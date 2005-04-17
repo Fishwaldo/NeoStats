@@ -151,24 +151,14 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 	send_cmd( "%s %s %d %d :%s", MSG_USER, "user",( int ) me.now,( int ) me.now, "real name" );
 }
 
-void send_cmode( const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts )
+void send_cmode( const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, const unsigned long ts )
 {
-	send_cmd( ":%s %s %s %s %s %lu", who, MSG_MODE, chan, mode, args, ts );
+	send_cmd( ":%s %s %s %s %s %lu", sourceuser, MSG_MODE, chan, mode, args, ts );
 }
 
 void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
 	send_cmd( "%s %s", MSG_NICK, nick );
-}
-
-void send_umode( const char *source, const char *target, const char *mode )
-{
-	send_cmd( ":%s %s %s :%s", source, MSG_MODE, target, mode );
-}
-
-void send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
-{
-	send_cmd( ":%s %s %s", oldnick, MSG_NICK, newnick );
 }
 
 void send_swhois( const char *source, const char *target, const char *swhois )

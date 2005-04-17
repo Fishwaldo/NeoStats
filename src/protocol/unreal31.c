@@ -171,11 +171,6 @@ mode_init user_umodes[] =
 	{0, 0},
 };
 
-void send_server( const char *source, const char *name, const int numeric, const char *infoline )
-{
-	send_cmd( ":%s %s %s %d :%s", source, MSGTOK( SERVER ), name, numeric, infoline );
-}
-
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 */
@@ -187,11 +182,6 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 void send_sjoin( const char *source, const char *target, const char *chan, const unsigned long ts )
 {
 	send_cmd( ":%s %s %lu %s + :%s", source, MSGTOK( SJOIN ), ts, chan, target );
-}
-
-void send_cmode( const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts )
-{
-	send_cmd( ":%s %s %s %s %s %lu", source, MSGTOK( MODE ), chan, mode, args, ts );
 }
 
 /* m_nick
@@ -218,11 +208,6 @@ void send_nick( const char *nick, const unsigned long ts, const char* newmode, c
 	send_cmd( "%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK( NICK ), nick, ts, ident, host, server, newmode, realname );
 }
 
-void send_umode( const char *source, const char *target, const char *mode )
-{
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( MODE ), target, mode );
-}
-
 void send_netinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
 {
 	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSGTOK( NETINFO ), ts, prot, cloak, netname );
@@ -231,11 +216,6 @@ void send_netinfo( const char* source, const int prot, const char* cloak, const 
 void send_smo( const char *source, const char *umodetarget, const char *msg )
 {
 	send_cmd( ":%s %s %s :%s", source, MSGTOK( SMO ), umodetarget, msg );
-}
-
-void send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
-{
-	send_cmd( ":%s %s %s %lu", oldnick, MSGTOK( NICK ), newnick, ts );
 }
 
 void send_swhois( const char *source, const char *target, const char *swhois )

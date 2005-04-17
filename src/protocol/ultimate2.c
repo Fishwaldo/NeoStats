@@ -146,11 +146,6 @@ mode_init user_umodes[] =
 	{0, 0},
 };
 
-void send_server( const char *source, const char *name, const int numeric, const char *infoline )
-{
-	send_cmd( ":%s %s %s %d :%s", source, MSG_SERVER, name, numeric, infoline );
-}
-
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
 	send_cmd( "%s %s", MSG_PASS, pass );
@@ -158,20 +153,15 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 	send_cmd( "%s TOKEN CLIENT", MSG_PROTOCTL );
 }
 
-void send_cmode( const char *source, const char *who, const char *chan, const char *mode, const char *args, const unsigned long ts )
+void send_cmode( const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, const unsigned long ts )
 {
-	send_cmd( ":%s %s %s %s %s %lu", who, MSGTOK( MODE ), chan, mode, args, ts );
+	send_cmd( ":%s %s %s %s %s %lu", sourceuser, MSGTOK( MODE ), chan, mode, args, ts );
 }
 
 void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s 0 :%s", MSGTOK( NICK ), nick, ts, ident, host, server, realname );
-	send_umode( nick, nick, newmode );
-}
-
-void send_umode( const char *source, const char *target, const char *mode )
-{
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( MODE ), target, mode );
+	send_cmd( ":%s %s %s :%s", nick, MSGTOK( MODE ), nick, newmode );
 }
 
 void send_snetinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
@@ -189,11 +179,6 @@ void send_vctrl( const int uprot, const int nicklen, const int modex, const int 
 	send_cmd( "%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname );
 }
 
-void send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
-{
-	send_cmd( ":%s %s %s %lu", oldnick, MSGTOK( NICK ), newnick, ts );
-}
-
 void send_svshost( const char *source, const char *target, const char *vhost )
 {
 	send_cmd( ":%s %s %s %s", source, MSG_CHGHOST, target, vhost );
@@ -208,11 +193,6 @@ void send_rakill( const char *source, const char *host, const char *ident )
 {
 	/* ultimate2 needs an oper to remove */
 	send_cmd( ":%s %s :%s@%s", ns_botptr->name, MSG_REMGLINE, host, ident );
-}
-
-void send_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow )
-{
-	send_cmd( "%s %d %d 0 :%lu", MSG_SVINFO, tscurrent, tsmin, tsnow );
 }
 
 void send_burst( int b )
