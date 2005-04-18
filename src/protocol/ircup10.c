@@ -45,190 +45,190 @@
 
 /* Messages/Tokens */
 
-#define MSG_PRIVATE             "PRIVMSG"       /* PRIV */
-#define TOK_PRIVATE             "P"
-#define MSG_WHO                 "WHO"           /* WHO  -> WHOC */
-#define TOK_WHO                 "H"
-#define MSG_WHOIS               "WHOIS"         /* WHOI */
-#define TOK_WHOIS               "W"
-#define MSG_WHOWAS              "WHOWAS"        /* WHOW */
-#define TOK_WHOWAS              "X"
-#define MSG_USER                "USER"          /* USER */
-#define TOK_USER                "USER"
-#define MSG_NICK                "NICK"          /* NICK */
-#define TOK_NICK                "N"
-#define MSG_SVSNICK             "SVSNICK"       /* SVNI */
-#define TOK_SVSNICK             "SN"
-#define MSG_SERVER              "SERVER"        /* SERV */
-#define TOK_SERVER              "S"
-#define MSG_LIST                "LIST"          /* LIST */
-#define TOK_LIST                "LIST"
-#define MSG_TOPIC               "TOPIC"         /* TOPI */
-#define TOK_TOPIC               "T"
-#define MSG_INVITE              "INVITE"        /* INVI */
-#define TOK_INVITE              "I"
-#define MSG_VERSION             "VERSION"       /* VERS */
-#define TOK_VERSION             "V"
-#define MSG_QUIT                "QUIT"          /* QUIT */
-#define TOK_QUIT                "Q"
-#define MSG_SQUIT               "SQUIT"         /* SQUI */
-#define TOK_SQUIT               "SQ"
-#define MSG_KILL                "KILL"          /* KILL */
-#define TOK_KILL                "D"
-#define MSG_INFO                "INFO"          /* INFO */
-#define TOK_INFO                "F"
-#define MSG_LINKS               "LINKS"         /* LINK */
-#define TOK_LINKS               "LI"
-#define MSG_STATS               "STATS"         /* STAT */
-#define TOK_STATS               "R"
-#define MSG_HELP                "HELP"          /* HELP */
-#define TOK_HELP                "HELP"
-#define MSG_ERROR               "ERROR"         /* ERRO */
-#define TOK_ERROR               "Y"
-#define MSG_AWAY                "AWAY"          /* AWAY */
-#define TOK_AWAY                "A"
-#define MSG_CONNECT             "CONNECT"       /* CONN */
-#define TOK_CONNECT             "CO"
-#define MSG_MAP                 "MAP"           /* MAP  */
-#define TOK_MAP                 "MAP"
-#define MSG_PING                "PING"          /* PING */
-#define TOK_PING                "G"
-#define MSG_PONG                "PONG"          /* PONG */
-#define TOK_PONG                "Z"
-#define MSG_OPER                "OPER"          /* OPER */
-#define TOK_OPER                "OPER"
-#define MSG_PASS                "PASS"          /* PASS */
-#define TOK_PASS                "PA"
-#define MSG_WALLOPS             "WALLOPS"       /* WALL */
-#define TOK_WALLOPS             "WA"
-#define MSG_WALLUSERS           "WALLUSERS"     /* WALL */
-#define TOK_WALLUSERS           "WU"
-#define MSG_DESYNCH             "DESYNCH"       /* DESY */
-#define TOK_DESYNCH             "DS"
-#define MSG_TIME                "TIME"          /* TIME */
-#define TOK_TIME                "TI"
-#define MSG_SETTIME             "SETTIME"       /* SETT */
-#define TOK_SETTIME             "SE"
-#define MSG_RPING               "RPING"         /* RPIN */
-#define TOK_RPING               "RI"
-#define MSG_RPONG               "RPONG"         /* RPON */
-#define TOK_RPONG               "RO"
-#define MSG_NAMES               "NAMES"         /* NAME */
-#define TOK_NAMES               "E"
-#define MSG_ADMIN               "ADMIN"         /* ADMI */
-#define TOK_ADMIN               "AD"
-#define MSG_TRACE               "TRACE"         /* TRAC */
-#define TOK_TRACE               "TR"
-#define MSG_NOTICE              "NOTICE"        /* NOTI */
-#define TOK_NOTICE              "O"
-#define MSG_WALLCHOPS           "WALLCHOPS"     /* WC */
-#define TOK_WALLCHOPS           "WC"
-#define MSG_WALLVOICES          "WALLVOICES"    /* WV */
-#define TOK_WALLVOICES          "WV"
-#define MSG_WALLHOPS            "WALLHOPS"      /* WH */
-#define TOK_WALLHOPS            "WH"
-#define MSG_CPRIVMSG            "CPRIVMSG"      /* CPRI */
-#define TOK_CPRIVMSG            "CP"
-#define MSG_CNOTICE             "CNOTICE"       /* CNOT */
-#define TOK_CNOTICE             "CN"
-#define MSG_JOIN                "JOIN"          /* JOIN */
-#define TOK_JOIN                "J"
-#define MSG_SVSJOIN             "SVSJOIN"       /* SVJO */
-#define TOK_SVSJOIN             "SJ"
-#define MSG_PART                "PART"          /* PART */
-#define TOK_PART                "L"
-#define MSG_SVSPART             "SVSPART"       /* SVPA */
-#define TOK_SVSPART             "SP"
-#define MSG_LUSERS              "LUSERS"        /* LUSE */
-#define TOK_LUSERS              "LU"
-#define MSG_MOTD                "MOTD"          /* MOTD */
-#define TOK_MOTD                "MO"
-#define MSG_MODE                "MODE"          /* MODE */
-#define TOK_MODE                "M"
-#define MSG_KICK                "KICK"          /* KICK */
-#define TOK_KICK                "K"
-#define MSG_USERHOST            "USERHOST"      /* USER -> USRH */
-#define TOK_USERHOST            "USERHOST"
-#define MSG_USERIP              "USERIP"        /* USER -> USIP */
-#define TOK_USERIP              "USERIP"
-#define MSG_ISON                "ISON"          /* ISON */
-#define TOK_ISON                "ISON"
-#define MSG_SQUERY              "SQUERY"        /* SQUE */
-#define TOK_SQUERY              "SQUERY"
-#define MSG_SERVLIST            "SERVLIST"      /* SERV -> SLIS */
-#define TOK_SERVLIST            "SERVSET"
-#define MSG_SERVSET             "SERVSET"       /* SERV -> SSET */
-#define TOK_SERVSET             "SERVSET"
-#define MSG_CHECK               "CHECK"         /* CHEC */
-#define TOK_CHECK               "CC"
-#define MSG_REHASH              "REHASH"        /* REHA */
-#define TOK_REHASH              "REHASH"
-#define MSG_RESTART             "RESTART"       /* REST */
-#define TOK_RESTART             "RESTART"
-#define MSG_CLOSE               "CLOSE"         /* CLOS */
-#define TOK_CLOSE               "CLOSE"
-#define MSG_DIE                 "DIE"           /* DIE  */
-#define TOK_DIE                 "DIE"
-#define MSG_HASH                "HASH"          /* HASH */
-#define TOK_HASH                "HASH"
-#define MSG_DNS                 "DNS"           /* DNS  -> DNSS */
-#define TOK_DNS                 "DNS"
-#define MSG_SILENCE             "SILENCE"       /* SILE */
-#define TOK_SILENCE             "U"
-#define MSG_EXEMPT              "EXEMPT"       /* EXEM */
-#define TOK_EXEMPT              "EX"
-#define MSG_GLINE               "GLINE"         /* GLIN */
-#define TOK_GLINE               "GL"
-#define MSG_BURST               "BURST"         /* BURS */
-#define TOK_BURST               "B"
-#define MSG_UPING               "UPING"         /* UPIN */
-#define TOK_UPING               "UP"
-#define MSG_CREATE              "CREATE"        /* CREA */
-#define TOK_CREATE              "C"
-#define MSG_DESTRUCT            "DESTRUCT"      /* DEST */
-#define TOK_DESTRUCT            "DE"
-#define MSG_END_OF_BURST        "END_OF_BURST"  /* END_ */
-#define TOK_END_OF_BURST        "EB"
-#define MSG_END_OF_BURST_ACK    "EOB_ACK"       /* EOB_ */
-#define TOK_END_OF_BURST_ACK    "EA"
-#define MSG_PROTO               "PROTO"         /* PROTO */
-#define TOK_PROTO               "PROTO"         /* PROTO */
-#define MSG_JUPE                "JUPE"          /* JUPE */
-#define TOK_JUPE                "JU"
-#define MSG_OPMODE              "OPMODE"        /* OPMO */
-#define TOK_OPMODE              "OM"
-#define MSG_CLEARMODE           "CLEARMODE"     /* CLMO */
-#define TOK_CLEARMODE           "CM"
-#define MSG_ACCOUNT		"ACCOUNT"	/* ACCO */
-#define TOK_ACCOUNT		"AC"
-#define MSG_ASLL		"ASLL"		/* ASLL */
-#define TOK_ASLL		"LL"
-#define MSG_MKPASSWD            "MKPASSWD"      /* MKPA */
-#define TOK_MKPASSWD            "MKPASSWD"
-#define MSG_POST                "POST"          /* POST */
-#define TOK_POST                "POST"
-#define MSG_SET			"SET"		/* SET */
-#define TOK_SET			"SET"
-#define MSG_RESET		"RESET"		/* RESE */
-#define TOK_RESET		"RESET"
-#define MSG_GET			"GET"		/* GET */
-#define TOK_GET			"GET"
-#define MSG_PRIVS		"PRIVS"		/* PRIV */
-#define TOK_PRIVS		"PRIVS"
-#define MSG_SETHOST             "SETHOST"       /* SETH */
-#define TOK_SETHOST             "SH"
-#define MSG_FAKEHOST            "FAKE"          /* FAKE */
-#define TOK_FAKEHOST            "FA"
-#define MSG_OPERMOTD            "OPERMOTD"      /* OPMO */
-#define TOK_OPERMOTD            "OPM"
-#define MSG_RULES               "RULES"         /* RULE */
-#define TOK_RULES               "RL"
-#define MSG_SVSNOOP             "SVSNOOP"       /* SVNO */
-#define TOK_SVSNOOP             "SO"
-#define MSG_SWHOIS              "SWHOIS"        /* SWHO */
-#define TOK_SWHOIS              "SW"
-#define MSG_MARK                "MARK"          /* MARK */
-#define TOK_MARK                "MK"
+const char MSG_PRIVATE[] = "PRIVMSG";
+const char TOK_PRIVATE[] = "P";
+const char MSG_WHO[] = "WHO";
+const char TOK_WHO[] = "H";
+const char MSG_WHOIS[] = "WHOIS";
+const char TOK_WHOIS[] = "W";
+const char MSG_WHOWAS[] = "WHOWAS";
+const char TOK_WHOWAS[] = "X";
+const char MSG_USER[] = "USER";
+const char TOK_USER[] = "USER";
+const char MSG_NICK[] = "NICK";
+const char TOK_NICK[] = "N";
+const char MSG_SVSNICK[] = "SVSNICK";
+const char TOK_SVSNICK[] = "SN";
+const char MSG_SERVER[] = "SERVER";
+const char TOK_SERVER[] = "S";
+const char MSG_LIST[] = "LIST";
+const char TOK_LIST[] = "LIST";
+const char MSG_TOPIC[] = "TOPIC";
+const char TOK_TOPIC[] = "T";
+const char MSG_INVITE[] = "INVITE";
+const char TOK_INVITE[] = "I";
+const char MSG_VERSION[] = "VERSION";
+const char TOK_VERSION[] = "V";
+const char MSG_QUIT[] = "QUIT";
+const char TOK_QUIT[] = "Q";
+const char MSG_SQUIT[] = "SQUIT";
+const char TOK_SQUIT[] = "SQ";
+const char MSG_KILL[] = "KILL";
+const char TOK_KILL[] = "D";
+const char MSG_INFO[] = "INFO";
+const char TOK_INFO[] = "F";
+const char MSG_LINKS[] = "LINKS";
+const char TOK_LINKS[] = "LI";
+const char MSG_STATS[] = "STATS";
+const char TOK_STATS[] = "R";
+const char MSG_HELP[] = "HELP";
+const char TOK_HELP[] = "HELP";
+const char MSG_ERROR[] = "ERROR";
+const char TOK_ERROR[] = "Y";
+const char MSG_AWAY[] = "AWAY";
+const char TOK_AWAY[] = "A";
+const char MSG_CONNECT[] = "CONNECT";
+const char TOK_CONNECT[] = "CO";
+const char MSG_MAP[] = "MAP";
+const char TOK_MAP[] = "MAP";
+const char MSG_PING[] = "PING";
+const char TOK_PING[] = "G";
+const char MSG_PONG[] = "PONG";
+const char TOK_PONG[] = "Z";
+const char MSG_OPER[] = "OPER";
+const char TOK_OPER[] = "OPER";
+const char MSG_PASS[] = "PASS";
+const char TOK_PASS[] = "PA";
+const char MSG_WALLOPS[] = "WALLOPS";
+const char TOK_WALLOPS[] = "WA";
+const char MSG_WALLUSERS[] = "WALLUSERS";
+const char TOK_WALLUSERS[] = "WU";
+const char MSG_DESYNCH[] = "DESYNCH";
+const char TOK_DESYNCH[] = "DS";
+const char MSG_TIME[] = "TIME";
+const char TOK_TIME[] = "TI";
+const char MSG_SETTIME[] = "SETTIME";
+const char TOK_SETTIME[] = "SE";
+const char MSG_RPING[] = "RPING";
+const char TOK_RPING[] = "RI";
+const char MSG_RPONG[] = "RPONG";
+const char TOK_RPONG[] = "RO";
+const char MSG_NAMES[] = "NAMES";
+const char TOK_NAMES[] = "E";
+const char MSG_ADMIN[] = "ADMIN";
+const char TOK_ADMIN[] = "AD";
+const char MSG_TRACE[] = "TRACE";
+const char TOK_TRACE[] = "TR";
+const char MSG_NOTICE[] = "NOTICE";
+const char TOK_NOTICE[] = "O";
+const char MSG_WALLCHOPS[] = "WALLCHOPS";
+const char TOK_WALLCHOPS[] = "WC";
+const char MSG_WALLVOICES[] = "WALLVOICES";
+const char TOK_WALLVOICES[] = "WV";
+const char MSG_WALLHOPS[] = "WALLHOPS";
+const char TOK_WALLHOPS[] = "WH";
+const char MSG_CPRIVMSG[] = "CPRIVMSG";
+const char TOK_CPRIVMSG[] = "CP";
+const char MSG_CNOTICE[] = "CNOTICE";
+const char TOK_CNOTICE[] = "CN";
+const char MSG_JOIN[] = "JOIN";
+const char TOK_JOIN[] = "J";
+const char MSG_SVSJOIN[] = "SVSJOIN";
+const char TOK_SVSJOIN[] = "SJ";
+const char MSG_PART[] = "PART";
+const char TOK_PART[] = "L";
+const char MSG_SVSPART[] = "SVSPART";
+const char TOK_SVSPART[] = "SP";
+const char MSG_LUSERS[] = "LUSERS";
+const char TOK_LUSERS[] = "LU";
+const char MSG_MOTD[] = "MOTD";
+const char TOK_MOTD[] = "MO";
+const char MSG_MODE[] = "MODE";
+const char TOK_MODE[] = "M";
+const char MSG_KICK[] = "KICK";
+const char TOK_KICK[] = "K";
+const char MSG_USERHOST[] = "USERHOST";
+const char TOK_USERHOST[] = "USERHOST";
+const char MSG_USERIP[] = "USERIP";
+const char TOK_USERIP[] = "USERIP";
+const char MSG_ISON[] = "ISON";
+const char TOK_ISON[] = "ISON";
+const char MSG_SQUERY[] = "SQUERY";
+const char TOK_SQUERY[] = "SQUERY";
+const char MSG_SERVLIST[] = "SERVLIST";
+const char TOK_SERVLIST[] = "SERVSET";
+const char MSG_SERVSET[] = "SERVSET";
+const char TOK_SERVSET[] = "SERVSET";
+const char MSG_CHECK[] = "CHECK";
+const char TOK_CHECK[] = "CC";
+const char MSG_REHASH[] = "REHASH";
+const char TOK_REHASH[] = "REHASH";
+const char MSG_RESTART[] = "RESTART";
+const char TOK_RESTART[] = "RESTART";
+const char MSG_CLOSE[] = "CLOSE";
+const char TOK_CLOSE[] = "CLOSE";
+const char MSG_DIE[] = "DIE";
+const char TOK_DIE[] = "DIE";
+const char MSG_HASH[] = "HASH";
+const char TOK_HASH[] = "HASH";
+const char MSG_DNS[] = "DNS";
+const char TOK_DNS[] = "DNS";
+const char MSG_SILENCE[] = "SILENCE";
+const char TOK_SILENCE[] = "U";
+const char MSG_EXEMPT[] = "EXEMPT";
+const char TOK_EXEMPT[] = "EX";
+const char MSG_GLINE[] = "GLINE";
+const char TOK_GLINE[] = "GL";
+const char MSG_BURST[] = "BURST";
+const char TOK_BURST[] = "B";
+const char MSG_UPING[] = "UPING";
+const char TOK_UPING[] = "UP";
+const char MSG_CREATE[] = "CREATE";
+const char TOK_CREATE[] = "C";
+const char MSG_DESTRUCT[] = "DESTRUCT";
+const char TOK_DESTRUCT[] = "DE";
+const char MSG_END_OF_BURST[] = "END_OF_BURST";
+const char TOK_END_OF_BURST[] = "EB";
+const char MSG_END_OF_BURST_ACK[] = "EOB_ACK";
+const char TOK_END_OF_BURST_ACK[] = "EA";
+const char MSG_PROTO[] = "PROTO";
+const char TOK_PROTO[] = "PROTO";
+const char MSG_JUPE[] = "JUPE";
+const char TOK_JUPE[] = "JU";
+const char MSG_OPMODE[] = "OPMODE";
+const char TOK_OPMODE[] = "OM";
+const char MSG_CLEARMODE[] = "CLEARMODE";
+const char TOK_CLEARMODE[] = "CM";
+const char MSG_ACCOUNT[] = "ACCOUNT";
+const char TOK_ACCOUNT[] = "AC";
+const char MSG_ASLL[] = "ASLL";
+const char TOK_ASLL[] = "LL";
+const char MSG_MKPASSWD[] = "MKPASSWD";
+const char TOK_MKPASSWD[] = "MKPASSWD";
+const char MSG_POST[] = "POST";
+const char TOK_POST[] = "POST";
+const char MSG_SET[] = "SET";
+const char TOK_SET[] = "SET";
+const char MSG_RESET[] = "RESET";
+const char TOK_RESET[] = "RESET";
+const char MSG_GET[] = "GET";
+const char TOK_GET[] = "GET";
+const char MSG_PRIVS[] = "PRIVS";
+const char TOK_PRIVS[] = "PRIVS";
+const char MSG_SETHOST[] = "SETHOST";
+const char TOK_SETHOST[] = "SH";
+const char MSG_FAKEHOST[] = "FAKE";
+const char TOK_FAKEHOST[] = "FA";
+const char MSG_OPERMOTD[] = "OPERMOTD";
+const char TOK_OPERMOTD[] = "OPM";
+const char MSG_RULES[] = "RULES";
+const char TOK_RULES[] = "RL";
+const char MSG_SVSNOOP[] = "SVSNOOP";
+const char TOK_SVSNOOP[] = "SO";
+const char MSG_SWHOIS[] = "SWHOIS";
+const char TOK_SWHOIS[] = "SW";
+const char MSG_MARK[] = "MARK";
+const char TOK_MARK[] = "MK";
 
  /* User modes: */
 #define UMODE_SERVNOTICE        0x00800000	/* See server notices */
@@ -294,9 +294,6 @@ static void m_swhois (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
 static void m_numeric242 (char *origin, char **argv, int argc, int srv);
 static void m_numeric351 (char *origin, char **argv, int argc, int srv);
-
-void send_end_of_burst(void);
-void send_end_of_burst_ack(void);
 
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
