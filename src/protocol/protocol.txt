@@ -81,6 +81,20 @@ ProtocolInfo protocol_info = {
 	PROTOCOL_TOKEN,
 	/* Features supported */
 	FEATURE_UMODECLOAK,
+	/* Max host length */
+	128,
+	/* Max password length */
+	32,
+	/* Max nick length */
+	30,
+	/* Max user length */
+	10,
+	/* Max real name length */
+	50,
+	/* Max channel name length */
+	32,
+	/* Max topic length */
+	307,
 	/* Default operator modes for NeoStats service bots */
 	"+oSq",
 	/* Default channel mode for NeoStats service bots */

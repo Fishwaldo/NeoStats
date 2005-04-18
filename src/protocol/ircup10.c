@@ -298,15 +298,6 @@ static void m_numeric351 (char *origin, char **argv, int argc, int srv);
 void send_end_of_burst(void);
 void send_end_of_burst_ack(void);
 
-/* buffer sizes */
-const int proto_maxhost		= (63 + 1);
-const int proto_maxpass		= (32 + 1);
-const int proto_maxnick		= (32 + 1);
-const int proto_maxuser		= (10 + 1);
-const int proto_maxrealname	= (50 + 1);
-const int proto_chanlen		= (200 + 1);
-const int proto_topiclen	= (250 + 1);
-
 ProtocolInfo protocol_info = {
 	/* Protocol options required by this IRCd */
 	PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_B64SERVER|PROTOCOL_B64NICK|PROTOCOL_NICKIP|PROTOCOL_KICKPART,
@@ -320,8 +311,23 @@ ProtocolInfo protocol_info = {
 # endif /* NEFARIOUS_CLOAKHOST */
 #endif /* NEFARIOUS */
 	FEATURE_SVSTIME,
-	"+iok",
+	/* Max host length */
+	63 ,
+	/* Max password length */
+	32,
+	/* Max nick length */
+	32,
+	/* Max user length */
+	10,
+	/* Max real name length */
+	50,
+	/* Max channel name length */
+	20,
+	/* Max topic length */
+	250,
+	/* Default operator modes for NeoStats service bots */
 	"+o",
+	/* Default channel mode for NeoStats service bots */
 };
 
 /* this is the command list and associated functions to run */

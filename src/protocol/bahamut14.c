@@ -148,15 +148,6 @@ static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_burst( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 
-/* buffer sizes */
-const int proto_maxhost		=( 128 + 1 );
-const int proto_maxpass		=( 63 + 1 );
-const int proto_maxnick		=( 30 + 1 );
-const int proto_maxuser		=( 10 + 1 );
-const int proto_maxrealname	=( 50 + 1 );
-const int proto_chanlen		=( 32 + 1 );
-const int proto_topiclen	=( 307 + 1 );
-
 ProtocolInfo protocol_info = 
 {
 	/* Protocol options required by this IRCd */
@@ -165,7 +156,23 @@ ProtocolInfo protocol_info =
 	PROTOCOL_NICKIP,
 	/* Features supported by this IRCd */
 	0,
+	/* Max host length */
+	128,
+	/* Max password length */
+	63,
+	/* Max nick length */
+	30,
+	/* Max user length */
+	10,
+	/* Max real name length */
+	50,
+	/* Max channel name length */
+	32,
+	/* Max topic length */
+	307,
+	/* Default operator modes for NeoStats service bots */
 	"+oS",
+	/* Default channel mode for NeoStats service bots */
 	"+o",
 };
 

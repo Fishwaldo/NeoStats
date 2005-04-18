@@ -61,15 +61,30 @@ typedef struct ircd_server {
 } ircd_server;
 
 typedef struct ProtocolInfo {
-	/* Minimum protocols that are required for the selected protocol
-	 * e.g. NOQUIT */
+	/* Minimum protocols that are required * e.g. NOQUIT */
 	const unsigned int minprotocol;
 	/* Optional protocols that are negotiated during connection that the
 	 * protocol module supports but will work when not available e.g. SJOIN */
 	const unsigned int optprotocol;
-	/* Features provided by this protocol module e.g. SVSNICK support. */
+	/* Features provided by this protocol module e.g. USERSMODES support. */
 	const unsigned int features;
+	/* Max host length */
+	const unsigned int maxhost;
+	/* Max password length */
+	const unsigned int maxpass;
+	/* Max nick length */
+	const unsigned int maxnick;
+	/* Max user length */
+	const unsigned int maxuser;
+	/* Max real name length */
+	const unsigned int maxrealname;
+	/* Max channel name length */
+	const unsigned int chanlen;
+	/* Max topic length */
+	const unsigned int topiclen;
+	/* Default operator modes for NeoStats service bots */
 	char *services_umode;
+	/* Default channel mode for NeoStats service bots */
 	char *services_cmode;
 } ProtocolInfo;
 
