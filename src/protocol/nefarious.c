@@ -275,8 +275,6 @@ static void m_svspart( char *origin, char **argv, int argc, int srv );
 static void m_whois( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_vhost( char *origin, char **argv, int argc, int srv );
-static void m_numeric242( char *origin, char **argv, int argc, int srv );
-static void m_numeric351( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
 {
@@ -348,8 +346,6 @@ ircd_cmd cmd_list[] =
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_FAKEHOST, TOK_FAKEHOST, m_vhost, 0},
 	{MSG_ERROR, TOK_ERROR, _m_error, 0},
-	{"242", "242", m_numeric242, 0},
-	{"351", "351", m_numeric351, 0},
 	{0, 0, 0, 0},
 };
 
@@ -1217,16 +1213,6 @@ static void m_swhois( char *origin, char **argv, int argc, int srv )
 static void m_vhost( char *origin, char **argv, int argc, int srv )
 {
 	do_vhost( base64_to_nick( argv[0] ), argv[1] );
-}
-
-static void m_numeric242( char *origin, char **argv, int argc, int srv )
-{
-	_m_numeric242( base64_to_server( origin ), argv, argc, srv );
-}
-
-static void m_numeric351( char *origin, char **argv, int argc, int srv )
-{
-	_m_numeric351( base64_to_server( origin ), argv, argc, srv );
 }
 
 /* :<source> <command> <param1> <paramN> :<last parameter> */

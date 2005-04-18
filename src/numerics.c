@@ -24,6 +24,7 @@
 #include "neostats.h"
 #include "ircd.h"
 #include "numerics.h"
+#include "base64.h"
 
 ircd_cmd numeric_cmd_list[] = {
 	/*Message	Token	handler	usage */
@@ -54,6 +55,10 @@ void _m_numeric351( char *origin, char **argv, int argc, int srv )
 {
 	Client *s;
 
+	if( ircd_srv.protocol & PROTOCOL_B64SERVER )
+		origin = base64_to_server( origin );
+	if( !origin )
+		return;
 	s = FindServer( origin );
 	if( s ) {
 		strlcpy( s->version, argv[1], MAXHOST );
@@ -77,6 +82,10 @@ void _m_numeric242( char *origin, char **argv, int argc, int srv )
 {
 	Client *s;
 
+	if( ircd_srv.protocol & PROTOCOL_B64SERVER )
+		origin = base64_to_server( origin );
+	if( !origin )
+		return;
 	s = FindServer( origin );
 	if( s ) {
 		/* Convert "Server Up d days, hh:mm:ss" to seconds*/
