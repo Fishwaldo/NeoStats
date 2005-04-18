@@ -550,6 +550,7 @@ src/protocol/hybrid7.c eol=lf
 src/protocol/hybrid7.vcproj -text
 src/protocol/ircup10.c eol=lf
 src/protocol/ircup10.vcproj -text
+src/protocol/ircup10base.c -text
 src/protocol/nefarious.c -text
 src/protocol/nefarious.vcproj -text
 src/protocol/plexus.c -text

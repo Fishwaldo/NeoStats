@@ -210,6 +210,7 @@ EXPORTFUNC void _m_wallops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_chatops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_svinfo( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_error( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_ignorecommand( char *origin, char **argv, int argc, int srv );
 
 EXPORTFUNC void do_synch_neostats( void );
 EXPORTFUNC void do_motd( const char *nick, const char *remoteserver );

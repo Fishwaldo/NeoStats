@@ -266,13 +266,11 @@ static void m_stats( char *origin, char **argv, int argc, int srv );
 static void m_ping( char *origin, char **argv, int argc, int srv );
 static void m_burst( char *origin, char **argv, int argc, int srv );
 static void m_end_of_burst( char *origin, char **argv, int argc, int srv );
-static void m_end_of_burst_ack( char *origin, char **argv, int argc, int srv );
 static void m_wallusers( char *origin, char **argv, int argc, int srv );
 static void m_wallops( char *origin, char **argv, int argc, int srv );
 static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_svsjoin( char *origin, char **argv, int argc, int srv );
 static void m_svspart( char *origin, char **argv, int argc, int srv );
-static void m_whois( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_vhost( char *origin, char **argv, int argc, int srv );
 
@@ -336,13 +334,12 @@ ircd_cmd cmd_list[] =
 	{MSG_PASS, TOK_PASS, _m_pass, 0},
 	{MSG_BURST, TOK_BURST, m_burst, 0},
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
-	{MSG_END_OF_BURST_ACK, TOK_END_OF_BURST_ACK, m_end_of_burst_ack, 0},
+	{MSG_END_OF_BURST_ACK, TOK_END_OF_BURST_ACK, _m_ignorecommand, 0},
 	{MSG_WALLOPS, TOK_WALLOPS, m_wallops, 0},
 	{MSG_WALLUSERS, TOK_WALLUSERS, m_wallusers, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
 	{MSG_SVSJOIN, TOK_SVSJOIN, m_svsjoin, 0},
 	{MSG_SVSPART, TOK_SVSPART, m_svspart, 0},
-	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_FAKEHOST, TOK_FAKEHOST, m_vhost, 0},
 	{MSG_ERROR, TOK_ERROR, _m_error, 0},
@@ -1150,11 +1147,6 @@ static void m_end_of_burst( char *origin, char **argv, int argc, int srv )
 	}
 }
 
-static void m_end_of_burst_ack( char *origin, char **argv, int argc, int srv )
-{
-	return;
-}
-
 static void m_wallusers( char *origin, char **argv, int argc, int srv )
 {
 	char* b64origin;
@@ -1191,14 +1183,6 @@ static void m_svsjoin( char *origin, char **argv, int argc, int srv )
 static void m_svspart( char *origin, char **argv, int argc, int srv )
 {
 	do_part( base64_to_nick( argv[0] ), argv[1], argv[2] );
-}
-
-/* m_whois
- *      argv[0] = nickname masklist
- */
-static void m_whois( char *origin, char **argv, int argc, int srv )
-{
-	/* TODO */
 }
 
 /* m_swhois

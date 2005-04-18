@@ -632,6 +632,24 @@ void _m_error( char* origin, char **av, int ac, int cmdptr )
 	do_exit (NS_EXIT_ERROR, av[0] );
 }
 
+/** @brief _m_ignorecommand
+ *
+ *  silently drop command
+ *  RX: 
+ *  cmd anything else
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_ignorecommand( char *origin, char **argv, int argc, int srv )
+{
+}
+
 /** @brief _m_pass
  *
  *  process PASS command

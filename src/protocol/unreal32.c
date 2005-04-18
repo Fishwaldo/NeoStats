@@ -331,7 +331,6 @@ static void m_eos( char *origin, char **argv, int argc, int srv );
 static void m_netinfo( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 static void m_svsnick( char *origin, char **argv, int argc, int srv );
-static void m_whois( char *origin, char **argv, int argc, int srv );
 static void m_smo( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_tkl( char *origin, char **argv, int argc, int srv );
@@ -375,7 +374,6 @@ ircd_cmd cmd_list[] =
 	{MSG_NETINFO, TOK_NETINFO, m_netinfo, 0},
 	{MSG_SJOIN, TOK_SJOIN, m_sjoin, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
-	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_SMO, TOK_SMO, m_smo, 0},
 	{MSG_EOS, TOK_EOS, m_eos, 0},
@@ -818,14 +816,6 @@ static void m_sjoin( char *origin, char **argv, int argc, int srv )
 static void m_svsnick( char *origin, char **argv, int argc, int srv )
 {
 	do_nickchange( argv[0], argv[1], argv[2] );
-}
-
-/* m_whois
- *	argv[0] = nickname masklist
- */
-static void m_whois( char *origin, char **argv, int argc, int srv )
-{
-	/* TODO */
 }
 
 /* m_swhois

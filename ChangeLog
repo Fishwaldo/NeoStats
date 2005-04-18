@@ -4,6 +4,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add _m_ignorecommand function for protocol modules to silently drop messages
+   that they receive but require no further processing by NeoStats. (M).
+ - Add seperate protocol files for IRCu and variants rathe than require users
+   to modify the code in order to access variants. (M)
  - New protocol support minismising the code required to implement an ircd
    protocol module for NeoStats by providing comprehensive and where possible
    automatic support for common functions. (M)
