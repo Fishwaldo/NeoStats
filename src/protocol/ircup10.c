@@ -44,8 +44,6 @@ const char MSG_USER[] = "USER";
 const char TOK_USER[] = "USER";
 const char MSG_NICK[] = "NICK";
 const char TOK_NICK[] = "N";
-const char MSG_SVSNICK[] = "SVSNICK";
-const char TOK_SVSNICK[] = "SN";
 const char MSG_SERVER[] = "SERVER";
 const char TOK_SERVER[] = "S";
 const char MSG_LIST[] = "LIST";
@@ -120,12 +118,8 @@ const char MSG_CNOTICE[] = "CNOTICE";
 const char TOK_CNOTICE[] = "CN";
 const char MSG_JOIN[] = "JOIN";
 const char TOK_JOIN[] = "J";
-const char MSG_SVSJOIN[] = "SVSJOIN";
-const char TOK_SVSJOIN[] = "SJ";
 const char MSG_PART[] = "PART";
 const char TOK_PART[] = "L";
-const char MSG_SVSPART[] = "SVSPART";
-const char TOK_SVSPART[] = "SP";
 const char MSG_LUSERS[] = "LUSERS";
 const char TOK_LUSERS[] = "LU";
 const char MSG_MOTD[] = "MOTD";
@@ -204,16 +198,12 @@ const char MSG_PRIVS[] = "PRIVS";
 const char TOK_PRIVS[] = "PRIVS";
 const char MSG_SETHOST[] = "SETHOST";
 const char TOK_SETHOST[] = "SH";
-const char MSG_FAKEHOST[] = "FAKE";
-const char TOK_FAKEHOST[] = "FA";
 const char MSG_OPERMOTD[] = "OPERMOTD";
 const char TOK_OPERMOTD[] = "OPM";
 const char MSG_RULES[] = "RULES";
 const char TOK_RULES[] = "RL";
 const char MSG_SVSNOOP[] = "SVSNOOP";
 const char TOK_SVSNOOP[] = "SO";
-const char MSG_SWHOIS[] = "SWHOIS";
-const char TOK_SWHOIS[] = "SW";
 const char MSG_MARK[] = "MARK";
 const char TOK_MARK[] = "MK";
 
@@ -248,11 +238,7 @@ static void m_end_of_burst( char *origin, char **argv, int argc, int srv );
 static void m_end_of_burst_ack( char *origin, char **argv, int argc, int srv );
 static void m_wallusers( char *origin, char **argv, int argc, int srv );
 static void m_wallops( char *origin, char **argv, int argc, int srv );
-static void m_svsnick( char *origin, char **argv, int argc, int srv );
-static void m_svsjoin( char *origin, char **argv, int argc, int srv );
-static void m_svspart( char *origin, char **argv, int argc, int srv );
 static void m_whois( char *origin, char **argv, int argc, int srv );
-static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_vhost( char *origin, char **argv, int argc, int srv );
 static void m_numeric242( char *origin, char **argv, int argc, int srv );
 static void m_numeric351( char *origin, char **argv, int argc, int srv );
@@ -264,12 +250,6 @@ ProtocolInfo protocol_info =
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
-#ifdef NEFARIOUS
-	FEATURE_SVSJOIN|FEATURE_SVSPART|FEATURE_SVSNICK|FEATURE_SVSHOST|FEATURE_SWHOIS|
-# ifdef NEFARIOUS_CLOAKHOST
-	FEATURE_UMODECLOAK|
-# endif /* NEFARIOUS_CLOAKHOST */
-#endif /* NEFARIOUS */
 	FEATURE_SVSTIME,
 	/* Max host length */
 	63 ,
@@ -322,12 +302,7 @@ ircd_cmd cmd_list[] =
 	{MSG_END_OF_BURST_ACK, TOK_END_OF_BURST_ACK, m_end_of_burst_ack, 0},
 	{MSG_WALLOPS, TOK_WALLOPS, m_wallops, 0},
 	{MSG_WALLUSERS, TOK_WALLUSERS, m_wallusers, 0},
-	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
-	{MSG_SVSJOIN, TOK_SVSJOIN, m_svsjoin, 0},
-	{MSG_SVSPART, TOK_SVSPART, m_svspart, 0},
 	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
-	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
-	{MSG_FAKEHOST, TOK_FAKEHOST, m_vhost, 0},
 	{MSG_ERROR, TOK_ERROR, _m_error, 0},
 	{"242", "242", m_numeric242, 0},
 	{"351", "351", m_numeric351, 0},
@@ -600,31 +575,6 @@ void send_kick( const char *source, const char *chan, const char *target, const 
 	send_cmd( "%s %s %s %s :%s", nick_to_base64( source ), TOK_KICK, chan, nick_to_base64( target ),( reason ? reason : "No Reason Given" ) );
 }
 
-void send_swhois( const char *source, const char *target, const char *swhois )
-{
-	send_cmd( "%s %s %s :%s", neostatsbase64, TOK_SWHOIS, nick_to_base64( target ), swhois );
-}
-
-void send_svsnick( const char *source, const char *target, const char *newnick, const unsigned long ts )
-{
-	send_cmd( "%s %s %s %s :%lu", neostatsbase64, TOK_SVSNICK, nick_to_base64( target ), newnick, ts );
-}
-
-void send_svsjoin( const char *source, const char *target, const char *chan )
-{
-	send_cmd( "%s %s %s %s", neostatsbase64, TOK_SVSJOIN, nick_to_base64( target ), chan );
-}
-
-void send_svspart( const char *source, const char *target, const char *chan )
-{
-	send_cmd( "%s %s %s %s", neostatsbase64, TOK_SVSPART, nick_to_base64( target ), chan );
-}
-
-void send_svshost( const char *source, const char *who, const char *vhost )
-{
-	send_cmd( "%s %s %s %s", neostatsbase64, TOK_FAKEHOST, nick_to_base64( who ), vhost );
-}
-
 void send_wallops( const char *source, const char *buf )
 {
 	char* b64source;
@@ -889,7 +839,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 		const char *modeptr;
 		const char *account = NULL;
 		const char *sethost = NULL;
-		const char *fakehost = NULL;
 		int param;
 
 		modes =( argv[5][0] == '+' ) ? argv[5]: NULL;
@@ -902,9 +851,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 					break;
 				case 'h':
 					sethost = argv[param++];
-					break;
-				case 'f':
-					fakehost = argv[param++];
 					break;
 				default:
 					break;
@@ -920,7 +866,7 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 			/* server, ip, servicestamp, modes, */
 			base64_to_server( origin ), IPAddress, NULL, modes,
 			/* vhost, realname, numeric, smodes */ 
-			fakehost, argv[argc-1], argv[argc-2], NULL );
+			NULL, argv[argc-1], argv[argc-2], NULL );
 	} else {
 		do_nickchange( base64_to_nick( origin ), argv[0], argv[1] );
 	}
@@ -1136,41 +1082,12 @@ static void m_wallops( char *origin, char **argv, int argc, int srv )
 	do_globops( b64origin, argv[0] );
 }
 
-/* m_svsnick
- *  argv[0] = old nickname
- *  argv[1] = new nickname
- *  argv[2] = timestamp
- */
-static void m_svsnick( char *origin, char **argv, int argc, int srv )
-{
-	do_nickchange( base64_to_nick( argv[0] ), argv[1], argv[2] );
-}
-
-static void m_svsjoin( char *origin, char **argv, int argc, int srv )
-{
-	do_join( base64_to_nick( argv[0] ), argv[1], argv[2] );
-}
-
-static void m_svspart( char *origin, char **argv, int argc, int srv )
-{
-	do_part( base64_to_nick( argv[0] ), argv[1], argv[2] );
-}
-
 /* m_whois
  *      argv[0] = nickname masklist
  */
 static void m_whois( char *origin, char **argv, int argc, int srv )
 {
 	/* TODO */
-}
-
-/* m_swhois
- *  argv[0] = nickname
- *  argv[1] = new swhois
- */
-static void m_swhois( char *origin, char **argv, int argc, int srv )
-{
-	do_swhois( base64_to_nick( argv[0] ), argv[1] );
 }
 
 static void m_vhost( char *origin, char **argv, int argc, int srv )
