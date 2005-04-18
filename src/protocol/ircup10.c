@@ -862,7 +862,7 @@ m_server (char *origin, char **argv, int argc, int srv)
 static void
 m_squit (char *origin, char **argv, int argc, int srv)
 {
-        char* b64arg0;
+	char* b64arg0;
 	if ((b64arg0 = base64_to_server(argv[0]))) {
 		do_squit (b64arg0, argv[2]);
 	} else {
@@ -882,10 +882,10 @@ m_quit (char *origin, char **argv, int argc, int srv)
 static void
 m_mode (char *origin, char **argv, int argc, int srv)
 {
-        char* b64origin;
-        if (!(b64origin = base64_to_nick(origin))) {
-                b64origin = base64_to_server(origin);
-        }
+	char* b64origin;
+	if (!(b64origin = base64_to_nick(origin))) {
+		b64origin = base64_to_server(origin);
+	}
 	if (argv[0][0] == '#') {
 		char **av;
 		int ac = 0;
