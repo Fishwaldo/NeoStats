@@ -95,6 +95,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gdbm", "src\dbm\gdbm\gdbm.v
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asuka", "src\protocol\asuka.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nefarious", "src\protocol\nefarious.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -169,6 +177,14 @@ Global
 		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Debug.Build.0 = Debug|Win32
 		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Release.ActiveCfg = Release|Win32
 		{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}.Release.Build.0 = Release|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32
+		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.Build.0 = Release|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.ActiveCfg = Debug|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Debug.Build.0 = Debug|Win32
 		{B6701C0A-27E3-468D-8473-FBE671989E33}.Release.ActiveCfg = Release|Win32

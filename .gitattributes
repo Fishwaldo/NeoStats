@@ -538,6 +538,8 @@ src/osfile.c -text
 src/ossocket.c -text
 src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
+src/protocol/asuka.c -text
+src/protocol/asuka.vcproj -text
 src/protocol/bahamut14.c eol=lf
 src/protocol/bahamut14.vcproj -text
 src/protocol/bahamut18.c -text
@@ -548,6 +550,8 @@ src/protocol/hybrid7.c eol=lf
 src/protocol/hybrid7.vcproj -text
 src/protocol/ircup10.c eol=lf
 src/protocol/ircup10.vcproj -text
+src/protocol/nefarious.c -text
+src/protocol/nefarious.vcproj -text
 src/protocol/plexus.c -text
 src/protocol/plexus.vcproj -text
 src/protocol/protocol.txt -text

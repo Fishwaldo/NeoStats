@@ -95,7 +95,7 @@ MODULEVAR extern mode_init chan_modes[];
 MODULEVAR extern mode_init user_umodes[];
 MODULEVAR extern mode_init user_smodes[];
 MODULEVAR extern ProtocolInfo protocol_info;
-#ifndef IGNORECOREMESSAGEDEFS
+#ifndef OVERRIDECOREMESSAGESUPPORT
 MODULEVAR extern const char MSG_PRIVATE[];
 MODULEVAR extern const char TOK_PRIVATE[];
 MODULEVAR extern const char MSG_NOTICE[];
@@ -170,18 +170,10 @@ MODULEVAR extern const char MSG_SVSMODE[];
 MODULEVAR extern const char TOK_SVSMODE[];
 MODULEVAR extern const char MSG_SVSKILL[];
 MODULEVAR extern const char TOK_SVSKILL[];
-#endif /* IGNORECOREMESSAGEDEFS */
+#endif /* OVERRIDECOREMESSAGESUPPORT */
 #endif
 
 EXPORTVAR extern ircd_server ircd_srv;
-
-extern const int proto_maxhost;
-extern const int proto_maxpass;
-extern const int proto_maxnick;
-extern const int proto_maxuser;
-extern const int proto_maxrealname;
-extern const int proto_chanlen;
-extern const int proto_topiclen;
 
 EXPORTFUNC int ircsplitbuf( char *buf, char ***argv, int colon_special );
 EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av, int ac );
