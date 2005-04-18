@@ -1216,12 +1216,16 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char* origin, char **av
 	}
 	intrinsic_cmd_ptr = intrinsic_cmd_list;
 	while( intrinsic_cmd_ptr->handler ) {
-		if( *intrinsic_cmd_ptr->name && !ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) || 
-		 ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && *intrinsic_cmd_ptr->token && !ircstrcasecmp( *intrinsic_cmd_ptr->token, cmd ) ) ) {
-			dlog( DEBUG3, "process_ircd_cmd: running command %s", *intrinsic_cmd_ptr->name );
-			intrinsic_cmd_ptr->handler( origin, av, ac, cmdptr );
-			intrinsic_cmd_ptr->usage++;
-			return;
+		if( *intrinsic_cmd_ptr->name )
+		{
+			if( !ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) || 
+			  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && *intrinsic_cmd_ptr->token && !ircstrcasecmp( *intrinsic_cmd_ptr->token, cmd ) ) ) 
+			{
+				dlog( DEBUG3, "process_ircd_cmd: running command %s", *intrinsic_cmd_ptr->name );
+				intrinsic_cmd_ptr->handler( origin, av, ac, cmdptr );
+				intrinsic_cmd_ptr->usage++;
+				return;
+			}
 		}
 		intrinsic_cmd_ptr ++;
 	}

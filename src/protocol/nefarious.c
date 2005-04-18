@@ -30,18 +30,12 @@
 #include <arpa/inet.h>
 #endif
 
-/* IRCu modification support 
- * Currently we only support modifications for Nefarious and Asuka
- * To enable support uncomment the appropriate line below.
- */
 /* Nefarious IRCu - http://evilnet.sourceforge.net */
 /* #define NEFARIOUS */
 /* ...... */
 /* Nefarious IRCu with F:HOST_HIDING_STYLE:2 */
 /* #define NEFARIOUS_CLOAKHOST */
 /* ...... */
-/* QuakeNet Asuka - http://dev.quakenet.org */
-/* #define ASUKA */
 
 /* Messages/Tokens */
 
@@ -233,33 +227,22 @@ const char TOK_MARK[] = "MK";
  /* User modes: */
 #define UMODE_SERVNOTICE        0x00800000	/* See server notices */
 #define UMODE_DEBUG             0x01000000	/* See hack notices */
-#ifdef NEFARIOUS
 #define UMODE_FAKEHOST		0x02000000	/* */
 #define UMODE_WHOIS		0x04000000	/* */
-#endif
-#if ( defined NEFARIOUS ) || (defined ASUKA )
 #define UMODE_SETHOST		0x08000000	/* */
 #define UMODE_NOCHAN		0x10000000	/* */
 #define UMODE_NOIDLE		0x20000000	/* */
 #define UMODE_XTRAOP		0x40000000	/* */
-#endif
 
 /* Cmodes */
-#if ( defined NEFARIOUS ) || (defined ASUKA )
 #define CMODE_NOCTCP		0x02000000
 #define CMODE_NONOTICE		0x04000000
 #define CMODE_NOQUITPARTS	0x08000000
-#endif
-#ifdef ASUKA
-#define CMODE_DELJOINS		0x10000000
-#endif
-#ifdef NEFARIOUS
 #define CMODE_PERSIST		0x20000000
 #define CMODE_NOLISTMODES	0x40000000
 #define CMODE_MODREG		0x80000000
 #define CMODE_NOAMSG		0x100000000
 #define CMODE_ONLYSECURE	0x200000000
-#endif
 
 static void m_private( char *origin, char **argv, int argc, int srv );
 static void m_notice( char *origin, char **argv, int argc, int srv );
@@ -302,12 +285,10 @@ ProtocolInfo protocol_info =
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
-#ifdef NEFARIOUS
 	FEATURE_SVSJOIN|FEATURE_SVSPART|FEATURE_SVSNICK|FEATURE_SVSHOST|FEATURE_SWHOIS|
 # ifdef NEFARIOUS_CLOAKHOST
 	FEATURE_UMODECLOAK|
 # endif /* NEFARIOUS_CLOAKHOST */
-#endif /* NEFARIOUS */
 	FEATURE_SVSTIME,
 	/* Max host length */
 	63 ,
@@ -379,16 +360,9 @@ mode_init chan_umodes[] =
 
 mode_init chan_modes[] = 
 {
-#if( defined NEFARIOUS ) ||( defined ASUKA )
 	{'c', CMODE_NOCOLOR, 0},
 	{'C', CMODE_NOCTCP, 0},
 	{'N', CMODE_NONOTICE, 0},
-#endif
-#ifdef ASUKA
-	{'D', CMODE_DELJOINS, 0},
-	{'u', CMODE_NOQUITPARTS, 0},
-#endif
-#ifdef NEFARIOUS
 	{'a', CMODE_ADMONLY, 0},
 	{'e', CMODE_EXCEPT, MODEPARAM},
 	{'z', CMODE_PERSIST, 0},
@@ -399,7 +373,6 @@ mode_init chan_modes[] =
 	{'S', CMODE_STRIP, 0},
 	{'T', CMODE_NOAMSG, 0},
 	{'Z', CMODE_ONLYSECURE, 0},
-#endif
 	{'r', CMODE_RGSTRONLY, 0},
 	{0, 0, 0},
 };
@@ -414,19 +387,15 @@ mode_init user_umodes[] =
 	{'k', UMODE_SERVICES},
 	{'r', UMODE_REGNICK},
 	{'x', UMODE_HIDE},
-#ifdef NEFARIOUS
 	{'a', UMODE_ADMIN},
 	{'f', UMODE_FAKEHOST},
 	{'B', UMODE_BOT},
 	{'W', UMODE_WHOIS},
-#endif
-#if( defined NEFARIOUS ) ||( defined ASUKA )
 	{'h', UMODE_SETHOST},
 	{'n', UMODE_NOCHAN},
 	{'I', UMODE_NOIDLE},
 	{'R', UMODE_RGSTRONLY},
 	{'X', UMODE_XTRAOP},
-#endif
 	{0, 0},
 };
 
