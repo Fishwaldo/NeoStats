@@ -27,17 +27,17 @@
 
 ircd_cmd numeric_cmd_list[] = {
 	/*Message	Token	handler	usage */
-	{"351", "351", m_numeric351, 0},
-	{"242", "242", m_numeric242, 0},
+	{"351", "351", _m_numeric351, 0},
+	{"242", "242", _m_numeric242, 0},
 /*  RX: :irc.foo.com 219 NeoStats u :End of /STATS report */
-	{"219", "219", m_numericdefault, 0},
+	{"219", "219", _m_numericdefault, 0},
 	{0, 0, 0, 0},
 };
 
 /*  RX: :irc.foo.com 250 NeoStats :Highest connection count: 3( 2 clients )
  */
 
-/** @brief m_numeric351
+/** @brief _m_numeric351
  *
  *  process numeric 351
  *  RX: :irc.foo.com 351 stats.neostats.net Unreal3.2. irc.foo.com :FinWXOoZ [*=2303]
@@ -50,7 +50,7 @@ ircd_cmd numeric_cmd_list[] = {
  *  @return none
  */
 
-void m_numeric351( char *origin, char **argv, int argc, int srv )
+void _m_numeric351( char *origin, char **argv, int argc, int srv )
 {
 	Client *s;
 
@@ -60,7 +60,7 @@ void m_numeric351( char *origin, char **argv, int argc, int srv )
 	}
 }
 
-/** @brief m_numeric242
+/** @brief _m_numeric242
  *
  *  process numeric 242
  *  RX: :irc.foo.com 242 NeoStats :Server Up 6 days, 23:52:55
@@ -73,7 +73,7 @@ void m_numeric351( char *origin, char **argv, int argc, int srv )
  *  @return none
  */
 
-void m_numeric242( char *origin, char **argv, int argc, int srv )
+void _m_numeric242( char *origin, char **argv, int argc, int srv )
 {
 	Client *s;
 
@@ -108,7 +108,7 @@ void m_numeric242( char *origin, char **argv, int argc, int srv )
 	}
 }
 
-/** @brief m_numericdefault
+/** @brief _m_numericdefault
  *
  *  dummy routine to "process" a numeric and avoid warnings for 
  *  unprocessed numerics. This mainly allows us to ignore end
@@ -123,6 +123,6 @@ void m_numeric242( char *origin, char **argv, int argc, int srv )
  *  @return none
  */
 
-void m_numericdefault( char *origin, char **argv, int argc, int srv )
+void _m_numericdefault( char *origin, char **argv, int argc, int srv )
 {
 }

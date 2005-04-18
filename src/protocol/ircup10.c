@@ -292,8 +292,8 @@ static void m_svspart (char *origin, char **argv, int argc, int srv);
 static void m_whois (char *origin, char **argv, int argc, int srv);
 static void m_swhois (char *origin, char **argv, int argc, int srv);
 static void m_vhost (char *origin, char **argv, int argc, int srv);
-static void _m_numeric242 (char *origin, char **argv, int argc, int srv);
-static void _m_numeric351 (char *origin, char **argv, int argc, int srv);
+static void m_numeric242 (char *origin, char **argv, int argc, int srv);
+static void m_numeric351 (char *origin, char **argv, int argc, int srv);
 
 void send_end_of_burst(void);
 void send_end_of_burst_ack(void);
@@ -1300,15 +1300,15 @@ m_vhost (char *origin, char **argv, int argc, int srv)
 }
 
 static void
-_m_numeric242 (char *origin, char **argv, int argc, int srv)
+m_numeric242 (char *origin, char **argv, int argc, int srv)
 {
-	m_numeric242(base64_to_server(origin), argv, argc, srv);
+	_m_numeric242(base64_to_server(origin), argv, argc, srv);
 }
 
 static void
-_m_numeric351(char *origin, char **argv, int argc, int srv)
+m_numeric351(char *origin, char **argv, int argc, int srv)
 {
-	m_numeric351(base64_to_server(origin), argv, argc, srv);
+	_m_numeric351(base64_to_server(origin), argv, argc, srv);
 }
 
 /* :<source> <command> <param1> <paramN> :<last parameter> */

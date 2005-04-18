@@ -26,8 +26,8 @@
 
 extern ircd_cmd numeric_cmd_list[];
 
-EXPORTFUNC void m_numeric242( char *origin, char **argv, int argc, int srv );
-EXPORTFUNC void m_numeric351( char *origin, char **argv, int argc, int srv );
-EXPORTFUNC void m_numericdefault( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_numeric242( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_numeric351( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_numericdefault( char *origin, char **argv, int argc, int srv );
 
 #endif /* _NUMERICS_H_ */
