@@ -362,8 +362,8 @@ ircd_cmd cmd_list[] = {
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_FAKEHOST, TOK_FAKEHOST, m_vhost, 0},
 	{MSG_ERROR, TOK_ERROR, _m_error, 0},
-	{"242", "242", _m_numeric242, 0},
-	{"351", "351", _m_numeric351, 0},
+	{"242", "242", m_numeric242, 0},
+	{"351", "351", m_numeric351, 0},
 	{0, 0, 0, 0},
 };
 
