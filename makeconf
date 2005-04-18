@@ -164,6 +164,8 @@ echo "     6) Bahamut 1.4"
 echo "     7) Bahamut 1.8"
 echo "     8) Plexus"
 echo "     9) IRCu P10"
+echo "     10) Asuka"
+echo "     11) Nefarious"
 while [ $validselection -eq 0 ] ; do
 	echo $n " [$IRCD_DEFAULT] -> $c"
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
@@ -210,6 +212,14 @@ while [ $validselection -eq 0 ] ; do
 			;;
 		9)
 			IRCD="ircup10"
+			validselection=1
+			;;
+		10)
+			IRCD="asuka"
+			validselection=1
+			;;
+		11)
+			IRCD="nefarious"
 			validselection=1
 			;;
 		*)
@@ -327,7 +337,8 @@ cat > $CONF << __EOF__
 #    Valid protocol options are:
 # 		unreal31 unreal32 ultimate2 ultimate3
 #		hybrid7 bahamut14 bahamut18 plexus
-#		ircup10 client
+#		ircup10 asuka nefarious
+#       client
 #
 #          PROTOCOL "unreal32"
 #      
