@@ -253,6 +253,7 @@ static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_svsjoin( char *origin, char **argv, int argc, int srv );
 static void m_svspart( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
+static void m_vhost( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
 {
@@ -426,3 +427,7 @@ static void m_swhois( char *origin, char **argv, int argc, int srv )
 	do_swhois( base64_to_nick( argv[0] ), argv[1] );
 }
 
+static void m_vhost( char *origin, char **argv, int argc, int srv )
+{
+	do_vhost( base64_to_nick( argv[0] ), argv[1] );
+}

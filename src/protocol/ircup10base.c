@@ -45,7 +45,6 @@ static void m_burst( char *origin, char **argv, int argc, int srv );
 static void m_end_of_burst( char *origin, char **argv, int argc, int srv );
 static void m_wallusers( char *origin, char **argv, int argc, int srv );
 static void m_wallops( char *origin, char **argv, int argc, int srv );
-static void m_vhost( char *origin, char **argv, int argc, int srv );
 
 /* Temporary buffers for numeric conversion */
 char neostatsbase64[3] = "\0";
@@ -789,11 +788,6 @@ static void m_wallops( char *origin, char **argv, int argc, int srv )
 		b64origin = base64_to_server( origin );
 	}
 	do_globops( b64origin, argv[0] );
-}
-
-static void m_vhost( char *origin, char **argv, int argc, int srv )
-{
-	do_vhost( base64_to_nick( argv[0] ), argv[1] );
 }
 
 /* :<source> <command> <param1> <paramN> :<last parameter> */
