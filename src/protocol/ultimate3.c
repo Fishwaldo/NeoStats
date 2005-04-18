@@ -182,7 +182,7 @@ const char MSG_USERIP[] = "USERIP";	/* USERIP */
 static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
-static void m_vhost( char *origin, char **argv, int argc, int srv );
+static void m_sethost( char *origin, char **argv, int argc, int srv );
 static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_netinfo( char *origin, char **argv, int argc, int srv );
 static void m_burst( char *origin, char **argv, int argc, int srv );
@@ -215,23 +215,17 @@ ProtocolInfo protocol_info =
 ircd_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
-	{MSG_SETHOST,   0, m_vhost,     0},
+	{MSG_SETHOST,   0, m_sethost,   0},
 	{MSG_SERVER,    0, m_server,	0},
 	{MSG_SVSMODE,   0, m_svsmode,   0},
-	{MSG_AWAY,      0, _m_away,      0},
 	{MSG_NICK,      0, m_nick,      0},
-	{MSG_TOPIC,     0, _m_topic,     0},
-	{MSG_CAPAB,     0, _m_capab,  0},
 	{MSG_BURST,     0, m_burst,     0},
 	{MSG_SJOIN,     0, m_sjoin,     0},
 	{MSG_CLIENT,    0, m_client,    0},
 	{MSG_SMODE,     0, m_smode,     0},
 	{MSG_NETINFO,   0, m_netinfo,   0},
 	{MSG_VCTRL,     0, m_vctrl,     0},
-	{MSG_PASS,      0, _m_pass,      0},
 	{MSG_SVSNICK,   0, m_svsnick,   0},
-	{MSG_CHATOPS,	0, _m_chatops, 0},
-	{MSG_ERROR,		0, _m_error, 0},
 	{0, 0, 0, 0},
 };
 
@@ -391,7 +385,7 @@ static void m_svsmode( char *origin, char **argv, int argc, int srv )
 	}
 }
 
-static void m_vhost( char *origin, char **argv, int argc, int srv )
+static void m_sethost( char *origin, char **argv, int argc, int srv )
 {
 	do_vhost( argv[0], argv[1] );
 }

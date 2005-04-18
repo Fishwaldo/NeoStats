@@ -186,6 +186,8 @@ static char *MSG_NICK;
 static char *TOK_NICK;
 static char *MSG_MODE;
 static char *TOK_MODE;
+static char *MSG_AWAY;
+static char *TOK_AWAY;
 static char *MSG_QUIT;
 static char *TOK_QUIT;
 static char *MSG_JOIN;
@@ -206,6 +208,18 @@ static char *MSG_SQUIT;
 static char *TOK_SQUIT;
 static char *MSG_SVINFO;
 static char *TOK_SVINFO;
+static char *MSG_PROTOCTL;
+static char *TOK_PROTOCTL;
+static char *MSG_CAPAB;
+static char *TOK_CAPAB;
+static char *MSG_PASS;
+static char *TOK_PASS;
+static char *MSG_TOPIC;
+static char *TOK_TOPIC;
+static char *MSG_CHATOPS;
+static char *TOK_CHATOPS;
+static char *MSG_ERROR;
+static char *TOK_ERROR;
 static char *MSG_KILL;
 static char *TOK_KILL;
 static char *MSG_SETNAME;
@@ -240,6 +254,7 @@ msgtok_sym msgtok_sym_table[] =
 	{( void * )&irc_send_umode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_umode, 0 },
 	{( void * )&irc_send_cmode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_cmode, 0 },
 	{( void * )&irc_send_quit, &MSG_QUIT, "MSG_QUIT", &TOK_QUIT, "TOK_QUIT", _send_quit, 0 },
+	{( void * )NULL, &MSG_AWAY, "MSG_AWAY", &TOK_AWAY, "TOK_AWAY", NULL, 0 },
 	{( void * )&irc_send_join, &MSG_JOIN, "MSG_JOIN", &TOK_JOIN, "TOK_JOIN", _send_join, 0 },
 	{( void * )&irc_send_part, &MSG_PART, "MSG_PART", &TOK_PART, "TOK_PART", _send_part, 0 },
 	{( void * )&irc_send_kick, &MSG_KICK, "MSG_KICK", &TOK_KICK, "TOK_KICK", _send_kick, 0 },
@@ -258,6 +273,13 @@ msgtok_sym msgtok_sym_table[] =
 	{( void * )&irc_send_svspart, &MSG_SVSPART, "MSG_SVSPART", &TOK_SVSPART, "TOK_SVSPART", _send_svspart, 0 },
 	{( void * )&irc_send_svsmode, &MSG_SVSMODE, "MSG_SVSMODE", &TOK_SVSMODE, "TOK_SVSMODE", _send_svsmode, 0 },
 	{( void * )&irc_send_svskill, &MSG_SVSKILL, "MSG_SVSKILL", &TOK_SVSKILL, "TOK_SVSKILL", _send_svskill, 0 },
+	{( void * )NULL, &MSG_PROTOCTL, "MSG_PROTOCTL", &TOK_PROTOCTL, "TOK_PROTOCTL", NULL, 0},
+	{( void * )NULL, &MSG_CAPAB, "MSG_CAPAB", &TOK_CAPAB, "TOK_CAPAB", NULL, 0},
+	{( void * )NULL, &MSG_PASS, "MSG_PASS", &TOK_PASS, "TOK_PASS", NULL, 0},
+	{( void * )NULL, &MSG_TOPIC, "MSG_TOPIC", &TOK_TOPIC, "TOK_TOPIC", NULL, 0},
+	{( void * )NULL, &MSG_CHATOPS, "MSG_CHATOPS", &TOK_CHATOPS, "TOK_CHATOPS", NULL, 0},
+	{( void * )NULL, &MSG_ERROR, "MSG_ERROR", &TOK_ERROR, "TOK_ERROR", NULL, 0},
+
 	{NULL, NULL, NULL, NULL, NULL, NULL, 0},
 };
 
@@ -342,6 +364,7 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 	{&MSG_ADMIN, &TOK_ADMIN, _m_admin, 0},
 	{&MSG_CREDITS, &TOK_CREDITS, _m_credits, 0},
 	{&MSG_SQUIT, &TOK_SQUIT, _m_squit, 0},
+	{&MSG_AWAY, &TOK_AWAY, _m_away, 0},
 	{&MSG_QUIT, &TOK_QUIT, _m_quit, 0},
 	{&MSG_MODE, &TOK_MODE, _m_mode, 0},
 	{&MSG_SVSJOIN, &TOK_SVSJOIN, _m_svsjoin, 0},
@@ -355,6 +378,15 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 	{&MSG_GLOBOPS, &TOK_GLOBOPS, _m_globops, 0},
 	{&MSG_WALLOPS, &TOK_WALLOPS, _m_wallops, 0},
 	{&MSG_SVINFO, &TOK_SVINFO, _m_svinfo, 0},
+	{&MSG_PROTOCTL, &TOK_PROTOCTL, _m_protoctl, 0},
+	{&MSG_CAPAB, &TOK_CAPAB, _m_capab, 0},
+	{&MSG_PASS, &TOK_PASS, _m_pass, 0},
+	{&MSG_TOPIC, &TOK_TOPIC, _m_topic, 0},
+	{&MSG_SETNAME, &TOK_SETNAME, _m_setname, 0},
+	{&MSG_SETHOST, &TOK_SETHOST, _m_sethost, 0},
+	{&MSG_SETIDENT, &TOK_SETIDENT, _m_setident, 0},
+	{&MSG_CHATOPS, &TOK_CHATOPS, _m_chatops, 0},
+	{&MSG_ERROR, &TOK_ERROR, _m_error, 0},
 	{0, 0, 0, 0},
 };
 
@@ -1184,7 +1216,7 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char* origin, char **av
 	}
 	intrinsic_cmd_ptr = intrinsic_cmd_list;
 	while( intrinsic_cmd_ptr->handler ) {
-		if( !ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) || 
+		if( *intrinsic_cmd_ptr->name && !ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) || 
 		 ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && *intrinsic_cmd_ptr->token && !ircstrcasecmp( *intrinsic_cmd_ptr->token, cmd ) ) ) {
 			dlog( DEBUG3, "process_ircd_cmd: running command %s", *intrinsic_cmd_ptr->name );
 			intrinsic_cmd_ptr->handler( origin, av, ac, cmdptr );

@@ -110,15 +110,10 @@ ircd_cmd cmd_list[] =
 {
 	/* Command Token Function usage */
 	{MSG_SERVER, 0, m_server, 0},
-	{MSG_AWAY, 0, _m_away, 0},
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_TOPIC, 0, m_topic, 0},
-	{MSG_PASS, 0, _m_pass, 0},
 	{MSG_EOB, 0, m_burst, 0},
 	{MSG_SJOIN, 0, m_sjoin, 0},
-	{MSG_CAPAB, 0, _m_capab, 0},
-	{MSG_CHATOPS,	0, _m_chatops, 0},
-	{MSG_ERROR, 0, _m_error, 0},
 	{0, 0, 0, 0},
 };
 

@@ -179,7 +179,6 @@ static void m_topic( char *origin, char **argv, int argc, int srv );
 static void m_kick( char *origin, char **argv, int argc, int srv );
 static void m_join( char *origin, char **argv, int argc, int srv );
 static void m_part( char *origin, char **argv, int argc, int srv );
-static void m_vhost( char *origin, char **argv, int argc, int srv );
 static void m_emotd( char *origin, char **argv, int argc, int srv );
 
 /* buffer sizes */
@@ -209,15 +208,11 @@ ircd_cmd cmd_list[] =
 	{MSG_PRIVATE, 0, m_private, 0},
 	{MSG_NOTICE, 0, _m_notice, 0},
 	{"376", 0, m_emotd, 0},
-	{MSG_SETHOST, 0, m_vhost, 0},
-	{MSG_AWAY, 0, _m_away, 0},
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_TOPIC, 0, m_topic, 0},
 	{MSG_KICK, 0, m_kick, 0},
 	{MSG_JOIN, 0, m_join, 0},
 	{MSG_PART, 0, m_part, 0},
-	{MSG_CHATOPS,	0, _m_chatops, 0},
-	{MSG_ERROR, 0, _m_error, 0},
 	{0, 0, 0, 0},
 };
 
@@ -314,11 +309,6 @@ void send_akill( const char *source, const char *host, const char *ident, const 
 void send_rakill( const char *source, const char *host, const char *ident )
 {
 	send_cmd( ":%s %s - G %s %s %s", source, MSG_TKL, ident, host, source );
-}
-
-static void m_vhost( char *origin, char **argv, int argc, int srv )
-{
-	do_vhost( origin, argv[0] );
 }
 
 static void m_nick( char *origin, char **argv, int argc, int srv )

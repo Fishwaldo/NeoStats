@@ -322,7 +322,6 @@ static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_umode2( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
-static void m_vhost( char *origin, char **argv, int argc, int srv );
 static void m_netinfo( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 static void m_svsnick( char *origin, char **argv, int argc, int srv );
@@ -357,25 +356,18 @@ ProtocolInfo protocol_info =
 ircd_cmd cmd_list[] = 
 {
 	/*Message	Token	Function	usage */
-	{MSG_SETHOST, TOK_SETHOST, m_vhost, 0},
 	{MSG_SERVER, TOK_SERVER, m_server, 0},
 	{MSG_UMODE2, TOK_UMODE2, m_umode2, 0},
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
-	{MSG_AWAY, TOK_AWAY, _m_away, 0},
 	{MSG_NICK, TOK_NICK, m_nick, 0},
-	{MSG_TOPIC, TOK_TOPIC, _m_topic, 0},
 	{MSG_NETINFO, TOK_NETINFO, m_netinfo, 0},
 	{MSG_SJOIN, TOK_SJOIN, m_sjoin, 0},
-	{MSG_PASS, TOK_PASS, _m_pass, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
-	{MSG_PROTOCTL, TOK_PROTOCTL, _m_protoctl, 0},
 	{MSG_WHOIS, TOK_WHOIS, m_whois, 0},
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_SMO, TOK_SMO, m_smo, 0},
 	{MSG_TKL, TOK_TKL, m_tkl, 0},
-	{MSG_CHATOPS, TOK_CHATOPS, _m_chatops, 0},
-	{MSG_ERROR, TOK_ERROR, _m_error, 0},
 	{0, 0, 0, 0},
 };
 
@@ -563,11 +555,6 @@ static void m_svsmode( char *origin, char **argv, int argc, int srv )
 static void m_umode2( char *origin, char **argv, int argc, int srv )
 {
 	do_mode_user( origin, argv[0] );
-}
-
-static void m_vhost( char *origin, char **argv, int argc, int srv )
-{
-	do_vhost( origin, argv[0] );
 }
 
 /* m_nick

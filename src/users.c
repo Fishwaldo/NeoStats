@@ -150,7 +150,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	}
 	/* check if the user is excluded */
 	ns_do_exclude_user(u);
-	if ((ircd_srv.protocol & PROTOCOL_B64SERVER) && numeric) {
+	if ((ircd_srv.protocol & PROTOCOL_B64NICK) && numeric) {
 		set_nick_base64 (u->name, numeric);
 	}
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
@@ -403,7 +403,7 @@ static int dumpuser (Client *u, void* v)
 	int i = 0;
 
 	cmdparams = (CmdParams *) v;
-	if (ircd_srv.protocol & PROTOCOL_B64SERVER) {
+	if (ircd_srv.protocol & PROTOCOL_B64NICK) {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("User:     %s!%s@%s (%s)", cmdparams->source), u->name, u->user->username, u->user->hostname, u->name64);
 	} else {
 		irc_prefmsg (ns_botptr, cmdparams->source, __("User:     %s!%s@%s", cmdparams->source), u->name, u->user->username, u->user->hostname);
