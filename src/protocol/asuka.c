@@ -112,8 +112,6 @@ const char MSG_WALLCHOPS[] = "WALLCHOPS";
 const char TOK_WALLCHOPS[] = "WC";
 const char MSG_WALLVOICES[] = "WALLVOICES";
 const char TOK_WALLVOICES[] = "WV";
-const char MSG_WALLHOPS[] = "WALLHOPS";
-const char TOK_WALLHOPS[] = "WH";
 const char MSG_CPRIVMSG[] = "CPRIVMSG";
 const char TOK_CPRIVMSG[] = "CP";
 const char MSG_CNOTICE[] = "CNOTICE";
@@ -158,8 +156,6 @@ const char MSG_DNS[] = "DNS";
 const char TOK_DNS[] = "DNS";
 const char MSG_SILENCE[] = "SILENCE";
 const char TOK_SILENCE[] = "U";
-const char MSG_EXEMPT[] = "EXEMPT";
-const char TOK_EXEMPT[] = "EX";
 const char MSG_GLINE[] = "GLINE";
 const char TOK_GLINE[] = "GL";
 const char MSG_BURST[] = "BURST";
@@ -186,8 +182,6 @@ const char MSG_ACCOUNT[] = "ACCOUNT";
 const char TOK_ACCOUNT[] = "AC";
 const char MSG_ASLL[] = "ASLL";
 const char TOK_ASLL[] = "LL";
-const char MSG_MKPASSWD[] = "MKPASSWD";
-const char TOK_MKPASSWD[] = "MKPASSWD";
 const char MSG_POST[] = "POST";
 const char TOK_POST[] = "POST";
 const char MSG_SET[] = "SET";
@@ -200,14 +194,6 @@ const char MSG_PRIVS[] = "PRIVS";
 const char TOK_PRIVS[] = "PRIVS";
 const char MSG_SETHOST[] = "SETHOST";
 const char TOK_SETHOST[] = "SH";
-const char MSG_OPERMOTD[] = "OPERMOTD";
-const char TOK_OPERMOTD[] = "OPM";
-const char MSG_RULES[] = "RULES";
-const char TOK_RULES[] = "RL";
-const char MSG_SVSNOOP[] = "SVSNOOP";
-const char TOK_SVSNOOP[] = "SO";
-const char MSG_MARK[] = "MARK";
-const char TOK_MARK[] = "MK";
 
  /* User modes: */
 #define UMODE_SERVNOTICE        0x00800000	/* See server notices */
@@ -227,6 +213,8 @@ const char TOK_MARK[] = "MK";
  * while core/IRCu interaction is improved.
  */
 #include "ircup10base.c"
+
+static void m_nick( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
 {
@@ -324,3 +312,65 @@ mode_init user_umodes[] =
 	{'X', UMODE_XTRAOP},
 	{0, 0},
 };
+
+/*
+1 <nickname>
+2 <hops>
+3 <TS>
+4 <userid>
+5 <host>
+6 [<+modes>]
+7+ [<mode parameters>]
+-3 <base64 IP>
+-2 <numeric>
+-1 <fullname>
+*/
+/* R: AB N Mark 1 1076011621 a xxx.xxx.xxx.xxx DAqO4N ABAAB :M */
+/* R: AB N TheEggMan 1 1076104492 ~eggy 64.XX.XXX.XXX +oiwg BAFtnj ABAAA :eggy */
+/* R: ABAAH N m2 1076077934 */
+/*
+<reed> in a generated burst message, the users must be sorted by the modes: first users w/o modes, then users with voice, then with op, then with op+voice: num,num:v,num:o,num:ov
+*/
+
+static void m_nick( char *origin, char **argv, int argc, int srv )
+{
+	if( argc > 2 ) {
+		char IPAddress[32];
+		unsigned long IP;
+		const char *modes;
+		const char *modeptr;
+		const char *account = NULL;
+		const char *sethost = NULL;
+		int param;
+
+		modes =( argv[5][0] == '+' ) ? argv[5]: NULL;
+		if( modes ) {
+			param = 6;
+			for( modeptr = modes; *modeptr; ++modeptr ) {
+				switch( *modeptr ) {
+				case 'r':
+					account = argv[param++];
+					break;
+				case 'h':
+					sethost = argv[param++];
+					break;
+				default:
+					break;
+				} /* switch( *modeptr ) */
+			} /* for( ) */
+		} /* if( modes ) */
+
+		IP = htonl( base64toIP( argv[argc-3] ) );
+		ircsnprintf( IPAddress, 32, "%lu", IP );
+
+		/*       nick,    hopcount, TS,     user,    host, */       
+		do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], 
+			/* server, ip, servicestamp, modes, */
+			base64_to_server( origin ), IPAddress, NULL, modes,
+			/* vhost, realname, numeric, smodes */ 
+			NULL, argv[argc-1], argv[argc-2], NULL );
+	} else {
+		do_nickchange( base64_to_nick( origin ), argv[0], argv[1] );
+	}
+}
+

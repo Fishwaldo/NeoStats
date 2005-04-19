@@ -254,6 +254,7 @@ static void m_svsjoin( char *origin, char **argv, int argc, int srv );
 static void m_svspart( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_vhost( char *origin, char **argv, int argc, int srv );
+static void m_nick( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
 {
@@ -429,4 +430,69 @@ static void m_swhois( char *origin, char **argv, int argc, int srv )
 static void m_vhost( char *origin, char **argv, int argc, int srv )
 {
 	do_vhost( base64_to_nick( argv[0] ), argv[1] );
+}
+
+/*
+1 <nickname>
+2 <hops>
+3 <TS>
+4 <userid>
+5 <host>
+6 [<+modes>]
+7+ [<mode parameters>]
+-3 <base64 IP>
+-2 <numeric>
+-1 <fullname>
+*/
+/* R: AB N Mark 1 1076011621 a xxx.xxx.xxx.xxx DAqO4N ABAAB :M */
+/* R: AB N TheEggMan 1 1076104492 ~eggy 64.XX.XXX.XXX +oiwg BAFtnj ABAAA :eggy */
+/* R: ABAAH N m2 1076077934 */
+/*
+<reed> in a generated burst message, the users must be sorted by the modes: first users w/o modes, then users with voice, then with op, then with op+voice: num,num:v,num:o,num:ov
+*/
+
+static void m_nick( char *origin, char **argv, int argc, int srv )
+{
+	if( argc > 2 ) {
+		char IPAddress[32];
+		unsigned long IP;
+		const char *modes;
+		const char *modeptr;
+		const char *account = NULL;
+		const char *sethost = NULL;
+		const char *fakehost = NULL;
+		int param;
+
+		modes =( argv[5][0] == '+' ) ? argv[5]: NULL;
+		if( modes ) {
+			param = 6;
+			for( modeptr = modes; *modeptr; ++modeptr ) {
+				switch( *modeptr ) {
+				case 'r':
+					account = argv[param++];
+					break;
+				case 'h':
+					sethost = argv[param++];
+					break;
+				case 'f':
+					fakehost = argv[param++];
+					break;
+				default:
+					break;
+				} /* switch( *modeptr ) */
+			} /* for( ) */
+		} /* if( modes ) */
+
+		IP = htonl( base64toIP( argv[argc-3] ) );
+		ircsnprintf( IPAddress, 32, "%lu", IP );
+
+		/*       nick,    hopcount, TS,     user,    host, */       
+		do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], 
+			/* server, ip, servicestamp, modes, */
+			base64_to_server( origin ), IPAddress, NULL, modes,
+			/* vhost, realname, numeric, smodes */ 
+			fakehost, argv[argc-1], argv[argc-2], NULL );
+	} else {
+		do_nickchange( base64_to_nick( origin ), argv[0], argv[1] );
+	}
 }
