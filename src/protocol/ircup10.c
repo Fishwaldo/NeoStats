@@ -314,7 +314,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 		const char *modes;
 		const char *modeptr;
 		const char *account = NULL;
-		const char *sethost = NULL;
 		int param;
 
 		modes =( argv[5][0] == '+' ) ? argv[5]: NULL;
@@ -324,9 +323,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 				switch( *modeptr ) {
 				case 'r':
 					account = argv[param++];
-					break;
-				case 'h':
-					sethost = argv[param++];
 					break;
 				default:
 					break;

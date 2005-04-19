@@ -103,6 +103,8 @@ static void _send_ping( const char *source, const char *reply, const char *targe
 static void _send_pong( const char *reply );
 static void _send_server( const char *source, const char *name, const int numeric, const char *infoline );
 static void _send_squit( const char *server, const char *quitmsg );
+static void _send_netinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
+static void _send_snetinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 static void _send_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow );
 static void _send_kill( const char *source, const char *target, const char *reason );
 static void _send_setname( const char *nick, const char *realname );
@@ -206,6 +208,10 @@ static char *MSG_SERVER;
 static char *TOK_SERVER;
 static char *MSG_SQUIT;
 static char *TOK_SQUIT;
+static char *MSG_NETINFO;
+static char *TOK_NETINFO;
+static char *MSG_SNETINFO;
+static char *TOK_SNETINFO;
 static char *MSG_SVINFO;
 static char *TOK_SVINFO;
 static char *MSG_PROTOCTL;
@@ -263,6 +269,8 @@ msgtok_sym msgtok_sym_table[] =
 	{( void * )&irc_send_pong, &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", _send_pong, 0 },
 	{( void * )&irc_send_server, &MSG_SERVER, "MSG_SERVER", &TOK_SERVER, "TOK_SERVER", _send_server, 0 },
 	{( void * )&irc_send_squit, &MSG_SQUIT, "MSG_SQUIT", &TOK_SQUIT, "TOK_SQUIT", _send_squit, 0 },
+	{( void * )&irc_send_netinfo, &MSG_NETINFO, "MSG_NETINFO", &TOK_NETINFO, "TOK_NETINFO", _send_netinfo, 0 },
+	{( void * )&irc_send_snetinfo, &MSG_SNETINFO, "MSG_SNETINFO", &TOK_SNETINFO, "TOK_SNETINFO", _send_snetinfo, 0 },
 	{( void * )&irc_send_svinfo, &MSG_SVINFO, "MSG_SVINFO", &TOK_SVINFO, "TOK_SVINFO", _send_svinfo, 0 },
 	{( void * )&irc_send_kill, &MSG_KILL, "MSG_KILL", &TOK_KILL, "TOK_KILL", _send_kill, 0 },
 	{( void * )&irc_send_setname, &MSG_SETNAME, "MSG_SETNAME", &TOK_SETNAME, "TOK_SETNAME", _send_setname, 0 },
@@ -331,10 +339,10 @@ static ircd_sym ircd_sym_table[] =
 	{( void * )&irc_send_pong, NULL, "send_pong", 0, 0},
 	{( void * )&irc_send_server, NULL, "send_server", 0, 0},
 	{( void * )&irc_send_squit, NULL, "send_squit", 0, 0},
-	{( void * )&irc_send_nick, NULL, "send_nick", 1, 0},
-	{( void * )&irc_send_server_connect, NULL, "send_server_connect", 1, 0},
 	{( void * )&irc_send_netinfo, NULL, "send_netinfo", 0, 0},
 	{( void * )&irc_send_snetinfo, NULL, "send_snetinfo", 0, 0},
+	{( void * )&irc_send_nick, NULL, "send_nick", 1, 0},
+	{( void * )&irc_send_server_connect, NULL, "send_server_connect", 1, 0},
 	{( void * )&irc_send_svinfo, NULL, "send_svinfo", 0, 0},
 	{( void * )&irc_send_vctrl, NULL, "send_vctrl", 0, 0},
 	{( void * )&irc_send_burst, NULL, "send_burst", 0, 0},
@@ -982,6 +990,56 @@ void _m_kill( char *origin, char **argv, int argc, int srv )
 void _m_squit( char *origin, char **argv, int argc, int srv )
 {
 	do_squit( argv[0], argv[argc-1] );
+}
+
+/** @brief _m_netinfo
+ *
+ *  process NETINFO command
+ *  argv[0] = max global count
+ *  argv[1] = time of end sync
+ *  argv[2] = protocol
+ *  argv[3] = cloak
+ *  argv[4] = free( ** )
+ *  argv[5] = free( ** )
+ *  argv[6] = free( ** )
+ *  argv[7] = ircnet
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_netinfo( char *origin, char **argv, int argc, int srv )
+{
+	do_netinfo( argv[0], argv[1], argv[2], argv[3], argv[7] );
+}
+
+/** @brief _m_snetinfo
+ *
+ *  process NETINFO command
+ *  argv[0] = max global count
+ *  argv[1] = time of end sync
+ *  argv[2] = protocol
+ *  argv[3] = cloak
+ *  argv[4] = free( ** )
+ *  argv[5] = free( ** )
+ *  argv[6] = free( ** )
+ *  argv[7] = ircnet
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_snetinfo( char *origin, char **argv, int argc, int srv )
+{
+	do_snetinfo( argv[0], argv[1], argv[2], argv[3], argv[7] );
 }
 
 /** @brief _m_mode
@@ -3266,6 +3324,25 @@ static void _send_server( const char *source, const char *name, const int numeri
 static void _send_squit( const char *server, const char *quitmsg )
 {
 	send_cmd( "%s %s :%s", MSGTOK( SQUIT ), server, quitmsg );
+}
+
+/*  argv[0] = max global count
+ *  argv[1] = time of end sync
+ *  argv[2] = unreal protocol using( numeric )
+ *  argv[3] = cloak-crc( > u2302 )
+ *  argv[4] = free( ** )
+ *  argv[5] = free( ** )
+ *  argv[6] = free( ** )
+ *  argv[7] = ircnet
+ */
+static void _send_netinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname )
+{
+	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSGTOK( NETINFO ), ts, prot, cloak, netname );
+}
+
+static void _send_snetinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname )
+{
+	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSGTOK( SNETINFO ), ts, prot, cloak, netname );
 }
 
 static void _send_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow )

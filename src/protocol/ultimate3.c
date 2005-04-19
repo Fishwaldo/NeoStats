@@ -327,11 +327,6 @@ void send_nick( const char *nick, const unsigned long ts, const char* newmode, c
 	send_cmd( "%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, ts, newmode, ident, host, server, ts, realname );
 }
 
-void send_netinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
-{
-	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_NETINFO, ts, prot, cloak, netname );
-}
-
 void send_vctrl( const int uprot, const int nicklen, const int modex, const int gc, const char* netname )
 {
 	send_cmd( "%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname );

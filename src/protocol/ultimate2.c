@@ -336,7 +336,6 @@ static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
 static void m_svsnick( char *origin, char **argv, int argc, int srv );
-static void m_snetinfo( char *origin, char **argv, int argc, int srv );
 static void m_vctrl( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
@@ -373,7 +372,6 @@ ircd_cmd cmd_list[] =
 	{MSG_SERVER,    0,		m_server,	0},
 	{MSG_SVSMODE,   0,   m_svsmode,   0},
 	{MSG_NICK,      TOK_NICK,      m_nick,      0},
-	{MSG_SNETINFO,  0,  m_snetinfo,   0},
 	{MSG_VCTRL,     0,     m_vctrl,     0},
 	{MSG_SVSNICK,   0,   m_svsnick,   0},
 	{0, 0, 0, 0},
@@ -447,16 +445,6 @@ void send_nick( const char *nick, const unsigned long ts, const char* newmode, c
 	send_cmd( ":%s %s %s :%s", nick, MSGTOK( MODE ), nick, newmode );
 }
 
-void send_snetinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
-{
-	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_SNETINFO, ts, prot, cloak, netname );
-}
-
-void send_netinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
-{
-	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_NETINFO, ts, prot, cloak, netname );
-}
-
 void send_vctrl( const int uprot, const int nicklen, const int modex, const int gc, const char* netname )
 {
 	send_cmd( "%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname );
@@ -517,11 +505,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 static void m_vctrl( char *origin, char **argv, int argc, int srv )
 {
 	do_vctrl( argv[0], argv[1], argv[2], argv[3], argv[14] );
-}
-
-static void m_snetinfo( char *origin, char **argv, int argc, int srv )
-{
-	do_snetinfo( argv[0], argv[1], argv[2], argv[3], argv[7] );
 }
 
 static void m_svsnick( char *origin, char **argv, int argc, int srv )

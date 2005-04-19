@@ -476,11 +476,6 @@ void send_nick( const char *nick, const unsigned long ts, const char* newmode, c
 	send_cmd( "%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK( NICK ), nick, ts, ident, host, server, newmode, realname );
 }
 
-void send_netinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
-{
-	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSGTOK( NETINFO ), ts, prot, cloak, netname );
-}
-
 void send_smo( const char *source, const char *umodetarget, const char *msg )
 {
 	send_cmd( ":%s %s %s :%s", source, MSGTOK( SMO ), umodetarget, msg );

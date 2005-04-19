@@ -186,16 +186,6 @@ void send_nick( const char *nick, const unsigned long ts, const char* newmode, c
 	send_cmd( "%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, ts, newmode, ident, host, server, realname );
 }
 
-void send_snetinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
-{
-	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_SNETINFO, ts, prot, cloak, netname );
-}
-
-void send_netinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
-{
-	send_cmd( ":%s %s 0 %lu %d %s 0 0 0 :%s", source, MSG_NETINFO, ts, prot, cloak, netname );
-}
-
 /* there isn't an akill on Hybrid, so we send a kline to all servers! */
 void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
