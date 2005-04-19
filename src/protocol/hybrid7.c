@@ -81,7 +81,7 @@ const char MSG_SJOIN[] = "SJOIN";
 static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
 static void m_topic( char *origin, char **argv, int argc, int srv );
-static void m_burst( char *origin, char **argv, int argc, int srv );
+static void m_eob( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
@@ -103,7 +103,7 @@ ProtocolInfo protocol_info =
 	/* Max real name length */
 	50,
 	/* Max channel name length */
-	20,
+	200,
 	/* Max topic length */
 	512,
 	/* Default operator modes for NeoStats service bots */
@@ -119,7 +119,7 @@ ircd_cmd cmd_list[] =
 	{MSG_SERVER, 0, m_server, 0},
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_TOPIC, 0, m_topic, 0},
-	{MSG_EOB, 0, m_burst, 0},
+	{MSG_EOB, 0, m_eob, 0},
 	{MSG_SJOIN, 0, m_sjoin, 0},
 	{0, 0, 0, 0},
 };
@@ -171,10 +171,6 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 	send_cmd( "%s %s %d :%s", MSG_SERVER, name, numeric, infoline );
 }
 
-void send_burst( int b )
-{
-}
-
 void send_sjoin( const char *source, const char *target, const char *chan, const unsigned long ts )
 {
 	send_cmd( ":%s %s %lu %s + :%s", source, MSG_SJOIN, ts, chan, target );
@@ -221,7 +217,7 @@ static void m_sjoin( char *origin, char **argv, int argc, int srv )
 	do_sjoin( argv[0], argv[1],( ( argc <= 2 ) ? argv[1] : argv[2] ), argv[4], argv, argc );
 }
 
-static void m_burst( char *origin, char **argv, int argc, int srv )
+static void m_eob( char *origin, char **argv, int argc, int srv )
 {
 	send_eob( me.name );
 	do_synch_neostats( );
