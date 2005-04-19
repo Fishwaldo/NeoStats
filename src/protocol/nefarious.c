@@ -262,7 +262,6 @@ ProtocolInfo protocol_info =
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
-	FEATURE_SVSJOIN|FEATURE_SVSPART|FEATURE_SVSNICK|FEATURE_SVSHOST|FEATURE_SWHOIS|
 # ifdef NEFARIOUS_CLOAKHOST
 	FEATURE_UMODECLOAK|
 # endif /* NEFARIOUS_CLOAKHOST */
