@@ -81,7 +81,6 @@ const char MSG_SJOIN[] = "SJOIN";
 static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
 static void m_topic( char *origin, char **argv, int argc, int srv );
-static void m_eob( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
@@ -119,7 +118,6 @@ ircd_cmd cmd_list[] =
 	{MSG_SERVER, 0, m_server, 0},
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_TOPIC, 0, m_topic, 0},
-	{MSG_EOB, 0, m_eob, 0},
 	{MSG_SJOIN, 0, m_sjoin, 0},
 	{0, 0, 0, 0},
 };
@@ -158,11 +156,6 @@ mode_init user_umodes[] =
 	{'z', UMODE_OPERWALL},
 	{0, 0},
 };
-
-void send_eob( const char *server )
-{
-	send_cmd( ":%s %s", server, MSG_EOB );
-}
 
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
@@ -205,12 +198,6 @@ void send_rakill( const char *source, const char *host, const char *ident )
 static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
 	do_sjoin( argv[0], argv[1],( ( argc <= 2 ) ? argv[1] : argv[2] ), argv[4], argv, argc );
-}
-
-static void m_eob( char *origin, char **argv, int argc, int srv )
-{
-	send_eob( me.name );
-	do_synch_neostats( );
 }
 
 static void m_server( char *origin, char **argv, int argc, int srv )

@@ -144,6 +144,8 @@ MODULEVAR extern const char MSG_SNETINFO[];
 MODULEVAR extern const char TOK_SNETINFO[];
 MODULEVAR extern const char MSG_SVINFO[];
 MODULEVAR extern const char TOK_SVINFO[];
+MODULEVAR extern const char MSG_EOB[];
+MODULEVAR extern const char TOK_EOB[];
 MODULEVAR extern const char MSG_PROTOCTL[];
 MODULEVAR extern const char TOK_PROTOCTL[];
 MODULEVAR extern const char MSG_CAPAB[];
@@ -215,6 +217,7 @@ EXPORTFUNC void _m_globops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_wallops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_chatops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_svinfo( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_eob( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_error( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_ignorecommand( char *origin, char **argv, int argc, int srv );
 
@@ -315,6 +318,7 @@ MODULEFUNC void send_server_connect( const char *name, const int numeric, const 
 MODULEFUNC void send_netinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 MODULEFUNC void send_snetinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 MODULEFUNC void send_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow );
+MODULEFUNC void send_eob( const char *server );
 MODULEFUNC void send_vctrl( const int uprot, const int nicklen, const int modex, const int gc, const char *netname );
 MODULEFUNC void send_burst( int b );
 MODULEFUNC void send_svstime( const char *source, const unsigned long ts );
