@@ -301,7 +301,7 @@ void send_cmode( const char *sourceserver, const char *sourceuser, const char *c
 
 void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
-	send_cmd( "%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, ts, newmode, ident, host, server, realname );
+	send_cmd( "%s %s 1 %lu %s %s %s %s %s %s%lu :%s", MSG_NICK, nick, ts, newmode, ident, host, host, server, nick, ts, realname );
 }
 
 void send_snetinfo( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts )
@@ -353,14 +353,15 @@ static void m_server( char *origin, char **argv, int argc, int srv )
  *    argv[3] = umode
  *    argv[4] = username
  *    argv[5] = hostname
- *    argv[6] = server
- *    argv[7] = ircname
+ *    argv[6] = vhost
+ *    argv[7] = server
+ *    argv[8] = svsid
+ *    argv[9] = ircname
  */
 static void m_nick( char *origin, char **argv, int argc, int srv )
 {
 	if( !srv ) {
-		do_nick( argv[0], argv[1], argv[2], argv[4], argv[5], argv[6], 
-			NULL, NULL, argv[3], NULL, argv[7], NULL, NULL );
+		do_nick( argv[0], argv[1], argv[2], argv[4], argv[5], argv[7], NULL, NULL, argv[3], argv[6], argv[9], NULL, NULL );
 	} else {
 		do_nickchange( origin, argv[0], NULL );
 	}
