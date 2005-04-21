@@ -335,7 +335,6 @@ const char MSG_SMODE[] = "SMODE";
 static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
-static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_vctrl( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
@@ -373,7 +372,6 @@ ircd_cmd cmd_list[] =
 	{MSG_SVSMODE,   0,   m_svsmode,   0},
 	{MSG_NICK,      TOK_NICK,      m_nick,      0},
 	{MSG_VCTRL,     0,     m_vctrl,     0},
-	{MSG_SVSNICK,   0,   m_svsnick,   0},
 	{0, 0, 0, 0},
 };
 
@@ -489,7 +487,7 @@ static void m_svsmode( char *origin, char **argv, int argc, int srv )
 	if( argv[0][0] == '#' ) {
 		do_svsmode_channel( origin, argv, argc );
 	} else {
-		do_svsmode_user( argv[0], argv[1], NULL );
+		do_svsmode_user( argv[0], argv[1], argv[2] );
 	}
 }
 
@@ -505,9 +503,4 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 static void m_vctrl( char *origin, char **argv, int argc, int srv )
 {
 	do_vctrl( argv[0], argv[1], argv[2], argv[3], argv[14] );
-}
-
-static void m_svsnick( char *origin, char **argv, int argc, int srv )
-{
-	do_nickchange( argv[0], argv[1], NULL );
 }

@@ -150,7 +150,6 @@ const char MSG_SVSCLONE[] = "SVSCLONE";     /* SVSCLONE */
 static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
-static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_burst( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 
@@ -190,7 +189,6 @@ ircd_cmd cmd_list[] =
 	{MSG_NICK, 0, m_nick, 0},
 	{MSG_BURST, 0, m_burst, 0},
 	{MSG_SJOIN, 0, m_sjoin, 0},
-	{MSG_SVSNICK, 0, m_svsnick, 0},
 	{0, 0, 0, 0},
 };
 
@@ -340,9 +338,4 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 	} else {
 		do_nickchange( origin, argv[0], argv[1] );
 	}
-}
-
-static void m_svsnick( char *origin, char **argv, int argc, int srv )
-{
-	do_nickchange( argv[0], argv[1], NULL );
 }

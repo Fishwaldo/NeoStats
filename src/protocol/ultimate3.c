@@ -183,7 +183,6 @@ static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
 static void m_sethost( char *origin, char **argv, int argc, int srv );
-static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_burst( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 static void m_client( char *origin, char **argv, int argc, int srv );
@@ -230,7 +229,6 @@ ircd_cmd cmd_list[] =
 	{MSG_CLIENT,    0, m_client,    0},
 	{MSG_SMODE,     0, m_smode,     0},
 	{MSG_VCTRL,     0, m_vctrl,     0},
-	{MSG_SVSNICK,   0, m_svsnick,   0},
 	{0, 0, 0, 0},
 };
 
@@ -414,9 +412,4 @@ static void m_client( char *origin, char **argv, int argc, int srv )
 static void m_smode( char *origin, char **argv, int argc, int srv )
 {
 	do_smode( argv[0], argv[1] );
-}
-
-static void m_svsnick( char *origin, char **argv, int argc, int srv )
-{
-	do_nickchange( argv[0], argv[1], NULL );
 }

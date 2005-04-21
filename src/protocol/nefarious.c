@@ -405,7 +405,7 @@ void send_svshost( const char *source, const char *who, const char *vhost )
  */
 static void m_svsnick( char *origin, char **argv, int argc, int srv )
 {
-	do_nickchange( base64_to_nick( argv[0] ), argv[1], argv[2] );
+	do_svsnick( base64_to_nick( argv[0] ), argv[1], argv[2] );
 }
 
 static void m_svsjoin( char *origin, char **argv, int argc, int srv )

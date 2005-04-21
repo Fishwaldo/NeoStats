@@ -323,7 +323,6 @@ static void m_umode2( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
-static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_smo( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_tkl( char *origin, char **argv, int argc, int srv );
@@ -367,7 +366,6 @@ ircd_cmd cmd_list[] =
 	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
 	{MSG_NICK, TOK_NICK, m_nick, 0},
 	{MSG_SJOIN, TOK_SJOIN, m_sjoin, 0},
-	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_SMO, TOK_SMO, m_smo, 0},
 	{MSG_TKL, TOK_TKL, m_tkl, 0},
@@ -613,16 +611,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
 	do_sjoin( argv[0], argv[1],( ( argc >= 4 ) ? argv[2] : "" ), origin, argv, argc );
-}
-
-/* m_svsnick
- *  argv[0] = old nickname
- *  argv[1] = new nickname
- *  argv[2] = timestamp
- */
-static void m_svsnick( char *origin, char **argv, int argc, int srv )
-{
-	do_nickchange( argv[0], argv[1], argv[2] );
 }
 
 /* m_swhois

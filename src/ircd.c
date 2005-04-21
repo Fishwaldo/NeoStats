@@ -145,21 +145,21 @@ static void( *irc_send_ping )( const char *source, const char *reply, const char
 static void( *irc_send_pong )( const char *reply );
 static void( *irc_send_server )( const char *source, const char *name, const int numeric, const char *infoline );
 static void( *irc_send_squit )( const char *server, const char *quitmsg );
-static void( *irc_send_nick )( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname );
+static void( *irc_send_nick )( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname );
 static void( *irc_send_server_connect )( const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink );
 static void( *irc_send_netinfo )( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 static void( *irc_send_snetinfo )( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 static void( *irc_send_svinfo )( const int tscurrent, const int tsmin, const unsigned long tsnow );
 static void( *irc_send_eob )( const char *server );
-static void( *irc_send_vctrl )( const int uprot, const int nicklen, const int modex, const int gc, const char* netname );
+static void( *irc_send_vctrl )( const int uprot, const int nicklen, const int modex, const int gc, const char *netname );
 static void( *irc_send_burst )( int b );
 static void( *irc_send_svstime )( const char *source, const unsigned long ts );
-static void( *irc_send_setname )( const char* nick, const char* realname );
-static void( *irc_send_sethost )( const char* nick, const char* host );
-static void( *irc_send_setident )( const char* nick, const char* ident );
+static void( *irc_send_setname )( const char *nick, const char *realname );
+static void( *irc_send_sethost )( const char *nick, const char *host );
+static void( *irc_send_setident )( const char *nick, const char *ident );
 static void( *irc_send_serverrequptime )( const char *source, const char *target );
 static void( *irc_send_serverreqversion )( const char *source, const char *target );
-static void( *irc_send_cloakhost )( char* host );
+static void( *irc_send_cloakhost )( char *host );
 
 protocol_entry protocol_list[] =
 {
@@ -287,7 +287,7 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 };
 
 
-static void IrcdError( char* err )
+static void IrcdError( char *err )
 {
 	nlog( LOG_CRITICAL, "Unable to find %s in selected IRCd module", err );
 }
@@ -469,7 +469,7 @@ int InitIrcd( void )
  *  @return none
  */
 
-void _m_globops( char* origin, char **av, int ac, int cmdptr )
+void _m_globops( char *origin, char **av, int ac, int cmdptr )
 {
 	do_globops( origin, av[0] );	
 }
@@ -489,7 +489,7 @@ void _m_globops( char* origin, char **av, int ac, int cmdptr )
  *  @return none
  */
 
-void _m_wallops( char* origin, char **av, int ac, int cmdptr )
+void _m_wallops( char *origin, char **av, int ac, int cmdptr )
 {
 	do_wallops( origin, av[0] );	
 }
@@ -509,7 +509,7 @@ void _m_wallops( char* origin, char **av, int ac, int cmdptr )
  *  @return none
  */
 
-void _m_chatops( char* origin, char **av, int ac, int cmdptr )
+void _m_chatops( char *origin, char **av, int ac, int cmdptr )
 {
 	do_chatops( origin, av[0] );	
 }
@@ -529,7 +529,7 @@ void _m_chatops( char* origin, char **av, int ac, int cmdptr )
  *  @return none
  */
 
-void _m_error( char* origin, char **av, int ac, int cmdptr )
+void _m_error( char *origin, char **av, int ac, int cmdptr )
 {
 	fprintf(stderr, "IRCD reported error: %s", av[0] );
 	nlog (LOG_ERROR, "IRCD reported error: %s", av[0] );
@@ -569,7 +569,7 @@ void _m_ignorecommand( char *origin, char **argv, int argc, int srv )
  *  @return none
  */
 
-void _m_pass( char* origin, char **av, int ac, int cmdptr )
+void _m_pass( char *origin, char **av, int ac, int cmdptr )
 {
 	
 }
@@ -988,7 +988,7 @@ void _m_mode( char *origin, char **argv, int argc, int srv )
 
 void _m_svsnick( char *origin, char **argv, int argc, int srv )
 {
-	do_nickchange( argv[0], argv[1], argv[2] );
+	do_svsnick( argv[0], argv[1], ( argc > 2 ) ? argv[2] : NULL );
 }
 
 /** @brief _m_setname
@@ -1137,7 +1137,7 @@ void _m_eob( char *origin, char **argv, int argc, int srv )
  *  @return none
  */
 
-void _m_notice( char* origin, char **argv, int argc, int cmdptr )
+void _m_notice( char *origin, char **argv, int argc, int cmdptr )
 {
 	SET_SEGV_LOCATION();
 	if( argv[0] == NULL ) {
@@ -1171,7 +1171,7 @@ void _m_notice( char* origin, char **argv, int argc, int cmdptr )
  *  @return none
  */
 
-void _m_private( char* origin, char **argv, int argc, int cmdptr )
+void _m_private( char *origin, char **argv, int argc, int cmdptr )
 {
 	char target[64];
 
@@ -1205,7 +1205,7 @@ void _m_private( char* origin, char **argv, int argc, int cmdptr )
  *  @return none
  */
 
-EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char* origin, char **av, int ac )
+EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av, int ac )
 {
 	ircd_cmd *ircd_cmd_ptr;
 	ircd_cmd_intrinsic *intrinsic_cmd_ptr;
@@ -1324,7 +1324,7 @@ int parse(void *arg,  void *rline, size_t len )
  *  @return none
  */
 
-static void unsupported_cmd( const char* cmd )
+static void unsupported_cmd( const char *cmd )
 {
 	irc_chanalert( ns_botptr, _( "Warning, %s tried to %s which is not supported" ), GET_CUR_MODNAME(), cmd );
 	nlog( LOG_NOTICE, "Warning, %s tried to %s, which is not supported", GET_CUR_MODNAME(), cmd );
@@ -1354,7 +1354,7 @@ int irc_prefmsg_list( const Bot *botptr, const Client * target, const char **tex
 	}
 	while( *text ) {
 		if( **text ) {
-			irc_prefmsg( botptr, target,( char* )*text );
+			irc_prefmsg( botptr, target,( char *)*text );
 		} else {
 			irc_prefmsg( botptr, target, " " );
 		}
@@ -1376,7 +1376,7 @@ int irc_privmsg_list( const Bot *botptr, const Client * target, const char **tex
 	}
 	while( *text ) {
 		if( **text ) {
-			irc_privmsg( botptr, target,( char* )*text );
+			irc_privmsg( botptr, target,( char *)*text );
 		} else {
 			irc_privmsg( botptr, target, " " );
 		}
@@ -1606,7 +1606,7 @@ int irc_cloakhost( const Bot *botptr )
 
 int irc_umode( const Bot *botptr, const char *target, long mode )
 {
-	char* newmode;
+	char *newmode;
 	
 	newmode = UmodeMaskToString( mode );
 	irc_send_umode( botptr->u->name, target, newmode );
@@ -1684,7 +1684,7 @@ int irc_part( const Bot *botptr, const char *chan, const char *quitmsg )
 		c->persistentusers --;
 	}
 	irc_send_part( botptr->u->name, chan, quitmsg ? quitmsg : "" );
-	PartChannel( botptr->u, ( char * ) chan, quitmsg );
+	PartChannel( botptr->u, ( char *) chan, quitmsg );
 	return NS_SUCCESS;
 }
 
@@ -1714,14 +1714,14 @@ int irc_nickchange( const Bot *botptr, const char *newnick )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_setname( const Bot *botptr, const char* realname )
+int irc_setname( const Bot *botptr, const char *realname )
 {
 	if( !irc_send_setname ) {
 		unsupported_cmd( "SETNAME" );
 		return NS_FAILURE;
 	}
 	irc_send_setname( botptr->name, realname );
-	strlcpy( botptr->u->info,( char* )realname, MAXHOST );
+	strlcpy( botptr->u->info,( char *)realname, MAXHOST );
 	return NS_SUCCESS;
 }
 
@@ -1730,14 +1730,14 @@ int irc_setname( const Bot *botptr, const char* realname )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_sethost( const Bot *botptr, const char* host )
+int irc_sethost( const Bot *botptr, const char *host )
 {
 	if( !irc_send_sethost ) {
 		unsupported_cmd( "SETHOST" );
 		return NS_FAILURE;
 	}
 	irc_send_sethost( botptr->name, host );
-	strlcpy( botptr->u->user->hostname,( char* )host, MAXHOST );
+	strlcpy( botptr->u->user->hostname,( char *)host, MAXHOST );
 	return NS_SUCCESS;
 }
  
@@ -1746,14 +1746,14 @@ int irc_sethost( const Bot *botptr, const char* host )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_setident( const Bot *botptr, const char* ident )
+int irc_setident( const Bot *botptr, const char *ident )
 {
 	if( !irc_send_setident ) {
 		unsupported_cmd( "SETIDENT" );
 		return NS_FAILURE;
 	}
 	irc_send_setident( botptr->name, ident );
-	strlcpy( botptr->u->user->username,( char* )ident, MAXHOST );
+	strlcpy( botptr->u->user->username,( char *)ident, MAXHOST );
 	return NS_SUCCESS;
 }
 
@@ -1839,7 +1839,7 @@ int irc_kick( const Bot *botptr, const char *chan, const char *target, const cha
 		return NS_FAILURE;
 	}
 	irc_send_kick( botptr->u->name, chan, target, reason );
-	PartChannel( FindUser( target ), ( char * ) chan, reason[0] != 0 ?( char * )reason : NULL );
+	PartChannel( FindUser( target ), ( char *) chan, reason[0] != 0 ?( char *)reason : NULL );
 	return NS_SUCCESS;
 }
 
@@ -2351,7 +2351,7 @@ void do_synch_neostats( void )
  *  @return none
  */
 
-void do_ping( const char* origin, const char* destination )
+void do_ping( const char *origin, const char *destination )
 {
 	irc_pong( origin );
 	if( ircd_srv.burst ) {
@@ -2368,7 +2368,7 @@ void do_ping( const char* origin, const char* destination )
  *  @return none
  */
 
-void do_pong( const char* origin, const char* destination )
+void do_pong( const char *origin, const char *destination )
 {
 	Client *s;
 	CmdParams * cmdparams;
@@ -2398,7 +2398,7 @@ void do_pong( const char* origin, const char* destination )
  *  @return none
  */
 
-void do_version( const char* nick, const char *remoteserver )
+void do_version( const char *nick, const char *remoteserver )
 {
 	SET_SEGV_LOCATION();
 	irc_numeric( RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time );
@@ -2414,7 +2414,7 @@ void do_version( const char* nick, const char *remoteserver )
  *  @return none
  */
 
-void do_motd( const char* nick, const char *remoteserver )
+void do_motd( const char *nick, const char *remoteserver )
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -2446,7 +2446,7 @@ void do_motd( const char* nick, const char *remoteserver )
  *  @return none
  */
 
-void do_admin( const char* nick, const char *remoteserver )
+void do_admin( const char *nick, const char *remoteserver )
 {
 	FILE *fp;
 	char buf[BUFSIZE];
@@ -2476,7 +2476,7 @@ void do_admin( const char* nick, const char *remoteserver )
  *  @return none
  */
 
-void do_credits( const char* nick, const char *remoteserver )
+void do_credits( const char *nick, const char *remoteserver )
 {
 	SET_SEGV_LOCATION();
 	irc_numeric( RPL_VERSION, nick, ":- NeoStats %s Credits ", me.version );
@@ -2516,7 +2516,7 @@ void do_credits( const char* nick, const char *remoteserver )
  *  @return none
  */
 
-void do_stats( const char* nick, const char *what )
+void do_stats( const char *nick, const char *what )
 {
 	ircd_cmd* ircd_cmd_ptr;
 	time_t tmp;
@@ -2602,10 +2602,10 @@ void do_protocol( char *origin, char **argv, int argc )
 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
 
-void do_sjoin( char* tstime, char* channame, char *modes, char *sjoinnick, char **argv, int argc )
+void do_sjoin( char *tstime, char *channame, char *modes, char *sjoinnick, char **argv, int argc )
 {
 	char nick[MAXNICK];
-	char* nicklist;
+	char *nicklist;
 	long mask = 0;
 	int ok = 1, j = 3;
 	Channel *c;
@@ -2659,7 +2659,7 @@ void do_sjoin( char* tstime, char* channame, char *modes, char *sjoinnick, char 
  *  @return none
  */
 
-void do_netinfo( const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname )
+void do_netinfo( const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname )
 {
 	ircd_srv.maxglobalcnt = atoi( maxglobalcnt );
 	ircd_srv.tsendsync = atoi( tsendsync );
@@ -2679,7 +2679,7 @@ void do_netinfo( const char* maxglobalcnt, const char* tsendsync, const char* pr
  *  @return none
  */
 
-void do_snetinfo( const char* maxglobalcnt, const char* tsendsync, const char* prot, const char* cloak, const char* netname )
+void do_snetinfo( const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname )
 {
 	ircd_srv.uprot = atoi( prot );
 	strlcpy( ircd_srv.cloak, cloak, CLOAKKEYLEN );
@@ -2697,10 +2697,10 @@ void do_snetinfo( const char* maxglobalcnt, const char* tsendsync, const char* p
  *  @return none
  */
 
-void do_join( const char* nick, const char* chanlist, const char* keys )
+void do_join( const char *nick, const char *chanlist, const char *keys )
 {
 	char *s, *t;
-	t =( char* )chanlist;
+	t =( char *)chanlist;
 	while( *( s = t ) ) {
 		t = s + strcspn( s, "," );
 		if( *t )
@@ -2718,7 +2718,7 @@ void do_join( const char* nick, const char* chanlist, const char* keys )
  *  @return none
  */
 
-void do_part( const char* nick, const char* chan, const char* reason )
+void do_part( const char *nick, const char *chan, const char *reason )
 {
 	PartChannel( FindUser( nick ), chan, reason );
 }
@@ -2732,7 +2732,7 @@ void do_part( const char* nick, const char* chan, const char* reason )
  *  @return none
  */
 
-void do_nick( const char *nick, const char *hopcount, const char* TS, 
+void do_nick( const char *nick, const char *hopcount, const char *TS, 
 		 const char *user, const char *host, const char *server, 
 		 const char *ip, const char *servicestamp, const char *modes, 
 		 const char *vhost, const char *realname, const char *numeric, 
@@ -2810,7 +2810,7 @@ void do_quit( const char *nick, const char *quitmsg )
  *  @return none
  */
 
-void do_squit( const char *name, const char* reason )
+void do_squit( const char *name, const char *reason )
 {
 	DelServer( name, reason );
 }
@@ -2852,7 +2852,7 @@ void do_svinfo( void )
  *  @return none
  */
 
-void do_vctrl( const char* uprot, const char* nicklen, const char* modex, const char* gc, const char* netname )
+void do_vctrl( const char *uprot, const char *nicklen, const char *modex, const char *gc, const char *netname )
 {
 	ircd_srv.uprot = atoi( uprot );
 	ircd_srv.nicklen = atoi( nicklen );
@@ -2873,7 +2873,7 @@ void do_vctrl( const char* uprot, const char* nicklen, const char* modex, const 
  *  @return none
  */
 
-void do_smode( const char* targetnick, const char* modes )
+void do_smode( const char *targetnick, const char *modes )
 {
 	UserSMode( targetnick, modes );
 }
@@ -2887,7 +2887,7 @@ void do_smode( const char* targetnick, const char* modes )
  *  @return none
  */
 
-void do_mode_user( const char* targetnick, const char* modes )
+void do_mode_user( const char *targetnick, const char *modes )
 {
 	UserMode( targetnick, modes );
 }
@@ -2901,13 +2901,13 @@ void do_mode_user( const char* targetnick, const char* modes )
  *  @return none
  */
 
-void do_svsmode_user( const char* targetnick, const char* modes, const char* ts )
+void do_svsmode_user( const char *targetnick, const char *modes, const char *ts )
 {
 	char modebuf[MODESIZE];
 	
 	if( ts && isdigit( *ts ) ) {
-		const char* pModes;	
-		char* pNewModes;	
+		const char *pModes;	
+		char *pNewModes;	
 
 		SetUserServicesTS( targetnick, ts );
 		/* If only setting TS, we do not need further mode processing */
@@ -2956,7 +2956,7 @@ void do_mode_channel( char *origin, char **argv, int argc )
  *  @return none
  */
 
-void do_away( const char* nick, const char *reason )
+void do_away( const char *nick, const char *reason )
 {
 	UserAway( nick, reason );
 }
@@ -2970,7 +2970,7 @@ void do_away( const char* nick, const char *reason )
  *  @return none
  */
 
-void do_vhost( const char* nick, const char *vhost )
+void do_vhost( const char *nick, const char *vhost )
 {
 	SetUserVhost( nick, vhost );
 }
@@ -2984,7 +2984,7 @@ void do_vhost( const char* nick, const char *vhost )
  *  @return none
  */
 
-void do_nickchange( const char * oldnick, const char *newnick, const char * ts )
+void do_nickchange( const char *oldnick, const char *newnick, const char *ts )
 {
 	UserNickChange( oldnick, newnick, ts );
 }
@@ -2998,7 +2998,7 @@ void do_nickchange( const char * oldnick, const char *newnick, const char * ts )
  *  @return none
  */
 
-void do_topic( const char* chan, const char *owner, const char* ts, const char *topic )
+void do_topic( const char *chan, const char *owner, const char *ts, const char *topic )
 {
 	ChannelTopic( chan, owner, ts, topic );
 }
@@ -3012,7 +3012,7 @@ void do_topic( const char* chan, const char *owner, const char* ts, const char *
  *  @return none
  */
 
-void do_server( const char *name, const char *uplink, const char* hops, const char *numeric, const char *infoline, int srv )
+void do_server( const char *name, const char *uplink, const char *hops, const char *numeric, const char *infoline, int srv )
 {
 	if( !srv ) {
 		if( uplink == NULL || *uplink == 0 ) {
@@ -3120,14 +3120,14 @@ void do_eos( const char *name )
  *  @return none
  */
 
-void do_setname( const char* nick, const char* realname )
+void do_setname( const char *nick, const char *realname )
 {
 	Client *u;
 
 	u = FindUser( nick );
 	if( u ) {
 		dlog( DEBUG1, "do_setname: setting realname of user %s to %s", nick, realname );
-		strlcpy( u->info,( char* )realname, MAXHOST );
+		strlcpy( u->info,( char *)realname, MAXHOST );
 	} else {
 		nlog( LOG_WARNING, "do_setname: user %s not found", nick );
 	}
@@ -3142,14 +3142,28 @@ void do_setname( const char* nick, const char* realname )
  *  @return none
  */
 
-void do_sethost( const char* nick, const char* host )
+void do_svsnick( const char *oldnick, const char *newnick, const char *ts )
+{
+	do_nickchange( oldnick, newnick, ts );
+}
+
+/** @brief 
+ *
+ *  
+ *
+ *  @param 
+ *
+ *  @return none
+ */
+
+void do_sethost( const char *nick, const char *host )
 {
 	Client *u;
 
 	u = FindUser( nick );
 	if( u ) {
 		dlog( DEBUG1, "do_sethost: setting host of user %s to %s", nick, host );
-		strlcpy( u->user->hostname,( char* )host, MAXHOST );
+		strlcpy( u->user->hostname,( char *)host, MAXHOST );
 	} else {
 		nlog( LOG_WARNING, "do_sethost: user %s not found", nick );
 	}
@@ -3164,14 +3178,14 @@ void do_sethost( const char* nick, const char* host )
  *  @return none
  */
 
-void do_setident( const char* nick, const char* ident )
+void do_setident( const char *nick, const char *ident )
 {
 	Client *u;
 
 	u = FindUser( nick );
 	if( u ) {
 		dlog( DEBUG1, "do_setident: setting ident of user %s to %s", nick, ident );
-		strlcpy( u->user->username,( char* )ident, MAXHOST );
+		strlcpy( u->user->username,( char *)ident, MAXHOST );
 	} else {
 		nlog( LOG_WARNING, "do_setident: user %s not found", nick );
 	}

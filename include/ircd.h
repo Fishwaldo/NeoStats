@@ -262,6 +262,7 @@ EXPORTFUNC void do_smode( const char *target, const char *modes );
 EXPORTFUNC void do_mode_user( const char *target, const char *modes );
 EXPORTFUNC void do_mode_channel( char *origin, char **argv, int argc );
 EXPORTFUNC void do_svsmode_user( const char *target, const char *modes, const char *ts );
+EXPORTFUNC void do_svsnick( const char *oldnick, const char *newnick, const char *ts );
 /* These are the same for now but we might need to be different in the 
  * future so use macros
  */
