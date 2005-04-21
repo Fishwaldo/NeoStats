@@ -50,25 +50,18 @@
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
 
-typedef struct ircd_sym 
+typedef struct protocol_sym
 {
 	void **handler;
 	void *defaulthandler;
 	char *sym;
-	unsigned int required;
-	unsigned int feature;
-} ircd_sym;
-
-typedef struct msgtok_sym 
-{
-	void **handler;
 	char **msgptr;
 	char *msgsym;
 	char **tokptr;
 	char *toksym;
-	void *defaulthandler;
+	unsigned int required;
 	unsigned int feature;
-} msgtok_sym;
+} protocol_sym;
 
 typedef struct protocol_entry {
 	char *token;
@@ -154,8 +147,8 @@ static void( *irc_send_server )( const char *source, const char *name, const int
 static void( *irc_send_squit )( const char *server, const char *quitmsg );
 static void( *irc_send_nick )( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname );
 static void( *irc_send_server_connect )( const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink );
-static void( *irc_send_netinfo )( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts );
-static void( *irc_send_snetinfo )( const char* source, const int prot, const char* cloak, const char* netname, const unsigned long ts );
+static void( *irc_send_netinfo )( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
+static void( *irc_send_snetinfo )( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 static void( *irc_send_svinfo )( const int tscurrent, const int tsmin, const unsigned long tsnow );
 static void( *irc_send_eob )( const char *server );
 static void( *irc_send_vctrl )( const int uprot, const int nicklen, const int modex, const int gc, const char* netname );
@@ -167,134 +160,6 @@ static void( *irc_send_setident )( const char* nick, const char* ident );
 static void( *irc_send_serverrequptime )( const char *source, const char *target );
 static void( *irc_send_serverreqversion )( const char *source, const char *target );
 static void( *irc_send_cloakhost )( char* host );
-
-static char *MSG_PRIVATE;
-static char *TOK_PRIVATE;
-static char *MSG_NOTICE;
-static char *TOK_NOTICE;
-static char *MSG_WALLOPS;
-static char *TOK_WALLOPS;
-static char *MSG_GLOBOPS;
-static char *TOK_GLOBOPS;
-static char *MSG_STATS;
-static char *TOK_STATS;
-static char *MSG_VERSION;
-static char *TOK_VERSION;
-static char *MSG_MOTD;
-static char *TOK_MOTD;
-static char *MSG_ADMIN;
-static char *TOK_ADMIN;
-static char *MSG_CREDITS;
-static char *TOK_CREDITS;
-static char *MSG_NICK;
-static char *TOK_NICK;
-static char *MSG_MODE;
-static char *TOK_MODE;
-static char *MSG_AWAY;
-static char *TOK_AWAY;
-static char *MSG_QUIT;
-static char *TOK_QUIT;
-static char *MSG_JOIN;
-static char *TOK_JOIN;
-static char *MSG_PART;
-static char *TOK_PART;
-static char *MSG_KICK;
-static char *TOK_KICK;
-static char *MSG_INVITE;
-static char *TOK_INVITE;
-static char *MSG_PING;
-static char *TOK_PING;
-static char *MSG_PONG;
-static char *TOK_PONG;
-static char *MSG_SERVER;
-static char *TOK_SERVER;
-static char *MSG_SQUIT;
-static char *TOK_SQUIT;
-static char *MSG_NETINFO;
-static char *TOK_NETINFO;
-static char *MSG_SNETINFO;
-static char *TOK_SNETINFO;
-static char *MSG_SVINFO;
-static char *TOK_SVINFO;
-static char *MSG_EOB;
-static char *TOK_EOB;
-static char *MSG_PROTOCTL;
-static char *TOK_PROTOCTL;
-static char *MSG_CAPAB;
-static char *TOK_CAPAB;
-static char *MSG_PASS;
-static char *TOK_PASS;
-static char *MSG_TOPIC;
-static char *TOK_TOPIC;
-static char *MSG_CHATOPS;
-static char *TOK_CHATOPS;
-static char *MSG_ERROR;
-static char *TOK_ERROR;
-static char *MSG_KILL;
-static char *TOK_KILL;
-static char *MSG_SETNAME;
-static char *TOK_SETNAME;
-static char *MSG_SETHOST;
-static char *TOK_SETHOST;
-static char *MSG_SETIDENT;
-static char *TOK_SETIDENT;
-static char *MSG_SVSNICK;
-static char *TOK_SVSNICK;
-static char *MSG_SVSJOIN;
-static char *TOK_SVSJOIN;
-static char *MSG_SVSPART;
-static char *TOK_SVSPART;
-static char *MSG_SVSMODE;
-static char *TOK_SVSMODE;
-static char *MSG_SVSKILL;
-static char *TOK_SVSKILL;
-
-msgtok_sym msgtok_sym_table[] =
-{
-	{( void * )&irc_send_privmsg, &MSG_PRIVATE, "MSG_PRIVATE", &TOK_PRIVATE, "TOK_PRIVATE", _send_privmsg, 0 },
-	{( void * )&irc_send_notice, &MSG_NOTICE, "MSG_NOTICE", &TOK_NOTICE, "TOK_NOTICE", _send_notice, 0 },
-	{( void * )&irc_send_wallops, &MSG_WALLOPS, "MSG_WALLOPS", &TOK_WALLOPS, "TOK_WALLOPS", _send_wallops, 0 },
-	{( void * )&irc_send_globops, &MSG_GLOBOPS, "MSG_GLOBOPS", &TOK_GLOBOPS, "TOK_GLOBOPS", _send_globops, 0 },
-	{( void * )NULL, &MSG_STATS, "MSG_STATS", &TOK_STATS, "TOK_STATS", NULL, 0 },
-	{( void * )NULL, &MSG_VERSION, "MSG_VERSION", &TOK_VERSION, "TOK_VERSION", NULL, 0 },
-	{( void * )NULL, &MSG_MOTD, "MSG_MOTD", &TOK_MOTD, "TOK_MOTD", NULL, 0 },
-	{( void * )NULL, &MSG_ADMIN, "MSG_ADMIN", &TOK_ADMIN, "TOK_ADMIN", NULL, 0 },
-	{( void * )NULL, &MSG_CREDITS, "MSG_CREDITS", &TOK_CREDITS, "TOK_CREDITS", NULL, 0 },
-	{( void * )&irc_send_nickchange, &MSG_NICK, "MSG_NICK", &TOK_NICK, "TOK_NICK", _send_nickchange, 0 },
-	{( void * )&irc_send_umode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_umode, 0 },
-	{( void * )&irc_send_cmode, &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", _send_cmode, 0 },
-	{( void * )&irc_send_quit, &MSG_QUIT, "MSG_QUIT", &TOK_QUIT, "TOK_QUIT", _send_quit, 0 },
-	{( void * )NULL, &MSG_AWAY, "MSG_AWAY", &TOK_AWAY, "TOK_AWAY", NULL, 0 },
-	{( void * )&irc_send_join, &MSG_JOIN, "MSG_JOIN", &TOK_JOIN, "TOK_JOIN", _send_join, 0 },
-	{( void * )&irc_send_part, &MSG_PART, "MSG_PART", &TOK_PART, "TOK_PART", _send_part, 0 },
-	{( void * )&irc_send_kick, &MSG_KICK, "MSG_KICK", &TOK_KICK, "TOK_KICK", _send_kick, 0 },
-	{( void * )&irc_send_invite, &MSG_INVITE, "MSG_INVITE", &TOK_INVITE, "TOK_INVITE", _send_invite, 0 },
-	{( void * )&irc_send_ping, &MSG_PING, "MSG_PING", &TOK_PING, "TOK_PING", _send_ping, 0 },
-	{( void * )&irc_send_pong, &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", _send_pong, 0 },
-	{( void * )&irc_send_server, &MSG_SERVER, "MSG_SERVER", &TOK_SERVER, "TOK_SERVER", _send_server, 0 },
-	{( void * )&irc_send_squit, &MSG_SQUIT, "MSG_SQUIT", &TOK_SQUIT, "TOK_SQUIT", _send_squit, 0 },
-	{( void * )&irc_send_netinfo, &MSG_NETINFO, "MSG_NETINFO", &TOK_NETINFO, "TOK_NETINFO", _send_netinfo, 0 },
-	{( void * )&irc_send_snetinfo, &MSG_SNETINFO, "MSG_SNETINFO", &TOK_SNETINFO, "TOK_SNETINFO", _send_snetinfo, 0 },
-	{( void * )&irc_send_svinfo, &MSG_SVINFO, "MSG_SVINFO", &TOK_SVINFO, "TOK_SVINFO", _send_svinfo, 0 },
-	{( void * )&irc_send_eob, &MSG_EOB, "MSG_EOB", &TOK_EOB, "TOK_EOB", _send_eob, 0 },
-	{( void * )&irc_send_kill, &MSG_KILL, "MSG_KILL", &TOK_KILL, "TOK_KILL", _send_kill, 0 },
-	{( void * )&irc_send_setname, &MSG_SETNAME, "MSG_SETNAME", &TOK_SETNAME, "TOK_SETNAME", _send_setname, 0 },
-	{( void * )&irc_send_sethost, &MSG_SETHOST, "MSG_SETHOST", &TOK_SETHOST, "TOK_SETHOST", _send_sethost, 0 },
-	{( void * )&irc_send_setident, &MSG_SETIDENT, "MSG_SETIDENT", &TOK_SETIDENT, "TOK_SETIDENT", _send_setident, 0 },
-	{( void * )&irc_send_svsnick, &MSG_SVSNICK, "MSG_SVSNICK", &TOK_SVSNICK, "TOK_SVSNICK", _send_svsnick, 0 },
-	{( void * )&irc_send_svsjoin, &MSG_SVSJOIN, "MSG_SVSJOIN", &TOK_SVSJOIN, "TOK_SVSJOIN", _send_svsjoin, 0 },
-	{( void * )&irc_send_svspart, &MSG_SVSPART, "MSG_SVSPART", &TOK_SVSPART, "TOK_SVSPART", _send_svspart, 0 },
-	{( void * )&irc_send_svsmode, &MSG_SVSMODE, "MSG_SVSMODE", &TOK_SVSMODE, "TOK_SVSMODE", _send_svsmode, 0 },
-	{( void * )&irc_send_svskill, &MSG_SVSKILL, "MSG_SVSKILL", &TOK_SVSKILL, "TOK_SVSKILL", _send_svskill, 0 },
-	{( void * )NULL, &MSG_PROTOCTL, "MSG_PROTOCTL", &TOK_PROTOCTL, "TOK_PROTOCTL", NULL, 0},
-	{( void * )NULL, &MSG_CAPAB, "MSG_CAPAB", &TOK_CAPAB, "TOK_CAPAB", NULL, 0},
-	{( void * )NULL, &MSG_PASS, "MSG_PASS", &TOK_PASS, "TOK_PASS", NULL, 0},
-	{( void * )NULL, &MSG_TOPIC, "MSG_TOPIC", &TOK_TOPIC, "TOK_TOPIC", NULL, 0},
-	{( void * )NULL, &MSG_CHATOPS, "MSG_CHATOPS", &TOK_CHATOPS, "TOK_CHATOPS", NULL, 0},
-	{( void * )NULL, &MSG_ERROR, "MSG_ERROR", &TOK_ERROR, "TOK_ERROR", NULL, 0},
-
-	{NULL, NULL, NULL, NULL, NULL, NULL, 0},
-};
 
 protocol_entry protocol_list[] =
 {
@@ -308,58 +173,71 @@ protocol_entry protocol_list[] =
 	{NULL, 0}
 };
 
-static ircd_sym ircd_sym_table[] = 
+static protocol_sym protocol_sym_table[] = 
 {
-	{( void * )&irc_send_privmsg, NULL, "send_privmsg", 1, 0},
-	{( void * )&irc_send_notice, NULL, "send_notice", 1, 0},
-	{( void * )&irc_send_globops, NULL, "send_globops", 0, 0},
-	{( void * )&irc_send_wallops, NULL, "send_wallops", 0, 0},
-	{( void * )&irc_send_numeric, _send_numeric, "send_numeric", 0, 0},
-	{( void * )&irc_send_umode, NULL, "send_umode", 1, 0},
-	{( void * )&irc_send_join, NULL, "send_join", 1, 0},
-	{( void * )&irc_send_sjoin, NULL, "send_sjoin", 0, 0},
-	{( void * )&irc_send_part, NULL, "send_part", 1, 0},
-	{( void * )&irc_send_nickchange, NULL, "send_nickchange", 1, 0},
-	{( void * )&irc_send_cmode, NULL, "send_cmode", 1, 0},
-	{( void * )&irc_send_quit, NULL, "send_quit", 1, 0},
-	{( void * )&irc_send_kill, NULL, "send_kill", 0, 0},
-	{( void * )&irc_send_kick, NULL, "send_kick", 0, 0},
-	{( void * )&irc_send_invite, NULL, "send_invite", 0, 0},
-	{( void * )&irc_send_svskill, NULL, "send_svskill", 0, FEATURE_SVSKILL},
-	{( void * )&irc_send_svsmode, NULL, "send_svsmode", 0, FEATURE_SVSMODE},
-	{( void * )&irc_send_svshost, NULL, "send_svshost", 0, FEATURE_SVSHOST},
-	{( void * )&irc_send_svsjoin, NULL, "send_svsjoin", 0, FEATURE_SVSJOIN},
-	{( void * )&irc_send_svspart, NULL, "send_svspart", 0, FEATURE_SVSPART},
-	{( void * )&irc_send_svsnick, NULL, "send_svsnick", 0, FEATURE_SVSNICK},
-	{( void * )&irc_send_swhois, NULL, "send_swhois", 0, FEATURE_SWHOIS},
-	{( void * )&irc_send_smo, NULL, "send_smo", 0, FEATURE_SMO},
-	{( void * )&irc_send_svstime, NULL, "send_svstime", 0, FEATURE_SVSTIME},
-	{( void * )&irc_send_akill, NULL, "send_akill", 0, 0},
-	{( void * )&irc_send_sqline, NULL, "send_sqline", 0, 0},
-	{( void * )&irc_send_unsqline, NULL, "send_unsqline", 0, 0},
-	{( void * )&irc_send_zline, NULL, "send_zline", 0, 0},
-	{( void * )&irc_send_unzline, NULL, "send_unzline", 0, 0},
-	{( void * )&irc_send_rakill, NULL, "send_rakill", 0, 0},
-	{( void * )&irc_send_ping, NULL, "send_ping", 0, 0},
-	{( void * )&irc_send_pong, NULL, "send_pong", 0, 0},
-	{( void * )&irc_send_server, NULL, "send_server", 0, 0},
-	{( void * )&irc_send_squit, NULL, "send_squit", 0, 0},
-	{( void * )&irc_send_netinfo, NULL, "send_netinfo", 0, 0},
-	{( void * )&irc_send_snetinfo, NULL, "send_snetinfo", 0, 0},
-	{( void * )&irc_send_nick, NULL, "send_nick", 1, 0},
-	{( void * )&irc_send_server_connect, NULL, "send_server_connect", 1, 0},
-	{( void * )&irc_send_svinfo, NULL, "send_svinfo", 0, 0},
-	{( void * )&irc_send_eob, NULL, "send_eob", 0, 0},
-	{( void * )&irc_send_vctrl, NULL, "send_vctrl", 0, 0},
-	{( void * )&irc_send_burst, NULL, "send_burst", 0, 0},
-	{( void * )&irc_send_setname, NULL, "send_setname", 0, 0},
-	{( void * )&irc_send_sethost, NULL, "send_sethost", 0, 0},
-	{( void * )&irc_send_setident, NULL, "send_setident", 0, 0},
-	{( void * )&irc_send_cloakhost, NULL, "cloakhost", 0, 0},
-	{( void * )&irc_send_serverrequptime, NULL, "send_serverrequptime", 0, 0},
-	{( void * )&irc_send_serverreqversion, NULL, "send_serverreqversion", 0, 0},
-	{NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_privmsg, _send_privmsg, "send_privmsg", &MSG_PRIVATE, "MSG_PRIVATE", &TOK_PRIVATE, "TOK_PRIVATE", 1, 0},
+	{( void * )&irc_send_notice, _send_notice, "send_notice", &MSG_NOTICE, "MSG_NOTICE", &TOK_NOTICE, "TOK_NOTICE", 1, 0},
+	{( void * )&irc_send_globops, _send_globops, "send_globops", &MSG_GLOBOPS, "MSG_GLOBOPS", &TOK_GLOBOPS, "TOK_GLOBOPS", 0, 0},
+	{( void * )&irc_send_wallops, _send_wallops, "send_wallops", &MSG_WALLOPS, "MSG_WALLOPS", &TOK_WALLOPS, "TOK_WALLOPS", 0, 0},
+	{( void * )&irc_send_numeric, _send_numeric, "send_numeric", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_umode, _send_umode, "send_umode", &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", 1, 0},
+	{( void * )&irc_send_join, _send_join, "send_join", &MSG_JOIN, "MSG_JOIN", &TOK_JOIN, "TOK_JOIN", 1, 0},
+	{( void * )&irc_send_sjoin, NULL, "send_sjoin", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_part, _send_part, "send_part", &MSG_PART, "MSG_PART", &TOK_PART, "TOK_PART", 1, 0},
+	{( void * )&irc_send_nickchange, _send_nickchange, "send_nickchange", &MSG_NICK, "MSG_NICK", &TOK_NICK, "TOK_NICK", 1, 0},
+	{( void * )&irc_send_cmode, _send_cmode, "send_cmode", &MSG_MODE, "MSG_MODE", &TOK_MODE, "TOK_MODE", 1, 0},
+	{( void * )&irc_send_quit, _send_quit, "send_quit", &MSG_QUIT, "MSG_QUIT", &TOK_QUIT, "TOK_QUIT", 1, 0},
+	{( void * )&irc_send_kill, _send_kill, "send_kill", &MSG_KILL, "MSG_KILL", &TOK_KILL, "TOK_KILL", 0, 0},
+	{( void * )&irc_send_kick, _send_kick, "send_kick", &MSG_KICK, "MSG_KICK", &TOK_KICK, "TOK_KICK", 0, 0},
+	{( void * )&irc_send_invite, _send_invite, "send_invite", &MSG_INVITE, "MSG_INVITE", &TOK_INVITE, "TOK_INVITE", 0, 0},
+	{( void * )&irc_send_svskill, _send_svskill, "send_svskill", &MSG_SVSKILL, "MSG_SVSKILL", &TOK_SVSKILL, "TOK_SVSKILL", 0, FEATURE_SVSKILL},
+	{( void * )&irc_send_svsmode, _send_svsmode, "send_svsmode", &MSG_SVSMODE, "MSG_SVSMODE", &TOK_SVSMODE, "TOK_SVSMODE", 0, FEATURE_SVSMODE},
+	{( void * )&irc_send_svshost, NULL, "send_svshost", NULL, NULL, NULL, NULL, 0, FEATURE_SVSHOST},
+	{( void * )&irc_send_svsjoin, _send_svsjoin, "send_svsjoin", &MSG_SVSJOIN, "MSG_SVSJOIN", &TOK_SVSJOIN, "TOK_SVSJOIN", 0, FEATURE_SVSJOIN},
+	{( void * )&irc_send_svspart, _send_svspart, "send_svspart", &MSG_SVSPART, "MSG_SVSPART", &TOK_SVSPART, "TOK_SVSPART", 0, FEATURE_SVSPART},
+	{( void * )&irc_send_svsnick, _send_svsnick, "send_svsnick", &MSG_SVSNICK, "MSG_SVSNICK", &TOK_SVSNICK, "TOK_SVSNICK", 0, FEATURE_SVSNICK},
+	{( void * )&irc_send_swhois, NULL, "send_swhois", NULL, NULL, NULL, NULL, 0, FEATURE_SWHOIS},
+	{( void * )&irc_send_smo, NULL, "send_smo", NULL, NULL, NULL, NULL, 0, FEATURE_SMO},
+	{( void * )&irc_send_svstime, NULL, "send_svstime", NULL, NULL, NULL, NULL, 0, FEATURE_SVSTIME},
+	{( void * )&irc_send_akill, NULL, "send_akill", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_sqline, NULL, "send_sqline", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_unsqline, NULL, "send_unsqline", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_zline, NULL, "send_zline", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_unzline, NULL, "send_unzline", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_rakill, NULL, "send_rakill", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_ping, _send_ping, "send_ping", &MSG_PING, "MSG_PING", &TOK_PING, "TOK_PING", 0, 0},
+	{( void * )&irc_send_pong, _send_pong, "send_pong", &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", 0, 0},
+	{( void * )&irc_send_server, _send_server, "send_server", &MSG_SERVER, "MSG_SERVER", &TOK_SERVER, "TOK_SERVER", 0, 0},
+	{( void * )&irc_send_squit, _send_squit, "send_squit", &MSG_SQUIT, "MSG_SQUIT", &TOK_SQUIT, "TOK_SQUIT", 0, 0},
+	{( void * )&irc_send_netinfo, _send_netinfo, "send_netinfo", &MSG_NETINFO, "MSG_NETINFO", &TOK_NETINFO, "TOK_NETINFO", 0, 0},
+	{( void * )&irc_send_snetinfo, _send_snetinfo, "send_snetinfo", &MSG_SNETINFO, "MSG_SNETINFO", &TOK_SNETINFO, "TOK_SNETINFO", 0, 0},
+	{( void * )&irc_send_nick, NULL, "send_nick", NULL, NULL, NULL, NULL, 1, 0},
+	{( void * )&irc_send_server_connect, NULL, "send_server_connect", NULL, NULL, NULL, NULL, 1, 0},
+	{( void * )&irc_send_svinfo, _send_svinfo, "send_svinfo", &MSG_SVINFO, "MSG_SVINFO", &TOK_SVINFO, "TOK_SVINFO", 0, 0},
+	{( void * )&irc_send_eob, _send_eob, "send_eob", &MSG_EOB, "MSG_EOB", &TOK_EOB, "TOK_EOB", 0, 0},
+	{( void * )&irc_send_vctrl, NULL, "send_vctrl", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_burst, NULL, "send_burst", NULL, NULL, NULL, NULL,  0, 0},
+	{( void * )&irc_send_setname, _send_setname, "send_setname", &MSG_SETNAME, "MSG_SETNAME", &TOK_SETNAME, "TOK_SETNAME", 0, 0},
+	{( void * )&irc_send_sethost, _send_sethost, "send_sethost", &MSG_SETHOST, "MSG_SETHOST", &TOK_SETHOST, "TOK_SETHOST", 0, 0},
+	{( void * )&irc_send_setident, _send_setident, "send_setident", &MSG_SETIDENT, "MSG_SETIDENT", &TOK_SETIDENT, "TOK_SETIDENT", 0, 0},
+	{( void * )&irc_send_cloakhost, NULL, "cloakhost", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_serverrequptime, NULL, "send_serverrequptime", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_serverreqversion, NULL, "send_serverreqversion", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )NULL, NULL ,NULL, &MSG_STATS, "MSG_STATS", &TOK_STATS, "TOK_STATS", 0, 0 },
+	{( void * )NULL, NULL ,NULL, &MSG_VERSION, "MSG_VERSION", &TOK_VERSION, "TOK_VERSION", 0, 0 },
+	{( void * )NULL, NULL ,NULL, &MSG_MOTD, "MSG_MOTD", &TOK_MOTD, "TOK_MOTD", 0, 0 },
+	{( void * )NULL, NULL ,NULL, &MSG_ADMIN, "MSG_ADMIN", &TOK_ADMIN, "TOK_ADMIN", 0, 0 },
+	{( void * )NULL, NULL ,NULL, &MSG_CREDITS, "MSG_CREDITS", &TOK_CREDITS, "TOK_CREDITS", 0, 0 },
+	{( void * )NULL, NULL ,NULL, &MSG_AWAY, "MSG_AWAY", &TOK_AWAY, "TOK_AWAY", 0, 0 },
+	{( void * )NULL, NULL ,NULL, &MSG_PROTOCTL, "MSG_PROTOCTL", &TOK_PROTOCTL, "TOK_PROTOCTL", 0, 0},
+	{( void * )NULL, NULL ,NULL, &MSG_CAPAB, "MSG_CAPAB", &TOK_CAPAB, "TOK_CAPAB", 0, 0},
+	{( void * )NULL, NULL ,NULL, &MSG_PASS, "MSG_PASS", &TOK_PASS, "TOK_PASS", 0, 0},
+	{( void * )NULL, NULL ,NULL, &MSG_TOPIC, "MSG_TOPIC", &TOK_TOPIC, "TOK_TOPIC", 0, 0},
+	{( void * )NULL, NULL ,NULL, &MSG_CHATOPS, "MSG_CHATOPS", &TOK_CHATOPS, "TOK_CHATOPS", 0, 0},
+	{( void * )NULL, NULL ,NULL, &MSG_ERROR, "MSG_ERROR", &TOK_ERROR, "TOK_ERROR", 0, 0},
+	{( void * )NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0},
 };
+
 
 typedef struct ircd_cmd_intrinsic {
 	char **name;
@@ -392,11 +270,14 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 	{&MSG_GLOBOPS, &TOK_GLOBOPS, _m_globops, 0},
 	{&MSG_WALLOPS, &TOK_WALLOPS, _m_wallops, 0},
 	{&MSG_SVINFO, &TOK_SVINFO, _m_svinfo, 0},
+	{&MSG_NETINFO, &TOK_NETINFO, _m_netinfo, 0},
+	{&MSG_SNETINFO, &TOK_SNETINFO, _m_snetinfo, 0},
 	{&MSG_EOB, &TOK_EOB, _m_eob, 0},
 	{&MSG_PROTOCTL, &TOK_PROTOCTL, _m_protoctl, 0},
 	{&MSG_CAPAB, &TOK_CAPAB, _m_capab, 0},
 	{&MSG_PASS, &TOK_PASS, _m_pass, 0},
 	{&MSG_TOPIC, &TOK_TOPIC, _m_topic, 0},
+	{&MSG_SVSNICK, &TOK_SVSNICK, _m_svsnick, 0},
 	{&MSG_SETNAME, &TOK_SETNAME, _m_setname, 0},
 	{&MSG_SETHOST, &TOK_SETHOST, _m_sethost, 0},
 	{&MSG_SETIDENT, &TOK_SETIDENT, _m_setident, 0},
@@ -460,36 +341,44 @@ static int InitIrcdProtocol( void )
 static int InitIrcdSymbols( void )
 {
 	void **protocol_handler;
-	msgtok_sym *pmsgtok_sym;
-	ircd_sym *pircd_sym;
+	protocol_sym *pprotocol_sym;
 
-	/* Build up core supported message and function table */
-	pmsgtok_sym = msgtok_sym_table;
-	while( pmsgtok_sym->msgptr )
+	/* Build up supported message and function table */
+	pprotocol_sym = protocol_sym_table;
+	while( pprotocol_sym->msgptr || pprotocol_sym->handler )
 	{
-		*pmsgtok_sym->msgptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->msgsym );
-		if( pmsgtok_sym->tokptr )
-			*pmsgtok_sym->tokptr = ns_dlsym( protocol_module_handle, pmsgtok_sym->toksym );
-		if( pmsgtok_sym->msgptr && pmsgtok_sym->handler )
-			*pmsgtok_sym->handler = pmsgtok_sym->defaulthandler;
-		pmsgtok_sym ++;
-	}
-	/* Build up protocol module overrides */
-	pircd_sym = ircd_sym_table;
-	while( pircd_sym->handler )
-	{
-		protocol_handler = ns_dlsym( protocol_module_handle, pircd_sym->sym );
-		if( protocol_handler )
-			*pircd_sym->handler = protocol_handler;
-		if( !*pircd_sym->handler ) 
-			*pircd_sym->handler = pircd_sym->defaulthandler;
-		if( pircd_sym->required && !*pircd_sym->handler ) 
+		/* Find MSG_cmd */
+		if( pprotocol_sym->msgptr )
+			*pprotocol_sym->msgptr = ns_dlsym( protocol_module_handle, pprotocol_sym->msgsym );
+		/* Find TOK_cmd */
+		if( pprotocol_sym->tokptr )
+			*pprotocol_sym->tokptr = ns_dlsym( protocol_module_handle, pprotocol_sym->toksym );
+		/* If we have a message or token, apply default handler */
+		if( ( pprotocol_sym->msgptr || pprotocol_sym->tokptr ) && pprotocol_sym->handler )
+			*pprotocol_sym->handler = pprotocol_sym->defaulthandler;
+		/* Check for IRCd override handler */
+		protocol_handler = ns_dlsym( protocol_module_handle, pprotocol_sym->sym );
+		/* If we need a handler */
+		if( pprotocol_sym->handler )
 		{
-			IrcdError( pircd_sym->sym );
-			return NS_FAILURE;	
+			/* Apply IRCd override handler */
+			if( protocol_handler )
+				*pprotocol_sym->handler = protocol_handler;
+			/* Try to apply handler if no IRCd override and we have not already set the default */
+			if( !*pprotocol_sym->handler ) 
+				*pprotocol_sym->handler = pprotocol_sym->defaulthandler;
+			/* If no default or IRCd handler but we require the function, quit with error */
+			if( pprotocol_sym->required && !*pprotocol_sym->handler ) 
+			{
+				IrcdError( pprotocol_sym->sym );
+				return NS_FAILURE;	
+			}
+			/* If handler implies a feature, apply it */
+			if( *pprotocol_sym->handler ) 
+				ircd_srv.features |= pprotocol_sym->feature;
 		}
-		ircd_srv.features |= pircd_sym->feature;
-		pircd_sym ++;
+		/* Next... */
+		pprotocol_sym ++;
 	}
 	return NS_SUCCESS;
 }
@@ -1080,6 +969,26 @@ void _m_mode( char *origin, char **argv, int argc, int srv )
 	{
 		do_mode_user( argv[0], argv[1] );
 	}
+}
+
+/** @brief _m_svsnick
+ *
+ *  process SVSNICK command
+ *  argv[0] = old nickname
+ *  argv[1] = new nickname
+ *  argv[2] = timestamp
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_svsnick( char *origin, char **argv, int argc, int srv )
+{
+	do_nickchange( argv[0], argv[1], argv[2] );
 }
 
 /** @brief _m_setname
@@ -2757,7 +2666,7 @@ void do_netinfo( const char* maxglobalcnt, const char* tsendsync, const char* pr
 	ircd_srv.uprot = atoi( prot );
 	strlcpy( ircd_srv.cloak, cloak, CLOAKKEYLEN );
 	strlcpy( me.netname, netname, MAXPASS );
-	irc_send_netinfo( me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, ( unsigned long )me.now );
+	irc_send_netinfo( me.name, maxglobalcnt, ( unsigned long )me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname );
 	do_synch_neostats();
 }
 
@@ -2775,7 +2684,7 @@ void do_snetinfo( const char* maxglobalcnt, const char* tsendsync, const char* p
 	ircd_srv.uprot = atoi( prot );
 	strlcpy( ircd_srv.cloak, cloak, CLOAKKEYLEN );
 	strlcpy( me.netname, netname, MAXPASS );
-	irc_send_snetinfo( me.name, ircd_srv.uprot, ircd_srv.cloak, me.netname, ( unsigned long )me.now );
+	irc_send_snetinfo( me.name, maxglobalcnt, ( unsigned long )me.now, ircd_srv.uprot, ircd_srv.cloak, me.netname );
 	do_synch_neostats();
 }
 

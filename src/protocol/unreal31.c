@@ -322,7 +322,6 @@ static void m_server( char *origin, char **argv, int argc, int srv );
 static void m_umode2( char *origin, char **argv, int argc, int srv );
 static void m_svsmode( char *origin, char **argv, int argc, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
-static void m_netinfo( char *origin, char **argv, int argc, int srv );
 static void m_sjoin( char *origin, char **argv, int argc, int srv );
 static void m_svsnick( char *origin, char **argv, int argc, int srv );
 static void m_smo( char *origin, char **argv, int argc, int srv );
@@ -367,7 +366,6 @@ ircd_cmd cmd_list[] =
 	{MSG_SVSMODE, TOK_SVSMODE, m_svsmode, 0},
 	{MSG_SVS2MODE, TOK_SVS2MODE, m_svsmode, 0},
 	{MSG_NICK, TOK_NICK, m_nick, 0},
-	{MSG_NETINFO, TOK_NETINFO, m_netinfo, 0},
 	{MSG_SJOIN, TOK_SJOIN, m_sjoin, 0},
 	{MSG_SVSNICK, TOK_SVSNICK, m_svsnick, 0},
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
@@ -589,21 +587,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 	} else {
 		do_nickchange( origin, argv[0], NULL );
 	}
-}
-
-/* m_netinfo
- *  argv[0] = max global count
- *  argv[1] = time of end sync
- *  argv[2] = unreal protocol using( numeric )
- *  argv[3] = cloak-crc( > u2302 )
- *  argv[4] = free( ** )
- *  argv[5] = free( ** )
- *  argv[6] = free( ** )
- *  argv[7] = ircnet
- */
-static void m_netinfo( char *origin, char **argv, int argc, int srv )
-{
-	do_netinfo( argv[0], argv[1], argv[2], argv[3], argv[7] );
 }
 
 /* m_sjoin  
