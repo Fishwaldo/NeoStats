@@ -255,6 +255,7 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 	{&MSG_MOTD, &TOK_MOTD, _m_motd, 0},
 	{&MSG_ADMIN, &TOK_ADMIN, _m_admin, 0},
 	{&MSG_CREDITS, &TOK_CREDITS, _m_credits, 0},
+	{&MSG_INFO, &TOK_INFO, _m_info, 0},
 	{&MSG_SQUIT, &TOK_SQUIT, _m_squit, 0},
 	{&MSG_AWAY, &TOK_AWAY, _m_away, 0},
 	{&MSG_QUIT, &TOK_QUIT, _m_quit, 0},
@@ -665,6 +666,26 @@ void _m_admin( char *origin, char **argv, int argc, int srv )
 
 void _m_credits( char *origin, char **argv, int argc, int srv )
 {
+	do_credits( origin, argv[0] );
+}
+
+/** @brief _m_info
+ *
+ *  process INFO command
+ *  origin INFO :stats.neostats.net
+ *	argv[0] = servername
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_info( char *origin, char **argv, int argc, int srv )
+{
+	/* For now */
 	do_credits( origin, argv[0] );
 }
 
@@ -2479,32 +2500,33 @@ void do_admin( const char *nick, const char *remoteserver )
 void do_credits( const char *nick, const char *remoteserver )
 {
 	SET_SEGV_LOCATION();
-	irc_numeric( RPL_VERSION, nick, ":- NeoStats %s Credits ", me.version );
-	irc_numeric( RPL_VERSION, nick, ":- Now Maintained by Fish (fish@dynam.ac) and Mark (mark@ctcp.net)" );
-	irc_numeric( RPL_VERSION, nick, ":- Previous Authors: Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)" );
-	irc_numeric( RPL_VERSION, nick, ":- For Support, you can find us at" );
-	irc_numeric( RPL_VERSION, nick, ":- irc.irc-chat.net #NeoStats" );
-	irc_numeric( RPL_VERSION, nick, ":- Thanks to:" );
-	irc_numeric( RPL_VERSION, nick, ":- Enigma for being part of the dev team" );
-	irc_numeric( RPL_VERSION, nick, ":- Stskeeps for writing the best IRCD ever!" );
-	irc_numeric( RPL_VERSION, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)" );
-	irc_numeric( RPL_VERSION, nick, ":- monkeyIRCD for the Module Segv Catching code" );
-	irc_numeric( RPL_VERSION, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!" );
-	irc_numeric( RPL_VERSION, nick, ":- Andy For Ideas" );
-	irc_numeric( RPL_VERSION, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies" );
-	irc_numeric( RPL_VERSION, nick, ":- sre and Jacob for development systems and access" );
-	irc_numeric( RPL_VERSION, nick, ":- Error51 for Translating our FAQ and README files" );
-	irc_numeric( RPL_VERSION, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!" );
-	irc_numeric( RPL_VERSION, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't( and all the bug reports! )" );
-	irc_numeric( RPL_VERSION, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips : )" );
-	irc_numeric( RPL_VERSION, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback" );
-	irc_numeric( RPL_VERSION, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd" );
-	irc_numeric( RPL_VERSION, nick, ":- Blud - Giving us patches for Mystic IRCd" );
-	irc_numeric( RPL_VERSION, nick, ":- herrohr - Giving us patches for Liquid IRCd support" );
-	irc_numeric( RPL_VERSION, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support" );
-	irc_numeric( RPL_VERSION, nick, ":- Reed Loden - Contributions to IRCu support" );
-	irc_numeric( RPL_VERSION, nick, ":- Adam Rutter (Shmad) - Developer from the 1.0 days to 2.0 Days");
-	irc_numeric( RPL_VERSION, nick, ":- DeadNotBuried - early testing of 3.0, providing patches and feedback and his NeoStats modules" );
+	irc_numeric( RPL_INFO, nick, ":- NeoStats %s Credits ", me.version );
+	irc_numeric( RPL_INFO, nick, ":- Now Maintained by Fish (fish@dynam.ac) and Mark (mark@ctcp.net)" );
+	irc_numeric( RPL_INFO, nick, ":- Previous Authors: Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)" );
+	irc_numeric( RPL_INFO, nick, ":- For Support, you can find us at" );
+	irc_numeric( RPL_INFO, nick, ":- irc.irc-chat.net #NeoStats" );
+	irc_numeric( RPL_INFO, nick, ":- Thanks to:" );
+	irc_numeric( RPL_INFO, nick, ":- Enigma for being part of the dev team" );
+	irc_numeric( RPL_INFO, nick, ":- Stskeeps for writing the best IRCD ever!" );
+	irc_numeric( RPL_INFO, nick, ":- chrisv@b0rked.dhs.org for the Code for Dynamically Loading Modules (Hurrican IRCD)" );
+	irc_numeric( RPL_INFO, nick, ":- monkeyIRCD for the Module Segv Catching code" );
+	irc_numeric( RPL_INFO, nick, ":- the Users of Global-irc.net and Dreaming.org for being our Guinea Pigs!" );
+	irc_numeric( RPL_INFO, nick, ":- Andy For Ideas" );
+	irc_numeric( RPL_INFO, nick, ":- HeadBang for BetaTesting, and Ideas, And Hassling us for Beta Copies" );
+	irc_numeric( RPL_INFO, nick, ":- sre and Jacob for development systems and access" );
+	irc_numeric( RPL_INFO, nick, ":- Error51 for Translating our FAQ and README files" );
+	irc_numeric( RPL_INFO, nick, ":- users and opers of irc.irc-chat.net/org for putting up with our constant coding crashes!" );
+	irc_numeric( RPL_INFO, nick, ":- Eggy for proving to use our code still had bugs when we thought it didn't( and all the bug reports! )" );
+	irc_numeric( RPL_INFO, nick, ":- Hwy - Helping us even though he also has a similar project, and providing solaris porting tips : )" );
+	irc_numeric( RPL_INFO, nick, ":- M - Updating lots of Doco and code and providing lots of great feedback" );
+	irc_numeric( RPL_INFO, nick, ":- J Michael Jones - Giving us Patches to support QuantumIRCd" );
+	irc_numeric( RPL_INFO, nick, ":- Blud - Giving us patches for Mystic IRCd" );
+	irc_numeric( RPL_INFO, nick, ":- herrohr - Giving us patches for Liquid IRCd support" );
+	irc_numeric( RPL_INFO, nick, ":- OvErRiTe - Giving us patches for Viagra IRCd support" );
+	irc_numeric( RPL_INFO, nick, ":- Reed Loden - Contributions to IRCu support" );
+	irc_numeric( RPL_INFO, nick, ":- Adam Rutter (Shmad) - Developer from the 1.0 days to 2.0 Days");
+	irc_numeric( RPL_INFO, nick, ":- DeadNotBuried - early testing of 3.0, providing patches and feedback and his NeoStats modules" );
+	irc_numeric( RPL_ENDOFINFO, nick, ":End of /CREDITS." );
 }
 
 /** @brief 
