@@ -898,7 +898,7 @@ void do_globops( const char *origin, const char *message )
 		{
 			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 			cmdparams->source = c;
-			cmdparams->param = message;
+			cmdparams->param = ( char * )message;
 			SendAllModuleEvent( EVENT_GLOBOPS, cmdparams );
 			ns_free( cmdparams );
 		}
@@ -929,7 +929,7 @@ void do_wallops( const char *origin, const char *message )
 		{
 			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 			cmdparams->source = c;
-			cmdparams->param = message;
+			cmdparams->param = ( char * )message;
 			SendAllModuleEvent( EVENT_WALLOPS, cmdparams );
 			ns_free( cmdparams );
 		}
@@ -960,7 +960,7 @@ void do_chatops( const char *origin, const char *message )
 		{
 			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 			cmdparams->source = c;
-			cmdparams->param = message;
+			cmdparams->param = ( char * )message;
 			SendAllModuleEvent( EVENT_CHATOPS, cmdparams );
 			ns_free( cmdparams );
 		}
