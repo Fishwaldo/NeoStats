@@ -147,6 +147,8 @@ include/exclude.h -text
 include/hash.h eol=lf
 include/helpstrings.h eol=lf
 include/ircd.h eol=lf
+include/ircrecv.h -text
+include/ircsend.h -text
 include/ircstring.h eol=lf
 include/lang.h -text
 include/list.h eol=lf
@@ -519,6 +521,8 @@ src/exclude.c -text
 src/hash.c eol=lf
 src/helpstrings.c eol=lf
 src/ircd.c eol=lf
+src/ircrecv.c -text
+src/ircsend.c -text
 src/ircstring.c eol=lf
 src/keeper.c eol=lf
 src/lang.c -text
