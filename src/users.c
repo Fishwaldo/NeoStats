@@ -24,7 +24,8 @@
 */
 
 #include "neostats.h"
-#include "ircd.h"
+#include "protocol.h"
+#include "ircprotocol.h"
 #include "modes.h"
 #include "users.h"
 #include "channels.h"

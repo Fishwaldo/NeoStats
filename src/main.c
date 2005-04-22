@@ -28,7 +28,7 @@
 
 #include "neostats.h"
 #include "main.h"
-#include "ircd.h"
+#include "ircprotocol.h"
 #include "conf.h"
 #include "log.h"
 #include "sock.h"

@@ -20,8 +20,8 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-#ifndef IRCD_H
-#define IRCD_H
+#ifndef _PROTOCOL_H_
+#define _PROTOCOL_H_
 
 #define NICKPARAM	0x00000001
 #define MODEPARAM	0x00000002
@@ -336,22 +336,10 @@ MODULEFUNC void send_setident( const char *nick, const char *ident );
 MODULEFUNC void send_serverrequptime( const char *source, const char *target );
 MODULEFUNC void send_serverreqversion( const char *source, const char *target );
 
-MODULEFUNC void cloakhost(  char *host  );
-
-int InitIrcd(  void  );
-int irc_connect(  const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink  );
-int irc_nick(  const char *nick, const char *user, const char *host, const char *realname, const char *modes  );
-int irc_server(  const char *name, const int numeric, const char *infoline  );
-int irc_squit(  const char *server, const char *quitmsg  );
-/*int snetinfo_cmd( void );*/
-/*int ssvinfo_cmd( void );*/
-/*int sburst_cmd( int b );*/
-/*int seob_cmd( const char *server );*/
-int irc_smo(  const char *source, const char *umodetarget, const char *msg  );
+MODULEFUNC void cloakhost( char *host );
 
 EXPORTFUNC void send_cmd( char *fmt, ... )__attribute__( ( format( printf, 1, 2 ) ) ); /* 2=format 3=params */
 
 MODULEFUNC int parse (void *notused, void *rline, size_t len);
-int (*irc_parse) (void *notused, void *rline, size_t len);
 
-#endif
+#endif /* _PROTOCOL_H_ */

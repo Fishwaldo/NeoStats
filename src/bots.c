@@ -27,7 +27,8 @@
 
 #include "neostats.h"
 #include "modules.h"
-#include "ircd.h"
+#include "protocol.h"
+#include "ircprotocol.h"
 #include "modes.h"
 #include "services.h"
 #include "commands.h"

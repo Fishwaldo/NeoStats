@@ -34,7 +34,7 @@
 #include "users.h"
 #include "servers.h"
 #include "channels.h"
-#include "ircd.h"
+#include "ircprotocol.h"
 #include "exclude.h"
 #include "services.h"
 #include "bans.h"

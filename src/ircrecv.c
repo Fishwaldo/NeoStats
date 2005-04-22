@@ -22,7 +22,8 @@
 */
 
 #include "neostats.h"
-#include "ircd.h"
+#include "ircprotocol.h"
+#include "protocol.h"
 #include "ircsend.h"
 #include "ircrecv.h"
 #include "main.h"

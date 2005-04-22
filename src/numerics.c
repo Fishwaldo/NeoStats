@@ -22,7 +22,8 @@
 */
 
 #include "neostats.h"
-#include "ircd.h"
+#include "protocol.h"
+#include "ircprotocol.h"
 #include "numerics.h"
 #include "base64.h"
 

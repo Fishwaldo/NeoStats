@@ -38,7 +38,7 @@
 #include "transfer.h"
 #include "curl.h"
 #include "services.h"
-#include "ircd.h"
+#include "ircprotocol.h"
 #include "dcc.h"
 #include "sock.h"
 

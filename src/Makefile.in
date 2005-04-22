@@ -61,7 +61,7 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	channels.$(OBJEXT) commands.$(OBJEXT) confuse.$(OBJEXT) \
 	confuselexer.$(OBJEXT) nsdba.$(OBJEXT) dotconf.$(OBJEXT) \
 	conf.$(OBJEXT) dl.$(OBJEXT) dns.$(OBJEXT) exclude.$(OBJEXT) \
-	hash.$(OBJEXT) ircstring.$(OBJEXT) ircd.$(OBJEXT) \
+	hash.$(OBJEXT) ircstring.$(OBJEXT) ircprotocol.$(OBJEXT) \
 	ircsend.$(OBJEXT) ircrecv.$(OBJEXT) lang.$(OBJEXT) \
 	list.$(OBJEXT) log.$(OBJEXT) main.$(OBJEXT) match.$(OBJEXT) \
 	misc.$(OBJEXT) modules.$(OBJEXT) helpstrings.$(OBJEXT) \
@@ -224,7 +224,7 @@ wi_PWD = @wi_PWD@
 SUBDIRS = dbm protocol
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
 		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircstring.c \
-		ircd.c ircsend.c ircrecv.c \
+		ircprotocol.c ircsend.c ircrecv.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
 		helpstrings.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
@@ -329,7 +329,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exclude.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helpstrings.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircprotocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircrecv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircsend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircstring.Po@am__quote@

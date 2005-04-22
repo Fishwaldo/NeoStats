@@ -146,7 +146,7 @@ include/events.h eol=lf
 include/exclude.h -text
 include/hash.h eol=lf
 include/helpstrings.h eol=lf
-include/ircd.h eol=lf
+include/ircprotocol.h -text
 include/ircrecv.h -text
 include/ircsend.h -text
 include/ircstring.h eol=lf
@@ -161,6 +161,7 @@ include/nsdba.h -text
 include/nsdbm.h -text
 include/numeric.h -text
 include/numerics.h -text
+include/protocol.h -text
 include/servers.h eol=lf
 include/services.h eol=lf
 include/settings.h -text
@@ -520,7 +521,7 @@ src/dotconf.c eol=lf
 src/exclude.c -text
 src/hash.c eol=lf
 src/helpstrings.c eol=lf
-src/ircd.c eol=lf
+src/ircprotocol.c -text
 src/ircrecv.c -text
 src/ircsend.c -text
 src/ircstring.c eol=lf

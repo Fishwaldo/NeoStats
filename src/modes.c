@@ -23,7 +23,8 @@
 
 #include "neostats.h"
 #include "main.h"
-#include "ircd.h"
+#include "protocol.h"
+#include "ircprotocol.h"
 #include "modes.h"
 #include "services.h"
 #include "users.h"

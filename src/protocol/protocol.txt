@@ -23,7 +23,7 @@ Required includes
 A protocol module must include the following files:
 
 #include "neostats.h"
-#include "ircd.h"
+#include "protocol.h"
 
 If you use a protocol specific header file, this should also be 
 included.

@@ -27,7 +27,7 @@
  */
 
 #include "neostats.h"
-#include "ircd.h"
+#include "protocol.h"
 #include "modes.h"
 #include "bots.h"
 #include "users.h"

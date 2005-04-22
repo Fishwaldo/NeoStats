@@ -22,7 +22,8 @@
 */
 
 #include "neostats.h"
-#include "ircd.h"
+#include "ircprotocol.h"
+#include "protocol.h"
 #include "services.h"
 #include "dcc.h"
 #include "users.h"

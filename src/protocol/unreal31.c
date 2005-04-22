@@ -24,7 +24,7 @@
 */
 
 #include "neostats.h"
-#include "ircd.h"
+#include "protocol.h"
 
 /* Messages/Tokens */
 const char MSG_PRIVATE[] = "PRIVMSG";

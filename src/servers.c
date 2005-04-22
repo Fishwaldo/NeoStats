@@ -24,7 +24,7 @@
 */
 
 #include "neostats.h"
-#include "ircd.h"
+#include "protocol.h"
 #include "exclude.h"
 #include "modules.h"
 #include "servers.h"

@@ -213,7 +213,7 @@
 				RelativePath=".\helpstrings.c">
 			</File>
 			<File
-				RelativePath=".\ircd.c">
+				RelativePath=".\ircprotocol.c">
 			</File>
 			<File
 				RelativePath=".\ircrecv.c">
@@ -374,7 +374,7 @@
 				RelativePath="..\include\helpstrings.h">
 			</File>
 			<File
-				RelativePath="..\include\ircd.h">
+				RelativePath="..\include\ircprotocol.h">
 			</File>
 			<File
 				RelativePath="..\include\ircrecv.h">
@@ -417,6 +417,9 @@
 			</File>
 			<File
 				RelativePath="..\include\numerics.h">
+			</File>
+			<File
+				RelativePath="..\include\protocol.h">
 			</File>
 			<File
 				RelativePath="..\..\src\win32\resource.h">
