@@ -210,7 +210,16 @@
 				RelativePath=".\hash.c">
 			</File>
 			<File
+				RelativePath=".\helpstrings.c">
+			</File>
+			<File
 				RelativePath=".\ircd.c">
+			</File>
+			<File
+				RelativePath=".\ircrecv.c">
+			</File>
+			<File
+				RelativePath=".\ircsend.c">
 			</File>
 			<File
 				RelativePath=".\ircstring.c">
@@ -238,9 +247,6 @@
 			</File>
 			<File
 				RelativePath=".\modules.c">
-			</File>
-			<File
-				RelativePath=".\ns_help.c">
 			</File>
 			<File
 				RelativePath=".\nsdba.c">
@@ -365,7 +371,16 @@
 				RelativePath="..\include\hash.h">
 			</File>
 			<File
+				RelativePath="..\include\helpstrings.h">
+			</File>
+			<File
 				RelativePath="..\include\ircd.h">
+			</File>
+			<File
+				RelativePath="..\include\ircrecv.h">
+			</File>
+			<File
+				RelativePath="..\include\ircsend.h">
 			</File>
 			<File
 				RelativePath="..\include\ircstring.h">
@@ -390,9 +405,6 @@
 			</File>
 			<File
 				RelativePath="..\include\neostats.h">
-			</File>
-			<File
-				RelativePath="..\include\ns_help.h">
 			</File>
 			<File
 				RelativePath="..\include\nsdba.h">

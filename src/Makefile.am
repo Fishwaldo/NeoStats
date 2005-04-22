@@ -3,9 +3,10 @@ SUBDIRS = dbm protocol
 bin_PROGRAMS = neostats
 
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
-		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircd.c ircstring.c \
+		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircstring.c \
+		ircd.c ircsend.c ircrecv.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
-		ns_help.c servers.c services.c signals.c sock.c support.c \
+		helpstrings.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
 		base64.c numerics.c settings.c botinfo.c \
 		adnscheck.c adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c \

@@ -25,7 +25,7 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#include "ns_help.h"
+#include "helpstrings.h"
 #include "modules.h"
 #include "services.h"
 #include "ircstring.h"

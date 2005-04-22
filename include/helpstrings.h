@@ -21,8 +21,8 @@
 ** $Id$
 */
 
-#ifndef _NS_HELP_H_
-#define _NS_HELP_H_
+#ifndef _HELPSTRINGS_H_
+#define _HELPSTRINGS_H_
 
 /* ns.c */
 extern const char *ns_help_shutdown[];
@@ -100,4 +100,4 @@ extern const char *cmd_help_version[];
 extern const char *cmd_help_levels[];
 extern const char *cmd_help_set[];
 
-#endif /* _NS_HELP_H_ */
+#endif /* _HELPSTRINGS_H_ */

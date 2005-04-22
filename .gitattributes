@@ -145,6 +145,7 @@ include/dotconf.h eol=lf
 include/events.h eol=lf
 include/exclude.h -text
 include/hash.h eol=lf
+include/helpstrings.h eol=lf
 include/ircd.h eol=lf
 include/ircstring.h eol=lf
 include/lang.h -text
@@ -154,7 +155,6 @@ include/main.h -text
 include/modes.h -text
 include/modules.h -text
 include/neostats.h -text
-include/ns_help.h eol=lf
 include/nsdba.h -text
 include/nsdbm.h -text
 include/numeric.h -text
@@ -517,6 +517,7 @@ src/dns.c eol=lf
 src/dotconf.c eol=lf
 src/exclude.c -text
 src/hash.c eol=lf
+src/helpstrings.c eol=lf
 src/ircd.c eol=lf
 src/ircstring.c eol=lf
 src/keeper.c eol=lf
@@ -529,7 +530,6 @@ src/misc.c eol=lf
 src/modes.c -text
 src/modules.c -text
 src/neostats.vcproj -text
-src/ns_help.c eol=lf
 src/nsdba.c -text
 src/nsmemory.c -text
 src/numerics.c -text

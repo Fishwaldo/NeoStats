@@ -22,7 +22,7 @@
 */
 
 #include "neostats.h"
-#include "ns_help.h"
+#include "helpstrings.h"
 #include "commands.h"
 #include "settings.h"
 

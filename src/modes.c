@@ -30,6 +30,8 @@
 #include "channels.h"
 #include "modules.h"
 
+#define MODE_TABLE_SIZE	256
+
 typedef struct mode_data {
 	unsigned int mask;
 	unsigned int flags;

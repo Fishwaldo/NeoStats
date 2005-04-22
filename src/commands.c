@@ -27,7 +27,7 @@
  */
 
 #include "neostats.h"
-#include "ns_help.h"
+#include "helpstrings.h"
 #include "modules.h"
 #include "services.h"
 #include "commands.h"

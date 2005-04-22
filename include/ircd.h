@@ -23,13 +23,11 @@
 #ifndef IRCD_H
 #define IRCD_H
 
-#define MODE_TABLE_SIZE	256
-
 #define NICKPARAM	0x00000001
 #define MODEPARAM	0x00000002
 #define MULTIPARAM	0x00000004
 
-#define MSGTOK( a ) ( ( ircd_srv.protocol & PROTOCOL_TOKEN )? TOK_##a: MSG_##a )
+#define MSGTOK( a ) ( ( ircd_srv.protocol & PROTOCOL_TOKEN )? TOK_##a : MSG_##a )
 
 typedef void( *ircd_cmd_handler )( char *origin, char **argv, int argc, int srv );
 
@@ -62,10 +60,10 @@ typedef struct ircd_server {
 
 typedef struct ProtocolInfo {
 	/* Minimum protocols that are required * e.g. NOQUIT */
-	const unsigned int minprotocol;
+	const unsigned int required;
 	/* Optional protocols that are negotiated during connection that the
 	 * protocol module supports but will work when not available e.g. SJOIN */
-	const unsigned int optprotocol;
+	const unsigned int options;
 	/* Features provided by this protocol module e.g. USERSMODES support. */
 	const unsigned int features;
 	/* Max host length */
@@ -79,9 +77,9 @@ typedef struct ProtocolInfo {
 	/* Max real name length */
 	const unsigned int maxrealname;
 	/* Max channel name length */
-	const unsigned int chanlen;
+	const unsigned int maxchannelname;
 	/* Max topic length */
-	const unsigned int topiclen;
+	const unsigned int maxtopic;
 	/* Default operator modes for NeoStats service bots */
 	char *services_umode;
 	/* Default channel mode for NeoStats service bots */
@@ -95,13 +93,13 @@ MODULEVAR extern mode_init chan_modes[];
 MODULEVAR extern mode_init user_umodes[];
 MODULEVAR extern mode_init user_smodes[];
 MODULEVAR extern ProtocolInfo protocol_info;
-#endif
+#endif /* NEOSTATSCORE */
 #ifndef OVERRIDECOREMESSAGESUPPORT
 #ifdef NEOSTATSCORE
 #define MSGDEF( msg ) char *msg;
-#else
+#else /* NEOSTATSCORE */
 #define MSGDEF( msg ) MODULEVAR extern const char msg[];
-#endif
+#endif /* NEOSTATSCORE */
 MSGDEF( MSG_PRIVATE );
 MSGDEF( TOK_PRIVATE );
 MSGDEF( MSG_NOTICE );
@@ -217,9 +215,9 @@ EXPORTFUNC void _m_netinfo( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_snetinfo( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_mode( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_svsnick( char *origin, char **argv, int argc, int srv );
-EXPORTFUNC void _m_setname (char *origin, char **argv, int argc, int srv);
-EXPORTFUNC void _m_sethost (char *origin, char **argv, int argc, int srv);
-EXPORTFUNC void _m_setident (char *origin, char **argv, int argc, int srv);
+EXPORTFUNC void _m_setname( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_sethost( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_setident( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_svsjoin( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_svspart( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_globops( char *origin, char **argv, int argc, int srv );
@@ -283,9 +281,9 @@ EXPORTFUNC void do_setname( const char *nick, const char *realname );
 EXPORTFUNC void do_sethost( const char *nick, const char *host );
 EXPORTFUNC void do_setident( const char *nick, const char *ident );
 
-EXPORTFUNC void do_globops( char *origin, char *message );
-EXPORTFUNC void do_wallops( char *origin, char *message );
-EXPORTFUNC void do_chatops( char *origin, char *message );
+EXPORTFUNC void do_globops( const char *origin, const char *message );
+EXPORTFUNC void do_wallops( const char *origin, const char *message );
+EXPORTFUNC void do_chatops( const char *origin, const char *message );
 
 /* Defined in ircd specific files */
 MODULEFUNC void send_privmsg( const char *source, const char *target, const char *buf );
@@ -351,7 +349,7 @@ int irc_squit(  const char *server, const char *quitmsg  );
 /*int seob_cmd( const char *server );*/
 int irc_smo(  const char *source, const char *umodetarget, const char *msg  );
 
-EXPORTFUNC void send_cmd( char *fmt, ... )__attribute__( ( format( printf,1,2 ) ) ); /* 2=format 3=params */
+EXPORTFUNC void send_cmd( char *fmt, ... )__attribute__( ( format( printf, 1, 2 ) ) ); /* 2=format 3=params */
 
 MODULEFUNC int parse (void *notused, void *rline, size_t len);
 int (*irc_parse) (void *notused, void *rline, size_t len);

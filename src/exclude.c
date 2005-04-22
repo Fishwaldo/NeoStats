@@ -33,7 +33,7 @@
 #include "exclude.h"
 #include "services.h"
 #include "ircstring.h"
-#include "ns_help.h"
+#include "helpstrings.h"
 
 int mod_cmd_exclude(CmdParams *cmdparams);
 

@@ -30,7 +30,7 @@
 #include "timer.h"
 #include "commands.h"
 #include "sock.h"
-#include "ns_help.h"
+#include "helpstrings.h"
 #include "users.h"
 #include "servers.h"
 #include "channels.h"
