@@ -180,6 +180,7 @@ protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_setname, _send_setname, "send_setname", &MSG_SETNAME, "MSG_SETNAME", &TOK_SETNAME, "TOK_SETNAME", 0, 0},
 	{( void * )&irc_send_sethost, _send_sethost, "send_sethost", &MSG_SETHOST, "MSG_SETHOST", &TOK_SETHOST, "TOK_SETHOST", 0, 0},
 	{( void * )&irc_send_setident, _send_setident, "send_setident", &MSG_SETIDENT, "MSG_SETIDENT", &TOK_SETIDENT, "TOK_SETIDENT", 0, 0},
+	{( void * )NULL, NULL, NULL, &MSG_CHGHOST, "MSG_CHGHOST", &TOK_CHGHOST, "TOK_CHGHOST", 0, 0},
 	{( void * )&irc_send_cloakhost, NULL, "cloakhost", NULL, NULL, NULL, NULL, 0, 0},
 	{( void * )&irc_send_serverrequptime, NULL, "send_serverrequptime", NULL, NULL, NULL, NULL, 0, 0},
 	{( void * )&irc_send_serverreqversion, NULL, "send_serverreqversion", NULL, NULL, NULL, NULL, 0, 0},

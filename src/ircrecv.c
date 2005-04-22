@@ -100,6 +100,7 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 	{&MSG_SETNAME, &TOK_SETNAME, _m_setname, 0},
 	{&MSG_SETHOST, &TOK_SETHOST, _m_sethost, 0},
 	{&MSG_SETIDENT, &TOK_SETIDENT, _m_setident, 0},
+	{&MSG_CHGHOST, &TOK_CHGHOST, _m_chghost, 0},
 	{&MSG_CHATOPS, &TOK_CHATOPS, _m_chatops, 0},
 	{&MSG_ERROR, &TOK_ERROR, _m_error, 0},
 	{0, 0, 0, 0},
@@ -704,6 +705,25 @@ void _m_setname( char *origin, char **argv, int argc, int srv )
 void _m_sethost( char *origin, char **argv, int argc, int srv )
 {
 	do_sethost( origin, argv[0] );
+}
+
+/** @brief _m_chghost
+ *
+ *  process CHGHOST command
+ *	argv[0] = nick
+ *	argv[1] = host
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_chghost( char *origin, char **argv, int argc, int srv )
+{
+	do_chghost( argv[0], argv[1] );
 }
 
 /** @brief _m_setident
@@ -1828,3 +1848,26 @@ void do_setident( const char *nick, const char *ident )
 		nlog( LOG_WARNING, "do_setident: user %s not found", nick );
 	}
 }
+
+/** @brief 
+ *
+ *  
+ *
+ *  @param 
+ *
+ *  @return none
+ */
+
+void do_chghost( const char *nick, const char *host )
+{
+	Client *u;
+
+	u = FindUser( nick );
+	if( u ) {
+		dlog( DEBUG1, "do_chghost: setting host of user %s to %s", nick, host );
+		strlcpy( u->user->hostname,( char *)host, MAXHOST );
+	} else {
+		nlog( LOG_WARNING, "do_chghost: user %s not found", nick );
+	}
+}
+
