@@ -101,6 +101,8 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 	{&MSG_SETHOST, &TOK_SETHOST, _m_sethost, 0},
 	{&MSG_SETIDENT, &TOK_SETIDENT, _m_setident, 0},
 	{&MSG_CHGHOST, &TOK_CHGHOST, _m_chghost, 0},
+	{&MSG_CHGIDENT, &TOK_CHGIDENT, _m_chgident, 0},
+	{&MSG_CHGNAME, &TOK_CHGNAME, _m_chgname, 0},
 	{&MSG_CHATOPS, &TOK_CHATOPS, _m_chatops, 0},
 	{&MSG_ERROR, &TOK_ERROR, _m_error, 0},
 	{0, 0, 0, 0},
@@ -689,6 +691,25 @@ void _m_setname( char *origin, char **argv, int argc, int srv )
 	do_setname( origin, argv[0] );
 }
 
+/** @brief _m_chgname
+ *
+ *  process CHGNAME command
+ *	argv[0] = nick
+ *	argv[1] = name
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_chgname( char *origin, char **argv, int argc, int srv )
+{
+	do_setname( argv[0], argv[1] );
+}
+
 /** @brief _m_sethost
  *
  *  process SETHOST command
@@ -742,6 +763,25 @@ void _m_chghost( char *origin, char **argv, int argc, int srv )
 void _m_setident( char *origin, char **argv, int argc, int srv )
 {
 	do_setident( origin, argv[0] );
+}
+
+/** @brief _m_chgident
+ *
+ *  process CHGIDENT command
+ *	argv[0] = nick
+ *	argv[1] = ident
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_chgident( char *origin, char **argv, int argc, int srv )
+{
+	do_setident( argv[0], argv[1] );
 }
 
 /** @brief _m_svsjoin
@@ -1871,3 +1911,46 @@ void do_chghost( const char *nick, const char *host )
 	}
 }
 
+/** @brief 
+ *
+ *  
+ *
+ *  @param 
+ *
+ *  @return none
+ */
+
+void do_chgident( const char *nick, const char *ident )
+{
+	Client *u;
+
+	u = FindUser( nick );
+	if( u ) {
+		dlog( DEBUG1, "do_chgident: setting ident of user %s to %s", nick, ident );
+		strlcpy( u->user->username,( char *)ident, MAXHOST );
+	} else {
+		nlog( LOG_WARNING, "do_chgident: user %s not found", nick );
+	}
+}
+
+/** @brief 
+ *
+ *  
+ *
+ *  @param 
+ *
+ *  @return none
+ */
+
+void do_chgname( const char *nick, const char *realname )
+{
+	Client *u;
+
+	u = FindUser( nick );
+	if( u ) {
+		dlog( DEBUG1, "do_chgname: setting realname of user %s to %s", nick, realname );
+		strlcpy( u->info,( char *)realname, MAXHOST );
+	} else {
+		nlog( LOG_WARNING, "do_chgname: user %s not found", nick );
+	}
+}
