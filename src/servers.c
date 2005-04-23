@@ -300,7 +300,7 @@ void RequestServerUptimes (void)
 	while ((sn = hash_scan_next (&ss)) != NULL) {
 		s = hnode_get (sn);
 		if( !IsMe( s ) ) {
-			irc_serverrequptime( ns_botptr->u->name, s->name );
+			irc_stats( ns_botptr->u->name, 'u', s->name );
 		}
 	}
 }

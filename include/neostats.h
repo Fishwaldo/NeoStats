@@ -1205,7 +1205,7 @@ EXPORTFUNC int irc_sethost( const Bot *botptr, const char *host );
 EXPORTFUNC int irc_setident( const Bot *botptr, const char *ident );
 
 /* Other */
-EXPORTFUNC int irc_serverrequptime( const char *source, const char *target );
+EXPORTFUNC int irc_stats( const char *source, const char type, const char *target );
 
 
 int irc_ping( const char *source, const char *reply, const char *to );

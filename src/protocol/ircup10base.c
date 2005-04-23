@@ -352,12 +352,12 @@ void send_svstime( const char *source, const unsigned long ts )
 	send_cmd( "%s %s %lu", server_to_base64( source ), TOK_SETTIME, ts );
 }
 
-void send_serverrequptime( const char *source, const char *target )
+void send_stats( const char *source, const char type, const char *target )
 {
-	send_cmd( "%s %s u :%s", nick_to_base64( source ), TOK_STATS, server_to_base64( target ) );
+	send_cmd( "%s %s %c :%s", nick_to_base64( source ), TOK_STATS, type, server_to_base64( target ) );
 }
 
-void send_serverreqversion( const char *source, const char *target )
+void send_version( const char *source, const char *target )
 {
 	send_cmd( "%s %s %s", server_to_base64( source ), TOK_VERSION, server_to_base64( target ) );
 }

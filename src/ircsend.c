@@ -78,8 +78,12 @@ static void( *irc_send_sqline )( const char *source, const char *mask, const cha
 static void( *irc_send_unsqline )( const char *source, const char *mask );
 static void( *irc_send_sgline )( const char *source, const char *mask, const char *reason );
 static void( *irc_send_unsgline )( const char *source, const char *mask );
+static void( *irc_send_gline )( const char *source, const char *mask, const char *reason );
+static void( *irc_send_remgline )( const char *source, const char *mask );
 static void( *irc_send_zline )( const char *source, const char *mask, const char *reason );
 static void( *irc_send_unzline )( const char *source, const char *mask );
+static void( *irc_send_kline )( const char *source, const char *mask, const char *reason );
+static void( *irc_send_unkline )( const char *source, const char *mask );
 static void( *irc_send_ping )( const char *source, const char *reply, const char *to );
 static void( *irc_send_pong )( const char *reply );
 static void( *irc_send_server )( const char *source, const char *name, const int numeric, const char *infoline );
@@ -96,8 +100,11 @@ static void( *irc_send_svstime )( const char *source, const unsigned long ts );
 static void( *irc_send_setname )( const char *nick, const char *realname );
 static void( *irc_send_sethost )( const char *nick, const char *host );
 static void( *irc_send_setident )( const char *nick, const char *ident );
-static void( *irc_send_serverrequptime )( const char *source, const char *target );
-static void( *irc_send_serverreqversion )( const char *source, const char *target );
+static void( *irc_send_chgname )( const char *source, const char *nick, const char *realname );
+static void( *irc_send_chghost )( const char *source, const char *nick, const char *host );
+static void( *irc_send_chgident )( const char *source, const char *nick, const char *ident );
+static void( *irc_send_stats )( const char *source, const char type, const char *target );
+static void( *irc_send_version )( const char *source, const char *target );
 static void( *irc_send_cloakhost )( char *host );
 
 static void _send_numeric( const char *source, const int numeric, const char *target, const char *buf );
@@ -125,11 +132,29 @@ static void _send_kill( const char *source, const char *target, const char *reas
 static void _send_setname( const char *nick, const char *realname );
 static void _send_sethost( const char *nick, const char *host );
 static void _send_setident( const char *nick, const char *ident );
+static void _send_chgname( const char *source, const char *nick, const char *realname );
+static void _send_chghost( const char *source, const char *nick, const char *host );
+static void _send_chgident( const char *source, const char *nick, const char *ident );
 static void _send_svsnick( const char *source, const char *target, const char *newnick, const unsigned long ts );
 static void _send_svsjoin( const char *source, const char *target, const char *chan );
 static void _send_svspart( const char *source, const char *target, const char *chan );
 static void _send_svsmode( const char *source, const char *target, const char *modes );
+static void _send_svshost( const char *source, const char *who, const char *vhost );
 static void _send_svskill( const char *source, const char *target, const char *reason );
+static void _send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts );
+static void _send_rakill( const char *source, const char *host, const char *ident );
+static void _send_sqline( const char *source, const char *mask, const char *reason );
+static void _send_unsqline( const char *source, const char *mask );
+static void _send_sgline( const char *source, const char *mask, const char *reason );
+static void _send_unsgline( const char *source, const char *mask );
+static void _send_gline( const char *source, const char *mask, const char *reason );
+static void _send_remgline( const char *source, const char *mask );
+static void _send_zline( const char *source, const char *mask, const char *reason );
+static void _send_unzline( const char *source, const char *mask );
+static void _send_kline( const char *source, const char *mask, const char *reason );
+static void _send_unkline( const char *source, const char *mask );
+static void _send_stats( const char *source, const char type, const char *target );
+static void _send_version( const char *source, const char *target );
 
 static char ircd_buf[BUFSIZE];
 
@@ -152,19 +177,23 @@ protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_invite, _send_invite, "send_invite", &MSG_INVITE, "MSG_INVITE", &TOK_INVITE, "TOK_INVITE", 0, 0},
 	{( void * )&irc_send_svskill, _send_svskill, "send_svskill", &MSG_SVSKILL, "MSG_SVSKILL", &TOK_SVSKILL, "TOK_SVSKILL", 0, FEATURE_SVSKILL},
 	{( void * )&irc_send_svsmode, _send_svsmode, "send_svsmode", &MSG_SVSMODE, "MSG_SVSMODE", &TOK_SVSMODE, "TOK_SVSMODE", 0, FEATURE_SVSMODE},
-	{( void * )&irc_send_svshost, NULL, "send_svshost", NULL, NULL, NULL, NULL, 0, FEATURE_SVSHOST},
+	{( void * )&irc_send_svshost, NULL, "send_svshost", &MSG_SVSHOST, "MSG_SVSHOST", &TOK_SVSHOST, "TOK_SVSHOST", 0, FEATURE_SVSHOST},
 	{( void * )&irc_send_svsjoin, _send_svsjoin, "send_svsjoin", &MSG_SVSJOIN, "MSG_SVSJOIN", &TOK_SVSJOIN, "TOK_SVSJOIN", 0, FEATURE_SVSJOIN},
 	{( void * )&irc_send_svspart, _send_svspart, "send_svspart", &MSG_SVSPART, "MSG_SVSPART", &TOK_SVSPART, "TOK_SVSPART", 0, FEATURE_SVSPART},
 	{( void * )&irc_send_svsnick, _send_svsnick, "send_svsnick", &MSG_SVSNICK, "MSG_SVSNICK", &TOK_SVSNICK, "TOK_SVSNICK", 0, FEATURE_SVSNICK},
 	{( void * )&irc_send_swhois, NULL, "send_swhois", NULL, NULL, NULL, NULL, 0, FEATURE_SWHOIS},
 	{( void * )&irc_send_smo, NULL, "send_smo", NULL, NULL, NULL, NULL, 0, FEATURE_SMO},
 	{( void * )&irc_send_svstime, NULL, "send_svstime", NULL, NULL, NULL, NULL, 0, FEATURE_SVSTIME},
-	{( void * )&irc_send_akill, NULL, "send_akill", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )&irc_send_sqline, NULL, "send_sqline", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )&irc_send_unsqline, NULL, "send_unsqline", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )&irc_send_zline, NULL, "send_zline", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )&irc_send_unzline, NULL, "send_unzline", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )&irc_send_rakill, NULL, "send_rakill", NULL, NULL, NULL, NULL, 0, 0},
+	{( void * )&irc_send_akill, NULL, "send_akill", &MSG_AKILL, "MSG_AKILL", &TOK_AKILL, "TOK_AKILL", 0, 0},
+	{( void * )&irc_send_rakill, NULL, "send_rakill", &MSG_RAKILL, "MSG_RAKILL", &TOK_RAKILL, "TOK_RAKILL", 0, 0},
+	{( void * )&irc_send_sqline, NULL, "send_sqline", &MSG_UNSQLINE, "MSG_UNSQLINE", &TOK_UNSQLINE, "TOK_UNSQLINE", 0, 0},
+	{( void * )&irc_send_unsqline, NULL, "send_unsqline", &MSG_SQLINE, "MSG_SQLINE", &TOK_SQLINE, "TOK_SQLINE", 0, 0},
+	{( void * )&irc_send_zline, NULL, "send_zline", &MSG_ZLINE, "MSG_ZLINE", &TOK_ZLINE, "TOK_ZLINE", 0, 0},
+	{( void * )&irc_send_unzline, NULL, "send_unzline", &MSG_UNZLINE, "MSG_UNZLINE", &TOK_UNZLINE, "TOK_UNZLINE", 0, 0},
+	{( void * )&irc_send_kline, NULL, "send_kline", &MSG_KLINE, "MSG_KLINE", &TOK_KLINE, "TOK_KLINE", 0, 0},
+	{( void * )&irc_send_unkline, NULL, "send_unkline", &MSG_UNKLINE, "MSG_UNKLINE", &TOK_UNKLINE, "TOK_UNKLINE", 0, 0},
+	{( void * )&irc_send_gline, NULL, "send_gline", &MSG_GLINE, "MSG_GLINE", &TOK_GLINE, "TOK_GLINE", 0, 0},
+	{( void * )&irc_send_remgline, NULL, "send_remgline", &MSG_REMGLINE, "MSG_REMGLINE", &TOK_REMGLINE, "TOK_REMGLINE", 0, 0},
 	{( void * )&irc_send_ping, _send_ping, "send_ping", &MSG_PING, "MSG_PING", &TOK_PING, "TOK_PING", 0, 0},
 	{( void * )&irc_send_pong, _send_pong, "send_pong", &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", 0, 0},
 	{( void * )&irc_send_server, _send_server, "send_server", &MSG_SERVER, "MSG_SERVER", &TOK_SERVER, "TOK_SERVER", 0, 0},
@@ -180,14 +209,12 @@ protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_setname, _send_setname, "send_setname", &MSG_SETNAME, "MSG_SETNAME", &TOK_SETNAME, "TOK_SETNAME", 0, 0},
 	{( void * )&irc_send_sethost, _send_sethost, "send_sethost", &MSG_SETHOST, "MSG_SETHOST", &TOK_SETHOST, "TOK_SETHOST", 0, 0},
 	{( void * )&irc_send_setident, _send_setident, "send_setident", &MSG_SETIDENT, "MSG_SETIDENT", &TOK_SETIDENT, "TOK_SETIDENT", 0, 0},
-	{( void * )NULL, NULL, NULL, &MSG_CHGHOST, "MSG_CHGHOST", &TOK_CHGHOST, "TOK_CHGHOST", 0, 0},
-	{( void * )NULL, NULL, NULL, &MSG_CHGNAME , "MSG_CHGNAME ", &TOK_CHGNAME , "TOK_CHGNAME ", 0, 0},
-	{( void * )NULL, NULL, NULL, &MSG_CHGIDENT, "MSG_CHGIDENT", &TOK_CHGIDENT, "TOK_CHGIDENT", 0, 0},
+	{( void * )&irc_send_chgname, _send_chgname, "send_chgname", &MSG_CHGNAME, "MSG_CHGNAME", &TOK_CHGNAME , "TOK_CHGNAME", 0, 0},
+	{( void * )&irc_send_chghost, _send_chghost, "send_chghost", &MSG_CHGHOST, "MSG_CHGHOST", &TOK_CHGHOST, "TOK_CHGHOST", 0, FEATURE_SVSHOST},
+	{( void * )&irc_send_chgident, _send_chgident, "send_chgident", &MSG_CHGIDENT, "MSG_CHGIDENT", &TOK_CHGIDENT, "TOK_CHGIDENT", 0, 0},
 	{( void * )&irc_send_cloakhost, NULL, "cloakhost", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )&irc_send_serverrequptime, NULL, "send_serverrequptime", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )&irc_send_serverreqversion, NULL, "send_serverreqversion", NULL, NULL, NULL, NULL, 0, 0},
-	{( void * )NULL, NULL ,NULL, &MSG_STATS, "MSG_STATS", &TOK_STATS, "TOK_STATS", 0, 0 },
-	{( void * )NULL, NULL ,NULL, &MSG_VERSION, "MSG_VERSION", &TOK_VERSION, "TOK_VERSION", 0, 0 },
+	{( void * )&irc_send_stats, _send_stats, "send_stats", &MSG_STATS, "MSG_STATS", &TOK_STATS, "TOK_STATS", 0, 0 },
+	{( void * )&irc_send_version, _send_version, "send_version", &MSG_VERSION, "MSG_VERSION", &TOK_VERSION, "TOK_VERSION", 0, 0 },
 	{( void * )NULL, NULL ,NULL, &MSG_MOTD, "MSG_MOTD", &TOK_MOTD, "TOK_MOTD", 0, 0 },
 	{( void * )NULL, NULL ,NULL, &MSG_ADMIN, "MSG_ADMIN", &TOK_ADMIN, "TOK_ADMIN", 0, 0 },
 	{( void * )NULL, NULL ,NULL, &MSG_CREDITS, "MSG_CREDITS", &TOK_CREDITS, "TOK_CREDITS", 0, 0 },
@@ -381,6 +408,21 @@ static void _send_setident( const char *nick, const char *ident )
 	send_cmd( ":%s %s :%s", nick, MSGTOK( SETIDENT ), ident );
 }
 
+static void _send_chgname( const char *source, const char *nick, const char *realname )
+{
+	send_cmd( ":%s %s %s %s", source, MSGTOK( CHGNAME ), nick, realname );
+}
+
+static void _send_chghost( const char *source, const char *nick, const char *host )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( CHGHOST ), nick, host );
+}
+
+static void _send_chgident( const char *source, const char *nick, const char *ident )
+{
+	send_cmd( ":%s %s :%s", source, MSGTOK( CHGIDENT ), nick, ident );
+}
+
 static void _send_svsnick( const char *source, const char *target, const char *newnick, const unsigned long ts )
 {
 	send_cmd( "%s %s %s :%lu", MSGTOK( SVSNICK ), target, newnick, ts );
@@ -401,9 +443,71 @@ static void _send_svsmode( const char *source, const char *target, const char *m
 	send_cmd( ":%s %s %s %s", source, MSGTOK( SVSMODE ), target, modes );
 }
 
+static void _send_svshost( const char *source, const char *who, const char *vhost )
+{
+}
+
 static void _send_svskill( const char *source, const char *target, const char *reason )
 {
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( SVSKILL ), target, reason );
+	send_cmd( "%s %s %s :%s", source, MSGTOK( SVSKILL ), target, reason );
+}
+
+static void _send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
+{
+}
+
+static void _send_rakill( const char *source, const char *host, const char *ident )
+{
+}
+
+static void _send_sqline( const char *source, const char *mask, const char *reason )
+{
+}
+
+static void _send_unsqline( const char *source, const char *mask )
+{
+}
+
+static void _send_sgline( const char *source, const char *mask, const char *reason )
+{
+}
+
+static void _send_unsgline( const char *source, const char *mask )
+{
+}
+
+static void _send_gline( const char *source, const char *mask, const char *reason )
+{
+}
+
+static void _send_remgline( const char *source, const char *mask )
+{
+}
+
+static void _send_zline( const char *source, const char *mask, const char *reason )
+{
+}
+
+static void _send_unzline( const char *source, const char *mask )
+{
+}
+
+static void _send_kline( const char *source, const char *mask, const char *reason )
+{
+}
+
+static void _send_unkline( const char *source, const char *mask )
+{
+}
+
+static void _send_stats( const char *source, const char type, const char *target )
+{
+	send_cmd(":%s STATS %c %s", source, type, target );
+}
+
+static void _send_version( const char *source, const char *target )
+{
+	send_cmd( ":%s VERSION %s", source, target );
 }
 
 /** @brief send_cmd
@@ -1039,13 +1143,21 @@ int irc_svsmode( const Bot *botptr, Client *target, const char *modes )
 
 int irc_svshost( const Bot *botptr, Client *target, const char *vhost )
 {
-	if( !irc_send_svshost ) {
+	if( irc_send_svshost )
+	{
+		irc_send_svshost( me.name, target->name, vhost );
+	}
+	else if( irc_send_chghost )
+	{
+		irc_send_chghost( me.name, target->name, vhost );
+	}
+	else
+	{
 		unsupported_cmd( "SVSHOST" );
 		return NS_FAILURE;
 	}
 	strlcpy( target->user->vhost, vhost, MAXHOST );
 	target->flags |= CLIENT_FLAG_SETHOST;
-	irc_send_svshost( me.name, target->name, vhost );
 	return NS_SUCCESS;
 }
 
@@ -1309,31 +1421,27 @@ int irc_server( const char *name, const int numeric, const char *infoline )
 	return NS_SUCCESS;
 }
 
-/** @brief irc_serverrequptime
+/** @brief irc_stats
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_serverrequptime( const char *source, const char *target )
+int irc_stats( const char *source, const char type, const char *target )
 {
-	if( irc_send_serverrequptime )
-		irc_send_serverrequptime( source, target );
-	else
-		send_cmd(":%s STATS u %s", source, target );
+	if( irc_send_stats )
+		irc_send_stats( source, type, target );
 	return NS_SUCCESS;
 }
 
-/** @brief irc_serverreqversion
+/** @brief irc_version
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_serverreqversion( const char *source, const char *target )
+int irc_version( const char *source, const char *target )
 {
-	if( irc_send_serverreqversion )
-		irc_send_serverreqversion( source, target );
-	else
-		send_cmd( ":%s VERSION %s", source, target );
+	if( irc_send_version )
+		irc_send_version( source, target );
 	return NS_SUCCESS;
 }
 

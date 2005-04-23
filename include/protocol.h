@@ -188,6 +188,29 @@ MSGDEF( MSG_SVSMODE );
 MSGDEF( TOK_SVSMODE );
 MSGDEF( MSG_SVSKILL );
 MSGDEF( TOK_SVSKILL );
+MSGDEF( MSG_SVSHOST );
+MSGDEF( TOK_SVSHOST );
+MSGDEF( MSG_SQLINE );
+MSGDEF( TOK_SQLINE );
+MSGDEF( MSG_UNSQLINE );
+MSGDEF( TOK_UNSQLINE );
+MSGDEF( MSG_ZLINE );
+MSGDEF( TOK_ZLINE );
+MSGDEF( MSG_UNZLINE );
+MSGDEF( TOK_UNZLINE );
+MSGDEF( MSG_AKILL );
+MSGDEF( TOK_AKILL );
+MSGDEF( MSG_RAKILL );
+MSGDEF( TOK_RAKILL );
+MSGDEF( MSG_KLINE );
+MSGDEF( TOK_KLINE );
+MSGDEF( MSG_UNKLINE );
+MSGDEF( TOK_UNKLINE );
+MSGDEF( MSG_GLINE );
+MSGDEF( TOK_GLINE );
+MSGDEF( MSG_REMGLINE );
+MSGDEF( TOK_REMGLINE );
+
 #endif /* OVERRIDECOREMESSAGESUPPORT */
 
 EXPORTVAR extern ircd_server ircd_srv;
@@ -234,6 +257,16 @@ EXPORTFUNC void _m_wallops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_chatops( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_svinfo( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_eob( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_sqline( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_unsqline( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_zline( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_unzline( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_akill( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_rakill( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_kline( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_unkline( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_gline( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_remgline( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_error( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_ignorecommand( char *origin, char **argv, int argc, int srv );
 
@@ -327,8 +360,12 @@ MODULEFUNC void send_sqline( const char *source, const char *mask, const char *r
 MODULEFUNC void send_unsqline( const char *source, const char *mask );
 MODULEFUNC void send_sgline( const char *source, const char *mask, const char *reason );
 MODULEFUNC void send_unsgline( const char *source, const char *mask );
+MODULEFUNC void send_gline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_remgline( const char *source, const char *mask );
 MODULEFUNC void send_zline( const char *source, const char *mask, const char *reason );
 MODULEFUNC void send_unzline( const char *source, const char *mask );
+MODULEFUNC void send_kline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_unkline( const char *source, const char *mask );
 MODULEFUNC void send_ping( const char *source, const char *reply, const char *target );
 MODULEFUNC void send_pong( const char *reply );
 MODULEFUNC void send_server( const char *source, const char *name, const int numeric, const char *infoline );
@@ -345,8 +382,11 @@ MODULEFUNC void send_svstime( const char *source, const unsigned long ts );
 MODULEFUNC void send_setname( const char *nick, const char *realname );
 MODULEFUNC void send_sethost( const char *nick, const char *host );
 MODULEFUNC void send_setident( const char *nick, const char *ident );
-MODULEFUNC void send_serverrequptime( const char *source, const char *target );
-MODULEFUNC void send_serverreqversion( const char *source, const char *target );
+MODULEFUNC void send_chgname( const char *source, const char *nick, const char *realname );
+MODULEFUNC void send_chghost( const char *source, const char *nick, const char *host );
+MODULEFUNC void send_chgident( const char *source, const char *nick, const char *ident );
+MODULEFUNC void send_stats( const char *source, const char type, const char *target );
+MODULEFUNC void send_version( const char *source, const char *target );
 
 MODULEFUNC void cloakhost( char *host );
 

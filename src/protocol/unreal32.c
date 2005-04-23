@@ -560,6 +560,19 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 	return( tarindex );
 }
 
+int decode_ip( char *buf )
+{
+	int len = strlen( buf );
+	char targ[25];
+	struct in_addr ia;
+
+	b64_decode( buf, targ, 25 );
+	ia = *( struct in_addr * )targ;
+	if( len == 8 )  /* IPv4 */
+		return ia.s_addr;
+	return 0;
+}
+
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 TKLEXT NICKIP CHANMODES=be,kfL,l,psmntirRcOAQKVGCuzNSMT */
@@ -573,32 +586,6 @@ void send_sjoin( const char *source, const char *target, const char *chan, const
 	send_cmd( ":%s %s %lu %s + :%s", source, MSGTOK( SJOIN ), ts, chan, target );
 }
 
-/* m_nick
- *  argv[0] = nickname
- * if from new client
- *  argv[1] = nick password
- * if from server:
- *  argv[1] = hopcount
- *  argv[2] = timestamp
- *  argv[3] = username
- *  argv[4] = hostname
- *  argv[5] = servername
- * if NICK version 1:
- *  argv[6] = servicestamp
- *  argv[7] = info
- * if NICK version 2:
- *  argv[6] = servicestamp
- *  argv[7] = umodes
- *  argv[8] = virthost, * if none
- *  argv[9] = info
- * if NICKIP:
- *  argv[9] = ip
- *  argv[10] = info
- */
-/*
-RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP fwAAAQ== :Mark
-RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP :Mark
-*/
 void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK( NICK ), nick, ts, ident, host, server, newmode, realname );
@@ -612,11 +599,6 @@ void send_smo( const char *source, const char *umodetarget, const char *msg )
 void send_swhois( const char *source, const char *target, const char *swhois )
 {
 	send_cmd( "%s %s :%s", MSGTOK( SWHOIS ), target, swhois );
-}
-
-void send_svshost( const char *source, const char *target, const char *vhost )
-{
-	send_cmd( ":%s %s %s %s", source, MSGTOK( CHGHOST ), target, vhost );
 }
 
 /* akill is gone in the latest Unreals, so we set Glines instead */
@@ -635,14 +617,25 @@ void send_svstime( const char *source, const unsigned long ts )
 	send_cmd( ":%s %s SVSTIME %lu", source, MSGTOK( TSCTL ), ts );
 }
 
-/* m_server
+/** m_server
+ *
+ *  process SERVER command
+ *  RX: SERVER irc.foonet.com 1 :U2305-FinWXOoZE-1 FooNet Server
+ *  SERVER servername hopcount numeric :U<protocol>-flags-numeric serverdesc
  *	argv[0] = servername
  *  argv[1] = hopcount
  *  argv[2] = numeric
  *  argv[3] = serverinfo
- * on old protocols, serverinfo is argv[2], and numeric is left out
+ *  on old protocols, serverinfo is argv[2], and numeric is left out
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
  */
-/*SERVER servername hopcount :U<protocol>-flags-numeric serverdesc*/
+
 static void m_server( char *origin, char **argv, int argc, int srv )
 {
 	char* s = argv[argc-1];
@@ -663,11 +656,22 @@ static void m_server( char *origin, char **argv, int argc, int srv )
 	
 }
 
-/* m_svsmode
+/** m_svsmode
+ *
+ *  process SVSMODE command
+ *  RX:
  *  argv[0] - username to change mode for
  *  argv[1] - modes to change
  *  argv[2] - Service Stamp( if mode == d )
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
  */
+
 static void m_svsmode( char *origin, char **argv, int argc, int srv )
 {
 	if( argv[0][0] == '#' ) {
@@ -677,15 +681,30 @@ static void m_svsmode( char *origin, char **argv, int argc, int srv )
 	}
 }
 
-/* m_umode2
- * argv[0] - modes to change
+/** m_umode2
+ *
+ *  process UMODE2 command
+ *  RX:
+ *  argv[0] - modes to change
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
  */
+
 static void m_umode2( char *origin, char **argv, int argc, int srv )
 {
 	do_mode_user( origin, argv[0] );
 }
 
-/* m_nick
+/** m_nick
+ *
+ *  process NICK command
+ *  RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP fwAAAQ== :Mark
+ *  RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP :Mark
  *  argv[0] = nickname
  * if from new client
  *  argv[1] = nick password
@@ -706,20 +725,14 @@ static void m_umode2( char *origin, char **argv, int argc, int srv )
  * if NICKIP:
  *  argv[9] = ip
  *  argv[10] = info
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
  */
-
-int decode_ip( char *buf )
-{
-	int len = strlen( buf );
-	char targ[25];
-	struct in_addr ia;
-
-	b64_decode( buf, targ, 25 );
-	ia = *( struct in_addr * )targ;
-	if( len == 8 )  /* IPv4 */
-		return ia.s_addr;
-	return 0;
-}
 
 static void m_nick( char *origin, char **argv, int argc, int srv )
 {
@@ -750,15 +763,29 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 	}
 }
 
-/*  EOS
- *  :servername EOS
+/** m_eos
+ *
+ *  process EOS command
+ *  RX: :servername EOS
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
  */
+
 static void m_eos( char *origin, char **argv, int argc, int srv )
 {
 	do_eos( origin );
 }
     
-/* m_sjoin  
+/** m_sjoin
+ *
+ *  process SJOIN command
+ *  RX: ~ 1073861298 #services + <none> :Mark
+ *  MSG_SJOIN creationtime chname    modebuf parabuf :member list
  *  argv[0] = channel timestamp
  *    char *argv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
  *  argv[1] = channel name
@@ -776,29 +803,63 @@ static void m_eos( char *origin, char **argv, int argc, int srv )
  *  argv[3 to argc - 2] = mode parameters
  *  argv[argc - 1] = nick names + modes
  *  "ts parabuf :parv[parc - 1]"	OPT_SJOIN | OPT_SJ3 
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
  */
-/*    MSG_SJOIN creationtime chname    modebuf parabuf :member list */
-/* R: ~         1073861298   #services +       <none>  :Mark */
+
 static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
 	do_sjoin( argv[0], argv[1],( ( argc >= 4 ) ? argv[2] : "" ), origin, argv, argc );
 }
 
-/* m_swhois
+/** m_swhois
+ *
+ *  process SWHOIS command
+ *  RX:
  *  argv[0] = nickname
  *  argv[1] = new swhois
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
  */
+
 static void m_swhois( char *origin, char **argv, int argc, int srv )
 {
 	do_swhois( argv[0], argv[1] );
 }
+
+/** m_smo
+ *
+ *  process SMO command
+ *  RX:
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
 
 static void m_smo( char *origin, char **argv, int argc, int srv )
 {
 	/* TODO */
 }
 
-/*
+/** m_tkl
+ *
+ *  process TKL command
+ *  RX: :server BD + G * mask setter 1074811259 1074206459 :reason
+ *  RX: :server BD + Z * mask setter 0 1070062390 :reason
  *  argv[0]  +|- 
  *  argv[1]  G   
  *  argv[2]  user 
@@ -807,14 +868,16 @@ static void m_smo( char *origin, char **argv, int argc, int srv )
  *  argv[5]  expire_at 
  *  argv[6]  set_at 
  *  argv[7]  reason 
-
-R: :server BD + G * mask setter 1074811259 1074206459 :reason
-R: :server BD + Z * mask setter 0 1070062390 :reason
-R: :server c dos_bot* :Reserved nickname: Dosbot
-*/
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
 
 static void m_tkl( char *origin, char **argv, int argc, int srv )
 {
 	do_tkl( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7] );
 }
-

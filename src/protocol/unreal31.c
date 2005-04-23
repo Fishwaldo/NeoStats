@@ -482,11 +482,6 @@ void send_swhois( const char *source, const char *target, const char *swhois )
 	send_cmd( "%s %s :%s", MSGTOK( SWHOIS ), target, swhois );
 }
 
-void send_svshost( const char *source, const char *target, const char *vhost )
-{
-	send_cmd( ":%s %s %s %s", source, MSGTOK( CHGHOST ), target, vhost );
-}
-
 /* akill is gone in the latest Unreals, so we set Glines instead */
 void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {

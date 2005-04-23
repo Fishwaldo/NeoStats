@@ -30,7 +30,7 @@ int irc_netinfo( const char *source, const char *maxglobalcnt, const unsigned lo
 int irc_snetinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 int irc_vctrl( const int uprot, const int nicklen, const int modex, const int gc, const char *netname );
 int irc_burst( int b );
-int irc_serverreqversion( const char *source, const char *target );
+int irc_version( const char *source, const char *target );
 int irc_svinfo( const int tscurrent, const int tsmin, const unsigned long tsnow );
 
 #endif /* _IRC_SEND_H_ */

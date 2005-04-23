@@ -104,6 +104,16 @@ ircd_cmd_intrinsic intrinsic_cmd_list[] =
 	{&MSG_CHGIDENT, &TOK_CHGIDENT, _m_chgident, 0},
 	{&MSG_CHGNAME, &TOK_CHGNAME, _m_chgname, 0},
 	{&MSG_CHATOPS, &TOK_CHATOPS, _m_chatops, 0},
+	{&MSG_SQLINE, &TOK_SQLINE, _m_sqline, 0},
+	{&MSG_UNSQLINE, &TOK_UNSQLINE, _m_unsqline, 0},
+	{&MSG_ZLINE, &TOK_ZLINE, _m_zline, 0},
+	{&MSG_UNZLINE, &TOK_UNZLINE, _m_unzline, 0},
+	{&MSG_AKILL, &TOK_AKILL, _m_akill, 0},
+	{&MSG_RAKILL, &TOK_RAKILL, _m_rakill, 0},
+	{&MSG_KLINE, &TOK_KLINE, _m_kline, 0},
+	{&MSG_UNKLINE, &TOK_UNKLINE, _m_unkline, 0},
+	{&MSG_GLINE, &TOK_GLINE, _m_gline, 0},
+	{&MSG_REMGLINE, &TOK_REMGLINE, _m_remgline, 0},
 	{&MSG_ERROR, &TOK_ERROR, _m_error, 0},
 	{0, 0, 0, 0},
 };
@@ -862,6 +872,198 @@ void _m_eob( char *origin, char **argv, int argc, int srv )
 {
 	irc_eob( me.name );
 	do_synch_neostats( );
+}
+
+/** @brief _m_sqline
+ *
+ *  process SQLINE command
+ *  RX: :server c dos_bot* :Reserved nickname: Dosbot
+ *  SQLINE
+ *  argv[0] - mask
+ *  argv[1] - reason
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_sqline( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_unsqline
+ *
+ *  process UNSQLINE command
+ *  RX: 
+ *  UNSQLINE
+ *  argv[0] - mask
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_unsqline( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_zline
+ *
+ *  process ZLINE command
+ *  RX: 
+ *  ZLINE
+ *  argv[0] - mask
+ *  argv[1] - reason
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_zline( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_unzline
+ *
+ *  process UNZLINE command
+ *  RX: 
+ *  UNZLINE
+ *  argv[0] - mask
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_unzline( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_akill
+ *
+ *  process AKILL command
+ *  RX: 
+ *  AKILL
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_akill( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_rakill
+ *
+ *  process RAKILL command
+ *  RX: 
+ *  RAKILL
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_rakill( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_kline
+ *
+ *  process KLINE command
+ *  RX: 
+ *  KLINE
+ *  argv[0] - mask
+ *  argv[1] - reason
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_kline( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_unkline
+ *
+ *  process UNKLINE command
+ *  RX: 
+ *  UNKLINE
+ *  argv[0] - mask
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_unkline( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_gline
+ *
+ *  process GLINE command
+ *  RX: 
+ *  GLINE
+ *  argv[0] - mask
+ *  argv[1] - reason
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_gline( char *origin, char **argv, int argc, int srv )
+{
+}
+
+/** @brief _m_remgline
+ *
+ *  process REMGLINE command
+ *  RX: 
+ *  REMGLINE
+ *  argv[0] - mask
+ *
+ *  @param origin source of message (user/server)
+ *  @param av list of message parameters
+ *  @param ac parameter count
+ *  @param cmdptr command flag
+ *
+ *  @return none
+ */
+
+void _m_remgline( char *origin, char **argv, int argc, int srv )
+{
 }
 
 /** @brief _m_notice
@@ -1723,7 +1925,7 @@ void do_server( const char *name, const char *uplink, const char *hops, const ch
 	} else {
 		AddServer( name, uplink, hops, numeric, infoline );
 	}
-	irc_serverreqversion( me.name, name );
+	irc_version( me.name, name );
 }
 
 /** @brief 
@@ -1954,3 +2156,21 @@ void do_chgname( const char *nick, const char *realname )
 		nlog( LOG_WARNING, "do_chgname: user %s not found", nick );
 	}
 }
+
+/** @brief 
+ *
+ *  
+ *
+ *  @param 
+ *
+ *  @return none
+ */
+
+MODULEFUNC void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts );
+MODULEFUNC void send_rakill( const char *source, const char *host, const char *ident );
+MODULEFUNC void send_sqline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_unsqline( const char *source, const char *mask );
+MODULEFUNC void send_sgline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_unsgline( const char *source, const char *mask );
+MODULEFUNC void send_zline( const char *source, const char *mask, const char *reason );
+MODULEFUNC void send_unzline( const char *source, const char *mask );

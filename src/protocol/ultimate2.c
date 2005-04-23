@@ -448,11 +448,6 @@ void send_vctrl( const int uprot, const int nicklen, const int modex, const int 
 	send_cmd( "%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname );
 }
 
-void send_svshost( const char *source, const char *target, const char *vhost )
-{
-	send_cmd( ":%s %s %s %s", source, MSG_CHGHOST, target, vhost );
-}
-
 void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
 	send_cmd( ":%s %s %s@%s %lu %lu %s :%s", source, MSG_GLINE, ident, host,( ts + length ), ts, setby, reason );
