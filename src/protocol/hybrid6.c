@@ -98,11 +98,29 @@ const char MSG_RESV[] = "RESV";
 const char MSG_UNRESV[] = "UNRESV";
 
 /* Umodes */
+#define UMODE_SERVNOTICE   0x00000000 /* server notices such as kill */
+#define UMODE_REJ          0x00000000 /* Bot Rejections */
+#define UMODE_SKILL        0x00000000 /* Server Killed */
+#define UMODE_FULL         0x00080000 /* Full messages */
+#define UMODE_SPY          0x00100000 /* see STATS / LINKS */
+#define UMODE_DEBUG        0x00200000 /* 'debugging' info */
+#define UMODE_NCHANGE      0x00400000 /* Nick change notice */
+#define UMODE_OPERWALL     0x00800000 /* Operwalls */
+#define UMODE_BOTS         0x01000000 /* shows bots */
+#define UMODE_EXTERNAL     0x02000000 /* show servers introduced and splitting */
+#define UMODE_CALLERID     0x04000000 /* block unless caller id's */
+#define UMODE_UNAUTH       0x08000000 /* show unauth connects here */
+#define UMODE_STATSPHIDE   0x10000000 /* Oper hides from stats P */
+#define UMODE_OSPYLOG      0x20000000 /* show Oper Spy being used */
+#define UMODE_UNIDLE       0x40000000 /* Hide idle time with umode +u */
+#define UMODE_LOCOPS       0x80000000 /* Oper see's LOCOPS */
  
 /* Cmodes */
+#define CMODE_EXCEPTION  0x0800
+#define CMODE_DENY       0x1000
 
-/* static void m_server( char *origin, char **argv, int argc, int srv ); */
-/* static void m_nick( char *origin, char **argv, int argc, int srv ); */
+static void m_server( char *origin, char **argv, int argc, int srv );
+static void m_nick( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
 {
@@ -136,6 +154,8 @@ ProtocolInfo protocol_info =
 ircd_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
+	{MSG_SERVER, 0, m_server, 0},
+	{MSG_NICK, 0, m_nick, 0},
 	{0, 0, 0, 0},
 };
 
@@ -153,3 +173,52 @@ mode_init user_umodes[] =
 {
 	{0, 0},
 };
+
+void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
+{
+	send_cmd( "%s %s :TS", MSG_PASS, pass );
+	/* CAP QS ZIP EX CHW KNOCK KLN UNKLN CLUSTER ENCAP IE */
+	send_cmd( "CAPAB :EX CHW IE KLN KNOCK" );
+	send_cmd( "%s %s :%s", MSG_SERVER, name, infoline );
+}
+
+void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
+{
+	send_cmd( "%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, ts, newmode, ident, host, server, realname );
+}
+
+/*  m_nick
+ *   RX: SERVER servername 1 :hybrid6server
+ *   argv[0] = servername
+ *   argv[1] = hopcount
+ *   argv[2] = serverinfo
+ */
+
+static void m_server( char *origin, char **argv, int argc, int srv )
+{
+	do_server( argv[0], origin, argv[1], NULL, argv[2], srv );
+	if( !srv )
+		do_synch_neostats();
+}
+
+/*  m_nick
+ *   argv[0] = nickname
+ *   argv[1] = optional hopcount when new user; TS when nick change
+ *   argv[2] = optional TS
+ *   argv[3] = optional umode
+ *   argv[4] = optional username
+ *   argv[5] = optional hostname
+ *   argv[6] = optional server
+ *   argv[7] = optional ircname
+ */
+
+static void m_nick( char *origin, char **argv, int argc, int srv )
+{
+	if( !srv ) {
+		do_nick( argv[0], argv[1], argv[2], argv[4], argv[5], argv[6], 
+			NULL, NULL, argv[3], NULL, argv[7], NULL, NULL );
+	} else {
+		do_nickchange( origin, argv[0], argv[1] );
+	}
+}
+

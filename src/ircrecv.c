@@ -871,7 +871,7 @@ void _m_svinfo( char *origin, char **argv, int argc, int srv )
 void _m_eob( char *origin, char **argv, int argc, int srv )
 {
 	irc_eob( me.name );
-	do_synch_neostats( );
+	do_synch_neostats();
 }
 
 /** @brief _m_sqline
