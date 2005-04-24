@@ -1,11 +1,15 @@
-pkglib_LTLIBRARIES	= bahamut14.la bahamut18.la client.la hybrid7.la \
+pkglib_LTLIBRARIES	= bahamut14.la bahamut18.la \
+						client.la \
+						hybrid6.la hybrid7.la \
 						ircup10.la asuka.la nefarious.la \
 						plexus.la \
-						ultimate2.la ultimate3.la unreal31.la unreal32.la
+						ultimate2.la ultimate3.la \
+						unreal31.la unreal32.la
 bahamut14_la_SOURCES = bahamut14.c
 bahamut18_la_SOURCES = bahamut18.c
 client_la_SOURCES = client.c
 hybrid7_la_SOURCES = hybrid7.c
+hybrid6_la_SOURCES = hybrid6.c
 ircup10_la_SOURCES = ircup10.c
 asuka_la_SOURCES = asuka.c
 nefarious_la_SOURCES = nefarious.c

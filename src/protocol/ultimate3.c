@@ -25,7 +25,6 @@
 
 #include "neostats.h"
 #include "protocol.h"
-#include "services.h"
 
 /* Messages/Tokens */
 const char MSG_PRIVATE[] = "PRIVMSG";	/* PRIV */

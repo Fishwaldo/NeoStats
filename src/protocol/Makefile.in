@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(nefarious_la_SOURCES) $(plexus_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
+SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(nefarious_la_SOURCES) $(plexus_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -73,6 +73,9 @@ bahamut18_la_OBJECTS = $(am_bahamut18_la_OBJECTS)
 client_la_LIBADD =
 am_client_la_OBJECTS = client.lo
 client_la_OBJECTS = $(am_client_la_OBJECTS)
+hybrid6_la_LIBADD =
+am_hybrid6_la_OBJECTS = hybrid6.lo
+hybrid6_la_OBJECTS = $(am_hybrid6_la_OBJECTS)
 hybrid7_la_LIBADD =
 am_hybrid7_la_OBJECTS = hybrid7.lo
 hybrid7_la_OBJECTS = $(am_hybrid7_la_OBJECTS)
@@ -108,16 +111,18 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 CCLD = $(CC)
 SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) \
 	$(bahamut18_la_SOURCES) $(client_la_SOURCES) \
-	$(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) \
-	$(nefarious_la_SOURCES) $(plexus_la_SOURCES) \
-	$(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) \
-	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
+	$(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) \
+	$(ircup10_la_SOURCES) $(nefarious_la_SOURCES) \
+	$(plexus_la_SOURCES) $(ultimate2_la_SOURCES) \
+	$(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) \
+	$(unreal32_la_SOURCES)
 DIST_SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) \
 	$(bahamut18_la_SOURCES) $(client_la_SOURCES) \
-	$(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) \
-	$(nefarious_la_SOURCES) $(plexus_la_SOURCES) \
-	$(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) \
-	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
+	$(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) \
+	$(ircup10_la_SOURCES) $(nefarious_la_SOURCES) \
+	$(plexus_la_SOURCES) $(ultimate2_la_SOURCES) \
+	$(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) \
+	$(unreal32_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -243,15 +248,19 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 wi_PWD = @wi_PWD@
-pkglib_LTLIBRARIES = bahamut14.la bahamut18.la client.la hybrid7.la \
+pkglib_LTLIBRARIES = bahamut14.la bahamut18.la \
+						client.la \
+						hybrid6.la hybrid7.la \
 						ircup10.la asuka.la nefarious.la \
 						plexus.la \
-						ultimate2.la ultimate3.la unreal31.la unreal32.la
+						ultimate2.la ultimate3.la \
+						unreal31.la unreal32.la
 
 bahamut14_la_SOURCES = bahamut14.c
 bahamut18_la_SOURCES = bahamut18.c
 client_la_SOURCES = client.c
 hybrid7_la_SOURCES = hybrid7.c
+hybrid6_la_SOURCES = hybrid6.c
 ircup10_la_SOURCES = ircup10.c
 asuka_la_SOURCES = asuka.c
 nefarious_la_SOURCES = nefarious.c
@@ -323,6 +332,8 @@ bahamut18.la: $(bahamut18_la_OBJECTS) $(bahamut18_la_DEPENDENCIES)
 	$(LINK) -rpath $(pkglibdir) $(bahamut18_la_LDFLAGS) $(bahamut18_la_OBJECTS) $(bahamut18_la_LIBADD) $(LIBS)
 client.la: $(client_la_OBJECTS) $(client_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(client_la_LDFLAGS) $(client_la_OBJECTS) $(client_la_LIBADD) $(LIBS)
+hybrid6.la: $(hybrid6_la_OBJECTS) $(hybrid6_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(hybrid6_la_LDFLAGS) $(hybrid6_la_OBJECTS) $(hybrid6_la_LIBADD) $(LIBS)
 hybrid7.la: $(hybrid7_la_OBJECTS) $(hybrid7_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(hybrid7_la_LDFLAGS) $(hybrid7_la_OBJECTS) $(hybrid7_la_LIBADD) $(LIBS)
 ircup10.la: $(ircup10_la_OBJECTS) $(ircup10_la_DEPENDENCIES) 
@@ -350,6 +361,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut14.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut18.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hybrid6.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hybrid7.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircup10.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nefarious.Plo@am__quote@

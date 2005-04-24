@@ -551,6 +551,8 @@ src/protocol/bahamut18.c -text
 src/protocol/bahamut18.vcproj -text
 src/protocol/client.c -text
 src/protocol/client.vcproj -text
+src/protocol/hybrid6.c -text
+src/protocol/hybrid6.vcproj -text
 src/protocol/hybrid7.c eol=lf
 src/protocol/hybrid7.vcproj -text
 src/protocol/ircup10.c eol=lf
