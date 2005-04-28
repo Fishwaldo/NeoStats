@@ -26,7 +26,7 @@
 #include "ctcp.h"
 #include "dcc.h"
 
-typedef int (*ctcp_cmd_handler) (CmdParams* cmdparams);
+typedef int( *ctcp_cmd_handler )( CmdParams* cmdparams );
 
 typedef struct ctcp_cmd {
 	const char* cmd;
@@ -34,17 +34,17 @@ typedef struct ctcp_cmd {
 	ctcp_cmd_handler rpl_handler;
 } ctcp_cmd;
 
-static int ctcp_req_version (CmdParams* cmdparams);
-static int ctcp_rpl_version (CmdParams* cmdparams);
-static int ctcp_req_finger (CmdParams* cmdparams);
-static int ctcp_rpl_finger (CmdParams* cmdparams);
-static int ctcp_req_action (CmdParams* cmdparams);
-static int ctcp_req_dcc (CmdParams* cmdparams);
-static int ctcp_rpl_dcc (CmdParams* cmdparams);
-static int ctcp_req_time (CmdParams* cmdparams);
-static int ctcp_rpl_time (CmdParams* cmdparams);
-static int ctcp_req_ping (CmdParams* cmdparams);
-static int ctcp_rpl_ping (CmdParams* cmdparams);
+static int ctcp_req_version( CmdParams* cmdparams );
+static int ctcp_rpl_version( CmdParams* cmdparams );
+static int ctcp_req_finger( CmdParams* cmdparams );
+static int ctcp_rpl_finger( CmdParams* cmdparams );
+static int ctcp_req_action( CmdParams* cmdparams );
+static int ctcp_req_dcc( CmdParams* cmdparams );
+static int ctcp_rpl_dcc( CmdParams* cmdparams );
+static int ctcp_req_time( CmdParams* cmdparams );
+static int ctcp_rpl_time( CmdParams* cmdparams );
+static int ctcp_req_ping( CmdParams* cmdparams );
+static int ctcp_rpl_ping( CmdParams* cmdparams );
 
 static ctcp_cmd ctcp_cmds[]= {
 	{"VERSION",	ctcp_req_version,	ctcp_rpl_version },
@@ -56,11 +56,11 @@ static ctcp_cmd ctcp_cmds[]= {
 	{NULL, NULL, NULL}
 };
 
-static void strip_ctcp_codes (char *line)
+static void strip_ctcp_codes( char *line )
 {
 	char *outline = line;
-	while (*line) {
-		if ((*line) == 1) {
+	while( *line ) {
+		if( (*line ) == 1 ) {
 			line++;
 		} else {
 			*outline = *line;
@@ -71,21 +71,21 @@ static void strip_ctcp_codes (char *line)
 	*outline = 0;
 }
 
-int ctcp_private (CmdParams *cmdparams)
+int ctcp_private( CmdParams *cmdparams )
 {
 	ctcp_cmd* cmd;
 	int len;
     
-	if (cmdparams->param[0] == '\1') {
-		strip_ctcp_codes (cmdparams->param);
+	if( cmdparams->param[0] == '\1' ) {
+		strip_ctcp_codes( cmdparams->param );
 		cmd = ctcp_cmds;
-		while (cmd->cmd) {	
-			len = strlen (cmd->cmd);
-			if ( ircstrncasecmp (cmd->cmd, cmdparams->param, len ) == 0)
+		while( cmd->cmd ) {	
+			len = strlen( cmd->cmd );
+			if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )
 			{
-				cmdparams->param += (len + 1);		
-				if (cmd->req_handler) {
-					cmd->req_handler (cmdparams);
+				cmdparams->param +=( len + 1 );		
+				if( cmd->req_handler ) {
+					cmd->req_handler( cmdparams );
 				}
 				return NS_SUCCESS;
 			}
@@ -95,21 +95,21 @@ int ctcp_private (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-int ctcp_notice (CmdParams *cmdparams)
+int ctcp_notice( CmdParams *cmdparams )
 {
 	ctcp_cmd* cmd;
 	int len;
     
-	if (cmdparams->param[0] == '\1') {
-		strip_ctcp_codes (cmdparams->param);
+	if( cmdparams->param[0] == '\1' ) {
+		strip_ctcp_codes( cmdparams->param );
 		cmd = ctcp_cmds;
-		while (cmd->cmd) {	
-			len = strlen (cmd->cmd);
-			if ( ircstrncasecmp (cmd->cmd, cmdparams->param, len ) == 0)
+		while( cmd->cmd ) {	
+			len = strlen( cmd->cmd );
+			if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )
 			{
-				cmdparams->param += (len + 1);		
-				if (cmd->rpl_handler) {
-					cmd->rpl_handler (cmdparams);
+				cmdparams->param +=( len + 1 );		
+				if( cmd->rpl_handler ) {
+					cmd->rpl_handler( cmdparams );
 				}
 				return NS_SUCCESS;
 			}
@@ -119,126 +119,126 @@ int ctcp_notice (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-int ctcp_cprivate (CmdParams *cmdparams)
+int ctcp_cprivate( CmdParams *cmdparams )
 {
-	dlog (DEBUG5, "Channel CTCP requests currently not supported");
+	dlog( DEBUG5, "Channel CTCP requests currently not supported" );
 	return NS_SUCCESS;
 }
 
-int ctcp_cnotice (CmdParams *cmdparams)
+int ctcp_cnotice( CmdParams *cmdparams )
 {
-	dlog (DEBUG5, "Channel CTCP replies currently not supported");
+	dlog( DEBUG5, "Channel CTCP replies currently not supported" );
 	return NS_SUCCESS;
 }
 
-static int ctcp_req_version (CmdParams* cmdparams)
+static int ctcp_req_version( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP VERSION request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPVERSIONREQ, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP VERSION request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPVERSIONREQ, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-static int ctcp_rpl_version (CmdParams* cmdparams)
+static int ctcp_rpl_version( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP VERSION reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPVERSIONRPL, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP VERSION reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_version_req (Bot* botptr, Client* target) 
+int irc_ctcp_version_req( Bot* botptr, Client* target ) 
 {
-	dlog (DEBUG5, "Sending CTCP VERSION request from %s to %s", botptr->name, target->name);
-	irc_privmsg (botptr, target, "\1VERSION\1");
+	dlog( DEBUG5, "TX: CTCP VERSION request from %s to %s", botptr->name, target->name );
+	irc_privmsg( botptr, target, "\1VERSION\1" );
 	return NS_SUCCESS;
 }
 
-static int ctcp_req_finger (CmdParams* cmdparams)
+static int ctcp_req_finger( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP FINGER request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPFINGERREQ, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP FINGER request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPFINGERREQ, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-static int ctcp_rpl_finger (CmdParams* cmdparams)
+static int ctcp_rpl_finger( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP FINGER reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPFINGERRPL, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP FINGER reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPFINGERRPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_finger_req (Bot* botptr, Client* target) 
+int irc_ctcp_finger_req( Bot* botptr, Client* target ) 
 {
-	dlog (DEBUG5, "Sending CTCP FINGER request from %s to %s", botptr->name, target->name);
-	irc_privmsg (botptr, target, "\1FINGER\1");
+	dlog( DEBUG5, "TX: CTCP FINGER request from %s to %s", botptr->name, target->name );
+	irc_privmsg( botptr, target, "\1FINGER\1" );
 	return NS_SUCCESS;
 }
 
-static int ctcp_req_action (CmdParams* cmdparams)
+static int ctcp_req_action( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP ACTION request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPACTIONREQ, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP ACTION request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPACTIONREQ, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_action_req (Bot* botptr, Client* target, const char *action) 
+int irc_ctcp_action_req( Bot* botptr, Client* target, const char *action ) 
 {
-	dlog (DEBUG5, "Sending CTCP ACTION request from %s to %s", botptr->name, target->name);
-	irc_privmsg (botptr, target, "\1ACTION %s\1", action);
+	dlog( DEBUG5, "TX: Sending CTCP ACTION request from %s to %s", botptr->name, target->name );
+	irc_privmsg( botptr, target, "\1ACTION %s\1", action );
 	return NS_SUCCESS;
 }
 
-static int ctcp_req_dcc (CmdParams* cmdparams)
+static int ctcp_req_dcc( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP DCC request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	dcc_req(cmdparams);
+	dlog( DEBUG5, "RX: CTCP DCC request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	dcc_req( cmdparams  );
 	return NS_SUCCESS;
 }
 
-static int ctcp_rpl_dcc (CmdParams* cmdparams)
+static int ctcp_rpl_dcc( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP DCC reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	dlog (DEBUG5, "CTCP DCC replies currently not supported");
+	dlog( DEBUG5, "RX: CTCP DCC reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	dlog( DEBUG5, "CTCP DCC replies currently not supported" );
 	return NS_SUCCESS;
 }
 
-static int ctcp_req_time (CmdParams* cmdparams)
+static int ctcp_req_time( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP TIME request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPTIMEREQ, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP TIME request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPTIMEREQ, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-static int ctcp_rpl_time (CmdParams* cmdparams)
+static int ctcp_rpl_time( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP TIME reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPTIMERPL, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP TIME reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPTIMERPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_time_req (Bot* botptr, Client* target) 
+int irc_ctcp_time_req( Bot* botptr, Client* target ) 
 {
-	dlog (DEBUG5, "Sending CTCP TIME request from %s to %s", botptr->name, target->name);
-	irc_privmsg (botptr, target, "\1TIME\1");
+	dlog( DEBUG5, "TX: CTCP TIME request from %s to %s", botptr->name, target->name );
+	irc_privmsg( botptr, target, "\1TIME\1" );
 	return NS_SUCCESS;
 }
 
-static int ctcp_req_ping (CmdParams* cmdparams)
+static int ctcp_req_ping( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP PING request from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPPINGREQ, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP PING request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPPINGREQ, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-static int ctcp_rpl_ping (CmdParams* cmdparams)
+static int ctcp_rpl_ping( CmdParams* cmdparams )
 {
-	dlog (DEBUG5, "CTCP PING reply from %s to %s", cmdparams->source->name, cmdparams->bot->name);
-	SendModuleEvent (EVENT_CTCPPINGRPL, cmdparams, cmdparams->bot->moduleptr);
+	dlog( DEBUG5, "RX: CTCP PING reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPPINGRPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_ping_req (Bot* botptr, Client* target) 
+int irc_ctcp_ping_req( Bot* botptr, Client* target ) 
 {
-	dlog (DEBUG5, "Sending CTCP PING request from %s to %s", botptr->name, target->name);
-	irc_privmsg (botptr, target, "\1PING\1");
+	dlog( DEBUG5, "TX: CTCP PING request from %s to %s", botptr->name, target->name );
+	irc_privmsg( botptr, target, "\1PING\1" );
 	return NS_SUCCESS;
 }

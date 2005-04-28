@@ -400,6 +400,9 @@ modules/ircdauth/Makefile.in -text
 modules/ircdauth/ircdauth.c -text
 modules/ircdauth/ircdauth.vcproj -text
 modules/modules.txt -text
+modules/nstest/Makefile.am -text
+modules/nstest/main.c -text
+modules/nstest/nstest.vcproj -text
 modules/operlog/Makefile.am -text
 modules/operlog/Makefile.in -text
 modules/operlog/help.c -text

@@ -1276,13 +1276,13 @@ int irc_svsnick( const Bot *botptr, Client *target, const char *newnick )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_smo( const char *from, const char *umodetarget, const char *msg )
+int irc_smo( const char *source, const char *umodetarget, const char *msg )
 {
 	if( !irc_send_smo ) {
 		unsupported_cmd( "SMO" );
 		return NS_FAILURE;
 	}
-	irc_send_smo( from, umodetarget, msg );
+	irc_send_smo( source, umodetarget, msg );
 	return NS_SUCCESS;
 }
 
@@ -1431,13 +1431,13 @@ int irc_unzline( const Bot *botptr, const char *mask )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_ping( const char *from, const char *reply, const char *to )
+int irc_ping( const char *source, const char *reply, const char *to )
 {
 	if( !irc_send_ping ) {
 		unsupported_cmd( "PING" );
 		return NS_FAILURE;
 	}
-	irc_send_ping( from, reply, to );
+	irc_send_ping( source, reply, to );
 	return NS_SUCCESS;
 }
 
@@ -1478,8 +1478,11 @@ int irc_server( const char *name, const int numeric, const char *infoline )
 
 int irc_stats( const char *source, const char type, const char *target )
 {
-	if( irc_send_stats )
-		irc_send_stats( source, type, target );
+	if( !irc_send_stats ) {
+		unsupported_cmd( "STATS" );
+		return NS_FAILURE;
+	}
+	irc_send_stats( source, type, target );
 	return NS_SUCCESS;
 }
 
@@ -1490,8 +1493,11 @@ int irc_stats( const char *source, const char type, const char *target )
 
 int irc_version( const char *source, const char *target )
 {
-	if( irc_send_version )
-		irc_send_version( source, target );
+	if( !irc_send_version ) {
+		unsupported_cmd( "VERSION" );
+		return NS_FAILURE;
+	}
+	irc_send_version( source, target );
 	return NS_SUCCESS;
 }
 

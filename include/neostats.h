@@ -1233,6 +1233,8 @@ EXPORTFUNC int irc_ctcp_finger_req( Bot *botptr, Client *target );
 
 EXPORTFUNC int irc_ctcp_action_req( Bot *botptr, Client *target, const char *action );
 
+EXPORTFUNC int irc_ctcp_time_req( Bot* botptr, Client* target );
+
 /* users.c */
 EXPORTFUNC Client *FindUser( const char *nick );
 EXPORTFUNC int UserLevel( Client *u );
