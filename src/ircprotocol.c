@@ -50,7 +50,7 @@ ircd_server ircd_srv;
 static char protocol_path[MAXPATH];
 ProtocolInfo *protocol_info;
 void *protocol_module_handle;
-ircd_cmd *cmd_list;
+irc_cmd *cmd_list;
 
 /** @brief process ircd commands
  *
@@ -63,7 +63,7 @@ ircd_cmd *cmd_list;
 
 EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av, int ac )
 {
-	ircd_cmd *ircd_cmd_ptr;
+	irc_cmd *ircd_cmd_ptr;
 	ircd_cmd_intrinsic *intrinsic_cmd_ptr;
 
 	SET_SEGV_LOCATION();
@@ -125,7 +125,7 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av
  *  @return none
  */
 
-int parse(void *arg,  void *rline, size_t len )
+int parse( void *arg, void *rline, size_t len )
 {
 	char origin[64], cmd[64], *coreLine;
 	char *line = (char *)rline;
@@ -171,6 +171,65 @@ int parse(void *arg,  void *rline, size_t len )
 	return NS_SUCCESS;
 }
 
+/* :<source> <command> <param1> <paramN> :<last parameter> */
+/* <source> <command> <param1> <paramN> :<last parameter> */
+int parsep10( void *notused, void *rline, size_t len )
+{
+	char origin[64], cmd[64], *coreLine;
+	char *line =( char * )rline;
+	int cmdptr = 0;
+	int ac = 0;
+	char **av = NULL;
+
+	SET_SEGV_LOCATION();
+	if( !( *line ) )
+		return NS_FAILURE;
+	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
+	dlog( DEBUGRX, "%s", line );
+	coreLine = strpbrk( line, " " );
+	if( coreLine ) {
+		*coreLine = 0;
+		while( isspace( *++coreLine ) );
+	} else
+		coreLine = line + strlen( line );
+	if( ( !ircstrcasecmp( line, "SERVER" ) ) ||( !ircstrcasecmp( line, "PASS" ) ) ) {
+		strlcpy( cmd, line, sizeof( cmd ) );
+		dlog( DEBUG1, "cmd   : %s", cmd );
+		dlog( DEBUG1, "args  : %s", coreLine );
+		ac = ircsplitbuf( coreLine, &av, 1 );
+		cmdptr = 2;
+		dlog( DEBUG1, "0 %d", ac );
+		/* really needs to be in AddServer since this is a NeoStats wide bug
+		 if config uplink name does not match our uplinks server name we can
+		 never find the uplink!
+		*/
+		if( strcmp( cmd, "SERVER" ) == 0 ) {
+			strlcpy( me.uplink, av[0], MAXHOST );
+		}
+	} else {
+		strlcpy( origin, line, sizeof( origin ) );	
+		cmdptr = 0;
+		line = strpbrk( coreLine, " " );
+		if( line ) {
+			*line = 0;
+			while( isspace( *++line ) );
+		} /*else
+			coreLine = line + strlen( line );*/
+		strlcpy( cmd, coreLine, sizeof( cmd ) );
+		dlog( DEBUG1, "origin: %s", origin );
+		dlog( DEBUG1, "cmd   : %s", cmd );
+		dlog( DEBUG1, "args  : %s", line );
+		if( line ) {
+			ac = ircsplitbuf( line, &av, 1 );
+		}
+		dlog( DEBUG1, "0 %d", ac );
+	}
+	process_ircd_cmd( cmdptr, cmd, origin, av, ac );
+	ns_free( av );
+	dlog( DEBUG1, "-------------------------END PARSE--------------------------" );
+	return NS_SUCCESS;
+}
+
 /** @brief InitIrcdProtocol
  *
  *  Init protocol info
@@ -197,7 +256,10 @@ static int InitIrcdProtocol( void )
 	/* Allow protocol module to "override" the parser */
 	irc_parse = ns_dlsym( protocol_module_handle, "parse" );
 	if( irc_parse == NULL ) {
-		irc_parse = parse;
+		if( ircd_srv.protocol & PROTOCOL_P10 )
+			irc_parse = parsep10;
+		else
+			irc_parse = parse;
 	}
 	cmd_list = ns_dlsym( protocol_module_handle, "cmd_list" );
 	if( !cmd_list ) {

@@ -24,7 +24,7 @@
 #ifndef _NUMERICS_H_
 #define _NUMERICS_H_
 
-extern ircd_cmd numeric_cmd_list[];
+extern irc_cmd numeric_cmd_list[];
 
 EXPORTFUNC void _m_numeric242( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_numeric351( char *origin, char **argv, int argc, int srv );

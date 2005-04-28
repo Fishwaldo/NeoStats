@@ -209,7 +209,7 @@ ProtocolInfo protocol_info =
 	"+o",
 };
 
-ircd_cmd cmd_list[] = 
+irc_cmd cmd_list[] = 
 {
 	/*Message	Token	Function	usage */
 	{MSG_PRIVATE, 0, m_private, 0},

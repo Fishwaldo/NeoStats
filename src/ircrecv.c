@@ -36,6 +36,7 @@
 #include "services.h"
 #include "bans.h"
 #include "dns.h"
+#include "base64.h"
 
 
 
@@ -50,7 +51,7 @@ typedef struct protocol_entry {
 
 extern ProtocolInfo *protocol_info;
 
-extern ircd_cmd *cmd_list;
+extern irc_cmd *cmd_list;
 
 protocol_entry protocol_list[] =
 {
@@ -281,7 +282,18 @@ void _m_protoctl( char *origin, char **argv, int argc, int cmdptr )
 
 void _m_version( char *origin, char **argv, int argc, int srv )
 {
-	do_version( origin, argv[0] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+	{
+		/* ABAAB V :Bj */
+		char *b64origin;
+
+		b64origin = base64_to_nick( origin );
+		if( !b64origin )
+			b64origin = base64_to_server( origin );
+		do_version( b64origin, base64_to_server( argv[0] ) );
+	}
+	else
+		do_version( origin, argv[0] );
 }
 
 /** @brief _m_motd
@@ -299,7 +311,10 @@ void _m_version( char *origin, char **argv, int argc, int srv )
 
 void _m_motd( char *origin, char **argv, int argc, int srv )
 {
-	do_motd( origin, argv[0] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_motd( base64_to_nick( origin ), base64_to_server( argv[0] ) );
+	else
+		do_motd( origin, argv[0] );
 }
 
 /** @brief _m_admin
@@ -318,7 +333,10 @@ void _m_motd( char *origin, char **argv, int argc, int srv )
 
 void _m_admin( char *origin, char **argv, int argc, int srv )
 {
-	do_admin( origin, argv[0] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_admin( base64_to_nick( origin ), base64_to_server( argv[0] ) );
+	else
+		do_admin( origin, argv[0] );
 }
 
 /** @brief _m_credits
@@ -378,7 +396,17 @@ void _m_info( char *origin, char **argv, int argc, int srv )
 
 void _m_stats( char *origin, char **argv, int argc, int srv )
 {
-	do_stats( origin, argv[0] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+	{
+		char *b64origin;
+
+		b64origin = base64_to_nick( origin );
+		if( !b64origin )
+			b64origin = base64_to_server( origin );
+		do_stats( b64origin, argv[0] );
+	}
+	else
+		do_stats( origin, argv[0] );
 }
 
 /** @brief _m_ping
@@ -388,6 +416,7 @@ void _m_stats( char *origin, char **argv, int argc, int srv )
  *  PING :irc.foonet.com
  *	argv[0] = origin
  *	argv[1] = destination
+ *  P10: R: AB G !1076065765.431368 stats.mark.net 1076065765.431368
  *
  *  @param origin source of message (user/server)
  *  @param av list of message parameters
@@ -399,7 +428,10 @@ void _m_stats( char *origin, char **argv, int argc, int srv )
 
 void _m_ping( char *origin, char **argv, int argc, int srv )
 {
-	do_ping( argv[0], argc > 1 ? argv[1] : NULL );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_ping( base64_to_server( origin ), argv[1] );
+	else
+		do_ping( argv[0], argc > 1 ? argv[1] : NULL );
 }
 
 /** @brief _m_pong
@@ -408,6 +440,7 @@ void _m_ping( char *origin, char **argv, int argc, int srv )
  *  irc.foonet.com PONG irc.foonet.com :stats.neostats.net
  *  argv[0] = origin
  *  argv[1] = destination
+ *  P10: R: AB Z AB :stats.mark.net
  *
  *  @param origin source of message (user/server)
  *  @param av list of message parameters
@@ -419,7 +452,10 @@ void _m_ping( char *origin, char **argv, int argc, int srv )
 
 void _m_pong( char *origin, char **argv, int argc, int srv )
 {
-	do_pong( argv[0], argv[1] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_pong( base64_to_server( origin ), argv[1] );
+	else
+		do_pong( argv[0], argv[1] );
 }
 
 /** @brief _m_quit
@@ -438,7 +474,10 @@ void _m_pong( char *origin, char **argv, int argc, int srv )
 
 void _m_quit( char *origin, char **argv, int argc, int srv )
 {
-	do_quit( origin, argv[0] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_quit( base64_to_nick( origin ), argv[0] );
+	else
+		do_quit( origin, argv[0] );
 }
 
 /** @brief m_join
@@ -457,7 +496,10 @@ void _m_quit( char *origin, char **argv, int argc, int srv )
 
 void _m_join( char *origin, char **argv, int argc, int srv )
 {
-	do_join( origin, argv[0], argv[1] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_join( base64_to_nick( origin ), argv[0], argv[1] );
+	else
+		do_join( origin, argv[0], argv[1] );
 }
 
 /** @brief m_part
@@ -476,7 +518,10 @@ void _m_join( char *origin, char **argv, int argc, int srv )
 
 void _m_part( char *origin, char **argv, int argc, int srv )
 {
-	do_part( origin, argv[0], argv[1] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_part( base64_to_nick( origin ), argv[0], argv[1] );
+	else
+		do_part( origin, argv[0], argv[1] );
 }
 
 /** @brief _m_kick
@@ -496,7 +541,17 @@ void _m_part( char *origin, char **argv, int argc, int srv )
 
 void _m_kick( char *origin, char **argv, int argc, int srv )
 {
-	do_kick( origin, argv[0], argv[1], argv[2] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+	{
+		char *b64origin;
+
+		if( !( b64origin = base64_to_nick( origin ) ) ) {
+			b64origin = base64_to_server( origin );
+		}
+		do_kick( b64origin, argv[0], base64_to_nick( argv[1] ), argv[2] );
+	}
+	else
+		do_kick( origin, argv[0], argv[1], argv[2] );
 }
 
 /** @brief _m_topic
@@ -521,7 +576,17 @@ void _m_kick( char *origin, char **argv, int argc, int srv )
 
 void _m_topic( char *origin, char **argv, int argc, int srv )
 {
-	do_topic( argv[0], argv[1], argv[2], argv[3] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+	{
+		char *b64origin;
+
+		b64origin = base64_to_nick( origin );
+		if( !b64origin )
+			b64origin = base64_to_server( origin );
+		do_topic( argv[0], b64origin, NULL, argv[argc-1] );
+	}
+	else
+		do_topic( argv[0], argv[1], argv[2], argv[3] );
 }
 
 /** @brief _m_away
@@ -539,7 +604,20 @@ void _m_topic( char *origin, char **argv, int argc, int srv )
 
 void _m_away( char *origin, char **argv, int argc, int srv )
 {
-	do_away( origin,( argc > 0 ) ? argv[0] : NULL );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+	{
+		char *buf;
+
+		if( argc > 0 ) {
+			buf = joinbuf( argv, argc, 0 );
+			do_away( base64_to_nick( origin ), buf );
+			ns_free( buf );
+		} else {
+			do_away( base64_to_nick( origin ), NULL );
+		}
+	}
+	else
+		do_away( origin,( argc > 0 ) ? argv[0] : NULL );
 }
 
 /** @brief _m_kill
@@ -558,7 +636,17 @@ void _m_away( char *origin, char **argv, int argc, int srv )
 
 void _m_kill( char *origin, char **argv, int argc, int srv )
 {
-	do_kill( origin, argv[0], argv[1] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+	{
+		char *b64origin;
+
+		b64origin = base64_to_nick( origin );
+		if( !b64origin )
+			b64origin = base64_to_server( origin );
+		do_kill( b64origin, base64_to_nick( argv[0] ), argv[1] );
+	}
+	else
+		do_kill( origin, argv[0], argv[1] );
 }
 
 /** @brief _m_squit
@@ -566,6 +654,8 @@ void _m_kill( char *origin, char **argv, int argc, int srv )
  *  process SQUIT command
  *	argv[0] = server name
  *	argv[argc-1] = comment
+ *  P10: R: AB SQ mark.local.org 0 :Ping timeout 
+ *  P10: R: ABAAV SQ york.gose.org 1076280461 :relink
  *
  *  @param origin source of message (user/server)
  *  @param av list of message parameters
@@ -577,7 +667,18 @@ void _m_kill( char *origin, char **argv, int argc, int srv )
 
 void _m_squit( char *origin, char **argv, int argc, int srv )
 {
-	do_squit( argv[0], argv[argc-1] );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+	{
+		char *b64argv0;
+
+		b64argv0 = base64_to_server( argv[0] );
+		if( b64argv0 )
+			do_squit( b64argv0, argv[2] );
+		else
+			do_squit( argv[0], argv[2] );
+	}
+	else
+		do_squit( argv[0], argv[argc-1] );
 }
 
 /** @brief _m_netinfo
@@ -654,13 +755,9 @@ void _m_snetinfo( char *origin, char **argv, int argc, int srv )
 void _m_mode( char *origin, char **argv, int argc, int srv )
 {
 	if( argv[0][0] == '#' )
-	{
 		do_mode_channel( origin, argv, argc );
-	}
 	else
-	{
 		do_mode_user( argv[0], argv[1] );
-	}
 }
 
 /** @brief _m_svsnick
@@ -1422,7 +1519,7 @@ void do_credits( const char *nick, const char *remoteserver )
 
 void do_stats( const char *nick, const char *what )
 {
-	ircd_cmd* ircd_cmd_ptr;
+	irc_cmd* ircd_cmd_ptr;
 	time_t tmp;
 	time_t tmp2;
 	Client *u;

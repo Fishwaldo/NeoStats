@@ -181,7 +181,7 @@ ProtocolInfo protocol_info =
 	"+o",
 };
 
-ircd_cmd cmd_list[] = 
+irc_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
 	{MSG_SERVER, 0, m_server, 0},

@@ -22,7 +22,6 @@
 */
 
 #include "neostats.h"
-#define OVERRIDECOREMESSAGESUPPORT
 #include "protocol.h"
 #include "base64.h"
 #include "numerics.h"
@@ -259,13 +258,13 @@ static void m_nick( char *origin, char **argv, int argc, int srv );
 ProtocolInfo protocol_info = 
 {
 	/* Protocol options required by this IRCd */
-	PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_B64SERVER|PROTOCOL_B64NICK|PROTOCOL_NICKIP|PROTOCOL_KICKPART,
+	PROTOCOL_TOKEN|PROTOCOL_NOQUIT|PROTOCOL_P10|PROTOCOL_B64SERVER|PROTOCOL_B64NICK|PROTOCOL_NICKIP|PROTOCOL_KICKPART,
 	/* Protocol options negotiated at link by this IRCd */
 	0,
 	/* Features supported by this IRCd */
-# ifdef NEFARIOUS_CLOAKHOST
+#ifdef NEFARIOUS_CLOAKHOST
 	FEATURE_UMODECLOAK|
-# endif /* NEFARIOUS_CLOAKHOST */
+#endif /* NEFARIOUS_CLOAKHOST */
 	FEATURE_SVSTIME,
 	/* Max host length */
 	63 ,
@@ -287,32 +286,17 @@ ProtocolInfo protocol_info =
 };
 
 /* this is the command list and associated functions to run */
-ircd_cmd cmd_list[] = 
+irc_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
 	{MSG_PRIVATE, TOK_PRIVATE, m_private, 0},
 	{MSG_CPRIVMSG, TOK_CPRIVMSG, m_private, 0},
 	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
 	{MSG_CNOTICE, TOK_CNOTICE, m_notice, 0},
-	{MSG_STATS, TOK_STATS, m_stats, 0},
-	{MSG_VERSION, TOK_VERSION, m_version, 0},
-	{MSG_MOTD, TOK_MOTD, m_motd, 0},
-	{MSG_ADMIN, TOK_ADMIN, m_admin, 0},
 	{MSG_SERVER, TOK_SERVER, m_server, 0},
-	{MSG_SQUIT, TOK_SQUIT, m_squit, 0},
-	{MSG_QUIT, TOK_QUIT, m_quit, 0},
 	{MSG_MODE, TOK_MODE, m_mode, 0},
-	{MSG_KILL, TOK_KILL, m_kill, 0},
-	{MSG_PONG, TOK_PONG, m_pong, 0},
-	{MSG_AWAY, TOK_AWAY, m_away, 0},
 	{MSG_NICK, TOK_NICK, m_nick, 0},
-	{MSG_TOPIC, TOK_TOPIC, m_topic, 0},
-	{MSG_KICK, TOK_KICK, m_kick, 0},
 	{MSG_CREATE, TOK_CREATE, m_create, 0},
-	{MSG_JOIN, TOK_JOIN, m_join, 0},
-	{MSG_PART, TOK_PART, m_part, 0},
-	{MSG_PING, TOK_PING, m_ping, 0},
-	{MSG_PASS, TOK_PASS, _m_pass, 0},
 	{MSG_BURST, TOK_BURST, m_burst, 0},
 	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
 	{MSG_END_OF_BURST_ACK, TOK_END_OF_BURST_ACK, _m_ignorecommand, 0},
@@ -323,7 +307,6 @@ ircd_cmd cmd_list[] =
 	{MSG_SVSPART, TOK_SVSPART, m_svspart, 0},
 	{MSG_SWHOIS, TOK_SWHOIS, m_swhois, 0},
 	{MSG_FAKEHOST, TOK_FAKEHOST, m_vhost, 0},
-	{MSG_ERROR, TOK_ERROR, _m_error, 0},
 	{0, 0, 0, 0},
 };
 

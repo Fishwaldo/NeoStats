@@ -365,7 +365,7 @@ ProtocolInfo protocol_info =
 	"+a",
 };
 
-ircd_cmd cmd_list[] = 
+irc_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
 	{MSG_SERVER,    0,		m_server,	0},
@@ -495,6 +495,23 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 		do_nickchange( origin, argv[0], NULL );
 }
 
+/*
+ *  argv[0] = ultimate protocol
+ *  argv[1] = nickname length
+ *  argv[2] = Global Connect Notices
+ *  argv[3] = Reserved for future extentions
+ *  argv[4] = Reserved for future extentions
+ *  argv[5] = Reserved for future extentions
+ *  argv[6] = Reserved for future extentions
+ *  argv[7] = Reserved for future extentions
+ *  argv[8] = Reserved for future extentions
+ *  argv[9] = Reserved for future extentions
+ *  argv[10] = Reserved for future extentions
+ *  argv[11] = Reserved for future extentions
+ *  argv[12] = Reserved for future extentions
+ *  argv[13] = Reserved for future extentions
+ *  argv[14] = ircnet
+ */
 static void m_vctrl( char *origin, char **argv, int argc, int srv )
 {
 	do_vctrl( argv[0], argv[1], argv[2], argv[3], argv[14] );

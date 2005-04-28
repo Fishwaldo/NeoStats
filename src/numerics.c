@@ -27,7 +27,7 @@
 #include "numerics.h"
 #include "base64.h"
 
-ircd_cmd numeric_cmd_list[] = {
+irc_cmd numeric_cmd_list[] = {
 	/*Message	Token	handler	usage */
 	{"351", "351", _m_numeric351, 0},
 	{"242", "242", _m_numeric242, 0},

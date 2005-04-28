@@ -216,7 +216,7 @@ ProtocolInfo protocol_info =
 	"+a",
 };
 
-ircd_cmd cmd_list[] = 
+irc_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
 	{MSG_SETHOST,   0, m_sethost,   0},

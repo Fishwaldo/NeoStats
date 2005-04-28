@@ -31,12 +31,12 @@
 
 typedef void( *ircd_cmd_handler )( char *origin, char **argv, int argc, int srv );
 
-typedef struct ircd_cmd {
+typedef struct irc_cmd {
 	const char *name;
 	const char *token;
 	ircd_cmd_handler handler;
 	unsigned int usage;
-}ircd_cmd;
+}irc_cmd;
 
 typedef struct mode_init {
 	unsigned char mode;
@@ -87,14 +87,13 @@ typedef struct ProtocolInfo {
 } ProtocolInfo;
 
 #ifndef NEOSTATSCORE
-MODULEVAR extern ircd_cmd cmd_list[];
+MODULEVAR extern irc_cmd cmd_list[];
 MODULEVAR extern mode_init chan_umodes[];
 MODULEVAR extern mode_init chan_modes[];
 MODULEVAR extern mode_init user_umodes[];
 MODULEVAR extern mode_init user_smodes[];
 MODULEVAR extern ProtocolInfo protocol_info;
 #endif /* NEOSTATSCORE */
-#ifndef OVERRIDECOREMESSAGESUPPORT
 #ifdef NEOSTATSCORE
 #define MSGDEF( msg ) char *msg;
 #else /* NEOSTATSCORE */
@@ -210,8 +209,6 @@ MSGDEF( MSG_GLINE );
 MSGDEF( TOK_GLINE );
 MSGDEF( MSG_REMGLINE );
 MSGDEF( TOK_REMGLINE );
-
-#endif /* OVERRIDECOREMESSAGESUPPORT */
 
 EXPORTVAR extern ircd_server ircd_srv;
 

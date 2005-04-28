@@ -197,6 +197,7 @@ char *LANGgettext( const char *string, int mylang );
 #define PROTOCOL_UNKLN		0x00008000  /* Have UNKLINE support */
 #define PROTOCOL_NICKIP		0x00010000  /* NICK passes IP address */
 #define PROTOCOL_KICKPART	0x00020000  /* KICK also generates PART */
+#define PROTOCOL_P10		0x00040000  /* Protocol is IRCu P10 based */
 
 #define PROTOCOL_CLIENTMODE	0x80000000  /* Client mode */
 
@@ -690,7 +691,7 @@ typedef struct CmdParams {
 	Bot *bot;			/* pointer to associated bot where appropriate */
 	char *param;		/* command parameter */
 	char *cmd;			/* command */
-	Channel* channel;	/* pointer to channel struct where appropriate */
+	Channel *channel;	/* pointer to channel struct where appropriate */
 	char **av;			/* command parameter list */
 	int ac;				/* count of command parameter list */
 } CmdParams; 
@@ -1520,9 +1521,9 @@ EXPORTFUNC int ModIsChannelExcluded( Channel *c );
 
 /* Module Data Pointer Interface */
 /* Module Data Pointer Interface Channel */
-EXPORTFUNC void *AllocChannelModPtr( Channel* c, int size );
+EXPORTFUNC void *AllocChannelModPtr( Channel *c, int size );
 EXPORTFUNC void FreeChannelModPtr( Channel *c );
-EXPORTFUNC void *GetChannelModPtr( Channel* c );
+EXPORTFUNC void *GetChannelModPtr( Channel *c );
 /* Module Data Pointer Interface User */
 EXPORTFUNC void *AllocUserModPtr( Client *u, int size );
 EXPORTFUNC void FreeUserModPtr( Client *u );
@@ -1533,9 +1534,9 @@ EXPORTFUNC void FreeServerModPtr( Client *s );
 EXPORTFUNC void *GetServerModPtr( Client *s );
 /* Module Data Value Interface */
 /* Module Data Value Interface Channel */
-EXPORTFUNC void ClearChannelModValue( Channel* c );
-EXPORTFUNC void SetChannelModValue( Channel* c, void *data );
-EXPORTFUNC void *GetChannelModValue( Channel* c );
+EXPORTFUNC void ClearChannelModValue( Channel *c );
+EXPORTFUNC void SetChannelModValue( Channel *c, void *data );
+EXPORTFUNC void *GetChannelModValue( Channel *c );
 /* Module Data Value Interface User */
 EXPORTFUNC void ClearUserModValue( Client *u );
 EXPORTFUNC void SetUserModValue( Client *u, void *data );

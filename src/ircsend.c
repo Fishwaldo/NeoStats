@@ -257,7 +257,8 @@ int InitIrcdSymbols( void )
 		if( ( pprotocol_sym->msgptr || pprotocol_sym->tokptr ) && pprotocol_sym->handler )
 			*pprotocol_sym->handler = pprotocol_sym->defaulthandler;
 		/* Check for IRCd override handler */
-		protocol_handler = ns_dlsym( protocol_module_handle, pprotocol_sym->sym );
+		if( pprotocol_sym->sym )
+			protocol_handler = ns_dlsym( protocol_module_handle, pprotocol_sym->sym );
 		/* If we need a handler */
 		if( pprotocol_sym->handler )
 		{
@@ -285,17 +286,26 @@ int InitIrcdSymbols( void )
 
 static void _send_numeric( const char *source, const int numeric, const char *target, const char *buf )
 {
-	send_cmd( ":%s %d %s :%s", source, numeric, target, buf );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %d %s :%s", me.s->name64, numeric, nick_to_base64( target ), buf );
+	else
+		send_cmd( ":%s %d %s :%s", source, numeric, target, buf );
 }
 
 static void _send_privmsg( const char *source, const char *target, const char *buf )
 {
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( PRIVATE ), target, buf );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s :%s", nick_to_base64( source ), TOK_PRIVATE, ( target[0] == '#' ) ? target : nick_to_base64( target ), buf );
+	else
+		send_cmd( ":%s %s %s :%s", source, MSGTOK( PRIVATE ), target, buf );
 }
 
 static void _send_notice( const char *source, const char *target, const char *buf )
 {
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( NOTICE ), target, buf );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s :%s", nick_to_base64( source ), TOK_NOTICE, ( target[0] == '#' ) ? target : nick_to_base64( target ), buf );
+	else
+		send_cmd( ":%s %s %s :%s", source, MSGTOK( NOTICE ), target, buf );
 }
 
 static void _send_wallops( const char *source, const char *buf )
@@ -310,37 +320,59 @@ static void _send_globops( const char *source, const char *buf )
 
 static void _send_join( const char *source, const char *chan, const char *key, const unsigned long ts )
 {
-	send_cmd( ":%s %s %s", source, MSGTOK( JOIN ), chan );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s %lu", nick_to_base64( source ), TOK_JOIN, chan, ts );
+	else
+		send_cmd( ":%s %s %s", source, MSGTOK( JOIN ), chan );
 }
 
 static void _send_part( const char *source, const char *chan, const char *reason )
 {
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( PART ), chan, reason );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s :%s", nick_to_base64( source ), TOK_PART, chan, reason );
+	else
+		send_cmd( ":%s %s %s :%s", source, MSGTOK( PART ), chan, reason );
 }
 
 static void _send_kick( const char *source, const char *chan, const char *target, const char *reason )
 {
-	send_cmd( ":%s %s %s %s :%s", source, MSGTOK( KICK ), chan, target, ( reason ? reason : "No Reason Given" ) );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s %s :%s", nick_to_base64( source ), TOK_KICK, chan, nick_to_base64( target ),( reason ? reason : "No reason given" ) );
+	else
+		send_cmd( ":%s %s %s %s :%s", source, MSGTOK( KICK ), chan, target, ( reason ? reason : "No reason given" ) );
 }
 
 static void _send_invite( const char *source, const char *target, const char *chan )
 {
-	send_cmd( ":%s %s %s %s", source, MSGTOK( INVITE ), target, chan );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s %s", nick_to_base64( source ), TOK_INVITE, target, chan );
+	else
+		send_cmd( ":%s %s %s %s", source, MSGTOK( INVITE ), target, chan );
 }
 
 static void _send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
 {
-	send_cmd( ":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s %lu", nick_to_base64( oldnick ), TOK_NICK, newnick, ts );
+	else
+		send_cmd( ":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts );
 }
 
 static void _send_umode( const char *source, const char *target, const char *mode )
 {
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( MODE ), target, mode );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s :%s", nick_to_base64( source ), TOK_MODE, target, mode );
+	else
+		send_cmd( ":%s %s %s :%s", source, MSGTOK( MODE ), target, mode );
 }
 
+/* R: ABAAH M #c3 +tn */
 static void _send_cmode( const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, const unsigned long ts )
 {
-	send_cmd( ":%s %s %s %s %s %lu", sourceserver, MSGTOK( MODE ), chan, mode, args, ts );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s %s %s %lu", me.s->name64, TOK_MODE, chan, mode, args, ts );
+	else
+		send_cmd( ":%s %s %s %s %s %lu", sourceserver, MSGTOK( MODE ), chan, mode, args, ts );
 }
 
 static void _send_quit( const char *source, const char *quitmsg )
@@ -350,12 +382,18 @@ static void _send_quit( const char *source, const char *quitmsg )
 
 static void _send_ping( const char *source, const char *reply, const char *target )
 {
-	send_cmd( ":%s %s %s :%s", source, MSGTOK( PING ), reply, target );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s :%s", me.s->name64, TOK_PING, reply, target );
+	else
+		send_cmd( ":%s %s %s :%s", source, MSGTOK( PING ), reply, target );
 }
 
 static void _send_pong( const char *reply )
 {
-	send_cmd( "%s %s", MSGTOK( PONG ), reply );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s :%s", me.s->name64, TOK_PONG, me.s->name64, reply );
+	else	
+		send_cmd( "%s %s", MSGTOK( PONG ), reply );
 }
 
 static void _send_server( const char *source, const char *name, const int numeric, const char *infoline )
@@ -365,7 +403,10 @@ static void _send_server( const char *source, const char *name, const int numeri
 
 static void _send_squit( const char *server, const char *quitmsg )
 {
-	send_cmd( "%s %s :%s", MSGTOK( SQUIT ), server, quitmsg );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s 0 :%s", me.s->name64, TOK_SQUIT, server, quitmsg );
+	else	
+		send_cmd( "%s %s :%s", MSGTOK( SQUIT ), server, quitmsg );
 }
 
 static void _send_netinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname )
@@ -390,7 +431,10 @@ static void _send_eob( const char *server )
 
 static void _send_kill( const char *source, const char *target, const char *reason )
 {
-	send_cmd( ":%s %s %s :%s", source, MSGTOK(KILL), target, reason );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s :%s", me.s->name64, TOK_KILL, nick_to_base64( target ), reason );
+	else	
+		send_cmd( ":%s %s %s :%s", source, MSGTOK(KILL), target, reason );
 }
 
 static void _send_setname( const char *nick, const char *realname )
@@ -502,12 +546,18 @@ static void _send_unkline( const char *source, const char *mask )
 
 static void _send_stats( const char *source, const char type, const char *target )
 {
-	send_cmd(":%s STATS %c %s", source, type, target );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %c :%s", nick_to_base64( source ), TOK_STATS, type, server_to_base64( target ) );
+	else	
+		send_cmd(":%s STATS %c %s", source, type, target );
 }
 
 static void _send_version( const char *source, const char *target )
 {
-	send_cmd( ":%s VERSION %s", source, target );
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		send_cmd( "%s %s %s", server_to_base64( source ), TOK_VERSION, server_to_base64( target ) );		
+	else	
+		send_cmd( ":%s VERSION %s", source, target );
 }
 
 /** @brief send_cmd

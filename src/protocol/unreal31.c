@@ -357,7 +357,7 @@ ProtocolInfo protocol_info =
 	"+o",
 };
 
-ircd_cmd cmd_list[] = 
+irc_cmd cmd_list[] = 
 {
 	/*Message	Token	Function	usage */
 	{MSG_SERVER, TOK_SERVER, m_server, 0},

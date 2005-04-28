@@ -108,7 +108,7 @@ Command list
 This is parsed by NeoStats when we receive a message from an IRC server
 in order to handle the message and is formatted as follows.
 
-ircd_cmd cmd_list[] = 
+irc_cmd cmd_list[] = 
 {
 	/*Message	Token	Function	usage */
 	{MSG_PRIVATE, TOK_PRIVATE, _m_private, 0},
