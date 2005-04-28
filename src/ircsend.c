@@ -355,7 +355,7 @@ static void _send_nickchange( const char *oldnick, const char *newnick, const un
 	if( ircd_srv.protocol & PROTOCOL_P10 )
 		send_cmd( "%s %s %s %lu", nick_to_base64( oldnick ), TOK_NICK, newnick, ts );
 	else
-		send_cmd( ":%s %s %s %lu", oldnick, MSG_NICK, newnick, ts );
+		send_cmd( ":%s %s %s %lu", oldnick, MSGTOK( NICK ), newnick, ts );
 }
 
 static void _send_umode( const char *source, const char *target, const char *mode )
@@ -549,7 +549,7 @@ static void _send_stats( const char *source, const char type, const char *target
 	if( ircd_srv.protocol & PROTOCOL_P10 )
 		send_cmd( "%s %s %c :%s", nick_to_base64( source ), TOK_STATS, type, server_to_base64( target ) );
 	else	
-		send_cmd(":%s STATS %c %s", source, type, target );
+		send_cmd(":%s %s %c %s", source, MSGTOK( STATS ), type, target );
 }
 
 static void _send_version( const char *source, const char *target )
@@ -557,7 +557,7 @@ static void _send_version( const char *source, const char *target )
 	if( ircd_srv.protocol & PROTOCOL_P10 )
 		send_cmd( "%s %s %s", server_to_base64( source ), TOK_VERSION, server_to_base64( target ) );		
 	else	
-		send_cmd( ":%s VERSION %s", source, target );
+		send_cmd( ":%s %s %s", source, MSGTOK( VERSION ), target );
 }
 
 /** @brief send_cmd
