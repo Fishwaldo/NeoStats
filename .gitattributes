@@ -401,7 +401,11 @@ modules/ircdauth/ircdauth.c -text
 modules/ircdauth/ircdauth.vcproj -text
 modules/modules.txt -text
 modules/nstest/Makefile.am -text
+modules/nstest/commands.c -text
+modules/nstest/commands.h -text
+modules/nstest/events.c -text
 modules/nstest/main.c -text
+modules/nstest/main.h -text
 modules/nstest/nstest.vcproj -text
 modules/operlog/Makefile.am -text
 modules/operlog/Makefile.in -text

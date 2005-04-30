@@ -64,6 +64,7 @@ static void( *irc_send_cmode )( const char *sourceserver, const char *sourceuser
 static void( *irc_send_kill )( const char *source, const char *target, const char *reason );
 static void( *irc_send_kick )( const char *source, const char *chan, const char *target, const char *reason );
 static void( *irc_send_invite )( const char *source, const char *to, const char *chan );
+static void( *irc_send_topic )( const char *source, const char *channel, const char *topic );
 static void( *irc_send_svskill )( const char *source, const char *target, const char *reason );
 static void( *irc_send_svsmode )( const char *source, const char *target, const char *modes );
 static void( *irc_send_svshost )( const char *source, const char *who, const char *vhost );
@@ -119,6 +120,7 @@ static void _send_join( const char *source, const char *chan, const char *key, c
 static void _send_part( const char *source, const char *chan, const char *reason );
 static void _send_kick( const char *source, const char *chan, const char *target, const char *reason );
 static void _send_invite( const char *source, const char *target, const char *chan );
+static void _send_topic( const char *source, const char *channel, const char *topic );
 static void _send_quit( const char *source, const char *quitmsg );
 static void _send_ping( const char *source, const char *reply, const char *target );
 static void _send_pong( const char *reply );
@@ -175,6 +177,7 @@ protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_kill, _send_kill, "send_kill", &MSG_KILL, "MSG_KILL", &TOK_KILL, "TOK_KILL", 0, 0},
 	{( void * )&irc_send_kick, _send_kick, "send_kick", &MSG_KICK, "MSG_KICK", &TOK_KICK, "TOK_KICK", 0, 0},
 	{( void * )&irc_send_invite, _send_invite, "send_invite", &MSG_INVITE, "MSG_INVITE", &TOK_INVITE, "TOK_INVITE", 0, 0},
+	{( void * )&irc_send_topic, _send_topic, "send_topic", &MSG_TOPIC, "MSG_TOPIC", &TOK_TOPIC, "TOK_TOPIC", 0, 0},
 	{( void * )&irc_send_svskill, _send_svskill, "send_svskill", &MSG_SVSKILL, "MSG_SVSKILL", &TOK_SVSKILL, "TOK_SVSKILL", 0, FEATURE_SVSKILL},
 	{( void * )&irc_send_svsmode, _send_svsmode, "send_svsmode", &MSG_SVSMODE, "MSG_SVSMODE", &TOK_SVSMODE, "TOK_SVSMODE", 0, FEATURE_SVSMODE},
 	{( void * )&irc_send_svshost, NULL, "send_svshost", &MSG_SVSHOST, "MSG_SVSHOST", &TOK_SVSHOST, "TOK_SVSHOST", 0, FEATURE_SVSHOST},
@@ -349,6 +352,12 @@ static void _send_invite( const char *source, const char *target, const char *ch
 	else
 		send_cmd( ":%s %s %s %s", source, MSGTOK( INVITE ), target, chan );
 }
+
+static void _send_topic( const char *source, const char *channel, const char *topic )
+{
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( TOPIC ), channel, topic );
+}
+
 
 static void _send_nickchange( const char *oldnick, const char *newnick, const unsigned long ts )
 {
@@ -1127,6 +1136,22 @@ int irc_invite( const Bot *botptr, const Client *target, const char *chan )
 		return NS_FAILURE;
 	}
 	irc_send_invite( botptr->u->name, target->name, chan );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_invite
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_topic( const Bot *botptr, const Channel *channel, const char *topic )
+{
+	if( !irc_send_topic ) {
+		unsupported_cmd( "TOPIC" );
+		return NS_FAILURE;
+	}
+	irc_send_topic( botptr->u->name, channel->name, topic );
+	do_topic( botptr->u->name, channel->name, me.strnow, topic );
 	return NS_SUCCESS;
 }
 

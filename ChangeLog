@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add support to set topic from NeoStats. (M)
  - Add _m_ignorecommand function for protocol modules to silently drop messages
    that they receive but require no further processing by NeoStats. (M).
  - Add seperate protocol files for IRCu and variants rathe than require users

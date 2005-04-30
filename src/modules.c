@@ -476,6 +476,10 @@ unload_module (const char *modname, Client * u)
 	{
 		FiniModExcludes(mod_ptr);
 	}
+	cmdparams = ns_calloc (sizeof(CmdParams));
+	cmdparams->param = (char*)modname;
+	SendAllModuleEvent(EVENT_MODULEUNLOAD, cmdparams);
+	ns_free(cmdparams);
 	RESET_RUN_LEVEL();
 #ifndef VALGRIND
 	SET_RUN_LEVEL(mod_ptr);
@@ -499,10 +503,6 @@ unload_module (const char *modname, Client * u)
 	if (fchannelmoddata & (1 << moduleindex)) {
 		CleanupChannelModdata (moduleindex);
 	}
-	cmdparams = ns_calloc (sizeof(CmdParams));
-	cmdparams->param = (char*)modname;
-	SendAllModuleEvent(EVENT_MODULEUNLOAD, cmdparams);
-	ns_free(cmdparams);
 	return NS_SUCCESS;
 }
 

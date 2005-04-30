@@ -1180,6 +1180,8 @@ EXPORTFUNC int irc_join( const Bot *botptr, const char *chan, const char *chanmo
 EXPORTFUNC int irc_part( const Bot *botptr, const char *chan, const char *quitmsg );
 EXPORTFUNC int irc_kick( const Bot *botptr, const char *chan, const char *target, const char *reason );
 EXPORTFUNC int irc_invite( const Bot *botptr, const Client *target, const char *chan );
+EXPORTFUNC int irc_topic( const Bot *botptr, const Channel *channel, const char *topic );
+
 EXPORTFUNC int irc_cloakhost( const Bot *botptr );
 EXPORTFUNC int irc_setname( const Bot *botptr, const char *realname );
 
