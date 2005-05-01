@@ -382,6 +382,10 @@ modules/connectserv/connectserv.vcproj -text
 modules/connectserv/cs.c -text
 modules/connectserv/cs.h -text
 modules/connectserv/cs_help.c -text
+modules/dccpartyline/Makefile.am -text
+modules/dccpartyline/Makefile.in -text
+modules/dccpartyline/dccpartyline.vcproj -text
+modules/dccpartyline/main.c -text
 modules/extauth/.indent.pro -text
 modules/extauth/Makefile.am -text
 modules/extauth/Makefile.in -text

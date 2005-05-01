@@ -395,6 +395,20 @@ typedef enum Event {
  */
 	EVENT_DCCSEND,
 
+/*  EVENT_DCCCHAT
+ *    parameters:
+ *      user in cmdparams->source
+ *      parameters in cmdparams->param
+ */
+	EVENT_DCCCHAT,
+
+/*  EVENT_DCCCHATMSG
+ *    parameters:
+ *      user in cmdparams->source
+ *      parameters in cmdparams->param
+ */
+	EVENT_DCCCHATMSG,
+
 /*  Ban events 
  *    Generated in response to ban events
  */

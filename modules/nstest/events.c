@@ -69,6 +69,8 @@ static int ns_event_ctcptimereq( CmdParams *cmdparams );
 static int ns_event_ctcppingrpl( CmdParams *cmdparams );
 static int ns_event_ctcppingreq( CmdParams *cmdparams );
 static int ns_event_dccsend( CmdParams *cmdparams );
+static int ns_event_dccchat( CmdParams *cmdparams );
+static int ns_event_dccchatmsg( CmdParams *cmdparams );
 static int ns_event_addban( CmdParams *cmdparams );
 static int ns_event_delban( CmdParams *cmdparams );
 
@@ -120,6 +122,8 @@ ModuleEvent module_events[] =
 	{EVENT_CTCPPINGRPL,	ns_event_ctcppingrpl},
 	{EVENT_CTCPPINGREQ,	ns_event_ctcppingreq},
 	{EVENT_DCCSEND,	ns_event_dccsend},
+	{EVENT_DCCCHAT,	ns_event_dccchat},
+	{EVENT_DCCCHATMSG,	ns_event_dccchatmsg},
 	{EVENT_ADDBAN,	ns_event_addban},
 	{EVENT_DELBAN,	ns_event_delban},
 	{EVENT_NULL,		NULL}
@@ -437,6 +441,20 @@ static int ns_event_dccsend( CmdParams *cmdparams )
 {
 	dlog( DEBUG1, "EVENT_DCCSEND %s %s", cmdparams->source->name, cmdparams->param );
 	irc_chanalert( ns_bot, "EVENT_DCCSEND %s %s", cmdparams->source->name, cmdparams->param );
+	return NS_SUCCESS;
+}
+
+static int ns_event_dccchat( CmdParams *cmdparams )
+{
+	dlog( DEBUG1, "EVENT_DCCCHAT %s %s", cmdparams->source->name, cmdparams->param );
+	irc_chanalert( ns_bot, "EVENT_DCCCHAT %s %s", cmdparams->source->name, cmdparams->param );
+	return NS_SUCCESS;
+}
+
+static int ns_event_dccchatmsg( CmdParams *cmdparams )
+{
+	dlog( DEBUG1, "EVENT_DCCCHATMSG %s %s", cmdparams->source->name, cmdparams->param );
+	irc_chanalert( ns_bot, "EVENT_DCCCHATMSG %s %s", cmdparams->source->name, cmdparams->param );
 	return NS_SUCCESS;
 }
 

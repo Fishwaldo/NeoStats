@@ -1164,6 +1164,9 @@ EXPORTFUNC int irc_notice( const Bot *botptr, const Client *target, const char *
 EXPORTFUNC int irc_chanprivmsg( const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC int irc_channotice( const Bot *botptr, const char *chan, const char *fmt, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
 
+EXPORTFUNC int irc_dccmsgall( const char *fmt, ...) __attribute__((format(printf,1,2))); /* 1=format 2=params */
+
+
 /*  Specialised messaging functions for global messages, services channel 
  *  alerts and numeric responses
  */
@@ -1247,8 +1250,8 @@ EXPORTFUNC Client *FindServer( const char *name );
 /* chans.c */
 EXPORTFUNC Channel *FindChannel( const char *chan );
 EXPORTFUNC int test_cmode( Channel *c, const unsigned int mode );
-EXPORTFUNC int IsChannelMember( Channel *c, Client *u );
-EXPORTFUNC int test_cumode( char *chan, char *nick, int flag );
+EXPORTFUNC int IsChannelMember( const Channel *c, const Client *u );
+EXPORTFUNC int test_cumode( const char *chan, const char *nick, const int flag );
 EXPORTFUNC Channel *GetRandomChannel( void );
 EXPORTFUNC Client *GetRandomChannelMember(int uge, Channel *c);
 EXPORTFUNC char *GetRandomChannelKey( int length );

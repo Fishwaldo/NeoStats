@@ -92,8 +92,6 @@ static int ns_cmd_chantest( CmdParams *cmdparams )
 	irc_join( ns_testbot, testchannel, NULL );
 	irc_chanalert( ns_bot, "Testing invite" );
 	irc_invite( ns_testbot, cmdparams->source, testchannel );
-	irc_chanalert( ns_bot, "Testing CTCP ACTION" );
-	irc_ctcp_action_req( ns_bot, testchannel, "test action" );
 	irc_chanalert( ns_bot, "Testing topic" );
 	irc_topic( ns_testbot, FindChannel( testchannel ), "Test topic" );
 	irc_chanalert( ns_bot, "Testing part" );
@@ -102,4 +100,3 @@ static int ns_cmd_chantest( CmdParams *cmdparams )
 	irc_quit( ns_testbot, "quit" );
 	return NS_SUCCESS;
 }
-

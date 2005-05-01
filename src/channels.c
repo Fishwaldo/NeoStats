@@ -569,7 +569,7 @@ Channel *FindChannel( const char *chan )
  *  @returns NS_TRUE if user is a member of channel, NS_FALSE if not 
 */
 
-int IsChannelMember( Channel *c, Client *u ) 
+int IsChannelMember( const Channel *c, const Client *u ) 
 {
 	if( !u || !c ) {
 		return NS_FALSE;
@@ -590,7 +590,7 @@ int IsChannelMember( Channel *c, Client *u )
  *  @return NS_TRUE if has, else NS_FALSE
  */
 
-int test_cumode( char *chan, char *nick, int flag )
+int test_cumode( const char *chan, const char *nick, const int flag )
 {
 	Client *u;
 	Channel *c;

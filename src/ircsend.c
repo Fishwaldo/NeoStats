@@ -675,12 +675,12 @@ int irc_chanalert( const Bot *botptr, const char *fmt, ... )
 {
 	va_list ap;
 
-	if( !is_synched || !botptr )
+	if( !is_synched )
 		return NS_SUCCESS;
 	va_start( ap, fmt );
 	ircvsnprintf( ircd_buf, BUFSIZE, fmt, ap );
 	va_end( ap );
-	irc_send_privmsg( botptr->name, me.serviceschan, ircd_buf );
+	irc_send_privmsg( botptr ? botptr->name : ns_botptr->u->name, me.serviceschan, ircd_buf );
 	return NS_SUCCESS;
 }
 
@@ -908,7 +908,7 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 	Channel *c;
 
 	c = FindChannel( chan );
-	ts =( !c ) ? me.now : c->creationtime;
+	ts = ( !c ) ? me.now : c->creationtime;
 	/* Use sjoin if available */
 	if( ( ircd_srv.protocol & PROTOCOL_SJOIN ) && irc_send_sjoin ) 
 	{
@@ -1131,9 +1131,15 @@ int irc_kick( const Bot *botptr, const char *chan, const char *target, const cha
 
 int irc_invite( const Bot *botptr, const Client *target, const char *chan ) 
 {
-	if( !irc_send_invite ) {
+	if( !irc_send_invite ) 
+	{
 		unsupported_cmd( "INVITE" );
 		return NS_FAILURE;
+	}
+	if( IsChannelMember( FindChannel( chan ), target ) )
+	{
+		dlog( DEBUGTX, "irc_invite: %s already on channel %s, skipping invite", target->name, chan );
+		return NS_SUCCESS;
 	}
 	irc_send_invite( botptr->u->name, target->name, chan );
 	return NS_SUCCESS;

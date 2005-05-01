@@ -1556,7 +1556,7 @@ x_maj=3
 x_min='0'
 x_rev="a3-dev"
 x_package='NeoStats'
-MODULES="connectserv hostserv statserv ircdauth extauth textserv operlog"
+MODULES="connectserv hostserv statserv ircdauth extauth textserv operlog dccpartyline"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
@@ -28326,7 +28326,7 @@ CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 
 
-                                                                                                                                                                                                        ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile src/dbm/bdb/Makefile src/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/operlog/Makefile neostats"
+                                                                                                                                                                                                                  ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile src/dbm/bdb/Makefile src/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile neostats"
 
 
 cat >confcache <<\_ACEOF
@@ -28979,6 +28979,7 @@ do
   "modules/statserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/statserv/Makefile" ;;
   "modules/textserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/textserv/Makefile" ;;
   "modules/operlog/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/operlog/Makefile" ;;
+  "modules/dccpartyline/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/dccpartyline/Makefile" ;;
   "neostats" ) CONFIG_FILES="$CONFIG_FILES neostats" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;
