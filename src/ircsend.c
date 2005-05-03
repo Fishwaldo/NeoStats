@@ -23,6 +23,8 @@
 
 #include "neostats.h"
 #include "ircprotocol.h"
+/* Override MSGDEF to make declarations */
+#define MSGDEF( msg ) char *msg;
 #include "protocol.h"
 #include "services.h"
 #include "dcc.h"
@@ -243,7 +245,7 @@ protocol_sym protocol_sym_table[] =
 
 int InitIrcdSymbols( void )
 {
-	void **protocol_handler;
+	void **protocol_handler = NULL;
 	protocol_sym *pprotocol_sym;
 
 	/* Build up supported message and function table */
@@ -473,7 +475,7 @@ static void _send_chghost( const char *source, const char *nick, const char *hos
 
 static void _send_chgident( const char *source, const char *nick, const char *ident )
 {
-	send_cmd( ":%s %s :%s", source, MSGTOK( CHGIDENT ), nick, ident );
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( CHGIDENT ), nick, ident );
 }
 
 static void _send_svsnick( const char *source, const char *target, const char *newnick, const unsigned long ts )
@@ -515,42 +517,52 @@ static void _send_rakill( const char *source, const char *host, const char *iden
 
 static void _send_sqline( const char *source, const char *mask, const char *reason )
 {
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( SQLINE ), mask, reason );
 }
 
 static void _send_unsqline( const char *source, const char *mask )
 {
+	send_cmd( ":%s %s %s", source, MSGTOK( UNSQLINE ), mask );
 }
 
 static void _send_sgline( const char *source, const char *mask, const char *reason )
 {
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( SGLINE ), mask, reason );
 }
 
 static void _send_unsgline( const char *source, const char *mask )
 {
+	send_cmd( ":%s %s %s", source, MSGTOK( UNSGLINE ), mask );
 }
 
 static void _send_gline( const char *source, const char *mask, const char *reason )
 {
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( GLINE ), mask, reason );
 }
 
 static void _send_remgline( const char *source, const char *mask )
 {
+	send_cmd( ":%s %s %s", source, MSGTOK( REMGLINE ), mask );
 }
 
 static void _send_zline( const char *source, const char *mask, const char *reason )
 {
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( ZLINE ), mask, reason );
 }
 
 static void _send_unzline( const char *source, const char *mask )
 {
+	send_cmd( ":%s %s %s", source, MSGTOK( UNZLINE ), mask );
 }
 
 static void _send_kline( const char *source, const char *mask, const char *reason )
 {
+	send_cmd( ":%s %s %s :%s", source, MSGTOK( KLINE ), mask, reason );
 }
 
 static void _send_unkline( const char *source, const char *mask )
 {
+	send_cmd( ":%s %s %s", source, MSGTOK( UNKLINE ), mask );
 }
 
 static void _send_stats( const char *source, const char type, const char *target )
@@ -591,9 +603,7 @@ void send_cmd( char *fmt, ... )
 		buf[BUFSIZE - 2] = '\n';
 	}
 	buflen = strnlen( buf, BUFSIZE );
-	if (send_to_sock(me.servsock, buf, buflen) == NS_FAILURE) {
-		do_exit(NS_EXIT_ERROR, NULL);
-	}
+	send_to_sock(me.servsock, buf, buflen);
 }
 
 /** @brief unsupported_cmd
