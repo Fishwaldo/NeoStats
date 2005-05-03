@@ -50,7 +50,7 @@
 #include "dcc.h"
 
 static void do_reconnect( void );
-
+static int in_do_exit = 0;
 #define PID_FILENAME	"neostats.pid"
 
 #ifdef WIN32
@@ -476,6 +476,12 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 {
 	int return_code;
 
+	if( in_do_exit )
+	{
+		nlog( LOG_CRITICAL, "BUG: recursive do_exit calls, report this log entry to the NeoStats team" );
+		return;
+	}
+	in_do_exit = 1;
 	return_code = exit_reports[exitcode].exit_code;
 	nlog( LOG_CRITICAL, exit_reports[exitcode].exit_message );
 
