@@ -65,7 +65,7 @@ protocol_entry protocol_list[] =
 	{NULL, 0}
 };
 
-ircd_cmd_intrinsic intrinsic_cmd_list[] = 
+irc_cmd intrinsic_cmd_list[] = 
 {
 	{&MSG_PRIVATE, &TOK_PRIVATE, _m_private, 0},
 	{&MSG_NOTICE, &TOK_NOTICE, _m_notice, 0},

@@ -252,12 +252,22 @@ int InitIrcdSymbols( void )
 	pprotocol_sym = protocol_sym_table;
 	while( pprotocol_sym->msgptr || pprotocol_sym->handler )
 	{
+		char **ptr;
+
 		/* Find MSG_cmd */
 		if( pprotocol_sym->msgptr )
-			*pprotocol_sym->msgptr = ns_dlsym( protocol_module_handle, pprotocol_sym->msgsym );
+		{
+			ptr = ns_dlsym( protocol_module_handle, pprotocol_sym->msgsym );
+			if( ptr )
+				*pprotocol_sym->msgptr = *ptr;
+		}
 		/* Find TOK_cmd */
 		if( pprotocol_sym->tokptr )
-			*pprotocol_sym->tokptr = ns_dlsym( protocol_module_handle, pprotocol_sym->toksym );
+		{			
+			ptr = ns_dlsym( protocol_module_handle, pprotocol_sym->toksym );
+			if( ptr )
+				*pprotocol_sym->tokptr = *ptr;
+		}
 		/* If we have a message or token, apply default handler */
 		if( ( pprotocol_sym->msgptr || pprotocol_sym->tokptr ) && pprotocol_sym->handler )
 			*pprotocol_sym->handler = pprotocol_sym->defaulthandler;

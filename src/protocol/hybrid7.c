@@ -26,39 +26,39 @@
 #include "services.h"
 
 /* Messages/Tokens */
-const char MSG_EOB[] = "EOB";	/* end of burst */
-const char MSG_PRIVATE[] = "PRIVMSG";	/* PRIV */
-const char MSG_NICK[] = "NICK";	/* NICK */
-const char MSG_SERVER[] = "SERVER";	/* SERV */
-const char MSG_TOPIC[] = "TOPIC";	/* TOPI */
-const char MSG_INVITE[] = "INVITE";	/* INVI */
-const char MSG_VERSION[] = "VERSION";	/* VERS */
-const char MSG_QUIT[] = "QUIT";	/* QUIT */
-const char MSG_SQUIT[] = "SQUIT";	/* SQUI */
-const char MSG_KILL[] = "KILL";	/* KILL */
-const char MSG_STATS[] = "STATS";	/* STAT */
-const char MSG_ERROR[] = "ERROR";	/* ERRO */
-const char MSG_AWAY[] = "AWAY";	/* AWAY */
-const char MSG_PING[] = "PING";	/* PING */
-const char MSG_PONG[] = "PONG";	/* PONG */
-const char MSG_PASS[] = "PASS";	/* PASS */
-const char MSG_WALLOPS[] = "WALLOPS";	/* WALL */
-const char MSG_ADMIN[] = "ADMIN";	/* ADMI */
-const char MSG_NOTICE[] = "NOTICE";	/* NOTI */
-const char MSG_JOIN[] = "JOIN";	/* JOIN */
-const char MSG_PART[] = "PART";	/* PART */
-const char MSG_MOTD[] = "MOTD";	/* MOTD */
-const char MSG_MODE[] = "MODE";	/* MODE */
-const char MSG_KICK[] = "KICK";	/* KICK */
-const char MSG_KLINE[] = "KLINE";	/* KLINE */
-const char MSG_UNKLINE[] = "UNKLINE";	/* UNKLINE */
-const char MSG_CHATOPS[] = "CHATOPS";	/* CHATOPS */
-const char MSG_NETINFO[] = "NETINFO";	/* NETINFO */
-const char MSG_CREDITS[] = "CREDITS";
-const char MSG_SNETINFO[] = "SNETINFO";	/* SNetInfo */
-const char MSG_SVINFO[] = "SVINFO";
-const char MSG_CAPAB[] = "CAPAB";
-const char MSG_SJOIN[] = "SJOIN";
+char *MSG_EOB = "EOB";	/* end of burst */
+char *MSG_PRIVATE = "PRIVMSG";	/* PRIV */
+char *MSG_NICK = "NICK";	/* NICK */
+char *MSG_SERVER = "SERVER";	/* SERV */
+char *MSG_TOPIC = "TOPIC";	/* TOPI */
+char *MSG_INVITE = "INVITE";	/* INVI */
+char *MSG_VERSION = "VERSION";	/* VERS */
+char *MSG_QUIT = "QUIT";	/* QUIT */
+char *MSG_SQUIT = "SQUIT";	/* SQUI */
+char *MSG_KILL = "KILL";	/* KILL */
+char *MSG_STATS = "STATS";	/* STAT */
+char *MSG_ERROR = "ERROR";	/* ERRO */
+char *MSG_AWAY = "AWAY";	/* AWAY */
+char *MSG_PING = "PING";	/* PING */
+char *MSG_PONG = "PONG";	/* PONG */
+char *MSG_PASS = "PASS";	/* PASS */
+char *MSG_WALLOPS = "WALLOPS";	/* WALL */
+char *MSG_ADMIN = "ADMIN";	/* ADMI */
+char *MSG_NOTICE = "NOTICE";	/* NOTI */
+char *MSG_JOIN = "JOIN";	/* JOIN */
+char *MSG_PART = "PART";	/* PART */
+char *MSG_MOTD = "MOTD";	/* MOTD */
+char *MSG_MODE = "MODE";	/* MODE */
+char *MSG_KICK = "KICK";	/* KICK */
+char *MSG_KLINE = "KLINE";	/* KLINE */
+char *MSG_UNKLINE = "UNKLINE";	/* UNKLINE */
+char *MSG_CHATOPS = "CHATOPS";	/* CHATOPS */
+char *MSG_NETINFO = "NETINFO";	/* NETINFO */
+char *MSG_CREDITS = "CREDITS";
+char *MSG_SNETINFO = "SNETINFO";	/* SNetInfo */
+char *MSG_SVINFO = "SVINFO";
+char *MSG_CAPAB = "CAPAB";
+char *MSG_SJOIN = "SJOIN";
 
 /* Umodes */
 #define UMODE_SERVNOTICE   0x00100000 /* server notices such as kill */
@@ -115,10 +115,10 @@ ProtocolInfo protocol_info =
 irc_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
-	{MSG_SERVER, 0, m_server, 0},
-	{MSG_NICK, 0, m_nick, 0},
-	{MSG_TOPIC, 0, m_topic, 0},
-	{MSG_SJOIN, 0, m_sjoin, 0},
+	{&MSG_SERVER, 0, m_server, 0},
+	{&MSG_NICK, 0, m_nick, 0},
+	{&MSG_TOPIC, 0, m_topic, 0},
+	{&MSG_SJOIN, 0, m_sjoin, 0},
 	{0, 0, 0, 0},
 };
 

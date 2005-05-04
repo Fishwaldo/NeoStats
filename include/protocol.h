@@ -32,8 +32,8 @@
 typedef void( *ircd_cmd_handler )( char *origin, char **argv, int argc, int srv );
 
 typedef struct irc_cmd {
-	const char *name;
-	const char *token;
+	char **name;
+	char **token;
 	ircd_cmd_handler handler;
 	unsigned int usage;
 }irc_cmd;
@@ -96,10 +96,10 @@ MODULEVAR extern ProtocolInfo protocol_info;
 #endif /* NEOSTATSCORE */
 #ifdef NEOSTATSCORE
 #ifndef MSGDEF
-#define MSGDEF( msg ) char *msg;
+#define MSGDEF( msg ) extern char *msg;
 #endif /* MSGDEF */
 #else /* NEOSTATSCORE */
-#define MSGDEF( msg ) MODULEVAR extern const char msg[];
+#define MSGDEF( msg ) MODULEVAR extern char *msg;
 #endif /* NEOSTATSCORE */
 MSGDEF( MSG_PRIVATE );
 MSGDEF( TOK_PRIVATE );

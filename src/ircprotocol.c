@@ -64,15 +64,15 @@ irc_cmd *cmd_list;
 EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av, int ac )
 {
 	irc_cmd *ircd_cmd_ptr;
-	ircd_cmd_intrinsic *intrinsic_cmd_ptr;
+	irc_cmd *intrinsic_cmd_ptr;
 
 	SET_SEGV_LOCATION();
 	ircd_cmd_ptr = cmd_list;
 	while( ircd_cmd_ptr->name ) {
-		if( !ircstrcasecmp( ircd_cmd_ptr->name, cmd ) || 
-		 ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && !ircstrcasecmp( ircd_cmd_ptr->token, cmd ) ) ) {
+		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) || 
+		 ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && !ircstrcasecmp( *ircd_cmd_ptr->token, cmd ) ) ) {
 			if( ircd_cmd_ptr->handler ) {
-				dlog( DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name );
+				dlog( DEBUG3, "process_ircd_cmd: running command %s", *ircd_cmd_ptr->name );
 				ircd_cmd_ptr->handler( origin, av, ac, cmdptr );
 			} else {
 				dlog( DEBUG3, "process_ircd_cmd: ignoring command %s", cmd );

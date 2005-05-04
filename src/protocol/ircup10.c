@@ -31,162 +31,162 @@
 
 /* Messages/Tokens */
 
-const char MSG_PRIVATE[] = "PRIVMSG";
-const char TOK_PRIVATE[] = "P";
-const char MSG_WHO[] = "WHO";
-const char TOK_WHO[] = "H";
-const char MSG_WHOIS[] = "WHOIS";
-const char TOK_WHOIS[] = "W";
-const char MSG_WHOWAS[] = "WHOWAS";
-const char TOK_WHOWAS[] = "X";
-const char MSG_USER[] = "USER";
-const char TOK_USER[] = "USER";
-const char MSG_NICK[] = "NICK";
-const char TOK_NICK[] = "N";
-const char MSG_SERVER[] = "SERVER";
-const char TOK_SERVER[] = "S";
-const char MSG_LIST[] = "LIST";
-const char TOK_LIST[] = "LIST";
-const char MSG_TOPIC[] = "TOPIC";
-const char TOK_TOPIC[] = "T";
-const char MSG_INVITE[] = "INVITE";
-const char TOK_INVITE[] = "I";
-const char MSG_VERSION[] = "VERSION";
-const char TOK_VERSION[] = "V";
-const char MSG_QUIT[] = "QUIT";
-const char TOK_QUIT[] = "Q";
-const char MSG_SQUIT[] = "SQUIT";
-const char TOK_SQUIT[] = "SQ";
-const char MSG_KILL[] = "KILL";
-const char TOK_KILL[] = "D";
-const char MSG_INFO[] = "INFO";
-const char TOK_INFO[] = "F";
-const char MSG_LINKS[] = "LINKS";
-const char TOK_LINKS[] = "LI";
-const char MSG_STATS[] = "STATS";
-const char TOK_STATS[] = "R";
-const char MSG_HELP[] = "HELP";
-const char TOK_HELP[] = "HELP";
-const char MSG_ERROR[] = "ERROR";
-const char TOK_ERROR[] = "Y";
-const char MSG_AWAY[] = "AWAY";
-const char TOK_AWAY[] = "A";
-const char MSG_CONNECT[] = "CONNECT";
-const char TOK_CONNECT[] = "CO";
-const char MSG_MAP[] = "MAP";
-const char TOK_MAP[] = "MAP";
-const char MSG_PING[] = "PING";
-const char TOK_PING[] = "G";
-const char MSG_PONG[] = "PONG";
-const char TOK_PONG[] = "Z";
-const char MSG_OPER[] = "OPER";
-const char TOK_OPER[] = "OPER";
-const char MSG_PASS[] = "PASS";
-const char TOK_PASS[] = "PA";
-const char MSG_WALLOPS[] = "WALLOPS";
-const char TOK_WALLOPS[] = "WA";
-const char MSG_WALLUSERS[] = "WALLUSERS";
-const char TOK_WALLUSERS[] = "WU";
-const char MSG_DESYNCH[] = "DESYNCH";
-const char TOK_DESYNCH[] = "DS";
-const char MSG_TIME[] = "TIME";
-const char TOK_TIME[] = "TI";
-const char MSG_SETTIME[] = "SETTIME";
-const char TOK_SETTIME[] = "SE";
-const char MSG_RPING[] = "RPING";
-const char TOK_RPING[] = "RI";
-const char MSG_RPONG[] = "RPONG";
-const char TOK_RPONG[] = "RO";
-const char MSG_NAMES[] = "NAMES";
-const char TOK_NAMES[] = "E";
-const char MSG_ADMIN[] = "ADMIN";
-const char TOK_ADMIN[] = "AD";
-const char MSG_TRACE[] = "TRACE";
-const char TOK_TRACE[] = "TR";
-const char MSG_NOTICE[] = "NOTICE";
-const char TOK_NOTICE[] = "O";
-const char MSG_WALLCHOPS[] = "WALLCHOPS";
-const char TOK_WALLCHOPS[] = "WC";
-const char MSG_WALLVOICES[] = "WALLVOICES";
-const char TOK_WALLVOICES[] = "WV";
-const char MSG_CPRIVMSG[] = "CPRIVMSG";
-const char TOK_CPRIVMSG[] = "CP";
-const char MSG_CNOTICE[] = "CNOTICE";
-const char TOK_CNOTICE[] = "CN";
-const char MSG_JOIN[] = "JOIN";
-const char TOK_JOIN[] = "J";
-const char MSG_PART[] = "PART";
-const char TOK_PART[] = "L";
-const char MSG_LUSERS[] = "LUSERS";
-const char TOK_LUSERS[] = "LU";
-const char MSG_MOTD[] = "MOTD";
-const char TOK_MOTD[] = "MO";
-const char MSG_MODE[] = "MODE";
-const char TOK_MODE[] = "M";
-const char MSG_KICK[] = "KICK";
-const char TOK_KICK[] = "K";
-const char MSG_USERHOST[] = "USERHOST";
-const char TOK_USERHOST[] = "USERHOST";
-const char MSG_USERIP[] = "USERIP";
-const char TOK_USERIP[] = "USERIP";
-const char MSG_ISON[] = "ISON";
-const char TOK_ISON[] = "ISON";
-const char MSG_SQUERY[] = "SQUERY";
-const char TOK_SQUERY[] = "SQUERY";
-const char MSG_SERVLIST[] = "SERVLIST";
-const char TOK_SERVLIST[] = "SERVSET";
-const char MSG_SERVSET[] = "SERVSET";
-const char TOK_SERVSET[] = "SERVSET";
-const char MSG_REHASH[] = "REHASH";
-const char TOK_REHASH[] = "REHASH";
-const char MSG_RESTART[] = "RESTART";
-const char TOK_RESTART[] = "RESTART";
-const char MSG_CLOSE[] = "CLOSE";
-const char TOK_CLOSE[] = "CLOSE";
-const char MSG_DIE[] = "DIE";
-const char TOK_DIE[] = "DIE";
-const char MSG_HASH[] = "HASH";
-const char TOK_HASH[] = "HASH";
-const char MSG_DNS[] = "DNS";
-const char TOK_DNS[] = "DNS";
-const char MSG_SILENCE[] = "SILENCE";
-const char TOK_SILENCE[] = "U";
-const char MSG_GLINE[] = "GLINE";
-const char TOK_GLINE[] = "GL";
-const char MSG_BURST[] = "BURST";
-const char TOK_BURST[] = "B";
-const char MSG_UPING[] = "UPING";
-const char TOK_UPING[] = "UP";
-const char MSG_CREATE[] = "CREATE";
-const char TOK_CREATE[] = "C";
-const char MSG_DESTRUCT[] = "DESTRUCT";
-const char TOK_DESTRUCT[] = "DE";
-const char MSG_END_OF_BURST[] = "END_OF_BURST";
-const char TOK_END_OF_BURST[] = "EB";
-const char MSG_END_OF_BURST_ACK[] = "EOB_ACK";
-const char TOK_END_OF_BURST_ACK[] = "EA";
-const char MSG_PROTO[] = "PROTO";
-const char TOK_PROTO[] = "PROTO";
-const char MSG_JUPE[] = "JUPE";
-const char TOK_JUPE[] = "JU";
-const char MSG_OPMODE[] = "OPMODE";
-const char TOK_OPMODE[] = "OM";
-const char MSG_CLEARMODE[] = "CLEARMODE";
-const char TOK_CLEARMODE[] = "CM";
-const char MSG_ACCOUNT[] = "ACCOUNT";
-const char TOK_ACCOUNT[] = "AC";
-const char MSG_ASLL[] = "ASLL";
-const char TOK_ASLL[] = "LL";
-const char MSG_POST[] = "POST";
-const char TOK_POST[] = "POST";
-const char MSG_SET[] = "SET";
-const char TOK_SET[] = "SET";
-const char MSG_RESET[] = "RESET";
-const char TOK_RESET[] = "RESET";
-const char MSG_GET[] = "GET";
-const char TOK_GET[] = "GET";
-const char MSG_PRIVS[] = "PRIVS";
-const char TOK_PRIVS[] = "PRIVS";
+char *MSG_PRIVATE = "PRIVMSG";
+char *TOK_PRIVATE = "P";
+char *MSG_WHO = "WHO";
+char *TOK_WHO = "H";
+char *MSG_WHOIS = "WHOIS";
+char *TOK_WHOIS = "W";
+char *MSG_WHOWAS = "WHOWAS";
+char *TOK_WHOWAS = "X";
+char *MSG_USER = "USER";
+char *TOK_USER = "USER";
+char *MSG_NICK = "NICK";
+char *TOK_NICK = "N";
+char *MSG_SERVER = "SERVER";
+char *TOK_SERVER = "S";
+char *MSG_LIST = "LIST";
+char *TOK_LIST = "LIST";
+char *MSG_TOPIC = "TOPIC";
+char *TOK_TOPIC = "T";
+char *MSG_INVITE = "INVITE";
+char *TOK_INVITE = "I";
+char *MSG_VERSION = "VERSION";
+char *TOK_VERSION = "V";
+char *MSG_QUIT = "QUIT";
+char *TOK_QUIT = "Q";
+char *MSG_SQUIT = "SQUIT";
+char *TOK_SQUIT = "SQ";
+char *MSG_KILL = "KILL";
+char *TOK_KILL = "D";
+char *MSG_INFO = "INFO";
+char *TOK_INFO = "F";
+char *MSG_LINKS = "LINKS";
+char *TOK_LINKS = "LI";
+char *MSG_STATS = "STATS";
+char *TOK_STATS = "R";
+char *MSG_HELP = "HELP";
+char *TOK_HELP = "HELP";
+char *MSG_ERROR = "ERROR";
+char *TOK_ERROR = "Y";
+char *MSG_AWAY = "AWAY";
+char *TOK_AWAY = "A";
+char *MSG_CONNECT = "CONNECT";
+char *TOK_CONNECT = "CO";
+char *MSG_MAP = "MAP";
+char *TOK_MAP = "MAP";
+char *MSG_PING = "PING";
+char *TOK_PING = "G";
+char *MSG_PONG = "PONG";
+char *TOK_PONG = "Z";
+char *MSG_OPER = "OPER";
+char *TOK_OPER = "OPER";
+char *MSG_PASS = "PASS";
+char *TOK_PASS = "PA";
+char *MSG_WALLOPS = "WALLOPS";
+char *TOK_WALLOPS = "WA";
+char *MSG_WALLUSERS = "WALLUSERS";
+char *TOK_WALLUSERS = "WU";
+char *MSG_DESYNCH = "DESYNCH";
+char *TOK_DESYNCH = "DS";
+char *MSG_TIME = "TIME";
+char *TOK_TIME = "TI";
+char *MSG_SETTIME = "SETTIME";
+char *TOK_SETTIME = "SE";
+char *MSG_RPING = "RPING";
+char *TOK_RPING = "RI";
+char *MSG_RPONG = "RPONG";
+char *TOK_RPONG = "RO";
+char *MSG_NAMES = "NAMES";
+char *TOK_NAMES = "E";
+char *MSG_ADMIN = "ADMIN";
+char *TOK_ADMIN = "AD";
+char *MSG_TRACE = "TRACE";
+char *TOK_TRACE = "TR";
+char *MSG_NOTICE = "NOTICE";
+char *TOK_NOTICE = "O";
+char *MSG_WALLCHOPS = "WALLCHOPS";
+char *TOK_WALLCHOPS = "WC";
+char *MSG_WALLVOICES = "WALLVOICES";
+char *TOK_WALLVOICES = "WV";
+char *MSG_CPRIVMSG = "CPRIVMSG";
+char *TOK_CPRIVMSG = "CP";
+char *MSG_CNOTICE = "CNOTICE";
+char *TOK_CNOTICE = "CN";
+char *MSG_JOIN = "JOIN";
+char *TOK_JOIN = "J";
+char *MSG_PART = "PART";
+char *TOK_PART = "L";
+char *MSG_LUSERS = "LUSERS";
+char *TOK_LUSERS = "LU";
+char *MSG_MOTD = "MOTD";
+char *TOK_MOTD = "MO";
+char *MSG_MODE = "MODE";
+char *TOK_MODE = "M";
+char *MSG_KICK = "KICK";
+char *TOK_KICK = "K";
+char *MSG_USERHOST = "USERHOST";
+char *TOK_USERHOST = "USERHOST";
+char *MSG_USERIP = "USERIP";
+char *TOK_USERIP = "USERIP";
+char *MSG_ISON = "ISON";
+char *TOK_ISON = "ISON";
+char *MSG_SQUERY = "SQUERY";
+char *TOK_SQUERY = "SQUERY";
+char *MSG_SERVLIST = "SERVLIST";
+char *TOK_SERVLIST = "SERVSET";
+char *MSG_SERVSET = "SERVSET";
+char *TOK_SERVSET = "SERVSET";
+char *MSG_REHASH = "REHASH";
+char *TOK_REHASH = "REHASH";
+char *MSG_RESTART = "RESTART";
+char *TOK_RESTART = "RESTART";
+char *MSG_CLOSE = "CLOSE";
+char *TOK_CLOSE = "CLOSE";
+char *MSG_DIE = "DIE";
+char *TOK_DIE = "DIE";
+char *MSG_HASH = "HASH";
+char *TOK_HASH = "HASH";
+char *MSG_DNS = "DNS";
+char *TOK_DNS = "DNS";
+char *MSG_SILENCE = "SILENCE";
+char *TOK_SILENCE = "U";
+char *MSG_GLINE = "GLINE";
+char *TOK_GLINE = "GL";
+char *MSG_BURST = "BURST";
+char *TOK_BURST = "B";
+char *MSG_UPING = "UPING";
+char *TOK_UPING = "UP";
+char *MSG_CREATE = "CREATE";
+char *TOK_CREATE = "C";
+char *MSG_DESTRUCT = "DESTRUCT";
+char *TOK_DESTRUCT = "DE";
+char *MSG_END_OF_BURST = "END_OF_BURST";
+char *TOK_END_OF_BURST = "EB";
+char *MSG_END_OF_BURST_ACK = "EOB_ACK";
+char *TOK_END_OF_BURST_ACK = "EA";
+char *MSG_PROTO = "PROTO";
+char *TOK_PROTO = "PROTO";
+char *MSG_JUPE = "JUPE";
+char *TOK_JUPE = "JU";
+char *MSG_OPMODE = "OPMODE";
+char *TOK_OPMODE = "OM";
+char *MSG_CLEARMODE = "CLEARMODE";
+char *TOK_CLEARMODE = "CM";
+char *MSG_ACCOUNT = "ACCOUNT";
+char *TOK_ACCOUNT = "AC";
+char *MSG_ASLL = "ASLL";
+char *TOK_ASLL = "LL";
+char *MSG_POST = "POST";
+char *TOK_POST = "POST";
+char *MSG_SET = "SET";
+char *TOK_SET = "SET";
+char *MSG_RESET = "RESET";
+char *TOK_RESET = "RESET";
+char *MSG_GET = "GET";
+char *TOK_GET = "GET";
+char *MSG_PRIVS = "PRIVS";
+char *TOK_PRIVS = "PRIVS";
 
  /* User modes: */
 #define UMODE_SERVNOTICE        0x00800000	/* See server notices */
@@ -230,19 +230,19 @@ ProtocolInfo protocol_info =
 irc_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
-	{MSG_PRIVATE, TOK_PRIVATE, m_private, 0},
-	{MSG_CPRIVMSG, TOK_CPRIVMSG, m_private, 0},
-	{MSG_NOTICE, TOK_NOTICE, m_notice, 0},
-	{MSG_CNOTICE, TOK_CNOTICE, m_notice, 0},
-	{MSG_SERVER, TOK_SERVER, m_server, 0},
-	{MSG_MODE, TOK_MODE, m_mode, 0},
-	{MSG_NICK, TOK_NICK, m_nick, 0},
-	{MSG_CREATE, TOK_CREATE, m_create, 0},
-	{MSG_BURST, TOK_BURST, m_burst, 0},
-	{MSG_END_OF_BURST, TOK_END_OF_BURST, m_end_of_burst, 0},
-	{MSG_END_OF_BURST_ACK, TOK_END_OF_BURST_ACK, _m_ignorecommand, 0},
-	{MSG_WALLOPS, TOK_WALLOPS, m_wallops, 0},
-	{MSG_WALLUSERS, TOK_WALLUSERS, m_wallusers, 0},
+	{&MSG_PRIVATE, &TOK_PRIVATE, m_private, 0},
+	{&MSG_CPRIVMSG, &TOK_CPRIVMSG, m_private, 0},
+	{&MSG_NOTICE, &TOK_NOTICE, m_notice, 0},
+	{&MSG_CNOTICE, &TOK_CNOTICE, m_notice, 0},
+	{&MSG_SERVER, &TOK_SERVER, m_server, 0},
+	{&MSG_MODE, &TOK_MODE, m_mode, 0},
+	{&MSG_NICK, &TOK_NICK, m_nick, 0},
+	{&MSG_CREATE, &TOK_CREATE, m_create, 0},
+	{&MSG_BURST, &TOK_BURST, m_burst, 0},
+	{&MSG_END_OF_BURST, &TOK_END_OF_BURST, m_end_of_burst, 0},
+	{&MSG_END_OF_BURST_ACK, &TOK_END_OF_BURST_ACK, _m_ignorecommand, 0},
+	{&MSG_WALLOPS, &TOK_WALLOPS, m_wallops, 0},
+	{&MSG_WALLUSERS, &TOK_WALLUSERS, m_wallusers, 0},
 	{0, 0, 0, 0},
 };
 

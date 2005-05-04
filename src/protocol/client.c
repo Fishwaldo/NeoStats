@@ -27,129 +27,129 @@
 #include "users.h"
 
 /* Messages/Tokens */
-const char MSG_PRIVATE[] = "PRIVMSG";	/* PRIV */
-const char MSG_WHOIS[] = "WHOIS";	/* WHOI */
-const char MSG_WHOWAS[] = "WHOWAS";	/* WHOW */
-const char MSG_USER[] = "USER";	/* USER */
-const char MSG_NICK[] = "NICK";	/* NICK */
-const char MSG_LIST[] = "LIST";	/* LIST */
-const char MSG_TOPIC[] = "TOPIC";	/* TOPI */
-const char MSG_INVITE[] = "INVITE";	/* INVI */
-const char MSG_VERSION[] = "VERSION";	/* VERS */
-const char MSG_QUIT[] = "QUIT";	/* QUIT */
-const char MSG_KILL[] = "KILL";	/* KILL */
-const char MSG_INFO[] = "INFO";	/* INFO */
-const char MSG_LINKS[] = "LINKS";	/* LINK */
-const char MSG_SUMMON[] = "SUMMON";	/* SUMM */
-const char MSG_USERS[] = "USERS";	/* USER -> USRS */
-const char MSG_HELP[] = "HELP";	/* HELP */
-const char MSG_HELPOP[] = "HELPOP";	/* HELP */
-const char MSG_ERROR[] = "ERROR";	/* ERRO */
-const char MSG_AWAY[] = "AWAY";	/* AWAY */
-const char MSG_CONNECT[] = "CONNECT";	/* CONN */
-const char MSG_PING[] = "PING";	/* PING */
-const char MSG_PONG[] = "PONG";	/* PONG */
-const char MSG_OPER[] = "OPER";	/* OPER */
-const char MSG_PASS[] = "PASS";	/* PASS */
-const char MSG_WALLOPS[] = "WALLOPS";	/* WALL */
-const char MSG_TIME[] = "TIME";	/* TIME */
-const char MSG_NAMES[] = "NAMES";	/* NAME */
-const char MSG_ADMIN[] = "ADMIN";	/* ADMI */
-const char MSG_NOTICE[] = "NOTICE";	/* NOTI */
-const char MSG_JOIN[] = "JOIN";	/* JOIN */
-const char MSG_PART[] = "PART";	/* PART */
-const char MSG_LUSERS[] = "LUSERS";	/* LUSE */
-const char MSG_MOTD[] = "MOTD";	/* MOTD */
-const char MSG_MODE[] = "MODE";	/* MODE */
-const char MSG_KICK[] = "KICK";	/* KICK */
-const char MSG_SERVICE[] = "SERVICE";	/* SERV -> SRVI */
-const char MSG_USERHOST[] = "USERHOST";	/* USER -> USRH */
-const char MSG_ISON[] = "ISON";	/* ISON */
-const char MSG_REHASH[] = "REHASH";	/* REHA */
-const char MSG_RESTART[] = "RESTART";	/* REST */
-const char MSG_CLOSE[] = "CLOSE";	/* CLOS */
-const char MSG_DIE[] = "DIE";	/* DIE */
-const char MSG_HASH[] = "HASH";	/* HASH */
-const char MSG_DNS[] = "DNS";	/* DNS  -> DNSS */
-const char MSG_SILENCE[] = "SILENCE";	/* SILE */
-const char MSG_AKILL[] = "AKILL";	/* AKILL */
-const char MSG_KLINE[] = "KLINE";	/* KLINE */
-const char MSG_UNKLINE[] = "UNKLINE";	/* UNKLINE */
-const char MSG_RAKILL[] = "RAKILL";	/* RAKILL */
-const char MSG_GNOTICE[] = "GNOTICE";	/* GNOTICE */
-const char MSG_GOPER[] = "GOPER";	/* GOPER */
-const char MSG_GLOBOPS[] = "GLOBOPS";	/* GLOBOPS */
-const char MSG_LOCOPS[] = "LOCOPS";	/* LOCOPS */
-const char MSG_PROTOCTL[] = "PROTOCTL";	/* PROTOCTL */
-const char MSG_WATCH[] = "WATCH";	/* WATCH */
-const char MSG_TRACE[] = "TRACE";	/* TRAC */
-const char MSG_SQLINE[] = "SQLINE";	/* SQLINE */
-const char MSG_UNSQLINE[] = "UNSQLINE";	/* UNSQLINE */
-const char MSG_IDENTIFY[] = "IDENTIFY";	/* IDENTIFY */
-const char MSG_NICKSERV[] = "NICKSERV";	/* NICKSERV */
-const char MSG_NS[] = "NS";
-const char MSG_CHANSERV[] = "CHANSERV";	/* CHANSERV */
-const char MSG_CS[] = "CS";
-const char MSG_OPERSERV[] = "OPERSERV";	/* OPERSERV */
-const char MSG_OS[] = "OS";
-const char MSG_MEMOSERV[] = "MEMOSERV";	/* MEMOSERV */
-const char MSG_MS[] = "MS";
-const char MSG_SERVICES[] = "SERVICES";	/* SERVICES */
-const char MSG_SAMODE[] = "SAMODE";	/* SAMODE */
-const char MSG_CHATOPS[] = "CHATOPS";	/* CHATOPS */
-const char MSG_ZLINE[] = "ZLINE";	/* ZLINE */
-const char MSG_UNZLINE[] = "UNZLINE";	/* UNZLINE */
-const char MSG_HELPSERV[] = "HELPSERV";	/* HELPSERV */
-const char MSG_HS[] = "HS";
-const char MSG_RULES[] = "RULES";	/* RULES */
-const char MSG_MAP[] = "MAP";	/* MAP */
-const char MSG_DALINFO[] = "DALINFO";	/* dalinfo */
-const char MSG_ADMINCHAT[] = "ADCHAT";	/* Admin chat */
-const char MSG_MKPASSWD[] = "MKPASSWD";	/* MKPASSWD */
-const char MSG_ADDLINE[] = "ADDLINE";	/* ADDLINE */
-const char MSG_GLINE[] = "GLINE";	/* The awesome g-line */
-const char MSG_SJOIN[] = "SJOIN";
-const char MSG_SETHOST[] = "SETHOST";	/* sethost */
-const char MSG_NACHAT[] = "NACHAT";	/* netadmin chat */
-const char MSG_SETIDENT[] = "SETIDENT";
-const char MSG_SETNAME[] = "SETNAME";	/* set GECOS */
-const char MSG_LAG[] = "LAG";	/* Lag detect */
-const char MSG_STATSERV[] = "STATSERV";	/* alias */
-const char MSG_KNOCK[] = "KNOCK";
-const char MSG_CREDITS[] = "CREDITS";
-const char MSG_LICENSE[] = "LICENSE";
-const char MSG_CHGHOST[] = "CHGHOST";
-const char MSG_RPING[] = "RPING";
-const char MSG_RPONG[] = "RPONG";
-const char MSG_NETINFO[] = "NETINFO";
-const char MSG_SENDUMODE[] = "SENDUMODE";
-const char MSG_ADDMOTD[] = "ADDMOTD";
-const char MSG_ADDOMOTD[] = "ADDOMOTD";
-const char MSG_SMO[] = "SMO";
-const char MSG_OPERMOTD[] = "OPERMOTD";
-const char MSG_TSCTL[] = "TSCTL";
-const char MSG_SAJOIN[] = "SAJOIN";
-const char MSG_SAPART[] = "SAPART";
-const char MSG_CHGIDENT[] = "CHGIDENT";
-const char MSG_SWHOIS[] = "SWHOIS";
-const char MSG_SVSO[] = "SVSO";
-const char MSG_TKL[] = "TKL";
-const char MSG_VHOST[] = "VHOST";
-const char MSG_BOTMOTD[] = "BOTMOTD";
-const char MSG_REMGLINE[] = "REMGLINE";	/* remove g-line */
-const char MSG_UMODE2[] = "UMODE2";
-const char MSG_DCCDENY[] = "DCCDENY";
-const char MSG_UNDCCDENY[] = "UNDCCDENY";
-const char MSG_CHGNAME[] = "CHGNAME";
-const char MSG_SHUN[] = "SHUN";
-const char MSG_NEWJOIN[] = "NEWJOIN";	/* For CR Java Chat */
-const char MSG_POST[] = "POST";
-const char MSG_INFOSERV[] = "INFOSERV";
-const char MSG_IS[] = "IS";
-const char MSG_BOTSERV[] = "BOTSERV";
-const char MSG_CYCLE[] = "CYCLE";
-const char MSG_MODULE[] = "MODULE";
-const char MSG_SENDSNO[] = "SENDSNO";
+char *MSG_PRIVATE = "PRIVMSG";	/* PRIV */
+char *MSG_WHOIS = "WHOIS";	/* WHOI */
+char *MSG_WHOWAS = "WHOWAS";	/* WHOW */
+char *MSG_USER = "USER";	/* USER */
+char *MSG_NICK = "NICK";	/* NICK */
+char *MSG_LIST = "LIST";	/* LIST */
+char *MSG_TOPIC = "TOPIC";	/* TOPI */
+char *MSG_INVITE = "INVITE";	/* INVI */
+char *MSG_VERSION = "VERSION";	/* VERS */
+char *MSG_QUIT = "QUIT";	/* QUIT */
+char *MSG_KILL = "KILL";	/* KILL */
+char *MSG_INFO = "INFO";	/* INFO */
+char *MSG_LINKS = "LINKS";	/* LINK */
+char *MSG_SUMMON = "SUMMON";	/* SUMM */
+char *MSG_USERS = "USERS";	/* USER -> USRS */
+char *MSG_HELP = "HELP";	/* HELP */
+char *MSG_HELPOP = "HELPOP";	/* HELP */
+char *MSG_ERROR = "ERROR";	/* ERRO */
+char *MSG_AWAY = "AWAY";	/* AWAY */
+char *MSG_CONNECT = "CONNECT";	/* CONN */
+char *MSG_PING = "PING";	/* PING */
+char *MSG_PONG = "PONG";	/* PONG */
+char *MSG_OPER = "OPER";	/* OPER */
+char *MSG_PASS = "PASS";	/* PASS */
+char *MSG_WALLOPS = "WALLOPS";	/* WALL */
+char *MSG_TIME = "TIME";	/* TIME */
+char *MSG_NAMES = "NAMES";	/* NAME */
+char *MSG_ADMIN = "ADMIN";	/* ADMI */
+char *MSG_NOTICE = "NOTICE";	/* NOTI */
+char *MSG_JOIN = "JOIN";	/* JOIN */
+char *MSG_PART = "PART";	/* PART */
+char *MSG_LUSERS = "LUSERS";	/* LUSE */
+char *MSG_MOTD = "MOTD";	/* MOTD */
+char *MSG_MODE = "MODE";	/* MODE */
+char *MSG_KICK = "KICK";	/* KICK */
+char *MSG_SERVICE = "SERVICE";	/* SERV -> SRVI */
+char *MSG_USERHOST = "USERHOST";	/* USER -> USRH */
+char *MSG_ISON = "ISON";	/* ISON */
+char *MSG_REHASH = "REHASH";	/* REHA */
+char *MSG_RESTART = "RESTART";	/* REST */
+char *MSG_CLOSE = "CLOSE";	/* CLOS */
+char *MSG_DIE = "DIE";	/* DIE */
+char *MSG_HASH = "HASH";	/* HASH */
+char *MSG_DNS = "DNS";	/* DNS  -> DNSS */
+char *MSG_SILENCE = "SILENCE";	/* SILE */
+char *MSG_AKILL = "AKILL";	/* AKILL */
+char *MSG_KLINE = "KLINE";	/* KLINE */
+char *MSG_UNKLINE = "UNKLINE";	/* UNKLINE */
+char *MSG_RAKILL = "RAKILL";	/* RAKILL */
+char *MSG_GNOTICE = "GNOTICE";	/* GNOTICE */
+char *MSG_GOPER = "GOPER";	/* GOPER */
+char *MSG_GLOBOPS = "GLOBOPS";	/* GLOBOPS */
+char *MSG_LOCOPS = "LOCOPS";	/* LOCOPS */
+char *MSG_PROTOCTL = "PROTOCTL";	/* PROTOCTL */
+char *MSG_WATCH = "WATCH";	/* WATCH */
+char *MSG_TRACE = "TRACE";	/* TRAC */
+char *MSG_SQLINE = "SQLINE";	/* SQLINE */
+char *MSG_UNSQLINE = "UNSQLINE";	/* UNSQLINE */
+char *MSG_IDENTIFY = "IDENTIFY";	/* IDENTIFY */
+char *MSG_NICKSERV = "NICKSERV";	/* NICKSERV */
+char *MSG_NS = "NS";
+char *MSG_CHANSERV = "CHANSERV";	/* CHANSERV */
+char *MSG_CS = "CS";
+char *MSG_OPERSERV = "OPERSERV";	/* OPERSERV */
+char *MSG_OS = "OS";
+char *MSG_MEMOSERV = "MEMOSERV";	/* MEMOSERV */
+char *MSG_MS = "MS";
+char *MSG_SERVICES = "SERVICES";	/* SERVICES */
+char *MSG_SAMODE = "SAMODE";	/* SAMODE */
+char *MSG_CHATOPS = "CHATOPS";	/* CHATOPS */
+char *MSG_ZLINE = "ZLINE";	/* ZLINE */
+char *MSG_UNZLINE = "UNZLINE";	/* UNZLINE */
+char *MSG_HELPSERV = "HELPSERV";	/* HELPSERV */
+char *MSG_HS = "HS";
+char *MSG_RULES = "RULES";	/* RULES */
+char *MSG_MAP = "MAP";	/* MAP */
+char *MSG_DALINFO = "DALINFO";	/* dalinfo */
+char *MSG_ADMINCHAT = "ADCHAT";	/* Admin chat */
+char *MSG_MKPASSWD = "MKPASSWD";	/* MKPASSWD */
+char *MSG_ADDLINE = "ADDLINE";	/* ADDLINE */
+char *MSG_GLINE = "GLINE";	/* The awesome g-line */
+char *MSG_SJOIN = "SJOIN";
+char *MSG_SETHOST = "SETHOST";	/* sethost */
+char *MSG_NACHAT = "NACHAT";	/* netadmin chat */
+char *MSG_SETIDENT = "SETIDENT";
+char *MSG_SETNAME = "SETNAME";	/* set GECOS */
+char *MSG_LAG = "LAG";	/* Lag detect */
+char *MSG_STATSERV = "STATSERV";	/* alias */
+char *MSG_KNOCK = "KNOCK";
+char *MSG_CREDITS = "CREDITS";
+char *MSG_LICENSE = "LICENSE";
+char *MSG_CHGHOST = "CHGHOST";
+char *MSG_RPING = "RPING";
+char *MSG_RPONG = "RPONG";
+char *MSG_NETINFO = "NETINFO";
+char *MSG_SENDUMODE = "SENDUMODE";
+char *MSG_ADDMOTD = "ADDMOTD";
+char *MSG_ADDOMOTD = "ADDOMOTD";
+char *MSG_SMO = "SMO";
+char *MSG_OPERMOTD = "OPERMOTD";
+char *MSG_TSCTL = "TSCTL";
+char *MSG_SAJOIN = "SAJOIN";
+char *MSG_SAPART = "SAPART";
+char *MSG_CHGIDENT = "CHGIDENT";
+char *MSG_SWHOIS = "SWHOIS";
+char *MSG_SVSO = "SVSO";
+char *MSG_TKL = "TKL";
+char *MSG_VHOST = "VHOST";
+char *MSG_BOTMOTD = "BOTMOTD";
+char *MSG_REMGLINE = "REMGLINE";	/* remove g-line */
+char *MSG_UMODE2 = "UMODE2";
+char *MSG_DCCDENY = "DCCDENY";
+char *MSG_UNDCCDENY = "UNDCCDENY";
+char *MSG_CHGNAME = "CHGNAME";
+char *MSG_SHUN = "SHUN";
+char *MSG_NEWJOIN = "NEWJOIN";	/* For CR Java Chat */
+char *MSG_POST = "POST";
+char *MSG_INFOSERV = "INFOSERV";
+char *MSG_IS = "IS";
+char *MSG_BOTSERV = "BOTSERV";
+char *MSG_CYCLE = "CYCLE";
+char *MSG_MODULE = "MODULE";
+char *MSG_SENDSNO = "SENDSNO";
 
 /* Umodes */
 #define UMODE_FAILOP		0x00200000
@@ -212,14 +212,14 @@ ProtocolInfo protocol_info =
 irc_cmd cmd_list[] = 
 {
 	/*Message	Token	Function	usage */
-	{MSG_PRIVATE, 0, m_private, 0},
-	{MSG_NOTICE, 0, _m_notice, 0},
+	{&MSG_PRIVATE, 0, m_private, 0},
+	{&MSG_NOTICE, 0, _m_notice, 0},
 	{"376", 0, m_emotd, 0},
-	{MSG_NICK, 0, m_nick, 0},
-	{MSG_TOPIC, 0, m_topic, 0},
-	{MSG_KICK, 0, m_kick, 0},
-	{MSG_JOIN, 0, m_join, 0},
-	{MSG_PART, 0, m_part, 0},
+	{&MSG_NICK, 0, m_nick, 0},
+	{&MSG_TOPIC, 0, m_topic, 0},
+	{&MSG_KICK, 0, m_kick, 0},
+	{&MSG_JOIN, 0, m_join, 0},
+	{&MSG_PART, 0, m_part, 0},
 	{0, 0, 0, 0},
 };
 

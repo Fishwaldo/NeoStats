@@ -24,78 +24,78 @@
 #include "neostats.h"
 #include "protocol.h"
 
-const char MSG_PRIVATE[] = "PRIVMSG";
-const char MSG_WHO[] = "WHO";
-const char MSG_WHOIS[] = "WHOIS";
-const char MSG_WHOWAS[] = "WHOWAS";
-const char MSG_USER[] = "USER";
-const char MSG_NICK[] = "NICK";
-const char MSG_SERVER[] = "SERVER";
-const char MSG_LIST[] = "LIST";
-const char MSG_TOPIC[] = "TOPIC";
-const char MSG_INVITE[] = "INVITE";
-const char MSG_VERSION[] = "VERSION";
-const char MSG_QUIT[] = "QUIT";
-const char MSG_SQUIT[] = "SQUIT";
-const char MSG_KILL[] = "KILL";
-const char MSG_INFO[] = "INFO";
-const char MSG_LINKS[] = "LINKS";
-const char MSG_STATS[] = "STATS";
-const char MSG_USERS[] = "USERS";
-const char MSG_HELP[] = "HELP";
-const char MSG_ERROR[] = "ERROR";
-const char MSG_AWAY[] = "AWAY";
-const char MSG_CONNECT[] = "CONNECT";
-const char MSG_PING[] = "PING";
-const char MSG_PONG[] = "PONG";
-const char MSG_OPER[] = "OPER";
-const char MSG_PASS[] = "PASS";
-const char MSG_WALLOPS[] = "WALLOPS";
-const char MSG_TIME[] = "TIME";
-const char MSG_NAMES[] = "NAMES";
-const char MSG_ADMIN[] = "ADMIN";
-const char MSG_TRACE[] = "TRACE";
-const char MSG_LTRACE[] = "LTRACE";
-const char MSG_NOTICE[] = "NOTICE";
-const char MSG_JOIN[] = "JOIN";
-const char MSG_PART[] = "PART";
-const char MSG_LUSERS[] = "LUSERS";
-const char MSG_MOTD[] = "MOTD";
-const char MSG_MODE[] = "MODE";
-const char MSG_KICK[] = "KICK";
-const char MSG_USERHOST[] = "USERHOST";
-const char MSG_ISON[] = "ISON";
-const char MSG_REHASH[] = "REHASH";
-const char MSG_RESTART[] = "RESTART";
-const char MSG_CLOSE[] = "CLOSE";
-const char MSG_SVINFO[] = "SVINFO";
-const char MSG_SJOIN[] = "SJOIN";
-const char MSG_CAPAB[] = "CAPAB";
-const char MSG_DIE[] = "DIE";
-const char MSG_HASH[] = "HASH";
-const char MSG_DNS[] = "DNS";
-const char MSG_OPERWALL[] = "OPERWALL";
-const char MSG_KLINE[] = "KLINE";
-const char MSG_UNKLINE[] = "UNKLINE";
-const char MSG_DLINE[] = "DLINE";
-const char MSG_UNDLINE[] = "UNDLINE";
-const char MSG_HTM[] = "HTM";
-const char MSG_SET[] = "SET";
-const char MSG_GLINE[] = "GLINE";
-const char MSG_UNGLINE[] = "UNGLINE";
-const char MSG_LOCOPS[] = "LOCOPS";
-const char MSG_LWALLOPS[] = "LWALLOPS";
-const char MSG_KNOCK[] = "KNOCK";
-const char MSG_MAP[] = "MAP";
-const char MSG_ETRACE[] = "ETRACE";
-const char MSG_SINFO[] = "SINFO";
-const char MSG_TESTLINE[] = "TESTLINE";
-const char MSG_OPERSPY[] = "OPERSPY";
-const char MSG_ENCAP[] = "ENCAP";
-const char MSG_XLINE[] = "XLINE";
-const char MSG_UNXLINE[] = "UNXLINE";
-const char MSG_RESV[] = "RESV";
-const char MSG_UNRESV[] = "UNRESV";
+char *MSG_PRIVATE = "PRIVMSG";
+char *MSG_WHO = "WHO";
+char *MSG_WHOIS = "WHOIS";
+char *MSG_WHOWAS = "WHOWAS";
+char *MSG_USER = "USER";
+char *MSG_NICK = "NICK";
+char *MSG_SERVER = "SERVER";
+char *MSG_LIST = "LIST";
+char *MSG_TOPIC = "TOPIC";
+char *MSG_INVITE = "INVITE";
+char *MSG_VERSION = "VERSION";
+char *MSG_QUIT = "QUIT";
+char *MSG_SQUIT = "SQUIT";
+char *MSG_KILL = "KILL";
+char *MSG_INFO = "INFO";
+char *MSG_LINKS = "LINKS";
+char *MSG_STATS = "STATS";
+char *MSG_USERS = "USERS";
+char *MSG_HELP = "HELP";
+char *MSG_ERROR = "ERROR";
+char *MSG_AWAY = "AWAY";
+char *MSG_CONNECT = "CONNECT";
+char *MSG_PING = "PING";
+char *MSG_PONG = "PONG";
+char *MSG_OPER = "OPER";
+char *MSG_PASS = "PASS";
+char *MSG_WALLOPS = "WALLOPS";
+char *MSG_TIME = "TIME";
+char *MSG_NAMES = "NAMES";
+char *MSG_ADMIN = "ADMIN";
+char *MSG_TRACE = "TRACE";
+char *MSG_LTRACE = "LTRACE";
+char *MSG_NOTICE = "NOTICE";
+char *MSG_JOIN = "JOIN";
+char *MSG_PART = "PART";
+char *MSG_LUSERS = "LUSERS";
+char *MSG_MOTD = "MOTD";
+char *MSG_MODE = "MODE";
+char *MSG_KICK = "KICK";
+char *MSG_USERHOST = "USERHOST";
+char *MSG_ISON = "ISON";
+char *MSG_REHASH = "REHASH";
+char *MSG_RESTART = "RESTART";
+char *MSG_CLOSE = "CLOSE";
+char *MSG_SVINFO = "SVINFO";
+char *MSG_SJOIN = "SJOIN";
+char *MSG_CAPAB = "CAPAB";
+char *MSG_DIE = "DIE";
+char *MSG_HASH = "HASH";
+char *MSG_DNS = "DNS";
+char *MSG_OPERWALL = "OPERWALL";
+char *MSG_KLINE = "KLINE";
+char *MSG_UNKLINE = "UNKLINE";
+char *MSG_DLINE = "DLINE";
+char *MSG_UNDLINE = "UNDLINE";
+char *MSG_HTM = "HTM";
+char *MSG_SET = "SET";
+char *MSG_GLINE = "GLINE";
+char *MSG_UNGLINE = "UNGLINE";
+char *MSG_LOCOPS = "LOCOPS";
+char *MSG_LWALLOPS = "LWALLOPS";
+char *MSG_KNOCK = "KNOCK";
+char *MSG_MAP = "MAP";
+char *MSG_ETRACE = "ETRACE";
+char *MSG_SINFO = "SINFO";
+char *MSG_TESTLINE = "TESTLINE";
+char *MSG_OPERSPY = "OPERSPY";
+char *MSG_ENCAP = "ENCAP";
+char *MSG_XLINE = "XLINE";
+char *MSG_UNXLINE = "UNXLINE";
+char *MSG_RESV = "RESV";
+char *MSG_UNRESV = "UNRESV";
 
 /* Umodes */
 #define UMODE_SERVNOTICE   0x00000000 /* server notices such as kill */
@@ -154,8 +154,8 @@ ProtocolInfo protocol_info =
 irc_cmd cmd_list[] = 
 {
 	/* Command Token Function usage */
-	{MSG_SERVER, 0, m_server, 0},
-	{MSG_NICK, 0, m_nick, 0},
+	{&MSG_SERVER, 0, m_server, 0},
+	{&MSG_NICK, 0, m_nick, 0},
 	{0, 0, 0, 0},
 };
 

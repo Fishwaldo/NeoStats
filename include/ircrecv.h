@@ -24,13 +24,6 @@
 #ifndef _IRCRECV_H_
 #define _IRCRECV_H_
 
-typedef struct ircd_cmd_intrinsic {
-	char **name;
-	char **token;
-	ircd_cmd_handler handler;
-	unsigned int usage;
-}ircd_cmd_intrinsic;
-
-extern ircd_cmd_intrinsic intrinsic_cmd_list[];
+extern irc_cmd intrinsic_cmd_list[];
 
 #endif /* _IRCRECV_H_ */
