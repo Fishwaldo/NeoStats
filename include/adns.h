@@ -38,9 +38,7 @@
 #pragma warning(disable:4003)
 #endif /* _MSC_VER */
 
-/* ---------------- START OF C HEADER -------------- */
-
-#include <Winsock2.h>
+#include <winsock2.h>
 #include <windows.h>
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
@@ -48,20 +46,7 @@
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
 #endif /* HAVE_MALLOC_H */
-
-/* Win32 does not set errno on Winsock errors(!) 
- * We have to map the winsock errors to errno manually
- * in order to support the original UNIX error hadnlig
- */
-#define ADNS_CAPTURE_ERRNO {errno = WSAGetLastError(); WSASetLastError(errno);}
-#define ADNS_CLEAR_ERRNO {WSASetLastError(errno = 0);}
-
 #define ENOPROTOOPT WSAENOPROTOOPT
-
-/* ---------------- END OF C HEADER -------------- */
-#else
-# define ADNS_CAPTURE_ERRNO {}
-# define ADNS_CLEAR_ERRNO {}
 #endif
 
 
