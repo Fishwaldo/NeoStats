@@ -43,6 +43,13 @@ void adns__vdiag(adns_state ads, const char *pfx, adns_initflags prevent,
 	const char *bef, *aft;
 	vbuf vb;
 
+	
+	{
+		static char dlog_buf[BUFSIZE];
+		ircvsnprintf( dlog_buf, BUFSIZE, fmt, al );
+		dlog( DEBUG1, dlog_buf );
+	}
+
 	if (!ads->diagfile || (!(ads->iflags & adns_if_debug)
 	     && (!prevent || (ads->iflags & prevent))))
 		return;
