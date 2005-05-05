@@ -479,7 +479,6 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 	if( in_do_exit )
 	{
 		nlog( LOG_CRITICAL, "BUG: recursive do_exit calls, report this log entry to the NeoStats team" );
-		return;
 	}
 	in_do_exit = 1;
 	return_code = exit_reports[exitcode].exit_code;
