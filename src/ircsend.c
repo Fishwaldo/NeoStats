@@ -143,8 +143,8 @@ static void _send_svsnick( const char *source, const char *target, const char *n
 static void _send_svsjoin( const char *source, const char *target, const char *chan );
 static void _send_svspart( const char *source, const char *target, const char *chan );
 static void _send_svsmode( const char *source, const char *target, const char *modes );
-static void _send_svshost( const char *source, const char *who, const char *vhost );
 static void _send_svskill( const char *source, const char *target, const char *reason );
+#if 0 /* Work in progress */
 static void _send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts );
 static void _send_rakill( const char *source, const char *host, const char *ident );
 static void _send_sqline( const char *source, const char *mask, const char *reason );
@@ -157,6 +157,7 @@ static void _send_zline( const char *source, const char *mask, const char *reaso
 static void _send_unzline( const char *source, const char *mask );
 static void _send_kline( const char *source, const char *mask, const char *reason );
 static void _send_unkline( const char *source, const char *mask );
+#endif /* 0 Work in progress */
 static void _send_stats( const char *source, const char type, const char *target );
 static void _send_version( const char *source, const char *target );
 
@@ -189,6 +190,7 @@ protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_swhois, NULL, "send_swhois", NULL, NULL, NULL, NULL, 0, FEATURE_SWHOIS},
 	{( void * )&irc_send_smo, NULL, "send_smo", NULL, NULL, NULL, NULL, 0, FEATURE_SMO},
 	{( void * )&irc_send_svstime, NULL, "send_svstime", NULL, NULL, NULL, NULL, 0, FEATURE_SVSTIME},
+#if 0 /* Work in progress */
 	{( void * )&irc_send_akill, NULL, "send_akill", &MSG_AKILL, "MSG_AKILL", &TOK_AKILL, "TOK_AKILL", 0, 0},
 	{( void * )&irc_send_rakill, NULL, "send_rakill", &MSG_RAKILL, "MSG_RAKILL", &TOK_RAKILL, "TOK_RAKILL", 0, 0},
 	{( void * )&irc_send_sqline, NULL, "send_sqline", &MSG_UNSQLINE, "MSG_UNSQLINE", &TOK_UNSQLINE, "TOK_UNSQLINE", 0, 0},
@@ -199,6 +201,7 @@ protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_unkline, NULL, "send_unkline", &MSG_UNKLINE, "MSG_UNKLINE", &TOK_UNKLINE, "TOK_UNKLINE", 0, 0},
 	{( void * )&irc_send_gline, NULL, "send_gline", &MSG_GLINE, "MSG_GLINE", &TOK_GLINE, "TOK_GLINE", 0, 0},
 	{( void * )&irc_send_remgline, NULL, "send_remgline", &MSG_REMGLINE, "MSG_REMGLINE", &TOK_REMGLINE, "TOK_REMGLINE", 0, 0},
+#endif /* 0 Work in progress */
 	{( void * )&irc_send_ping, _send_ping, "send_ping", &MSG_PING, "MSG_PING", &TOK_PING, "TOK_PING", 0, 0},
 	{( void * )&irc_send_pong, _send_pong, "send_pong", &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", 0, 0},
 	{( void * )&irc_send_server, _send_server, "send_server", &MSG_SERVER, "MSG_SERVER", &TOK_SERVER, "TOK_SERVER", 0, 0},
@@ -508,15 +511,12 @@ static void _send_svsmode( const char *source, const char *target, const char *m
 	send_cmd( ":%s %s %s %s", source, MSGTOK( SVSMODE ), target, modes );
 }
 
-static void _send_svshost( const char *source, const char *who, const char *vhost )
-{
-}
-
 static void _send_svskill( const char *source, const char *target, const char *reason )
 {
 	send_cmd( "%s %s %s :%s", source, MSGTOK( SVSKILL ), target, reason );
 }
 
+#if 0 /* Work in progress */
 static void _send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
 }
@@ -574,6 +574,7 @@ static void _send_unkline( const char *source, const char *mask )
 {
 	send_cmd( ":%s %s %s", source, MSGTOK( UNKLINE ), mask );
 }
+#endif /* 0 Work in progress */
 
 static void _send_stats( const char *source, const char type, const char *target )
 {
