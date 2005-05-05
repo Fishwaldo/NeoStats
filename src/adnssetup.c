@@ -601,6 +601,7 @@ static int init_finish(adns_state ads)
 
 	proto = getprotobyname("udp");
 	if (!proto) {
+		adns__diag(ads,-1,0,"unable to find protocol no. for UDP !"); 
 		r = ENOPROTOOPT;
 	}
 	else
