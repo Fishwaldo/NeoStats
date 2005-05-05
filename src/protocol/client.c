@@ -209,12 +209,13 @@ ProtocolInfo protocol_info =
 	"+o",
 };
 
+char *numeric376 = "376";
 irc_cmd cmd_list[] = 
 {
 	/*Message	Token	Function	usage */
 	{&MSG_PRIVATE, 0, m_private, 0},
 	{&MSG_NOTICE, 0, _m_notice, 0},
-	{"376", 0, m_emotd, 0},
+	{&numeric376, 0, m_emotd, 0},
 	{&MSG_NICK, 0, m_nick, 0},
 	{&MSG_TOPIC, 0, m_topic, 0},
 	{&MSG_KICK, 0, m_kick, 0},

@@ -27,16 +27,16 @@
 #include "numerics.h"
 #include "base64.h"
 
-char *numeric351 = "351";
-char *numeric242 = "242";
 char *numeric219 = "219";
+char *numeric242 = "242";
+char *numeric351 = "351";
 
 irc_cmd numeric_cmd_list[] = {
 	/*Message	Token	handler	usage */
-	{&numeric351, NULL, _m_numeric351, 0},
-	{&numeric242, NULL, _m_numeric242, 0},
 /*  RX: :irc.foo.com 219 NeoStats u :End of /STATS report */
 	{&numeric219, NULL, _m_numericdefault, 0},
+	{&numeric242, NULL, _m_numeric242, 0},
+	{&numeric351, NULL, _m_numeric351, 0},
 	{0, 0, 0, 0},
 };
 

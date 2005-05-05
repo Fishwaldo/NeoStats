@@ -1554,7 +1554,7 @@ void do_stats( const char *nick, const char *what )
 		ircd_cmd_ptr = cmd_list;
 		while( ircd_cmd_ptr->name ) {
 			if( ircd_cmd_ptr->usage > 0 ) {
-				irc_numeric( RPL_STATSCOMMANDS, u->name, "Command %s Usage %d", ircd_cmd_ptr->name, ircd_cmd_ptr->usage );
+				irc_numeric( RPL_STATSCOMMANDS, u->name, "Command %s Usage %d", *ircd_cmd_ptr->name, ircd_cmd_ptr->usage );
 			}
 			ircd_cmd_ptr ++;
 		}

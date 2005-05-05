@@ -100,9 +100,9 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av
 	ircd_cmd_ptr = numeric_cmd_list;	
 	/* Process numeric replies */
 	while( ircd_cmd_ptr->name ) {
-		if( !ircstrcasecmp( ircd_cmd_ptr->name, cmd ) ) {
+		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) ) {
 			if( ircd_cmd_ptr->handler ) {
-				dlog( DEBUG3, "process_ircd_cmd: running command %s", ircd_cmd_ptr->name );
+				dlog( DEBUG3, "process_ircd_cmd: running command %s", *ircd_cmd_ptr->name );
 				ircd_cmd_ptr->handler( origin, av, ac, cmdptr );
 			} else {
 				dlog( DEBUG3, "process_ircd_cmd: ignoring command %s", cmd );

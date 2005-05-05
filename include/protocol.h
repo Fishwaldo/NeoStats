@@ -218,6 +218,10 @@ MSGDEF( TOK_GLINE );
 MSGDEF( MSG_REMGLINE );
 MSGDEF( TOK_REMGLINE );
 
+EXPORTVAR extern char *numeric219;
+EXPORTVAR extern char *numeric242;
+EXPORTVAR extern char *numeric351;
+
 EXPORTVAR extern ircd_server ircd_srv;
 
 EXPORTFUNC int ircsplitbuf( char *buf, char ***argv, int colon_special );
