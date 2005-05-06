@@ -179,7 +179,7 @@ static void m_topic( char *origin, char **argv, int argc, int srv );
 static void m_kick( char *origin, char **argv, int argc, int srv );
 static void m_join( char *origin, char **argv, int argc, int srv );
 static void m_part( char *origin, char **argv, int argc, int srv );
-static void m_emotd( char *origin, char **argv, int argc, int srv );
+static void m_rpl_welcome( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
 {
@@ -209,13 +209,13 @@ ProtocolInfo protocol_info =
 	"+o",
 };
 
-char *numeric376 = "376";
+char *numeric001 = "001";
 irc_cmd cmd_list[] = 
 {
 	/*Message	Token	Function	usage */
 	{&MSG_PRIVATE, 0, m_private, 0},
 	{&MSG_NOTICE, 0, _m_notice, 0},
-	{&numeric376, 0, m_emotd, 0},
+	{&numeric001, 0, m_rpl_welcome, 0},
 	{&MSG_NICK, 0, m_nick, 0},
 	{&MSG_TOPIC, 0, m_topic, 0},
 	{&MSG_KICK, 0, m_kick, 0},
@@ -382,8 +382,8 @@ static void m_private( char* origin, char **av, int ac, int cmdptr )
 	DelFakeUser( origin );
 }
 
-static void m_emotd( char *origin, char **argv, int argc, int srv )
+static void m_rpl_welcome( char *origin, char **argv, int argc, int srv )
 {
 	send_cmd( "%s mark mark", MSG_OPER );
-	do_synch_neostats(  );
+	do_synch_neostats();
 }
