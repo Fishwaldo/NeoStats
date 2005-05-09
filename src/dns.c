@@ -107,6 +107,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (void *data, adns_
 	dnsdata->data = data;
 	dnsdata->callback = callback;
 	dnsdata->type = type;
+	strlcpy(dnsdata->lookupdata, str, 254);
 	if (list_isfull (dnslist)) {
 		dlog(DEBUG1, "DNS: Lookup list is full, adding to queue");
 		strlcpy(dnsdata->lookupdata, str, 254);
@@ -310,8 +311,8 @@ void do_dns (int notused, short event, void *arg)
 
 
 	/* process timeouts for ADNS */
-    gettimeofday(&tv,NULL);
-    adns_processtimeouts(ads, &tv);
+	gettimeofday(&tv,NULL);
+	adns_processtimeouts(ads, &tv);
     
 	/* if the list is empty, no use doing anything */
 	if (list_isempty (dnslist)) {
@@ -325,12 +326,9 @@ void do_dns (int notused, short event, void *arg)
 		status = adns_check (ads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
-			dlog(DEBUG2, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->data);
+			dlog(DEBUG2, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->lookupdata);
 			dnsnode = list_next (dnslist, dnsnode);
-			break;
-		}
-		/* there was an error */
-		if (status) {
+		} else if (status) {
 			nlog (LOG_CRITICAL, "DNS: Bad error on adns_check: %s. Please report to NeoStats", strerror (status));
 			irc_chanalert (ns_botptr, "Bad Error on DNS lookup. Please check logfile");
 			DNSStats.failure++;
@@ -339,25 +337,27 @@ void do_dns (int notused, short event, void *arg)
 			dnsdata->callback (dnsdata->data, NULL);
 			RESET_RUN_LEVEL();
 			/* delete from list */
-			dnsnode1 = list_delete (dnslist, dnsnode);
-			dnsnode = list_next (dnslist, dnsnode1);
+			dnsnode1 = dnsnode;
+			dnsnode = list_next (dnslist, dnsnode);
 			ns_free (dnsdata->a);
 			ns_free (dnsdata);
+			list_delete(dnslist, dnsnode1);
 			lnode_destroy (dnsnode1);
-			break;
+		} else {
+			dlog(DEBUG1, "DNS: Calling callback function for lookup %s", dnsdata->lookupdata);
+			DNSStats.success++;
+			/* call the callback function */
+			SET_RUN_LEVEL(dnsdata->modptr);
+			dnsdata->callback (dnsdata->data, dnsdata->a);
+			RESET_RUN_LEVEL();
+			/* delete from list */
+			dnsnode1 = dnsnode;
+			dnsnode = list_next (dnslist, dnsnode);
+			ns_free (dnsdata->a);
+			ns_free (dnsdata);
+			list_delete(dnslist, dnsnode1);
+			lnode_destroy (dnsnode1);
 		}
-		dlog(DEBUG1, "DNS: Calling callback function with for module %s", dnsdata->modptr->info->name);
-		DNSStats.success++;
-		/* call the callback function */
-		SET_RUN_LEVEL(dnsdata->modptr);
-		dnsdata->callback (dnsdata->data, dnsdata->a);
-		RESET_RUN_LEVEL();
-		/* delete from list */
-		dnsnode1 = list_delete (dnslist, dnsnode);
-		dnsnode = list_next (dnslist, dnsnode1);
-		ns_free (dnsdata->a);
-		ns_free (dnsdata);
-		lnode_destroy (dnsnode1);
 	}
 	dns_check_queue();
 }

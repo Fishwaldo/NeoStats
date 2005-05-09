@@ -977,7 +977,7 @@ int ns_cmd_socklist (CmdParams* cmdparams)
 	hscan_t ss;
 	hnode_t *sn;
 	int size;
-    struct sockaddr_in add;
+	struct sockaddr_in add;
 	
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ns_botptr, cmdparams->source, __("Sockets List: (%d)", cmdparams->source), (int)hash_count (sockethash));
@@ -986,15 +986,15 @@ int ns_cmd_socklist (CmdParams* cmdparams)
 		sock = hnode_get (sn);
 		irc_prefmsg (ns_botptr, cmdparams->source, "%s:--------------------------------", sock->moduleptr->info->name);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Socket Name: %s", cmdparams->source), sock->name);
-        size = sizeof(struct sockaddr_in);
+		size = sizeof(struct sockaddr_in);
 		if(getsockname(sock->sock_no, (struct sockaddr *) &add, (socklen_t *)&size) > -1) {
-            irc_prefmsg (ns_botptr, cmdparams->source, "Local Socket: %s:%d", inet_ntoa(add.sin_addr), ntohs(add.sin_port));
-        }
-        size = sizeof(struct sockaddr_in);
-        /* this will not print anything if the socket is not connected */
-        if (getpeername(sock->sock_no,(struct sockaddr *)&add, (socklen_t *)&size) > -1) {
-            irc_prefmsg (ns_botptr, cmdparams->source, "Remote Socket: %s:%hu", inet_ntoa(add.sin_addr), ntohs(add.sin_port));
-        }
+			irc_prefmsg (ns_botptr, cmdparams->source, "Local Socket: %s:%d", inet_ntoa(add.sin_addr), ntohs(add.sin_port));
+		}
+		size = sizeof(struct sockaddr_in);
+		/* this will not print anything if the socket is not connected */
+		if (getpeername(sock->sock_no,(struct sockaddr *)&add, (socklen_t *)&size) > -1) {
+			irc_prefmsg (ns_botptr, cmdparams->source, "Remote Socket: %s:%hu", inet_ntoa(add.sin_addr), ntohs(add.sin_port));
+		}
 
 		switch (sock->socktype) {
 			case SOCK_STANDARD:
