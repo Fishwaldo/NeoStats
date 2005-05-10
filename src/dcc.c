@@ -42,10 +42,8 @@ static int dccoutput = 0;
 
 static int dcc_req_send( CmdParams* cmdparams );
 static int dcc_req_chat( CmdParams* cmdparams );
-static int DCCChatConnect( Client *dcc, int port );
 static int dcc_parse( void *arg, void *line, size_t );
 static int dcc_error( int what, void *arg );
-static void DelDCCClient( Client *dcc );
 static int dcc_write( Client *dcc, char *buf );
 
 static dcc_cmd dcc_cmds[]= 
@@ -54,6 +52,59 @@ static dcc_cmd dcc_cmds[]=
 	{"CHAT", dcc_req_chat},
 	{NULL},
 };
+
+static Client *AddDCCClient( CmdParams *cmdparams )
+{
+	Client *dcc;
+
+	dcc = ns_calloc( sizeof( Client ) );
+	if( dcc ) 
+	{
+		os_memcpy( dcc, cmdparams->source, sizeof( Client ) );
+		lnode_create_append( dcclist, dcc );
+		dcc->flags = CLIENT_FLAG_DCC;
+		return dcc;
+	}
+	return NULL;
+}
+
+static void DelDCCClient( Client *dcc )
+{
+	lnode_t *dccnode;
+
+	dccnode = lnode_find( dcclist, dcc->name, comparef );
+	if( dccnode )
+	{
+		lnode_destroy( dccnode );
+		ns_free( dcc );
+	}
+}
+
+static int DCCChatConnect( Client *dcc, int port ) 
+{
+	static char tmpname[BUFSIZE];
+	OS_SOCKET socketfd;
+
+	if( ( socketfd = sock_connect( SOCK_STREAM, dcc->ip, port ) ) == NS_FAILURE )
+	{
+		nlog( LOG_WARNING, "Error Connecting to DCC Host %s( %s:%d )", dcc->user->hostname, inet_ntoa( dcc->ip ), port );
+		DelDCCClient( dcc );
+		return NS_FAILURE;
+	}			
+	/* ok, now add it as a linebuffered protocol */
+	ircsnprintf( tmpname, BUFSIZE, "DCC-%s", dcc->name );
+	if( ( dcc->sock = add_linemode_socket( tmpname, socketfd, dcc_parse, dcc_error, ( void * )dcc ) ) == NULL )
+	{
+		nlog( LOG_WARNING, "Can't add a Linemode Socket for DCC %s", dcc->user->hostname );
+		os_sock_close( socketfd );
+		DelDCCClient( dcc );
+		return NS_FAILURE;
+	}
+
+	dcc->fd = socketfd;
+	dcc->port = port;
+	return NS_SUCCESS;
+}
 
 static void DCCChatDisconnect( Client *dcc )
 {
@@ -93,32 +144,6 @@ static int DCCChatStart( Client *dcc, int port )
 		/* we don't have a valid IP address, kick off a DNS lookup */
 		dns_lookup( dcc->user->hostname, adns_r_addr, DCCGotAddr,( void * )dcc );
 	}
-	return NS_SUCCESS;
-}
-
-static int DCCChatConnect( Client *dcc, int port ) 
-{
-	static char tmpname[BUFSIZE];
-	OS_SOCKET socketfd;
-
-	if( ( socketfd = sock_connect( SOCK_STREAM, dcc->ip, port ) ) == NS_FAILURE )
-	{
-		nlog( LOG_WARNING, "Error Connecting to DCC Host %s( %s:%d )", dcc->user->hostname, inet_ntoa( dcc->ip ), port );
-		DelDCCClient( dcc );
-		return NS_FAILURE;
-	}			
-	/* ok, now add it as a linebuffered protocol */
-	ircsnprintf( tmpname, BUFSIZE, "DCC-%s", dcc->name );
-	if( ( dcc->sock = add_linemode_socket( tmpname, socketfd, dcc_parse, dcc_error, ( void * )dcc ) ) == NULL )
-	{
-		nlog( LOG_WARNING, "Can't add a Linemode Socket for DCC %s", dcc->user->hostname );
-		os_sock_close( socketfd );
-		DelDCCClient( dcc );
-		return NS_FAILURE;
-	}
-
-	dcc->fd = socketfd;
-	dcc->port = port;
 	return NS_SUCCESS;
 }
 
@@ -190,7 +215,7 @@ static int dcc_parse( void *arg, void *rline, size_t len )
 	return NS_SUCCESS;
 }
 
-int dcc_write( Client *dcc, char *buf )
+static int dcc_write( Client *dcc, char *buf )
 {
 	static char dcc_buf[BUFSIZE];
 
@@ -212,7 +237,7 @@ void dcc_send_msg( const Client* dcc, char * buf )
 	dcc_write( ( Client * )dcc, buf );
 }
 
-int dcc_error( int sock_no, void *name )
+static int dcc_error( int sock_no, void *name )
 {
 	Sock *sock =( Sock * )name;
 	if( sock->data )
@@ -221,55 +246,6 @@ int dcc_error( int sock_no, void *name )
 		nlog( LOG_WARNING, "Problem, Sock->data is NULL, therefore we can't delete DCCClient!" );
 	DelSock( sock );
 	return NS_SUCCESS;
-}
-
-int InitDCC( void )
-{
-	dcclist = list_create( -1 );
-	return NS_SUCCESS;
-}
-
-void FiniDCC( void )
-{
-	Client *dcc;
-	lnode_t *dccnode;
- 
-	dccnode = list_first( dcclist );
-	while( dccnode )
-	{
-		dcc =( Client * )lnode_get( dccnode );
-		DCCChatDisconnect( dcc );
-		ns_free( dcc );
-		dccnode = list_next( dcclist, dccnode );
-	}
-	list_destroy_nodes( dcclist );
-}
-
-Client *AddDCCClient( CmdParams *cmdparams )
-{
-	Client *dcc;
-
-	dcc = ns_calloc( sizeof( Client ) );
-	if( dcc ) 
-	{
-		os_memcpy( dcc, cmdparams->source, sizeof( Client ) );
-		lnode_create_append( dcclist, dcc );
-		dcc->flags = CLIENT_FLAG_DCC;
-		return dcc;
-	}
-	return NULL;
-}
-
-static void DelDCCClient( Client *dcc )
-{
-	lnode_t *dccnode;
-
-	dccnode = lnode_find( dcclist, dcc->name, comparef );
-	if( dccnode )
-	{
-		lnode_destroy( dccnode );
-		ns_free( dcc );
-	}
 }
 
 int dcc_req( CmdParams* cmdparams )
@@ -332,4 +308,26 @@ static int dcc_req_chat( CmdParams* cmdparams )
 	ns_free( av );
 	SendModuleEvent( EVENT_DCCCHAT, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
+}
+
+int InitDCC( void )
+{
+	dcclist = list_create( -1 );
+	return NS_SUCCESS;
+}
+
+void FiniDCC( void )
+{
+	Client *dcc;
+	lnode_t *dccnode;
+ 
+	dccnode = list_first( dcclist );
+	while( dccnode )
+	{
+		dcc =( Client * )lnode_get( dccnode );
+		DCCChatDisconnect( dcc );
+		ns_free( dcc );
+		dccnode = list_next( dcclist, dccnode );
+	}
+	list_destroy_nodes( dcclist );
 }

@@ -1108,7 +1108,6 @@ EXPORTFUNC int UpdateSock( Sock *sock, short what, short reset, struct timeval *
 EXPORTFUNC int DelSock( Sock *sock );
 EXPORTFUNC Sock *FindSock( const char *sock_name );
 EXPORTFUNC OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port );
-EXPORTFUNC int sock_disconnect( const char *name );
 EXPORTFUNC Sock *add_listen_sock( const char *sock_name, const int port, int type, sockcb acceptcb, void *data );
 EXPORTFUNC Sock *add_linemode_socket( const char *sock_name, OS_SOCKET socknum, sockfunccb readcb, sockcb errcb, void *arg );
 EXPORTFUNC int send_to_sock( Sock *sock, const char *buf, const int buflen );
@@ -1204,8 +1203,12 @@ EXPORTFUNC int irc_sqline( const Bot *botptr, const char *mask, const char *reas
 EXPORTFUNC int irc_unsqline( const Bot *botptr, const char *mask );
 EXPORTFUNC int irc_sgline( const Bot *botptr, const char *mask, const char *reason, ...)  __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC int irc_unsgline( const Bot *botptr, const char *mask );
+EXPORTFUNC int irc_gline( const Bot *botptr, const char *mask, const char *reason, ...)  __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_remgline( const Bot *botptr, const char *mask );
 EXPORTFUNC int irc_zline( const Bot *botptr, const char *mask, const char *reason, ...)  __attribute__((format(printf,3,4))); /* 3=format 4=params */
 EXPORTFUNC int irc_unzline( const Bot *botptr, const char *mask );
+EXPORTFUNC int irc_kline( const Bot *botptr, const char *mask, const char *reason, ...)  __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_unkline( const Bot *botptr, const char *mask );
 EXPORTFUNC int irc_swhois( const char *target, const char *swhois );
 EXPORTFUNC int irc_sethost( const Bot *botptr, const char *host );
 EXPORTFUNC int irc_setident( const Bot *botptr, const char *ident );

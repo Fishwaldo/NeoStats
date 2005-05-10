@@ -1443,6 +1443,41 @@ int irc_unsgline( const Bot *botptr, const char *mask )
 	return NS_SUCCESS;
 }
 
+/** @brief irc_gline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_gline( const Bot *botptr, const char *mask, const char *reason, ...)
+{
+	va_list ap;
+
+	if( !irc_send_gline) {
+		unsupported_cmd( "GLINE" );
+		return NS_FAILURE;
+	}
+	va_start( ap, reason );
+	ircvsnprintf( ircd_buf, BUFSIZE, reason, ap );
+	va_end( ap );
+	irc_send_gline( me.name, mask, ircd_buf );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_remgline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_remgline( const Bot *botptr, const char *mask )
+{
+	if( !irc_send_remgline) {
+		unsupported_cmd( "REMGLINE" );
+		return NS_FAILURE;
+	}
+	irc_send_remgline( me.name, mask );
+	return NS_SUCCESS;
+}
+
 /** @brief irc_zline
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -1475,6 +1510,41 @@ int irc_unzline( const Bot *botptr, const char *mask )
 		return NS_FAILURE;
 	}
 	irc_send_unzline( me.name, mask );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_kline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_kline( const Bot *botptr, const char *mask, const char *reason, ...)
+{
+	va_list ap;
+
+	if( !irc_send_sqline) {
+		unsupported_cmd( "KLINE" );
+		return NS_FAILURE;
+	}
+	va_start( ap, reason );
+	ircvsnprintf( ircd_buf, BUFSIZE, reason, ap );
+	va_end( ap );
+	irc_send_kline( me.name, mask, ircd_buf );
+	return NS_SUCCESS;
+}
+
+/** @brief irc_unkline
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int irc_unkline( const Bot *botptr, const char *mask )
+{
+	if( !irc_send_unsqline) {
+		unsupported_cmd( "UNKLINE" );
+		return NS_FAILURE;
+	}
+	irc_send_unkline( me.name, mask );
 	return NS_SUCCESS;
 }
 

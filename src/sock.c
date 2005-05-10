@@ -79,8 +79,8 @@ void libevent_log(int severity, const char *msg)
   * @return Never Returns. Just exits
   */
 
-static int 
-error_from_ircd_socket(int what, void *data) {
+static int irc_sock_error( int what, void *data )
+{
 	nlog (LOG_CRITICAL, "Error from IRCd Socket: %s", strerror(errno));
 	/* Try to close socket then reset the servsock value to avoid cyclic calls */
 	DelSock(me.servsock);
@@ -210,7 +210,7 @@ void Connect( void )
 	if (mysock <= 0) {
 		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
-		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, error_from_ircd_socket, NULL);
+		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, irc_sock_error, NULL);
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
 		irc_connect (me.name, me.numeric, me.infoline, nsconfig.pass, (unsigned long)me.ts_boot, (unsigned long)me.now);
 #ifndef WIN32
