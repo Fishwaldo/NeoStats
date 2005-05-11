@@ -860,23 +860,25 @@ list_destroy_auto (list_t * list)
 /*
  * Create node and append to list
  */
-void lnode_create_append (list_t *list, void *data)
+lnode_t *lnode_create_append (list_t *list, void *data)
 {
 	lnode_t *ln;
 	
 	ln = lnode_create(data);
 	list_append(list, ln);
+	return ln;
 }
 
 /*
  * Create node and append to list
  */
-void lnode_create_prepend (list_t *list, void *data)
+lnode_t *lnode_create_prepend (list_t *list, void *data)
 {
 	lnode_t *ln;
 	
 	ln = lnode_create(data);
 	list_prepend(list, ln);
+	return ln;
 }
 
 /*
