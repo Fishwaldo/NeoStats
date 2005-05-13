@@ -34,6 +34,8 @@ typedef struct dbbot {
 	dbentry database;
 	BotInfo botinfo;
 	Bot *botptr;
+	char **stringlist;
+	int stringcount;
 }dbbot;
 
 /** Bot command function prototypes */
@@ -83,7 +85,23 @@ static bot_setting ts_settings[]=
 	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
 };
 
-/** Sub bot setting table */
+/** Sub bot comand table template */
+const char ts_help_cmd_oneline[] ="oneline";
+
+const char *ts_help_cmd[] = {
+	"Syntax: \2CMD\2",
+	"",
+	"command...",
+	NULL
+};
+
+
+static bot_cmd ts_commandtemplate[]=
+{
+	{NULL,	NULL,	0, 	0,	ts_help_cmd,	ts_help_cmd_oneline },
+};
+
+/** Sub bot setting table template */
 static bot_setting ts_settingstemplate[]=
 {
 	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
@@ -102,6 +120,169 @@ static BotInfo ts_botinfo =
 	NULL,
 };
 
+/** @brief tsprintf
+ *
+ *  printf style message function 
+ *
+ *  @param buf Storage location for output. 
+ *  @param fmt Format specification. 
+ *  @param ... to list of arguments. 
+ *
+ *  @return number of characters written excluding terminating null
+ */
+
+int tsprintf( char *botname, char *from, char *target, char *buf, const size_t size, const char *fmt, ... )
+{
+	static char nullstring[] = "(null)";
+	size_t len = 0;
+    char *str;
+    char c;
+    va_list args;
+
+	va_start( args, fmt );
+	while( ( c = *fmt++ ) != 0 && ( len < size ) )
+	{
+		/* Is it a format string character? */
+	    if( c == '%' ) 
+		{
+			switch( *fmt ) 
+			{
+				/* handle %B (botname) */
+				case 'B': 
+					str = botname;
+					/* If NULL string point to our null output string */
+					if( str == NULL ) {
+						str = nullstring;
+					}
+					/* copy string to output observing limit */
+					while( *str && len < size ) {
+						buf[len++] = *str++;
+					}
+					/* next char... */
+					fmt++;
+					break;
+				/* handle %F (from) */
+				case 'F': 
+					str = from;
+					/* If NULL string point to our null output string */
+					if( str == NULL ) {
+						str = nullstring;
+					}
+					/* copy string to output observing limit */
+					while( *str && len < size ) {
+						buf[len++] = *str++;
+					}
+					/* next char... */
+					fmt++;
+					break;
+				/* handle %T (target) */
+				case 'T': 
+					str = target;
+					/* If NULL string point to our null output string */
+					if( str == NULL ) {
+						str = nullstring;
+					}
+					/* copy string to output observing limit */
+					while( *str && len < size ) {
+						buf[len++] = *str++;
+					}
+					/* next char... */
+					fmt++;
+					break;
+				default:
+					buf[len++] = c;
+					break;
+			}
+		}
+		/* just copy char from src */
+		else 
+		{
+			buf[len++] = c;
+	    }
+	}
+	/* NULL terminate */
+	if( len < size ) 
+		buf[len] = 0;
+	else
+		buf[size -1] = 0;
+	/* return count chars written */
+    va_end( args );
+    return len;
+}
+
+/** @brief ts_read_database
+ *
+ *  Read a database file
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int ts_read_database( dbbot *db )
+{
+	static char buf[BUFSIZE];
+	FILE *fp;
+	int commandcount;
+	int commandreadcount = 0;
+	int i;
+
+	fp = os_fopen( db->database.name, "rt" );
+	if( !fp )
+		return NS_SUCCESS;
+	/* Get command count */
+	os_fgets(buf, BUFSIZE, fp);
+	commandcount = atoi(buf);	
+	while( os_fgets( buf, BUFSIZE, fp ) != NULL )
+	{
+		char *ptr;
+		char *ptr2;
+		
+		/* comment char */
+		if( buf[0] == '#' )
+			continue;
+		/* Get command text */
+		ptr = strtok( buf, "|" );
+		if( !ptr )
+			break;
+		dlog( DEBUG1, "command %s", ptr );
+		ptr2 = ns_malloc( strlen( ptr ) );
+		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
+		/* Get param text */
+		ptr = strtok( NULL, "|" );
+		if( !ptr )
+			break;
+		dlog( DEBUG1, "params %s", ptr );
+		ptr2 = ns_malloc( strlen( ptr ) );
+		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
+		/* Get help text */
+		ptr = strtok( NULL, "|" );
+		if( !ptr )
+			break;
+		dlog( DEBUG1, "desc %s", ptr );
+		ptr2 = ns_malloc( strlen( ptr ) );
+		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
+		/* Get output text */
+		ptr = strtok( NULL, "|" );
+		if( !ptr )
+			break;
+		ptr2 = ns_malloc( strlen( ptr ) );
+		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
+		dlog( DEBUG1, "text %s", ptr );
+		commandreadcount++;
+	}	
+	os_fclose( fp );
+	if( commandreadcount != commandcount )
+	{
+		for( i = 0; i < db->stringcount; i++ )
+		{
+			ns_free( db->stringlist[i] );
+		}
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
 /** @brief BuildBot
  *
  *  populate botinfo structure
@@ -118,6 +299,7 @@ void BuildBot( dbbot *db )
 	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
 	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
 	db->botinfo.flags = BOT_FLAG_SERVICEBOT;
+	ts_read_database( db );
 }
 
 /** @brief JoinBot
@@ -147,11 +329,17 @@ void JoinBot( dbbot *db )
 
 void PartBot( dbbot *db )
 {
+	int i;
+
 	if( db->botptr )
 	{
 		if( *db->database.channel )
 			irc_part( db->botptr, db->database.channel, "" );
 		irc_quit( db->botptr, "" );
+	}
+	for( i = 0; i < db->stringcount; i++ )
+	{
+		ns_free( db->stringlist[i] );
 	}
 }
 
@@ -284,6 +472,7 @@ static int ts_cmd_add( CmdParams *cmdparams )
 			"%s not found", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
+	os_fclose( fp );
 	if( cmdparams->ac > 1 && ValidateNick( cmdparams->av[1] ) != NS_SUCCESS )
 	{
 		irc_prefmsg( ts_bot, cmdparams->source, 
@@ -308,7 +497,6 @@ static int ts_cmd_add( CmdParams *cmdparams )
 	DBAStore( "databases", db->database.name,( void * )db, sizeof( dbentry ) );
 	BuildBot( db );
 	JoinBot( db );
-	os_fclose( fp );
 	return NS_SUCCESS;
 }
 

@@ -660,10 +660,10 @@ void DeleteEventList (ModuleEvent *eventlistptr)
 	Module* mod_ptr;
 
 	mod_ptr = GET_CUR_MODULE();
-	while (eventlistptr->event) {
-		if (mod_ptr->event_list[eventlistptr->event]) {
+	while (eventlistptr->event)
+	{
+		if (mod_ptr->event_list[eventlistptr->event])
 			mod_ptr->event_list[eventlistptr->event] = NULL;
-		}
 		eventlistptr++;
 	}
 }
@@ -683,11 +683,10 @@ void SetAllEventFlags (unsigned int flag, unsigned int enable)
 	if (eventlistptr) {
 		for (i = 0; i < EVENT_COUNT; i++) {
 			if (eventlistptr[i]) {
-				if (enable) {
+				if (enable)
 					eventlistptr[i]->flags |= flag;
-				} else {
+				else
 					eventlistptr[i]->flags &= ~flag;
-				}
 			}
 		}
 	}
@@ -704,12 +703,12 @@ void SetEventFlags (Event event, unsigned int flag, unsigned int enable)
 	ModuleEvent** eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
-	if (eventlistptr) {
-		if (enable) {
+	if (eventlistptr)
+	{
+		if (enable)
 			eventlistptr[event]->flags |= flag;
-		} else {
+		else
 			eventlistptr[event]->flags &= ~flag;
-		}
 	}
 }
 
