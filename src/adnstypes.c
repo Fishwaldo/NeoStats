@@ -31,10 +31,6 @@
 
 #include "adnsinternal.h"
 
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
-
 #define R_NOMEM           return adns_s_nomemory
 #define CSP_ADDSTR(s)     do { if (!adns__vbuf_appendstr(vb,(s))) R_NOMEM; } while (0)
 

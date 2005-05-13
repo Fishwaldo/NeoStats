@@ -31,9 +31,6 @@
  */
 
 #include "adnsinternal.h"
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
 
 /* Core diagnostic functions */
 

@@ -22,9 +22,6 @@
 */
 
 #include "neostats.h"
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
 #include "modules.h"
 #include "commands.h"
 #include "services.h"

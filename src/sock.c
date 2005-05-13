@@ -27,9 +27,6 @@
 
 #include "neostats.h"
 #include "main.h"
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h> 
 #endif

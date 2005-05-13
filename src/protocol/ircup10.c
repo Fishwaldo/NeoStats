@@ -25,9 +25,6 @@
 #include "protocol.h"
 #include "base64.h"
 #include "numerics.h"
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
 
 /* Messages/Tokens */
 

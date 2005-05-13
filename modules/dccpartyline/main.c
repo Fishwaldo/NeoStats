@@ -105,7 +105,7 @@ int ModSynch( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini( void)
+int ModFini( void )
 {
 	return NS_SUCCESS;
 }

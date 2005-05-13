@@ -36,9 +36,6 @@
 #include "services.h"
 #include "ctcp.h"
 #include "base64.h"
-#ifdef HAVE_ARPA_INET_H
-#include <arpa/inet.h>
-#endif
 
 #define USER_TABLE_SIZE	-1
 #define MAXJOINCHANS	-1
