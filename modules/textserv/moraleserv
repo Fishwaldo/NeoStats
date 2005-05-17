@@ -1,0 +1,56 @@
+VERSION|3.0.a3-dev
+ABOUT|Send cheery messages to friends on IRC
+CREDITS|Copyright (c) 1999-2005, NeoStats. http://www.neostats.net/
+HAIL|<TARGET><ABOUT>|Send a hail song greeting|*sings* Hail to the %T, they're the %T and they need hailing, hail to the %T so you better all hail like crazy...
+REDNECK|<TARGET>|Send a redneck dubbing to someone|I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of weird contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots.
+CHEERUP|<TARGET>|Send a cheerup message to someone|"Cheer up %T ....."All of us on the network love you! 3--<--<--<{4@
+#BEHAPPY|<TARGET>|Send a behappy song to someone|
+#"%F thinks that you're a little sad.....",
+#*starts singing*
+#Here's a little song I wrote, You might want to sing it note for note
+#Don't Worry - Be Happy
+#In every life we have some trouble, But when you worry you make it Double
+#Don't Worry - Be Happy, Don't Worry - Be Happy now
+#Don't Worry - Be Happy, Don't Worry - Be Happy
+#Ain't got no place to lay your head, Somebody came and took your bed
+#Don't Worry - Be Happy
+#The landlord say your rent is late, He may have to litigate
+#Don't Worry - Be Happy, Look at Me - I'm Happy
+#Don't Worry - Be Happy
+#Here I give you my phone number, When you worry call me, I make you happy
+#Don't Worry - Be Happy
+#Ain't got not cash, ain't got no style, Ain't got no gal to make you smile
+#Don't Worry - Be Happy
+#'Cause when you worry your face will frown, and that will bring everybody down
+#Don't Worry - Be Happy, Don't Worry, Don't Worry - Don't do it
+#Be Happy - Put a smile on your face, Don't bring everybody down
+#Don't Worry, it will soon pass, whatever it is
+#Don't Worry - Be Happy, I'm not worried, I'm happy . . . .
+#WONDERFUL|<TARGET>|Send a wonderful song to someone|
+#*starts singing*
+#So excuse me forgetting but these things I do
+#You see I've forgotten if they're green or they're blue
+#Anyway the thing is what I really mean
+#Yours are the sweetest eyes I've ever seen
+#And you can tell everybody this is your song
+#It may be quite simple but now that it's done
+#I hope you don't mind, I hope you don't mind that I put down in words
+#How wonderful life is while %T is in the world
+#ODE|<TARGET><ABOUT>|Send an ode about someone|
+#*recites*
+#How I wish to be a %T,
+#a %T I would like to be.
+#For if I was a %T,
+#I'd watch the network hail thee."
+#*bows*
+#LAPDANCE|<TARGET>|Send a lapdance to someone|
+#*%B seductively walks up to %T and gives %T a sly look*",
+#*%B sits across %T's legs and gives %T the best lap dance of their life*",
+#*I think we both need a cold shower now*... *wink*
+#POEM|<TARGET><ABOUT>|Send an poem about someone|
+#*recites*
+#I wish I was a %T,
+#A %T is never glum,
+#Coz how can you be grumpy,
+#When the sun shines out your bum.
+#*bows*

@@ -461,6 +461,7 @@ modules/textserv/Makefile.in -text
 modules/textserv/help.c -text
 modules/textserv/loveserv -text
 modules/textserv/main.c -text
+modules/textserv/moraleserv -text
 modules/textserv/textserv.h -text
 modules/textserv/textserv.vcproj -text
 /neostats.in -text
