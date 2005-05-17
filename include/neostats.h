@@ -685,12 +685,15 @@ typedef struct Channel {
 	void *modvalue[NUM_MODULES];
 } Channel;
 
+typedef struct _bot_cmd bot_cmd;
+
 typedef struct CmdParams {
 	Client *source;		/* pointer to client triggering command */
 	Client *target;		/* pointer to client command acts on */
 	Bot *bot;			/* pointer to associated bot where appropriate */
 	char *param;		/* command parameter */
 	char *cmd;			/* command */
+	bot_cmd *cmd_ptr;	/* pointer to associated command structure */
 	Channel *channel;	/* pointer to channel struct where appropriate */
 	char **av;			/* command parameter list */
 	int ac;				/* count of command parameter list */
@@ -726,7 +729,7 @@ typedef int (*bot_set_handler) ( CmdParams* cmdparams, SET_REASON reason );
 /** @brief bot_cmd structure
  *  defines command lists for bots
  */
-typedef struct bot_cmd {
+typedef struct _bot_cmd {
 	const char		*cmd;		/* command string */
 	bot_cmd_handler	handler;	/* handler */
 	int				minparams;	/* min num params */
@@ -734,8 +737,9 @@ typedef struct bot_cmd {
 	const char		**helptext;	/* pointer to help text */
 	const char		*onelinehelp;/* single line help for generic help function */
 	int				flags;		/* command flags */
+	void			*moddata;	/* pointer for module use */
 	Module			*modptr;	/* NeoStats internal use only */
-}bot_cmd;
+}_bot_cmd;
 
 /** @brief flags for bots
  *  flags to influence how bots are managed
@@ -769,6 +773,10 @@ typedef struct bot_cmd {
  * are created. 
  */
 #define BOT_FLAG_PERSIST	0x00000010
+/* Prevent addition of LEVELS command to a service bot
+ * E.g. TextServ db bots
+ */
+#define BOT_FLAG_NOINTRINSICLEVELS	0x00000020
 
 /* This defines a "NULL" string for the purpose of BotInfo structures that 
  * want to inherit the main host used by NeoStats and still make the info
@@ -1089,6 +1097,8 @@ typedef struct _Bot {
 	int set_ulevel;
 	/* Link back to user struct associated with this bot*/
 	Client *u;
+	/* pointer for module use */
+	void *moddata;
 }_Bot;
 
 /* load configuration associated with this bot_setting list */
@@ -1555,5 +1565,9 @@ EXPORTFUNC void *GetUserModValue( Client *u );
 EXPORTFUNC void ClearServerModValue( Client *s );
 EXPORTFUNC void SetServerModValue( Client *s, void *data );
 EXPORTFUNC void *GetServerModValue( Client *s );
+/* Module Data Value Interface Bot */
+#define ClearBotModValue( b ) b->moddata = 0
+#define SetBotModValue( b, data ) b->moddata = data
+#define GetBotModValue( b ) b->moddata
 
 #endif /* NEOSTATS_H */

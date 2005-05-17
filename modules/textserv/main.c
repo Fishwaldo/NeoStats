@@ -34,6 +34,9 @@ typedef struct dbbot {
 	dbentry database;
 	BotInfo botinfo;
 	Bot *botptr;
+	char *abouttext;
+	char *creditstext;
+	char *versiontext;
 	char **stringlist;
 	int stringcount;
 }dbbot;
@@ -42,6 +45,11 @@ typedef struct dbbot {
 static int ts_cmd_add( CmdParams *cmdparams );
 static int ts_cmd_list( CmdParams *cmdparams );
 static int ts_cmd_del( CmdParams *cmdparams );
+
+static int ts_cmd_msg( CmdParams* cmdparams );
+static int ts_cmd_about( CmdParams* cmdparams );
+static int ts_cmd_credits( CmdParams* cmdparams );
+static int ts_cmd_version( CmdParams* cmdparams );
 
 /** hash to store database and bot info */
 static hash_t *tshash;
@@ -87,6 +95,9 @@ static bot_setting ts_settings[]=
 
 /** Sub bot comand table template */
 const char ts_help_cmd_oneline[] ="oneline";
+const char ts_help_about_oneline[] = "Display about text";
+const char ts_help_credits_oneline[] = "Display credits";
+const char ts_help_version_oneline[] = "Display version";
 
 const char *ts_help_cmd[] = {
 	"Syntax: \2CMD\2",
@@ -95,10 +106,45 @@ const char *ts_help_cmd[] = {
 	NULL
 };
 
+const char *ts_help_about[] = {
+	"Syntax: \2ABOUT\2",
+	"",
+	"Display information about the database",
+	NULL
+};
+
+const char *ts_help_credits[] = {
+	"Syntax: \2CREDITS\2",
+	"",
+	"Display credits",
+	NULL
+};
+
+const char *ts_help_version[] = {
+	"Syntax: \2VERSION\2",
+	"",
+	"Display version",
+	NULL
+};
 
 static bot_cmd ts_commandtemplate[]=
 {
-	{NULL,	NULL,	0, 	0,	ts_help_cmd,	ts_help_cmd_oneline },
+	{NULL,	ts_cmd_msg,	1, 	0,	ts_help_cmd,	ts_help_cmd_oneline },
+};
+
+static bot_cmd ts_commandtemplateabout[]=
+{
+	{"ABOUT",	ts_cmd_about,	0, 	0,	ts_help_about,	ts_help_about_oneline },
+};
+
+static bot_cmd ts_commandtemplatecredits[]=
+{
+	{"CREDITS",	ts_cmd_credits,	0, 	0,	ts_help_credits,	ts_help_credits_oneline },
+};
+
+static bot_cmd ts_commandtemplateversion[]=
+{
+	{"VERSION",	ts_cmd_version,	0, 	0,	ts_help_version,	ts_help_version_oneline },
 };
 
 /** Sub bot setting table template */
@@ -189,6 +235,20 @@ int tsprintf( char *botname, char *from, char *target, char *buf, const size_t s
 					/* next char... */
 					fmt++;
 					break;
+				/* handle %M (message) */
+				case 'M': 
+					str = va_arg( args, char * );
+					/* If NULL string point to our null output string */
+					if( str == NULL ) {
+						str = nullstring;
+					}
+					/* copy string to output observing limit */
+					while( *str && len < size ) {
+						buf[len++] = *str++;
+					}
+					/* next char... */
+					fmt++;
+					break;
 				default:
 					buf[len++] = c;
 					break;
@@ -210,6 +270,72 @@ int tsprintf( char *botname, char *from, char *target, char *buf, const size_t s
     return len;
 }
 
+/** @brief parse_line
+ *
+ *  parse line of database file
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+static int parse_line( dbbot *db, char *buf, int *commandreadcount )
+{
+	int readcount = 0;
+	char *ptr;
+	char *ptr2;
+
+	/* Get command text */
+	ptr = strtok( buf, "|" );
+	if( !ptr )
+		return NS_FAILURE;
+	if( ircstrcasecmp( ptr, "ABOUT" ) == 0 )
+	{
+		ptr = strtok( NULL, "|" );
+		if( !ptr )
+			return NS_FAILURE;
+		dlog( DEBUG1, "about %s", ptr );
+		ptr2 = ns_malloc( strlen( ptr ) );
+		strcpy( ptr2, ptr );
+		db->abouttext = ptr2;
+		return NS_SUCCESS;		
+	}
+	if( ircstrcasecmp( ptr, "CREDITS" ) == 0 )
+	{
+		ptr = strtok( NULL, "|" );
+		if( !ptr )
+			return NS_FAILURE;
+		dlog( DEBUG1, "credits %s", ptr );
+		ptr2 = ns_malloc( strlen( ptr ) );
+		strcpy( ptr2, ptr );
+		db->creditstext = ptr2;
+		return NS_SUCCESS;		
+	}
+	if( ircstrcasecmp( ptr, "VERSION" ) == 0 )
+	{
+		ptr = strtok( NULL, "|" );
+		if( !ptr )
+			return NS_FAILURE;
+		dlog( DEBUG1, "credits %s", ptr );
+		ptr2 = ns_malloc( strlen( ptr ) );
+		strcpy( ptr2, ptr );
+		db->versiontext = ptr2;
+		return NS_SUCCESS;		
+	}
+	while( ptr )
+	{
+		readcount++;
+		dlog( DEBUG1, "read %s", ptr );
+		ptr2 = ns_malloc( strlen( ptr ) );
+		strcpy( ptr2, ptr );
+		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
+		ptr = strtok( NULL, "|" );
+	}
+	if( readcount != 4 )
+		return NS_FAILURE;
+	(*commandreadcount)++;
+	return NS_SUCCESS;
+}
+
 /** @brief ts_read_database
  *
  *  Read a database file
@@ -221,65 +347,36 @@ int tsprintf( char *botname, char *from, char *target, char *buf, const size_t s
 
 static int ts_read_database( dbbot *db )
 {
-	static char buf[BUFSIZE];
+	static char filename[MAXPATH];
+	static char buf[BUFSIZE*4];
 	FILE *fp;
-	int commandcount;
 	int commandreadcount = 0;
 	int i;
 
-	fp = os_fopen( db->database.name, "rt" );
+	strlcpy( filename, "data/", MAXPATH );
+	strlcat( filename, db->database.name, MAXPATH );
+	fp = os_fopen( filename, "rt" );
 	if( !fp )
 		return NS_SUCCESS;
-	/* Get command count */
-	os_fgets(buf, BUFSIZE, fp);
-	commandcount = atoi(buf);	
-	while( os_fgets( buf, BUFSIZE, fp ) != NULL )
+	while( os_fgets( buf, BUFSIZE*4, fp ) != NULL )
 	{
-		char *ptr;
-		char *ptr2;
-		
 		/* comment char */
 		if( buf[0] == '#' )
 			continue;
-		/* Get command text */
-		ptr = strtok( buf, "|" );
-		if( !ptr )
-			break;
-		dlog( DEBUG1, "command %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) );
-		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
-		/* Get param text */
-		ptr = strtok( NULL, "|" );
-		if( !ptr )
-			break;
-		dlog( DEBUG1, "params %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) );
-		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
-		/* Get help text */
-		ptr = strtok( NULL, "|" );
-		if( !ptr )
-			break;
-		dlog( DEBUG1, "desc %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) );
-		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
-		/* Get output text */
-		ptr = strtok( NULL, "|" );
-		if( !ptr )
-			break;
-		ptr2 = ns_malloc( strlen( ptr ) );
-		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
-		dlog( DEBUG1, "text %s", ptr );
-		commandreadcount++;
+		parse_line( db, buf, &commandreadcount );
 	}	
 	os_fclose( fp );
-	if( commandreadcount != commandcount )
+	db->botinfo.bot_cmd_list = ns_calloc( sizeof( bot_cmd ) * ( ( db->stringcount / 4 ) + 4 ) );
+	for( i = 0; i < commandreadcount; i ++ )
 	{
-		for( i = 0; i < db->stringcount; i++ )
-		{
-			ns_free( db->stringlist[i] );
-		}
-		return NS_FAILURE;
+		os_memcpy( &db->botinfo.bot_cmd_list[i], &ts_commandtemplate, sizeof( bot_cmd ) );
+		db->botinfo.bot_cmd_list[i].cmd = db->stringlist[( i * 4 ) + 0];
+		db->botinfo.bot_cmd_list[i].onelinehelp = db->stringlist[( i * 4 ) + 2];
+		db->botinfo.bot_cmd_list[i].moddata = ( void * )db->stringlist[( i * 4 ) + 3];
 	}
+	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateabout, sizeof( bot_cmd ) );
+	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatecredits, sizeof( bot_cmd ) );
+	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateversion, sizeof( bot_cmd ) );
 	return NS_SUCCESS;
 }
 
@@ -291,14 +388,15 @@ static int ts_read_database( dbbot *db )
  *
  *  @return none
  */
+
 void BuildBot( dbbot *db )
 {
 	strlcpy( db->botinfo.nick, db->database.nick, MAXNICK );
 	strlcpy( db->botinfo.user, "ts", MAXUSER );
-	strlcpy( db->botinfo.realname, db->database.name, MAXREALNAME );
+	strlcat( db->botinfo.realname, db->database.name, MAXREALNAME );
 	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
 	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
-	db->botinfo.flags = BOT_FLAG_SERVICEBOT;
+	db->botinfo.flags = BOT_FLAG_SERVICEBOT|BOT_FLAG_NOINTRINSICLEVELS;
 	ts_read_database( db );
 }
 
@@ -314,6 +412,7 @@ void BuildBot( dbbot *db )
 void JoinBot( dbbot *db )
 {
 	db->botptr = AddBot( &db->botinfo );
+	SetBotModValue( db->botptr, (void *) db );
 	if( *db->database.channel )
 		irc_join( db->botptr, db->database.channel, NULL );
 }
@@ -341,6 +440,9 @@ void PartBot( dbbot *db )
 	{
 		ns_free( db->stringlist[i] );
 	}
+	ns_free( db->abouttext );
+	ns_free( db->creditstext );	
+	ns_free( db->versiontext );	
 }
 
 /** @brief load_dbentry
@@ -455,6 +557,7 @@ int ModFini( void )
 
 static int ts_cmd_add( CmdParams *cmdparams )
 {
+	static char filename[MAXPATH];
 	FILE *fp;
 	dbbot *db;
 
@@ -465,24 +568,23 @@ static int ts_cmd_add( CmdParams *cmdparams )
 			"%s already exists in the database list", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	fp = os_fopen( cmdparams->av[0], "rt" );
+	strlcpy( filename, "data/", MAXPATH );
+	strlcat( filename, cmdparams->av[0], MAXPATH );
+	fp = os_fopen( filename, "rt" );
 	if( !fp )
 	{
-		irc_prefmsg( ts_bot, cmdparams->source, 
-			"%s not found", cmdparams->av[0] );
+		irc_prefmsg( ts_bot, cmdparams->source, "%s not found", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
 	os_fclose( fp );
 	if( cmdparams->ac > 1 && ValidateNick( cmdparams->av[1] ) != NS_SUCCESS )
 	{
-		irc_prefmsg( ts_bot, cmdparams->source, 
-			"%s is an invalid nick", cmdparams->av[1] );
+		irc_prefmsg( ts_bot, cmdparams->source, "%s is an invalid nick", cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
 	if( cmdparams->ac > 2 && ValidateChannel( cmdparams->av[2] ) != NS_SUCCESS )
 	{
-		irc_prefmsg( ts_bot, cmdparams->source, 
-			"%s is an invalid channel", cmdparams->av[2] );
+		irc_prefmsg( ts_bot, cmdparams->source, "%s is an invalid channel", cmdparams->av[2] );
 		return NS_SUCCESS;
 	}
 	db = ns_calloc( sizeof( dbbot ) );
@@ -568,5 +670,76 @@ static int ts_cmd_del( CmdParams *cmdparams )
 		}
 	}
 	irc_prefmsg( ts_bot, cmdparams->source, "No entry for %s", cmdparams->av[0] );
+	return NS_SUCCESS;
+}
+
+/** @brief ts_cmd_msg
+ *
+ *  ts_cmd_msg
+ *    cmdparams->av[0] = target nick
+ *    cmdparams->av[1 - cmdparams->ac] = message
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ts_cmd_msg( CmdParams* cmdparams )
+{
+	static char buf[BUFSIZE];
+	dbbot *db;
+	Client *target;
+
+	SET_SEGV_LOCATION();
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	target = FindValidUser( cmdparams->bot, cmdparams->source, cmdparams->av[0] );
+	if( !target ) 
+	{
+		return NS_FAILURE;
+	}
+	irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, target->name );
+	if( cmdparams->ac > 1)
+	{
+		char *message;
+		
+		message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
+		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, ( char * ) cmdparams->cmd_ptr->moddata, message );
+		ns_free( message );
+	}
+	else
+	{
+		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, ( char * ) cmdparams->cmd_ptr->moddata );
+	}
+	irc_prefmsg( cmdparams->bot, cmdparams->source, buf );
+	return NS_SUCCESS;
+}
+
+static int ts_cmd_about( CmdParams* cmdparams )
+{
+	dbbot *db;
+
+	SET_SEGV_LOCATION();
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	irc_prefmsg( cmdparams->bot, cmdparams->source, db->abouttext );
+	return NS_SUCCESS;
+}
+
+static int ts_cmd_credits( CmdParams* cmdparams )
+{
+	dbbot *db;
+
+	SET_SEGV_LOCATION();
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	irc_prefmsg( cmdparams->bot, cmdparams->source, db->creditstext );
+	return NS_SUCCESS;
+}
+
+static int ts_cmd_version( CmdParams* cmdparams )
+{
+	dbbot *db;
+
+	SET_SEGV_LOCATION();
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	irc_prefmsg( cmdparams->bot, cmdparams->source, db->versiontext );
 	return NS_SUCCESS;
 }

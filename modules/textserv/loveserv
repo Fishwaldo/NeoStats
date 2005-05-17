@@ -1,0 +1,13 @@
+VERSION|3.0.a3-dev
+ABOUT|Send presents and messages to loved ones on IRC.
+CREDITS|Copyright (c) 1999-2005, NeoStats. http://www.neostats.net/
+ROSE|<TARGET>|Send a rose to a loved one.|%F has sent you this beautiful rose! 3--<--<--<{4@
+KISS|<TARGET>|Send a kiss to that special someone.|%F has virtually kissed you!
+TONSIL|<TARGET>|Send a deep tonsil penitrating kiss to someone.|%F would like to send a SLoW..LoNG..DeeP..PeNeTRaTiNG..ToNSiL-TiCKLiNG.. HaiR STRaiGHTeNiNG..Toe-CuRLiNG..NeRVe-JaNGLiNG..LiFe-aLTeRiNG.. FaNTaSY-CauSiNG..i JuST SaW GoD!..GoSH, DiD MY CLoTHeS FaLL oFF?.. YeS, i'M GLaD i CaMe oN iRC..KiSS oN Da LiPS!!!
+HUG|<TARGET>|Send a hug to someone.|%F has sent you a *BIG WARM HUG*!
+ADMIRER|<TARGET>|Tell someone they have a secret admirer.|You have a secret admirer! ;)
+CHOCOLATE|<TARGET>|Send a big yummy box of candy to someone.|%F would like you to have this yummy box of chocolates
+CANDY|<TARGET>|Send someone a box of yummy heart shaped candies.|%F would like you to have this big yummy bag of heart shaped candies
+LOVENOTE|<TARGET><MSG>|Send that special someone a love note.|%F has sent you a love note which reads: %M
+APOLOGY|<TARGET><MSG>|Send an apology to someone.|%F is sorry, and would like to apologise for %M
+THANKYOU|<TARGET><MSG>|Send a thank you message to someone.|%F wishes to thank you for %M

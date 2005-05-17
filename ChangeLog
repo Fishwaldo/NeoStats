@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - TextServ: Add moraleserv database. (M)
+ - TextServ: Add loveserv database. (M)
+ - TextServ: Add database reading support. (M)
  - DCC fixes and move partyline support to an external module to aid 
    development of the DCC module API. (M)
  - Add support to set topic from NeoStats. (M)

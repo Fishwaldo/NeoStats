@@ -391,6 +391,8 @@ run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
 	}
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
+	if( !ircstrcasecmp( cmd, "LEVELS" ) && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS ) 
+		return NS_FAILURE;
 	while( cmd_ptr->cmd ) {
 		if( !ircstrcasecmp( cmd, cmd_ptr->cmd ) ) {
 			intrinsic_handler( cmdparams, cmd_ptr->handler );
@@ -455,6 +457,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 		cmd_ptr = ( bot_cmd * ) hnode_find( cmdparams->bot->botcmds, av[0] );
 		if( cmd_ptr ) 
 		{
+			cmdparams->cmd_ptr = cmd_ptr;
 			processed = 1;
 			if( ischancmd && ( cmd_ptr->flags & CMD_FLAG_PRIVMSGONLY ) ) 
 			{
@@ -593,6 +596,11 @@ bot_cmd_help( CmdParams *cmdparams )
 		cmd_ptr = intrinsic_commands;
 		while( cmd_ptr->cmd ) {
 			/* Check for module override */	
+			if( !ircstrcasecmp( cmd_ptr->cmd, "LEVELS" ) && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS )
+			{
+				cmd_ptr++;
+				continue;
+			}
 			if( !cmdparams->bot->botcmds || !hash_lookup( cmdparams->bot->botcmds, cmd_ptr->cmd ) ) {
 				irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp );
 			}
