@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add new module: QuoteServ. (M)
  - TextServ: Add moraleserv database. (M)
  - TextServ: Add loveserv database. (M)
  - TextServ: Add database reading support. (M)
