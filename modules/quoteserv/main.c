@@ -26,6 +26,8 @@
 
 typedef struct database {
 	char name[MAXNICK];
+	char *prefixstring;
+	char *suffixstring;
 	char **stringlist;
 	int stringcount;
 }database;
@@ -122,7 +124,13 @@ static int qs_read_database( database *db )
 		dlog( DEBUG1, "read %s", buf );
 		ptr = ns_malloc( strlen( buf ) );
 		strcpy( ptr, buf );
-		AddStringToList( &db->stringlist, ptr, &db->stringcount );
+		strip( ptr );
+		if( ircstrncasecmp( buf, "PREFIX:", 7 ) == 0 )
+			db->prefixstring = ptr + 7;
+		else if( ircstrncasecmp( buf, "SUFFIX:", 7 ) == 0 )
+			db->suffixstring = ptr + 7;
+		else
+			AddStringToList( &db->stringlist, ptr, &db->stringcount );
 	}	
 	os_fclose( fp );
 	return NS_SUCCESS;
@@ -341,17 +349,56 @@ static int qs_cmd_del( CmdParams *cmdparams )
 
 static int qs_cmd_quote( CmdParams* cmdparams )
 {
+	int flag = 0;
 	database *db;
 	int randno;
 	
 	SET_SEGV_LOCATION();
-	db = (database *)hnode_find (qshash, cmdparams->av[0]);
-	if (!db) {
-		irc_prefmsg( qs_bot, cmdparams->source, 
-			"%s not available", cmdparams->av[0] );
-		return NS_SUCCESS;
+	if( ircstrcasecmp( cmdparams->av[0], "random" ) == 0 )
+	{
+		hnode_t *hn;
+		hscan_t hs;
+		int randdb;
+		int i = 0;
+		
+		randdb = hrand( hash_count( qshash ) , 1 );	
+		hash_scan_begin( &hs, qshash );
+		while( ( hn = hash_scan_next( &hs ) ) != NULL )
+		{
+			i++;
+			db =( database * )hnode_get( hn );
+			if( i == randdb )
+				break;
+		}
+		
+	}
+	else
+	{
+		db = (database *)hnode_find( qshash, cmdparams->av[0] );
+		if (!db) {
+			irc_prefmsg( qs_bot, cmdparams->source, "%s not available", cmdparams->av[0] );
+			return NS_SUCCESS;
+		}
 	}
 	randno = hrand( db->stringcount, 1 );	
-	irc_prefmsg( qs_bot, cmdparams->source, db->stringlist[randno] );
+	if( db->prefixstring )
+		flag |= 1 << 0;
+	if( db->suffixstring )
+		flag |= 1 << 1;
+	switch( flag )
+	{
+		case 3:
+			irc_prefmsg( qs_bot, cmdparams->source, "%s %s %s", db->prefixstring, db->stringlist[randno], db->suffixstring );
+			break;
+		case 2:
+			irc_prefmsg( qs_bot, cmdparams->source, "%s %s", db->stringlist[randno], db->suffixstring );
+			break;
+		case 1:
+			irc_prefmsg( qs_bot, cmdparams->source, "%s %s", db->prefixstring, db->stringlist[randno] );
+			break;
+		case 0:
+		default:
+			irc_prefmsg( qs_bot, cmdparams->source, db->stringlist[randno] );
+	}
 	return NS_SUCCESS;
 }
