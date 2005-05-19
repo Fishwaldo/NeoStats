@@ -115,6 +115,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "quoteserv", "modules\quotes
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "limitserv", "modules\limitserv\limitserv.vcproj", "{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -221,6 +225,10 @@ Global
 		{FE700C44-B03E-4C62-B2BA-0F3392AD6A46}.Debug.Build.0 = Debug|Win32
 		{FE700C44-B03E-4C62-B2BA-0F3392AD6A46}.Release.ActiveCfg = Release|Win32
 		{FE700C44-B03E-4C62-B2BA-0F3392AD6A46}.Release.Build.0 = Release|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.ActiveCfg = Debug|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.Build.0 = Debug|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Release.ActiveCfg = Release|Win32
+		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Release.Build.0 = Release|Win32
 		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.ActiveCfg = Debug|Win32
 		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Debug.Build.0 = Debug|Win32
 		{5E3A1DF8-46AF-485A-BAB2-3DC78C922F8F}.Release.ActiveCfg = Release|Win32

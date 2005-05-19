@@ -403,6 +403,12 @@ modules/ircdauth/Makefile.am -text
 modules/ircdauth/Makefile.in -text
 modules/ircdauth/ircdauth.c -text
 modules/ircdauth/ircdauth.vcproj -text
+modules/limitserv/Makefile.am -text
+modules/limitserv/Makefile.in -text
+modules/limitserv/help.c -text
+modules/limitserv/limitserv.h -text
+modules/limitserv/limitserv.vcproj -text
+modules/limitserv/main.c -text
 modules/modules.txt -text
 modules/nstest/Makefile.am -text
 modules/nstest/commands.c -text
