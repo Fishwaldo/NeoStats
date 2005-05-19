@@ -1250,6 +1250,7 @@ EXPORTFUNC int irc_ctcp_ping_req( Bot *botptr, Client *target );
 EXPORTFUNC int irc_ctcp_finger_req( Bot *botptr, Client *target );
 
 EXPORTFUNC int irc_ctcp_action_req( Bot *botptr, Client *target, const char *action );
+EXPORTFUNC int irc_ctcp_action_req_channel( Bot* botptr, Channel* channel, const char *action );
 
 EXPORTFUNC int irc_ctcp_time_req( Bot* botptr, Client* target );
 

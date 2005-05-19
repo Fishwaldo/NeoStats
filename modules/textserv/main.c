@@ -129,7 +129,7 @@ const char *ts_help_version[] = {
 
 static bot_cmd ts_commandtemplate[]=
 {
-	{NULL,	ts_cmd_msg,	1, 	0,	ts_help_cmd,	ts_help_cmd_oneline },
+	{NULL,	ts_cmd_msg,	1, 	0,	ts_help_cmd,	ts_help_cmd_oneline, CMD_FLAG_CHANONLY },
 };
 
 static bot_cmd ts_commandtemplateabout[]=
@@ -479,7 +479,7 @@ int ModInit( void )
 	tshash = hash_create( -1, 0, 0 );
 	if( !tshash ) {
 		nlog( LOG_CRITICAL, "Unable to create database hash" );
-		return -1;
+		return NS_FAILURE;
 	}
 	DBAFetchRows( "databases", load_dbentry );
 	ModuleConfig( ts_settings );
@@ -504,11 +504,10 @@ int ModSynch( void )
 
 	ts_bot = AddBot( &ts_botinfo );
 	if( !ts_bot ) 
-	{
 		return NS_FAILURE;
-	}
 	hash_scan_begin( &hs, tshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
 		db =( ( dbbot * )hnode_get( hn ) );
 		JoinBot( db );
 	}
@@ -687,8 +686,10 @@ static int ts_cmd_del( CmdParams *cmdparams )
 static int ts_cmd_msg( CmdParams* cmdparams )
 {
 	static char buf[BUFSIZE];
+	char *fmt;
 	dbbot *db;
 	Client *target;
+	int isaction = 0;
 
 	SET_SEGV_LOCATION();
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
@@ -698,19 +699,28 @@ static int ts_cmd_msg( CmdParams* cmdparams )
 		return NS_FAILURE;
 	}
 	irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, target->name );
+	fmt = ( char * ) cmdparams->cmd_ptr->moddata;
+	if( ircstrncasecmp( fmt, "ACTION ", 7 ) == 0 )
+	{
+		isaction = 1;
+		fmt += 7;
+	}
 	if( cmdparams->ac > 1)
 	{
 		char *message;
 		
 		message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
-		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, ( char * ) cmdparams->cmd_ptr->moddata, message );
+		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, fmt, message );
 		ns_free( message );
 	}
 	else
 	{
-		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, ( char * ) cmdparams->cmd_ptr->moddata );
+		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, fmt );
 	}
-	irc_prefmsg( cmdparams->bot, cmdparams->source, buf );
+	if( isaction )
+		irc_ctcp_action_req_channel( cmdparams->bot, cmdparams->channel, buf );
+	else
+		irc_chanprivmsg( cmdparams->bot, cmdparams->channel, buf );
 	return NS_SUCCESS;
 }
 

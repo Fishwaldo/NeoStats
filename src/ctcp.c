@@ -187,6 +187,13 @@ int irc_ctcp_action_req( Bot* botptr, Client* target, const char *action )
 	return NS_SUCCESS;
 }
 
+int irc_ctcp_action_req_channel( Bot* botptr, Channel* channel, const char *action ) 
+{
+	dlog( DEBUG5, "TX: Sending CTCP ACTION request from %s to %s", botptr->name, channel->name );
+	irc_chanprivmsg( botptr, channel->name, "\1ACTION %s\1", action );
+	return NS_SUCCESS;
+}
+
 static int ctcp_req_dcc( CmdParams* cmdparams )
 {
 	dlog( DEBUG5, "RX: CTCP DCC request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
