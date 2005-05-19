@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: quoteserv.h 2597 2005-05-18 23:14:38Z Mark $
+** $Id$
 */
 
 extern const char *ls_about[];

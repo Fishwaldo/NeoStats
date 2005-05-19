@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: main.c 2599 2005-05-19 20:50:01Z Mark $
+** $Id$
 */
 
 #include "neostats.h"
