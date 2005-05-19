@@ -422,6 +422,7 @@ modules/quoteserv/Makefile.in -text
 modules/quoteserv/discworld -text
 modules/quoteserv/help.c -text
 modules/quoteserv/main.c -text
+modules/quoteserv/misc -text
 modules/quoteserv/quoteserv.h -text
 modules/quoteserv/quoteserv.vcproj -text
 modules/statserv/.indent.pro -text
