@@ -294,7 +294,7 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
 		if( !ptr )
 			return NS_FAILURE;
 		dlog( DEBUG1, "about %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) );
+		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
 		db->abouttext = ptr2;
 		return NS_SUCCESS;		
@@ -305,7 +305,7 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
 		if( !ptr )
 			return NS_FAILURE;
 		dlog( DEBUG1, "credits %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) );
+		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
 		db->creditstext = ptr2;
 		return NS_SUCCESS;		
@@ -316,7 +316,7 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
 		if( !ptr )
 			return NS_FAILURE;
 		dlog( DEBUG1, "credits %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) );
+		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
 		db->versiontext = ptr2;
 		return NS_SUCCESS;		
@@ -325,7 +325,7 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
 	{
 		readcount++;
 		dlog( DEBUG1, "read %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) );
+		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
 		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
 		ptr = strtok( NULL, "|" );
