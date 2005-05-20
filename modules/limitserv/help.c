@@ -25,15 +25,15 @@
 
 const char *ls_about[] = 
 {
-	"\2TextServ\2 is a text messaging service",
+	"\2LimitServ\2 manages channel limit settings",
 	NULL
 };
 
-const char ls_help_add_oneline[] ="Add a channel";
-const char ls_help_del_oneline[] ="Delete a channel";
-const char ls_help_list_oneline[] ="List channels";
+const char help_add_oneline[] ="Add a channel";
+const char help_del_oneline[] ="Delete a channel";
+const char help_list_oneline[] ="List channels";
 
-const char *ls_help_add[] = {
+const char *help_add[] = {
 	"Syntax: \2ADD <channel>\2",
 	"",
 	"Register a channel with limitserv.",
@@ -41,16 +41,22 @@ const char *ls_help_add[] = {
 	NULL
 };
 
-const char *ls_help_del[] = {
+const char *help_del[] = {
 	"Syntax: \2DEL <channel>\2",
 	"",
 	"Delete a channel.",
 	NULL
 };
 
-const char *ls_help_list[] = {
+const char *help_list[] = {
 	"Syntax: \2LIST\2",
 	"",
 	"Lists channels.",
+	NULL
+};
+
+const char *help_set_join[] = {
+	"\2JOIN <ON|OFF>\2",
+	"Whether to join channels managed by limitserv",
 	NULL
 };

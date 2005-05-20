@@ -28,10 +28,20 @@ typedef struct ls_channel {
 	char name[MAXCHANLEN];
 }ls_channel;
 
+int joinchannels = 0;
+
 /** Bot command function prototypes */
-static int ls_cmd_add( CmdParams *cmdparams );
-static int ls_cmd_list( CmdParams *cmdparams );
-static int ls_cmd_del( CmdParams *cmdparams );
+static int cmd_add( CmdParams *cmdparams );
+static int cmd_list( CmdParams *cmdparams );
+static int cmd_del( CmdParams *cmdparams );
+
+/** Event function prototypes */
+static int event_join( CmdParams *cmdparams );
+static int event_part( CmdParams *cmdparams );
+
+/** Setting callback prototypes */
+static int set_join_cb( CmdParams* cmdparams, SET_REASON reason );
+
 
 /** hash to store ls_channel and bot info */
 static hash_t *qshash;
@@ -63,19 +73,20 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd ls_commands[]=
 {
-	{"ADD",		ls_cmd_add,		1,	NS_ULEVEL_ADMIN,	ls_help_add,	ls_help_add_oneline },
-	{"DEL",		ls_cmd_del,		1, 	NS_ULEVEL_ADMIN,	ls_help_del,	ls_help_del_oneline },
-	{"LIST",	ls_cmd_list,	0, 	NS_ULEVEL_ADMIN,	ls_help_list,	ls_help_list_oneline },
-	{NULL,		NULL,			0, 	0,					NULL, 			NULL}
+	{"ADD",		cmd_add,	1,	NS_ULEVEL_ADMIN,	help_add,	help_add_oneline },
+	{"DEL",		cmd_del,	1, 	NS_ULEVEL_ADMIN,	help_del,	help_del_oneline },
+	{"LIST",	cmd_list,	0, 	NS_ULEVEL_ADMIN,	help_list,	help_list_oneline },
+	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
 };
 
 /** Bot setting table */
 static bot_setting ls_settings[]=
 {
-	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
+	{"JOIN",	&joinchannels,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void* )0	},
+	{NULL,		NULL,			0,					0, 0, 		0,				 NULL,	NULL,			NULL	},
 };
 
-/** TextServ BotInfo */
+/** Bot info */
 static BotInfo ls_botinfo = 
 {
 	"LimitServ", 
@@ -85,10 +96,98 @@ static BotInfo ls_botinfo =
 	"Limit service",
 	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
 	ls_commands, 
-	NULL,
+	ls_settings,
 };
 
-/** @brief load_ls_channel
+/** Module Events */
+ModuleEvent module_events[] = 
+{
+	{EVENT_JOIN,	event_join},
+	{EVENT_PART,	event_part},
+	{EVENT_NULL,	NULL}
+};
+
+/** @brief ManageLimit
+ *
+ *  manage channel limit
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void ManageLimit( char *name, int users, int curlimit, int add )
+{
+	static char limitsize[10];
+	int limit;
+
+	limit = curlimit;
+	if( limit < users )
+		limit = users;
+	if( add )
+		limit++;
+	else
+		limit--;
+	ircsnprintf( limitsize, 10, "%d", limit );	
+	irc_cmode( ls_bot, name, "+l", limitsize );
+}
+
+/** @brief JoinChannels
+ *
+ *  join channels
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void JoinChannels( void )
+{
+	ls_channel *db;
+	hnode_t *hn;
+	hscan_t hs;
+
+	hash_scan_begin( &hs, qshash );
+	while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+	{
+		Channel *c;
+
+		db =( ( ls_channel * )hnode_get( hn ) );
+		c = FindChannel( db->name );
+		if( c )
+		{
+			if( joinchannels )
+				irc_join (ls_bot, db->name, "+o");
+			ManageLimit( db->name, c->users, 0, 1 );
+		}
+	}
+}
+
+/** @brief PartChannels
+ *
+ *  part channels
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void PartChannels( void )
+{
+	ls_channel *db;
+	hnode_t *hn;
+	hscan_t hs;
+
+	hash_scan_begin( &hs, qshash );
+	while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+	{
+		db =( ( ls_channel * )hnode_get( hn ) );
+		if( FindChannel( db->name ) )
+			irc_part( ls_bot, db->name, NULL);
+	}
+}
+
+/** @brief LoadChannel
  *
  *  load ls_channel
  *
@@ -97,7 +196,7 @@ static BotInfo ls_botinfo =
  *  @return none
  */
 
-static int load_ls_channel( void *data, int size )
+static int LoadChannel( void *data, int size )
 {
 	ls_channel *db;
 
@@ -123,7 +222,7 @@ int ModInit( void )
 		nlog( LOG_CRITICAL, "Unable to create ls_channel hash" );
 		return -1;
 	}
-	DBAFetchRows( "channels", load_ls_channel );
+	DBAFetchRows( "channels", LoadChannel );
 	ModuleConfig( ls_settings );
 	return NS_SUCCESS;
 }
@@ -142,9 +241,8 @@ int ModSynch( void )
 {
 	ls_bot = AddBot( &ls_botinfo );
 	if( !ls_bot ) 
-	{
 		return NS_FAILURE;
-	}
+	JoinChannels();
 	return NS_SUCCESS;
 }
 
@@ -165,7 +263,8 @@ int ModFini( void )
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
 		db =( ( ls_channel * )hnode_get( hn ) );
 		hash_delete( qshash, hn );
 		hnode_destroy( hn );
@@ -175,7 +274,7 @@ int ModFini( void )
 	return NS_SUCCESS;
 }
 
-/** @brief ls_cmd_add
+/** @brief cmd_add
  *
  *  Command handler for ADD
  *
@@ -185,7 +284,7 @@ int ModFini( void )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ls_cmd_add( CmdParams *cmdparams )
+static int cmd_add( CmdParams *cmdparams )
 {
 	ls_channel *db;
 
@@ -200,10 +299,14 @@ static int ls_cmd_add( CmdParams *cmdparams )
 	strlcpy( db->name, cmdparams->av[0], MAXCHANLEN );
 	hnode_create_insert( qshash, db, db->name );
 	DBAStore( "channels", db->name,( void * )db->name, MAXCHANLEN );
+	CommandReport( ls_bot, "%s added %s to the channel list",
+		cmdparams->source->name, cmdparams->av[0] );
+	nlog( LOG_NOTICE, "%s added %s to the channel list",
+		cmdparams->source->name, cmdparams->av[0] );
 	return NS_SUCCESS;
 }
 
-/** @brief ls_cmd_list
+/** @brief cmd_list
  *
  *  Command handler for LIST
  *
@@ -212,30 +315,30 @@ static int ls_cmd_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ls_cmd_list( CmdParams *cmdparams )
+static int cmd_list( CmdParams *cmdparams )
 {
 	ls_channel *db;
 	hnode_t *hn;
 	hscan_t hs;
-	int i = 1;
 
 	SET_SEGV_LOCATION();
-	if( hash_count( qshash ) == 0 ) {
+	if( hash_count( qshash ) == 0 )
+	{
 		irc_prefmsg( ls_bot, cmdparams->source, "No channels are defined." );
 		return NS_SUCCESS;
 	}
 	hash_scan_begin( &hs, qshash );
 	irc_prefmsg( ls_bot, cmdparams->source, "channels" );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
 		db =( ( ls_channel * )hnode_get( hn ) );
-		irc_prefmsg( ls_bot, cmdparams->source, "%d - %s", i, db->name );
-		i++;
+		irc_prefmsg( ls_bot, cmdparams->source, "%s", db->name );
 	}
 	irc_prefmsg( ls_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
-/** @brief ls_cmd_del
+/** @brief cmd_del
  *
  *  Command handler for DEL
  *    cmdparams->av[0] = ls_channel to delete
@@ -245,7 +348,7 @@ static int ls_cmd_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ls_cmd_del( CmdParams *cmdparams )
+static int cmd_del( CmdParams *cmdparams )
 {
 	ls_channel *db;
 	hnode_t *hn;
@@ -253,9 +356,11 @@ static int ls_cmd_del( CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
 		db =( ls_channel * )hnode_get( hn );
-		if( ircstrcasecmp( db->name, cmdparams->av[0] ) == 0 ) {
+		if( ircstrcasecmp( db->name, cmdparams->av[0] ) == 0 )
+		{
 			hash_scan_delete( qshash, hn );
 			irc_prefmsg( ls_bot, cmdparams->source, 
 				"Deleted %s from the channel list", cmdparams->av[0] );
@@ -270,5 +375,74 @@ static int ls_cmd_del( CmdParams *cmdparams )
 		}
 	}
 	irc_prefmsg( ls_bot, cmdparams->source, "No entry for %s", cmdparams->av[0] );
+	return NS_SUCCESS;
+}
+
+/** @brief event_join
+ *
+ *  join event handler
+ *  join channels if we need to and manage limit on channels
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int event_join( CmdParams *cmdparams )
+{
+	ls_channel *db;
+
+	SET_SEGV_LOCATION();
+	db = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
+	if( db )
+	{
+		/* Join channel if we are not a member */
+		if( joinchannels && !IsChannelMember( cmdparams->channel, ls_bot->u ) )
+			irc_join( ls_bot, db->name, "+o" );
+		ManageLimit( cmdparams->channel->name, cmdparams->channel->limit, cmdparams->channel->users, 1 );
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief event_part
+ *
+ *  part event handler
+ *  manage limit on channels
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int event_part( CmdParams *cmdparams )
+{
+	ls_channel *db;
+
+	SET_SEGV_LOCATION();
+	db = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
+	if( db )
+		ManageLimit( cmdparams->channel->name, cmdparams->channel->limit, cmdparams->channel->users, 0 );
+	return NS_SUCCESS;
+}
+
+/** @brief set_join_cb
+ *
+ *  SET JOIN callback
+ *
+ *  @param cmdparams
+ *  @param reason
+ *
+ *  @return NS_SUCCESS 
+ */
+
+static int set_join_cb( CmdParams* cmdparams, SET_REASON reason )
+{
+	if( reason == SET_CHANGE )
+	{
+		if( joinchannels )
+			JoinChannels();
+		else
+			PartChannels();
+	}
 	return NS_SUCCESS;
 }

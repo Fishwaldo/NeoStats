@@ -396,7 +396,8 @@ static void _send_cmode( const char *sourceserver, const char *sourceuser, const
 	if( ircd_srv.protocol & PROTOCOL_P10 )
 		send_cmd( "%s %s %s %s %s %lu", me.s->name64, TOK_MODE, chan, mode, args, ts );
 	else
-		send_cmd( ":%s %s %s %s %s %lu", sourceserver, MSGTOK( MODE ), chan, mode, args, ts );
+		/* TS of 0 forces the ircd to set the mode */
+		send_cmd( ":%s %s %s %s %s 0", sourceserver, MSGTOK( MODE ), chan, mode, args );
 }
 
 static void _send_quit( const char *source, const char *quitmsg )
