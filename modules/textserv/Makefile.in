@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 SOURCES = $(textserv_la_SOURCES)
 
 srcdir = @srcdir@
@@ -37,8 +38,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/autotools/rules.mk
+DIST_COMMON = $(dist_data_DATA) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk
 subdir = modules/textserv
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -58,7 +59,7 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(pkglibdir)"
+am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(datadir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 textserv_la_LIBADD =
@@ -75,6 +76,8 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 CCLD = $(CC)
 SOURCES = $(textserv_la_SOURCES)
 DIST_SOURCES = $(textserv_la_SOURCES)
+dist_dataDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(dist_data_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -204,6 +207,7 @@ pkglib_LTLIBRARIES = textserv.la
 textserv_la_SOURCES = main.c textserv.h help.c
 textserv_la_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
+dist_data_DATA = data/*
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -279,6 +283,14 @@ distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
 
+uninstall-dist_dataDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_data_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(datadir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(datadir)/$$f"; \
+	done
+
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -328,7 +340,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../../autotools
+	$(mkdir_p) $(distdir)/../../autotools $(distdir)/data
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -357,9 +369,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(pkglibdir)"; do \
+	for dir in "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(datadir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -407,7 +419,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-dist_dataDATA
 
 install-exec-am: install-pkglibLTLIBRARIES
 
@@ -435,20 +447,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-pkglibLTLIBRARIES
+uninstall-am: uninstall-dist_dataDATA uninstall-info-am \
+	uninstall-pkglibLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libtool clean-pkglibLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
+	install install-am install-data install-data-am \
+	install-dist_dataDATA install-exec install-exec-am \
+	install-info install-info-am install-man \
 	install-pkglibLTLIBRARIES install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-info-am \
-	uninstall-pkglibLTLIBRARIES
+	tags uninstall uninstall-am uninstall-dist_dataDATA \
+	uninstall-info-am uninstall-pkglibLTLIBRARIES
 
 
 .c.o:
