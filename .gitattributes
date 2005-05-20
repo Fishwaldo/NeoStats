@@ -425,12 +425,13 @@ modules/operlog/operlog.h -text
 modules/operlog/operlog.vcproj -text
 modules/quoteserv/Makefile.am -text
 modules/quoteserv/Makefile.in -text
-modules/quoteserv/discworld -text
+modules/quoteserv/data/discworld -text
 modules/quoteserv/help.c -text
 modules/quoteserv/main.c -text
 modules/quoteserv/misc -text
 modules/quoteserv/quoteserv.h -text
 modules/quoteserv/quoteserv.vcproj -text
+modules/quoteserv/redneck -text
 modules/statserv/.indent.pro -text
 modules/statserv/GeoIP.dat -text
 modules/statserv/Makefile.am -text
