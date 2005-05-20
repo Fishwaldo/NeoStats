@@ -26,6 +26,7 @@
  *  - Database sanity checking
  *  - Parameter support
  *  - Multiple channel per bot support
+ *  - Multiple output line support
  */
 
 #include "neostats.h"
@@ -33,7 +34,6 @@
 
 typedef struct dbentry {
 	char name[MAXNICK];
-	char nick[MAXNICK];
 	char channel[MAXCHANLEN];
 } dbentry;
 
@@ -398,7 +398,7 @@ static int ts_read_database( dbbot *db )
 
 void BuildBot( dbbot *db )
 {
-	strlcpy( db->botinfo.nick, db->database.nick, MAXNICK );
+	strlcpy( db->botinfo.nick, db->database.name, MAXNICK );
 	strlcpy( db->botinfo.user, "ts", MAXUSER );
 	strlcat( db->botinfo.realname, db->database.name, MAXREALNAME );
 	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
@@ -613,7 +613,6 @@ static int ts_cmd_list( CmdParams *cmdparams )
 	dbbot *db;
 	hnode_t *hn;
 	hscan_t hs;
-	int i = 1;
 
 	SET_SEGV_LOCATION();
 	if( hash_count( tshash ) == 0 ) {
@@ -624,8 +623,7 @@ static int ts_cmd_list( CmdParams *cmdparams )
 	irc_prefmsg( ts_bot, cmdparams->source, "Databases" );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		db =( ( dbbot * )hnode_get( hn ) );
-		irc_prefmsg( ts_bot, cmdparams->source, "%d - %s %s %s", i, db->database.name, db->database.nick, db->database.channel );
-		i++;
+		irc_prefmsg( ts_bot, cmdparams->source, "%s %s", db->database.name, db->database.channel );
 	}
 	irc_prefmsg( ts_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
@@ -718,7 +716,7 @@ static int ts_cmd_msg( CmdParams* cmdparams )
 	if( isaction )
 		irc_ctcp_action_req_channel( cmdparams->bot, cmdparams->channel, buf );
 	else
-		irc_chanprivmsg( cmdparams->bot, cmdparams->channel, buf );
+		irc_chanprivmsg( cmdparams->bot, cmdparams->channel->name, buf );
 	return NS_SUCCESS;
 }
 
