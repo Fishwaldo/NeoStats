@@ -472,6 +472,7 @@ modules/templateauth/main.c -text
 modules/templateauth/templateauth.vcproj -text
 modules/textserv/Makefile.am -text
 modules/textserv/Makefile.in -text
+modules/textserv/barmaid -text
 modules/textserv/help.c -text
 modules/textserv/icecream -text
 modules/textserv/loveserv -text

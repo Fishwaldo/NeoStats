@@ -1,0 +1,37 @@
+VERSION|3.0.a3-dev
+ABOUT|Bar Service.
+CREDITS|Copyright (c) 1999-2005, NeoStats. http://www.neostats.net/
+BEER|<BRAND>|Nice cold beer of your choice|ACTION pours some %M from the tap and slides it to %F
+SHOT|<TYPE>|Have a shot of hard liquor|ACTION pours a %M into a shotglass and hands it to %F
+MIXED|<TYPE>|Mixed drink of your choice|ACTION mixes a %M for %F and sticks an umbrella in it
+SELTZER|<NONE>|Be a wuss and have a seltzer|ACTION throws %F a seltzer water (wimp)
+SODA|<BRAND>|Be a wuss and have a soda|ACTION thinks %F is a wuss, but pours a %M anyway
+COFFEE|<NONE>|addicted to caffine ? <use help for types>|ACTION passes %F a cup of coffee
+COKE|<NONE>|Have a coke|ACTION opens up a fresh can of coke and sets it in front of %F
+COKETO|<NICK>|gives a coke to <nick>|ACTION opens up a fresh can of coke and sets it in front of %T, compliments of %F
+PEPSI|<NONE>|Have a pepsi|ACTION opens up a fresh can of pepsi and sets it in front of %F
+PEPSITO|<NICK>|gives a pepsi to <nick>|ACTION opens up a fresh can of pepsi and sets it in front of %T, compliments of %F
+PRETZELS|<NONE>|Get a basket of salted pretzels|ACTION hands %F a basket of salted pretzels to munch on
+CIG|<BRAND>|Buy a pack of smokes, any brand|ACTION pulls a pack of %M cigarettes from under the counter and hands them to %F
+MATCHES|<NONE>|Need a light? I'ts on the house|ACTION graciously lights %F's cigarette
+ORDER|<ITEM>|Order anything you like|ACTION gives %F a %M
+ORDERFOR|<NICK><ITEM>|Order anything you like for <nick>|ACTION gives %T a %M, compliments of %F.
+LATTE|<NONE>|LATTE|You want a WHAT? Have a real coffee you wimp!
+MUG|<NONE>|MUG|You need a warmup honey ?
+#ACTION Fills %F's mug to the brim with freshly brewed coffee
+POT|<NONE>|POT|Boy, you must really need to wake up :-)
+#ACTION passes the coffee pot to %F.
+ESPRESSO|<NONE>|ESPRESSO|ACTION fires up Espresso
+#Think I'm getting one for you %F? I ain't your wife!
+GROUNDS|<NONE>|GROUNDS|Are you sucking on those coffee grounds %F?
+#ACTION watches %F suck on the used filter
+MOCHA|<NONE>|MOCHA|ACTION fires up Espresso
+#Did you want some foam and cinnamon on that %F?
+DECAF|<NONE>|DECAF|Decaf ? WTF ? Why don't you just drink hot water ?
+#ACTION pours %F a cup of decaf
+TIME|<NONE>|TIME|Guess what time it is guys ?
+#It's Maxwell House Time !!
+#This round's on me...it's good to the last drop!
+#And you say bots are useless...
+
+
