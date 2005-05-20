@@ -62,3 +62,9 @@ const char *qs_help_quote[] = {
 	"Get quote.",
 	NULL
 };
+
+const char *help_set_signonquote[] = {
+	"\2SIGNONQUOTE <ON|OFF>\2",
+	"Whether quoteserv gives a quote to users when the join the network",
+	NULL
+};

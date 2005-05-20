@@ -38,6 +38,11 @@ static int qs_cmd_list( CmdParams *cmdparams );
 static int qs_cmd_del( CmdParams *cmdparams );
 static int qs_cmd_quote( CmdParams* cmdparams );
 
+/** Event function prototypes */
+static int event_signon( CmdParams *cmdparams );
+
+int signonquote = 0;
+
 /** hash to store database and bot info */
 static hash_t *qshash;
 
@@ -78,20 +83,28 @@ static bot_cmd qs_commands[]=
 /** Bot setting table */
 static bot_setting qs_settings[]=
 {
-	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
+	{"SIGNONQUOTE",	&signonquote,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_signonquote,	NULL,	( void* )0	},
+	{NULL,			NULL,			0,					0, 0, 		0,				 NULL,		NULL,			NULL	},
 };
 
-/** TextServ BotInfo */
+/** BotInfo */
 static BotInfo qs_botinfo = 
 {
 	"QuoteServ", 
 	"QuoteServ1", 
-	"TS", 
+	"QS", 
 	BOT_COMMON_HOST, 
 	"Quote service",
 	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
 	qs_commands, 
-	NULL,
+	qs_settings,
+};
+
+/** Module Events */
+ModuleEvent module_events[] = 
+{
+	{EVENT_SIGNON,	event_signon},
+	{EVENT_NULL,	NULL}
 };
 
 /** @brief qs_read_database
@@ -336,25 +349,23 @@ static int qs_cmd_del( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** @brief qs_cmd_quote
+/** @brief do_quote
  *
- *  qs_cmd_quote
- *    cmdparams->av[0] = target nick
- *    cmdparams->av[1 - cmdparams->ac] = message
+ *  do_quote
  *
- *  @cmdparams pointer to commands param struct
+ *  @
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int qs_cmd_quote( CmdParams* cmdparams )
+static int do_quote( Client *target, char *which, int reporterror )
 {
 	int flag = 0;
 	database *db;
 	int randno;
 	
 	SET_SEGV_LOCATION();
-	if( ircstrcasecmp( cmdparams->av[0], "random" ) == 0 )
+	if( ircstrcasecmp( which, "random" ) == 0 )
 	{
 		hnode_t *hn;
 		hscan_t hs;
@@ -374,9 +385,10 @@ static int qs_cmd_quote( CmdParams* cmdparams )
 	}
 	else
 	{
-		db = (database *)hnode_find( qshash, cmdparams->av[0] );
+		db = (database *)hnode_find( qshash, which );
 		if (!db) {
-			irc_prefmsg( qs_bot, cmdparams->source, "%s not available", cmdparams->av[0] );
+			if( reporterror )
+				irc_prefmsg( qs_bot, target, "%s not available", which );
 			return NS_SUCCESS;
 		}
 	}
@@ -388,17 +400,48 @@ static int qs_cmd_quote( CmdParams* cmdparams )
 	switch( flag )
 	{
 		case 3:
-			irc_prefmsg( qs_bot, cmdparams->source, "%s %s %s", db->prefixstring, db->stringlist[randno], db->suffixstring );
+			irc_prefmsg( qs_bot, target, "%s %s %s", db->prefixstring, db->stringlist[randno], db->suffixstring );
 			break;
 		case 2:
-			irc_prefmsg( qs_bot, cmdparams->source, "%s %s", db->stringlist[randno], db->suffixstring );
+			irc_prefmsg( qs_bot, target, "%s %s", db->stringlist[randno], db->suffixstring );
 			break;
 		case 1:
-			irc_prefmsg( qs_bot, cmdparams->source, "%s %s", db->prefixstring, db->stringlist[randno] );
+			irc_prefmsg( qs_bot, target, "%s %s", db->prefixstring, db->stringlist[randno] );
 			break;
 		case 0:
 		default:
-			irc_prefmsg( qs_bot, cmdparams->source, db->stringlist[randno] );
+			irc_prefmsg( qs_bot, target, db->stringlist[randno] );
 	}
 	return NS_SUCCESS;
+}
+
+/** @brief qs_cmd_quote
+ *
+ *  qs_cmd_quote
+ *    cmdparams->av[0] = target nick
+ *    cmdparams->av[1 - cmdparams->ac] = message
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int qs_cmd_quote( CmdParams* cmdparams )
+{
+	return do_quote( cmdparams->source, cmdparams->av[0], 1 );
+}
+
+/** @brief event_part
+ *
+ *  part event handler
+ *  manage limit on channels
+ *
+ *  @cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int event_signon( CmdParams *cmdparams )
+{
+	return do_quote( cmdparams->source, "random", 0 );
 }

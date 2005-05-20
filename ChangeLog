@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - QuoteServ: Add support for quotes at SIGNON. (M)
  - QuoteServ: Add support for prefix and suffix entries. (M)
  - QuoteServ: Add support for random quotes. (M)
  - Add new module: QuoteServ. (M)
