@@ -34,12 +34,10 @@ const char ts_help_del_oneline[] ="Delete a database";
 const char ts_help_list_oneline[] ="List databases";
 
 const char *ts_help_add[] = {
-	"Syntax: \2ADD <database> <nick> <channel>\2",
+	"Syntax: \2ADD <database> <channel>\2",
 	"",
 	"Register a database with textserv.",
 	"<database> is the name of the database to load",
-	"<nick> is the optional name of the bot you want to use. If not",
-	"specified, the database name is used as the nick",
 	"<channel> is the optional channel you want the bot to join. If not",
 	"specified, the bot will not join a channel",
 	NULL

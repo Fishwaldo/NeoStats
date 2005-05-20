@@ -21,6 +21,13 @@
 ** $Id$
 */
 
+/*  TODO:
+ *  - Help on individual commands
+ *  - Database sanity checking
+ *  - Parameter support
+ *  - Multiple channel per bot support
+ */
+
 #include "neostats.h"
 #include "textserv.h"
 
@@ -576,12 +583,7 @@ static int ts_cmd_add( CmdParams *cmdparams )
 		return NS_SUCCESS;
 	}
 	os_fclose( fp );
-	if( cmdparams->ac > 1 && ValidateNick( cmdparams->av[1] ) != NS_SUCCESS )
-	{
-		irc_prefmsg( ts_bot, cmdparams->source, "%s is an invalid nick", cmdparams->av[1] );
-		return NS_SUCCESS;
-	}
-	if( cmdparams->ac > 2 && ValidateChannel( cmdparams->av[2] ) != NS_SUCCESS )
+	if( cmdparams->ac > 1 && ValidateChannel( cmdparams->av[1] ) != NS_SUCCESS )
 	{
 		irc_prefmsg( ts_bot, cmdparams->source, "%s is an invalid channel", cmdparams->av[2] );
 		return NS_SUCCESS;
@@ -589,11 +591,7 @@ static int ts_cmd_add( CmdParams *cmdparams )
 	db = ns_calloc( sizeof( dbbot ) );
 	strlcpy( db->database.name, cmdparams->av[0], MAXNICK );
 	if( cmdparams->ac > 1 )
-		strlcpy( db->database.nick, cmdparams->av[1], MAXNICK );
-	else
-		strlcpy( db->database.nick, cmdparams->av[0], MAXNICK );
-	if( cmdparams->ac > 2 )
-		strlcpy( db->database.channel, cmdparams->av[2], MAXCHANLEN );
+		strlcpy( db->database.channel, cmdparams->av[1], MAXCHANLEN );
 	hnode_create_insert( tshash, db, db->database.name );
 	DBAStore( "databases", db->database.name,( void * )db, sizeof( dbentry ) );
 	BuildBot( db );

@@ -1,0 +1,16 @@
+VERSION|3.0.a3-dev
+ABOUT|Restaurant Service.
+CREDITS|Copyright (c) 1999-2005, NeoStats. http://www.neostats.net/
+BURGER|<TYPE>|Order a burger & fries|ACTION fixes up a %M burger and fries, and brings it to %F
+FRIES|<NONE>|Basket of our famous seasoned fries|ACTION fills a basket of our famous seasoned french fries, and brings it to %F's table
+PIZZA|<TYPE>|Hot pizza of your choice|ACTION bakes a %M pizza and brings it over to %F.
+BREAD|<TYPE>|Hot breadsticks of your choice|ACTION bakes some %M breadsticks and puts them in a basket. Then brings them over to %F.
+NACHOS|<NONE>|Big plate of nachos with melted cheese|ACTION prepares a heaping plate of nachos for %F, with melted cheese, beef, beans, sour cream and quacomole
+POTATO|<NONE>|Big plate of potato skins|ACTION brings out a large plate of potato skins and sour cream for %F, Careful its hot.
+WINGS|<TEMP>|Wings as spicy as you want|ACTION cooks a dozen wings %M and brings them over to %F!
+SALAD|<TYPE>|Fresh tossed salad|ACTION tosses a fresh %M salad for %F.
+BUYPIZZA|<NICK><PIZZA>|Buy someone a pizza|ACTION gives %T a %M pizza, Compliments of %F.
+DELIVER|<WHO><ITEMS>|Deliver items to someone|ACTION delivers %M to %T. Compliments of %F.
+TIP|<AMOUNT>|Give me a tip|ACTION takes the %M, 'Thanks %F!'", rest, nickfrom);
+PAY|<AMOUNT>|Pay your bill|ACTION accepts payment of %M from %F and rips up the bill, That about covers it!
+PIZZACHAN|<NONE>|Buy pizza for the entire channel|ACTION hands out pizza to the entire channel, Compliments of %F.

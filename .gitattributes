@@ -479,6 +479,7 @@ modules/textserv/main.c -text
 modules/textserv/moraleserv -text
 modules/textserv/textserv.h -text
 modules/textserv/textserv.vcproj -text
+modules/textserv/waitress -text
 /neostats.in -text
 /neostats.motd -text
 /neostats.sln -text
