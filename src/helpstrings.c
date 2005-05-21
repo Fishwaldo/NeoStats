@@ -44,6 +44,8 @@ const char ns_help_userlist_oneline[]="List users";
 const char ns_help_channellist_oneline[]="List channels";
 const char ns_help_serverlist_oneline[]="List servers";
 const char ns_help_banlist_oneline[]="List bans";
+const char ns_help_lookup_oneline[] = "Lookup DNS record";
+
 const char cmd_help_oneline[]="Online help";
 const char cmd_help_about_oneline[] = "Display about text";
 const char cmd_help_credits_oneline[] = "Display credits";
@@ -210,6 +212,22 @@ const char *ns_help_status[] = {
 	"Syntax: \2STATUS\2",
 	"",
 	"Display info about NeoStats uptime and other stats.",
+	NULL
+};
+
+const char *ns_help_lookup[] = {
+	"Syntax: \2LOOKUP <IP|HOSTNAME> [type]\2",
+	"",
+	"Lookup DNS records for an ip address or hostname.",
+	"The default lookup is the ip address for a hostname",
+	"or the hostname for an ip address.",
+	"",
+	"Options for type are:",
+	"    txt - text records",
+	"    rp  - responsible person for this record",
+	"    ns  - name servers for this record",
+	"    soa - SOA for this record",
+	"",
 	NULL
 };
 

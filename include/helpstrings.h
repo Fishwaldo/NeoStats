@@ -44,6 +44,7 @@ extern const char *ns_help_botlist[];
 extern const char *ns_help_socklist[];
 extern const char *ns_help_timerlist[];
 extern const char *ns_help_status[];
+extern const char *ns_help_lookup[];
 
 extern const char ns_help_level_oneline[];
 extern const char ns_help_status_oneline[];
@@ -64,6 +65,7 @@ extern const char ns_help_userlist_oneline[];
 extern const char ns_help_channellist_oneline[];
 extern const char ns_help_serverlist_oneline[];
 extern const char ns_help_banlist_oneline[];
+extern const char ns_help_lookup_oneline[];
 
 extern const char *ns_help_set_nick[];
 extern const char *ns_help_set_altnick[];
