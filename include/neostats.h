@@ -131,6 +131,13 @@ typedef int OS_SOCKET;
 #include "version.h"
 #endif /* WIN32 */
 
+#ifdef WIN32
+#define MODULECONFIG "modconfigwin32.h"
+#else /* WIN32 */
+#define MODULECONFIG "modconfig.h"
+#endif /* WIN32 */
+
+
 /* No language support under win32 */
 #ifndef WIN32
 /* when db stuff is working, change this back */
