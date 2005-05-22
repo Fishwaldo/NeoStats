@@ -634,12 +634,12 @@ Bot *AddBot( BotInfo *botinfo )
 		return(ns_botptr );
 	}
 	if( GetBotNick( botinfo, nick ) == NULL ) {
-		nlog( LOG_WARNING, "Unable to init bot" );
+		nlog( LOG_WARNING, "Unable to find free nick for bot %s", botinfo->nick );
 		return NULL;
 	}
 	botptr = new_bot( nick );
 	if( !botptr ) {
-		nlog( LOG_WARNING, "new_bot failed for module %s bot %s", modptr->info->name, nick );
+		nlog( LOG_WARNING, "Unable to create bot %s", modptr->info->name, nick );
 		return NULL;
 	}
 	botptr->moduleptr = modptr;
@@ -655,12 +655,11 @@ Bot *AddBot( BotInfo *botinfo )
 		add_bot_cmd_list( botptr, botinfo->bot_cmd_list );
 		add_bot_setting_list( botptr, botinfo->bot_setting_list );
 		/* Do not add set botinfo options for root bot */
-		if( !( botptr->flags & 0x80000000 ) ) {
+		if( !( botptr->flags & 0x80000000 ) )
 			add_bot_info_settings( botptr, botinfo );
-		}
-		if( botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES ) {
+		/* Create module exclusion command handlers if needed */
+		if( botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES )
 			add_bot_cmd_list( botptr, GetModExcludeCommands( botptr->moduleptr ) );
-		}
 	}
 	return botptr;
 }
