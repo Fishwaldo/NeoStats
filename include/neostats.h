@@ -376,7 +376,7 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 #define MAXTOPICLEN		(307 + 1)
 #define CLOAKKEYLEN		(40 + 1)
 
-#define HOSTIPLEN		15	/* Size of IP address in dotted quad */
+#define HOSTIPLEN		( 15 + 1 )	/* Size of IP address in dotted quad */
 /* Size of nick!user@host mask */
 #define	USERHOSTLEN		(MAXNICK + MAXHOST + MAXUSER + 5)
 
