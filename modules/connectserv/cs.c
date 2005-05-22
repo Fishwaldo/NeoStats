@@ -23,6 +23,11 @@
 ** $Id$
 */
 
+/*  TODO:
+ *  - Improve colour selection, should be configure time rather 
+ *    than source change.
+ */
+
 #include "neostats.h"
 #include "cs.h"
 
@@ -42,13 +47,6 @@ struct cs_cfg
 	int exclusions;
 	int logging;
 } cs_cfg;
-
-/** Mode table definition */
-typedef struct ModeDef 
-{
-	unsigned int mask;
-	unsigned int serverflag;
-}ModeDef;
 
 /** output message and format strings */
 #ifdef ENABLE_COLOUR_SUPPORT
@@ -172,33 +170,6 @@ ModuleEvent module_events[] =
 	{EVENT_NULL,		NULL}
 };
 
-/** umodes handled by this module */
-ModeDef OperUmodes[] =
-{
-	{UMODE_NETADMIN,	0},
-	{UMODE_TECHADMIN,	0},
-	{UMODE_ADMIN,		1},
-	{UMODE_COADMIN,		1},
-	{UMODE_SADMIN,		0},
-	{UMODE_OPER,		1},
-	{UMODE_LOCOP,		1},
-	{UMODE_SERVICES,	0},
-	{0, 0},
-};
-
-/** smodes handled by this module */
-ModeDef OperSmodes[] =
-{
-	{SMODE_NETADMIN,	0},
-	{SMODE_CONETADMIN,	0},
-	{SMODE_TECHADMIN,	0},
-	{SMODE_COTECHADMIN, 0},
-	{SMODE_ADMIN,		1},
-	{SMODE_COADMIN,		1},
-	{SMODE_GUESTADMIN,	1},
-	{0, 0},
-};
-
 /** @brief ModInit
  *
  *  Init handler
@@ -234,9 +205,7 @@ int ModSynch( void )
 	cs_bot = AddBot( &cs_botinfo );
 	/* If failed to create bot, module will terminate */
 	if( !cs_bot ) 
-	{
 		return NS_FAILURE;
-	}
 	return NS_SUCCESS;
 }
 
@@ -249,7 +218,7 @@ int ModSynch( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini (void)
+int ModFini( void )
 {
 	SET_SEGV_LOCATION();
 	return NS_SUCCESS;
@@ -274,9 +243,7 @@ void cs_report( const char *fmt, ... )
 	va_end( ap );
 	irc_chanalert( cs_bot, buf );
 	if( cs_cfg.logging ) 
-	{
 		nlog( LOG_NORMAL, buf );
-	}
 }
 
 /** @brief cs_event_signon
@@ -313,13 +280,10 @@ static int cs_event_quit( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	/* Print Disconnection Notice */
-	if( cs_cfg.sign_watch ) 
-	{
-		cs_report( msg_signoff, cmdparams->source->name, 
-			cmdparams->source->user->username, cmdparams->source->user->hostname, 
-			cmdparams->source->info, cmdparams->source->uplink->name, 
-			cmdparams->param );
-	}
+	cs_report( msg_signoff, cmdparams->source->name, 
+		cmdparams->source->user->username, cmdparams->source->user->hostname, 
+		cmdparams->source->info, cmdparams->source->uplink->name, 
+		cmdparams->param );
 	return NS_SUCCESS;
 }
 
@@ -336,12 +300,9 @@ static int cs_event_quit( CmdParams *cmdparams )
 static int cs_event_localkill( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( cs_cfg.kill_watch ) 
-	{
-		cs_report( msg_localkill, cmdparams->target->name, 
-			cmdparams->target->user->username, cmdparams->target->user->hostname,
-			cmdparams->source->name, cmdparams->param );
-	}
+	cs_report( msg_localkill, cmdparams->target->name, 
+		cmdparams->target->user->username, cmdparams->target->user->hostname,
+		cmdparams->source->name, cmdparams->param );
 	return NS_SUCCESS;
 }
 
@@ -358,12 +319,9 @@ static int cs_event_localkill( CmdParams *cmdparams )
 static int cs_event_globalkill( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( cs_cfg.kill_watch ) 
-	{
-		cs_report( msg_globalkill, cmdparams->target->name, 
-			cmdparams->target->user->username, cmdparams->target->user->hostname,
-			cmdparams->source->name, cmdparams->param );
-	}
+	cs_report( msg_globalkill, cmdparams->target->name, 
+		cmdparams->target->user->username, cmdparams->target->user->hostname,
+		cmdparams->source->name, cmdparams->param );
 	return NS_SUCCESS;
 }
 
@@ -380,12 +338,9 @@ static int cs_event_globalkill( CmdParams *cmdparams )
 static int cs_event_serverkill( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( cs_cfg.kill_watch ) 
-	{
-		cs_report( msg_serverkill, cmdparams->target->name, 
-			cmdparams->target->user->username, cmdparams->target->user->hostname,
-			cmdparams->source->name, cmdparams->param );
-	}
+	cs_report( msg_serverkill, cmdparams->target->name, 
+		cmdparams->target->user->username, cmdparams->target->user->hostname,
+		cmdparams->source->name, cmdparams->param );
 	return NS_SUCCESS;
 }
 
@@ -431,10 +386,18 @@ static int cs_report_mode( const char *modedesc, int serverflag, Client *u, int 
 
 static int cs_event_umode( CmdParams *cmdparams )
 {
+	static unsigned int OperUmodes = 
+		UMODE_NETADMIN |
+		UMODE_TECHADMIN |
+		UMODE_ADMIN |
+		UMODE_COADMIN |
+		UMODE_SADMIN |
+		UMODE_OPER |
+		UMODE_LOCOP |
+		UMODE_SERVICES;
 	int mask;
 	int add = 1;
 	char *modes;
-	ModeDef* def;
 
 	SET_SEGV_LOCATION();
 	modes = cmdparams->param;
@@ -449,24 +412,10 @@ static int cs_event_umode( CmdParams *cmdparams )
 				break;
 			default:
 				mask = UmodeCharToMask( *modes );
-				if( mask == UMODE_BOT ) 
-				{
-					cs_report( msg_bot, cmdparams->source->name, 
-						add ? "now" : "no longer", add ? '+' : '-', *modes );			
-				} 
-				else 
-				{
-					def = OperUmodes;
-					while( def->mask ) 
-					{
-						if( def->mask == mask ) 
-						{
-							cs_report_mode( GetUmodeDesc( def->mask ), def->serverflag, cmdparams->source, mask, add, *modes );
-							break;
-						}
-						def ++;
-					}
-				}
+				if( mask & UMODE_BOT )
+					cs_report( msg_bot, cmdparams->source->name, add ? "now" : "no longer", add ? '+' : '-', *modes );			
+				else if( OperUmodes & mask )
+					cs_report_mode( GetUmodeDesc( mask ), IsServerOperMode( mask ), cmdparams->source, mask, add, *modes );
 				break;
 		}
 		modes++;
@@ -486,10 +435,18 @@ static int cs_event_umode( CmdParams *cmdparams )
 
 static int cs_event_smode( CmdParams *cmdparams )
 {
+	static unsigned int OperSmodes =
+		SMODE_NETADMIN |
+		SMODE_CONETADMIN |
+		SMODE_TECHADMIN |
+		SMODE_COTECHADMIN |
+		SMODE_ADMIN |
+		SMODE_COADMIN |
+		SMODE_GUESTADMIN;
+
 	int mask;
 	int add = 1;
 	char *modes;
-	ModeDef* def;
 
 	SET_SEGV_LOCATION();
 	modes = cmdparams->param;
@@ -504,16 +461,8 @@ static int cs_event_smode( CmdParams *cmdparams )
 				break;
 			default:
 				mask = SmodeCharToMask( *modes );
-				def = OperSmodes;
-				while( def->mask ) 
-				{
-					if( def->mask == mask ) 
-					{
-						cs_report_mode( GetSmodeDesc( def->mask ), def->serverflag, cmdparams->source, mask, add, *modes );
-						break;
-					}
-					def ++;
-				}
+				if( OperSmodes & mask )
+					cs_report_mode( GetSmodeDesc( mask ), IsServerOperSMode( mask ), cmdparams->source, mask, add, *modes );
 				break;
 		}
 		modes++;
@@ -662,11 +611,13 @@ static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 		{
 			EnableEvent( EVENT_GLOBALKILL );
 			EnableEvent( EVENT_SERVERKILL );
+			EnableEvent( EVENT_LOCALKILL );
 		} 
 		else 
 		{
 			DisableEvent( EVENT_GLOBALKILL );
 			DisableEvent( EVENT_SERVERKILL );
+			DisableEvent( EVENT_LOCALKILL );
 		}
 	}
 	return NS_SUCCESS;

@@ -316,6 +316,8 @@ EXPORTVAR extern unsigned int ircd_supported_cumodes;
 /* Umode macros */
 #define IsOper(x) ( ( x ) && ( (x->user->Umode & (UMODE_OPER|UMODE_LOCOP ) ) ) )
 #define IsBot(x) ( ( x ) && ( x->user->Umode & UMODE_BOT ) )
+#define IsServerOperMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
+#define IsServerOperSMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
 
 EXPORTFUNC int UmodeCharToMask( const char mode );
 EXPORTFUNC const char *GetUmodeDesc( const unsigned int mask );

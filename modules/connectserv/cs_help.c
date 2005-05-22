@@ -34,13 +34,6 @@ const char *cs_about[] =
 	NULL
 };
 
-const char *cs_help_set_signwatch[] = 
-{
-	"SIGNWATCH <ON|OFF>",
-	"Report users joining and leaving the network.",
-	NULL
-};
-
 const char *cs_help_set_exclusions[] = 
 {
 	"EXCLUSIONS <ON|OFF>",
@@ -52,6 +45,13 @@ const char *cs_help_set_logging[] =
 {
 	"LOGGING <ON|OFF>",
 	"Log connectserv event reports",
+	NULL
+};
+
+const char *cs_help_set_signwatch[] = 
+{
+	"SIGNWATCH <ON|OFF>",
+	"Report users joining and leaving the network.",
 	NULL
 };
 
