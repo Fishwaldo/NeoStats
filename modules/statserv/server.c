@@ -366,7 +366,7 @@ static int ss_cmd_server_stats (CmdParams *cmdparams)
 
 		uptime = s->server->uptime + (me.now - me.ts_boot);
 		irc_prefmsg (ss_bot, cmdparams->source, "Version: %s", s->version );
-		irc_prefmsg (ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld", (uptime / 86400), (uptime / 86400 == 1) ? "" : "s", ((uptime / 3600) % 24), ((uptime / 60) % 60), (uptime % 60) );
+		irc_prefmsg (ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld", ( uptime / TS_ONE_DAY ), ( ( uptime / TS_ONE_DAY ) == 1 ) ? "" : "s", ((uptime / TS_ONE_HOUR) % 24), ((uptime / TS_ONE_MINUTE) % TS_ONE_MINUTE), (uptime % 60) );
 		irc_prefmsg (ss_bot, cmdparams->source, "Current Users: %-3d (%d%%)", 
 			s->server->users, 
 			(int)((float) s->server->users / (float) networkstats.users.current * 100));

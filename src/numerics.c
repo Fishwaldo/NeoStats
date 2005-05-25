@@ -103,14 +103,14 @@ void _m_numeric242( char *origin, char **argv, int argc, int srv )
 		strtok( NULL, " " );
 		/* current string: "d days, hh:mm:ss" */
 		ptr = strtok( NULL, " " );
-		secs = atoi( ptr ) * 86400;
+		secs = atoi( ptr ) * TS_ONE_DAY;
 		/* current string: "days, hh:mm:ss" */
 		strtok( NULL, " " );
 		/* current string: ", hh:mm:ss" */
 		ptr = strtok( NULL, "" );
 		/* current string: "hh:mm:ss" */
 		ptr = strtok( ptr , ":" );
-		secs += atoi( ptr )*3600;
+		secs += atoi( ptr ) * TS_ONE_HOUR;
 		/* current string: "mm:ss" */
 		ptr = strtok( NULL, ":" );
 		secs += atoi( ptr )*60;

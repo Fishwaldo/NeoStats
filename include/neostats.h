@@ -363,6 +363,11 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 #define TS_MIN          3       /* minimum supported TS protocol version */
 #endif /* TS5_ONLY */
 
+#define TS_ONE_MINUTE	( 60 )
+#define TS_ONE_HOUR		( TS_ONE_MINUTE * 60 )	/* 3600 */
+#define TS_ONE_DAY		( TS_ONE_HOUR * 24 )	/* 86400 */
+#define TS_ONE_WEEK		( TS_ONE_DAY * 7 )		/* 604800 */
+
 #define MOD_PATH		"modules"
 
 #define BASE64SERVERSIZE	2

@@ -379,12 +379,12 @@ static int ns_cmd_status( CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "%s status:", cmdparams->source ), ns_botptr->name );
-	if( uptime > 86400 ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source ), ns_botptr->name, uptime / 86400,( uptime / 86400 == 1 ) ? "" : "s",( uptime / 3600 ) % 24,( uptime / 60 ) % 60 );
-	} else if( uptime > 3600 ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source ), ns_botptr->name, uptime / 3600, uptime / 3600 == 1 ? "" : "s",( uptime / 60 ) % 60,( uptime / 60 ) % 60 == 1 ? "" : "s" );
-	} else if( uptime > 60 ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld minute%s, %ld second%s\2", cmdparams->source ), ns_botptr->name, uptime / 60, uptime / 60 == 1 ? "" : "s", uptime % 60, uptime % 60 == 1 ? "" : "s" );
+	if( uptime > TS_ONE_DAY ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_DAY,( uptime / TS_ONE_DAY == 1 ) ? "" : "s",( uptime / TS_ONE_HOUR ) % 24,( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE );
+	} else if( uptime > TS_ONE_HOUR ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_HOUR, uptime / TS_ONE_HOUR == 1 ? "" : "s",( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE,( uptime / 60 ) % TS_ONE_MINUTE == 1 ? "" : "s" );
+	} else if( uptime > TS_ONE_MINUTE ) {
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld minute%s, %ld second%s\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_MINUTE, uptime / TS_ONE_MINUTE == 1 ? "" : "s", uptime % TS_ONE_MINUTE, uptime % TS_ONE_MINUTE == 1 ? "" : "s" );
 	} else {
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%d second%s\2", cmdparams->source ), ns_botptr->name,( int )uptime, uptime == 1 ? "" : "s" );
 	}

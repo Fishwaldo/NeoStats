@@ -186,7 +186,7 @@ dumpserver (Client *s)
 		irc_chanalert (ns_botptr, _("Server: %s"), s->name);
 	}
 	irc_chanalert (ns_botptr, _("Version: %s"), s->version);
-	irc_chanalert (ns_botptr, _("Uptime:  %ld day%s, %02ld:%02ld:%02ld"), (uptime / 86400), (uptime / 86400 == 1) ? "" : "s", ((uptime / 3600) % 24), ((uptime / 60) % 60), (uptime % 60) );
+	irc_chanalert (ns_botptr, _("Uptime:  %ld day%s, %02ld:%02ld:%02ld"), ( uptime / TS_ONE_DAY ), (uptime / TS_ONE_DAY == 1) ? "" : "s", ((uptime / TS_ONE_HOUR) % 24), ((uptime / TS_ONE_MINUTE) % TS_ONE_MINUTE), (uptime % 60) );
 	irc_chanalert (ns_botptr, _("Flags:   %x"), s->flags);
 	irc_chanalert (ns_botptr, _("Uplink:  %s"), s->uplink ? s->uplink->name : "");
 	irc_chanalert (ns_botptr, "========================================");

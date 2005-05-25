@@ -32,7 +32,7 @@
 /* try a save every 10 minutes */
 #define DBSAVETIME 600
 /* but only save data older than 1 hour! */
-#define PROGCHANTIME 3600
+#define PROGCHANTIME TS_ONE_HOUR
 
 extern Bot *ss_bot;
 
