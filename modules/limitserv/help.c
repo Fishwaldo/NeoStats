@@ -29,11 +29,8 @@ const char *ls_about[] =
 	NULL
 };
 
-const char help_add_oneline[] ="Add a channel";
-const char help_del_oneline[] ="Delete a channel";
-const char help_list_oneline[] ="List channels";
-
 const char *help_add[] = {
+	"Add a channel",
 	"Syntax: \2ADD <channel>\2",
 	"",
 	"Register a channel with limitserv.",
@@ -42,6 +39,7 @@ const char *help_add[] = {
 };
 
 const char *help_del[] = {
+	"Delete a channel",
 	"Syntax: \2DEL <channel>\2",
 	"",
 	"Delete a channel.",
@@ -49,6 +47,7 @@ const char *help_del[] = {
 };
 
 const char *help_list[] = {
+	"List channels",
 	"Syntax: \2LIST\2",
 	"",
 	"Lists channels.",

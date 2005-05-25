@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Help system updated. The oneline help text is now part of the main help text
+   for commands to simplify creation and maintainance of help text. (M)
  - QuoteServ: Add support for quotes at SIGNON. (M)
  - QuoteServ: Add support for prefix and suffix entries. (M)
  - QuoteServ: Add support for random quotes. (M)

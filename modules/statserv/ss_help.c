@@ -25,17 +25,6 @@
 
 #include "neostats.h"
 
-const char ss_help_server_oneline[]="Display server statistics";
-const char ss_help_map_oneline[]="Display network map";
-const char ss_help_channel_oneline[]="Display channel statistics";
-const char ss_help_netstats_oneline[]="Display network statistics";
-const char ss_help_daily_oneline[]="Display daily statistics";
-const char ss_help_tldmap_oneline[]="Display TLD statistics";
-const char ss_help_operlist_oneline[]="Display list of IRC operators";
-const char ss_help_botlist_oneline[]="Display list of BOTS";
-const char ss_help_userversion_oneline[]="Display client versions statistics";
-const char ss_help_forcehtml_oneline[]="Force output of the HTML statistics";
-
 const char *ss_about[] = {
 	"\2StatServ\2 provides detailed statistics about your",
 	"IRC network users, channels and servers.",
@@ -43,6 +32,7 @@ const char *ss_about[] = {
 };
 
 const char *ss_help_userversion[] = {
+	"Display client versions statistics",
 	"Syntax: \2USERVERSION [limit]\2",
 	"",
 	"Display statistics on the client versions used on the network",
@@ -128,6 +118,7 @@ const char *ss_help_set_channeltime[] = {
 };
 
 const char *ss_help_channel[] = {
+	"Display channel statistics",
 	"Syntax: \2CHANNEL\2",
 	"        \2CHANNEL <Channame>\2",
 	"        \2CHANNEL <POP>\2",
@@ -148,6 +139,7 @@ const char *ss_help_channel[] = {
 };
 
 const char *ss_help_server[] = {
+	"Display server statistics",
 	"Syntax: \2SERVER <server name>\2",
 	"        \2SERVER LIST\2",
 	"        \2SERVER DEL <servername>\2",
@@ -164,6 +156,7 @@ const char *ss_help_server[] = {
 };
 
 const char *ss_help_map[] = {
+	"Display network map",
 	"Syntax: \2MAP\2",
 	"",
 	"Display a server map with basic statistics.",
@@ -171,6 +164,7 @@ const char *ss_help_map[] = {
 };
 
 const char *ss_help_netstats[] = {
+	"Display network statistics",
 	"Syntax: \2NETSTATS\2",
 	"",
 	"Display network wide statistics",
@@ -178,6 +172,7 @@ const char *ss_help_netstats[] = {
 };
 
 const char *ss_help_daily[] = {
+	"Display daily statistics",
 	"Syntax: \2DAILY\2",
 	"",
 	"Display statistics based on today.",
@@ -185,6 +180,7 @@ const char *ss_help_daily[] = {
 };
 
 const char *ss_help_tldmap[] = {
+	"Display TLD statistics",
 	"Syntax: \2TLDMAP\2",
 	"",
 	"Display map of top level domains on the network.",
@@ -192,6 +188,7 @@ const char *ss_help_tldmap[] = {
 };
 
 const char *ss_help_operlist[] = {
+	"Display list of IRC operators",
 	"Syntax: \2OPERLIST\2",
 	"        \2OPERLIST NOAWAY\2",
 	"        \2OPERLIST SERVER <servername>\2",
@@ -205,6 +202,7 @@ const char *ss_help_operlist[] = {
 };
 
 const char *ss_help_botlist[] = {
+	"Display list of BOTS",
 	"Syntax: \2BOTLIST\2",
 	"",
 	"Display current list of bots on the network.",
@@ -213,6 +211,7 @@ const char *ss_help_botlist[] = {
 };
 
 const char *ss_help_forcehtml[] = {
+	"Force output of the HTML statistics",
 	"Syntax: \2FORCEUPDATE\2",
 	"",
 	"Forces an immediate update of the HTML statistics output.",

@@ -54,8 +54,8 @@ const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
 
 bot_cmd mod_exclude_commands[]=
 {
-	{"EXCLUDE",	mod_cmd_exclude,1,	NS_ULEVEL_ADMIN,ns_help_exclude,ns_help_exclude_oneline},
-	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
+	{"EXCLUDE",	mod_cmd_exclude,1,	NS_ULEVEL_ADMIN,ns_help_exclude},
+	{NULL,		NULL,			0, 	0,				NULL}
 };
 
 static void new_exclude(list_t *elist, void *data)

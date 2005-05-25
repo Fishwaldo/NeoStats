@@ -73,11 +73,11 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd qs_commands[]=
 {
-	{"ADD",		qs_cmd_add,		1,	NS_ULEVEL_ADMIN,	qs_help_add,	qs_help_add_oneline },
-	{"DEL",		qs_cmd_del,		1, 	NS_ULEVEL_ADMIN,	qs_help_del,	qs_help_del_oneline },
-	{"LIST",	qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list,	qs_help_list_oneline },
-	{"QUOTE",	qs_cmd_quote,	1, 	NS_ULEVEL_ADMIN,	qs_help_quote,	qs_help_quote_oneline },
-	{NULL,		NULL,			0, 	0,					NULL, 			NULL}
+	{"ADD",		qs_cmd_add,		1,	NS_ULEVEL_ADMIN,	qs_help_add},
+	{"DEL",		qs_cmd_del,		1, 	NS_ULEVEL_ADMIN,	qs_help_del},
+	{"LIST",	qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
+	{"QUOTE",	qs_cmd_quote,	1, 	NS_ULEVEL_ADMIN,	qs_help_quote},
+	{NULL,		NULL,			0, 	0,					NULL}
 };
 
 /** Bot setting table */

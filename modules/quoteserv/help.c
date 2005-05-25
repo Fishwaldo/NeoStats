@@ -29,12 +29,8 @@ const char *qs_about[] =
 	NULL
 };
 
-const char qs_help_add_oneline[] ="Add a database";
-const char qs_help_del_oneline[] ="Delete a database";
-const char qs_help_list_oneline[] ="List databases";
-const char qs_help_quote_oneline[] ="Fetch quote";
-
 const char *qs_help_add[] = {
+	"Add a database",
 	"Syntax: \2ADD <database>\2",
 	"",
 	"Register a database with quoteserv.",
@@ -43,6 +39,7 @@ const char *qs_help_add[] = {
 };
 
 const char *qs_help_del[] = {
+	"Delete a database",
 	"Syntax: \2DEL <database>\2",
 	"",
 	"Delete a database.",
@@ -50,6 +47,7 @@ const char *qs_help_del[] = {
 };
 
 const char *qs_help_list[] = {
+	"List databases",
 	"Syntax: \2LIST\2",
 	"",
 	"Lists loaded databases.",
@@ -57,6 +55,7 @@ const char *qs_help_list[] = {
 };
 
 const char *qs_help_quote[] = {
+	"Fetch quote",
 	"Syntax: \2QUOTE\2",
 	"",
 	"Get quote.",

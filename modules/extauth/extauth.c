@@ -56,6 +56,7 @@ static const char *extauth_about[] =
 /** Help text */
 const char *ea_help_access[] = 
 {
+	"Manage NeoStats user access list",
 	"Syntax: \2ACCESS ADD <nick> <mask> <level>\2",
 	"        \2ACCESS DEL <nick>\2",
 	"        \2ACCESS LIST\2",
@@ -65,8 +66,6 @@ const char *ea_help_access[] =
 	"<level> must be between 0 and 200",
 	NULL
 };
-
-const char ea_help_access_oneline[] = "Manage NeoStats user access list";
 
 /** Module info */
 ModuleInfo module_info = 
@@ -90,8 +89,8 @@ static hash_t *accesshash;
 /** Bot comand table */
 bot_cmd extauth_commands[] =
 {
-	{"ACCESS",	ea_cmd_access,	0,	NS_ULEVEL_ROOT, ea_help_access,	ea_help_access_oneline},
-	{NULL,		NULL,			0, 	0,				NULL, 			NULL}
+	{"ACCESS",	ea_cmd_access,	0,	NS_ULEVEL_ROOT, ea_help_access},
+	{NULL,		NULL,			0, 	0,				NULL}
 };
 
 /** @brief dbaccesslisthandler

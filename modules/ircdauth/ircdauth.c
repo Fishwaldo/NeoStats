@@ -53,13 +53,12 @@ static const char *ircdauth_about[] =
 /** Help text */
 const char *auth_help_authmodelist[] = 
 {
+	"User mode auth list",
 	"Syntax: \2AUTHMODELIST\2",
 	"",
 	"Lists the user modes and their level",
 	NULL
 };
-
-const char auth_help_authmodelist_oneline[] = "User mode auth list";
 
 /** Module info */
 ModuleInfo module_info = 
@@ -139,8 +138,8 @@ static int auth_cmd_authmodelist( CmdParams* cmdparams )
 /** Bot comand table */
 bot_cmd ircdauth_commands[] =
 {
-	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist,	auth_help_authmodelist_oneline},
-	{NULL,				NULL,					0, 	0,				NULL, 					NULL}
+	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist},
+	{NULL,				NULL,					0, 	0,				NULL}
 };
 
 /** @brief ModInit

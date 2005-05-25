@@ -23,10 +23,6 @@
 
 extern const char *ls_about[];
 
-extern const char help_add_oneline[];
-extern const char help_del_oneline[];
-extern const char help_list_oneline[];
-
 extern const char *help_add[];
 extern const char *help_del[];
 extern const char *help_list[];

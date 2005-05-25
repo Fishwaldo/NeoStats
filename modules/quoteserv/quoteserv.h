@@ -23,11 +23,6 @@
 
 extern const char *qs_about[];
 
-extern const char qs_help_add_oneline[];
-extern const char qs_help_del_oneline[];
-extern const char qs_help_list_oneline[];
-extern const char qs_help_quote_oneline[];
-
 extern const char *qs_help_add[];
 extern const char *qs_help_del[];
 extern const char *qs_help_list[];

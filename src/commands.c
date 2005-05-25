@@ -60,11 +60,11 @@ char *help_level_title[]=
  */
 static bot_cmd intrinsic_commands[]=
 {
-	{"HELP",	bot_cmd_help,	0, 	0,	cmd_help_help, 		cmd_help_oneline},	
-	{"VERSION",	bot_cmd_version,0, 	0,	cmd_help_version,	cmd_help_version_oneline},
-	{"ABOUT",	bot_cmd_about,	0, 	0,	cmd_help_about, 	cmd_help_about_oneline },
-	{"CREDITS",	bot_cmd_credits,0, 	0,	cmd_help_credits, 	cmd_help_credits_oneline },
-	{"LEVELS",	bot_cmd_levels,	0, 	0,	cmd_help_levels, 	cmd_help_levels_oneline },
+	{"HELP",	bot_cmd_help,	0, 	0,	cmd_help_help},	
+	{"VERSION",	bot_cmd_version,0, 	0,	cmd_help_version},
+	{"ABOUT",	bot_cmd_about,	0, 	0,	cmd_help_about},
+	{"CREDITS",	bot_cmd_credits,0, 	0,	cmd_help_credits},
+	{"LEVELS",	bot_cmd_levels,	0, 	0,	cmd_help_levels},
 	{NULL,		NULL,			0, 	0,	NULL, 				NULL}
 };
 
@@ -223,11 +223,6 @@ static int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	/* No handler, we cannot recover from this */
 	if( !cmd_ptr->handler ) {
 		nlog( LOG_ERROR, "add_bot_cmd: missing command handler, command %s not added", 
-			cmd_ptr->cmd );
-		return NS_FAILURE;
-	}
-	if( !cmd_ptr->onelinehelp ) {
-		nlog( LOG_ERROR, "add_bot_cmd: missing oneline help text, command %s not added", 
 			cmd_ptr->cmd );
 		return NS_FAILURE;
 	}
@@ -602,7 +597,7 @@ bot_cmd_help( CmdParams *cmdparams )
 				continue;
 			}
 			if( !cmdparams->bot->botcmds || !hash_lookup( cmdparams->bot->botcmds, cmd_ptr->cmd ) ) {
-				irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp );
+				irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->helptext[0] );
 			}
 			cmd_ptr++;
 		}
@@ -623,7 +618,7 @@ bot_cmd_help( CmdParams *cmdparams )
 							irc_prefmsg( cmdparams->bot, cmdparams->source, __( "\2Additional commands available to %s:\2", cmdparams->source ), curlevelmsg );
 							donemsg = 1;
 						}
-						irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->onelinehelp );
+						irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->helptext[0] );
 					}
 				}
 				if( lowlevel >= userlevel ) {

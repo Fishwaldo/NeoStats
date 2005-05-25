@@ -744,7 +744,6 @@ typedef struct _bot_cmd {
 	int				minparams;	/* min num params */
 	int				ulevel;		/* min user level */
 	const char		**helptext;	/* pointer to help text */
-	const char		*onelinehelp;/* single line help for generic help function */
 	int				flags;		/* command flags */
 	void			*moddata;	/* pointer for module use */
 	Module			*modptr;	/* NeoStats internal use only */

@@ -76,17 +76,6 @@ extern const char *ss_help_set_lagalert[];
 extern const char *ss_help_set_recordalert[];
 extern const char *ss_help_userversion[];
 
-extern const char ss_help_server_oneline[];
-extern const char ss_help_map_oneline[];
-extern const char ss_help_channel_oneline[];
-extern const char ss_help_netstats_oneline[];
-extern const char ss_help_daily_oneline[];
-extern const char ss_help_tldmap_oneline[];
-extern const char ss_help_operlist_oneline[];
-extern const char ss_help_botlist_oneline[];
-extern const char ss_help_userversion_oneline[];
-extern const char ss_help_forcehtml_oneline[];
-
 int sortusers(const void *v, const void *v2);
 
 void announce_record (const char *msg, ...);

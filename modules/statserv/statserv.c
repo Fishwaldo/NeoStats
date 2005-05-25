@@ -92,17 +92,17 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd ss_commands[]=
 {
-	{"SERVER",		ss_cmd_server,		1, 	0,		ss_help_server,		 	ss_help_server_oneline},
-	{"MAP",			ss_cmd_map,			0, 	0,		ss_help_map, 		 	ss_help_map_oneline},
-	{"CHANNEL",		ss_cmd_channel,		0, 	0,		ss_help_channel, 		ss_help_channel_oneline},
-	{"NETSTATS",	ss_cmd_netstats,	0, 	0,		ss_help_netstats, 	 	ss_help_netstats_oneline},
-	{"DAILY",		ss_cmd_daily,		0, 	0,		ss_help_daily, 		 	ss_help_daily_oneline},
-	{"TLDMAP",		ss_cmd_tldmap,		0, 	0,		ss_help_tldmap, 	 	ss_help_tldmap_oneline},
-	{"OPERLIST",	ss_cmd_operlist,	0, 	0,		ss_help_operlist, 	 	ss_help_operlist_oneline},
-	{"BOTLIST",		ss_cmd_botlist,		0, 	0,		ss_help_botlist, 	 	ss_help_botlist_oneline},
-	{"USERVERSION",	ss_cmd_userversion,	0,	0,		ss_help_userversion,	ss_help_userversion_oneline},
-	{"FORCEHTML",	ss_cmd_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml, 		ss_help_forcehtml_oneline},
-	{NULL,			NULL,				0, 	0,					NULL, 					NULL}
+	{"SERVER",		ss_cmd_server,		1, 	0,		ss_help_server},
+	{"MAP",			ss_cmd_map,			0, 	0,		ss_help_map},
+	{"CHANNEL",		ss_cmd_channel,		0, 	0,		ss_help_channel},
+	{"NETSTATS",	ss_cmd_netstats,	0, 	0,		ss_help_netstats},
+	{"DAILY",		ss_cmd_daily,		0, 	0,		ss_help_daily},
+	{"TLDMAP",		ss_cmd_tldmap,		0, 	0,		ss_help_tldmap},
+	{"OPERLIST",	ss_cmd_operlist,	0, 	0,		ss_help_operlist},
+	{"BOTLIST",		ss_cmd_botlist,		0, 	0,		ss_help_botlist},
+	{"USERVERSION",	ss_cmd_userversion,	0,	0,		ss_help_userversion},
+	{"FORCEHTML",	ss_cmd_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml},
+	{NULL,			NULL,				0, 	0,					NULL}
 };
 
 /** Bot setting table */

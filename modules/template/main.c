@@ -67,8 +67,8 @@ const char *template_about[] = {
  *  2 ) Multi-line help text returned when a user requests:
  *     /msg help botname command
  */
-const char template_help_hello_world_oneline[]="Hello world example command";
 const char *template_help_hello_world[] = {
+	"Hello world example command",
 	"Syntax: \2HELLOWORLD\2",
 	"",
 	"Example of a privmsg command which just sends HELLO WORLD",
@@ -165,8 +165,6 @@ static bot_cmd template_commands[]=
 	0,	
 	/* Multi line help text for this command */
 	template_help_hello_world,		
-	/* Single line help text for this command */
-	template_help_hello_world_oneline 
 	},
 	/* End command list with a NULL entry */
 	{NULL,		NULL,					0, 	0,	NULL, 			NULL}

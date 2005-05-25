@@ -73,10 +73,10 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd ls_commands[]=
 {
-	{"ADD",		cmd_add,	1,	NS_ULEVEL_ADMIN,	help_add,	help_add_oneline },
-	{"DEL",		cmd_del,	1, 	NS_ULEVEL_ADMIN,	help_del,	help_del_oneline },
-	{"LIST",	cmd_list,	0, 	NS_ULEVEL_ADMIN,	help_list,	help_list_oneline },
-	{NULL,		NULL,		0, 	0,					NULL, 			NULL}
+	{"ADD",		cmd_add,	1,	NS_ULEVEL_ADMIN,	help_add},
+	{"DEL",		cmd_del,	1, 	NS_ULEVEL_ADMIN,	help_del},
+	{"LIST",	cmd_list,	0, 	NS_ULEVEL_ADMIN,	help_list},
+	{NULL,		NULL,		0, 	0,					NULL}
 };
 
 /** Bot setting table */

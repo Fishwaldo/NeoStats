@@ -22,7 +22,6 @@
 */
 
 /*  TODO:
- *  - Help on individual commands
  *  - Database sanity checking
  *  - Parameter support
  *  - Multiple channel per bot support
@@ -46,6 +45,8 @@ typedef struct dbbot {
 	char *versiontext;
 	char **stringlist;
 	int stringcount;
+	int helpcount;
+	int commandcount;
 }dbbot;
 
 /** Bot command function prototypes */
@@ -57,6 +58,8 @@ static int ts_cmd_msg( CmdParams* cmdparams );
 static int ts_cmd_about( CmdParams* cmdparams );
 static int ts_cmd_credits( CmdParams* cmdparams );
 static int ts_cmd_version( CmdParams* cmdparams );
+
+static char emptyline[] = "";
 
 /** hash to store database and bot info */
 static hash_t *tshash;
@@ -88,10 +91,10 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd ts_commands[]=
 {
-	{"ADD",		ts_cmd_add,		1,	NS_ULEVEL_ADMIN,	ts_help_add,	ts_help_add_oneline },
-	{"DEL",		ts_cmd_del,		1, 	NS_ULEVEL_ADMIN,	ts_help_del,	ts_help_del_oneline },
-	{"LIST",	ts_cmd_list,	0, 	NS_ULEVEL_ADMIN,	ts_help_list,	ts_help_list_oneline },
-	{NULL,		NULL,			0, 	0,					NULL, 			NULL}
+	{"ADD",		ts_cmd_add,		1,	NS_ULEVEL_ADMIN,	ts_help_add},
+	{"DEL",		ts_cmd_del,		1, 	NS_ULEVEL_ADMIN,	ts_help_del},
+	{"LIST",	ts_cmd_list,	0, 	NS_ULEVEL_ADMIN,	ts_help_list},
+	{NULL,		NULL,			0, 	0,					NULL}
 };
 
 /** Bot setting table */
@@ -101,19 +104,8 @@ static bot_setting ts_settings[]=
 };
 
 /** Sub bot comand table template */
-const char ts_help_cmd_oneline[] ="oneline";
-const char ts_help_about_oneline[] = "Display about text";
-const char ts_help_credits_oneline[] = "Display credits";
-const char ts_help_version_oneline[] = "Display version";
-
-const char *ts_help_cmd[] = {
-	"Syntax: \2CMD\2",
-	"",
-	"command...",
-	NULL
-};
-
 const char *ts_help_about[] = {
+	"Display about text",
 	"Syntax: \2ABOUT\2",
 	"",
 	"Display information about the database",
@@ -121,6 +113,7 @@ const char *ts_help_about[] = {
 };
 
 const char *ts_help_credits[] = {
+	"Display credits",
 	"Syntax: \2CREDITS\2",
 	"",
 	"Display credits",
@@ -128,6 +121,7 @@ const char *ts_help_credits[] = {
 };
 
 const char *ts_help_version[] = {
+	"Display version",
 	"Syntax: \2VERSION\2",
 	"",
 	"Display version",
@@ -136,22 +130,22 @@ const char *ts_help_version[] = {
 
 static bot_cmd ts_commandtemplate[]=
 {
-	{NULL,	ts_cmd_msg,	1, 	0,	ts_help_cmd,	ts_help_cmd_oneline, CMD_FLAG_CHANONLY },
+	{NULL,	ts_cmd_msg,	1, 	0,	NULL, CMD_FLAG_CHANONLY },
 };
 
 static bot_cmd ts_commandtemplateabout[]=
 {
-	{"ABOUT",	ts_cmd_about,	0, 	0,	ts_help_about,	ts_help_about_oneline },
+	{"ABOUT",	ts_cmd_about,	0, 	0,	ts_help_about},
 };
 
 static bot_cmd ts_commandtemplatecredits[]=
 {
-	{"CREDITS",	ts_cmd_credits,	0, 	0,	ts_help_credits,	ts_help_credits_oneline },
+	{"CREDITS",	ts_cmd_credits,	0, 	0,	ts_help_credits},
 };
 
 static bot_cmd ts_commandtemplateversion[]=
 {
-	{"VERSION",	ts_cmd_version,	0, 	0,	ts_help_version,	ts_help_version_oneline },
+	{"VERSION",	ts_cmd_version,	0, 	0,	ts_help_version},
 };
 
 /** Sub bot setting table template */
@@ -334,7 +328,7 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
 		dlog( DEBUG1, "read %s", ptr );
 		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
-		AddStringToList( &db->stringlist, ptr2, &db->stringcount );
+		AddStringToList( &db->stringlist, ptr2, &db->helpcount );
 		ptr = strtok( NULL, "|" );
 	}
 	if( readcount != 4 )
@@ -356,6 +350,7 @@ static int ts_read_database( dbbot *db )
 {
 	static char filename[MAXPATH];
 	static char buf[BUFSIZE*4];
+	static char helpbuf[128];
 	FILE *fp;
 	int commandreadcount = 0;
 	int i;
@@ -373,12 +368,27 @@ static int ts_read_database( dbbot *db )
 		parse_line( db, buf, &commandreadcount );
 	}	
 	os_fclose( fp );
-	db->botinfo.bot_cmd_list = ns_calloc( sizeof( bot_cmd ) * ( ( db->stringcount / 4 ) + 4 ) );
+	db->commandcount = commandreadcount;
+	/* Allocate command structure */
+	db->botinfo.bot_cmd_list = ns_calloc( ( commandreadcount + 4 ) * sizeof( bot_cmd ) );
 	for( i = 0; i < commandreadcount; i ++ )
-	{
+	{		
+		char *ptr;
+
+		/* Fill in command structure defaults */
 		os_memcpy( &db->botinfo.bot_cmd_list[i], &ts_commandtemplate, sizeof( bot_cmd ) );
+		/* Assign command */
 		db->botinfo.bot_cmd_list[i].cmd = db->stringlist[( i * 4 ) + 0];
-		db->botinfo.bot_cmd_list[i].onelinehelp = db->stringlist[( i * 4 ) + 2];
+		/* Allocate and build help text structures */
+		db->botinfo.bot_cmd_list[i].helptext = ns_malloc( 5 * sizeof( char * ) );
+		db->botinfo.bot_cmd_list[i].helptext[0] = db->stringlist[( i * 4 ) + 2];
+		ptr = ns_malloc( ircsnprintf( helpbuf, 128, "Syntax: \2%s\2", db->stringlist[( i * 4 ) + 0] ) + 1 );
+		strcpy( ptr, helpbuf );
+		db->botinfo.bot_cmd_list[i].helptext[1] = ptr;
+		db->botinfo.bot_cmd_list[i].helptext[2] = emptyline ;
+		db->botinfo.bot_cmd_list[i].helptext[3] = db->stringlist[( i * 4 ) + 2];
+		db->botinfo.bot_cmd_list[i].helptext[4] = NULL;
+		/* Pointer to output format string */
 		db->botinfo.bot_cmd_list[i].moddata = ( void * )db->stringlist[( i * 4 ) + 3];
 	}
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateabout, sizeof( bot_cmd ) );
@@ -443,10 +453,16 @@ void PartBot( dbbot *db )
 			irc_part( db->botptr, db->database.channel, "" );
 		irc_quit( db->botptr, "" );
 	}
+	for( i = 0; i < db->commandcount; i++ )
+	{
+		ns_free( db->botinfo.bot_cmd_list[i].helptext[1] );
+		ns_free( db->botinfo.bot_cmd_list[i].helptext );
+	}
 	for( i = 0; i < db->stringcount; i++ )
 	{
 		ns_free( db->stringlist[i] );
 	}
+	ns_free( db->stringlist );
 	ns_free( db->abouttext );
 	ns_free( db->creditstext );	
 	ns_free( db->versiontext );	

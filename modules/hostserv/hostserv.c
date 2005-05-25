@@ -98,14 +98,14 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd hs_commands[]=
 {
-	{"ADD",		hs_cmd_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add,	hs_help_add_oneline },
-	{"DEL",		hs_cmd_del,		1, 	NS_ULEVEL_LOCOPER,	hs_help_del,	hs_help_del_oneline },
-	{"LIST",	hs_cmd_list,	0, 	NS_ULEVEL_LOCOPER,	hs_help_list,	hs_help_list_oneline },
-	{"BANS",	hs_cmd_bans,	1,  NS_ULEVEL_ADMIN,	hs_help_bans,	hs_help_bans_oneline },
-	{"VIEW",	hs_cmd_view,	1, 	NS_ULEVEL_OPER,		hs_help_view,	hs_help_view_oneline },
-	{"LOGIN",	hs_cmd_login,	2, 	0,					hs_help_login,	hs_help_login_oneline },
-	{"CHPASS",	hs_cmd_chpass,	3, 	0,					hs_help_chpass,	hs_help_chpass_oneline },
-	{NULL,		NULL,			0, 	0,					NULL, 			NULL}
+	{"ADD",		hs_cmd_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add},
+	{"DEL",		hs_cmd_del,		1, 	NS_ULEVEL_LOCOPER,	hs_help_del},
+	{"LIST",	hs_cmd_list,	0, 	NS_ULEVEL_LOCOPER,	hs_help_list},
+	{"BANS",	hs_cmd_bans,	1,  NS_ULEVEL_ADMIN,	hs_help_bans},
+	{"VIEW",	hs_cmd_view,	1, 	NS_ULEVEL_OPER,		hs_help_view},
+	{"LOGIN",	hs_cmd_login,	2, 	0,					hs_help_login},
+	{"CHPASS",	hs_cmd_chpass,	3, 	0,					hs_help_chpass},
+	{NULL,		NULL,			0, 	0,					NULL}
 };
 
 /** Bot setting table */

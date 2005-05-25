@@ -23,10 +23,6 @@
 
 extern const char *ts_about[];
 
-extern const char ts_help_add_oneline[];
-extern const char ts_help_del_oneline[];
-extern const char ts_help_list_oneline[];
-
 extern const char *ts_help_add[];
 extern const char *ts_help_del[];
 extern const char *ts_help_list[];

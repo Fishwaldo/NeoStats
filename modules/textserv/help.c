@@ -29,11 +29,8 @@ const char *ts_about[] =
 	NULL
 };
 
-const char ts_help_add_oneline[] ="Add a database";
-const char ts_help_del_oneline[] ="Delete a database";
-const char ts_help_list_oneline[] ="List databases";
-
 const char *ts_help_add[] = {
+	"Add a database",
 	"Syntax: \2ADD <database> <channel>\2",
 	"",
 	"Register a database with textserv.",
@@ -44,6 +41,7 @@ const char *ts_help_add[] = {
 };
 
 const char *ts_help_del[] = {
+	"Delete a database",
 	"Syntax: \2DEL <database>\2",
 	"",
 	"Delete a database.",
@@ -51,6 +49,7 @@ const char *ts_help_del[] = {
 };
 
 const char *ts_help_list[] = {
+	"List databases",
 	"Syntax: \2LIST\2",
 	"",
 	"Lists loaded databases.",

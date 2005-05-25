@@ -25,14 +25,6 @@
 
 #include "neostats.h"
 
-const char hs_help_login_oneline[] ="Login to HostServ";
-const char hs_help_chpass_oneline[] ="Change password for a vhost";
-const char hs_help_bans_oneline[] ="List banned vhosts";
-const char hs_help_add_oneline[] ="Add a vhost";
-const char hs_help_del_oneline[] ="Delete a vhost";
-const char hs_help_list_oneline[] ="List vhosts";
-const char hs_help_view_oneline[] ="Detailed vhost list";
-
 const char *hs_about[] = {
 	"\2HostServ\2 provides users with a unique virtual host while",
 	"on the network. Virtual hosts are set automatically when",
@@ -44,6 +36,7 @@ const char *hs_about[] = {
 };
 
 const char *hs_help_add[] = {
+	"Add a vhost",
 	"Syntax: \2ADD <NICK> <HOSTNAME> <VHOST> <PASSWORD>\2",
 	"",
 	"Register a vhost with hostserv. e.g. vhost.com.",
@@ -56,6 +49,7 @@ const char *hs_help_add[] = {
 };
 
 const char *hs_help_del[] = {
+	"Delete a vhost",
 	"Syntax: \2DEL <nick>\2",
 	"",
 	"Delete the vhost for <nick>.",
@@ -63,6 +57,7 @@ const char *hs_help_del[] = {
 };
 
 const char *hs_help_view[] = {
+	"Detailed vhost list",
 	"Syntax: \2VIEW <nick>\2",
 	"",
 	"View detailed information about the vhost for <nick>.",
@@ -70,6 +65,7 @@ const char *hs_help_view[] = {
 };
 
 const char *hs_help_list[] = {
+	"List vhosts",
 	"Syntax: \2LIST\2",
 	"        \2LIST <startpos>\2",
 	"        \2LIST <NICK|HOST|VHOST> <limit>\2",
@@ -83,6 +79,7 @@ const char *hs_help_list[] = {
 };
 
 const char *hs_help_login[] = {
+	"Login to HostServ",
 	"Syntax: \2LOGIN <NICK> <PASSWORD>\2",
 	"",
 	"Sets your vhost if it was not set when you connect to IRC,",
@@ -92,6 +89,7 @@ const char *hs_help_login[] = {
 };
 
 const char *hs_help_chpass[] = {
+	"Change password for a vhost",
 	"Syntax: \2CHPASS <NICK> <OLDPASS> <NEWPASS>\2",
 	"",
 	"Change the password for your vhost.",
@@ -99,6 +97,7 @@ const char *hs_help_chpass[] = {
 };
 
 const char *hs_help_bans[] = {
+	"List banned vhosts",
 	"Syntax: \2BANS LIST\2",
 	"        \2BANS ADD <hostname> <reason>\2",
 	"        \2BANS DEL <hostname>\2",

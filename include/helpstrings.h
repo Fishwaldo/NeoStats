@@ -46,27 +46,6 @@ extern const char *ns_help_timerlist[];
 extern const char *ns_help_status[];
 extern const char *ns_help_lookup[];
 
-extern const char ns_help_level_oneline[];
-extern const char ns_help_status_oneline[];
-extern const char ns_help_shutdown_oneline[];
-extern const char ns_help_reload_oneline[];
-extern const char ns_help_load_oneline[];
-extern const char ns_help_unload_oneline[];
-extern const char ns_help_jupe_oneline[];
-extern const char ns_help_exclude_oneline[];
-#ifdef USE_RAW
-extern const char ns_help_raw_oneline[];
-#endif
-extern const char ns_help_botlist_oneline[];
-extern const char ns_help_socklist_oneline[];
-extern const char ns_help_timerlist_oneline[];
-extern const char ns_help_modlist_oneline[];
-extern const char ns_help_userlist_oneline[];
-extern const char ns_help_channellist_oneline[];
-extern const char ns_help_serverlist_oneline[];
-extern const char ns_help_banlist_oneline[];
-extern const char ns_help_lookup_oneline[];
-
 extern const char *ns_help_set_nick[];
 extern const char *ns_help_set_altnick[];
 extern const char *ns_help_set_user[];
@@ -90,11 +69,6 @@ extern const char *ns_help_set_debugtochan[];
 extern const char *ns_help_set_debugmodule[];
 extern const char *ns_help_set_recvq[];
 
-extern const char cmd_help_oneline[];
-extern const char cmd_help_about_oneline[];
-extern const char cmd_help_credits_oneline[];
-extern const char cmd_help_version_oneline[];
-extern const char cmd_help_levels_oneline[];
 extern const char *cmd_help_help[];
 extern const char *cmd_help_about[];
 extern const char *cmd_help_credits[];

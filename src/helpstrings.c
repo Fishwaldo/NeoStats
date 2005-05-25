@@ -25,34 +25,8 @@
 
 #include "neostats.h"
 
-const char ns_help_level_oneline[]="Permission level";
-const char ns_help_status_oneline[]="Status information";
-const char ns_help_shutdown_oneline[]="Shutdown NeoStats";
-const char ns_help_reload_oneline[]="Reload NeoStats";
-const char ns_help_load_oneline[]="Load module";
-const char ns_help_unload_oneline[]="Unload module";
-const char ns_help_jupe_oneline[]="Jupiter a server";
-const char ns_help_exclude_oneline[]="Maintain exclusion list";
-#ifdef USE_RAW
-const char ns_help_raw_oneline[]="Send a raw command";
-#endif
-const char ns_help_botlist_oneline[]="List module bots";
-const char ns_help_socklist_oneline[]="List module sockets";
-const char ns_help_timerlist_oneline[]="List module timers";
-const char ns_help_modlist_oneline[]="List loaded modules";
-const char ns_help_userlist_oneline[]="List users";
-const char ns_help_channellist_oneline[]="List channels";
-const char ns_help_serverlist_oneline[]="List servers";
-const char ns_help_banlist_oneline[]="List bans";
-const char ns_help_lookup_oneline[] = "Lookup DNS record";
-
-const char cmd_help_oneline[]="Online help";
-const char cmd_help_about_oneline[] = "Display about text";
-const char cmd_help_credits_oneline[] = "Display credits";
-const char cmd_help_version_oneline[] = "Display version";
-const char cmd_help_levels_oneline[] = "Change command user level";
-
 const char *ns_help_level[] = {
+	"Permission level",
 	"Syntax: \2LEVEL [nick]\2",
 	"",
 	"Display permission level for NeoStats in the range",
@@ -63,6 +37,7 @@ const char *ns_help_level[] = {
 };
 
 const char *ns_help_jupe[] = {
+	"Jupiter a server",
 	"Syntax: \2JUPE <servername>\2",
 	"",
 	"Jupiter a server; i.e. create a fake \"server\" connected",
@@ -73,6 +48,7 @@ const char *ns_help_jupe[] = {
 };
 
 const char *ns_help_exclude[] = {
+	"Maintain exclusion list",
 	"Syntax: \2EXCLUDE ADD <HOST|SERVER|CHANNEL|USERHOST> <pattern> <reason>\2",
 	"        \2EXCLUDE DEL <pattern>\2",
 	"        \2EXCLUDE LIST\2",
@@ -93,6 +69,7 @@ const char *ns_help_exclude[] = {
 
 #ifdef USE_RAW
 const char *ns_help_raw[] = {
+	"Send a raw command",
 	"Syntax: \2RAW <text>\2",
 	"",
 	"Sends a string of raw text directly to the server to which",
@@ -106,6 +83,7 @@ const char *ns_help_raw[] = {
 #endif
 
 const char *ns_help_load[] = {
+	"Load module",
 	"Syntax: \2LOAD <module name>\2",
 	"",
 	"Load a module.",
@@ -113,6 +91,7 @@ const char *ns_help_load[] = {
 };
 
 const char *ns_help_unload[] = {
+	"Unload module",
 	"Syntax: \2UNLOAD <module name>\2",
 	"",
 	"Unload a module.",
@@ -120,6 +99,7 @@ const char *ns_help_unload[] = {
 };
 
 const char *ns_help_modlist[] = {
+	"List loaded modules",
 	"Syntax: \2MODLIST\2",
 	"",
 	"Display names and descriptions of all loaded modules.",
@@ -127,6 +107,7 @@ const char *ns_help_modlist[] = {
 };
 
 const char *ns_help_shutdown[] = {
+	"Shutdown NeoStats",
 	"Syntax: \2SHUTDOWN <reason>\2",
 	"",
 	"Cause NeoStats to save data files and exit.",
@@ -136,6 +117,7 @@ const char *ns_help_shutdown[] = {
 };
 
 const char *ns_help_reload[] = {
+	"Reload NeoStats",
 	"Syntax: \2RELOAD <reason>\2",
 	"",
 	"Cause NeoStats to leave the network, reload datafiles,",
@@ -146,6 +128,7 @@ const char *ns_help_reload[] = {
 };
 
 const char *ns_help_userlist[] = {
+	"List users",
 	"Syntax: \2USERLIST\2",
 	"        \2USERLIST <name>\2",
 	"",
@@ -157,6 +140,7 @@ const char *ns_help_userlist[] = {
 };
 
 const char *ns_help_serverlist[] = {
+	"List servers",
 	"Syntax: \2SERVERLIST\2",
 	"        \2SERVERLIST <name>\2",
 	"",
@@ -168,6 +152,7 @@ const char *ns_help_serverlist[] = {
 };
 
 const char *ns_help_banlist[] = {
+	"List bans",
 	"Syntax: \2BANLIST\2",
 	"",
 	"Display list of bans on the network.",	
@@ -177,6 +162,7 @@ const char *ns_help_banlist[] = {
 };
 
 const char *ns_help_channellist[] = {
+	"List channels",
 	"Syntax: \2CHANNELLIST\2",
 	"        \2CHANNELLIST <name>\2",
 	"",
@@ -188,6 +174,7 @@ const char *ns_help_channellist[] = {
 };
 
 const char *ns_help_botlist[] = {
+	"List module bots",
 	"Syntax: \2BOTLIST\2",
 	"",
 	"Display list of neostats bots being used on the network.",	
@@ -195,6 +182,7 @@ const char *ns_help_botlist[] = {
 };
 
 const char *ns_help_socklist[] = {
+	"List module sockets",
 	"Syntax: \2SOCKLIST\2",
 	"",
 	"Display list of sockets being used on the network.",	
@@ -202,6 +190,7 @@ const char *ns_help_socklist[] = {
 };
 
 const char *ns_help_timerlist[] = {
+	"List module timers",
 	"Syntax: \2TIMERLIST\2",
 	"",
 	"Display list of timer functions being used on the network.",	
@@ -209,6 +198,7 @@ const char *ns_help_timerlist[] = {
 };
 
 const char *ns_help_status[] = {
+	"Status information",
 	"Syntax: \2STATUS\2",
 	"",
 	"Display info about NeoStats uptime and other stats.",
@@ -216,6 +206,7 @@ const char *ns_help_status[] = {
 };
 
 const char *ns_help_lookup[] = {
+	"Lookup DNS record",
 	"Syntax: \2LOOKUP <IP|HOSTNAME> [type]\2",
 	"",
 	"Lookup DNS records for an ip address or hostname.",
@@ -247,16 +238,16 @@ const char *ns_help_set_splittime[] = {
 };
 
 const char *ns_help_set_msgsampletime[] = {
-	"\2MSGSAMPLETIME <number>\2",
+	"\2MSGSAMPLETIME <seconds>\2",
 	"Sets the threshold for message floods.",
-	"<number> is number of changes in 10 seconds.",
+	"<seconds> is time used to measure floods.",
 	NULL
 };
 
 const char *ns_help_set_msgthreshold[] = {
 	"\2MSGTHRESHOLD <number>\2",
 	"Sets the threshold for message floods.",
-	"<number> is number of changes in 10 seconds.",
+	"<number> is number of messages in MSGSAMPLETIME seconds.",
 	NULL
 };
 
@@ -381,6 +372,7 @@ const char *ns_help_set_recvq[] = {
 };
 
 const char *cmd_help_help[] = {
+	"Online help",
 	"Syntax: \2HELP [command]\2",
 	"",
 	"Display help on the bot commands",
@@ -388,6 +380,7 @@ const char *cmd_help_help[] = {
 };
 
 const char *cmd_help_about[] = {
+	"Display about text",
 	"Syntax: \2ABOUT\2",
 	"",
 	"Display information about the module",
@@ -395,6 +388,7 @@ const char *cmd_help_about[] = {
 };
 
 const char *cmd_help_credits[] = {
+	"Display credits",
 	"Syntax: \2CREDITS\2",
 	"",
 	"Display credits",
@@ -402,6 +396,7 @@ const char *cmd_help_credits[] = {
 };
 
 const char *cmd_help_version[] = {
+	"Display version",
 	"Syntax: \2VERSION\2",
 	"",
 	"Display version information",
@@ -409,6 +404,7 @@ const char *cmd_help_version[] = {
 };
 
 const char *cmd_help_levels[] = {
+	"Change command user level",
 	"Syntax: \2LEVELS LIST\2",
 	"        \2LEVELS <command> <level>\2",
 	"",
