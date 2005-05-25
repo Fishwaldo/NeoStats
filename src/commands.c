@@ -675,7 +675,7 @@ bot_cmd_help( CmdParams *cmdparams )
 				msg_permission_denied( cmdparams, NULL );
 				return NS_ERR_NO_PERMISSION;
 			}		
-			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext );
+			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext + 1 );
 			return NS_SUCCESS;
 		}
 	}
@@ -684,7 +684,7 @@ bot_cmd_help( CmdParams *cmdparams )
 	cmd_ptr = intrinsic_commands;
 	while( cmd_ptr->cmd ) {
 		if( !ircstrcasecmp( cmdparams->av[0], cmd_ptr->cmd ) ) {
-			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext );
+			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext + 1 );
 			return NS_SUCCESS;
 		}
 		cmd_ptr++;
