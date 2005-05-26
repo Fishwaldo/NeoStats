@@ -38,10 +38,14 @@ static int qs_cmd_list( CmdParams *cmdparams );
 static int qs_cmd_del( CmdParams *cmdparams );
 static int qs_cmd_quote( CmdParams* cmdparams );
 
+/** Settings function prototypes */
+static int qs_set_exclusions( CmdParams *cmdparams, SET_REASON reason );
+
 /** Event function prototypes */
 static int event_signon( CmdParams *cmdparams );
 
 int signonquote = 0;
+int useexclusions = 0;
 
 /** hash to store database and bot info */
 static hash_t *qshash;
@@ -83,8 +87,9 @@ static bot_cmd qs_commands[]=
 /** Bot setting table */
 static bot_setting qs_settings[]=
 {
-	{"SIGNONQUOTE",	&signonquote,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_signonquote,	NULL,	( void* )0	},
-	{NULL,			NULL,			0,					0, 0, 		0,				 NULL,		NULL,			NULL	},
+	{"SIGNONQUOTE",	&signonquote,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_signonquote,	NULL,			( void* )0	},
+	{"EXCLUSIONS",	&useexclusions,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_exclusions,	qs_set_exclusions,	( void* )0	},
+	{NULL,		NULL,		0,			0, 0, 		0,			NULL,			NULL,			NULL		},
 };
 
 /** BotInfo */
@@ -449,5 +454,19 @@ static int qs_cmd_quote( CmdParams* cmdparams )
 
 static int event_signon( CmdParams *cmdparams )
 {
-	return do_quote( cmdparams->source, "random", 0 );
+	if (signonquote)
+		return do_quote( cmdparams->source, "random", 0 );
+	else
+		return NS_SUCCESS;
 }
+
+/*
+ * Enable/Disable Global Exclusions
+*/
+static int qs_set_exclusions( CmdParams *cmdparams, SET_REASON reason )
+{
+	if( reason == SET_LOAD || reason == SET_CHANGE )
+		SetAllEventFlags( EVENT_FLAG_USE_EXCLUDE, useexclusions );
+	return NS_SUCCESS;
+}
+

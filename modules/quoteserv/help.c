@@ -67,3 +67,9 @@ const char *help_set_signonquote[] = {
 	"Whether quoteserv gives a quote to users when the join the network",
 	NULL
 };
+
+const char *help_set_exclusions[] = {
+	"\2EXCLUSIONS <ON|OFF>\2",
+	"Whether quoteserv uses the Global Exclusion list",
+	NULL
+};

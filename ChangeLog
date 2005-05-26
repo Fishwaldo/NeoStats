@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - QuoteServ: add option to use global excludes (D)
+ - QuoteServ: check signon quote setting before sending signon quote (D)
  - QuoteServ: fix crash when quotes requested but no databases defined (D)
  - Help system updated. The oneline help text is now part of the main help text
    for commands to simplify creation and maintainance of help text. (M)

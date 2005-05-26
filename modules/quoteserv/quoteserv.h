@@ -29,3 +29,4 @@ extern const char *qs_help_list[];
 extern const char *qs_help_quote[];
 
 extern const char *help_set_signonquote[];
+extern const char *help_set_exclusions[];
