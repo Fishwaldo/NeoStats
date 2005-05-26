@@ -25,7 +25,7 @@
 
 const char *qs_about[] = 
 {
-	"\2TextServ\2 is a text messaging service",
+	"\2QuoteServ\2 is a Quote messaging service",
 	NULL
 };
 

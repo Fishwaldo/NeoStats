@@ -372,6 +372,9 @@ static int do_quote( Client *target, char *which, int reporterror )
 		int randdb;
 		int i = 0;
 		
+		/* return if no databases defined */
+		if (hash_count( qshash ) < 1)
+			return NS_FAILURE;
 		randdb = hrand( hash_count( qshash ) , 1 );	
 		hash_scan_begin( &hs, qshash );
 		while( ( hn = hash_scan_next( &hs ) ) != NULL )
@@ -392,6 +395,9 @@ static int do_quote( Client *target, char *which, int reporterror )
 			return NS_SUCCESS;
 		}
 	}
+	/* return if no records in selected database */
+	if (db->stringcount < 1)
+		return NS_FAILURE;
 	randno = hrand( db->stringcount, 1 );	
 	if( db->prefixstring )
 		flag |= 1 << 0;
