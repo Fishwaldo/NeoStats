@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - allow SERVICEROOT to check against IP Address as well as Host (D)
  - check if exclusions are already included in list before adding (D)
  - attempt to find bot unused nickname when both nick and altnick in use (D)
  - QuoteServ: add option to use global excludes (D)
