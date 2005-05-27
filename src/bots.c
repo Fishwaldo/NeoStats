@@ -552,13 +552,13 @@ static int GenerateBotNick( char *nickbuf, int stublen )
 {
 	/* find free nick from Bot nick */
 	/* if room, add random number between 0 and 9 */
-	if( ( stublen ) < MAXNICK )
+	if( ( stublen + 1 ) < MAXNICK )
 	{
 		nickbuf[stublen++] = ( ( rand() % 10 ) + 48 );
 		nickbuf[stublen] = '\0';
 	}
 	/* if room, add random letter */
-	if( ( stublen ) < MAXNICK )
+	if( ( stublen + 1 ) < MAXNICK )
 	{
 		nickbuf[stublen++] = ( ( rand() % 26 ) + 97 );
 		nickbuf[stublen] = '\0';
