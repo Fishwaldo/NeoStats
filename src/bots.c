@@ -21,10 +21,6 @@
 ** $Id$
 */
 
-/*  TODO:
- *  - find free nick for bots if NICK and ALTNICK are in use
- */
-
 #include "neostats.h"
 #include "modules.h"
 #include "protocol.h"
@@ -40,6 +36,7 @@
 #include "exclude.h"
 
 #define BOT_TABLE_SIZE		100		/* Max number of bots */
+#define NICK_TRIES			5		/* Number of attempts for nick generation */
 
 /* @brief Module Bot hash list */
 static hash_t *bothash;
@@ -57,8 +54,9 @@ static hash_t *bothash;
 int InitBots( void )
 {
 	bothash = hash_create( BOT_TABLE_SIZE, 0, 0 );
-	if( !bothash ) {
-		nlog( LOG_CRITICAL, "Unable to create bot hash" );
+	if( !bothash )
+	{
+		nlog( LOG_CRITICAL, "Failed to create bot hash" );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -123,16 +121,15 @@ static int flood_test( Client *u )
 static int process_origin( CmdParams *cmdparams, const char *origin )
 {
 	cmdparams->source = FindUser( origin );
-	if( cmdparams->source ) {
-		if( flood_test( cmdparams->source ) ) {
+	if( cmdparams->source )
+	{
+		if( flood_test( cmdparams->source ) )
 			return NS_FALSE;
-		}
 		return NS_TRUE;
 	}
 	cmdparams->source = FindServer( origin );
-	if( cmdparams->source ) {
+	if( cmdparams->source )
 		return NS_TRUE;
-	}
 	return NS_FALSE;
 }
 
@@ -150,11 +147,11 @@ static int process_origin( CmdParams *cmdparams, const char *origin )
 static int process_target_user( CmdParams *cmdparams, const char *target )
 {
 	cmdparams->target = FindUser( target );
-	if( cmdparams->target ) {
+	if( cmdparams->target )
+	{
 		cmdparams->bot = cmdparams->target->user->bot;
-		if( cmdparams->bot ) {
+		if( cmdparams->bot )
 			return NS_TRUE;
-		}
 	}
 	dlog( DEBUG1, "process_target_user: user %s not found", target );
 	return NS_FALSE;
@@ -174,9 +171,8 @@ static int process_target_user( CmdParams *cmdparams, const char *target )
 static int process_target_chan( CmdParams *cmdparams, const char *target )
 {
 	cmdparams->channel = FindChannel( target );
-	if( cmdparams->channel ) {
+	if( cmdparams->channel )
 		return NS_TRUE;
-	}
 	dlog( DEBUG1, "cmdparams->channel: chan %s not found", target );
 	return NS_FALSE;
 }
@@ -529,17 +525,19 @@ static Bot *new_bot( const char *bot_name )
 
 	SET_SEGV_LOCATION();
 	if( hash_isfull( bothash ) ) {
-		nlog( LOG_CRITICAL, "new_bot: bot list is full" );
+		nlog( LOG_CRITICAL, "new_bot: Failed to create bot %s, bot list is full", nick );
 		return NULL;
 	}
 	dlog( DEBUG2, "new_bot: %s", bot_name );
 	botptr = ns_calloc( sizeof( Bot ) );
 	strlcpy( botptr->name, bot_name, MAXNICK );
+	botptr->moduleptr = GET_CUR_MODULE();
+	botptr->set_ulevel = NS_ULEVEL_ROOT;
 	hnode_create_insert( bothash, botptr, botptr->name );
 	return botptr;
 }
 
-/** @brief FindBotNick
+/** @brief GenerateBotNick
  *
  *  find a new nick based on the passed nick
  *  Bot subsystem use only.
@@ -547,33 +545,30 @@ static Bot *new_bot( const char *bot_name )
  *  @param botinfo pointer to bot description
  *  @param pointer to nick buffer
  *
- *  @return nick or NULL if failed
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static char *FindBotNick( char *nickbuf )
+static int GenerateBotNick( char *nickbuf, int stublen )
 {
-	int tstnicklen;
-
 	/* find free nick from Bot nick */
 	/* if room, add random number between 0 and 9 */
-	tstnicklen = strlen( nickbuf );
-	if( ( tstnicklen + 1 ) < MAXNICK )
+	if( ( stublen ) < MAXNICK )
 	{
-		nickbuf[tstnicklen] = ( ( rand() % 10 ) + 48 );
-		nickbuf[tstnicklen + 1] = '\0';
+		nickbuf[stublen++] = ( ( rand() % 10 ) + 48 );
+		nickbuf[stublen] = '\0';
 	}
 	/* if room, add random letter */
-	tstnicklen = strlen( nickbuf );
-	if( ( tstnicklen + 1 ) < MAXNICK )
+	if( ( stublen ) < MAXNICK )
 	{
-		nickbuf[tstnicklen] = ( ( rand() % 26 ) + 97 );
-		nickbuf[tstnicklen + 1] = '\0';
+		nickbuf[stublen++] = ( ( rand() % 26 ) + 97 );
+		nickbuf[stublen] = '\0';
 	}
-	if( FindUser( nickbuf ) ) {
-		nlog( LOG_WARNING, "Bot test nick %s already in use", nickbuf );
-		return NULL;
+	if( FindUser( nickbuf ) )
+	{
+		nlog( LOG_WARNING, "GenerateBotNick, %s already in use", nickbuf );
+		return NS_FAILURE;
 	}
-	return nickbuf;
+	return NS_SUCCESS;
 }
 
 /** @brief GetBotNick
@@ -584,75 +579,47 @@ static char *FindBotNick( char *nickbuf )
  *  @param botinfo pointer to bot description
  *  @param pointer to nick buffer
  *
- *  @return nick or NULL if failed
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static char *GetBotNick( BotInfo *botinfo, char *nickbuf )
+static int GetBotNick( BotInfo *botinfo, char *nickbuf )
 {
-	int checkcycle;
-	char* nick;
-	char *tstnick;
+	int i, stublen;
 
-	tstnick = ns_calloc(MAXNICK);
-	for ( checkcycle = 0 ; checkcycle < 13 ; checkcycle++ )
+	/* Check primary nick */
+	strlcpy( nickbuf, botinfo->nick, MAXNICK );
+	if( FindUser( nickbuf ) == NULL )
+		return NS_SUCCESS;
+	nlog( LOG_WARNING, "Bot nick %s already in use", nickbuf );
+	/* Check alternate nick */
+	if( botinfo->altnick )
 	{
-		switch (checkcycle)
+		strlcpy( nickbuf, botinfo->altnick, MAXNICK );
+		if( FindUser( nickbuf ) == NULL )
+			return NS_SUCCESS;
+	}
+	nlog( LOG_WARNING, "Bot alt nick %s already in use", nickbuf );
+	/* Try to auto generate a nick from bot nick */
+	strlcpy(nickbuf, botinfo->nick, MAXNICK);
+	stublen = strlen( nickbuf );
+	for( i = 0 ; i < NICK_TRIES ; i++ )
+	{
+		if( GenerateBotNick( nickbuf, stublen ) == NS_SUCCESS )
+			return NS_SUCCESS;
+	}
+	/* Try to auto generate a nick from bot alt nick */
+	if( botinfo->altnick )
+	{
+		strlcpy(nickbuf, botinfo->altnick, MAXNICK);
+		stublen = strlen( nickbuf );
+		for( i = 0 ; i < NICK_TRIES ; i++ )
 		{
-			case 0:
-				/* Check primary nick */
-				nick = botinfo->nick;
-				if( FindUser( nick ) ) {
-					nlog( LOG_WARNING, "Bot nick %s already in use", nick );
-				} else {
-					checkcycle = 13;
-				}
-				break;
-			case 1:
-				/* Check alternate nick */
-				if( botinfo->altnick ) {
-					nick = botinfo->altnick;
-					if( FindUser( nick ) ) {
-						nlog( LOG_WARNING, "Bot alt nick %s already in use", nick );
-					} else {
-						checkcycle = 13;
-					}
-				}
-				break;
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-				strlcpy(tstnick, botinfo->nick, MAXNICK);
-				nick = FindBotNick( tstnick );
-				if( nick != NULL ) {
-					checkcycle = 13;
-					break;
-				}
-				break;
-			case 7:
-			case 8:
-			case 9:
-			case 10:
-			case 11:
-				if( botinfo->altnick ) {
-					strlcpy(tstnick, botinfo->altnick, MAXNICK);
-					nick = FindBotNick( tstnick );
-					if( nick != NULL ) {
-						checkcycle = 13;
-						break;
-					}
-				}
-				break;
-			default:
-				/* failed to find free nickname on 12 attempts */
-				ns_free(tstnick);
-				return NULL;
+			if( GenerateBotNick( nickbuf, stublen ) == NS_SUCCESS )
+				return NS_SUCCESS;
 		}
-	} 
-	strlcpy( nickbuf, nick, MAXNICK );
-	ns_free(tstnick);
-	return nickbuf;
+	}
+	/* Give up */
+	return NS_FAILURE;
 }
 
 /** @brief ConnectBot
@@ -667,20 +634,22 @@ static char *GetBotNick( BotInfo *botinfo, char *nickbuf )
 
 static void ConnectBot( Bot *botptr )
 {
-	if( botptr->flags & BOT_FLAG_SERVICEBOT ) {
+	if( botptr->flags & BOT_FLAG_SERVICEBOT )
+	{
 		irc_nick( botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, me.servicesumode );
 		UserMode( botptr->name, me.servicesumode );
-		if( nsconfig.joinserviceschan ) {
+		if( nsconfig.joinserviceschan )
 			irc_join( botptr, me.serviceschan, me.servicescmode );
-		}
-	} else {
+	} 
+	else
+	{
 		irc_nick( botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, "+" );
 	}	
-	if( botptr->flags & BOT_FLAG_DEAF ) {
-		if( HaveUmodeDeaf() ) {
-			/* Set deaf mode at IRCd level */
+	if( botptr->flags & BOT_FLAG_DEAF )
+	{
+		/* Set deaf mode at IRCd level if we can */
+		if( HaveUmodeDeaf() )
 			irc_umode( botptr, botptr->name, UMODE_DEAF );
-		}
 	}
 }
 
@@ -713,17 +682,13 @@ Bot *AddBot( BotInfo *botinfo )
 		add_bot_setting_list( ns_botptr, botinfo->bot_setting_list );
 		return(ns_botptr );
 	}
-	if( GetBotNick( botinfo, nick ) == NULL ) {
-		nlog( LOG_WARNING, "Unable to find free nick for bot %s", botinfo->nick );
+	if( GetBotNick( botinfo, nick ) == NS_FAILURE ) {
+		nlog( LOG_WARNING, "Failed to find free nick for bot %s", botinfo->nick );
 		return NULL;
 	}
 	botptr = new_bot( nick );
-	if( !botptr ) {
-		nlog( LOG_WARNING, "Unable to create bot %s", modptr->info->name, nick );
+	if( !botptr )
 		return NULL;
-	}
-	botptr->moduleptr = modptr;
-	botptr->set_ulevel = NS_ULEVEL_ROOT;
 	/* For more efficient transversal of bot/user lists, link 
 	 * associated user struct to bot and link bot into user struct */
 	botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.servicehost : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
@@ -764,13 +729,11 @@ void handle_dead_channel( Channel *c )
 
 	SET_SEGV_LOCATION();
 	/* If services channel ignore it */
-	if( IsServicesChannel ( c ) ) {
+	if( IsServicesChannel ( c ) )
 		return;
-	}
 	/* If channel has persistent bot(s) ignore it */
-	if( c->persistentusers ) {
+	if( c->persistentusers )
 		return;
-	}
 	hash_scan_begin( &bs, bothash );
 	cmdparams = ns_calloc( sizeof( CmdParams ) );
 	cmdparams->channel = c;

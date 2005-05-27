@@ -386,6 +386,7 @@ static int cs_report_mode( const char *modedesc, int serverflag, Client *u, int 
 
 static int cs_event_umode( CmdParams *cmdparams )
 {
+	/* Mask of modes we will handle */
 	static unsigned int OperUmodes = 
 		UMODE_NETADMIN |
 		UMODE_TECHADMIN |
@@ -435,6 +436,7 @@ static int cs_event_umode( CmdParams *cmdparams )
 
 static int cs_event_smode( CmdParams *cmdparams )
 {
+	/* Mask of modes we will handle */
 	static unsigned int OperSmodes =
 		SMODE_NETADMIN |
 		SMODE_CONETADMIN |
@@ -443,7 +445,6 @@ static int cs_event_smode( CmdParams *cmdparams )
 		SMODE_ADMIN |
 		SMODE_COADMIN |
 		SMODE_GUESTADMIN;
-
 	int mask;
 	int add = 1;
 	char *modes;

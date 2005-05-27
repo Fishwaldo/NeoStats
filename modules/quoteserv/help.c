@@ -47,10 +47,10 @@ const char *qs_help_del[] = {
 };
 
 const char *qs_help_list[] = {
-	"List databases",
+	"List loaded databases",
 	"Syntax: \2LIST\2",
 	"",
-	"Lists loaded databases.",
+	"List loaded databases.",
 	NULL
 };
 
