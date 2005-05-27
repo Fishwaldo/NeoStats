@@ -422,7 +422,7 @@ int ModIsServerExcluded(Client *s)
 		e = lnode_get(node);
 		if (e->type == NS_EXCLUDE_SERVER) {
 			if (match(e->pattern, s->name)) {
-				dlog (DEBUG1, "Matched server entry %s in Excludeions", e->pattern);
+				dlog (DEBUG1, "Matched server entry %s in exclusions", e->pattern);
 				return NS_TRUE;
 			}
 		}

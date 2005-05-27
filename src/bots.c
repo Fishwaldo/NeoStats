@@ -525,7 +525,7 @@ static Bot *new_bot( const char *bot_name )
 
 	SET_SEGV_LOCATION();
 	if( hash_isfull( bothash ) ) {
-		nlog( LOG_CRITICAL, "new_bot: Failed to create bot %s, bot list is full", nick );
+		nlog( LOG_CRITICAL, "new_bot: Failed to create bot %s, bot list is full", bot_name );
 		return NULL;
 	}
 	dlog( DEBUG2, "new_bot: %s", bot_name );
