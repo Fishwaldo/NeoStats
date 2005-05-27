@@ -539,6 +539,43 @@ static Bot *new_bot( const char *bot_name )
 	return botptr;
 }
 
+/** @brief FindBotNick
+ *
+ *  find a new nick based on the passed nick
+ *  Bot subsystem use only.
+ *
+ *  @param botinfo pointer to bot description
+ *  @param pointer to nick buffer
+ *
+ *  @return nick or NULL if failed
+ */
+
+static char *FindBotNick( char *nickbuf )
+{
+	int tstnicklen;
+
+	/* find free nick from Bot nick */
+	/* if room, add random number between 0 and 9 */
+	tstnicklen = strlen( nickbuf );
+	if( ( tstnicklen + 1 ) < MAXNICK )
+	{
+		nickbuf[tstnicklen] = ( ( rand() % 10 ) + 48 );
+		nickbuf[tstnicklen + 1] = '\0';
+	}
+	/* if room, add random letter */
+	tstnicklen = strlen( nickbuf );
+	if( ( tstnicklen + 1 ) < MAXNICK )
+	{
+		nickbuf[tstnicklen] = ( ( rand() % 26 ) + 97 );
+		nickbuf[tstnicklen + 1] = '\0';
+	}
+	if( FindUser( nickbuf ) ) {
+		nlog( LOG_WARNING, "Bot test nick %s already in use", nickbuf );
+		return NULL;
+	}
+	return nickbuf;
+}
+
 /** @brief GetBotNick
  *
  *  check the requested nick
@@ -552,26 +589,69 @@ static Bot *new_bot( const char *bot_name )
 
 static char *GetBotNick( BotInfo *botinfo, char *nickbuf )
 {
+	int checkcycle;
 	char* nick;
+	char *tstnick;
 
-	/* Check primary nick */
-	nick = botinfo->nick;
-	if( FindUser( nick ) ) {
-		nlog( LOG_WARNING, "Bot nick %s already in use", nick );
-		/* Check alternate nick */
-		if( botinfo->altnick ) {
-			nick = botinfo->altnick;
-			if( FindUser( nick ) ) {
-				nlog( LOG_WARNING, "Bot alt nick %s already in use", nick );
-				/* TODO: try and find a free nick */
+	tstnick = ns_calloc(MAXNICK);
+	for ( checkcycle = 0 ; checkcycle < 13 ; checkcycle++ )
+	{
+		switch (checkcycle)
+		{
+			case 0:
+				/* Check primary nick */
+				nick = botinfo->nick;
+				if( FindUser( nick ) ) {
+					nlog( LOG_WARNING, "Bot nick %s already in use", nick );
+				} else {
+					checkcycle = 13;
+				}
+				break;
+			case 1:
+				/* Check alternate nick */
+				if( botinfo->altnick ) {
+					nick = botinfo->altnick;
+					if( FindUser( nick ) ) {
+						nlog( LOG_WARNING, "Bot alt nick %s already in use", nick );
+					} else {
+						checkcycle = 13;
+					}
+				}
+				break;
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+				strlcpy(tstnick, botinfo->nick, MAXNICK);
+				nick = FindBotNick( tstnick );
+				if( nick != NULL ) {
+					checkcycle = 13;
+					break;
+				}
+				break;
+			case 7:
+			case 8:
+			case 9:
+			case 10:
+			case 11:
+				if( botinfo->altnick ) {
+					strlcpy(tstnick, botinfo->altnick, MAXNICK);
+					nick = FindBotNick( tstnick );
+					if( nick != NULL ) {
+						checkcycle = 13;
+						break;
+					}
+				}
+				break;
+			default:
+				/* failed to find free nickname on 12 attempts */
+				ns_free(tstnick);
 				return NULL;
-			}
-		} else {
-			/* TODO: try and find a free nick */
-			return NULL;
 		}
 	} 
 	strlcpy( nickbuf, nick, MAXNICK );
+	ns_free(tstnick);
 	return nickbuf;
 }
 

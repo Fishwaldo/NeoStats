@@ -25,7 +25,6 @@
  */
 
 /*  TODO:
- *  - Add check for existing exclusions during add
  *  - Real time exclusions??? possibly optional.
  */
 
@@ -126,7 +125,8 @@ static int do_exclude_add(list_t *elist, CmdParams* cmdparams)
 {
 	NS_EXCLUDE type;
 	char *buf;
-	Exclude *e;
+	Exclude *e, *etst;
+	lnode_t *ln;
 	
 	if (cmdparams->ac < 4) {
 		return NS_ERR_NEED_MORE_PARAMS;
@@ -135,8 +135,6 @@ static int do_exclude_add(list_t *elist, CmdParams* cmdparams)
 		irc_prefmsg (cmdparams->bot, cmdparams->source, "Error, Exception list is full");
 		return NS_SUCCESS;
 	}
-	/* we dont do any checking to see if a similar entry already exists... oh well, thats upto the user */
-
 	if (!ircstrcasecmp("HOST", cmdparams->av[1])) {
 		if (!index(cmdparams->av[2], '.')) {
 			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid host name");
@@ -164,6 +162,18 @@ static int do_exclude_add(list_t *elist, CmdParams* cmdparams)
 	} else {
 		irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid exclude type");
 		return NS_SUCCESS;
+	}
+	ln = list_first(elist);
+	while( ln != NULL  ) 
+	{
+		etst = lnode_get(ln);
+		if( etst->type == type ) {
+			if( match( etst->pattern, cmdparams->av[2] ) ) {
+				irc_prefmsg (cmdparams->bot, cmdparams->source, "Mask already matched by %s", etst->pattern);
+				return NS_SUCCESS;
+			}
+		}
+		ln = list_next(elist, ln);
 	}
 	e = ns_calloc (sizeof(Exclude));
 	e->type = type;
