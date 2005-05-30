@@ -540,28 +540,36 @@ static Bot *new_bot( const char *bot_name )
 /** @brief GenerateBotNick
  *
  *  find a new nick based on the passed nick
- *  Bot subsystem use only.
  *
- *  @param botinfo pointer to bot description
  *  @param pointer to nick buffer
+ *  @param length of passed nick stub
+ *  @param number of characters to add to nick
+ *  @param number of digits to add to nick
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int GenerateBotNick( char *nickbuf, int stublen )
+int GenerateBotNick( char *nickbuf, int stublen, int alphacount, int numcount)
 {
-	/* find free nick from Bot nick */
-	/* if room, add random number between 0 and 9 */
-	if( ( stublen + 1 ) < MAXNICK )
+	int i;
+	
+	for ( i = 0 ; i < alphacount ; i++ )
 	{
-		nickbuf[stublen++] = ( ( rand() % 10 ) + 48 );
-		nickbuf[stublen] = '\0';
+		/* if room, add random letter */
+		if( ( stublen + 1 ) < MAXNICK )
+		{
+			nickbuf[stublen++] = ( ( rand() % 26 ) + 97 );
+			nickbuf[stublen] = '\0';
+		}
 	}
-	/* if room, add random letter */
-	if( ( stublen + 1 ) < MAXNICK )
+	for ( i = 0 ; i < numcount ; i++ )
 	{
-		nickbuf[stublen++] = ( ( rand() % 26 ) + 97 );
-		nickbuf[stublen] = '\0';
+		/* if room, add random number between 0 and 9 */
+		if( ( stublen + 1 ) < MAXNICK )
+		{
+			nickbuf[stublen++] = ( ( rand() % 10 ) + 48 );
+			nickbuf[stublen] = '\0';
+		}
 	}
 	if( FindUser( nickbuf ) )
 	{
@@ -604,7 +612,7 @@ static int GetBotNick( BotInfo *botinfo, char *nickbuf )
 	stublen = strlen( nickbuf );
 	for( i = 0 ; i < NICK_TRIES ; i++ )
 	{
-		if( GenerateBotNick( nickbuf, stublen ) == NS_SUCCESS )
+		if( GenerateBotNick( nickbuf, stublen , (i + 1) , (i + 1)) == NS_SUCCESS )
 			return NS_SUCCESS;
 	}
 	/* Try to auto generate a nick from bot alt nick */
@@ -614,7 +622,7 @@ static int GetBotNick( BotInfo *botinfo, char *nickbuf )
 		stublen = strlen( nickbuf );
 		for( i = 0 ; i < NICK_TRIES ; i++ )
 		{
-			if( GenerateBotNick( nickbuf, stublen ) == NS_SUCCESS )
+			if( GenerateBotNick( nickbuf, stublen , (i + 1) , (i + 1)) == NS_SUCCESS )
 				return NS_SUCCESS;
 		}
 	}

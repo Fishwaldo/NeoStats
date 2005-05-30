@@ -1267,6 +1267,9 @@ EXPORTFUNC int irc_ctcp_action_req_channel( Bot* botptr, Channel* channel, const
 
 EXPORTFUNC int irc_ctcp_time_req( Bot* botptr, Client* target );
 
+/* bots.c */
+EXPORTFUNC int GenerateBotNick( char *nickbuf, int stublen );
+
 /* users.c */
 EXPORTFUNC Client *FindUser( const char *nick );
 EXPORTFUNC int UserLevel( Client *u );
