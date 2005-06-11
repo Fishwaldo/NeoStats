@@ -98,16 +98,15 @@ static int irc_sock_error( int what, void *data )
 static OS_SOCKET ConnectTo (char *host, int port)
 {
 	struct hostent *hp;
-	struct sockaddr_in sa;
 	OS_SOCKET s;
 
 	if ((hp = gethostbyname (host)) == NULL) {
 		return NS_FAILURE;
 	}
-	os_memset( &sa, 0, sizeof( sa ) );
-	sa.sin_family = AF_INET;
-	sa.sin_port = htons (port);
-	os_memcpy( ( char * ) &sa.sin_addr, hp->h_addr, hp->h_length );
+	os_memset( &me.srvip, 0, sizeof( me.srvip ) );
+	me.srvip.sin_family = AF_INET;
+	me.srvip.sin_port = htons (port);
+	os_memcpy( ( char * ) &me.srvip.sin_addr, hp->h_addr, hp->h_length );
 	if( ( s = os_sock_socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
 	{
 		return NS_FAILURE;
@@ -116,7 +115,7 @@ static OS_SOCKET ConnectTo (char *host, int port)
 	{
 		os_sock_bind( s, ( struct sockaddr * ) &me.lsa, sizeof( me.lsa ) );
 	}
-	if( os_sock_connect( s, ( struct sockaddr * ) &sa, sizeof( sa ) ) != 0 ) 
+	if( os_sock_connect( s, ( struct sockaddr * ) &me.srvip, sizeof( me.srvip ) ) != 0 ) 
 	{
 		os_sock_close (s);
 		return NS_FAILURE;
@@ -155,7 +154,6 @@ read_loop ()
 	int maxfdsunused;
 #endif
 
-	printf("readloop called\n");
 	me.lastmsg = me.now;
 	while (1) { /* loop till we get a error */
 		SET_SEGV_LOCATION();

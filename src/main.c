@@ -427,6 +427,7 @@ int main( int argc, char *argv[] )
 	   _fini problems when we fork */
 	ConfLoadModules();
 	/* Connect to server */
+	InitUpdate();
 	Connect();
 #ifdef WIN32
 	return 0;

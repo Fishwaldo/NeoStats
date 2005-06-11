@@ -637,6 +637,7 @@ typedef struct tme {
 	char version[VERSIONSIZE];
 	int dobind;
 	struct sockaddr_in lsa;
+	struct sockaddr_in srvip;
 	time_t tslastping;
 	int ulag;
 } tme;
@@ -996,13 +997,6 @@ typedef struct Sock {
 	void *data;
 	/* if socktype = SOCK_STANDARD, function calls */
 	/** Socket read function */
-#if 0
-	sock_func readfnc;
-	/** Socket write function */
-	sock_func writefnc;
-	/** Socket error function */
-	sock_func errfnc;
-#endif
 	/** rmsgs */
 	long rmsgs;
 	/** rbytes */
@@ -1586,5 +1580,14 @@ EXPORTFUNC void *GetServerModValue( Client *s );
 #define ClearBotModValue( b ) b->moddata = 0
 #define SetBotModValue( b, data ) b->moddata = data
 #define GetBotModValue( b ) b->moddata
+
+/* MQ Server update sending functions */
+typedef enum MQ_MSG_TYPE {
+	UPDATE_SSREPORT=1,
+	UPDATE_OPSBREPORT,
+} MQ_MSG_TYPE;
+
+EXPORTFUNC void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len);
+int InitUpdate();
 
 #endif /* NEOSTATS_H */

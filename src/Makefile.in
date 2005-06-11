@@ -74,7 +74,7 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	adnsgeneral.$(OBJEXT) adnsparse.$(OBJEXT) adnsquery.$(OBJEXT) \
 	adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) adnstransmit.$(OBJEXT) \
 	adnstypes.$(OBJEXT) oscalls.$(OBJEXT) ossocket.$(OBJEXT) \
-	osfile.$(OBJEXT)
+	osfile.$(OBJEXT) updates.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/event/libevent.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -231,7 +231,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		base64.c numerics.c settings.c botinfo.c \
 		adnscheck.c adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c \
 		adnsreply.c adnssetup.c adnstransmit.c adnstypes.c \
-		oscalls.c ossocket.c osfile.c 
+		oscalls.c ossocket.c osfile.c updates.c
 
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
 		-I$(top_srcdir)/lib/event
@@ -355,6 +355,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transfer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/updates.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/users.Po@am__quote@
 
 mostlyclean-libtool:

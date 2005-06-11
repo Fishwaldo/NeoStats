@@ -11,7 +11,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		base64.c numerics.c settings.c botinfo.c \
 		adnscheck.c adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c \
 		adnsreply.c adnssetup.c adnstransmit.c adnstypes.c \
-		oscalls.c ossocket.c osfile.c 
+		oscalls.c ossocket.c osfile.c updates.c
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
 		-I$(top_srcdir)/lib/event
 neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
