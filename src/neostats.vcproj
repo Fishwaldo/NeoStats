@@ -291,6 +291,9 @@
 				RelativePath=".\transfer.c">
 			</File>
 			<File
+				RelativePath=".\updates.c">
+			</File>
+			<File
 				RelativePath=".\users.c">
 			</File>
 			<File
