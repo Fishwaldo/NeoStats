@@ -3,7 +3,7 @@ SUBDIRS = dbm protocol
 bin_PROGRAMS = neostats
 
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
-		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircstring.c \
+		conf.c dl.c dns.c exclude.c hash.c ircstring.c \
 		ircprotocol.c ircsend.c ircrecv.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
 		helpstrings.c servers.c services.c signals.c sock.c support.c \

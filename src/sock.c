@@ -470,6 +470,8 @@ int InitSocks (void)
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
+/* done in the confuse callback now */
+#if 0
 	me.dobind = 0;
 	/* bind to a local ip */
 	os_memset( &me.lsa, 0, sizeof( me.lsa ) );
@@ -482,6 +484,7 @@ int InitSocks (void)
 			me.dobind = 1;
 		}
 	}
+#endif
 	event_set_log_callback(libevent_log);
 	event_init();
 	return NS_SUCCESS;

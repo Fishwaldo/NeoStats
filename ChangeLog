@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Move Config file over to confuse engine, and redo makeconf to work with
+   new config file format (F)
  - Move Secure.irc-chat.net update code to core to allow OPSB to use it as
    well (F)
  - Store the IP address we connect to in tme so we can reference it from

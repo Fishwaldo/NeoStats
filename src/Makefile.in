@@ -59,22 +59,21 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	channels.$(OBJEXT) commands.$(OBJEXT) confuse.$(OBJEXT) \
-	confuselexer.$(OBJEXT) nsdba.$(OBJEXT) dotconf.$(OBJEXT) \
-	conf.$(OBJEXT) dl.$(OBJEXT) dns.$(OBJEXT) exclude.$(OBJEXT) \
-	hash.$(OBJEXT) ircstring.$(OBJEXT) ircprotocol.$(OBJEXT) \
-	ircsend.$(OBJEXT) ircrecv.$(OBJEXT) lang.$(OBJEXT) \
-	list.$(OBJEXT) log.$(OBJEXT) main.$(OBJEXT) match.$(OBJEXT) \
-	misc.$(OBJEXT) modules.$(OBJEXT) helpstrings.$(OBJEXT) \
-	servers.$(OBJEXT) services.$(OBJEXT) signals.$(OBJEXT) \
-	sock.$(OBJEXT) support.$(OBJEXT) timer.$(OBJEXT) \
-	transfer.$(OBJEXT) users.$(OBJEXT) modes.$(OBJEXT) \
-	ctcp.$(OBJEXT) dcc.$(OBJEXT) nsmemory.$(OBJEXT) \
-	base64.$(OBJEXT) numerics.$(OBJEXT) settings.$(OBJEXT) \
-	botinfo.$(OBJEXT) adnscheck.$(OBJEXT) adnsevent.$(OBJEXT) \
-	adnsgeneral.$(OBJEXT) adnsparse.$(OBJEXT) adnsquery.$(OBJEXT) \
-	adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) adnstransmit.$(OBJEXT) \
-	adnstypes.$(OBJEXT) oscalls.$(OBJEXT) ossocket.$(OBJEXT) \
-	osfile.$(OBJEXT) updates.$(OBJEXT)
+	confuselexer.$(OBJEXT) nsdba.$(OBJEXT) conf.$(OBJEXT) \
+	dl.$(OBJEXT) dns.$(OBJEXT) exclude.$(OBJEXT) hash.$(OBJEXT) \
+	ircstring.$(OBJEXT) ircprotocol.$(OBJEXT) ircsend.$(OBJEXT) \
+	ircrecv.$(OBJEXT) lang.$(OBJEXT) list.$(OBJEXT) log.$(OBJEXT) \
+	main.$(OBJEXT) match.$(OBJEXT) misc.$(OBJEXT) \
+	modules.$(OBJEXT) helpstrings.$(OBJEXT) servers.$(OBJEXT) \
+	services.$(OBJEXT) signals.$(OBJEXT) sock.$(OBJEXT) \
+	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
+	users.$(OBJEXT) modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) \
+	nsmemory.$(OBJEXT) base64.$(OBJEXT) numerics.$(OBJEXT) \
+	settings.$(OBJEXT) botinfo.$(OBJEXT) adnscheck.$(OBJEXT) \
+	adnsevent.$(OBJEXT) adnsgeneral.$(OBJEXT) adnsparse.$(OBJEXT) \
+	adnsquery.$(OBJEXT) adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) \
+	adnstransmit.$(OBJEXT) adnstypes.$(OBJEXT) oscalls.$(OBJEXT) \
+	ossocket.$(OBJEXT) osfile.$(OBJEXT) updates.$(OBJEXT)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/event/libevent.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -223,7 +222,7 @@ target_alias = @target_alias@
 wi_PWD = @wi_PWD@
 SUBDIRS = dbm protocol
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
-		dotconf.c conf.c dl.c dns.c exclude.c hash.c ircstring.c \
+		conf.c dl.c dns.c exclude.c hash.c ircstring.c \
 		ircprotocol.c ircsend.c ircrecv.c \
 		lang.c list.c log.c main.c match.c misc.c modules.c \
 		helpstrings.c servers.c services.c signals.c sock.c support.c \
@@ -325,7 +324,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dcc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dns.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dotconf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exclude.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helpstrings.Po@am__quote@

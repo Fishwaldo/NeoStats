@@ -141,7 +141,6 @@ include/ctcp.h -text
 include/dcc.h -text
 include/dl.h eol=lf
 include/dns.h eol=lf
-include/dotconf.h eol=lf
 include/events.h eol=lf
 include/exclude.h -text
 include/hash.h eol=lf
@@ -548,7 +547,6 @@ src/dbm/gdbm/version.c -text
 src/dcc.c -text
 src/dl.c eol=lf
 src/dns.c eol=lf
-src/dotconf.c eol=lf
 src/exclude.c -text
 src/hash.c eol=lf
 src/helpstrings.c eol=lf
