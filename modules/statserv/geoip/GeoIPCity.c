@@ -76,7 +76,7 @@ GeoIPRecord * _extract_record(GeoIP* gi, unsigned int seek_record, int *next_rec
 		str_length++;
 	if (str_length > 0) {
 		record->region = malloc(str_length+1);
-		strncpy(record->region, record_buf, str_length+1);
+		strncpy(record->region, (char *)record_buf, str_length+1);
 	}
 	record_buf += str_length + 1;
 	str_length = 0;
@@ -86,7 +86,7 @@ GeoIPRecord * _extract_record(GeoIP* gi, unsigned int seek_record, int *next_rec
 		str_length++;
 	if (str_length > 0) {
 		record->city = malloc(str_length+1);
-		strncpy(record->city, record_buf, str_length+1);
+		strncpy(record->city, (char *)record_buf, str_length+1);
 	}
 	record_buf += (str_length + 1);
 	str_length = 0;
@@ -96,7 +96,7 @@ GeoIPRecord * _extract_record(GeoIP* gi, unsigned int seek_record, int *next_rec
 		str_length++;
 	if (str_length > 0) {
 		record->postal_code = malloc(str_length+1);
-		strncpy(record->postal_code, record_buf, str_length+1);
+		strncpy(record->postal_code, (char *)record_buf, str_length+1);
 	}
 	record_buf += (str_length + 1);
 

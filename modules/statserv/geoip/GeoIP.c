@@ -718,7 +718,7 @@ char *_get_name (GeoIP* gi, unsigned long ipnum) {
 		org_buf = malloc(sizeof(char) * (strlen(buf)+1));
 		strcpy(org_buf, buf);
 	} else {
-		buf_pointer = gi->cache + (long)record_pointer;
+		buf_pointer = (char *)gi->cache + (long)record_pointer;
 		org_buf = malloc(sizeof(char) * (strlen(buf_pointer)+1));
 		strcpy(org_buf, buf_pointer);
 	}

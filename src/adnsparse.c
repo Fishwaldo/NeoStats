@@ -49,7 +49,7 @@ int vbuf__append_quoted1035(vbuf * vb, const byte * buf, int len)
 			}
 		}
 		if (!adns__vbuf_append(vb, buf, i)
-		    || !adns__vbuf_append(vb, qbuf, strlen(qbuf)))
+		    || !adns__vbuf_append(vb, (const byte *)qbuf, strlen(qbuf)))
 			return 0;
 		if (i < len)
 			i++;
@@ -81,7 +81,7 @@ adns_status adns__findlabel_next(findlabel_state * fls,
 	int lablen, jumpto;
 	const char *dgram;
 
-	dgram = fls->dgram;
+	dgram = (const char *)fls->dgram;
 	for (;;) {
 		if (fls->cbyte >= fls->dglen)
 			goto x_truncated;
@@ -169,7 +169,7 @@ adns_status adns__parse_domain_more(findlabel_state * fls, adns_state ads,
 		if (first) {
 			first = 0;
 		} else {
-			if (!adns__vbuf_append(vb, ".", 1))
+			if (!adns__vbuf_append(vb, (const byte *)".", 1))
 				return adns_s_nomemory;
 		}
 		if (flags & pdf_quoteok) {
@@ -191,7 +191,7 @@ adns_status adns__parse_domain_more(findlabel_state * fls, adns_state ads,
 				return adns_s_nomemory;
 		}
 	}
-	if (!adns__vbuf_append(vb, "", 1))
+	if (!adns__vbuf_append(vb, (const byte *)"", 1))
 		return adns_s_nomemory;
 	return adns_s_ok;
 }

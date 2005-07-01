@@ -263,7 +263,7 @@ void adns__procdgram(adns_state ads, const byte * dgram, int dglen,
 					adns__query_fail(qu, st);
 					return;
 				}
-				l = strlen(qu->vb.buf) + 1;
+				l = strlen((char *)qu->vb.buf) + 1;
 				qu->answer->cname =
 				    adns__alloc_preserved(qu, l);
 				if (!qu->answer->cname) {

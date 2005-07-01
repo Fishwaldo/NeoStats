@@ -565,7 +565,7 @@ int decode_ip( char *buf )
 	char targ[25];
 	struct in_addr ia;
 
-	b64_decode( buf, targ, 25 );
+	b64_decode( buf, (unsigned char *)targ, 25 );
 	ia = *( struct in_addr * )targ;
 	if( len == 8 )  /* IPv4 */
 		return ia.s_addr;

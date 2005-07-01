@@ -1907,7 +1907,7 @@ static CURLcode CreateConnection(struct SessionHandle *data,
   CURLcode result=CURLE_OK;
   char resumerange[40]="";
   struct connectdata *conn;
-  struct connectdata *conn_temp;
+  struct connectdata *conn_temp = NULL;
   int urllen;
   struct Curl_dns_entry *hostaddr;
 #ifdef HAVE_ALARM

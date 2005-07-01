@@ -145,9 +145,9 @@ static void _send_svspart( const char *source, const char *target, const char *c
 static void _send_svsmode( const char *source, const char *target, const char *modes );
 static void _send_svskill( const char *source, const char *target, const char *reason );
 
+#if 0 /* Work in progress */
 static void _send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts );
 static void _send_rakill( const char *source, const char *host, const char *ident );
-#if 0 /* Work in progress */
 static void _send_sqline( const char *source, const char *mask, const char *reason );
 static void _send_unsqline( const char *source, const char *mask );
 static void _send_sgline( const char *source, const char *mask, const char *reason );

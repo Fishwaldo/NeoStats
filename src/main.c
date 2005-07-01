@@ -529,7 +529,7 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
  *  @return none
  */
 
-void fatal_error( char *file, int line, char *func, char *error_text )
+void fatal_error( char *file, int line, const char *func, char *error_text )
 {
 	nlog( LOG_CRITICAL, "Fatal Error: %s %d %s %s", file, line, func, error_text );
 	do_exit( NS_EXIT_ERROR, "Fatal Error - check log file" );

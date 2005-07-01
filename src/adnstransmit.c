@@ -305,7 +305,7 @@ void adns__query_send( adns_query qu, struct timeval now )
 	servaddr.sin_addr = ads->servers[serv].addr;
 	servaddr.sin_port = htons(DNS_PORT);
 
-	r = os_sock_sendto( ads->udpsocket, qu->query_dgram, qu->query_dglen, 0,
+	r = os_sock_sendto( ads->udpsocket, (char *)qu->query_dgram, qu->query_dglen, 0,
 		   ( const struct sockaddr * ) &servaddr, sizeof( servaddr ) );
 	if( r < 0 && os_sock_errno == OS_SOCK_EMSGSIZE ) 
 	{

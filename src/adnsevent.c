@@ -448,7 +448,7 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 				if (ads->tcprecv.used == ads->tcprecv.avail)
 					continue;
 				r = os_sock_read(ads->tcpsocket,
-					ads->tcprecv.buf + ads->tcprecv.used,
+					(char *)ads->tcprecv.buf + ads->tcprecv.used,
 					ads->tcprecv.avail - ads->tcprecv.used);
 				if (r > 0) {
 					ads->tcprecv.used += r;
@@ -476,7 +476,7 @@ int adns_processreadable(adns_state ads, OS_SOCKET fd, const struct timeval *now
 	if (fd == ads->udpsocket) {
 		for (;;) {
 			udpaddrlen = sizeof(udpaddr);
-			r = os_sock_recvfrom( ads->udpsocket, udpbuf, sizeof( udpbuf ), 0,
+			r = os_sock_recvfrom( ads->udpsocket, (char *)udpbuf, sizeof( udpbuf ), 0,
 				( struct sockaddr* ) &udpaddr, &udpaddrlen );
 			if (r < 0) {
 				if (os_sock_errno == EAGAIN || os_sock_errno == OS_SOCK_EWOULDBLOCK) 
@@ -585,7 +585,7 @@ int adns_processwriteable(adns_state ads, OS_SOCKET fd, const struct timeval *no
 			break;
 		while (ads->tcpsend.used) {
 			adns__sigpipe_protect(ads);
-			r = os_sock_write(ads->tcpsocket,ads->tcpsend.buf,ads->tcpsend.used);
+			r = os_sock_write(ads->tcpsocket,(char *)ads->tcpsend.buf,ads->tcpsend.used);
 			adns__sigpipe_unprotect(ads);
 			if (r < 0) {
 				if (os_sock_errno == OS_SOCK_EINTR)

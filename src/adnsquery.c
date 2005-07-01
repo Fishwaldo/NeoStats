@@ -185,7 +185,7 @@ void adns__search_next(adns_state ads, adns_query qu, struct timeval now)
 
 	qu->search_vb.used = qu->search_origlen;
 	if (nextentry) {
-		if (!adns__vbuf_append(&qu->search_vb, ".", 1) ||
+		if (!adns__vbuf_append(&qu->search_vb, (const byte *)".", 1) ||
 		    !adns__vbuf_appendstr(&qu->search_vb, nextentry)) {
 			stat = adns_s_nomemory;
 			goto x_fail;
@@ -196,7 +196,7 @@ void adns__search_next(adns_state ads, adns_query qu, struct timeval now)
 	qu->query_dgram = 0;
 	qu->query_dglen = 0;
 
-	query_simple(ads, qu, qu->search_vb.buf, qu->search_vb.used,
+	query_simple(ads, qu, (const char *)qu->search_vb.buf, qu->search_vb.used,
 		     qu->typei, qu->flags, now);
 	return;
 
@@ -268,7 +268,7 @@ int adns_submit(adns_state ads, const char *owner, adns_rrtype type,
 	}
 
 	if (flags & adns_qf_search) {
-		r = adns__vbuf_append(&qu->search_vb, owner, ol);
+		r = adns__vbuf_append(&qu->search_vb, (const byte *)owner, ol);
 		if (!r) {
 			stat = adns_s_nomemory;
 			goto x_adnsfail;
@@ -577,7 +577,7 @@ void adns__query_done(adns_query qu)
 
 	if (qu->flags & adns_qf_owner && qu->flags & adns_qf_search &&
 	    ans->status != adns_s_nomemory) {
-		if (!save_owner(qu, qu->search_vb.buf, qu->search_vb.used)) {
+		if (!save_owner(qu, (const char *)qu->search_vb.buf, qu->search_vb.used)) {
 			adns__query_fail(qu, adns_s_nomemory);
 			return;
 		}

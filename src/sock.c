@@ -462,8 +462,9 @@ socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg) {
 
 int InitSocks (void)
 {
+#if 0
 	struct hostent *hp;
-
+#endif
 	me.maxsocks = getmaxsock ();
 	sockethash = hash_create (me.maxsocks, 0, 0);
 	if(!sockethash) {
@@ -741,7 +742,7 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
 void
 read_sock_activity(int fd, short what, void *data) {
 	Sock *sock = (Sock *)data;
-	u_char *p = NULL;
+	char *p = NULL;
 	int n;
 	size_t howmuch = READBUFSIZE;
 
