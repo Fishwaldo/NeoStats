@@ -44,7 +44,7 @@ static char UmodeStringBuf[64];
 #ifdef GOTUSERSMODES
 static char SmodeStringBuf[64];
 #endif
-static long services_bot_umode= 0;
+long services_bot_umode= 0;
 
 /* Fully split buffer */
 static char privmsgbuffer[BUFSIZE];
