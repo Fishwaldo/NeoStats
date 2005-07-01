@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - LimitServ: set minimum limit settable by LimitServ to Users + 1 (D)
+ - LimitServ: fix paramter order being passed to ManageLimits (D)
  - Move Config file over to confuse engine, and redo makeconf to work with
    new config file format (F)
  - Move Secure.irc-chat.net update code to core to allow OPSB to use it as

@@ -122,12 +122,12 @@ static void ManageLimit( char *name, int users, int curlimit, int add )
 	int limit;
 
 	limit = curlimit;
-	if( limit < users )
-		limit = users;
 	if( add )
 		limit++;
 	else
 		limit--;
+	if( limit <= users )
+		limit = ( users + 1 );
 	ircsnprintf( limitsize, 10, "%d", limit );	
 	irc_cmode( ls_bot, name, "+l", limitsize );
 }
@@ -399,7 +399,7 @@ static int event_join( CmdParams *cmdparams )
 		/* Join channel if we are not a member */
 		if( joinchannels && !IsChannelMember( cmdparams->channel, ls_bot->u ) )
 			irc_join( ls_bot, db->name, "+o" );
-		ManageLimit( cmdparams->channel->name, cmdparams->channel->limit, cmdparams->channel->users, 1 );
+		ManageLimit( cmdparams->channel->name, cmdparams->channel->users, cmdparams->channel->limit, 1 );
 	}
 	return NS_SUCCESS;
 }
@@ -421,7 +421,7 @@ static int event_part( CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	db = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
 	if( db )
-		ManageLimit( cmdparams->channel->name, cmdparams->channel->limit, cmdparams->channel->users, 0 );
+		ManageLimit( cmdparams->channel->name, cmdparams->channel->users, cmdparams->channel->limit, 0 );
 	return NS_SUCCESS;
 }
 
