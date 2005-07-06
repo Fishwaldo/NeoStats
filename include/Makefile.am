@@ -3,7 +3,7 @@ CLEANFILES = version.h
 
 include_HEADERS		=	neostats.h config.h version.h \
 						list.h hash.h support.h events.h numeric.h \
-						adns.h protocol.h
+						adns.h protocol.h perlmod.h
 
 noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
 				log.h services.h modes.h signals.h \

@@ -18,16 +18,14 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id$
+** $Id: ctcp.h 2216 2005-01-24 22:21:33Z Mark $
 */
 
-#ifndef _NUMERICS_H_
-#define _NUMERICS_H_
+#ifndef _PERLMOD_H_
+#define _PERLMOD_H_
 
-extern irc_cmd numeric_cmd_list[];
+int Init_Perl();
+void FiniPerl();
+void ns_cmd_modperlist(CmdParams *cmd);
 
-EXPORTFUNC void _m_numeric242( char *origin, char **argv, int argc, int srv );
-EXPORTFUNC void _m_numeric351( char *origin, char **argv, int argc, int srv );
-EXPORTFUNC void _m_numericdefault( char *origin, char **argv, int argc, int srv );
-
-#endif /* _NUMERICS_H_ */
+#endif /* _PERLMOD_H_ */

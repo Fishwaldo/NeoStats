@@ -48,6 +48,9 @@
 #include "lang.h"
 #include "nsdba.h"
 #include "dcc.h"
+#ifdef USE_PERL
+#include "perlmod.h"
+#endif
 
 static void do_reconnect( void );
 static int in_do_exit = 0;

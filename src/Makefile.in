@@ -550,7 +550,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	uninstall-binPROGRAMS uninstall-info-am
 
 
-neostats.pm.h:	generate_header
+neostats.pm.h:	generate_header NeoStats.pm
 		$(top_builddir)/src/generate_header
 
 .c.o:

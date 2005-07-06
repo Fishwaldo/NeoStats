@@ -36,6 +36,9 @@
 #include "channels.h"
 #include "servers.h"
 #include "exclude.h"
+#ifdef USE_PERL
+#include "perlmod.h"
+#endif
 
 /** @brief Module list
  * 

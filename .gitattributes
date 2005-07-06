@@ -162,6 +162,7 @@ include/nsdba.h -text
 include/nsdbm.h -text
 include/numeric.h -text
 include/numerics.h -text
+include/perlmod.h -text
 include/protocol.h -text
 include/servers.h eol=lf
 include/services.h eol=lf
