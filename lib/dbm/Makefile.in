@@ -18,7 +18,7 @@ top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ..
+top_builddir = ../..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -36,7 +36,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/autotools/rules.mk
-subdir = lib
+subdir = lib/dbm
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
@@ -190,7 +190,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-SUBDIRS = pcre curl event dbm
+SUBDIRS = bdb gdbm
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -207,9 +207,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  lib/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  lib/dbm/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  lib/Makefile
+	  $(AUTOMAKE) --gnu  lib/dbm/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -359,7 +359,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../autotools
+	$(mkdir_p) $(distdir)/../../autotools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
