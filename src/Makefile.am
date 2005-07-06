@@ -1,5 +1,3 @@
-SUBDIRS = dbm protocol
-
 bin_PROGRAMS = neostats
 
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \

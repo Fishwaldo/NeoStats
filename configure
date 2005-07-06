@@ -28538,7 +28538,7 @@ CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 
 
-                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile src/protocol/Makefile src/dbm/Makefile src/dbm/bdb/Makefile src/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/quoteserv/Makefile modules/limitserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile neostats"
+                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile protocol/Makefile lib/dbm/Makefile lib/dbm/bdb/Makefile lib/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/quoteserv/Makefile modules/limitserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile neostats"
 
 
 cat >confcache <<\_ACEOF
@@ -29182,10 +29182,10 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "include/Makefile" ) CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-  "src/protocol/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/protocol/Makefile" ;;
-  "src/dbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/dbm/Makefile" ;;
-  "src/dbm/bdb/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/dbm/bdb/Makefile" ;;
-  "src/dbm/gdbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/dbm/gdbm/Makefile" ;;
+  "protocol/Makefile" ) CONFIG_FILES="$CONFIG_FILES protocol/Makefile" ;;
+  "lib/dbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/dbm/Makefile" ;;
+  "lib/dbm/bdb/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/dbm/bdb/Makefile" ;;
+  "lib/dbm/gdbm/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/dbm/gdbm/Makefile" ;;
   "lib/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
   "lib/curl/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/curl/Makefile" ;;
   "lib/pcre/Makefile" ) CONFIG_FILES="$CONFIG_FILES lib/pcre/Makefile" ;;

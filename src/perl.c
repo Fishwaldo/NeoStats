@@ -18,7 +18,7 @@
 **  USA
 **
 ** NeoStats CVS Identification
-** $Id: updates.c 2632 2005-06-11 06:09:46Z Fish $
+** $Id$
 */
 
 /* @file NeoStats interface to Perl Interpreter

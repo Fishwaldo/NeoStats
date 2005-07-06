@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS 	= foreign
-SUBDIRS 		= include lib src modules
+SUBDIRS 		= include lib src modules protocol
 ACLOCAL_AMFLAGS 	= -I autotools
 AM_MAKEFLAGS		= -s
 dist_bin_SCRIPTS 	= makeconf

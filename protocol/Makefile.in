@@ -14,14 +14,14 @@
 
 @SET_MAKE@
 
-SOURCES = $(bdb_la_SOURCES)
+SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(nefarious_la_SOURCES) $(plexus_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
-top_builddir = ../../..
+top_builddir = ..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = @INSTALL@
 install_sh_DATA = $(install_sh) -c -m 644
@@ -39,7 +39,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/autotools/rules.mk
-subdir = src/dbm/bdb
+subdir = protocol
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
@@ -61,9 +61,45 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-bdb_la_LIBADD =
-am_bdb_la_OBJECTS = bdb.lo
-bdb_la_OBJECTS = $(am_bdb_la_OBJECTS)
+asuka_la_LIBADD =
+am_asuka_la_OBJECTS = asuka.lo
+asuka_la_OBJECTS = $(am_asuka_la_OBJECTS)
+bahamut14_la_LIBADD =
+am_bahamut14_la_OBJECTS = bahamut14.lo
+bahamut14_la_OBJECTS = $(am_bahamut14_la_OBJECTS)
+bahamut18_la_LIBADD =
+am_bahamut18_la_OBJECTS = bahamut18.lo
+bahamut18_la_OBJECTS = $(am_bahamut18_la_OBJECTS)
+client_la_LIBADD =
+am_client_la_OBJECTS = client.lo
+client_la_OBJECTS = $(am_client_la_OBJECTS)
+hybrid6_la_LIBADD =
+am_hybrid6_la_OBJECTS = hybrid6.lo
+hybrid6_la_OBJECTS = $(am_hybrid6_la_OBJECTS)
+hybrid7_la_LIBADD =
+am_hybrid7_la_OBJECTS = hybrid7.lo
+hybrid7_la_OBJECTS = $(am_hybrid7_la_OBJECTS)
+ircup10_la_LIBADD =
+am_ircup10_la_OBJECTS = ircup10.lo
+ircup10_la_OBJECTS = $(am_ircup10_la_OBJECTS)
+nefarious_la_LIBADD =
+am_nefarious_la_OBJECTS = nefarious.lo
+nefarious_la_OBJECTS = $(am_nefarious_la_OBJECTS)
+plexus_la_LIBADD =
+am_plexus_la_OBJECTS = plexus.lo
+plexus_la_OBJECTS = $(am_plexus_la_OBJECTS)
+ultimate2_la_LIBADD =
+am_ultimate2_la_OBJECTS = ultimate2.lo
+ultimate2_la_OBJECTS = $(am_ultimate2_la_OBJECTS)
+ultimate3_la_LIBADD =
+am_ultimate3_la_OBJECTS = ultimate3.lo
+ultimate3_la_OBJECTS = $(am_ultimate3_la_OBJECTS)
+unreal31_la_LIBADD =
+am_unreal31_la_OBJECTS = unreal31.lo
+unreal31_la_OBJECTS = $(am_unreal31_la_OBJECTS)
+unreal32_la_LIBADD =
+am_unreal32_la_OBJECTS = unreal32.lo
+unreal32_la_OBJECTS = $(am_unreal32_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -73,8 +109,20 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-SOURCES = $(bdb_la_SOURCES)
-DIST_SOURCES = $(bdb_la_SOURCES)
+SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) \
+	$(bahamut18_la_SOURCES) $(client_la_SOURCES) \
+	$(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) \
+	$(ircup10_la_SOURCES) $(nefarious_la_SOURCES) \
+	$(plexus_la_SOURCES) $(ultimate2_la_SOURCES) \
+	$(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) \
+	$(unreal32_la_SOURCES)
+DIST_SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) \
+	$(bahamut18_la_SOURCES) $(client_la_SOURCES) \
+	$(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) \
+	$(ircup10_la_SOURCES) $(nefarious_la_SOURCES) \
+	$(plexus_la_SOURCES) $(ultimate2_la_SOURCES) \
+	$(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) \
+	$(unreal32_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -207,10 +255,29 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-pkglib_LTLIBRARIES = bdb.la
-bdb_la_SOURCES = bdb.c
+pkglib_LTLIBRARIES = bahamut14.la bahamut18.la \
+						client.la \
+						hybrid6.la hybrid7.la \
+						ircup10.la asuka.la nefarious.la \
+						plexus.la \
+						ultimate2.la ultimate3.la \
+						unreal31.la unreal32.la
+
+bahamut14_la_SOURCES = bahamut14.c
+bahamut18_la_SOURCES = bahamut18.c
+client_la_SOURCES = client.c
+hybrid7_la_SOURCES = hybrid7.c
+hybrid6_la_SOURCES = hybrid6.c
+ircup10_la_SOURCES = ircup10.c
+asuka_la_SOURCES = asuka.c
+nefarious_la_SOURCES = nefarious.c
+plexus_la_SOURCES = plexus.c
+ultimate2_la_SOURCES = ultimate2.c
+ultimate3_la_SOURCES = ultimate3.c
+unreal31_la_SOURCES = unreal31.c
+unreal32_la_SOURCES = unreal32.c
 AM_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = -I$(top_srcdir)/lib/adns/ @PCRE_CFLAGS@ @CURL_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/lib/adns/ -I$(top_srcdir)/lib/keeper @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -227,9 +294,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/dbm/bdb/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  protocol/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/dbm/bdb/Makefile
+	  $(AUTOMAKE) --gnu  protocol/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -264,8 +331,32 @@ clean-pkglibLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-bdb.la: $(bdb_la_OBJECTS) $(bdb_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(bdb_la_LDFLAGS) $(bdb_la_OBJECTS) $(bdb_la_LIBADD) $(LIBS)
+asuka.la: $(asuka_la_OBJECTS) $(asuka_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(asuka_la_LDFLAGS) $(asuka_la_OBJECTS) $(asuka_la_LIBADD) $(LIBS)
+bahamut14.la: $(bahamut14_la_OBJECTS) $(bahamut14_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(bahamut14_la_LDFLAGS) $(bahamut14_la_OBJECTS) $(bahamut14_la_LIBADD) $(LIBS)
+bahamut18.la: $(bahamut18_la_OBJECTS) $(bahamut18_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(bahamut18_la_LDFLAGS) $(bahamut18_la_OBJECTS) $(bahamut18_la_LIBADD) $(LIBS)
+client.la: $(client_la_OBJECTS) $(client_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(client_la_LDFLAGS) $(client_la_OBJECTS) $(client_la_LIBADD) $(LIBS)
+hybrid6.la: $(hybrid6_la_OBJECTS) $(hybrid6_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(hybrid6_la_LDFLAGS) $(hybrid6_la_OBJECTS) $(hybrid6_la_LIBADD) $(LIBS)
+hybrid7.la: $(hybrid7_la_OBJECTS) $(hybrid7_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(hybrid7_la_LDFLAGS) $(hybrid7_la_OBJECTS) $(hybrid7_la_LIBADD) $(LIBS)
+ircup10.la: $(ircup10_la_OBJECTS) $(ircup10_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(ircup10_la_LDFLAGS) $(ircup10_la_OBJECTS) $(ircup10_la_LIBADD) $(LIBS)
+nefarious.la: $(nefarious_la_OBJECTS) $(nefarious_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(nefarious_la_LDFLAGS) $(nefarious_la_OBJECTS) $(nefarious_la_LIBADD) $(LIBS)
+plexus.la: $(plexus_la_OBJECTS) $(plexus_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(plexus_la_LDFLAGS) $(plexus_la_OBJECTS) $(plexus_la_LIBADD) $(LIBS)
+ultimate2.la: $(ultimate2_la_OBJECTS) $(ultimate2_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(ultimate2_la_LDFLAGS) $(ultimate2_la_OBJECTS) $(ultimate2_la_LIBADD) $(LIBS)
+ultimate3.la: $(ultimate3_la_OBJECTS) $(ultimate3_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(ultimate3_la_LDFLAGS) $(ultimate3_la_OBJECTS) $(ultimate3_la_LIBADD) $(LIBS)
+unreal31.la: $(unreal31_la_OBJECTS) $(unreal31_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(unreal31_la_LDFLAGS) $(unreal31_la_OBJECTS) $(unreal31_la_LIBADD) $(LIBS)
+unreal32.la: $(unreal32_la_OBJECTS) $(unreal32_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(unreal32_la_LDFLAGS) $(unreal32_la_OBJECTS) $(unreal32_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -273,7 +364,19 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bdb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asuka.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut14.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bahamut18.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hybrid6.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hybrid7.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircup10.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nefarious.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plexus.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate3.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unreal31.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unreal32.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -334,7 +437,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/../../../autotools
+	$(mkdir_p) $(distdir)/../autotools
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
