@@ -324,6 +324,7 @@ load_module (const char *modfilename, Client * u)
 	dlog(DEBUG1, "Module description: %s", infoptr->description);
 	mod_ptr->info = infoptr;
 	mod_ptr->handle = handle;
+	mod_ptr->modtype = MOD_STANDARD;
 	/* Extract pointer to event list */
 	eventlistptr = ns_dlsym (handle, "module_events");
 	if(eventlistptr) {

@@ -919,6 +919,14 @@ typedef struct ModuleInfo {
 typedef int (*mod_auth) ( Client *u );
 typedef int (*userauthfunc) ( Client *u );
 
+typedef enum MOD_TYPE {
+	/* standard C Modules */
+	MOD_STANDARD = 1,
+	/* Perl Modules */
+	MOD_PERL
+} MOD_TYPE;
+	
+
 /** @brief Module structure
  * 
  */
@@ -932,6 +940,7 @@ typedef struct _Module {
 	unsigned int insynch;
 	unsigned int synched;
 	unsigned int error;
+	MOD_TYPE modtype;
 }_Module;
 
 EXPORTVAR extern Module *RunModule[10];

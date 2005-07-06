@@ -32,7 +32,7 @@
 #include <dirent.h>
 
 static int perl_load_file (char *script_name);
-
+static void free_perlmod(Module *mod);
 
 
 
@@ -92,7 +92,7 @@ list_t *perlmods;
 
 typedef struct {
 	char filename[MAXPATH];
-	ModuleInfo *modinfo;
+	Module *mod;
 	PerlInterpreter *my_perl;
 } PerlModInfo;
 
@@ -112,6 +112,7 @@ execute_perl (PerlModInfo *pm, SV * function, char *args)
 	dSP;
 	ENTER;
 	SAVETMPS;
+	SET_RUN_LEVEL(pm->mod);
 	PERL_SET_CONTEXT(pm->my_perl);
 
 	PUSHMARK (SP);
@@ -135,7 +136,7 @@ execute_perl (PerlModInfo *pm, SV * function, char *args)
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
-
+	RESET_RUN_LEVEL();
 	return ret_value;
 }
 
@@ -350,34 +351,45 @@ command_cb (char *word[], char *word_eol[], void *userdata)
 
 /* custom IRC perl functions for scripting */
 
-/* NeoStats::Internal::register (scriptname, version, desc, shutdowncallback, filename)
+/* NeoStats::Internal::register (scriptname, version, desc)
  *
  */
+#endif
 
 static
-XS (XS_Xchat_register)
+XS (XS_NeoStats_register)
 {
-	char *name, *version, *desc, *filename;
-	void *gui_entry;
+	char *name, *version, *desc;
+	Module *mod;
 	dXSARGS;
-	if (items != 4) {
-		xchat_printf (ph,
-						  "Usage: NeoStats::Internal::register(scriptname, version, desc, filename)");
+
+
+	if (items != 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::register(scriptname, version, desc)");
 	} else {
+		mod = GET_CUR_MODULE();
+		if (!mod) {
+			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
+			XSRETURN_EMPTY;
+		}
 		name = SvPV_nolen (ST (0));
 		version = SvPV_nolen (ST (1));
 		desc = SvPV_nolen (ST (2));
-		filename = SvPV_nolen (ST (3));
+		mod->info->name = os_malloc(strlen(name)+1);
+		strlcpy((char *)mod->info->name, name, strlen(name)+1);
 
-		gui_entry = xchat_plugingui_add (ph, filename, name,
-													desc, version, NULL);
+		mod->info->description = os_malloc(strlen(desc)+1);
+		strlcpy((char *)mod->info->description, desc, strlen(desc)+1);
 
-		XSRETURN_UV (PTR2UV (gui_entry));
+		mod->info->version = os_malloc(strlen(version)+1);
+		strlcpy((char *)mod->info->version, version, strlen(version)+1);
+		
+
+		XSRETURN_UV (PTR2UV (mod));
 
 	}
 }
 
-#endif
 /* NeoStats::debug(output) */
 static
 XS (XS_NeoStats_debug)
@@ -697,37 +709,67 @@ XS (XS_Xchat_get_list)
 static void
 xs_init (pTHX)
 {
-#if 0
 	HV *stash;
-#endif
 	/* This one allows dynamic loading of perl modules in perl
 	   scripts by the 'use perlmod;' construction */
 	newXS ("DynaLoader::boot_DynaLoader", boot_DynaLoader, __FILE__);
 	/* load up all the custom IRC perl functions */
 	newXS ("NeoStats::Internal::debug", XS_NeoStats_debug, __FILE__);
-#if 0
+	newXS ("NeoStats::Internal::register", XS_NeoStats_register, __FILE__);
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);
 	}
+	newCONSTSUB (stash, "EVENT_NULL", newSViv (EVENT_NULL));
+	newCONSTSUB (stash, "EVENT_MODULELOAD", newSViv (EVENT_MODULELOAD));
+	newCONSTSUB (stash, "EVENT_MODULEUNLOAD", newSViv (EVENT_MODULEUNLOAD));
+	newCONSTSUB (stash, "EVENT_SERVER", newSViv (EVENT_SERVER));
+	newCONSTSUB (stash, "EVENT_SQUIT", newSViv (EVENT_SQUIT));
+	newCONSTSUB (stash, "EVENT_PING", newSViv (EVENT_PING));
+	newCONSTSUB (stash, "EVENT_PONG", newSViv (EVENT_PONG));
+	newCONSTSUB (stash, "EVENT_SIGNON", newSViv (EVENT_SIGNON));
+	newCONSTSUB (stash, "EVENT_QUIT", newSViv (EVENT_QUIT));
+	newCONSTSUB (stash, "EVENT_NICKIP", newSViv (EVENT_NICKIP));
+	newCONSTSUB (stash, "EVENT_KILL", newSViv (EVENT_KILL));
+	newCONSTSUB (stash, "EVENT_GLOBALKILL", newSViv (EVENT_GLOBALKILL));
+	newCONSTSUB (stash, "EVENT_LOCALKILL", newSViv (EVENT_LOCALKILL));
+	newCONSTSUB (stash, "EVENT_SERVERKILL", newSViv (EVENT_SERVERKILL));
+	newCONSTSUB (stash, "EVENT_BOTKILL", newSViv (EVENT_BOTKILL));
+	newCONSTSUB (stash, "EVENT_NICK", newSViv (EVENT_NICK));
+	newCONSTSUB (stash, "EVENT_AWAY", newSViv (EVENT_AWAY));
+	newCONSTSUB (stash, "EVENT_UMODE", newSViv (EVENT_SMODE));
+	newCONSTSUB (stash, "EVENT_NEWCHAN", newSViv (EVENT_NEWCHAN));
+	newCONSTSUB (stash, "EVENT_DELCHAN", newSViv (EVENT_DELCHAN));
+	newCONSTSUB (stash, "EVENT_JOIN", newSViv (EVENT_JOIN));
+	newCONSTSUB (stash, "EVENT_PART", newSViv (EVENT_PART));
+	newCONSTSUB (stash, "EVENT_PARTBOT", newSViv (EVENT_PARTBOT));
+	newCONSTSUB (stash, "EVENT_EMPTYCHAN", newSViv (EVENT_EMPTYCHAN));
+	newCONSTSUB (stash, "EVENT_KICK", newSViv (EVENT_KICK));
+	newCONSTSUB (stash, "EVENT_KICKBOT", newSViv (EVENT_KICKBOT));
+	newCONSTSUB (stash, "EVENT_TOPIC", newSViv (EVENT_TOPIC));
+	newCONSTSUB (stash, "EVENT_CMODE", newSViv (EVENT_CMODE));
+	newCONSTSUB (stash, "EVENT_PRIVATE", newSViv (EVENT_PRIVATE));
+	newCONSTSUB (stash, "EVENT_NOTICE", newSViv (EVENT_NOTICE));
+	newCONSTSUB (stash, "EVENT_CPRIVATE", newSViv (EVENT_CPRIVATE));
+	newCONSTSUB (stash, "EVENT_CNOTICE", newSViv (EVENT_CNOTICE));
+	newCONSTSUB (stash, "EVENT_GLOBOPS", newSViv (EVENT_GLOBOPS));
+	newCONSTSUB (stash, "EVENT_CHATOPS", newSViv (EVENT_CHATOPS));
+	newCONSTSUB (stash, "EVENT_WALLOPS", newSViv (EVENT_WALLOPS));
+	newCONSTSUB (stash, "EVENT_CTCPVERSIONRPL", newSViv (EVENT_CTCPVERSIONRPL));
+	newCONSTSUB (stash, "EVENT_CTCPVERSIONREQ", newSViv (EVENT_CTCPVERSIONREQ));
+	newCONSTSUB (stash, "EVENT_CTCPFINGERRPL", newSViv (EVENT_CTCPFINGERRPL));
+	newCONSTSUB (stash, "EVENT_CTCPFINGERREQ", newSViv (EVENT_CTCPFINGERREQ));
+	newCONSTSUB (stash, "EVENT_CTCPACTIONREQ", newSViv (EVENT_CTCPACTIONREQ));
+	newCONSTSUB (stash, "EVENT_CTCPTIMERPL", newSViv (EVENT_CTCPTIMERPL));
+	newCONSTSUB (stash, "EVENT_CTCPTIMEREQ", newSViv (EVENT_CTCPTIMEREQ));
+	newCONSTSUB (stash, "EVENT_CTCPPINGRPL", newSViv (EVENT_CTCPPINGRPL));
+	newCONSTSUB (stash, "EVENT_CTCPPINGREQ", newSViv (EVENT_CTCPPINGREQ));
+	newCONSTSUB (stash, "EVENT_DCCSEND", newSViv (EVENT_DCCSEND));
+	newCONSTSUB (stash, "EVENT_DCCCHAT", newSViv (EVENT_DCCCHAT));
+	newCONSTSUB (stash, "EVENT_DCCCHATMSG", newSViv (EVENT_DCCCHATMSG));
+	newCONSTSUB (stash, "EVENT_ADDBAN", newSViv (EVENT_ADDBAN));
+	newCONSTSUB (stash, "EVENT_DELBAN", newSViv (EVENT_DELBAN));
 
-	newCONSTSUB (stash, "PRI_HIGHEST", newSViv (XCHAT_PRI_HIGHEST));
-	newCONSTSUB (stash, "PRI_HIGH", newSViv (XCHAT_PRI_HIGH));
-	newCONSTSUB (stash, "PRI_NORM", newSViv (XCHAT_PRI_NORM));
-	newCONSTSUB (stash, "PRI_LOW", newSViv (XCHAT_PRI_LOW));
-	newCONSTSUB (stash, "PRI_LOWEST", newSViv (XCHAT_PRI_LOWEST));
-
-	newCONSTSUB (stash, "EAT_NONE", newSViv (XCHAT_EAT_NONE));
-	newCONSTSUB (stash, "EAT_XCHAT", newSViv (XCHAT_EAT_XCHAT));
-	newCONSTSUB (stash, "EAT_PLUGIN", newSViv (XCHAT_EAT_PLUGIN));
-	newCONSTSUB (stash, "EAT_ALL", newSViv (XCHAT_EAT_ALL));
-	newCONSTSUB (stash, "FD_READ", newSViv (XCHAT_FD_READ));
-	newCONSTSUB (stash, "FD_WRITE", newSViv (XCHAT_FD_WRITE));
-	newCONSTSUB (stash, "FD_EXCEPTION", newSViv (XCHAT_FD_EXCEPTION));
-	newCONSTSUB (stash, "FD_NOTSOCKET", newSViv (XCHAT_FD_NOTSOCKET));
-	newCONSTSUB (stash, "KEEP", newSViv (1));
-	newCONSTSUB (stash, "REMOVE", newSViv (0));
-#endif
 }
 
 int
@@ -772,7 +814,10 @@ perl_load_file (char *filename)
 #endif
 
 	pm = os_malloc(sizeof(PerlModInfo));
-	pm->modinfo = os_malloc(sizeof(ModuleInfo));
+	pm->mod = os_malloc(sizeof(Module));
+	pm->mod->info = os_malloc(sizeof(ModuleInfo));
+	pm->mod->modtype = MOD_PERL;
+ 	pm->mod->info->name = NULL;
 	strlcpy(pm->filename, filename, MAXPATH);
 	pm->my_perl = perl_alloc ();
 	PL_perl_destruct_level = 1;
@@ -784,19 +829,27 @@ perl_load_file (char *filename)
 	   perl_definition array.
 	 */
 	eval_pv (perl_definitions, TRUE);
-
 	if (!execute_perl (pm, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
 								filename)) {
+		/* XXX if we are here, check that pm->mod->info has something, otherwise the script didnt register */
+		if (!pm->mod->info->name[0]) {
+			nlog(LOG_WARNING, "Perl Module %s didn't register. Unloading", filename);	
+			perl_destruct (pm->my_perl);
+			perl_free (pm->my_perl);
+			free_perlmod(pm->mod);
+			free(pm);
+			return NS_FAILURE;
+		}		
 		/* it loaded ok */
-		nlog(LOG_NORMAL, "Loaded Perl Module %s", filename);
+		nlog(LOG_NORMAL, "Loaded Perl Module %s (%s)", pm->mod->info->name, pm->mod->info->version);
 	} else {
 		nlog(LOG_WARNING, "Errors in Perl Module %s", filename);
 		perl_destruct (pm->my_perl);
 		perl_free (pm->my_perl);
-		free(pm->modinfo);
+		free_perlmod(pm->mod);
 		free(pm);
+		return NS_FAILURE;	
 	}
-		
 	node = lnode_create(pm);
 	list_append(perlmods, node);
 	return NS_SUCCESS;
@@ -813,7 +866,7 @@ FiniPerl (void)
 		execute_perl (pm, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), pm->filename);
 		perl_destruct (pm->my_perl);
 		perl_free (pm->my_perl);
-		free(pm->modinfo);
+		free_perlmod(pm->mod);
 		free(pm);
 		node = list_next(perlmods, node);
 	}
@@ -825,8 +878,22 @@ void ns_cmd_modperlist(CmdParams *cmd) {
 	node = list_first(perlmods);
 	while (node != NULL) {
 		pm = lnode_get(node);
-		irc_prefmsg(ns_botptr, cmd->source,__("Perl Module: %s (%s)", cmd->source), pm->filename, pm->modinfo->version);
-		irc_prefmsg(ns_botptr, cmd->source,"      : %s", pm->modinfo->description);
+		irc_prefmsg(ns_botptr, cmd->source,__("Perl Module: %s (%s)", cmd->source), pm->mod->info->name, pm->mod->info->version);
+		irc_prefmsg(ns_botptr, cmd->source,"      : %s", pm->mod->info->description);
 		node = list_next(perlmods, node);
 	}
+}
+
+
+static void free_perlmod(Module *mod) {
+		free((void *)mod->info->name);
+
+		free((void *)mod->info->description);
+
+		free((void *)mod->info->version);
+
+		free(mod->info);
+
+		free(mod);
+
 }

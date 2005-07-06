@@ -53,7 +53,7 @@ use Symbol();
 
     $pkg_info->{shutdown} = $callback;
     $pkg_info->{gui_entry} =
-      NeoStats::Internal::register( $name, $version, $description,	$filename );
+      NeoStats::Internal::register( $name, $version, $description);
 
     # keep with old behavior
     return ();
@@ -435,7 +435,6 @@ $SIG{__WARN__} = sub {
   }
 
   sub load {
-NeoStats::print('haha');
     my $file = expand_homedir( shift @_ );
 
     my $package = file2pkg( $file );
