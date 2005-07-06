@@ -39,7 +39,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = neostats$(EXEEXT)
-@DO_PERL_TRUE@am__append_1 = perl.c
+@DO_PERL_TRUE@am__append_1 = perl.c neostats.pm.h
 @DO_PERL_FALSE@am__append_2 = 
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk
@@ -68,7 +68,7 @@ am__neostats_SOURCES_DIST = auth.c bans.c bots.c channels.c commands.c \
 	numerics.c settings.c botinfo.c adnscheck.c adnsevent.c \
 	adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c adnssetup.c \
 	adnstransmit.c adnstypes.c oscalls.c ossocket.c osfile.c \
-	updates.c perl.c
+	updates.c perl.c neostats.pm.h
 @DO_PERL_TRUE@am__objects_1 = perl.$(OBJEXT)
 am__objects_2 =
 am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
@@ -252,7 +252,7 @@ neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ @PERL_LDFLAGS@ \
 		$(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
-noinst_HEADERS = confuselexer.l
+noinst_HEADERS = confuselexer.l NeoStats.pm generate_header
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -549,6 +549,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-info-am
 
+
+neostats.pm.h:	generate_header
+		$(top_builddir)/src/generate_header
 
 .c.o:
 @USECCDV@		@echo "Building $@"

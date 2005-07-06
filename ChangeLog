@@ -4,8 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Basic Perl Support thanks to XChat. Now time to write all the Hooks (F)
  - Change Source Layout, so we don't go and rebuild protocol and DB files
-   all the time
+   all the time (F)
  - Implement framework for Perl Support (F)
  - Fix warnings that GCC 4.0 generates (F)
  - LimitServ: set minimum limit settable by LimitServ to Users + 1 (D)

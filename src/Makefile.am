@@ -11,7 +11,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		adnsreply.c adnssetup.c adnstransmit.c adnstypes.c \
 		oscalls.c ossocket.c osfile.c updates.c
 if DO_PERL
-neostats_SOURCES += perl.c
+neostats_SOURCES += perl.c neostats.pm.h
 else
 neostats_SOURCES +=
 endif
@@ -22,7 +22,10 @@ neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ @PERL_LDFLAGS@ \
 		$(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
-noinst_HEADERS          =       confuselexer.l
+noinst_HEADERS          =       confuselexer.l NeoStats.pm generate_header
 
+
+neostats.pm.h:	generate_header
+		$(top_builddir)/src/generate_header
 
 include $(top_srcdir)/autotools/rules.mk 

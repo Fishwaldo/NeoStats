@@ -239,6 +239,10 @@ static int InitCore( void )
 		return NS_FAILURE;
 	if( InitDCC() != NS_SUCCESS )
 		return NS_FAILURE;
+#ifdef USE_PERL
+	if( Init_Perl() != NS_SUCCESS )
+		return NS_FAILURE;
+#endif
 	InitServices();
 	dlog( DEBUG1, "Core init successful" );
 	return NS_SUCCESS;
@@ -256,6 +260,7 @@ static int InitCore( void )
 
 void FiniCore( void )
 {
+	FiniPerl();
 	FiniDCC();
 	FiniCurl();
 	FiniUsers();

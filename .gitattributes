@@ -58,6 +58,8 @@ doc/old/INSTALL.pt -text
 doc/old/README.pt -text
 doc/read-faq -text
 doc/read-userman -text
+doc/test.pl -text
+doc/test2.pl -text
 graveyard/include/rtaserv.h -text
 graveyard/lib/rta/Makefile.am -text
 graveyard/lib/rta/Makefile.in -text
@@ -553,7 +555,9 @@ protocol/unreal32.c eol=lf
 protocol/unreal32.vcproj -text
 src/Makefile.am -text
 src/Makefile.in -text
+src/NeoStats.pm -text
 src/confuselexer.l -text
+src/generate_header -text
 src/neostats.vcproj -text
 src/win32/neostats.bmp -text
 src/win32/neostats.rc -text

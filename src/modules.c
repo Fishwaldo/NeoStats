@@ -404,6 +404,9 @@ ns_cmd_modlist (CmdParams* cmdparams)
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Module: %d %s (%s)", cmdparams->source), mod_ptr->modnum, mod_ptr->info->name, mod_ptr->info->version);
 		irc_prefmsg (ns_botptr, cmdparams->source, "      : %s", mod_ptr->info->description);
 	}
+#ifdef USE_PERL
+		ns_cmd_modperlist(cmdparams);
+#endif
 	irc_prefmsg (ns_botptr, cmdparams->source, __("End of Module List", cmdparams->source));
 	return 0;
 }
