@@ -525,6 +525,7 @@ src/dbm/gdbm/systems.h -text
 src/dbm/gdbm/update.c -text
 src/dbm/gdbm/version.c -text
 src/neostats.vcproj -text
+src/perl.c -text
 src/protocol/Makefile.am -text
 src/protocol/Makefile.in -text
 src/protocol/asuka.c -text

@@ -24,6 +24,7 @@ AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
 AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
 AC_DEFINE_UNQUOTED(VERSION, $x_version, "Full Version")
 AC_MSG_HEADER([Configuring Core Now])
+
 AC_LIBTOOL_DLOPEN
 dnl AC_DISABLE_SHARED
 dnl AC_LIBTOOL_WIN32_DLL
@@ -276,6 +277,69 @@ fi
 AX_PATH_LIB_PCRE
 AX_PATH_LIB_CURL
 
+	AC_PATH_PROG(unamepath, uname)
+	if test "_$unamepath" = _; then
+		system="unknown"
+	else
+		AC_MSG_CHECKING(system type)
+		system=`$unamepath -s`
+		AC_MSG_RESULT($system)
+	fi
+
+
+	AC_ARG_ENABLE(perl,
+	[  --disable-perl          don't build the perl plugin],
+	        perl=$enableval, perl=yes)
+
+	if test "$perl" = yes; then
+		AC_MSG_HEADER([Configuring for Perl Modules Now])
+		AC_PATH_PROG(sedpath, sed)
+		if test "_$sedpath" = _; then
+			AC_MSG_ERROR("Cannot find sed: I need it\!")
+		fi
+
+		AC_PATH_PROG(perlpath, perl)
+
+		AC_MSG_CHECKING(for Perl compile flags)
+		PERL_CFLAGS=`$perlpath -MExtUtils::Embed -e ccopts 2>/dev/null`
+		if test "_$PERL_CFLAGS" = _ ; then
+			AC_MSG_RESULT([not found, building without perl.])
+			perl=no
+		else
+			PERL_LDFLAGS=`$perlpath -MExtUtils::Embed -e ldopts |$sedpath 's/-lgdbm //'`
+			PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-ldb //'`
+			PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-lndbm //'`
+			if test "$system" = "Linux"; then
+				PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-lnsl //'`
+				PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-lposix //'`
+			fi
+			PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-lc //'`
+			AC_MSG_RESULT(ok)
+
+			AC_MSG_CHECKING(for $perlpath >= 5.8.0)
+			PERL_VER=`$perlpath -e 'print $]>= 5.008?"yes":"no"'`
+
+			if test "$PERL_VER" = "yes"; then
+				AC_MSG_RESULT(yes)
+				AC_DEFINE_UNQUOTED(USE_PERL, 1, 'Enable Perl Support')
+			else
+				AC_MSG_RESULT(no)
+				PERL_LDFLAGS=""
+				PERL_CFLAGS=""
+				perl=no
+			fi
+		fi
+	fi
+
+
+AC_SUBST(PERL_CFLAGS)
+AC_SUBST(PERL_LDFLAGS)
+AM_CONDITIONAL(DO_PERL, test "x$perl" = "xyes")
+
+
+
+
+
 AC_DEFINE_UNQUOTED(NS_HOST, "$host_os", "Operating System Host")
 AC_MSG_HEADER([Configuring CCDV Now])
 wi_ARG_DISABLE_CCDV
@@ -335,6 +399,8 @@ AC_ARG_ENABLE(raw, [  --enable-raw - Enable Raw command],
 esac],
 AC_MSG_RESULT(no)
 )
+
+
 
 
 AC_MSG_CHECKING(The Modules that will be automatically compiled)

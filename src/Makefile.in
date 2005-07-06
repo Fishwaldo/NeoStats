@@ -39,6 +39,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = neostats$(EXEEXT)
+@DO_PERL_TRUE@am__append_1 = perl.c
+@DO_PERL_FALSE@am__append_2 = 
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk
 subdir = src
@@ -57,6 +59,18 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
+am__neostats_SOURCES_DIST = auth.c bans.c bots.c channels.c commands.c \
+	confuse.c confuselexer.c nsdba.c conf.c dl.c dns.c exclude.c \
+	hash.c ircstring.c ircprotocol.c ircsend.c ircrecv.c lang.c \
+	list.c log.c main.c match.c misc.c modules.c helpstrings.c \
+	servers.c services.c signals.c sock.c support.c timer.c \
+	transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c base64.c \
+	numerics.c settings.c botinfo.c adnscheck.c adnsevent.c \
+	adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c adnssetup.c \
+	adnstransmit.c adnstypes.c oscalls.c ossocket.c osfile.c \
+	updates.c perl.c
+@DO_PERL_TRUE@am__objects_1 = perl.$(OBJEXT)
+am__objects_2 =
 am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	channels.$(OBJEXT) commands.$(OBJEXT) confuse.$(OBJEXT) \
 	confuselexer.$(OBJEXT) nsdba.$(OBJEXT) conf.$(OBJEXT) \
@@ -73,7 +87,8 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	adnsevent.$(OBJEXT) adnsgeneral.$(OBJEXT) adnsparse.$(OBJEXT) \
 	adnsquery.$(OBJEXT) adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) \
 	adnstransmit.$(OBJEXT) adnstypes.$(OBJEXT) oscalls.$(OBJEXT) \
-	ossocket.$(OBJEXT) osfile.$(OBJEXT) updates.$(OBJEXT)
+	ossocket.$(OBJEXT) osfile.$(OBJEXT) updates.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/event/libevent.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -86,7 +101,7 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 SOURCES = $(neostats_SOURCES)
-DIST_SOURCES = $(neostats_SOURCES)
+DIST_SOURCES = $(am__neostats_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -127,6 +142,8 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DO_PERL_FALSE = @DO_PERL_FALSE@
+DO_PERL_TRUE = @DO_PERL_TRUE@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -166,6 +183,8 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PCRE_CFLAGS = @PCRE_CFLAGS@
 PCRE_LIBS = @PCRE_LIBS@
+PERL_CFLAGS = @PERL_CFLAGS@
+PERL_LDFLAGS = @PERL_LDFLAGS@
 POW_LIB = @POW_LIB@
 PROTOCOL = @PROTOCOL@
 RANLIB = @RANLIB@
@@ -213,29 +232,31 @@ localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+perlpath = @perlpath@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
+sedpath = @sedpath@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 SUBDIRS = dbm protocol
-neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
-		conf.c dl.c dns.c exclude.c hash.c ircstring.c \
-		ircprotocol.c ircsend.c ircrecv.c \
-		lang.c list.c log.c main.c match.c misc.c modules.c \
-		helpstrings.c servers.c services.c signals.c sock.c support.c \
-		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
-		base64.c numerics.c settings.c botinfo.c \
-		adnscheck.c adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c \
-		adnsreply.c adnssetup.c adnstransmit.c adnstypes.c \
-		oscalls.c ossocket.c osfile.c updates.c
-
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE \
+neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
+	confuse.c confuselexer.c nsdba.c conf.c dl.c dns.c exclude.c \
+	hash.c ircstring.c ircprotocol.c ircsend.c ircrecv.c lang.c \
+	list.c log.c main.c match.c misc.c modules.c helpstrings.c \
+	servers.c services.c signals.c sock.c support.c timer.c \
+	transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c base64.c \
+	numerics.c settings.c botinfo.c adnscheck.c adnsevent.c \
+	adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c adnssetup.c \
+	adnstransmit.c adnstypes.c oscalls.c ossocket.c osfile.c \
+	updates.c $(am__append_1) $(am__append_2)
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event
 
-neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ \
+neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ @PERL_LDFLAGS@ \
 		$(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
@@ -345,6 +366,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/oscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/osfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ossocket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/perl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/servers.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/services.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/settings.Po@am__quote@

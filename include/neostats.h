@@ -69,9 +69,7 @@
 #include <time.h>
 #endif /* HAVE_TIME_H */
 #ifdef HAVE_STRING_H
-#define __USE_GNU
 #include <string.h>
-#undef __USE_GNU
 #endif  /* HAVE_STRING_H */
 #ifdef HAVE_STDARG_H
 #include <stdarg.h>
