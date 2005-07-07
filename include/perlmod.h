@@ -23,8 +23,8 @@
 
 #ifndef _PERLMOD_H_
 #define _PERLMOD_H_
-#include "config.h"
 #ifdef USE_PERL
+#include "config.h"
 
 #ifdef PERLDEFINES
 #include <EXTERN.h>

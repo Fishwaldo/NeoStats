@@ -201,9 +201,6 @@
 				RelativePath=".\dns.c">
 			</File>
 			<File
-				RelativePath=".\dotconf.c">
-			</File>
-			<File
 				RelativePath=".\exclude.c">
 			</File>
 			<File
@@ -360,9 +357,6 @@
 			</File>
 			<File
 				RelativePath="..\include\dns.h">
-			</File>
-			<File
-				RelativePath="..\include\dotconf.h">
 			</File>
 			<File
 				RelativePath="..\include\events.h">

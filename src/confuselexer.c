@@ -9,8 +9,9 @@
 #define YY_FLEX_MINOR_VERSION 5
 
 #include <stdio.h>
+#ifndef WIN32
 #include <unistd.h>
-
+#endif /* WIN32 */
 
 /* cfront 1.2 defines "c_plusplus" instead of "__cplusplus" */
 #ifdef c_plusplus
@@ -467,9 +468,11 @@ char *yytext;
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  */
 
+#ifndef WIN32
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
+#endif /* WIN32 */
 
 #include <assert.h>
 
