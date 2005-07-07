@@ -373,11 +373,15 @@ cb_verify_file (cfg_t * cfg, cfg_opt_t * opt)
 	struct stat buf;
 	ircsnprintf(buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_STDEXT);
 	if (stat(buf2, &buf) == -1) {
+#ifdef USE_PERL
 		ircsnprintf(buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_PERLEXT);
 		if (stat(buf2, &buf) == -1) {
+#endif
 			cfg_error(cfg, "File %s Specified in Option %s is Invalid: %s", buf2, opt->name, strerror(errno));
 			return CFG_PARSE_ERROR;
+#ifdef USE_PERL
 		}
+#endif
 	}
 	if (!S_ISREG(buf.st_mode)) {
 		cfg_error(cfg, "File %s Specified in Option %s is Invalid: Not a Regular File", buf2, opt->name);

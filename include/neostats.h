@@ -919,6 +919,8 @@ typedef struct ModuleInfo {
 typedef int (*mod_auth) ( Client *u );
 typedef int (*userauthfunc) ( Client *u );
 
+#ifdef USE_PERL	
+
 typedef enum MOD_TYPE {
 	/* standard C Modules */
 	MOD_STANDARD = 1,
@@ -926,6 +928,27 @@ typedef enum MOD_TYPE {
 	MOD_PERL
 } MOD_TYPE;
 	
+/* forward decleration (in perlmod.h) for perl module info
+ * we don't include any perl includes here because it screws up
+ * some of the existing system defines (like readdir) */
+struct PerlModInfo;
+
+
+/* defines to easily detect different modules */
+#define IS_PERL_MOD(mod) ((mod)->modtype & MOD_PERL)
+#define IS_STD_MOD(mod) ((mod)->modtype & MOD_STANDARD)
+
+/* to save some chars while typing */
+
+#define PMI PerlInterpreter
+
+#endif
+
+#ifndef USE_PERL
+#define IS_STD_MOD(mod) (1)
+#define IS_PERL_MOD(mod) (0)
+
+#endif
 
 /** @brief Module structure
  * 
@@ -940,8 +963,13 @@ typedef struct _Module {
 	unsigned int insynch;
 	unsigned int synched;
 	unsigned int error;
+#ifdef USE_PERL
 	MOD_TYPE modtype;
+	struct PerlModInfo *pm;
+#endif
 }_Module;
+
+
 
 EXPORTVAR extern Module *RunModule[10];
 EXPORTVAR extern int RunLevel;

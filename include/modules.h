@@ -31,7 +31,7 @@ extern unsigned int fchannelmoddata;
 
 int InitModules( void );
 void FiniModules( void );
-Module *load_module( const char *path, Client * u );
+Module *ns_load_module( const char *path, Client * u );
 int unload_module( const char *module_name, Client * u );
 void unload_modules( void );
 int ns_cmd_modlist( CmdParams* cmdparams );
@@ -40,5 +40,8 @@ void SendAllModuleEvent( Event event, CmdParams* cmdparams );
 void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr );
 int SynchModule( Module* module_ptr );
 int SynchAllModules( void );
+void assign_mod_number(Module *mod_ptr);
+void insert_module(Module *mod_ptr);
+void load_module_error(const Client *target, const char *fmt, ...);
 
 #endif /* _MODULES_H_ */

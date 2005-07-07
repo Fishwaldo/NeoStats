@@ -23,9 +23,29 @@
 
 #ifndef _PERLMOD_H_
 #define _PERLMOD_H_
+#include "config.h"
+#ifdef USE_PERL
+
+#ifdef PERLDEFINES
+#include <EXTERN.h>
+#define WIN32IOP_H
+#include <perl.h>
+#include <XSUB.h>
+
+
+typedef struct PerlModInfo {
+	char filename[MAXPATH];
+	PerlInterpreter *my_perl;
+} PerlModInfo;
+#endif
+
+#define MOD_PERLEXT	".pl"
+
 
 int Init_Perl();
-void FiniPerl();
+void PerlModFini(Module *);
+void unload_perlmod(Module *);
 void ns_cmd_modperlist(CmdParams *cmd);
-
+Module *load_perlmodule(const char *, Client *);
+#endif
 #endif /* _PERLMOD_H_ */

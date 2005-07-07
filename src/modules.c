@@ -270,10 +270,12 @@ ns_load_module(const char *modfilename, Client * u)
 	if (stat(path, &buf) != -1) {
 		return load_stdmodule(path, u);
 	}
+#ifdef USE_PERL
 	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT);
 	if (stat(path, &buf) != -1) {
 		return load_perlmodule(path, u);
 	}
+#endif
 	/* if we get here, ehhh, doesn't exist */
 	load_module_error (u, __("Unable to load module: %s", u), modfilename);
 	return NULL;
@@ -531,8 +533,10 @@ unload_module (const char *modname, Client * u)
 			RESET_RUN_LEVEL();
 			SET_SEGV_LOCATION();
 		}
+#if USE_PERL
 	} else {
 		PerlModFini(mod_ptr);
+#endif
 	}
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
@@ -556,8 +560,10 @@ unload_module (const char *modname, Client * u)
 	DBACloseDatabase ();
 	if (IS_STD_MOD(mod_ptr)) {
 		ns_dlclose (mod_ptr->handle);
+#ifdef USE_PERL
 	} else {
 		unload_perlmod(mod_ptr);
+#endif
 	}
 	RESET_RUN_LEVEL();
 #endif
