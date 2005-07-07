@@ -8,37 +8,37 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "connectserv", "modules\conn
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "src\protocol\client.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "modules\protocol\client.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hybrid7", "src\protocol\hybrid7.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hybrid7", "modules\protocol\hybrid7.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ircup10", "src\protocol\ircup10.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ircup10", "modules\protocol\ircup10.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ultimate2", "src\protocol\ultimate2.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ultimate2", "modules\protocol\ultimate2.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ultimate3", "src\protocol\ultimate3.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ultimate3", "modules\protocol\ultimate3.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unreal31", "src\protocol\unreal31.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unreal31", "modules\protocol\unreal31.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unreal32", "src\protocol\unreal32.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unreal32", "modules\protocol\unreal32.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
 	EndProjectSection
@@ -79,31 +79,31 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "operlog", "modules\operlog\
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bahamut18", "src\protocol\bahamut18.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bahamut18", "modules\protocol\bahamut18.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plexus", "src\protocol\plexus.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plexus", "modules\protocol\plexus.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bahamut14", "src\protocol\bahamut14.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bahamut14", "modules\protocol\bahamut14.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gdbm", "src\dbm\gdbm\gdbm.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gdbm", "modules\dbm\gdbm\gdbm.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asuka", "src\protocol\asuka.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asuka", "modules\protocol\asuka.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nefarious", "src\protocol\nefarious.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nefarious", "modules\protocol\nefarious.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hybrid6", "src\protocol\hybrid6.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hybrid6", "modules\protocol\hybrid6.vcproj", "{B6701C0A-27E3-468D-8473-FBE671989E33}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
