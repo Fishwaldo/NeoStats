@@ -425,10 +425,10 @@ AC_SUBST(EVNTLIBOBJS)
 AC_CONFIG_FILES([Makefile 
 		include/Makefile 
 		src/Makefile
-		protocol/Makefile 
-		lib/dbm/Makefile 
-		lib/dbm/bdb/Makefile 
-		lib/dbm/gdbm/Makefile 
+		modules/protocol/Makefile 
+		modules/dbm/Makefile 
+		modules/dbm/bdb/Makefile 
+		modules/dbm/gdbm/Makefile 
 		lib/Makefile
 		lib/curl/Makefile
 		lib/pcre/Makefile 

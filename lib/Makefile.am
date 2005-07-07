@@ -1,3 +1,3 @@
-SUBDIRS		= pcre curl event dbm
+SUBDIRS		= pcre curl event
 
 include $(top_srcdir)/autotools/rules.mk

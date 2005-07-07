@@ -1,4 +1,4 @@
-SUBDIRS		= @MODULES@
+SUBDIRS		= dbm protocol @MODULES@
 
 EXTRA_DIST	= modules.txt
 
