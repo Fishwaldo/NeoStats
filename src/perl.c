@@ -73,12 +73,12 @@ execute_perl (Module *mod, SV * function, char *args)
 	int count, ret_value = 1;
 	SV *sv;
 
+	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 	dSP;
 	ENTER;
 	SAVETMPS;
 
 	SET_RUN_LEVEL(mod);
-	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 
 	PUSHMARK (SP);
 	XPUSHs (sv_2mortal (newSVpv (args, 0)));
@@ -783,11 +783,12 @@ Module *load_perlmodule (const char *filename, Client *u)
 	mod->modtype = MOD_PERL;
  	mod->info->name = NULL;
 	strlcpy(mod->pm->filename, filename, MAXPATH);
+	PL_perl_destruct_level = 2;
 	mod->pm->my_perl = perl_alloc ();
-	PL_perl_destruct_level = 1;
+	PL_perl_destruct_level = 2;
 	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 	perl_construct (mod->pm->my_perl);
-
+	PL_perl_destruct_level = 2;
 	perl_parse (mod->pm->my_perl, xs_init, 4, perl_args, NULL);
 	/*
 	   Now initialising the perl interpreter by loading the
@@ -842,6 +843,7 @@ void unload_perlmod(Module *mod) {
 		PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 		/* because segv handler doesn't handle perl well yet */
 		RESET_RUN_LEVEL()
+		PL_perl_destruct_level = 2;
 		perl_destruct ((PMI *)mod->pm->my_perl);
 
 		perl_free ((PMI *)mod->pm->my_perl);
