@@ -67,21 +67,30 @@ thread_mbox (char *str)
   this is used for autoload and shutdown callbacks
 */
 static int
-execute_perl (Module *mod, SV * function, char *args)
+execute_perl1 (Module *mod, SV * function, int numargs, ...)
 {
 
 	int count, ret_value = 1;
 	SV *sv;
+	va_list args;
+	char *tmpstr;
 
 	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
+	SET_RUN_LEVEL(mod);
+
 	dSP;
 	ENTER;
 	SAVETMPS;
 
-	SET_RUN_LEVEL(mod);
+	va_start(args, numargs);
+	for (count = 0; count < numargs; count++) {
+		tmpstr = va_arg(args, char *);
+		XPUSHs (sv_2mortal (newSVpv (tmpstr, 0)));
+	}
+	va_end(args);
+	
 
 	PUSHMARK (SP);
-	XPUSHs (sv_2mortal (newSVpv (args, 0)));
 	PUTBACK;
 
 	count = call_sv (function, G_EVAL | G_SCALAR);
@@ -337,6 +346,10 @@ XS (XS_NeoStats_register)
 			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
 			XSRETURN_EMPTY;
 		}
+		mod->info->name = SvPV_nolen (ST (0));
+		mod->info->version = SvPV_nolen (ST (1));
+		mod->info->description = SvPV_nolen (ST (2));
+#if 0
 		name = SvPV_nolen (ST (0));
 		version = SvPV_nolen (ST (1));
 		desc = SvPV_nolen (ST (2));
@@ -348,7 +361,7 @@ XS (XS_NeoStats_register)
 
 		mod->info->version = os_malloc(strlen(version)+1);
 		strlcpy((char *)mod->info->version, version, strlen(version)+1);
-		
+#endif		
 
 		XSRETURN_UV (PTR2UV (mod));
 
@@ -781,8 +794,11 @@ Module *load_perlmodule (const char *filename, Client *u)
 	mod->pm = ns_calloc(sizeof(PerlModInfo));
 	mod->info = ns_calloc(sizeof(ModuleInfo));
 	mod->modtype = MOD_PERL;
- 	mod->info->name = NULL;
 	strlcpy(mod->pm->filename, filename, MAXPATH);
+	/*XXX  this is a temp solution till we get fully loaded. Its Bad */
+	mod->info->name = ns_malloc(strlen("NeoStats")+1);
+	ircsnprintf((char *)mod->info->name, strlen("NeoStats")+1, "NeoStats");
+
 	PL_perl_destruct_level = 2;
 	mod->pm->my_perl = perl_alloc ();
 	PL_perl_destruct_level = 2;
@@ -797,7 +813,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	eval_pv (perl_definitions, TRUE);
 	mod->insynch = 1;
 	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
-								(char *)filename)) {
+								1, (char *)filename)) {
 		/* XXX if we are here, check that pm->mod->info has something, otherwise the script didnt register */
 		if (!mod->info->name[0]) {
 			load_module_error(u, __("Perl Module %s didn't register. Unloading", u), filename);
