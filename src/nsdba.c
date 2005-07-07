@@ -81,7 +81,7 @@ static int InitDBAMSymbols( void )
 	void *dbm_module_handle;
 	dbm_sym *pdbm_sym;
 
-	ircsnprintf( dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_EXT );
+	ircsnprintf( dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_STDEXT );
 	nlog( LOG_NORMAL, "Using dbm module %s", dbm_path );
 	dbm_module_handle = ns_dlopen( dbm_path, RTLD_NOW || RTLD_GLOBAL );
 	if( !dbm_module_handle ) {
@@ -197,19 +197,21 @@ int DBACloseDatabase( void )
 
 	dlog( DEBUG1, "DBACloseDatabase %s", GET_CUR_MODNAME() );
 	node = hash_lookup( dbhash, GET_CUR_MODNAME() );
-	dbe = ( dbentry* )hnode_get( node );
-	hash_scan_begin( &ts, dbe->tablehash );
-	while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
-		tbe = (tableentry *) hnode_get( tnode );
-		DBACloseTable( tbe->table );
-		hash_delete( dbe->tablehash, tnode );
-		hnode_destroy( tnode );
-		ns_free( tbe );
+	if (node) {
+		dbe = ( dbentry* )hnode_get( node );
+		hash_scan_begin( &ts, dbe->tablehash );
+		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
+			tbe = (tableentry *) hnode_get( tnode );
+			DBACloseTable( tbe->table );
+			hash_delete( dbe->tablehash, tnode );
+			hnode_destroy( tnode );
+			ns_free( tbe );
+		}
+		hash_destroy( dbe->tablehash );
+		hash_delete( dbhash, node );
+		hnode_destroy( node );
+		ns_free( dbe );
 	}
-	hash_destroy( dbe->tablehash );
-	hash_delete( dbhash, node );
-	hnode_destroy( node );
-	ns_free( dbe );
 	return NS_SUCCESS;
 }
 

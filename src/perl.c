@@ -27,12 +27,14 @@
 
 #include "neostats.h"
 #include "services.h"
+#include "modules.h"
 #undef _
+#define PERLDEFINES
+#include "perlmod.h"
 #include <sys/types.h>
 #include <dirent.h>
 
-static int perl_load_file (char *script_name);
-static void free_perlmod(Module *mod);
+extern void boot_DynaLoader (pTHX_ CV * cv);
 
 
 
@@ -58,52 +60,14 @@ thread_mbox (char *str)
 
 #endif
 
-/* leave this before XSUB.h, to avoid readdir() being redefined */
-static void
-perl_auto_load (void)
-{
-	DIR *dir;
-	struct dirent *ent;
 
-	dir = opendir ("modules");
-	if (dir) {
-		while ((ent = readdir (dir))) {
-			int len = strlen (ent->d_name);
-			if (len > 3 && strcasecmp (".pl", ent->d_name + len - 3) == 0) {
-				char *file = malloc (len + strlen ("modules") + 2);
-				sprintf (file, "modules/%s", ent->d_name);
-				dlog(DEBUG2, "Loading Perl Module %s", file);
-				perl_load_file (file);
-				free (file);
-			}
-		}
-		closedir (dir);
-	}
-}
-
-#include <EXTERN.h>
-#define WIN32IOP_H
-#include <perl.h>
-#include <XSUB.h>
-
-
-
-list_t *perlmods;
-
-typedef struct {
-	char filename[MAXPATH];
-	Module *mod;
-	PerlInterpreter *my_perl;
-} PerlModInfo;
-
-extern void boot_DynaLoader (pTHX_ CV * cv);
 
 
 /*
   this is used for autoload and shutdown callbacks
 */
 static int
-execute_perl (PerlModInfo *pm, SV * function, char *args)
+execute_perl (Module *mod, SV * function, char *args)
 {
 
 	int count, ret_value = 1;
@@ -112,8 +76,9 @@ execute_perl (PerlModInfo *pm, SV * function, char *args)
 	dSP;
 	ENTER;
 	SAVETMPS;
-	SET_RUN_LEVEL(pm->mod);
-	PERL_SET_CONTEXT(pm->my_perl);
+
+	SET_RUN_LEVEL(mod);
+	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 
 	PUSHMARK (SP);
 	XPUSHs (sv_2mortal (newSVpv (args, 0)));
@@ -775,24 +740,19 @@ xs_init (pTHX)
 int
 Init_Perl (void)
 {
-	/* create the perl modules list */
-	perlmods = list_create(-1);
 
-	/* now load the modules */
-	perl_auto_load();
 	return NS_SUCCESS;
 }
 
 
-static int
-perl_load_file (char *filename)
+Module *load_perlmodule (const char *filename, Client *u)
 {
 	char *perl_args[] = { "", "-e", "0", "-w" };
+	CmdParams *cmd;
 	const char perl_definitions[] = {
 #include "neostats.pm.h"
 	};
-	PerlModInfo *pm;
-	lnode_t *node;
+	Module *mod;
 	
 	
 
@@ -807,85 +767,78 @@ perl_load_file (char *filename)
 							 "run perl scripts.\n\n"
 							 "http://www.activestate.com/ActivePerl/\n\n"
 							 "Make sure perl's bin directory is in your PATH.");
-			return FALSE;
+			return NULL;
 		}
 		FreeLibrary (lib);
 	}
 #endif
 
-	pm = os_malloc(sizeof(PerlModInfo));
-	pm->mod = os_malloc(sizeof(Module));
-	pm->mod->info = os_malloc(sizeof(ModuleInfo));
-	pm->mod->modtype = MOD_PERL;
- 	pm->mod->info->name = NULL;
-	strlcpy(pm->filename, filename, MAXPATH);
-	pm->my_perl = perl_alloc ();
+	mod = ns_calloc(sizeof(Module));
+	mod->pm = ns_calloc(sizeof(PerlModInfo));
+	mod->info = ns_calloc(sizeof(ModuleInfo));
+	mod->modtype = MOD_PERL;
+ 	mod->info->name = NULL;
+	strlcpy(mod->pm->filename, filename, MAXPATH);
+	mod->pm->my_perl = perl_alloc ();
 	PL_perl_destruct_level = 1;
-	perl_construct (pm->my_perl);
+	perl_construct (mod->pm->my_perl);
 
-	perl_parse (pm->my_perl, xs_init, 4, perl_args, NULL);
+	perl_parse (mod->pm->my_perl, xs_init, 4, perl_args, NULL);
 	/*
 	   Now initialising the perl interpreter by loading the
 	   perl_definition array.
 	 */
 	eval_pv (perl_definitions, TRUE);
-	if (!execute_perl (pm, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
-								filename)) {
+	mod->insynch = 1;
+	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
+								(char *)filename)) {
 		/* XXX if we are here, check that pm->mod->info has something, otherwise the script didnt register */
-		if (!pm->mod->info->name[0]) {
-			nlog(LOG_WARNING, "Perl Module %s didn't register. Unloading", filename);	
-			perl_destruct (pm->my_perl);
-			perl_free (pm->my_perl);
-			free_perlmod(pm->mod);
-			free(pm);
-			return NS_FAILURE;
+		if (!mod->info->name[0]) {
+			load_module_error(u, __("Perl Module %s didn't register. Unloading", u), filename);
+			unload_perlmod(mod);
+			free(mod);
+			return NULL;
 		}		
 		/* it loaded ok */
-		nlog(LOG_NORMAL, "Loaded Perl Module %s (%s)", pm->mod->info->name, pm->mod->info->version);
+		mod->synched = 1;
 	} else {
-		nlog(LOG_WARNING, "Errors in Perl Module %s", filename);
-		perl_destruct (pm->my_perl);
-		perl_free (pm->my_perl);
-		free_perlmod(pm->mod);
-		free(pm);
-		return NS_FAILURE;	
+		load_module_error(u, __("Errors in Perl Module %s", u), filename);
+		unload_perlmod(mod);
+		free(mod);
+		return NULL;	
 	}
-	node = lnode_create(pm);
-	list_append(perlmods, node);
-	return NS_SUCCESS;
+	assign_mod_number(mod);
+
+	insert_module(mod);
+
+	cmd = ns_calloc (sizeof(CmdParams));
+	cmd->param = (char*)mod->info->name;
+	SendAllModuleEvent(EVENT_MODULELOAD, cmd);
+	ns_free(cmd);
+
+	nlog(LOG_NORMAL, "Loaded Perl Module %s (%s)", mod->info->name, mod->info->version);
+         if (u) {
+	         irc_prefmsg (ns_botptr, u, __("Perl Module %s loaded, %s",u), mod->info->name, mod->info->description);
+                  irc_globops (NULL, _("Perl Module %s loaded"), mod->info->name);
+         }
+	return mod;
 }
 
-void
-FiniPerl (void)
-{
-	lnode_t *node;
-	PerlModInfo *pm;
-	node = list_first(perlmods);
-	while (node != NULL) {
-		pm = lnode_get(node);
-		execute_perl (pm, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), pm->filename);
-		perl_destruct (pm->my_perl);
-		perl_free (pm->my_perl);
-		free_perlmod(pm->mod);
-		free(pm);
-		node = list_next(perlmods, node);
-	}
+void PerlModFini(Module *mod) {
+		SET_RUN_LEVEL(mod);
+		if (mod->synched == 1) {
+			/* only execute unload if synced */
+			execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), mod->pm->filename);
+		}
+		RESET_RUN_LEVEL();
 }
 
-void ns_cmd_modperlist(CmdParams *cmd) {
-	lnode_t *node;
-	PerlModInfo *pm;
-	node = list_first(perlmods);
-	while (node != NULL) {
-		pm = lnode_get(node);
-		irc_prefmsg(ns_botptr, cmd->source,__("Perl Module: %s (%s)", cmd->source), pm->mod->info->name, pm->mod->info->version);
-		irc_prefmsg(ns_botptr, cmd->source,"      : %s", pm->mod->info->description);
-		node = list_next(perlmods, node);
-	}
-}
+void unload_perlmod(Module *mod) {
 
+		perl_destruct ((PMI *)mod->pm->my_perl);
 
-static void free_perlmod(Module *mod) {
+		perl_free ((PMI *)mod->pm->my_perl);
+
 		free((void *)mod->info->name);
 
 		free((void *)mod->info->description);
@@ -893,7 +846,8 @@ static void free_perlmod(Module *mod) {
 		free((void *)mod->info->version);
 
 		free(mod->info);
+		
+		free(mod->pm);
 
-		free(mod);
 
 }

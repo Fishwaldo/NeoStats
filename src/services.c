@@ -441,7 +441,7 @@ static int ns_cmd_level( CmdParams *cmdparams )
 static int ns_cmd_load( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( load_module( cmdparams->av[0], cmdparams->source ) ) {
+	if( ns_load_module( cmdparams->av[0], cmdparams->source ) ) {
 		irc_chanalert( ns_botptr, _( "%s loaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
 	} else {
 		irc_chanalert( ns_botptr, _( "%s tried to load module %s, but load failed" ), cmdparams->source->name, cmdparams->av[0] );

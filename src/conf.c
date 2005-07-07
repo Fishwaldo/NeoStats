@@ -30,7 +30,8 @@
 #include "log.h"
 #include "services.h"
 #include "modules.h"
-
+#include "dl.h"
+#include "perlmod.h"
 #define CONFIG_NAME		"neostats.conf"
 
 
@@ -296,7 +297,7 @@ ConfLoadModules (void)
 		nlog (LOG_NORMAL, "Loading configured modules");
 		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
 			dlog (DEBUG1, "ConfLoadModules: Loading Module %s", (char *) load_mods[i]);
-			if (load_module (load_mods[i], NULL)) {
+			if (ns_load_module (load_mods[i], NULL)) {
 				nlog (LOG_NORMAL, "Loaded module %s", (char *) load_mods[i]);
 			} else {
 				nlog (LOG_WARNING, "Failed to load module %s. Please check above error messages", (char *) load_mods[i]);
@@ -370,10 +371,13 @@ cb_verify_file (cfg_t * cfg, cfg_opt_t * opt)
 	char *file = opt->values[0]->string;
 	char buf2[MAXPATH];
 	struct stat buf;
-	ircsnprintf(buf2, MAXPATH, "%s/%s.so", MOD_PATH, file);
+	ircsnprintf(buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_STDEXT);
 	if (stat(buf2, &buf) == -1) {
-		cfg_error(cfg, "File %s Specified in Option %s is Invalid: %s", buf2, opt->name, strerror(errno));
-		return CFG_PARSE_ERROR;
+		ircsnprintf(buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_PERLEXT);
+		if (stat(buf2, &buf) == -1) {
+			cfg_error(cfg, "File %s Specified in Option %s is Invalid: %s", buf2, opt->name, strerror(errno));
+			return CFG_PARSE_ERROR;
+		}
 	}
 	if (!S_ISREG(buf.st_mode)) {
 		cfg_error(cfg, "File %s Specified in Option %s is Invalid: Not a Regular File", buf2, opt->name);

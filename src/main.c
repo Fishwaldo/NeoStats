@@ -263,7 +263,6 @@ static int InitCore( void )
 
 void FiniCore( void )
 {
-	FiniPerl();
 	FiniDCC();
 	FiniCurl();
 	FiniUsers();

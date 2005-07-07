@@ -237,6 +237,7 @@ void FiniDns (void)
 		adns_cancel(dnsdata->q);
 		ns_free (dnsdata->a);
 		ns_free (dnsdata);
+		dnsnode = list_next(dnslist, dnsnode);
 	}
 	list_destroy_nodes (dnslist);
 	list_destroy (dnslist);
@@ -244,6 +245,7 @@ void FiniDns (void)
 	while (dnsnode) {
 		dnsdata = lnode_get(dnsnode);
 		ns_free(dnsdata);
+		dnsnode = list_next(dnsqueue, dnsnode);
 	}
 	list_destroy_nodes (dnsqueue);
 	list_destroy (dnsqueue);
@@ -275,6 +277,7 @@ void canx_dns(Module* modptr)
 			lnode_destroy(dnsnode);
 			dnsnode = lnode2;
 		}
+		dnsnode = list_next(dnslist, dnsnode);
 	}
 	dnsnode = list_first(dnsqueue);
 	while (dnsnode) {
@@ -286,6 +289,7 @@ void canx_dns(Module* modptr)
 			lnode_destroy(dnsnode);
 			dnsnode = lnode2;
 		}
+		dnsnode = list_next(dnsqueue, dnsnode);
 	}
 	dns_check_queue();
 }

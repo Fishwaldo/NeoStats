@@ -37,6 +37,8 @@
 #include "servers.h"
 #include "exclude.h"
 #ifdef USE_PERL
+#undef _
+#define PERLDEFINES
 #include "perlmod.h"
 #endif
 
@@ -49,6 +51,8 @@ int RunLevel = 0;
 unsigned int fusermoddata = 0;
 unsigned int fservermoddata = 0;
 unsigned int fchannelmoddata = 0;
+Module *load_stdmodule (const char *modfilename, Client * u);
+
 
 /* @brief Module hash list */
 static hash_t *modulehash;
@@ -89,18 +93,25 @@ int SynchModule (Module* module_ptr)
 	int err = NS_SUCCESS; /*FAILURE;*/
 	int (*ModSynch) (void);
 
-	module_ptr->insynch = 1;
-	ModSynch = ns_dlsym ((int *) module_ptr->handle, "ModSynch");
-	if (ModSynch) {
-		SET_RUN_LEVEL(module_ptr);
-		err = (*ModSynch) (); 
-		RESET_RUN_LEVEL();
+#ifdef USE_PERL	
+	/* only standard modules get a sync */
+	if (IS_STD_MOD(module_ptr)) {
+#endif
+		module_ptr->insynch = 1;
+		ModSynch = ns_dlsym ((int *) module_ptr->handle, "ModSynch");
+		if (ModSynch) {
+			SET_RUN_LEVEL(module_ptr);
+			err = (*ModSynch) (); 
+			RESET_RUN_LEVEL();
+		}
+		SET_SEGV_LOCATION();
+		module_ptr->synched = 1;
+#ifdef USE_PERL
 	}
-	SET_SEGV_LOCATION();
-	module_ptr->synched = 1;
+#endif
 	return err;
 }
-
+	
 /** @brief SynchModule 
  *
  * 
@@ -229,7 +240,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
  * @return none
  */
 
-static void load_module_error(const Client *target, const char *fmt, ...)
+void load_module_error(const Client *target, const char *fmt, ...)
 {
 	static char buf[BUFSIZE];
 	va_list ap;
@@ -243,6 +254,31 @@ static void load_module_error(const Client *target, const char *fmt, ...)
 	nlog (LOG_WARNING, buf);
 }
 
+/** @brief determine the type of module based on extension and then
+ * call the relevent procedure to load it
+ */
+Module *
+ns_load_module(const char *modfilename, Client * u)
+{ 
+	char path[255];
+	char loadmodname[255];
+	struct stat buf;
+
+	strlcpy (loadmodname, modfilename, 255);
+	strlwr (loadmodname);
+	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_STDEXT);
+	if (stat(path, &buf) != -1) {
+		return load_stdmodule(path, u);
+	}
+	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT);
+	if (stat(path, &buf) != -1) {
+		return load_perlmodule(path, u);
+	}
+	/* if we get here, ehhh, doesn't exist */
+	load_module_error (u, __("Unable to load module: %s", u), modfilename);
+	return NULL;
+
+}
 /** @brief 
  *
  * @param 
@@ -250,35 +286,30 @@ static void load_module_error(const Client *target, const char *fmt, ...)
  * @return
  */
 Module *
-load_module (const char *modfilename, Client * u)
+load_stdmodule (const char *modfilename, Client * u)
 {
 	int err;
 	void *handle;
-	char path[255];
-	char loadmodname[255];
 	int moduleindex = 0;
 	ModuleInfo *infoptr = NULL;
 	ModuleEvent *eventlistptr = NULL;
 	Module *mod_ptr = NULL;
 	int (*ModInit) (void);
-	CmdParams *cmdparams;
+	CmdParams *cmd;
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (modulehash)) {
 		load_module_error (u, __("Unable to load module: module list is full", u));
 		return NULL;
 	} 
-	strlcpy (loadmodname, modfilename, 255);
-	strlwr (loadmodname);
-	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_EXT);
-	handle = ns_dlopen (path, RTLD_NOW || RTLD_GLOBAL);
+	handle = ns_dlopen (modfilename, RTLD_NOW || RTLD_GLOBAL);
 	if (!handle) {
-		load_module_error (u, __("Unable to load module: %s %s", u), ns_dlerrormsg, path);
+		load_module_error (u, __("Unable to load module: %s %s", u), ns_dlerrormsg, modfilename);
 		return NULL;
 	}
 	infoptr = ns_dlsym (handle, "module_info");
 	if(infoptr == NULL) {
-		load_module_error (u, __("Unable to load module: %s missing module_info", u), path);
+		load_module_error (u, __("Unable to load module: %s missing module_info", u), modfilename);
 		ns_dlclose (handle);
 		return NULL;
 	}
@@ -319,12 +350,14 @@ load_module (const char *modfilename, Client * u)
 	}
 	/* Allocate module */
 	mod_ptr = (Module *) ns_calloc (sizeof (Module));
-	hnode_create_insert (modulehash, mod_ptr, infoptr->name);
 	dlog(DEBUG1, "Module internal name: %s", infoptr->name);
 	dlog(DEBUG1, "Module description: %s", infoptr->description);
 	mod_ptr->info = infoptr;
 	mod_ptr->handle = handle;
+	insert_module(mod_ptr);
+#ifdef USE_PERL
 	mod_ptr->modtype = MOD_STANDARD;
+#endif
 	/* Extract pointer to event list */
 	eventlistptr = ns_dlsym (handle, "module_events");
 	if(eventlistptr) {
@@ -346,10 +379,7 @@ load_module (const char *modfilename, Client * u)
 		mod_ptr->authcb = ns_dlsym ((int *) handle, "ModAuthUser");
 	}
 	/* assign a module number to this module */
-	while (ModList[moduleindex] != NULL)
-		moduleindex++;
-	ModList[moduleindex] = mod_ptr;
-	mod_ptr->modnum = moduleindex;
+	assign_mod_number(mod_ptr);
 	dlog(DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name);
 
 	SET_SEGV_LOCATION();
@@ -377,16 +407,46 @@ load_module (const char *modfilename, Client * u)
 			return NULL;
 		}
 	}
-	cmdparams = ns_calloc (sizeof(CmdParams));
-	cmdparams->param = (char*)infoptr->name;
-	SendAllModuleEvent(EVENT_MODULELOAD, cmdparams);
-	ns_free(cmdparams);
+	cmd = ns_calloc (sizeof(CmdParams));
+	cmd->param = (char*)infoptr->name;
+	SendAllModuleEvent(EVENT_MODULELOAD, cmd);
+	ns_free(cmd);
 	if (u) {
 		irc_prefmsg (ns_botptr, u, __("Module %s loaded, %s",u), infoptr->name, infoptr->description);
 		irc_globops (NULL, _("Module %s loaded"), infoptr->name);
 	}
 	return mod_ptr;
 }
+/** @brief generate module number and assign it
+ *
+ * @param mod_ptr module pointer 
+ *
+ * @return Nothing 
+ */
+
+void 
+assign_mod_number(Module *mod_ptr) {
+	int moduleindex = 0;
+
+	while (ModList[moduleindex] != NULL)
+		moduleindex++;
+	ModList[moduleindex] = mod_ptr;
+	mod_ptr->modnum = moduleindex;
+}
+
+/** @brief insert module pointer into module hash. 
+ *
+ * @param mod_ptr module pointer 
+ *
+ * @return Nothing 
+ */
+
+void 
+insert_module(Module *mod_ptr) {
+	hnode_create_insert (modulehash, mod_ptr, mod_ptr->info->name);
+}
+
+
 
 /** @brief 
  *
@@ -408,9 +468,6 @@ ns_cmd_modlist (CmdParams* cmdparams)
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Module: %d %s (%s)", cmdparams->source), mod_ptr->modnum, mod_ptr->info->name, mod_ptr->info->version);
 		irc_prefmsg (ns_botptr, cmdparams->source, "      : %s", mod_ptr->info->description);
 	}
-#ifdef USE_PERL
-		ns_cmd_modperlist(cmdparams);
-#endif
 	irc_prefmsg (ns_botptr, cmdparams->source, __("End of Module List", cmdparams->source));
 	return 0;
 }
@@ -463,13 +520,19 @@ unload_module (const char *modname, Client * u)
 	 */
 	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
 	hash_delete (modulehash, modnode);		
-	/* call ModFini (replacement for library __fini() call */
-	ModFini = ns_dlsym ((int *) mod_ptr->handle, "ModFini");
-	if (ModFini) {
-		SET_RUN_LEVEL(mod_ptr);
-		(*ModFini) ();
-		RESET_RUN_LEVEL();
-		SET_SEGV_LOCATION();
+
+	/* now determine if its perl, or standard module */
+	if (IS_STD_MOD(mod_ptr)) {
+		/* call ModFini (replacement for library __fini() call */
+		ModFini = ns_dlsym ((int *) mod_ptr->handle, "ModFini");
+		if (ModFini) {
+			SET_RUN_LEVEL(mod_ptr);
+			(*ModFini) ();
+			RESET_RUN_LEVEL();
+			SET_SEGV_LOCATION();
+		}
+	} else {
+		PerlModFini(mod_ptr);
 	}
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
@@ -491,7 +554,11 @@ unload_module (const char *modname, Client * u)
 #ifndef VALGRIND
 	SET_RUN_LEVEL(mod_ptr);
 	DBACloseDatabase ();
-	ns_dlclose (mod_ptr->handle);
+	if (IS_STD_MOD(mod_ptr)) {
+		ns_dlclose (mod_ptr->handle);
+	} else {
+		unload_perlmod(mod_ptr);
+	}
 	RESET_RUN_LEVEL();
 #endif
 	ns_free (mod_ptr);
