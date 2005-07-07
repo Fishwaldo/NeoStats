@@ -379,7 +379,7 @@ int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockadd
 
 	/* reset local errno implementation */
 	os_sock_errno = 0;
-	ret = recvfrom( s, buf, len, flags, from, (socklen_t *)&fromlen );
+	ret = recvfrom( s, buf, len, flags, from, (socklen_t *)fromlen );
 	if( ret == SOCKET_ERROR )
 	{
 		OS_SOCK_SET_ERRNO();
