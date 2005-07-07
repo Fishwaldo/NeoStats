@@ -735,6 +735,10 @@ xs_init (pTHX)
 	newCONSTSUB (stash, "EVENT_ADDBAN", newSViv (EVENT_ADDBAN));
 	newCONSTSUB (stash, "EVENT_DELBAN", newSViv (EVENT_DELBAN));
 
+
+	newCONSTSUB (stash, "NS_SUCCESS", newSViv (NS_SUCCESS));
+	newCONSTSUB (stash, "NS_FAILURE", newSViv (NS_FAILURE));
+
 }
 
 int
@@ -781,6 +785,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	strlcpy(mod->pm->filename, filename, MAXPATH);
 	mod->pm->my_perl = perl_alloc ();
 	PL_perl_destruct_level = 1;
+	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 	perl_construct (mod->pm->my_perl);
 
 	perl_parse (mod->pm->my_perl, xs_init, 4, perl_args, NULL);
@@ -834,7 +839,9 @@ void PerlModFini(Module *mod) {
 }
 
 void unload_perlmod(Module *mod) {
-
+		PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
+		/* because segv handler doesn't handle perl well yet */
+		RESET_RUN_LEVEL()
 		perl_destruct ((PMI *)mod->pm->my_perl);
 
 		perl_free ((PMI *)mod->pm->my_perl);

@@ -18,13 +18,13 @@ use Symbol();
 			       qw(get_info get_prefs emit_print nickcmp),
 			       qw(get_list context_info strip_code),
 			       qw(PRI_HIGHEST PRI_HIGH PRI_NORM PRI_LOW),
-			       qw(PRI_LOWEST EAT_NONE EAT_NeoStats EAT_PLUGIN),
-			       qw(EAT_ALL KEEP REMOVE),
+			       qw(PRI_LOWEST EAT_NONE EAT_NeoStats NS_FAILURE),
+			       qw(NS_SUCCESS KEEP REMOVE),
 			      ],
 		       constants => [
 				     qw(PRI_HIGHEST PRI_HIGH PRI_NORM PRI_LOW),
 				     qw(PRI_LOWEST EAT_NONE EAT_NeoStats),
-				     qw(EAT_PLUGIN EAT_ALL FD_READ FD_WRITE),
+				     qw(NS_FAILURE NS_SUCCESS FD_READ FD_WRITE),
 				     qw(FD_EXCEPTION FD_NOTSOCKET KEEP REMOVE),
 				    ],
 		       hooks => [
@@ -515,15 +515,11 @@ $SIG{__WARN__} = sub {
         }
       }
       
-      if( exists $pkg_info->{gui_entry} ) {
-        plugingui_remove( $pkg_info->{gui_entry} );
-      }
-      
       Symbol::delete_package( $package );
       delete $scripts{$package};
-      return NeoStats::EAT_ALL;
+      return NeoStats::NS_SUCCESS;
     } else {
-      return NeoStats::EAT_NONE;
+      return NeoStats::NS_FAILURE;
     }
   }
 
@@ -538,14 +534,14 @@ $SIG{__WARN__} = sub {
       unload( $file );
     }
     load( $fullpath );
-    return NeoStats::EAT_ALL;
+    return NeoStats::NS_SUCCESS;
   }
 
   sub unload_all {
     for my $package ( keys %scripts ) {
       unload( $scripts{$package}->{filename} );
     }
-    return NeoStats::EAT_ALL;
+    return NeoStats::NS_SUCCESS;
   }
 
 #   sub auto_load {
