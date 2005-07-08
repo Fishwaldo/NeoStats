@@ -24,7 +24,6 @@
 #ifndef _PERLMOD_H_
 #define _PERLMOD_H_
 #ifdef USE_PERL
-#include "config.h"
 
 #ifdef PERLDEFINES
 #include <EXTERN.h>
