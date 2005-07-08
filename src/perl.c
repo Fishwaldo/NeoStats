@@ -116,7 +116,6 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 int
 perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 	int ret = NS_FAILURE;
-printf("Event %d Module %s\n", evt, mod_ptr->info->name);
 	switch (evt) {
 		case EVENT_NULL:
 			nlog(LOG_WARNING, "Ehhh, PerlModule got callback for EVENT_NULL?");
@@ -573,6 +572,27 @@ XS (XS_NeoStats_hook_event)
 	}
 }
 
+static
+XS (XS_NeoStats_unhook_event)
+{
+	Module *mod;
+	Event evt = -1;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items != 1) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:unhook_event(hook)");
+	} else {
+		evt = (int) SvIV (ST(0));
+		if (mod->event_list && mod->event_list[evt]->pe) {
+			SvREFCNT_dec(mod->event_list[evt]->pe->callback);
+			SvREFCNT_dec(mod->event_list[evt]->pe->userdata);
+			ns_free(mod->event_list[evt]->pe);
+			ns_free(mod->event_list[evt]);
+		}
+		DeleteEvent(evt);
+	}
+	XSRETURN_EMPTY;
+}
 
 
 
@@ -897,6 +917,7 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::debug", XS_NeoStats_debug, __FILE__);
 	newXS ("NeoStats::Internal::register", XS_NeoStats_register, __FILE__);
 	newXS ("NeoStats::Internal::hook_event", XS_NeoStats_hook_event, __FILE__);
+	newXS ("NeoStats::Internal::unhook_event", XS_NeoStats_unhook_event, __FILE__);
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);

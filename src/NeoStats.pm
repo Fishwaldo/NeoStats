@@ -535,7 +535,7 @@ $SIG{__WARN__} = sub {
 
       if( exists $pkg_info->{hooks} ) {
         for my $hook ( @{$pkg_info->{hooks}} ) {
-          NeoStats::unhook( $hook, $package );
+          NeoStats::Internal::unhook_event( $hook );
         }
       }
 
