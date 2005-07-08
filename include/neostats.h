@@ -944,8 +944,8 @@ struct PerlModInfo;
 
 
 /* defines to easily detect different modules */
-#define IS_PERL_MOD(mod) ((mod)->modtype & MOD_PERL)
-#define IS_STD_MOD(mod) ((mod)->modtype & MOD_STANDARD)
+#define IS_PERL_MOD(mod) ((mod)->modtype == MOD_PERL)
+#define IS_STD_MOD(mod) ((mod)->modtype == MOD_STANDARD)
 
 /* to save some chars while typing */
 
