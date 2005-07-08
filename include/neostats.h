@@ -841,6 +841,12 @@ typedef int (*timer_handler) ( void );
 #define	EVENT_FLAG_EXCLUDE_ME		0x00000008	/* Event excludes neostats bots and servers */
 #define	EVENT_FLAG_EXCLUDE_MODME	0x00000010	/* Event excludes module bots */
 
+#ifdef PERL
+/** @breif Forward Decl of Perl Events 
+ */
+struct PerlEvent;
+#endif
+
 /** @brief Event function types
  * 
  */
@@ -854,6 +860,9 @@ typedef struct ModuleEvent {
 	Event event;
 	event_handler handler;
 	unsigned int flags;
+#ifdef USE_PERL
+	struct PerlEvent *pe;
+#endif
 }ModuleEvent;
 
 typedef int ModuleProtocol;

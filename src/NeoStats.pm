@@ -17,12 +17,12 @@ use Symbol();
 			       qw(find_context get_context set_context),
 			       qw(get_info get_prefs emit_print nickcmp),
 			       qw(get_list context_info strip_code),
-			       qw(PRI_HIGHEST PRI_HIGH PRI_NORM PRI_LOW),
+			       qw(EVENT_MODULELOAD EVENT_MODULEUNLOAD),
 			       qw(PRI_LOWEST EAT_NONE EAT_NeoStats NS_FAILURE),
 			       qw(NS_SUCCESS KEEP REMOVE),
 			      ],
 		       constants => [
-				     qw(PRI_HIGHEST PRI_HIGH PRI_NORM PRI_LOW),
+				     qw(EVENT_MODULELOAD EVENT_MODULEUNLOAD PRI_NORM PRI_LOW),
 				     qw(PRI_LOWEST EAT_NONE EAT_NeoStats),
 				     qw(NS_FAILURE NS_SUCCESS FD_READ FD_WRITE),
 				     qw(FD_EXCEPTION FD_NOTSOCKET KEEP REMOVE),
@@ -44,7 +44,6 @@ use Symbol();
 
   sub register {
     my ($package) = caller;
-    ($package) = caller(1) if $package eq 'IRC';
     my $pkg_info = NeoStats::Embed::pkg_info( $package );
     my $filename = $pkg_info->{filename};
 
@@ -52,12 +51,48 @@ use Symbol();
     $description = "" unless defined $description;
 
     $pkg_info->{shutdown} = $callback;
+    $pkg_info->{name} = $name;
+    $pkg_info->{version} = $version;
+    $pkg_info->{description} = $description;
     $pkg_info->{gui_entry} =
-      NeoStats::Internal::register( $name, $version, $description);
+      NeoStats::Internal::register( $pkg_info->{name}, $pkg_info->{version}, $pkg_info->{description});
 
     # keep with old behavior
-    return ();
+    return NeoStats::NS_SUCCESS;
   }
+
+
+
+  sub hook_event {
+    return undef unless @_ >= 2;
+
+    my $event = shift;
+    my $callback = shift;
+    my $options = shift;
+    my ($package) = caller;
+    my $flags = 0;
+    my $data = "";
+    $callback = NeoStats::Embed::fix_callback( $package, $callback );
+  
+    if ( ref( $options ) eq 'HASH' ) {
+      if ( exists( $options->{flags} ) && defined( $options->{flags} ) ) {
+        $flags = $options->{flags};
+      }
+      if ( exists( $options->{data} ) && defined( $options->{data} ) ) {
+        $data = $options->{data};
+      }
+    }
+    
+    my $pkg_info = NeoStats::Embed::pkg_info( $package );
+    my $hook =  NeoStats::Internal::hook_event( $event, $flags, $callback, $data);
+    if ( defined ( $hook )) {
+      push @{$pkg_info->{hooks}}, $event;
+      return NeoStats::NS_SUCCESS;
+    } else {
+      return NeoStats::NS_FAILURE;
+    }
+  }
+
 
   sub hook_server {
     return undef unless @_ >= 2;
@@ -415,7 +450,7 @@ $SIG{__WARN__} = sub {
     $string =~ s/\.pl$//i;
     $string =~ s|([^A-Za-z0-9/])|'_'.unpack("H*",$1)|eg;
 
-    return "NeoStats::Script::" . $string;
+    return "NeoStats::Module::" . $string;
   }
 
   sub pkg_info {
@@ -438,14 +473,15 @@ $SIG{__WARN__} = sub {
     my $file = expand_homedir( shift @_ );
 
     my $package = file2pkg( $file );
-
-    if ( exists $scripts{$package} ) {
-      my $pkg_info = pkg_info( $package );
-      my $filename = File::Basename::basename( $pkg_info->{filename} );
-      NeoStats::print( qq{'$filename' already loaded from '$pkg_info->{filename}'.\n} );
-      NeoStats::print( 'If this is a different script then it rename and try loading it again.' );
-      return 2;
-    }
+# no need for this, as we only load one file per interpreter 
+#    print $package;
+#    if ( exists $scripts{$package} ) {
+#      my $pkg_info = pkg_info( $package );
+#      my $filename = File::Basename::basename( $pkg_info->{filename} );
+#      NeoStats::print( qq{'$filename' already loaded from '$pkg_info->{filename}'.\n} );
+#      NeoStats::print( 'If this is a different script then it rename and try loading it again.' );
+#      return 2;
+#    }
 
     if ( open FH, $file ) {
       my $source = do {local $/; <FH>};

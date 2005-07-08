@@ -33,6 +33,12 @@
 #include <XSUB.h>
 
 
+typedef struct PerlEvent {
+	SV *callback;
+	SV *userdata;
+	int options;
+} PerlEvent;
+
 typedef struct PerlModInfo {
 	char filename[MAXPATH];
 	PerlInterpreter *my_perl;

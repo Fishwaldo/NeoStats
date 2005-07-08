@@ -67,13 +67,13 @@ thread_mbox (char *str)
   this is used for autoload and shutdown callbacks
 */
 static int
-execute_perl1 (Module *mod, SV * function, int numargs, ...)
+execute_perl (Module *mod, SV * function, int numargs, ...)
 {
 
 	int count, ret_value = 1;
 	SV *sv;
 	va_list args;
-	char *tmpstr;
+	char *tmpstr[10];
 
 	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 	SET_RUN_LEVEL(mod);
@@ -81,16 +81,15 @@ execute_perl1 (Module *mod, SV * function, int numargs, ...)
 	dSP;
 	ENTER;
 	SAVETMPS;
+	PUSHMARK (SP);
 
 	va_start(args, numargs);
 	for (count = 0; count < numargs; count++) {
-		tmpstr = va_arg(args, char *);
-		XPUSHs (sv_2mortal (newSVpv (tmpstr, 0)));
+		tmpstr[count] = va_arg(args, char *);
+		XPUSHs (sv_2mortal (newSVpv (tmpstr[count], 0)));
 	}
 	va_end(args);
-	
 
-	PUSHMARK (SP);
 	PUTBACK;
 
 	count = call_sv (function, G_EVAL | G_SCALAR);
@@ -113,6 +112,168 @@ execute_perl1 (Module *mod, SV * function, int numargs, ...)
 	RESET_RUN_LEVEL();
 	return ret_value;
 }
+
+int
+perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
+	int ret = NS_FAILURE;
+printf("Event %d Module %s\n", evt, mod_ptr->info->name);
+	switch (evt) {
+		case EVENT_NULL:
+			nlog(LOG_WARNING, "Ehhh, PerlModule got callback for EVENT_NULL?");
+			break;
+		case EVENT_MODULELOAD:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->param);
+			break;
+		case EVENT_MODULEUNLOAD:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->param);
+			break;
+		case EVENT_SERVER:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_SQUIT:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_PING:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_PONG:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_SIGNON:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_QUIT:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_NICKIP:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_KILL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
+			break;
+		case EVENT_GLOBALKILL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
+			break;
+		case EVENT_LOCALKILL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
+			break;
+		case EVENT_SERVERKILL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
+			break;
+		case EVENT_BOTKILL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->target->name, cmdparams->param);
+			break;
+		case EVENT_NICK:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_AWAY:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_UMODE:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_SMODE:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_NEWCHAN:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->channel->name);
+			break;
+		case EVENT_DELCHAN:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->channel->name);
+			break;
+		case EVENT_JOIN:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name);
+			break;
+		case EVENT_PART:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_PARTBOT:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_EMPTYCHAN:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 4, cmdparams->channel->name, cmdparams->source->name, cmdparams->bot->name, cmdparams->param);
+			break;
+		case EVENT_KICK:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 4, cmdparams->channel->name, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
+			break;
+		case EVENT_KICKBOT:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 4, cmdparams->channel->name, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
+			break;
+		case EVENT_TOPIC:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name);
+			break;
+		case EVENT_CMODE:
+			dlog(DEBUG1, "EVENT_CMODE todo!");
+			break;
+		case EVENT_PRIVATE:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->bot->name, cmdparams->param);
+			break;
+		case EVENT_NOTICE:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->bot->name, cmdparams->param);
+			break;
+		case EVENT_CPRIVATE:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->channel->name, cmdparams->param);
+			break;
+		case EVENT_CNOTICE:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->source->name, cmdparams->channel->name, cmdparams->param);
+			break;
+		case EVENT_GLOBOPS:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_CHATOPS:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_WALLOPS:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_CTCPVERSIONRPL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_CTCPVERSIONREQ:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_CTCPFINGERRPL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_CTCPFINGERREQ:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_CTCPACTIONREQ:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_CTCPTIMERPL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_CTCPTIMEREQ:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_CTCPPINGRPL:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_CTCPPINGREQ:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
+			break;
+		case EVENT_DCCSEND:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_DCCCHAT:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_DCCCHATMSG:
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_ADDBAN:
+		case EVENT_DELBAN:
+			dlog(DEBUG1, "EVENT_*BAN Todo!");
+			break;
+		case EVENT_COUNT:
+			/* nothing */
+			break;
+			
+	}
+	return ret;
+}
+
 
 #if 0
 
@@ -333,7 +494,6 @@ command_cb (char *word[], char *word_eol[], void *userdata)
 static
 XS (XS_NeoStats_register)
 {
-	char *name, *version, *desc;
 	Module *mod;
 	dXSARGS;
 
@@ -384,6 +544,48 @@ XS (XS_NeoStats_debug)
 	}
 	XSRETURN_EMPTY;
 }
+
+/* NeoStats::Internal::hook_event(event, flags, callback, userdata) */
+static
+XS (XS_NeoStats_hook_event)
+{
+
+	ModuleEvent *evt;
+
+	dXSARGS;
+	if (items != 4) {
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::hook_event(event, flags, callback, userdata)");
+	} else {
+		evt = ns_calloc(sizeof(ModuleEvent));
+		evt->pe = ns_calloc(sizeof(PerlEvent));
+		evt->event = (int) SvIV (ST (0));
+		evt->flags = (int) SvIV (ST (1));
+		/* null, because its a perl event, which will execute via dedicated perl event handler */
+		evt->handler = NULL; 
+		evt->pe->callback = sv_mortalcopy(ST (2));
+		SvREFCNT_inc (evt->pe->callback);
+		evt->pe->userdata = sv_mortalcopy(ST (3));
+		SvREFCNT_inc (evt->pe->userdata);
+		/* add it as a event */
+		AddEvent(evt);
+
+		XSRETURN_UV (PTR2UV (evt));
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #if 0
 static
 XS (XS_Xchat_emit_print)
@@ -440,7 +642,7 @@ XS (XS_Xchat_emit_print)
 }
 /* NeoStats::Internal::hook_event(name, callback, userdata) */
 static
-XS (XS_Xchat_hook_event)
+XS (XS_NeoStats_hook_event)
 {
 
 	char *name;
@@ -694,6 +896,7 @@ xs_init (pTHX)
 	/* load up all the custom IRC perl functions */
 	newXS ("NeoStats::Internal::debug", XS_NeoStats_debug, __FILE__);
 	newXS ("NeoStats::Internal::register", XS_NeoStats_register, __FILE__);
+	newXS ("NeoStats::Internal::hook_event", XS_NeoStats_hook_event, __FILE__);
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);
@@ -715,7 +918,8 @@ xs_init (pTHX)
 	newCONSTSUB (stash, "EVENT_BOTKILL", newSViv (EVENT_BOTKILL));
 	newCONSTSUB (stash, "EVENT_NICK", newSViv (EVENT_NICK));
 	newCONSTSUB (stash, "EVENT_AWAY", newSViv (EVENT_AWAY));
-	newCONSTSUB (stash, "EVENT_UMODE", newSViv (EVENT_SMODE));
+	newCONSTSUB (stash, "EVENT_UMODE", newSViv (EVENT_UMODE));
+	newCONSTSUB (stash, "EVENT_SMODE", newSViv (EVENT_SMODE));
 	newCONSTSUB (stash, "EVENT_NEWCHAN", newSViv (EVENT_NEWCHAN));
 	newCONSTSUB (stash, "EVENT_DELCHAN", newSViv (EVENT_DELCHAN));
 	newCONSTSUB (stash, "EVENT_JOIN", newSViv (EVENT_JOIN));
@@ -814,6 +1018,10 @@ Module *load_perlmodule (const char *filename, Client *u)
 	mod->insynch = 1;
 	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
 								1, (char *)filename)) {
+#if 0
+	if (!execute_perl (mod, sv_2mortal (newSVpv ("pkg_load", 0)),
+								3, (char *)filename, (char *)filename, (char *)filename)) {
+#endif
 		/* XXX if we are here, check that pm->mod->info has something, otherwise the script didnt register */
 		if (!mod->info->name[0]) {
 			load_module_error(u, __("Perl Module %s didn't register. Unloading", u), filename);
@@ -850,7 +1058,7 @@ void PerlModFini(Module *mod) {
 		SET_RUN_LEVEL(mod);
 		if (mod->synched == 1) {
 			/* only execute unload if synced */
-			execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), mod->pm->filename);
+			execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), 1, mod->pm->filename);
 		}
 		RESET_RUN_LEVEL();
 }

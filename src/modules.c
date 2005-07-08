@@ -147,7 +147,11 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 {
 	SET_SEGV_LOCATION();
 	if (module_ptr->event_list) {
-		if (module_ptr->event_list[event] && module_ptr->event_list[event]->handler) {
+		if ((IS_STD_MOD(module_ptr) && module_ptr->event_list[event] && module_ptr->event_list[event]->handler)
+#ifdef USE_PERL
+			|| (IS_PERL_MOD(module_ptr) && module_ptr->event_list[event])
+#endif
+			){
 			/* If we are not yet synched, check that the module supports 
 				* the event before we are synched. */
 			if (!module_ptr->synched && !(module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH)) {
@@ -174,13 +178,19 @@ SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
 			}			
 			dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
 			SET_SEGV_LOCATION();
-			if (setjmp (sigvbuf) == 0) {
-				SET_RUN_LEVEL(module_ptr);
-				module_ptr->event_list[event]->handler (cmdparams);
-				RESET_RUN_LEVEL();
-			} else {
-				nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s", module_ptr->info->name);
-			}
+			if (IS_STD_MOD(module_ptr)) {
+				if (setjmp (sigvbuf) == 0) {
+					SET_RUN_LEVEL(module_ptr);
+					module_ptr->event_list[event]->handler (cmdparams);
+					RESET_RUN_LEVEL();
+				} else {
+					nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s", module_ptr->info->name);
+				}
+#if USE_PERL
+			} else if (IS_PERL_MOD(module_ptr)) {
+				perl_event_cb(event, cmdparams, module_ptr);
+#endif
+			}			
 			SET_SEGV_LOCATION();
 		}
 	}
