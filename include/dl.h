@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#ifndef _dl_h_
-#define _dl_h_
+#ifndef _DL_H_
+#define _DL_H_
 
 /*
  * dl.h
@@ -33,32 +33,31 @@
 
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
-#endif
+#endif /* HAVE_DLFCN_H */
 
 /* 
  *   Ensure RTLD flags correctly defined
  */
 #ifndef RTLD_NOW
 #define RTLD_NOW  1 
-#endif
+#endif /* RTLD_NOW */
 #ifndef RTLD_NOW
 #define RTLD_NOW RTLD_LAZY	/* openbsd deficiency */
-#endif
+#endif /* RTLD_NOW */
 #ifndef RTLD_GLOBAL
 #define RTLD_GLOBAL 0
-#endif
+#endif /* RTLD_GLOBAL */
 
 #ifdef WIN32
 #ifndef NDEBUG
 /* The extra d in debug mode uses debug versions of DLLs */
 #define MOD_STDEXT	"d.dll"
-#else
+#else /* NDEBUG */
 #define MOD_STDEXT	".dll"
-#endif
-#else
+#endif /* NDEBUG */
+#else /* WIN32 */
 #define MOD_STDEXT	".so"
-#endif
-
+#endif /* WIN32 */
 
 /* 
  * Prototypes
@@ -70,4 +69,4 @@ char *ns_dlerror( void );
 
 char *ns_dlerrormsg;
 
-#endif /* !_dl_h_ */
+#endif /* _DL_H_ */

@@ -33,7 +33,7 @@
 #include "tld.h"
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h> 
-#endif
+#endif /* HAVE_FCNTL_H */
 
 typedef void( *htmlhandler )( void );
 
@@ -485,7 +485,7 @@ int ss_html( void )
 #ifndef WIN32
     /* update the umode so others can read it */
     chmod(StatServ.htmlpath, S_IRUSR|S_IRGRP|S_IROTH);
-#endif
+#endif /* WIN32 */
 
 
 	return NS_SUCCESS;

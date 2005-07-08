@@ -486,7 +486,7 @@
    calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
 /* #undef inline */
-#endif
+#endif /* __cplusplus */
 
 /* Define to a type if <wchar.h> does not define. */
 /* #undef mbstate_t */

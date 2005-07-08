@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#ifndef SOCK_H
-#define SOCK_H
+#ifndef _SOCK_H_
+#define _SOCK_H_
 
 #include "event.h"
 
@@ -39,4 +39,4 @@ Sock *add_buffered_socket(const char *sock_name, OS_SOCKET socknum, evbuffercb r
 
 extern char recbuf[BUFSIZE];
 
-#endif
+#endif /* _SOCK_H_ */

@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#ifndef STATSERV_H
-#define STATSERV_H
+#ifndef _STATSERV_H_
+#define _STATSERV_H_
 
 /* this is the how often to save a portion of the DB. Don't alter this unless you need to */
 /* DO NOT set PROGCHANTIME less than ((DBSAVETIME + (DBSAVETIME/2)) * 4) otherwise you will not have the enitre database progressively saved! */
@@ -81,4 +81,4 @@ int sortusers(const void *v, const void *v2);
 void announce_record (const char *msg, ...);
 void announce_lag(const char *msg, ...);
 
-#endif
+#endif /* _STATSERV_H_ */

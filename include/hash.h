@@ -41,15 +41,15 @@
  * $Name:  $
  */
 
-#ifndef HASH_H
-#define HASH_H
+#ifndef _HASH_H_
+#define _HASH_H_
 
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
 #endif /* HAVE_LIMITS_H */
 #ifdef KAZLIB_SIDEEFFECT_DEBUG
 #include "sfx.h"
-#endif
+#endif /* KAZLIB_SIDEEFFECT_DEBUG */
 
 /*
  * Blurb for inclusion into C++ translation units
@@ -57,7 +57,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 	typedef unsigned long hashcount_t;
 #define HASHCOUNT_T_MAX ULONG_MAX
@@ -69,7 +69,7 @@ extern "C" {
 
 #ifndef HASH_VAL_T_BIT
 #define HASH_VAL_T_BIT ((int) hash_val_t_bit)
-#endif
+#endif /* HASH_VAL_T_BIT */
 
 /*
  * Hash chain node structure.
@@ -101,9 +101,9 @@ extern "C" {
 		const void *hash_key;	/* 3 */
 		void *hash_data;	/* 4 */
 		hash_val_t hash_hkey;	/* 5 */
-#else
+#else /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 		int hash_dummy;
-#endif
+#endif /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 	} hnode_t;
 
 /*
@@ -186,9 +186,9 @@ extern "C" {
 		void *hash_context;
 		hash_val_t hash_mask;	/* 9 */
 		int hash_dynamic;	/* 10 */
-#else
+#else /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 		int hash_dummy;
-#endif
+#endif /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 	} hash_t;
 
 /*
@@ -206,9 +206,9 @@ extern "C" {
 		hash_t *hash_table;	/* 1 */
 		hash_val_t hash_chain;	/* 2 */
 		hnode_t *hash_next;	/* 3 */
-#else
+#else /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 		int hash_dummy;
-#endif
+#endif /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 	} hscan_t;
 
 EXPORTFUNC 	extern hash_t *hash_create (hashcount_t, hash_comp_t, hash_fun_t);
@@ -247,16 +247,16 @@ EXPORTFUNC 	extern void hnode_destroy (hnode_t *);
 #if defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
 #ifdef KAZLIB_SIDEEFFECT_DEBUG
 #define hash_isfull(H) (SFX_CHECK(H)->hash_nodecount == (H)->hash_maxcount)
-#else
+#else /* KAZLIB_SIDEEFFECT_DEBUG */
 #define hash_isfull(H) ((H)->hash_nodecount == (H)->hash_maxcount)
-#endif
+#endif /* KAZLIB_SIDEEFFECT_DEBUG */
 #define hash_isempty(H) ((H)->hash_nodecount == 0)
 #define hash_count(H) ((H)->hash_nodecount)
 #define hash_size(H) ((H)->hash_nchains)
 #define hnode_get(N) ((N)->hash_data)
 #define hnode_getkey(N) ((N)->hash_key)
 #define hnode_put(N, V) ((N)->hash_data = (V))
-#endif
+#endif /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 
 EXPORTFUNC 	void hnode_create_insert (hash_t *, void *, const void *);
 EXPORTFUNC 	hnode_t *hnode_find (hash_t * hash, const void *key);
@@ -264,5 +264,5 @@ EXPORTFUNC 	hnode_t *hnode_find (hash_t * hash, const void *key);
 
 #ifdef __cplusplus
 }
-#endif
-#endif
+#endif /* __cplusplus */
+#endif /* _HASH_H_ */

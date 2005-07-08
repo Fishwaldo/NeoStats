@@ -62,7 +62,7 @@ static char msg_mode_serv[] = "\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\
 static char msg_bot[] = "\2\00313%s\2 is \2%s\2 a \2Bot\2 (%c%c)\003";
 static char msg_server[] = "\2SERVER\2 %s joined the network at %s";
 static char msg_squit[] = "\2SERVER\2 %s left the network at %s for %s";
-#else
+#else /* ENABLE_COLOUR_SUPPORT */
 static char msg_nickchange[] = "\2NICK\2 %s (%s@%s) changed their nick to %s";
 static char msg_away[] = "\2AWAY\2 %s (%s@%s) is %s away %s";
 static char msg_signon[] = "\2SIGNON\2 %s (%s@%s %s) signed on at %s";
@@ -75,7 +75,7 @@ static char msg_mode_serv[] = "\2MODE\2 %s is %s a %s (%c%c) on %s";
 static char msg_bot[] = "\2BOT\2 %s is %s a Bot (%c%c)";
 static char msg_server[] = "\2SERVER\2 %s joined the network at %s";
 static char msg_squit[] = "\2SERVER\2 %s left the network at %s for %s";
-#endif
+#endif /* ENABLE_COLOUR_SUPPORT */
 
 /** Bot event function prototypes */
 static int cs_event_signon( CmdParams *cmdparams );

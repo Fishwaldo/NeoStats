@@ -31,7 +31,9 @@
 #include "services.h"
 #include "modules.h"
 #include "dl.h"
+#ifdef USE_PERL
 #include "perlmod.h"
+#endif /* USE_PERL */
 #define CONFIG_NAME		"neostats.conf"
 
 

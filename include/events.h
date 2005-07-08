@@ -21,6 +21,9 @@
 ** $Id$
 */
 
+#ifndef _EVENTS_H_
+#define _EVENTS_H_
+
 /*  Events. 
  *    An event handler is passed a structure pointer of type
  *    CmdParams.
@@ -431,3 +434,5 @@ typedef enum Event {
 	EVENT_COUNT,
 
 } Event;
+
+#endif /* _EVENTS_H_ */

@@ -278,10 +278,8 @@ mode_init user_umodes[] =
 	{'x', UMODE_HIDE},
 	{'p', UMODE_KIX},
 	{'F', UMODE_FCLIENT},
-#if 0
 	/* useless modes, ignore them as services use these modes for services ID */
-	{'d', UMODE_DEBUG},
-#endif
+	/* {'d', UMODE_DEBUG}, */
 	{'e', UMODE_DCCWARN},
 	{'W', UMODE_WHOIS},
 	{0, 0},

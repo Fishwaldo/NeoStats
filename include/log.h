@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#ifndef _log_h_
-#define _log_h_
+#ifndef _LOG_H_
+#define _LOG_H_
 
 /*
  * log.h
@@ -42,4 +42,4 @@ void FiniLogs( void );
 /* Configurable log filename format string */
 extern char LogFileNameFormat[MAX_LOGFILENAME];
 
-#endif
+#endif /* _LOG_H_ */

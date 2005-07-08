@@ -41,8 +41,8 @@
  * $Name:  $
  */
 
-#ifndef LIST_H
-#define LIST_H
+#ifndef _LIST_H_
+#define _LIST_H_
 
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
@@ -50,9 +50,9 @@
 #ifdef KAZLIB_SIDEEFFECT_DEBUG
 #include "sfx.h"
 #define LIST_SFX_CHECK(E) SFX_CHECK(E)
-#else
+#else /* KAZLIB_SIDEEFFECT_DEBUG */
 #define LIST_SFX_CHECK(E) (E)
-#endif
+#endif /* KAZLIB_SIDEEFFECT_DEBUG */
 
 /*
  * Blurb for inclusion into C++ translation units
@@ -60,7 +60,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 	typedef unsigned long listcount_t;
 #define LISTCOUNT_T_MAX ULONG_MAX
@@ -70,9 +70,9 @@ extern "C" {
 		struct lnode_t *list_next;
 		struct lnode_t *list_prev;
 		void *list_data;
-#else
+#else /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 		int list_dummy;
-#endif
+#endif /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 	} lnode_t;
 
 	typedef struct lnodepool_t {
@@ -80,9 +80,9 @@ extern "C" {
 		struct lnode_t *list_pool;
 		struct lnode_t *list_free;
 		listcount_t list_size;
-#else
+#else /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 		int list_dummy;
-#endif
+#endif /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 	} lnodepool_t;
 
 	typedef struct list_t {
@@ -90,9 +90,9 @@ extern "C" {
 		lnode_t list_nilnode;
 		listcount_t list_nodecount;
 		listcount_t list_maxcount;
-#else
+#else /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 		int list_dummy;
-#endif
+#endif /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 	} list_t;
 
 EXPORTFUNC	lnode_t *lnode_create (void *);
@@ -105,7 +105,7 @@ EXPORTFUNC	void lnode_destroy (lnode_t *);
 #if defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
 #define lnode_put(N, D)		((N)->list_data = (D))
 #define lnode_get(N)		((N)->list_data)
-#endif
+#endif /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 
 	lnodepool_t *lnode_pool_init (lnodepool_t *, lnode_t *, listcount_t);
 	lnodepool_t *lnode_pool_create (listcount_t);
@@ -156,14 +156,14 @@ EXPORTFUNC	void list_process (list_t *, void *, void (*)(list_t *, lnode_t *, vo
 #define list_prev(L, N)		(LIST_SFX_CHECK(N)->list_prev == &(L)->list_nilnode ? NULL : (N)->list_prev)
 #define list_first(L)		list_next(LIST_SFX_CHECK(L), &(L)->list_nilnode)
 #define list_last(L)		list_prev(LIST_SFX_CHECK(L), &(L)->list_nilnode)
-#endif
+#endif /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 
 #if defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
 #define list_append(L, N)	list_ins_before(LIST_SFX_CHECK(L), N, &(L)->list_nilnode)
 #define list_prepend(L, N)	list_ins_after(LIST_SFX_CHECK(L), N, &(L)->list_nilnode)
 #define list_del_first(L)	list_delete(LIST_SFX_CHECK(L), list_first(L))
 #define list_del_last(L)	list_delete(LIST_SFX_CHECK(L), list_last(L))
-#endif
+#endif /* defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 
 /* destination list on the left, source on the right */
 
@@ -181,5 +181,5 @@ EXPORTFUNC	void *lnode_find (list_t * list, const void *key, int compare (const 
 
 #ifdef __cplusplus
 }
-#endif
-#endif
+#endif /* __cplusplus */
+#endif /* _LIST_H_ */

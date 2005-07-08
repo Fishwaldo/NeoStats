@@ -30,7 +30,7 @@ extern const char *ns_help_reload[];
 extern const char *ns_help_exclude[];
 #ifdef USE_RAW
 extern const char *ns_help_raw[];
-#endif
+#endif /* USE_RAW */
 extern const char *ns_help_userlist[];
 extern const char *ns_help_channellist[];
 extern const char *ns_help_serverlist[];

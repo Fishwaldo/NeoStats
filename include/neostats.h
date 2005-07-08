@@ -862,7 +862,7 @@ typedef struct ModuleEvent {
 	unsigned int flags;
 #ifdef USE_PERL
 	struct PerlEvent *pe;
-#endif
+#endif /* USE_PERL */
 }ModuleEvent;
 
 typedef int ModuleProtocol;
@@ -951,13 +951,13 @@ struct PerlModInfo;
 
 #define PMI PerlInterpreter
 
-#endif
+#endif /* USE_PERL */
 
 #ifndef USE_PERL
 #define IS_STD_MOD(mod) (1)
 #define IS_PERL_MOD(mod) (0)
 
-#endif
+#endif /* USE_PERL */
 
 /** @brief Module structure
  * 
@@ -975,7 +975,7 @@ typedef struct _Module {
 #ifdef USE_PERL
 	MOD_TYPE modtype;
 	struct PerlModInfo *pm;
-#endif
+#endif /* USE_PERL */
 }_Module;
 
 
@@ -1001,9 +1001,6 @@ EXPORTVAR extern int RunLevel;
 /** @brief Socket function types
  * 
  */
-#if 0
-typedef int (*sock_func) ( int sock_no, char *name );
-#endif
 
 /* socket interface type */
 typedef enum SOCK_TYPE {
@@ -1019,9 +1016,6 @@ typedef enum SOCK_TYPE {
 	SOCK_NATIVE,
 }SOCK_TYPE;
 
-#if 0
-typedef void (*linemodecb)(char *);
-#endif
 typedef int (*sockcb)(int, void *data);
 typedef int (*sockfunccb)(void *, void *, size_t);
 
@@ -1568,14 +1562,14 @@ EXPORTFUNC void os_free( void *ptr );
 #define OS_SOCK_EWOULDBLOCK				WSAEWOULDBLOCK
 #define OS_SOCK_EINPROGRESS				WSAEINPROGRESS
 #define OS_SOCK_EINTR					WSAEINTR
-#else
+#else /* WIN32 */
 #define OS_SOCK_EMSGSIZE                EMSGSIZE
 #define OS_SOCK_EAGAIN                  EAGAIN
 #define OS_SOCK_ENOBUFS					ENOBUFS 
 #define OS_SOCK_EWOULDBLOCK				EWOULDBLOCK
 #define OS_SOCK_EINPROGRESS				EINPROGRESS
 #define OS_SOCK_EINTR					EINTR
-#endif
+#endif /* WIN32 */
 
 /* 
  * Module Interface 

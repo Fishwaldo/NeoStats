@@ -24,10 +24,10 @@
 */
 
 
-#ifndef _conf_h_
-#define _conf_h_
+#ifndef _CONF_H_
+#define _CONF_H_
 
 int ConfLoad( void );
 int ConfLoadModules( void );
 
-#endif
+#endif /* _CONF_H_ */

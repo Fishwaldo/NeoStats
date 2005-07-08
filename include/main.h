@@ -20,8 +20,8 @@
 ** NeoStats CVS Identification
 ** $Id$
 */
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef _MAIN_H_
+#define _MAIN_H_
 
 /* Program exit codes usually defined in stdlib.h but 
    if not found will be defined here */
@@ -43,4 +43,4 @@ typedef enum {
 
 void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg ) __attribute__( ( noreturn ) );
 
-#endif
+#endif /* _MAIN_H_ */

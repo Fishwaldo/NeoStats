@@ -23,14 +23,12 @@
 
 #ifndef _PERLMOD_H_
 #define _PERLMOD_H_
-#ifdef USE_PERL
 
 #ifdef PERLDEFINES
 #include <EXTERN.h>
 #define WIN32IOP_H
 #include <perl.h>
 #include <XSUB.h>
-
 
 typedef struct PerlEvent {
 	SV *callback;
@@ -42,15 +40,15 @@ typedef struct PerlModInfo {
 	char filename[MAXPATH];
 	PerlInterpreter *my_perl;
 } PerlModInfo;
-#endif
+
+#endif /* PERLDEFINES */
 
 #define MOD_PERLEXT	".pl"
 
-
-int Init_Perl();
-void PerlModFini(Module *);
-void unload_perlmod(Module *);
+int Init_Perl( void );
+void PerlModFini(Module *mod);
+void unload_perlmod(Module *mod);
 void ns_cmd_modperlist(CmdParams *cmd);
-Module *load_perlmodule(const char *, Client *);
-#endif
+Module *load_perlmodule(const char *filename, Client *u);
+
 #endif /* _PERLMOD_H_ */

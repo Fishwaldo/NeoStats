@@ -40,7 +40,7 @@
 #undef _
 #define PERLDEFINES
 #include "perlmod.h"
-#endif
+#endif /* USE_PERL */
 
 /** @brief Module list
  * 

@@ -38,12 +38,12 @@
  * <em>If you can't convince, confuse.</em>
  */
 
-#ifndef _cfg_h_
-#define _cfg_h_
+#ifndef _CFG_H_
+#define _CFG_H_
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -62,7 +62,7 @@ extern "C" {
 
 #ifndef __BORLANDC__
 # define __export
-#endif
+#endif /* __BORLANDC__ */
 
 FILE *cfg_yyin;
 
@@ -1100,9 +1100,9 @@ cfg_validate_callback_t cfg_set_validate_func(cfg_t *cfg,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-#endif
+#endif /* _CFG_H_ */
 
 /** @example cfgtest.c
  */
