@@ -69,7 +69,8 @@ cfg_opt_t server_details[] = {
 	CFG_STR ("ServiceChannel", "#services", CFGF_NONE),
 	CFG_INT ("ServerNumeric", 123, CFGF_NONE),
 	CFG_STR ("BindTo", 0, CFGF_NONE),
-	CFG_STR ("Protocol", "unreal32", CFGF_NONE)
+	CFG_STR ("Protocol", "unreal32", CFGF_NONE),
+	CFG_END()
 };
 
 cfg_opt_t options[] = {
@@ -81,21 +82,25 @@ cfg_opt_t options[] = {
 	CFG_STR ("LogFileNameFormat", "-%m-%d", CFGF_NONE),
 	CFG_STR ("RootNick", "NeoStats", CFGF_NONE),
 	CFG_STR ("ServicesHost", "services.neostats.net", CFGF_NONE),
-	CFG_BOOL ("NOLOAD", cfg_true, CFGF_NONE)
+	CFG_BOOL ("NOLOAD", cfg_true, CFGF_NONE),
+	CFG_END()
 };
 
 cfg_opt_t servers[] = {
 	CFG_STR ("IpAddress", 0, CFGF_NONE),
 	CFG_INT ("Port", 6667, CFGF_NONE),
-	CFG_STR ("Password", 0, CFGF_NONE)
+	CFG_STR ("Password", 0, CFGF_NONE),
+	CFG_END()
 };
 
 cfg_opt_t serviceroots[] = {
-	CFG_STR ("Mask", 0, CFGF_NONE)
+	CFG_STR ("Mask", 0, CFGF_NONE),
+	CFG_END()
 };
 
 cfg_opt_t modules[] = {
-	CFG_STR_LIST ("ModuleName", 0, CFGF_NONE)
+	CFG_STR_LIST ("ModuleName", 0, CFGF_NONE),
+	CFG_END()
 };
 
 cfg_opt_t fileconfig[] = {
@@ -109,7 +114,8 @@ cfg_opt_t fileconfig[] = {
 #endif
 	CFG_SEC ("Servers", servers, CFGF_NONE),
 	CFG_SEC ("ServiceRoots", serviceroots, CFGF_NONE),
-	CFG_SEC ("Modules", modules, CFGF_NONE)
+	CFG_SEC ("Modules", modules, CFGF_NONE),
+	CFG_END()
 };
 
 validate_args arg_validate[] = {
