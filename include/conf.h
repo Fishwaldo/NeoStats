@@ -28,6 +28,6 @@
 #define _CONF_H_
 
 int ConfLoad( void );
-int ConfLoadModules( void );
+void ConfLoadModules( void );
 
 #endif /* _CONF_H_ */

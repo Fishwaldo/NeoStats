@@ -33,29 +33,28 @@
 #ifdef USE_PERL
 #include "perlmod.h"
 #endif /* USE_PERL */
+
 #define CONFIG_NAME		"neostats.conf"
-
-
-/** @brief The list of modules to load
- */
-static void *load_mods[NUM_MODULES];
-
-static void cb_Module (char *arg);
-static void set_config_values (cfg_t * cfg);
-int cb_verify_chan (cfg_t * cfg, cfg_opt_t * opt);
-int cb_verify_numeric (cfg_t * cfg, cfg_opt_t * opt);
-int cb_verify_bind (cfg_t * cfg, cfg_opt_t * opt);
-int cb_verify_file (cfg_t * cfg, cfg_opt_t * opt);
-int cb_verify_log (cfg_t * cfg, cfg_opt_t * opt);
-int cb_verify_mask (cfg_t * cfg, cfg_opt_t * opt);
-int cb_noload (cfg_t * cfg, cfg_opt_t * opt);
-int cb_verify_host (cfg_t * cfg, cfg_opt_t * opt);
-int cb_verify_settime (cfg_t * cfg, cfg_opt_t * opt);
 
 typedef struct validate_args {
 	char name[BUFSIZE];
 	cfg_validate_callback_t cb;
 } validate_args;
+
+/** @brief List of modules to load */
+static void *load_mods[NUM_MODULES];
+
+static void cb_module( char *name );
+static void set_config_values( cfg_t *cfg );
+static int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_noload( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt );
 
 /** @brief Core Configuration Items
  * 
@@ -105,13 +104,12 @@ cfg_opt_t modules[] = {
 cfg_opt_t fileconfig[] = {
 	CFG_SEC ("ServerConfig", server_details, CFGF_NONE),
 	CFG_SEC ("Options", options, CFGF_NONE),
-/* XXX do we want to specify backup linking servers? */
 #if 0
+/* XXX do we want to specify backup linking servers? */
 	CFG_SEC ("Servers", servers, CFGF_MULTI | CFGF_TITLE),
-/* Multiple Service Roots? Only usefull if extauth is loaded */
-	CFG_SEC ("ServiceRoots", serviceroots, CFGF_MULTI | CFGF_TITLE),
-#endif
+#else /* 0 */
 	CFG_SEC ("Servers", servers, CFGF_NONE),
+#endif /* 0 */
 	CFG_SEC ("ServiceRoots", serviceroots, CFGF_NONE),
 	CFG_SEC ("Modules", modules, CFGF_NONE),
 	CFG_END()
@@ -173,18 +171,6 @@ ConfLoad (void)
 		cfg_free (cfg);
 		return NS_FAILURE;
 	}
-	if (nsconfig.die) {
-		printf ("\n-----> ERROR: Read the README file then edit %s <-----\n\n", CONFIG_NAME);
-		nlog (LOG_CRITICAL, "Read the README file then edit %s", CONFIG_NAME);
-		cfg_free (cfg);
-		return NS_FAILURE;
-	}
-	if (nsconfig.error) {
-		printf ("\n-----> CONFIG ERROR: Check log file for more information then edit %s <-----\n\n", CONFIG_NAME);
-		nlog (LOG_CRITICAL, "CONFIG ERROR: Check log file for more information then edit %s", CONFIG_NAME);
-		cfg_free (cfg);
-		return NS_FAILURE;
-	}
 	printf ("-----------------------------------------------\n");
 	set_config_values (cfg);
 	cfg_free (cfg);
@@ -194,7 +180,7 @@ ConfLoad (void)
 }
 
 void
-set_config_values (cfg_t * cfg)
+set_config_values (cfg_t *cfg)
 {
 	int i;
 	/* Server name has a default */
@@ -203,21 +189,21 @@ set_config_values (cfg_t * cfg)
 	/* Server Port has a default */
 	me.port = cfg_getint (cfg, "Servers|Port");
 	/* Connect To */
-	if (cfg_size (cfg, "Servers|IpAddress") > 0) {
-		strlcpy (me.uplink, cfg_getstr (cfg, "Servers|IpAddress"), sizeof (me.uplink));
-	} else {
+	if (cfg_size (cfg, "Servers|IpAddress") <= 0)
+	{
 		printf ("ERROR: No Server was configured for Linking. Please fix this\n");
 		exit (-1);
 	}
-	if (cfg_size (cfg, "Servers|Password") > 0) {
-		/* Connect Pass */
-		strlcpy (nsconfig.pass, cfg_getstr (cfg, "Servers|Password"), sizeof (nsconfig.pass));
-	} else {
+	strlcpy (me.uplink, cfg_getstr (cfg, "Servers|IpAddress"), sizeof (me.uplink));
+	/* Connect Pass */
+	if (cfg_size (cfg, "Servers|Password") <= 0)
+	{
 		printf ("ERROR: No Password was specified for Linking. Please fix this\n");
 		exit (-1);
 	}
-	printf("NeoStats ServerName: %s\n", me.name);
-	printf("Connecting To:       %s:%d\n", me.uplink, me.port);
+	strlcpy (nsconfig.pass, cfg_getstr (cfg, "Servers|Password"), sizeof (nsconfig.pass));
+	dlog( DEBUG6, "NeoStats ServerName: %s", me.name );
+	dlog( DEBUG6, "Connecting To:       %s:%d", me.uplink, me.port );
 	/* Server InfoLine has a default */
 	strlcpy (me.infoline, cfg_getstr (cfg, "ServerConfig|Info"), sizeof (me.infoline));
 	/* Service host has a default */
@@ -233,7 +219,7 @@ set_config_values (cfg_t * cfg)
 	/* vhost has no default, nor is it required */
 	if (cfg_size (cfg, "ServerConfig|BindTo") > 1) {
 		strlcpy (me.local, cfg_getstr (cfg, "ServerConfig|BindTo"), sizeof (me.local));
-		printf("Source IP:          %s\n", me.local);
+		dlog( DEBUG6, "Source IP:          %s\n", me.local );
 	}
 	/* LogFile Format has a default */
 	strlcpy (LogFileNameFormat, cfg_getstr (cfg, "Options|LogFileNameFormat"), MAX_LOGFILENAME);
@@ -243,23 +229,25 @@ set_config_values (cfg_t * cfg)
 	nsconfig.setservertimes = cfg_getint (cfg, "Options|ServerSettime") * 60 * 60;
 	/* serviceroots has no default */
 	if (cfg_size (cfg, "ServiceRoots|Mask") > 0) {
-		char *nick;
-		char *user;
-		char *host;
-		char *arg;
+		char *nick, *user , *host, *arg;
+
 		/* already validate */
 		arg = cfg_getstr (cfg, "ServiceRoots|Mask");
-		nick = strtok (arg, "!");
-		user = strtok (NULL, "@");
-		host = strtok (NULL, "");
-		strlcpy (nsconfig.rootuser.nick, nick, MAXNICK);
-		strlcpy (nsconfig.rootuser.user, user, MAXUSER);
-		strlcpy (nsconfig.rootuser.host, host, MAXHOST);
-/*		nsconfig.rootuser.level = NS_ULEVEL_ROOT; */
-		printf("ServiceRoot:         %s!%s@%s\n", nsconfig.rootuser.nick, nsconfig.rootuser.user, nsconfig.rootuser.host);
-	} else {
-		printf("\nWARNING: No ServiceRoot Entry Defined\n\n");
+		if( arg )
+		{
+			nick = strtok (arg, "!");
+			user = strtok (NULL, "@");
+			host = strtok (NULL, "");
+			strlcpy (nsconfig.rootuser.nick, nick, MAXNICK);
+			strlcpy (nsconfig.rootuser.user, user, MAXUSER);
+			strlcpy (nsconfig.rootuser.host, host, MAXHOST);
+			dlog( DEBUG6, "ServiceRoot:         %s!%s@%s", nsconfig.rootuser.nick, nsconfig.rootuser.user, nsconfig.rootuser.host );
+		}
+		else
+			dlog( DEBUG6, "WARNING: No ServiceRoot Entry Defined");
 	}
+	else
+		dlog( DEBUG6, "WARNING: No ServiceRoot Entry Defined");
 	/* protocol is required, but defaults to unreal32 */
 	strlcpy (me.protocol, cfg_getstr (cfg, "ServerConfig|Protocol"), MAXHOST);
 	/* dbm has a default */
@@ -267,199 +255,290 @@ set_config_values (cfg_t * cfg)
 	/* has a default */
 	strlcpy (me.rootnick, cfg_getstr (cfg, "Options|RootNick"), MAXNICK);
 	/* now load the modules */
-	printf("Modules Loaded:\n");
+	dlog( DEBUG6, "Modules Loaded:");
 	for (i = 0; i < cfg_size(cfg, "Modules|ModuleName"); i++) {
-		cb_Module(cfg_getnstr(cfg, "Modules|ModuleName", i));
-		printf("                     %s\n", cfg_getnstr(cfg, "Modules|ModuleName", i));
+		cb_module( cfg_getnstr( cfg, "Modules|ModuleName", i ) );
+		dlog( DEBUG6, "                     %s", cfg_getnstr( cfg, "Modules|ModuleName", i ));
 	}	
-	printf ("-----------------------------------------------\n");
+	dlog( DEBUG6, "-----------------------------------------------" );
 }
 
-
-
-/** @brief Load the modules 
+/** @brief ConfLoadModules 
  *
- * Actually load the modules that were found in the config file
+ *  Load the modules that selected by the configuration file
  *
- * @returns 1 on success, -1 when a module failed to load
- * @bugs if a single module fails to load, it stops trying to load any other modules
+ *  @param opt pointer to option
+ *
+ *  @return none
  */
 
-int
-ConfLoadModules (void)
+void ConfLoadModules( void )
 {
 	int i;
 
-	SET_SEGV_LOCATION ();
-	if (load_mods[0] == 0) {
-		nlog (LOG_NORMAL, "No modules configured for loading");
-	} else {
-		nlog (LOG_NORMAL, "Loading configured modules");
-		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-			dlog (DEBUG1, "ConfLoadModules: Loading Module %s", (char *) load_mods[i]);
-			if (ns_load_module (load_mods[i], NULL)) {
-				nlog (LOG_NORMAL, "Loaded module %s", (char *) load_mods[i]);
-			} else {
-				nlog (LOG_WARNING, "Failed to load module %s. Please check above error messages", (char *) load_mods[i]);
-			}
+	SET_SEGV_LOCATION();
+	if( load_mods[0] == 0 )
+	{
+		nlog( LOG_NORMAL, "No modules configured for loading" );
+	}
+	else
+	{
+		nlog( LOG_NORMAL, "Loading configured modules" );
+		for( i = 0; ( i < NUM_MODULES ) && ( load_mods[i] != 0 ); i++ )
+		{
+			dlog( DEBUG1, "ConfLoadModules: Loading Module %s", ( char * ) load_mods[i] );
+			if( ns_load_module( load_mods[i], NULL ) )
+				nlog( LOG_NORMAL, "Loaded module %s", ( char * ) load_mods[i] );
+			else
+				nlog( LOG_WARNING, "Failed to load module %s. Please check above error messages", ( char * ) load_mods[i] );
 			ns_free (load_mods[i]);
 		}
-		nlog (LOG_NORMAL, "Completed loading configured modules");
+		nlog( LOG_NORMAL, "Completed loading configured modules" );
 	}
 	return NS_SUCCESS;
 }
 
 
+/** @brief cb_verify_chan
+ *
+ *  Verify channel name configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
 
-int
-cb_verify_chan (cfg_t * cfg, cfg_opt_t * opt)
+int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt )
 {
-
-	if (ValidateChannel (opt->values[0]->string) == NS_FAILURE) {
-		cfg_error (cfg, "Invalid Channel Name %s for Option %s", opt->values[0]->string, opt->name);
+	if( ValidateChannel( opt->values[0]->string ) == NS_FAILURE )
+	{
+		cfg_error( cfg, "Invalid channel name %s for option %s", opt->values[0]->string, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
 }
 
-int
-cb_verify_numeric (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_verify_numeric
+ *
+ *  Verify server numeric configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt )
 {
 	long int num = opt->values[0]->number;
-	/* limit value - really need to print error and quit */
-	if ((num <= 0) || (num > 254)) {
-		cfg_error (cfg, "Numeric Value %d is out of Range for %s", num, opt->name);
+
+	if( ( num <= 0 ) || ( num > 254 ) )
+	{
+		cfg_error( cfg, "%d is out of range for %s", num, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
 }
 
-int
-cb_verify_bind (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_verify_bind
+ *
+ *  Verify bindto configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 {
 	OS_SOCKET s;
 	struct hostent *hp;
+
 	/* test if we can bind */
-	s = os_sock_socket(AF_INET, SOCK_STREAM, 0);
-	if (s == INVALID_SOCKET) {
-		cfg_error(cfg, "Error Testing Bind Setting.");
+	s = os_sock_socket( AF_INET, SOCK_STREAM, 0 );
+	if( s == INVALID_SOCKET )
+	{
+		cfg_error( cfg, "Error testing bind setting." );
 		return CFG_PARSE_ERROR;
 	}
 	os_memset(&me.lsa, 0, sizeof(me.lsa));
-	if ((hp = gethostbyname(opt->values[0]->string)) == NULL) {
-		cfg_error(cfg, "Unable to Bind to Address %s for Option %s: %s", opt->values[0]->string, opt->name, strerror(errno));
+	if ( ( hp = gethostbyname( opt->values[0]->string ) ) == NULL )
+	{
+		cfg_error( cfg, "Unable to bind to address %s for option %s: %s", opt->values[0]->string, opt->name, strerror( errno ) );
 		return CFG_PARSE_ERROR;
-	} else {
-		os_memcpy((char *)&me.lsa.sin_addr, hp->h_addr, hp->h_length);
-		me.lsa.sin_family = hp->h_addrtype;
-		if (os_sock_bind(s, (struct sockaddr *) &me.lsa, sizeof(me.lsa)) == SOCKET_ERROR) {
-			cfg_error(cfg, "Unable to Bind to Address %s for Option %s: %s", opt->values[0]->string, opt->name, os_sock_getlasterrorstring());
-			return CFG_PARSE_ERROR;
-		}
-		/* if we get here, the socket is ok*/
-		os_close(s);
-/* 		ns_free(hp); */
-		me.dobind = 1;
 	}
-	
+    os_memcpy( ( char * )&me.lsa.sin_addr, hp->h_addr, hp->h_length );
+	me.lsa.sin_family = hp->h_addrtype;
+	if( os_sock_bind( s, ( struct sockaddr * ) &me.lsa, sizeof( me.lsa ) ) == SOCKET_ERROR )
+	{
+		cfg_error( cfg, "Unable to bind to address %s for option %s: %s", opt->values[0]->string, opt->name, os_sock_getlasterrorstring() );
+		return CFG_PARSE_ERROR;
+	}
+	/* if we get here, the socket is ok*/
+	os_close( s );
+	me.dobind = 1;
 	return CFG_SUCCESS;
 }
 
-int
-cb_verify_file (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_verify_file
+ *
+ *  Verify file exists
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt )
 {
 	char *file = opt->values[0]->string;
 	char buf2[MAXPATH];
 	struct stat buf;
-	ircsnprintf(buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_STDEXT);
-	if (stat(buf2, &buf) == -1) {
+
+	ircsnprintf( buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_STDEXT );
+	if( stat( buf2, &buf ) == -1 )
+	{
 #ifdef USE_PERL
-		ircsnprintf(buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_PERLEXT);
-		if (stat(buf2, &buf) == -1) {
+		ircsnprintf( buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_PERLEXT );
+		if( stat( buf2, &buf ) == -1 )
+		{
 #endif
-			cfg_error(cfg, "File %s Specified in Option %s is Invalid: %s", buf2, opt->name, strerror(errno));
+			cfg_error( cfg, "File %s Specified in Option %s is Invalid: %s", buf2, opt->name, strerror( errno ) );
 			return CFG_PARSE_ERROR;
 #ifdef USE_PERL
 		}
 #endif
 	}
-	if (!S_ISREG(buf.st_mode)) {
-		cfg_error(cfg, "File %s Specified in Option %s is Invalid: Not a Regular File", buf2, opt->name);
+	if( !S_ISREG( buf.st_mode ) )
+	{
+		cfg_error( cfg, "File %s Specified in Option %s is Invalid: Not a Regular File", buf2, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
 }
 
-int
-cb_verify_log (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_verify_log
+ *
+ *  Verify log filename format configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt )
 {
 	return CFG_SUCCESS;
 }
 
-int
-cb_verify_mask (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_verify_mask
+ *
+ *  Verify nick!user@host mask configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt )
 {
 	char *value = opt->values[0]->string;
-	if (strstr (value, "!") && !strstr (value, "@")) {
-		cfg_error (cfg, "Invalid HostMask %s for %s", value, opt->name);
+	if( strstr( value, "!" ) && !strstr( value, "@" ) )
+	{
+		cfg_error( cfg, "Invalid hostmask %s for %s", value, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
 }
 
-int
-cb_noload (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_noload
+ *
+ *  Verify NOLOAD configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_noload( cfg_t *cfg, cfg_opt_t *opt )
 {
-	if (opt->values[0]->boolean == cfg_true) {
-		cfg_error (cfg, "Error. You didn't edit %s", CONFIG_NAME);
+	if( opt->values[0]->boolean == cfg_true )
+	{
+		cfg_error( cfg, "Error. You didn't edit %s", CONFIG_NAME );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
 }
 
-int
-cb_verify_host (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_verify_host
+ *
+ *  Verify hostname/ip address configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt )
 {
-	/* this should actually be a validate ip as well */
-	if (ValidateHost (opt->values[0]->string) == NS_FAILURE) {
-		cfg_error (cfg, "Invalid HostName %s for option %s", opt->values[0]->string, opt->name);
+	if( ValidateHost( opt->values[0]->string ) == NS_FAILURE )
+	{
+		cfg_error( cfg, "Invalid hostname %s for option %s", opt->values[0]->string, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
 }
 
-int
-cb_verify_settime (cfg_t * cfg, cfg_opt_t * opt)
+/** @brief cb_verify_settime
+ *
+ *  Verify settime configuration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt )
 {
 	long int time = opt->values[0]->number;
 
-	if (time <= 0) {
-		cfg_error (cfg, "%d is out of range for %s", time, opt->name);
+	if( time <= 0 )
+	{
+		cfg_error( cfg, "%d is out of range for %s", time, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
 }
 
-/** @brief prepare Modules defined in the config file
+/** @brief cb_module
  *
- * When the config file encounters directives to Load Modules, 
- * it calls this function which prepares to load the modules( but doesn't actually load them )
+ *  Add module to list of modules to load
  *
- * @param arg the module name in this case
- * @returns Nothing
+ *  @param name of module
+ *
+ *  @return none
  */
-void
-cb_Module (char *arg)
+
+void cb_module( char *name )
 {
 	int i;
 
-	SET_SEGV_LOCATION ();
-	if (!nsconfig.modnoload) {
-		for (i = 0; (i < NUM_MODULES) && (load_mods[i] != 0); i++) {
-			if (!ircstrcasecmp (load_mods[i], arg)) {
+	SET_SEGV_LOCATION();
+	if( !nsconfig.modnoload )
+	{
+		for ( i = 0; ( i < NUM_MODULES ) && ( load_mods[i] != 0 ); i++ )
+		{
+			if( !ircstrcasecmp( load_mods[i], name ) )
 				return;
-			}
 		}
-		load_mods[i] = sstrdup (arg);
+		load_mods[i] = sstrdup( name );
 	}
 }

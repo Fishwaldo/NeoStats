@@ -28,7 +28,7 @@ typedef struct neoroot {
 	char nick[MAXNICK];
 	char user[MAXUSER];
 	char host[MAXHOST];
-} neoroot;
+}neoroot;
 
 /* general configuration items */
 typedef struct config {
@@ -43,8 +43,6 @@ typedef struct config {
 	/* dont detach into background */
 	unsigned int foreground:1;
 	unsigned int want_privmsg:1;
-	unsigned int die:1;
-	unsigned int error:1;
 	unsigned int onlyopers:1;
 	unsigned int setservertimes;
 	unsigned int splittime;
