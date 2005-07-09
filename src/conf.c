@@ -23,7 +23,6 @@
 ** $Id$
 */
 
-
 #include "neostats.h"
 #include "confuse.h"
 #include "conf.h"
@@ -146,20 +145,13 @@ ConfLoad (void)
 {
 	cfg_t *cfg;
 	int i, ret;
-#if 0
-	FILE *fp;
-#endif
+
 	/* Read in the Config File */
 	printf ("Reading the Config File. Please wait.....\n");
 	cfg = cfg_init (fileconfig, CFGF_NOCASE);
 	for (i = 0; i < arraylen (arg_validate); i++) {
 		cfg_set_validate_func (cfg, arg_validate[i].name, arg_validate[i].cb);
 	}
-#if 0
-	fp = fopen ("neostats.conf.out", "wt");
-	cfg_print (cfg, fp);
-	fclose (fp);
-#endif
 	if ((ret = cfg_parse (cfg, CONFIG_NAME)) != 0) {
 		printf ("***************************************************\n");
 		printf ("*                  Error!                         *\n");
@@ -172,7 +164,7 @@ ConfLoad (void)
 			printf ("*            Config Parse Error                   *\n");
 			break;
 		default:
-			printf ("*               Uknown Error                      *\n");
+			printf ("*               Unknown Error                     *\n");
 			break;
 		}
 		printf ("*                                                 *\n");
@@ -419,7 +411,7 @@ int
 cb_noload (cfg_t * cfg, cfg_opt_t * opt)
 {
 	if (opt->values[0]->boolean == cfg_true) {
-		cfg_error (cfg, "Error. You didn't edit NeoStats.conf");
+		cfg_error (cfg, "Error. You didn't edit %s", CONFIG_NAME);
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
@@ -430,7 +422,7 @@ cb_verify_host (cfg_t * cfg, cfg_opt_t * opt)
 {
 	/* this should actually be a validate ip as well */
 	if (ValidateHost (opt->values[0]->string) == NS_FAILURE) {
-		cfg_error (cfg, "Invalid HostName %s for Option %s", opt->values[0]->string, opt->name);
+		cfg_error (cfg, "Invalid HostName %s for option %s", opt->values[0]->string, opt->name);
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
@@ -442,7 +434,7 @@ cb_verify_settime (cfg_t * cfg, cfg_opt_t * opt)
 	long int time = opt->values[0]->number;
 
 	if (time <= 0) {
-		cfg_error (cfg, "SetTime Value of %d is out of range for %s", time, opt->name);
+		cfg_error (cfg, "%d is out of range for %s", time, opt->name);
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
@@ -450,10 +442,10 @@ cb_verify_settime (cfg_t * cfg, cfg_opt_t * opt)
 
 /** @brief prepare Modules defined in the config file
  *
- * When the config file encounters directives to Load Modules, it calls this function which prepares to load the modules( but doesn't actually load them )
+ * When the config file encounters directives to Load Modules, 
+ * it calls this function which prepares to load the modules( but doesn't actually load them )
  *
  * @param arg the module name in this case
- * @param configtype an index of what config item is currently being processed. Ignored
  * @returns Nothing
  */
 void
@@ -471,6 +463,3 @@ cb_Module (char *arg)
 		load_mods[i] = sstrdup (arg);
 	}
 }
-
-
-
