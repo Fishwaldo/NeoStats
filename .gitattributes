@@ -560,6 +560,7 @@ src/Makefile.in -text
 src/NeoStats.pm -text
 src/confuselexer.l -text
 src/generate_header -text
+src/neostats.pm.h -text
 src/neostats.vcproj -text
 src/win32/neostats.bmp -text
 src/win32/neostats.rc -text
