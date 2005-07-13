@@ -550,9 +550,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	uninstall-binPROGRAMS uninstall-info-am
 
 
-neostats.pm.h:	generate_header NeoStats.pm
-		$(top_builddir)/src/generate_header
-
 .c.o:
 @USECCDV@		@echo "Building $@"
 @am__fastdepCC_TRUE@	@if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \

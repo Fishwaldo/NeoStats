@@ -559,13 +559,13 @@ src/Makefile.am -text
 src/Makefile.in -text
 src/NeoStats.pm -text
 src/confuselexer.l -text
-src/generate_header -text
 src/neostats.pm.h -text
 src/neostats.vcproj -text
 src/win32/neostats.bmp -text
 src/win32/neostats.rc -text
 src/win32/resource.h -text
 src/win32/winmain.c -text
+tools/generate_header -text
 tools/sqlphp/README -text
 tools/sqlphp/rta_tables.php -text
 tools/sqlphp/rta_view.php -text

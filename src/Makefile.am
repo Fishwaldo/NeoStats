@@ -25,7 +25,4 @@ neostats_LDFLAGS = --export-dynamic -rdynamic
 noinst_HEADERS          =       confuselexer.l NeoStats.pm generate_header
 
 
-neostats.pm.h:	generate_header NeoStats.pm
-		$(top_builddir)/src/generate_header
-
 include $(top_srcdir)/autotools/rules.mk 
