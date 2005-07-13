@@ -295,7 +295,7 @@ void ConfLoadModules( void )
 		}
 		nlog( LOG_NORMAL, "Completed loading configured modules" );
 	}
-	return NS_SUCCESS;
+	return;
 }
 
 

@@ -992,7 +992,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	char *perl_args[] = { "", "-e", "0", "-w" };
 	CmdParams *cmd;
 	const char perl_definitions[] = {
-#include "neostats.pm.h"
+/* #include "neostats.pm.h" */
 	};
 	Module *mod;
 	
