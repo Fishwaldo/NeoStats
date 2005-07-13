@@ -30,28 +30,32 @@ const char *ts_about[] =
 };
 
 const char *ts_help_add[] = {
-	"Add a database",
-	"Syntax: \2ADD <database> <channel>\2",
+	"Add a bot",
+	"Syntax: \2ADD <nickname> <database> <channel> [PUBLIC|PRIVATE] [user] [host]\2",
 	"",
-	"Register a database with textserv.",
-	"<database> is the name of the database to load",
-	"<channel> is the optional channel you want the bot to join. If not",
-	"specified, the bot will not join a channel",
+	"Register a bot with textserv.",
+	"<nickname> is the name of the bot to add",
+	"<database> is the name of the database to load into the bot",
+	"<channel> is the main channel you want the bot to join.",
+	"[PUBLIC|PRIVATE] public control allows chanops to set the bot to join their channel",
+	"private control only allows service admins to add/delete channels from the bot.",
+	"[user] is the user for the bot to use if any (default 'ts')",
+	"[host] is the hostname for the bot to use.",
 	NULL
 };
 
 const char *ts_help_del[] = {
-	"Delete a database",
-	"Syntax: \2DEL <database>\2",
+	"Delete a bot",
+	"Syntax: \2DEL <nickname>\2",
 	"",
-	"Delete a database.",
+	"Delete a bot.",
 	NULL
 };
 
 const char *ts_help_list[] = {
-	"List databases",
+	"List bots",
 	"Syntax: \2LIST\2",
 	"",
-	"Lists loaded databases.",
+	"Lists loaded bots.",
 	NULL
 };

@@ -24,20 +24,23 @@
 /*  TODO:
  *  - Database sanity checking
  *  - Parameter support
- *  - Multiple channel per bot support
  *  - Multiple output line support
  */
 
 #include "neostats.h"
 #include "textserv.h"
 
-typedef struct dbentry {
-	char name[MAXNICK];
+typedef struct botentry {
+	char botname[MAXNICK];
+	char botuser[MAXUSER];
+	char bothost[MAXHOST];
+	char dbname[MAXNICK];
 	char channel[MAXCHANLEN];
-} dbentry;
+	int public;
+} botentry;
 
 typedef struct dbbot {
-	dbentry database;
+	botentry tsbot;
 	BotInfo botinfo;
 	Bot *botptr;
 	char *abouttext;
@@ -47,7 +50,14 @@ typedef struct dbbot {
 	int stringcount;
 	int helpcount;
 	int commandcount;
+	hash_t *chanhash;
 }dbbot;
+
+typedef struct botchanentry {
+	char name[MAXNICK];
+	char channel[MAXCHANLEN];
+	char namechan[MAXNICK+MAXCHANLEN];
+} botchanentry;
 
 /** Bot command function prototypes */
 static int ts_cmd_add( CmdParams *cmdparams );
@@ -58,6 +68,8 @@ static int ts_cmd_msg( CmdParams* cmdparams );
 static int ts_cmd_about( CmdParams* cmdparams );
 static int ts_cmd_credits( CmdParams* cmdparams );
 static int ts_cmd_version( CmdParams* cmdparams );
+static int ts_cmd_add_chan( CmdParams *cmdparams );
+static int ts_cmd_del_chan( CmdParams *cmdparams );
 
 static char emptyline[] = "";
 
@@ -91,16 +103,16 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd ts_commands[]=
 {
-	{"ADD",		ts_cmd_add,		1,	NS_ULEVEL_ADMIN,	ts_help_add},
-	{"DEL",		ts_cmd_del,		1, 	NS_ULEVEL_ADMIN,	ts_help_del},
-	{"LIST",	ts_cmd_list,	0, 	NS_ULEVEL_ADMIN,	ts_help_list},
-	{NULL,		NULL,			0, 	0,					NULL}
+	{"ADD",		ts_cmd_add,	3,	NS_ULEVEL_ADMIN,	ts_help_add},
+	{"DEL",		ts_cmd_del,	1, 	NS_ULEVEL_ADMIN,	ts_help_del},
+	{"LIST",	ts_cmd_list,	0, 	0,			ts_help_list},
+	{NULL,		NULL,		0, 	0,			NULL}
 };
 
 /** Bot setting table */
 static bot_setting ts_settings[]=
 {
-	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
+	{NULL,		NULL,		0,	0,	0,	0,	NULL,	NULL,	NULL},
 };
 
 /** Sub bot comand table template */
@@ -128,6 +140,22 @@ const char *ts_help_version[] = {
 	NULL
 };
 
+const char *ts_help_addchan[] = {
+	"Add Channel to Client",
+	"Syntax: \2ADD <#channel>\2",
+	"",
+	"Adds the channel to the clients list",
+	NULL
+};
+
+const char *ts_help_delchan[] = {
+	"Remove Channel from Client",
+	"Syntax: \2DEL <#channel>\2",
+	"",
+	"Removes the channel from the clients list",
+	NULL
+};
+
 static bot_cmd ts_commandtemplate[]=
 {
 	{NULL,	ts_cmd_msg,	1, 	0,	NULL, CMD_FLAG_CHANONLY },
@@ -146,6 +174,26 @@ static bot_cmd ts_commandtemplatecredits[]=
 static bot_cmd ts_commandtemplateversion[]=
 {
 	{"VERSION",	ts_cmd_version,	0, 	0,	ts_help_version},
+};
+
+static bot_cmd ts_commandtemplateaddchanpublic[]=
+{
+	{"ADD",	ts_cmd_add_chan,	1, 	0,	ts_help_addchan},
+};
+
+static bot_cmd ts_commandtemplatedelchanpublic[]=
+{
+	{"DEL",	ts_cmd_del_chan,	1, 	0,	ts_help_delchan},
+};
+
+static bot_cmd ts_commandtemplateaddchanprivate[]=
+{
+	{"ADD",	ts_cmd_add_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_addchan},
+};
+
+static bot_cmd ts_commandtemplatedelchanprivate[]=
+{
+	{"DEL",	ts_cmd_del_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_delchan},
 };
 
 /** Sub bot setting table template */
@@ -355,8 +403,8 @@ static int ts_read_database( dbbot *db )
 	int commandreadcount = 0;
 	int i;
 
-	strlcpy( filename, "data/", MAXPATH );
-	strlcat( filename, db->database.name, MAXPATH );
+	strlcpy( filename, "data/TSDB/", MAXPATH );
+	strlcat( filename, db->tsbot.dbname, MAXPATH );
 	fp = os_fopen( filename, "rt" );
 	if( !fp )
 		return NS_SUCCESS;
@@ -370,7 +418,7 @@ static int ts_read_database( dbbot *db )
 	os_fclose( fp );
 	db->commandcount = commandreadcount;
 	/* Allocate command structure */
-	db->botinfo.bot_cmd_list = ns_calloc( ( commandreadcount + 4 ) * sizeof( bot_cmd ) );
+	db->botinfo.bot_cmd_list = ns_calloc( ( commandreadcount + 6 ) * sizeof( bot_cmd ) );
 	for( i = 0; i < commandreadcount; i ++ )
 	{		
 		char *ptr;
@@ -394,6 +442,14 @@ static int ts_read_database( dbbot *db )
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateabout, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatecredits, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateversion, sizeof( bot_cmd ) );
+	if( db->tsbot.public == 1 )
+	{
+		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanpublic, sizeof( bot_cmd ) );
+		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanpublic, sizeof( bot_cmd ) );
+	} else {
+		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanprivate, sizeof( bot_cmd ) );
+		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanprivate, sizeof( bot_cmd ) );
+	}
 	return NS_SUCCESS;
 }
 
@@ -408,9 +464,11 @@ static int ts_read_database( dbbot *db )
 
 void BuildBot( dbbot *db )
 {
-	strlcpy( db->botinfo.nick, db->database.name, MAXNICK );
-	strlcpy( db->botinfo.user, "ts", MAXUSER );
-	strlcat( db->botinfo.realname, db->database.name, MAXREALNAME );
+	strlcpy( db->botinfo.nick, db->tsbot.botname, MAXNICK );
+	strlcpy( db->botinfo.altnick, db->tsbot.botname, MAXNICK );
+	strlcpy( db->botinfo.user, (db->tsbot.botuser[0] != '\0') ? db->tsbot.botuser : "ts", MAXUSER );
+	strlcpy( db->botinfo.host, db->tsbot.bothost, MAXHOST );
+	strlcat( db->botinfo.realname, db->tsbot.dbname, MAXREALNAME );
 	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
 	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
 	db->botinfo.flags = BOT_FLAG_SERVICEBOT|BOT_FLAG_NOINTRINSICLEVELS;
@@ -428,10 +486,20 @@ void BuildBot( dbbot *db )
 
 void JoinBot( dbbot *db )
 {
+	hnode_t *hn;
+	hscan_t hs;
+	char *channame;
+	
 	db->botptr = AddBot( &db->botinfo );
 	SetBotModValue( db->botptr, (void *) db );
-	if( *db->database.channel )
-		irc_join( db->botptr, db->database.channel, NULL );
+	if( *db->tsbot.channel )
+		irc_join( db->botptr, db->tsbot.channel, "+o" );
+	hash_scan_begin( &hs, db->chanhash );
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
+		channame = ( ( char * )hnode_get( hn ) );
+		irc_join( db->botptr, channame, "+o" );
+	}
 }
 
 /** @brief PartBot
@@ -445,13 +513,26 @@ void JoinBot( dbbot *db )
 
 void PartBot( dbbot *db )
 {
+	hnode_t *hn;
+	hscan_t hs;
+	char *channame;
 	int i;
 
 	if( db->botptr )
 	{
-		if( *db->database.channel )
-			irc_part( db->botptr, db->database.channel, "" );
+		if( *db->tsbot.channel )
+			irc_part( db->botptr, db->tsbot.channel, "" );
+		hash_scan_begin( &hs, db->chanhash );
+		while( ( hn = hash_scan_next( &hs ) ) != NULL )
+		{
+			channame = ( ( char * )hnode_get( hn ) );
+			irc_part( db->botptr, channame, "" );
+			hash_delete( db->chanhash, hn );
+			hnode_destroy( hn );
+			ns_free( channame );
+		}
 		irc_quit( db->botptr, "" );
+		hash_destroy( db->chanhash );
 	}
 	for( i = 0; i < db->commandcount; i++ )
 	{
@@ -468,23 +549,55 @@ void PartBot( dbbot *db )
 	ns_free( db->versiontext );	
 }
 
-/** @brief load_dbentry
+/** @brief load_botentry
  *
- *  load dbentry
+ *  load botentry
  *
  *  @param none
  *
  *  @return none
  */
 
-static int load_dbentry( void *data, int size )
+static int load_botentry( void *data, int size )
 {
 	dbbot *db;
 
 	db = ns_calloc( sizeof( dbbot ) );
-	os_memcpy( &db->database, data, sizeof( dbentry ) );
-	hnode_create_insert( tshash, db, db->database.name );
+	os_memcpy( &db->tsbot, data, sizeof( botentry ) );
+	db->chanhash = hash_create( -1, 0, 0 );
+	hnode_create_insert( tshash, db, db->tsbot.botname );
 	BuildBot( db );
+	return NS_FALSE;
+}
+
+/** @brief load_botchanentry
+ *
+ *  load botchanentry
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static int load_botchanentry( void *data, int size )
+{
+	dbbot *db;
+	botchanentry *bce;
+	char *channame;
+	hnode_t *hn;
+
+	bce = (botchanentry *)data;
+	hn = hash_lookup( tshash, bce->channel );
+	if( hn != NULL )
+	{
+		db =( ( dbbot * )hnode_get( hn ) );
+		if( hash_lookup( db->chanhash, bce->channel) == NULL ) 
+		{
+			channame = ns_calloc( MAXCHANLEN );
+			strlcpy( channame, bce->channel, MAXCHANLEN);
+			hnode_create_insert( db->chanhash, channame, channame );
+		}
+	}
 	return NS_FALSE;
 }
 
@@ -504,7 +617,8 @@ int ModInit( void )
 		nlog( LOG_CRITICAL, "Unable to create database hash" );
 		return NS_FAILURE;
 	}
-	DBAFetchRows( "databases", load_dbentry );
+	DBAFetchRows( "Bots", load_botentry );
+	DBAFetchRows( "BotChans", load_botchanentry );
 	ModuleConfig( ts_settings );
 	return NS_SUCCESS;
 }
@@ -570,9 +684,12 @@ int ModFini( void )
  *  Command handler for ADD
  *
  *  @param cmdparams
- *    cmdparams->av[0] = database
- *    cmdparams->av[1] = nick
- *    cmdparams->av[2] = optional channel
+ *    cmdparams->av[0] = nick
+ *    cmdparams->av[1] = database
+ *    cmdparams->av[2] = main channel
+ *    cmdparams->av[3] = optional public access on/off (default off)
+ *    cmdparams->av[4] = optional user
+ *    cmdparams->av[5] = optional host
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -584,32 +701,53 @@ static int ts_cmd_add( CmdParams *cmdparams )
 	dbbot *db;
 
 	SET_SEGV_LOCATION();
+	if( ValidateNick( cmdparams->av[0] ) != NS_SUCCESS )
+	{
+		irc_prefmsg( ts_bot, cmdparams->source, "%s is an invalid Nickname", cmdparams->av[0] );
+		return NS_SUCCESS;
+	}
 	if( hash_lookup( tshash, cmdparams->av[0] ) != NULL ) 
 	{
 		irc_prefmsg( ts_bot, cmdparams->source, 
-			"%s already exists in the database list", cmdparams->av[0] );
+			"%s already exists in the bot list", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	strlcpy( filename, "data/", MAXPATH );
-	strlcat( filename, cmdparams->av[0], MAXPATH );
+	strlcpy( filename, "data/TSDB/", MAXPATH );
+	strlcat( filename, cmdparams->av[1], MAXPATH );
 	fp = os_fopen( filename, "rt" );
 	if( !fp )
 	{
-		irc_prefmsg( ts_bot, cmdparams->source, "%s not found", cmdparams->av[0] );
+		irc_prefmsg( ts_bot, cmdparams->source, "database %s not found", cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
 	os_fclose( fp );
-	if( cmdparams->ac > 1 && ValidateChannel( cmdparams->av[1] ) != NS_SUCCESS )
+	if( ValidateChannel( cmdparams->av[2] ) != NS_SUCCESS )
 	{
 		irc_prefmsg( ts_bot, cmdparams->source, "%s is an invalid channel", cmdparams->av[2] );
 		return NS_SUCCESS;
 	}
 	db = ns_calloc( sizeof( dbbot ) );
-	strlcpy( db->database.name, cmdparams->av[0], MAXNICK );
-	if( cmdparams->ac > 1 )
-		strlcpy( db->database.channel, cmdparams->av[1], MAXCHANLEN );
-	hnode_create_insert( tshash, db, db->database.name );
-	DBAStore( "databases", db->database.name,( void * )db, sizeof( dbentry ) );
+	strlcpy( db->tsbot.botname, cmdparams->av[0], MAXNICK );
+	strlcpy( db->tsbot.dbname, cmdparams->av[1], MAXNICK );
+	strlcpy( db->tsbot.channel, cmdparams->av[2], MAXCHANLEN );
+	if( cmdparams->ac > 3 )
+		if( !ircstrcasecmp( cmdparams->av[3], "public" ) )
+			db->tsbot.public = 1;
+	if( cmdparams->ac > 4 )
+		if( ValidateUser( cmdparams->av[4] ) == NS_SUCCESS )
+			strlcpy( db->tsbot.botuser, cmdparams->av[4], MAXUSER );
+	if( cmdparams->ac > 5 )
+		if( ValidateHost( cmdparams->av[5] ) == NS_SUCCESS )
+			strlcpy( db->tsbot.bothost, cmdparams->av[5], MAXHOST );
+	db->chanhash = hash_create( -1, 0, 0 );
+	if( !db->chanhash ) {
+		nlog( LOG_CRITICAL, "Unable to create bots channel hash" );
+		irc_prefmsg( ts_bot, cmdparams->source, "Error creating channel list, %s not added as a bot", cmdparams->av[0] );
+		ns_free( db );
+		return NS_SUCCESS;
+	}
+	hnode_create_insert( tshash, db, db->tsbot.botname );
+	DBAStore( "Bots", db->tsbot.botname, ( void * )db, sizeof( botentry ) );
 	BuildBot( db );
 	JoinBot( db );
 	return NS_SUCCESS;
@@ -632,14 +770,14 @@ static int ts_cmd_list( CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	if( hash_count( tshash ) == 0 ) {
-		irc_prefmsg( ts_bot, cmdparams->source, "No databases are defined." );
+		irc_prefmsg( ts_bot, cmdparams->source, "No bots are defined." );
 		return NS_SUCCESS;
 	}
 	hash_scan_begin( &hs, tshash );
-	irc_prefmsg( ts_bot, cmdparams->source, "Databases" );
+	irc_prefmsg( ts_bot, cmdparams->source, "Bots" );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		db =( ( dbbot * )hnode_get( hn ) );
-		irc_prefmsg( ts_bot, cmdparams->source, "%s %s", db->database.name, db->database.channel );
+		irc_prefmsg( ts_bot, cmdparams->source, "%s (%s@%s), %s, %s, %s", db->tsbot.botname, db->tsbot.botuser, db->tsbot.bothost, db->tsbot.public ? "Public" : "Private", db->tsbot.dbname, db->tsbot.channel );
 	}
 	irc_prefmsg( ts_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
@@ -658,24 +796,36 @@ static int ts_cmd_list( CmdParams *cmdparams )
 static int ts_cmd_del( CmdParams *cmdparams )
 {
 	dbbot *db;
-	hnode_t *hn;
-	hscan_t hs;
+	hnode_t *hn, *hn2;
+	hscan_t hs, hs2;
+	char *botchan;
+	char *channame;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, tshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		db =( dbbot * )hnode_get( hn );
-		if( ircstrcasecmp( db->database.name, cmdparams->av[0] ) == 0 ) {
+		if( ircstrcasecmp( db->tsbot.botname, cmdparams->av[0] ) == 0 ) {
+			hash_scan_begin( &hs2, db->chanhash );
+			while( ( hn2 = hash_scan_next( &hs2 ) ) != NULL )
+			{
+				channame = ( ( char * )hnode_get( hn2 ) );
+				botchan = ns_calloc( MAXNICK+MAXCHANLEN );
+				strlcpy( botchan, db->tsbot.botname, MAXNICK+MAXCHANLEN );
+				strlcat( botchan, channame, MAXNICK+MAXCHANLEN );
+				DBADelete( "BotChans", botchan );
+				ns_free( botchan );
+			}
 			PartBot( db );
 			hash_scan_delete( tshash, hn );
 			irc_prefmsg( ts_bot, cmdparams->source, 
-				"Deleted %s from the database list", cmdparams->av[0] );
-			CommandReport( ts_bot, "%s deleted %s from the database list",
+				"Deleted %s from the Bot list", cmdparams->av[0] );
+			CommandReport( ts_bot, "%s deleted %s from the Bot list",
 				cmdparams->source->name, cmdparams->av[0] );
-			nlog( LOG_NOTICE, "%s deleted %s from the database list",
+			nlog( LOG_NOTICE, "%s deleted %s from the Bot list",
 				cmdparams->source->name, cmdparams->av[0] );
 			hnode_destroy( hn );
-			DBADelete( "databases", db->database.name );
+			DBADelete( "Bots", db->tsbot.botname );
 			ns_free( db );
 			return NS_SUCCESS;
 		}
@@ -763,5 +913,102 @@ static int ts_cmd_version( CmdParams* cmdparams )
 	SET_SEGV_LOCATION();
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
 	irc_prefmsg( cmdparams->bot, cmdparams->source, db->versiontext );
+	return NS_SUCCESS;
+}
+
+/** @brief ts_cmd_add_chan
+ *
+ *  Command handler for bots ADD chan
+ *
+ *  @param cmdparams
+ *    cmdparams->av[0] = channel
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int ts_cmd_add_chan( CmdParams *cmdparams )
+{
+	dbbot *db;
+	int i;
+	char *channame;
+	hnode_t *hn;
+	hscan_t hs;
+	botchanentry *bce;
+
+	SET_SEGV_LOCATION();
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	if( ValidateChannel( cmdparams->av[0] ) != NS_SUCCESS )
+	{
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "invalid channel name specified - %s ", cmdparams->av[0] );
+		return NS_SUCCESS;
+	}
+	if ((db->tsbot.public == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+		return NS_FAILURE;
+	if ((db->tsbot.public == 1) && (!IsChanOp(cmdparams->av[0], cmdparams->source->name)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+		return NS_FAILURE;
+	if( hash_lookup( db->chanhash, cmdparams->av[0] ) != NULL )
+	{
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s is already in the channel list", cmdparams->av[0] );
+		return NS_SUCCESS;
+	}
+	channame = ns_calloc( MAXCHANLEN );
+	strlcpy( channame, cmdparams->av[0], MAXCHANLEN );
+	hnode_create_insert( db->chanhash, channame, channame );
+	bce = ns_calloc( sizeof ( botchanentry ));
+	strlcpy( bce->name, db->tsbot.botname, MAXCHANLEN );
+	strlcpy( bce->channel, channame, MAXCHANLEN );
+	strlcpy( bce->namechan, db->tsbot.botname, MAXNICK+MAXCHANLEN );
+	strlcat( bce->namechan, channame, MAXNICK+MAXCHANLEN );
+	DBAStore( "BotChans", bce->namechan, ( void * )bce, sizeof( botchanentry ) );
+	irc_join( db->botptr, channame, "+o" );
+	ns_free( bce );
+	return NS_SUCCESS;
+}
+
+/** @brief ts_cmd_del_chan
+ *
+ *  Command handler for bots DEL chan
+ *
+ *  @param cmdparams
+ *    cmdparams->av[0] = channel
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int ts_cmd_del_chan( CmdParams *cmdparams )
+{
+	dbbot *db;
+	char *channame, *botchan;
+	hnode_t *hn;
+	hscan_t hs;
+	botchanentry *bce;
+
+	SET_SEGV_LOCATION();
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	if( ValidateChannel( cmdparams->av[0] ) != NS_SUCCESS )
+	{
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "invalid channel name specified - %s ", cmdparams->av[0] );
+		return NS_SUCCESS;
+	}
+	if ((db->tsbot.public == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+		return NS_FAILURE;
+	if ((db->tsbot.public == 1) && (!IsChanOp(cmdparams->av[0], cmdparams->source->name)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+		return NS_FAILURE;
+	hn = hash_lookup( db->chanhash, cmdparams->av[0] );
+	if( hn == NULL )
+	{
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s is not in the channel list", cmdparams->av[0] );
+		return NS_SUCCESS;
+	}
+	channame = ( ( char * )hnode_get( hn ) );
+	irc_part( db->botptr, channame, "" );
+	botchan = ns_calloc( MAXNICK+MAXCHANLEN );
+	strlcpy( botchan, db->tsbot.botname, MAXNICK+MAXCHANLEN );
+	strlcat( botchan, channame, MAXNICK+MAXCHANLEN );
+	DBADelete( "BotChans", botchan );
+	hash_delete( db->chanhash, hn );
+	hnode_destroy( hn );
+	ns_free( channame );
+	ns_free( botchan );
 	return NS_SUCCESS;
 }
