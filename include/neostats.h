@@ -435,7 +435,7 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 #define VERSIONSIZE		128
 
 /* doesn't have to be so big atm */
-#define NUM_MODULES		20
+#define NUM_MODULES		40
 
 #define is_synched		me.synched
 
