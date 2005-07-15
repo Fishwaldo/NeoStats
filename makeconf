@@ -628,8 +628,17 @@ MODULENAME = {
 # Extauth, authenticate users based on nick!user@host access lists
 #	"extauth"
 
+# QuoteServ, Quote Message Service
+#	"quoteserv",
+
+# LimitServ, Channel Limit Setting Service
+#	"limitserv",
+
 # SecureServ. You must download and install SecureServ first.
 #	"secureserv",
+
+# BLSB. You must download and install BLSB first.
+#	"blsb",
 
 # OPSB. You must download and install OPSB first.
 #	"opsb",
@@ -643,11 +652,20 @@ MODULENAME = {
 # WarServ. You must download and install WarServ first.
 #	"warserv",
 
-# GameServ. You must download and install GameServ first.
-#	"gameserv",
+# GamesServ. You must download and install GameServ first.
+#	"gamesserv",
 
 # YahzteeServ. You must download and install YahzteeServ first.
 #	"yahtzeeserv",
+
+# FloodServ. You must download and install FloodServ first.
+#	"floodserv",
+
+# SeenServ. You must download and install SeenServ first.
+#	"seenserv",
+
+# ProfileServ. You must download and install ProfileServ first.
+#	"profileserv",
 
 }
 }

@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - add missing modules lines to makeconf (D)
+ - increase module limit to 40 (D)
  - TextServ: allow multiple channels per bot (D)
  - TextServ: allow databases to be used in multiple bots (D)
  - TextServ: install data files to TSDB sub folder of data (D)
