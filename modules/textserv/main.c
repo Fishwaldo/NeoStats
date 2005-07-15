@@ -587,7 +587,7 @@ static int load_botchanentry( void *data, int size )
 	hnode_t *hn;
 
 	bce = (botchanentry *)data;
-	hn = hash_lookup( tshash, bce->channel );
+	hn = hash_lookup( tshash, bce->name );
 	if( hn != NULL )
 	{
 		db =( ( dbbot * )hnode_get( hn ) );
