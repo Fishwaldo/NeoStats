@@ -88,8 +88,6 @@ const char version_date[] = __DATE__;
 /*! Time we were compiled */
 const char version_time[] = __TIME__;
 
-/*! have we forked */
-static int forked = 0;
 static int attempts = 0;
 jmp_buf sigvbuf;
 
@@ -308,8 +306,6 @@ static void print_copyright( void )
  *  @param argv array of command line parameters
  *
  *  @return EXIT_SUCCESS if succeeds, EXIT_FAILURE if not 
- *
- *  @todo Close STDIN etc correctly
  */
 
 #ifdef WIN32
@@ -318,9 +314,6 @@ int neostats( void )
 int main( int argc, char *argv[] )
 #endif /* WIN32 */
 {
-#ifndef WIN32
-	FILE *fp;
-#endif /* WIN32 */
    	char dbpath[MAXPATH];
 
 	if( InitMe() != NS_SUCCESS )
@@ -367,42 +360,49 @@ int main( int argc, char *argv[] )
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );
 
-
 #ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
-	if( !nsconfig.foreground ) {
+	if( !nsconfig.foreground )
+	{
+		int pid;
 		/* fix the double log message problem by closing logs prior to fork() */ 
 		CloseLogs(); 
-		forked = fork();
+		pid = fork();
 		/* Error check fork() */ 
-		if( forked < 0 ) { 
+		if( pid < 0 )
+		{
 			perror( "fork" ); 
 			return EXIT_FAILURE; /* fork error */ 
 		} 
-#endif  /* !DEBUG */
 		/* we are the parent */ 
-		if( forked > 0 ) { 
-			/* write out our PID */
+		if( pid > 0 )
+		{
+			FILE *fp;
+
+			/* write PID file */
 			fp = fopen( PID_FILENAME, "wt" );
-			fprintf( fp, "%i", forked );
+			fprintf( fp, "%i", pid );
 			fclose( fp );
-			if( !nsconfig.quiet ) {
+			if( !nsconfig.quiet )
+			{
 				printf( "\n" );
 				printf( _( "NeoStats %s Successfully Launched into Background\n" ), me.version );
-				printf( _( "PID: %i - Wrote to %s\n" ), forked, PID_FILENAME );
+				printf( _( "PID: %i - Wrote to %s\n" ), pid, PID_FILENAME );
 			}
 			return EXIT_SUCCESS; /* parent exits */ 
 		}
-#ifndef DEBUG
 		/* child (daemon) continues */ 
+		/* close standard file descriptors since they are invalid for a daemon */
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
 		/* reopen logs for child */ 
 		if( InitLogs() != NS_SUCCESS )
 			return EXIT_FAILURE;
 		/* detach from parent process */
-		if( setpgid( 0, 0 ) < 0 ) {
+		if( setpgid( 0, 0 ) < 0 )
 			nlog( LOG_WARNING, "setpgid() failed" );
-		}
 	}
 #endif  /* !DEBUG */
 #endif /* !WIN32 */
