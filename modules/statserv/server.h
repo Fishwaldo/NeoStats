@@ -34,10 +34,10 @@ typedef struct serverstat {
 	statistic operkills;
 	statistic serverkills;
 	statistic splits;
-	long lowest_ping;
-	time_t t_lowest_ping;
-	long highest_ping;
-	time_t t_highest_ping;
+	time_t lowest_ping;
+	time_t ts_lowest_ping;
+	time_t highest_ping;
+	time_t ts_highest_ping;
 }serverstat;
 
 extern hash_t *serverstathash;

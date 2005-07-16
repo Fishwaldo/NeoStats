@@ -209,7 +209,7 @@ void send_end_of_burst( void )
 
 void send_end_of_burst_ack( void )
 {
-	if( !is_synched ) {
+	if( !IsNeoStatsSynched() ) {
 		do_synch_neostats();
 		send_end_of_burst();
 	}

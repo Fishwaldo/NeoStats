@@ -929,10 +929,7 @@ static int ts_cmd_version( CmdParams* cmdparams )
 static int ts_cmd_add_chan( CmdParams *cmdparams )
 {
 	dbbot *db;
-	int i;
 	char *channame;
-	hnode_t *hn;
-	hscan_t hs;
 	botchanentry *bce;
 
 	SET_SEGV_LOCATION();
@@ -980,8 +977,6 @@ static int ts_cmd_del_chan( CmdParams *cmdparams )
 	dbbot *db;
 	char *channame, *botchan;
 	hnode_t *hn;
-	hscan_t hs;
-	botchanentry *bce;
 
 	SET_SEGV_LOCATION();
 	db = (dbbot *) GetBotModValue( cmdparams->bot );

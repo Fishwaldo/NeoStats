@@ -254,7 +254,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
  - Combine standard and auth module load/unload systems so we can load and 
    unload auth modules easily. (M)
  - Remove me.onchan since it is always set with me.synched so is redundant. (M)
- - Replace me.synched references with is_synched for consistency. (M)
+ - Replace me.synched references with IsNeoStatsSynched() for consistency. (M)
  - Timers now have a new type field to select the standard interval timer or 
    a midnight timer. Other types to follow. (M)
  - Timers now check module synched before running. (M)

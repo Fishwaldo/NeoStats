@@ -48,7 +48,8 @@ static char quitreason[BUFSIZE];
 /* temp buffer to save kick info for IRCu */
 static char savekicker[MAXHOST];
 static char savekickreason[BUFSIZE];
-
+/** @brief Module data flags */
+static unsigned int fchannelmoddata = 0;
 static unsigned int moddatacnt[NUM_MODULES];
 
 int comparechanmember( const void *key1, const void *key2 )
@@ -817,17 +818,19 @@ void CleanupChannelModdata( int index )
 	Channel *c;
 
 	SET_SEGV_LOCATION();
-	if( moddatacnt[index] > 0 ) {
-		nlog( LOG_WARNING, "Cleaning up channels after dirty module!" );
-		hash_scan_begin( &scan, channelhash );
-		while( ( node = hash_scan_next( &scan ) ) != NULL ) {
-			c = hnode_get( node );
-			if( c->modptr[index] ) {
-				ns_free( c->modptr[index] );		
+	if (fchannelmoddata & (1 << index)) {
+		if( moddatacnt[index] > 0 ) {
+			nlog( LOG_WARNING, "Cleaning up channels after dirty module!" );
+			hash_scan_begin( &scan, channelhash );
+			while( ( node = hash_scan_next( &scan ) ) != NULL ) {
+				c = hnode_get( node );
+				if( c->modptr[index] ) {
+					ns_free( c->modptr[index] );		
+				}
+				c->modvalue[index] = NULL;
 			}
-			c->modvalue[index] = NULL;
 		}
+		fchannelmoddata &= ~( 1 << index );
+		moddatacnt[index] = 0;
 	}
-	fchannelmoddata &= ~( 1 << index );
-	moddatacnt[index] = 0;
 }

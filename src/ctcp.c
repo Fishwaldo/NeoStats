@@ -145,7 +145,7 @@ static int ctcp_rpl_version( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_version_req( Bot* botptr, Client* target ) 
+int irc_ctcp_version_req( const Bot* botptr, const Client* target ) 
 {
 	dlog( DEBUG5, "TX: CTCP VERSION request from %s to %s", botptr->name, target->name );
 	irc_privmsg( botptr, target, "\1VERSION\1" );
@@ -166,7 +166,7 @@ static int ctcp_rpl_finger( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_finger_req( Bot* botptr, Client* target ) 
+int irc_ctcp_finger_req( const Bot* botptr, const Client* target ) 
 {
 	dlog( DEBUG5, "TX: CTCP FINGER request from %s to %s", botptr->name, target->name );
 	irc_privmsg( botptr, target, "\1FINGER\1" );
@@ -180,14 +180,14 @@ static int ctcp_req_action( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_action_req( Bot* botptr, Client* target, const char *action ) 
+int irc_ctcp_action_req( const Bot* botptr, const Client* target, const char *action ) 
 {
 	dlog( DEBUG5, "TX: Sending CTCP ACTION request from %s to %s", botptr->name, target->name );
 	irc_privmsg( botptr, target, "\1ACTION %s\1", action );
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_action_req_channel( Bot* botptr, Channel* channel, const char *action ) 
+int irc_ctcp_action_req_channel( const Bot* botptr, const Channel* channel, const char *action ) 
 {
 	dlog( DEBUG5, "TX: Sending CTCP ACTION request from %s to %s", botptr->name, channel->name );
 	irc_chanprivmsg( botptr, channel->name, "\1ACTION %s\1", action );
@@ -222,7 +222,7 @@ static int ctcp_rpl_time( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_time_req( Bot* botptr, Client* target ) 
+int irc_ctcp_time_req( const Bot* botptr, const Client* target ) 
 {
 	dlog( DEBUG5, "TX: CTCP TIME request from %s to %s", botptr->name, target->name );
 	irc_privmsg( botptr, target, "\1TIME\1" );
@@ -243,7 +243,7 @@ static int ctcp_rpl_ping( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-int irc_ctcp_ping_req( Bot* botptr, Client* target ) 
+int irc_ctcp_ping_req( const Bot* botptr, const Client* target ) 
 {
 	dlog( DEBUG5, "TX: CTCP PING request from %s to %s", botptr->name, target->name );
 	irc_privmsg( botptr, target, "\1PING\1" );

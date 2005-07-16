@@ -73,6 +73,7 @@ extern const unsigned int CharAttrs[];
 #define IsUserChar(c)   (CharAttrs[(unsigned char)(c)] & USER_C)
 #define IsChanPrefix(c) (CharAttrs[(unsigned char)(c)] & CHANPFX_C)
 #define IsChanChar(c)   (CharAttrs[(unsigned char)(c)] & CHAN_C)
+#define IsChanKeyChar(c)   (IsAlNum((c)))
 #define IsKWildChar(c)  (CharAttrs[(unsigned char)(c)] & KWILD_C)
 #define IsNickChar(c)   (CharAttrs[(unsigned char)(c)] & NICK_C)
 #define IsServChar(c)   (CharAttrs[(unsigned char)(c)] & (NICK_C | SERV_C))

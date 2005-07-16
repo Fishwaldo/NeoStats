@@ -173,11 +173,11 @@ static void UpdatePingStats (Client* s)
 		return;
 	if (s->server->ping > ss->highest_ping) {
 		ss->highest_ping = s->server->ping;
-		ss->t_highest_ping = me.now;
+		ss->ts_highest_ping = me.now;
 	}
 	if (s->server->ping < ss->lowest_ping) {
 		ss->lowest_ping = s->server->ping;
-		ss->t_lowest_ping = me.now;
+		ss->ts_lowest_ping = me.now;
 	}
 	/* ok, updated the statistics, now lets see if this server is "lagged out" */
 	if (s->server->ping > StatServ.lagtime) {
@@ -382,9 +382,9 @@ static int ss_cmd_server_stats (CmdParams *cmdparams)
 	irc_prefmsg (ss_bot, cmdparams->source, "IRCop kills: %d", ss->operkills.alltime.runningtotal);
 	irc_prefmsg (ss_bot, cmdparams->source, "Server kills: %d", ss->serverkills.alltime.runningtotal);
 	irc_prefmsg (ss_bot, cmdparams->source, "Lowest ping: %-3d at %s",
-		(int)ss->lowest_ping, sftime(ss->t_lowest_ping));
+		(int)ss->lowest_ping, sftime(ss->ts_lowest_ping));
 	irc_prefmsg (ss_bot, cmdparams->source, "Higest ping: %-3d at %s",
-		(int)ss->highest_ping, sftime(ss->t_highest_ping));
+		(int)ss->highest_ping, sftime(ss->ts_highest_ping));
 	if (s) {
 		irc_prefmsg (ss_bot, cmdparams->source, "Current Ping: %-3d", s->server->ping);
 	}

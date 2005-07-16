@@ -35,6 +35,8 @@
 
 config nsconfig;
 static hash_t *serverhash;
+/** @brief Module data flags */
+static unsigned int fservermoddata = 0;
 
 static unsigned int moddatacnt[NUM_MODULES];
 
@@ -241,7 +243,7 @@ PingServers (void)
 	hscan_t ss;
 	hnode_t *sn;
 
-	if(!is_synched)
+	if(!IsNeoStatsSynched())
 		return;
 	dlog(DEBUG3, "Sending pings...");
 	me.ulag = 0;
@@ -374,17 +376,19 @@ void CleanupServerModdata (int index)
 	Client *s;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin(&scan, serverhash);
-	if (moddatacnt[index] > 0) {
-		nlog (LOG_WARNING, "Cleaning up servers after dirty module!");
-		while ((node = hash_scan_next(&scan)) != NULL) {
-			s = hnode_get(node);
-			if (s->modptr[index]) {
-				ns_free (s->modptr[index]);		
+	if (fservermoddata & (1 << index)) {
+		hash_scan_begin(&scan, serverhash);
+		if (moddatacnt[index] > 0) {
+			nlog (LOG_WARNING, "Cleaning up servers after dirty module!");
+			while ((node = hash_scan_next(&scan)) != NULL) {
+				s = hnode_get(node);
+				if (s->modptr[index]) {
+					ns_free (s->modptr[index]);		
+				}
+				s->modvalue[index] = NULL;
 			}
-			s->modvalue[index] = NULL;
 		}
+		fservermoddata &= ~(1 << index);	
+		moddatacnt[index] = 0;
 	}
-	fservermoddata &= ~(1 << index);	
-	moddatacnt[index] = 0;
 }

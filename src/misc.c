@@ -38,13 +38,13 @@
  *  @returns result
  */
 
-unsigned hrand( unsigned upperbound, unsigned lowerbound ) 
+unsigned int hrand( const unsigned int upperbound, const unsigned int lowerbound ) 
 {
 	if( ( upperbound < 1 ) ) {
 		nlog( LOG_WARNING, "hrand() invalid value for upperbound" );
 		return -1;
 	}
-	return( ( unsigned )( rand()%( ( int )( upperbound-lowerbound+1 ) )-( ( int )( lowerbound-1 ) ) ) );
+	return( ( unsigned )( rand()%( ( int )( upperbound - lowerbound + 1 ) )-( ( int )( lowerbound - 1 ) ) ) );
 }
 
 /** @brief make_safe_filename
@@ -108,7 +108,7 @@ void strip( char *line )
  *  @returns pointer to the new string
  */
 
-char* sstrdup( const char *s )
+char *sstrdup( const char *s )
 {
 	char *t = ns_malloc( strlen( s )+1 );
 	strlcpy( t, s, strlen( s )+1 );
@@ -128,7 +128,7 @@ char* sstrdup( const char *s )
  *  @returns pointer to the new string
  */
 
-char* strlwr( char *s )
+char *strlwr( char *s )
 {
 	char *t;
 	t = s;
@@ -150,7 +150,7 @@ char* strlwr( char *s )
  *  @returns count of arguments created from split
  */
 
-EXPORTFUNC int ircsplitbuf( char *buf, char ***argv, int colon_special )
+int ircsplitbuf( char *buf, char ***argv, int colon_special )
 {
 	int argvsize = 8;
 	int argc;
@@ -250,7 +250,7 @@ int split_buf( char *buf, char ***argv, int colon_special )
  *  @returns buffer containing combined arguments
  */
 
-char* joinbuf( char **av, int ac, int from )
+char *joinbuf( char **av, int ac, int from )
 {
 	int i;
 	char *buf;
@@ -372,7 +372,7 @@ void strip_mirc_codes( char *text )
  *  @returns 
  */
 
-char* sctime( time_t stuff )
+char *sctime( time_t stuff )
 {
 	char *s, *c;
 
@@ -394,7 +394,7 @@ char* sctime( time_t stuff )
 
 static char fmtime[TIMEBUFSIZE];
 
-char* sftime( time_t stuff )
+char *sftime( time_t stuff )
 {
 	struct tm *ltm = localtime( &stuff );
 
@@ -411,15 +411,15 @@ char* sftime( time_t stuff )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateNick( char* nick )
+int ValidateNick( char *nick )
 {
-	char* ptr;
+	char *ptr;
 
 	ptr = nick;
-	while( *ptr ) {
-		if( !IsNickChar( *ptr ) ) {
+	while( *ptr )
+	{
+		if( !IsNickChar( *ptr ) )
 			return NS_FAILURE;
-		}
 		ptr++;
 	}
 	return NS_SUCCESS;
@@ -434,15 +434,15 @@ int ValidateNick( char* nick )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateUser( char* username )
+int ValidateUser( char *username )
 {
-	char* ptr;
+	char *ptr;
 
 	ptr = username;
-	while( *ptr ) {
-		if( !IsUserChar( *ptr ) ) {
+	while( *ptr )
+	{
+		if( !IsUserChar( *ptr ) )
 			return NS_FAILURE;
-		}
 		ptr++;
 	}
 	return NS_SUCCESS;
@@ -457,15 +457,15 @@ int ValidateUser( char* username )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateHost( char* hostname )
+int ValidateHost( char *hostname )
 {
-	char* ptr;
+	char *ptr;
 
 	ptr = hostname;
-	while( *ptr ) {
-		if( !IsHostChar( *ptr ) ) {
+	while( *ptr )
+	{
+		if( !IsHostChar( *ptr ) )
 			return NS_FAILURE;
-		}
 		ptr++;
 	}
 	return NS_SUCCESS;
@@ -480,18 +480,20 @@ int ValidateHost( char* hostname )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateURL( char* url )
+int ValidateURL( char *url )
 {
-	char* ptr;
+	char *ptr;
 
-	if( ircstrncasecmp( url, "http://", 7 ) !=0 )
+	/* URL must begin with http:// */
+	if( ircstrncasecmp( url, "http://", 7 ) != 0 )
 		return NS_FAILURE;
+	/* Get pointer to rest of URL to test */
 	ptr = url;
 	ptr += 7;
-	while( *ptr ) {
-		if( !IsURLChar( *ptr ) ) {
+	while( *ptr )
+	{
+		if( !IsURLChar( *ptr ) )
 			return NS_FAILURE;
-		}
 		ptr++;
 	}
 	return NS_SUCCESS;
@@ -506,19 +508,19 @@ int ValidateURL( char* url )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateChannel( char* channel_name )
+int ValidateChannel( char *channel_name )
 {
-	char* ptr;
+	char *ptr;
 
 	ptr = channel_name;
-	if( !IsChanPrefix( *ptr ) ) {
+	/* Channel name must start with channel prefix */
+	if( !IsChanPrefix( *ptr ) )
 		return NS_FAILURE;
-	}
 	ptr ++;
-	while( *ptr ) {
-		if( !IsChanChar( *ptr ) ) {
+	while( *ptr )
+	{
+		if( !IsChanChar( *ptr ) )
 			return NS_FAILURE;
-		}
 		ptr++;
 	}
 	return NS_SUCCESS;
@@ -531,19 +533,17 @@ int ValidateChannel( char* channel_name )
  *  @param channel key to check
  *  
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- *  
- *  @TODO: establish valid key charset
  */
 
-int ValidateChannelKey( char* key )
+int ValidateChannelKey( char *key )
 {
-	char* ptr;
+	char *ptr;
 
 	ptr = key;
-	while( *ptr ) {
-		if( !IsAlNum( *ptr ) ) {
+	while( *ptr )
+	{
+		if( !IsChanKeyChar( *ptr ) )
 			return NS_FAILURE;
-		}
 		ptr++;
 	}
 	return NS_SUCCESS;

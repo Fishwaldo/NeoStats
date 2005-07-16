@@ -87,7 +87,7 @@ CheckTimers_cb (int notused, short event, void *arg)
 		/* flush log files */
 		fflush (NULL);
 	}
-	if (is_synched && nsconfig.setservertimes) {
+	if (IsNeoStatsSynched() && nsconfig.setservertimes) {
 		if((me.now - lastservertimesync) > nsconfig.setservertimes) {
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */

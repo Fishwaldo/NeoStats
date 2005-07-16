@@ -699,7 +699,7 @@ int irc_chanalert( const Bot *botptr, const char *fmt, ... )
 {
 	va_list ap;
 
-	if( !is_synched )
+	if( !IsNeoStatsSynched() )
 		return NS_SUCCESS;
 	va_start( ap, fmt );
 	ircvsnprintf( ircd_buf, BUFSIZE, fmt, ap );
@@ -818,7 +818,7 @@ int irc_globops( const Bot *botptr, const char *fmt, ... )
 	va_start( ap, fmt );
 	ircvsnprintf( ircd_buf, BUFSIZE, fmt, ap );
 	va_end( ap );
-	if( is_synched ) {
+	if( IsNeoStatsSynched() ) {
 		if( !irc_send_globops ) {
 			unsupported_cmd( "GLOBOPS" );
 			nlog( LOG_NOTICE, "Dropping unhandled globops: %s", ircd_buf );
@@ -1190,7 +1190,7 @@ int irc_topic( const Bot *botptr, const Channel *channel, const char *topic )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_svstime( const Bot *botptr, Client *target, const time_t ts )
+int irc_svstime( const Bot *botptr, const Client *target, const time_t ts )
 {
 	if( !irc_send_svstime ) {
 		unsupported_cmd( "SVSTIME" );
@@ -1206,7 +1206,7 @@ int irc_svstime( const Bot *botptr, Client *target, const time_t ts )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_svskill( const Bot *botptr, Client *target, const char *reason, ... )
+int irc_svskill( const Bot *botptr, const Client *target, const char *reason, ... )
 {
 	va_list ap;
 
@@ -1230,7 +1230,7 @@ int irc_svskill( const Bot *botptr, Client *target, const char *reason, ... )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_svsmode( const Bot *botptr, Client *target, const char *modes )
+int irc_svsmode( const Bot *botptr, const Client *target, const char *modes )
 {
 	if( !irc_send_svsmode ) {
 		unsupported_cmd( "SVSMODE" );
@@ -1271,7 +1271,7 @@ int irc_svshost( const Bot *botptr, Client *target, const char *vhost )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_svsjoin( const Bot *botptr, Client *target, const char *chan )
+int irc_svsjoin( const Bot *botptr, const Client *target, const char *chan )
 {
 	if( !irc_send_svsjoin ) {
 		unsupported_cmd( "SVSJOIN" );
@@ -1286,7 +1286,7 @@ int irc_svsjoin( const Bot *botptr, Client *target, const char *chan )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_svspart( const Bot *botptr, Client *target, const char *chan )
+int irc_svspart( const Bot *botptr, const Client *target, const char *chan )
 {
 	if( !irc_send_svspart ) {
 		unsupported_cmd( "SVSPART" );
@@ -1316,7 +1316,7 @@ int irc_swhois( const char *target, const char *swhois )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_svsnick( const Bot *botptr, Client *target, const char *newnick )
+int irc_svsnick( const Bot *botptr, const Client *target, const char *newnick )
 {
 	if( !irc_send_svsnick ) {
 		unsupported_cmd( "SVSNICK" );

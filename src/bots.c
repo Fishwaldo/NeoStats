@@ -762,3 +762,46 @@ void handle_dead_channel( Channel *c )
 	}
 	ns_free( cmdparams );
 }
+
+void *AllocBotModPtr( Bot *pBot, int size )
+{
+	void *ptr;
+	ptr = ns_calloc( size );
+	pBot->moddata = ptr;
+	return ptr;
+}
+
+void FreeBotModPtr( Bot *pBot )
+{
+	ns_free( pBot->moddata );
+}
+
+void* GetBotModPtr( Bot *pBot )
+{
+	return pBot->moddata;
+}
+
+void ClearBotModValue( Bot *pBot )
+{
+	if( pBot )
+	{
+		pBot->moddata = NULL;
+	}
+}
+
+void SetBotModValue( Bot *pBot, void *data )
+{
+	if( pBot )
+	{
+		pBot->moddata = data;
+	}
+}
+
+void *GetBotModValue( Bot *pBot )
+{
+	if( pBot )
+	{
+		return pBot->moddata;
+	}
+	return NULL;	
+}

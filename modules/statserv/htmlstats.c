@@ -139,7 +139,7 @@ static void serverlistdetailhandler( serverstat *ss, void *v )
 	os_fprintf( opf, "<tr><td>Server Kills</td><td colspan = 2>%d</td></tr>",
 		ss->serverkills.alltime.runningtotal );
 	os_fprintf( opf, "<tr><td>Highest Ping</td><td>%d</td><td>at %s</td></tr>",
-		( int )ss->highest_ping, sftime( ss->t_highest_ping ) );
+		( int )ss->highest_ping, sftime( ss->ts_highest_ping ) );
 	if( ss->s )
 		os_fprintf( opf, "<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
 			ss->s->server->ping );

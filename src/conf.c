@@ -147,7 +147,7 @@ ConfLoad (void)
 	/* Read in the Config File */
 	printf ("Reading the Config File. Please wait.....\n");
 	cfg = cfg_init (fileconfig, CFGF_NOCASE);
-	for (i = 0; i < arraylen (arg_validate); i++) {
+	for (i = 0; i < ARRAYLEN (arg_validate); i++) {
 		cfg_set_validate_func (cfg, arg_validate[i].name, arg_validate[i].cb);
 	}
 	if ((ret = cfg_parse (cfg, CONFIG_NAME)) != 0) {
@@ -377,7 +377,7 @@ int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 		return CFG_PARSE_ERROR;
 	}
 	/* if we get here, the socket is ok*/
-	os_close( s );
+	os_sock_close( s );
 	me.dobind = 1;
 	return CFG_SUCCESS;
 }

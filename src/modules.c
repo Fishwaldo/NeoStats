@@ -42,18 +42,11 @@
 #include "perlmod.h"
 #endif /* USE_PERL */
 
-/** @brief Module list
- * 
- */
+/** @brief Module list */
 static Module *ModList[NUM_MODULES];
+/** @brief Module run level stack control variables */
 Module* RunModule[10];
 int RunLevel = 0;
-unsigned int fusermoddata = 0;
-unsigned int fservermoddata = 0;
-unsigned int fchannelmoddata = 0;
-Module *load_stdmodule (const char *modfilename, Client * u);
-
-
 /* @brief Module hash list */
 static hash_t *modulehash;
 
@@ -264,41 +257,13 @@ void load_module_error(const Client *target, const char *fmt, ...)
 	nlog (LOG_WARNING, buf);
 }
 
-/** @brief determine the type of module based on extension and then
- * call the relevent procedure to load it
- */
-Module *
-ns_load_module(const char *modfilename, Client * u)
-{ 
-	char path[255];
-	char loadmodname[255];
-	struct stat buf;
-
-	strlcpy (loadmodname, modfilename, 255);
-	strlwr (loadmodname);
-	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_STDEXT);
-	if (stat(path, &buf) != -1) {
-		return load_stdmodule(path, u);
-	}
-#ifdef USE_PERL
-	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT);
-	if (stat(path, &buf) != -1) {
-		return load_perlmodule(path, u);
-	}
-#endif
-	/* if we get here, ehhh, doesn't exist */
-	load_module_error (u, __("Unable to load module: %s", u), modfilename);
-	return NULL;
-
-}
 /** @brief 
  *
  * @param 
  * 
  * @return
  */
-Module *
-load_stdmodule (const char *modfilename, Client * u)
+Module *load_stdmodule (const char *modfilename, Client * u)
 {
 	int err;
 	void *handle;
@@ -411,7 +376,7 @@ load_stdmodule (const char *modfilename, Client * u)
 	SET_SEGV_LOCATION();
 
 	/* Let this module know we are online if we are! */
-	if (is_synched) {
+	if (IsNeoStatsSynched()) {
 		if (SynchModule (mod_ptr) != NS_SUCCESS || mod_ptr->error)
 		{
 			load_module_error (u, __("Unable to load module: %s. See %s.log for further information.", u), mod_ptr->info->name, mod_ptr->info->name);
@@ -429,6 +394,34 @@ load_stdmodule (const char *modfilename, Client * u)
 	}
 	return mod_ptr;
 }
+
+/** @brief determine the type of module based on extension and then
+ * call the relevent procedure to load it
+ */
+Module *ns_load_module(const char *modfilename, Client * u)
+{ 
+	char path[255];
+	char loadmodname[255];
+	struct stat buf;
+
+	strlcpy (loadmodname, modfilename, 255);
+	strlwr (loadmodname);
+	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_STDEXT);
+	if (stat(path, &buf) != -1) {
+		return load_stdmodule(path, u);
+	}
+#ifdef USE_PERL
+	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT);
+	if (stat(path, &buf) != -1) {
+		return load_perlmodule(path, u);
+	}
+#endif
+	/* if we get here, ehhh, doesn't exist */
+	load_module_error (u, __("Unable to load module: %s", u), modfilename);
+	return NULL;
+
+}
+
 /** @brief generate module number and assign it
  *
  * @param mod_ptr module pointer 
@@ -584,15 +577,9 @@ unload_module (const char *modname, Client * u)
 		ModList[moduleindex] = NULL;
 	}
 	/* Cleanup moddata */
-	if (fusermoddata & (1 << moduleindex)) {
-		CleanupUserModdata (moduleindex);
-	}
-	if (fservermoddata & (1 << moduleindex)) {
-		CleanupServerModdata (moduleindex);
-	}
-	if (fchannelmoddata & (1 << moduleindex)) {
-		CleanupChannelModdata (moduleindex);
-	}
+	CleanupUserModdata (moduleindex);
+	CleanupServerModdata (moduleindex);
+	CleanupChannelModdata (moduleindex);
 	return NS_SUCCESS;
 }
 

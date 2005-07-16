@@ -118,7 +118,7 @@ void CommandReport( const Bot *botptr, const char *fmt, ... )
 	static char buf[BUFSIZE];
 	va_list ap;
 
-	if( !is_synched || !botptr || !nsconfig.cmdreport )
+	if( !IsNeoStatsSynched() || !botptr || !nsconfig.cmdreport )
 		return;
 	va_start( ap, fmt );
 	ircvsnprintf( buf, BUFSIZE, fmt, ap );

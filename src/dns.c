@@ -25,16 +25,17 @@
 /* this file does the dns checking for adns. it provides a callback mechinism for dns lookups
 ** so that DNS lookups will not block. It uses the adns libary (installed in the adns directory
 */
+
 #include "neostats.h"
 #include "dns.h"
 #include "services.h"
 #include "event.h"
 #ifdef HAVE_POLL_H
 #include <poll.h>
-#endif
+#endif /* HAVE_POLL_H */
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
+#endif /* HAVE_SYS_TIME_H */
 
 #define DNS_QUEUE_SIZE  300	/* number on concurrent DNS lookups */
 #define DNS_DATA_SIZE	255
@@ -54,11 +55,11 @@ adns_state ads;
 struct event *dnstimeout;
 
 struct DNSStats {
-	int totalq;
-	int maxqueued;
-	int totalqueued;
-	int success;
-	int failure;
+	unsigned int totalq;
+	unsigned int maxqueued;
+	unsigned int totalqueued;
+	unsigned int success;
+	unsigned int failure;
 } DNSStats;
 
 /** @brief List of DNS queryies

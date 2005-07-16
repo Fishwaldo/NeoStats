@@ -31,7 +31,7 @@ void GotUpdateAddress(void *data, adns_answer *a);
 struct updateserver {
 	int ok;
 	struct sockaddr_in sendtomq;
-	int sock;
+	OS_SOCKET sock;
 } mqs;
 
 int InitUpdate(void) 

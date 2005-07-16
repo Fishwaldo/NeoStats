@@ -41,6 +41,8 @@
 #define MAXJOINCHANS	-1
 
 static hash_t *userhash;
+/** @brief Module data flags */
+static unsigned int fusermoddata = 0;
 
 static unsigned int moddatacnt[NUM_MODULES];
 
@@ -127,9 +129,8 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	}
 
 	u->tsconnect = TS ? strtoul (TS, NULL, 10) : me.now;
-	if (time(NULL) - u->tsconnect > nsconfig.splittime) {
+	if( ( time( NULL ) - u->tsconnect ) > nsconfig.splittime )
 		u->flags |= NS_FLAGS_NETJOIN;
-	}
 	strlcpy (u->user->hostname, host, MAXHOST);
 	strlcpy (u->user->vhost, host, MAXHOST);
 	ircsnprintf( u->user->userhostmask, USERHOSTLEN, "%s!%s@%s", nick, user, host );
@@ -160,7 +161,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	}
 	ns_free (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
-	if (is_synched && nsconfig.versionscan && !IsExcluded(u) && !IsMe(u)) {
+	if (IsNeoStatsSynched() && nsconfig.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		irc_ctcp_version_req (ns_botptr, u);
 	}
 	return u;
@@ -725,17 +726,19 @@ void CleanupUserModdata (int index)
 	hnode_t *node;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&scan, userhash);
-	if (moddatacnt[index] > 0) {
-		nlog (LOG_WARNING, "Cleaning up users after dirty module!");
-		while ((node = hash_scan_next (&scan)) != NULL) {
-			u = hnode_get (node);
-			if (u->modptr[index]) {
-				ns_free (u->modptr[index]);		
+	if (fusermoddata & (1 << index)) {
+		hash_scan_begin (&scan, userhash);
+		if (moddatacnt[index] > 0) {
+			nlog (LOG_WARNING, "Cleaning up users after dirty module!");
+			while ((node = hash_scan_next (&scan)) != NULL) {
+				u = hnode_get (node);
+				if (u->modptr[index]) {
+					ns_free (u->modptr[index]);		
+				}
+				u->modvalue[index] = NULL;
 			}
-			u->modvalue[index] = NULL;
 		}
+		fusermoddata &= ~(1 << index);
+		moddatacnt[index] = 0;
 	}
-	fusermoddata &= ~(1 << index);
-	moddatacnt[index] = 0;
 }

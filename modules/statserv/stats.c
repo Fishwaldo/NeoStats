@@ -181,7 +181,7 @@ static int check_interval()
 	static time_t lasttime;
 	static int count;
 
-	if (!i_am_synched) {
+	if (!IsModuleSynched()) {
 		return -1;
 	}
 	if ((me.now - lasttime) < StatServ.msginterval ) {

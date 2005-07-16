@@ -152,25 +152,25 @@ typedef int OS_SOCKET;
 char *LANGgettext( const char *string, int mylang );
 /* our own defines for language support */
 /* this one is for standard language support */
-#define _(x) LANGgettext( x, me.lang )
+#define _( x ) LANGgettext( ( x ), me.lang )
 /* this one is for custom langs based on chan/user struct */
-#define __(x,y) LANGgettext( x, (y)->lang )
+#define __( x, y ) LANGgettext( ( x ), ( y )->lang )
 #else /* USEGETTEXT */
-#define _(x) ( x )
-#define __(x, y) ( x )
+#define _( x ) ( x )
+#define __( x, y ) ( x )
 #endif /* USEGETTEXT */
 
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__
-#define __attribute__(x)  /* NOTHING */
+#define __attribute__( x )  /* NOTHING */
 #endif /* __GNUC__ */
 
 /* va_copy handling*/
 #ifndef HAVE_VA_COPY
 #if HAVE___VA_COPY 
-#define va_copy(dest, src) __va_copy(dest, src) 
+#define va_copy( dest, src ) __va_copy( ( dest ), ( src ) ) 
 #else /* HAVE___VA_COPY */
-#define va_copy(dest, src) memcpy(&(dest), &(src), sizeof(dest)) 
+#define va_copy( dest, src ) memcpy( &( dest ), &( src ), sizeof( dest ) ) 
 #endif /* HAVE___VA_COPY */ 
 #endif /* HAVE_VA_COPY */
 
@@ -182,7 +182,7 @@ char *LANGgettext( const char *string, int mylang );
 #include "events.h"
 #include "numeric.h"
 
-#define arraylen(a)	(sizeof(a) / sizeof(*(a)))
+#define ARRAYLEN( a ) ( sizeof( a ) / sizeof( *( a ) ) )
 
 #define PROTOCOL_NOQUIT		0x00000001	/* NOQUIT */
 #define PROTOCOL_TOKEN		0x00000002	/* TOKEN */
@@ -258,9 +258,9 @@ char *LANGgettext( const char *string, int mylang );
  */
 
 /* Cmode macros */
-#define is_hidden_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_ADMONLY|CMODE_OPERONLY)))
-#define is_pub_chan(x)  ((x) && !(x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_KEY)))
-#define is_priv_chan(x) ((x) && (x->modes & (CMODE_PRIVATE|CMODE_SECRET|CMODE_RGSTRONLY|CMODE_ADMONLY|CMODE_OPERONLY|CMODE_INVITEONLY|CMODE_KEY)))
+#define is_hidden_chan( x ) ( ( x ) && ( x->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_ADMONLY | CMODE_OPERONLY ) ) )
+#define is_pub_chan( x )  ( ( x ) && !( x->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_RGSTRONLY | CMODE_ADMONLY | CMODE_OPERONLY | CMODE_INVITEONLY | CMODE_KEY ) ) )
+#define is_priv_chan( x ) ( ( x ) && ( x->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_RGSTRONLY | CMODE_ADMONLY | CMODE_OPERONLY | CMODE_INVITEONLY | CMODE_KEY ) ) )
 
 /* User modes available on all IRCds */
 #define UMODE_INVISIBLE		0x00000001	/* makes user invisible */
@@ -312,7 +312,7 @@ EXPORTVAR extern unsigned int ircd_supported_cumodes;
 #define HaveUmodeDeaf() ( ircd_supported_umodes & UMODE_DEAF )
 
 /* Umode macros */
-#define IsOper(x) ( ( x ) && ( (x->user->Umode & (UMODE_OPER|UMODE_LOCOP ) ) ) )
+#define IsOper(x) ( ( x ) && ( ( x->user->Umode & ( UMODE_OPER | UMODE_LOCOP ) ) ) )
 #define IsBot(x) ( ( x ) && ( x->user->Umode & UMODE_BOT ) )
 #define IsServerOperMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
 #define IsServerOperSMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
@@ -434,12 +434,12 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 /* Buffer size for version string */
 #define VERSIONSIZE		128
 
-/* doesn't have to be so big atm */
+/* Maximum number of modules that can be loaded */
 #define NUM_MODULES		40
 
-#define is_synched		me.synched
+#define IsNeoStatsSynched()		me.synched
 
-#define i_am_synched	GET_CUR_MODULE()->synched
+#define IsModuleSynched()	GET_CUR_MODULE()->synched
 
 /* Unified return values and error system */
 
@@ -473,7 +473,7 @@ typedef enum NS_ERR {
 #define CLIENT_FLAG_EXCLUDED	NS_FLAG_EXCLUDED /* client is excluded */
 #define CLIENT_FLAG_ME			0x00000002 /* client is a NeoStats one */
 #define CLIENT_FLAG_SYNCHED		0x00000004 /* client is synched */
-#define CLIENT_FLAG_SETHOST		0x00000008 /* client is synched */
+#define CLIENT_FLAG_SETHOST		0x00000008 /* client is sethosted */
 #define CLIENT_FLAG_DCC			0x00000010 /* client is connected via DCC */
 #define CLIENT_FLAG_ZOMBIE		0x00000020 /* client is zombie */
 #define NS_FLAGS_NETJOIN		0x00000080 /* client is on a net join */
@@ -481,10 +481,9 @@ typedef enum NS_ERR {
 #define CHANNEL_FLAG_EXCLUDED	NS_FLAG_EXCLUDED /* channel is excluded */
 #define CHANNEL_FLAG_ME			0x00000002 /* channel is services channel */
 
-#define IsServicesChannel(x) ((x)->flags & CHANNEL_FLAG_ME)
+#define IsServicesChannel( x ) ( ( x )->flags & CHANNEL_FLAG_ME )
 
-#define IsNetSplit(x) ((x)->flags & NS_FLAGS_NETJOIN)
-
+#define IsNetSplit( x ) ( ( x )->flags & NS_FLAGS_NETJOIN )
 
 typedef enum NS_EXCLUDE {
 	NS_EXCLUDE_HOST	= 0,
@@ -537,7 +536,7 @@ typedef struct Server {
 	unsigned int awaycount;
 	int hops;
 	int numeric;
-	int ping;
+	time_t ping;
 	time_t uptime;
 } Server;
 
@@ -552,7 +551,7 @@ typedef struct User {
 	char swhois[MAXHOST];
 	char userhostmask[USERHOSTLEN];
 	char uservhostmask[USERHOSTLEN];
-	int flood;
+	unsigned int flood;
 	int is_away;
 	time_t tslastmsg;
 	time_t tslastnick;
@@ -586,7 +585,7 @@ typedef struct Client {
 	int lang;
 	void *modptr[NUM_MODULES];
 	void *modvalue[NUM_MODULES];
-	int fd;
+	OS_SOCKET fd;
 	int port;
 	struct Sock *sock;
 } Client; 
@@ -637,7 +636,7 @@ typedef struct tme {
 	struct sockaddr_in lsa;
 	struct sockaddr_in srvip;
 	time_t tslastping;
-	int ulag;
+	time_t ulag;
 } tme;
 
 EXPORTVAR extern tme me;
@@ -842,7 +841,7 @@ typedef int (*timer_handler) ( void );
 #define	EVENT_FLAG_EXCLUDE_MODME	0x00000010	/* Event excludes module bots */
 
 #ifdef PERL
-/** @breif Forward Decl of Perl Events 
+/** @brief Forward declaration of perl events 
  */
 struct PerlEvent;
 #endif
@@ -989,14 +988,12 @@ EXPORTVAR extern int RunLevel;
  * have to set/reset when a module calls a core function which triggers
  * other modules to run (e.g. AddBot)
  */
-#define SET_RUN_LEVEL(moduleptr){if(RunLevel<10){RunLevel++;RunModule[RunLevel] = moduleptr;}}
-#define RESET_RUN_LEVEL(){if(RunLevel>0){RunLevel--;}}
+#define SET_RUN_LEVEL( moduleptr ) { if( RunLevel < 10 ) { RunLevel++; RunModule[RunLevel] = moduleptr; } }
+#define RESET_RUN_LEVEL() { if( RunLevel > 0 ) { RunLevel--; } }
 #define GET_CUR_MODULE() RunModule[RunLevel]
 #define GET_CUR_MODNUM() RunModule[RunLevel]->modnum
 #define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
 #define GET_CUR_MODVERSION() RunModule[RunLevel]->info->version
-
-
 
 /** @brief Socket function types
  * 
@@ -1092,7 +1089,7 @@ typedef struct Timer {
 	/** Timer name */
 	char name[MAX_MOD_NAME];
 	/** Timer interval */
-	int interval;
+	time_t interval;
 	/** Time last run */
 	time_t lastrun;
 	/** Timer handler */
@@ -1182,10 +1179,10 @@ EXPORTFUNC void *ns_malloc( const int size );
 EXPORTFUNC void *ns_calloc( const int size );
 EXPORTFUNC void *ns_realloc( void *ptr, const int size );
 EXPORTFUNC void _ns_free( void **ptr );
-#define ns_free(ptr) _ns_free( ( void **) &(ptr) );
+#define ns_free( ptr ) _ns_free( ( void **) &( ptr ) );
 
 /* misc.c */
-EXPORTFUNC unsigned hrand(unsigned upperbound, unsigned lowerbound );
+EXPORTFUNC unsigned hrand( const unsigned upperbound, const unsigned lowerbound );
 EXPORTFUNC void strip( char *line );
 EXPORTFUNC char *sstrdup( const char *s );
 char *strlwr( char *s );
@@ -1278,26 +1275,26 @@ int irc_pong( const char *reply );
 /*  SVS functions 
  *  these operate from the server rather than a bot 
  */
-EXPORTFUNC int irc_svsnick( const Bot *botptr, Client *target, const char *newnick );
-EXPORTFUNC int irc_svsjoin( const Bot *botptr, Client *target, const char *chan );
-EXPORTFUNC int irc_svspart( const Bot *botptr, Client *target, const char *chan );
+EXPORTFUNC int irc_svsnick( const Bot *botptr, const Client *target, const char *newnick );
+EXPORTFUNC int irc_svsjoin( const Bot *botptr, const Client *target, const char *chan );
+EXPORTFUNC int irc_svspart( const Bot *botptr, const Client *target, const char *chan );
 EXPORTFUNC int irc_svshost( const Bot *botptr, Client *target, const char *vhost );
-EXPORTFUNC int irc_svsmode( const Bot *botptr, Client *target, const char *modes );
-EXPORTFUNC int irc_svskill( const Bot *botptr, Client *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
-EXPORTFUNC int irc_svstime( const Bot *botptr, Client *target, const time_t ts );
+EXPORTFUNC int irc_svsmode( const Bot *botptr, const Client *target, const char *modes );
+EXPORTFUNC int irc_svskill( const Bot *botptr, const Client *target, const char *reason, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_svstime( const Bot *botptr, const Client *target, const time_t ts );
 
 /*  CTCP functions to correctly format CTCP requests and replies
  */
-EXPORTFUNC int irc_ctcp_version_req( Bot *botptr, Client *target );
-EXPORTFUNC int irc_ctcp_version_rpl( Bot *botptr, Client *target, const char *version );
-EXPORTFUNC int irc_ctcp_ping_req( Bot *botptr, Client *target );
+EXPORTFUNC int irc_ctcp_version_req( const Bot *botptr, const Client *target );
+EXPORTFUNC int irc_ctcp_version_rpl( const Bot *botptr, const Client *target, const char *version );
+EXPORTFUNC int irc_ctcp_ping_req( const Bot *botptr, const Client *target );
 
-EXPORTFUNC int irc_ctcp_finger_req( Bot *botptr, Client *target );
+EXPORTFUNC int irc_ctcp_finger_req( const Bot *botptr, const Client *target );
 
-EXPORTFUNC int irc_ctcp_action_req( Bot *botptr, Client *target, const char *action );
-EXPORTFUNC int irc_ctcp_action_req_channel( Bot* botptr, Channel* channel, const char *action );
+EXPORTFUNC int irc_ctcp_action_req( const Bot *botptr, const Client *target, const char *action );
+EXPORTFUNC int irc_ctcp_action_req_channel( const Bot* botptr, const Channel* channel, const char *action );
 
-EXPORTFUNC int irc_ctcp_time_req( Bot* botptr, Client* target );
+EXPORTFUNC int irc_ctcp_time_req( const Bot* botptr, const Client* target );
 
 /* bots.c */
 EXPORTFUNC int GenerateBotNick( char *nickbuf, int stublen, int alphacount, int numcount);
@@ -1318,12 +1315,12 @@ EXPORTFUNC Channel *GetRandomChannel( void );
 EXPORTFUNC Client *GetRandomChannelMember(int uge, Channel *c);
 EXPORTFUNC char *GetRandomChannelKey( int length );
 
-#define IsChanOp( chan, nick ) test_cumode(chan, nick, CUMODE_CHANOP)
-#define IsChanHalfOp( chan, nick ) test_cumode(chan, nick, CUMODE_HALFOP)
-#define IsChanVoice( chan, nick ) test_cumode(chan, nick, CUMODE_VOICE)
-#define IsChanOwner( chan, nick ) test_cumode(chan, nick, CUMODE_CHANOWNER)
-#define IsChanProt( chan, nick ) test_cumode(chan, nick, CUMODE_CHANPROT)
-#define IsChanAdmin( chan, nick ) test_cumode(chan, nick, CUMODE_CHANADMIN)
+#define IsChanOp( chan, nick ) test_cumode( chan, nick, CUMODE_CHANOP )
+#define IsChanHalfOp( chan, nick ) test_cumode( chan, nick, CUMODE_HALFOP )
+#define IsChanVoice( chan, nick ) test_cumode( chan, nick, CUMODE_VOICE )
+#define IsChanOwner( chan, nick ) test_cumode( chan, nick, CUMODE_CHANOWNER )
+#define IsChanProt( chan, nick ) test_cumode( chan, nick, CUMODE_CHANPROT )
+#define IsChanAdmin( chan, nick ) test_cumode( chan, nick, CUMODE_CHANADMIN )
 
 EXPORTVAR unsigned char UmodeChRegNick;
 
@@ -1348,22 +1345,22 @@ EXPORTFUNC void transfer_status( void );
 EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback );
 
 /* Is the client excluded */
-#define IsExcluded(x) ((x) && ((x)->flags & NS_FLAG_EXCLUDED))
+#define IsExcluded( x ) ( ( x ) && ( ( x )->flags & NS_FLAG_EXCLUDED ) )
 
 /* Is the client a NeoStats one? */
-#define IsMe(x) ((x) && ((x)->flags & CLIENT_FLAG_ME))
+#define IsMe( x ) ( ( x ) && ( ( x )->flags & CLIENT_FLAG_ME ) )
 
 /* Is the client synched? */
-#define IsSynched(x) ((x) && ((x)->flags & CLIENT_FLAG_SYNCHED))
+#define IsSynched( x ) ( ( x ) && ( ( x )->flags & CLIENT_FLAG_SYNCHED ) )
 
 /* Mark server as synched */
-#define SynchServer(x) (((x)->flags |= CLIENT_FLAG_SYNCHED))
+#define SynchServer( x ) ( ( ( x )->flags |= CLIENT_FLAG_SYNCHED ) )
 
 /* Has NeoStats issued a SETHOST for this user? */
-#define IsUserSetHosted(x)  ((x) && ((x)->flags & CLIENT_FLAG_SETHOST))
+#define IsUserSetHosted( x )  ( ( x ) && ( ( x )->flags & CLIENT_FLAG_SETHOST ) )
 
 /* Is the client marked away? */
-#define IsAway(x) ( ( x ) && ( x->user->is_away ) )
+#define IsAway( x ) ( ( x ) && ( x->user->is_away ) )
 
 EXPORTFUNC int ValidateNick( char *nick );
 EXPORTFUNC int ValidateUser( char *username );
@@ -1489,12 +1486,12 @@ EXPORTFUNC void EnableEvent( Event event );
 EXPORTFUNC void DisableEvent( Event event );
 
 /* String functions */
-/* [v]s[n]printf replacements */
+/* vs[n]printf replacements */
 EXPORTFUNC int ircvsprintf( char *buf, const char *fmt, va_list args );
 EXPORTFUNC int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args );
+/* s[n]printf replacements */
 EXPORTFUNC int ircsprintf( char *buf, const char *fmt, ...) __attribute__((format(printf,2,3)) ); /* 2=format 3=params */
 EXPORTFUNC int ircsnprintf( char *buf, size_t size, const char *fmt, ...) __attribute__((format(printf,3,4)) ); /* 3=format 4=params */
-
 /* str[n]casecmp replacements */
 EXPORTFUNC int ircstrcasecmp( const char *s1, const char *s2 );
 EXPORTFUNC int ircstrncasecmp( const char *s1, const char *s2, size_t size );
@@ -1572,52 +1569,60 @@ EXPORTFUNC void os_free( void *ptr );
 #endif /* WIN32 */
 
 /* 
- * Module Interface 
+ * Module interface 
  */
-/* Module Basic Interface */
+/* Module basic interface */
 MODULEVAR extern ModuleInfo module_info;   
 MODULEFUNC int ModInit( void );
 MODULEFUNC int ModSynch( void );
 MODULEFUNC int ModFini( void );
-/* Module Event Interface */
+/* Module event interface */
 MODULEVAR extern ModuleEvent module_events[];  
-/* Module Auth Interface */
+/* Module auth interface */
 MODULEFUNC int ModAuthUser( Client *u );
-/* Module Exclude Interface */
+/* Module exclude interface */
 EXPORTFUNC int ModIsServerExcluded( Client *s );
 EXPORTFUNC int ModIsUserExcluded( Client *u );
 EXPORTFUNC int ModIsChannelExcluded( Channel *c );
 
-/* Module Data Pointer Interface */
-/* Module Data Pointer Interface Channel */
+/* Module data pointer interface */
+/* Module data pointer interface channel */
 EXPORTFUNC void *AllocChannelModPtr( Channel *c, int size );
 EXPORTFUNC void FreeChannelModPtr( Channel *c );
 EXPORTFUNC void *GetChannelModPtr( Channel *c );
-/* Module Data Pointer Interface User */
+/* Module data pointer interface user */
 EXPORTFUNC void *AllocUserModPtr( Client *u, int size );
 EXPORTFUNC void FreeUserModPtr( Client *u );
 EXPORTFUNC void *GetUserModPtr( Client *u );
-/* Module Data Pointer Interface Server */
+/* Module data pointer interface server */
 EXPORTFUNC void *AllocServerModPtr( Client *s, int size );
 EXPORTFUNC void FreeServerModPtr( Client *s );
 EXPORTFUNC void *GetServerModPtr( Client *s );
-/* Module Data Value Interface */
-/* Module Data Value Interface Channel */
+/* Module data pointer interface bot */
+EXPORTFUNC void *AllocBotModPtr( Bot *pBot, int size );
+EXPORTFUNC void FreeBotModPtr( Bot *pBot );
+EXPORTFUNC void* GetBotModPtr( Bot *pBot );
+/* Module data value interface */
+/* Module data value interface channel */
 EXPORTFUNC void ClearChannelModValue( Channel *c );
 EXPORTFUNC void SetChannelModValue( Channel *c, void *data );
 EXPORTFUNC void *GetChannelModValue( Channel *c );
-/* Module Data Value Interface User */
+/* Module data value interface user */
 EXPORTFUNC void ClearUserModValue( Client *u );
 EXPORTFUNC void SetUserModValue( Client *u, void *data );
 EXPORTFUNC void *GetUserModValue( Client *u );
-/* Module Data Value Interface Server */
+/* Module data value interface server */
 EXPORTFUNC void ClearServerModValue( Client *s );
 EXPORTFUNC void SetServerModValue( Client *s, void *data );
 EXPORTFUNC void *GetServerModValue( Client *s );
-/* Module Data Value Interface Bot */
-#define ClearBotModValue( b ) b->moddata = 0
-#define SetBotModValue( b, data ) b->moddata = data
-#define GetBotModValue( b ) b->moddata
+/* Module data value interface bot */
+EXPORTFUNC void ClearBotModValue( Bot *pBot );
+EXPORTFUNC void SetBotModValue( Bot *pBot, void *data );
+EXPORTFUNC void *GetBotModValue( Bot *pBot );
+
+//#define ClearBotModValue( b ) b->moddata = 0
+//#define SetBotModValue( b, data ) b->moddata = data
+//#define GetBotModValue( b ) b->moddata
 
 /* MQ Server update sending functions */
 typedef enum MQ_MSG_TYPE {

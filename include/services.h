@@ -44,9 +44,9 @@ typedef struct config {
 	unsigned int foreground:1;
 	unsigned int want_privmsg:1;
 	unsigned int onlyopers:1;
-	unsigned int setservertimes;
-	unsigned int splittime;
-	unsigned int msgsampletime;
+	time_t setservertimes;
+	time_t splittime;
+	time_t msgsampletime;
 	unsigned int msgthreshold;
 	unsigned int versionscan;
 	unsigned int r_time;
@@ -54,7 +54,7 @@ typedef struct config {
 	unsigned int debug;
 	unsigned int debugtochan;
 	char debugchan[MAXCHANLEN];
-	unsigned int pingtime;
+	time_t pingtime;
 	unsigned int joinserviceschan;
 	neoroot rootuser;
 	char debugmodule[MAX_MOD_NAME];
