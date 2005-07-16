@@ -23,24 +23,16 @@
 */
 
 #include "neostats.h"
+#if 0 /* Temp since berkeley is causing too many problems */
+/* #if defined HAVE_DB_H && !defined WIN32 */
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
-#endif
-#if 0 /* Temp since berkeley is causing too many problems */
+#endif /* HAVE_STRINGS_H */
 #ifdef HAVE_DB_H
 #include <db.h>
-#endif
+#endif /* HAVE_DB_H */
 #include "lang.h"
 
-#if (!defined HAVE_DB_H) || (defined WIN32)
-void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
-{
-}
-
-void LANGfini() 
-{
-}
-#else
 static DBT dbkey;
 static DBT dbdata;
 static int dbret;
@@ -64,14 +56,6 @@ struct lang_info {
 char TranslatedLang[STRSIZE];
 hash_t *langcache[MAXLANG];
 static void* LANGGetData(void* key, int lang);
-
-#if (defined WIN32)
-#define LANGDEBUG
-#define LANGERROR
-#else
-#define LANGDEBUG(fmt,...) LANGDebug(__FILE__, __LINE__, __FUNCTION__, 0, fmt, __VA_ARGS__)
-#define LANGERROR(fmt,...) LANGDebug(__FILE__, __LINE__, __FUNCTION__, 1, fmt, __VA_ARGS__)
-#endif
 
 static void LANGDebug(char *file, int line, char *func, int err, char *fmt, ...) {
 	va_list ap;
@@ -456,8 +440,7 @@ void LANGfini()
 		LANGCloseDatabase(i);
 	}
 }
-#endif
-#else
+#else /* HAVE_DB_H */
 #include "lang.h"
 void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc) 
 {
@@ -466,4 +449,4 @@ void LANGinit(int debug, char *dbpath, LANGDebugFunc debugfunc)
 void LANGfini() 
 {
 }
-#endif /* 0 */
+#endif /* HAVE_DB_H */

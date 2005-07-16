@@ -52,22 +52,21 @@
 #include "perlmod.h"
 #endif /* USE_PERL */
 
+#define PID_FILENAME	"neostats.pid"
+
 static void do_reconnect( void );
 static int in_do_exit = 0;
-#define PID_FILENAME	"neostats.pid"
 
 #ifdef WIN32
 void *( *old_malloc )( size_t );
 void( *old_free )( void * );
 #endif /* WIN32 */
 
-typedef struct exit_report
+struct
 {
 	int exit_code;
 	char *exit_message;
-}exit_report;
-
-exit_report exit_reports[]=
+} exit_reports[]=
 {
 	/* NS_EXIT_NORMAL */
 	{ EXIT_SUCCESS, "Normal shut down subsystems" },
@@ -356,11 +355,10 @@ int main( int argc, char *argv[] )
 		return NS_FAILURE;
 	if( !me.servicehost[0] )
 		strlcpy( me.servicehost, me.name, sizeof( me.name ) );
+#ifndef WIN32
 	/* initialize Lang Subsystem */
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );
-
-#ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
 	if( !nsconfig.foreground )
@@ -504,13 +502,13 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 	}
 	FiniDBA();
 	FiniLogs();
-	LANGfini();
 #ifdef WIN32
 	/* restore pcre lib malloc pointers */
 	pcre_malloc = old_malloc;
 	pcre_free = old_free;
 #endif /* WIN32 */
 #ifndef WIN32
+	LANGfini();
 	if( ( exitcode == NS_EXIT_RECONNECT && nsconfig.r_time > 0 ) || exitcode == NS_EXIT_RELOAD ) {
 		sleep( nsconfig.r_time );
 		execve( "./bin/neostats", NULL, NULL );

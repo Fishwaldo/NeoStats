@@ -222,9 +222,6 @@
 				RelativePath=".\ircstring.c">
 			</File>
 			<File
-				RelativePath=".\lang.c">
-			</File>
-			<File
 				RelativePath=".\list.c">
 			</File>
 			<File
