@@ -840,7 +840,7 @@ typedef int (*timer_handler) ( void );
 #define	EVENT_FLAG_EXCLUDE_ME		0x00000008	/* Event excludes neostats bots and servers */
 #define	EVENT_FLAG_EXCLUDE_MODME	0x00000010	/* Event excludes module bots */
 
-#ifdef PERL
+#ifdef USE_PERL
 /** @brief Forward declaration of perl events 
  */
 struct PerlEvent;

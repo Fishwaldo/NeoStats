@@ -252,7 +252,7 @@ neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ @PERL_LDFLAGS@ \
 		$(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
-noinst_HEADERS = confuselexer.l NeoStats.pm generate_header
+noinst_HEADERS = confuselexer.l NeoStats.pm
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -549,6 +549,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-info-am
 
+
+neostats.pm.h: NeoStats.pm 	 
+		$(top_builddir)/tools/generate_header
 
 .c.o:
 @USECCDV@		@echo "Building $@"

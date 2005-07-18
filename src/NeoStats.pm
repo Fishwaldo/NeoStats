@@ -93,6 +93,50 @@ use Symbol();
     }
   }
 
+# AddBot(botinfo, botflag)
+  sub AddBot {
+    return undef unless @_ >= 2;
+
+    my $botinfo = shift;
+    my $botflag = shift;
+    my $data = shift;
+    my ($package) = caller;
+#    $callback = NeoStats::Embed::fix_callback( $package, $callback );
+  
+    if (!ref( $botinfo ) eq 'HASH' ) {
+      return NeoStats::NS_FAILURE;
+    }
+    if ((!exists( $botinfo->{nick} )) || (!defined( $botinfo->{nick} ))) {
+      NeoStats::print("Botinfo->{nick} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    if ((!exists( $botinfo->{altnick} )) || (!defined( $botinfo->{altnick} ))) {
+      NeoStats::print("Botinfo->{altnick} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    if ((!exists( $botinfo->{ident} )) || (!defined( $botinfo->{ident} ))) {
+      NeoStats::print("Botinfo->{ident} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    if ((!exists( $botinfo->{host} )) || (!defined( $botinfo->{host} ))) {
+      NeoStats::print("Botinfo->{host} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    if ((!exists( $botinfo->{gecos} )) || (!defined( $botinfo->{gecos} ))) {
+      NeoStats::print("Botinfo->{gecos} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    
+    my $pkg_info = NeoStats::Embed::pkg_info( $package );
+    my $bot =  NeoStats::Internal::AddBot( $botinfo, $botflag, $data);
+    if ( defined ( $bot )) {
+      push @{$pkg_info->{bots}}, $bot;
+      return NeoStats::NS_SUCCESS;
+    } else {
+      return NeoStats::NS_FAILURE;
+    }
+  }
+
 
   sub hook_server {
     return undef unless @_ >= 2;

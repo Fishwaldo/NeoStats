@@ -35,6 +35,7 @@
 #include <dirent.h>
 
 extern void boot_DynaLoader (pTHX_ CV * cv);
+static void dump_hash(HV *rethash);
 
 
 
@@ -595,6 +596,54 @@ XS (XS_NeoStats_unhook_event)
 }
 
 
+static
+XS (XS_NeoStats_AddBot)
+{
+	Module *mod;
+	HV * rethash;
+	SV *ret;
+	int flags;
+	SV *value;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:AddBot(botinfo, flags, data)");
+	} else {
+		ret = ST(0);
+		flags = (int) SvIV (ST (1));
+		if(SvTYPE(SvRV(ret))!=SVt_PVHV) {
+			 dlog(DEBUG1, "XS_NeoStats_AddBot: unsuported input %lu, must %i", SvTYPE(SvRV(ret)), SVt_PVHV);
+			 XSRETURN_EMPTY;
+		}
+		rethash = (HV*)SvRV(ret);
+		value = *hv_fetch(rethash, "nick", strlen("nick"), FALSE);
+		printf("Nick: %s\n", SvPV_nolen(value));
+		value = *hv_fetch(rethash, "altnick", strlen("altnick"), FALSE);
+		printf("AltNick: %s\n", SvPV_nolen(value));
+		dump_hash(rethash);
+
+
+	}
+exit(-1);
+	XSRETURN_EMPTY;
+}
+
+
+static void
+dump_hash(HV *rethash) {
+	char *key;
+	SV *value;
+	int keycount;
+	I32 *keylen;
+
+	keycount = hv_iterinit(rethash);
+	printf("%d items in call\n",keycount);
+	while(keycount-- != 0) {
+		value = hv_iternextsv(rethash, &key, &keylen);
+		printf("Return (%s) -> (%s)\n",key,SvPV_nolen(value));
+	}
+}
 
 
 
@@ -918,6 +967,7 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::register", XS_NeoStats_register, __FILE__);
 	newXS ("NeoStats::Internal::hook_event", XS_NeoStats_hook_event, __FILE__);
 	newXS ("NeoStats::Internal::unhook_event", XS_NeoStats_unhook_event, __FILE__);
+	newXS ("NeoStats::Internal::AddBot", XS_NeoStats_AddBot, __FILE__);
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);

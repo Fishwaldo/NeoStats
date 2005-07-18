@@ -22,7 +22,9 @@ neostats_LDADD = @PCRE_LIBS@ @CURL_LIBS@ @LIBDB@ @PERL_LDFLAGS@ \
 		$(top_srcdir)/lib/event/libevent.a
 
 neostats_LDFLAGS = --export-dynamic -rdynamic
-noinst_HEADERS          =       confuselexer.l NeoStats.pm generate_header
+noinst_HEADERS          =       confuselexer.l NeoStats.pm
 
+neostats.pm.h: NeoStats.pm 	 
+		$(top_builddir)/tools/generate_header
 
 include $(top_srcdir)/autotools/rules.mk 

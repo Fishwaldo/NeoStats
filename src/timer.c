@@ -307,7 +307,7 @@ ns_cmd_timerlist (CmdParams* cmdparams)
 		timer = hnode_get (tn);
 		irc_prefmsg (ns_botptr, cmdparams->source, "%s:", timer->moduleptr->info->name);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Timer: %s", cmdparams->source), timer->name);
-		irc_prefmsg (ns_botptr, cmdparams->source, __("Interval: %d", cmdparams->source), timer->interval);
+		irc_prefmsg (ns_botptr, cmdparams->source, __("Interval: %ld", cmdparams->source), (long)timer->interval);
 		irc_prefmsg (ns_botptr, cmdparams->source, __("Next run in: %ld", cmdparams->source), (long)(timer->interval - (me.now - timer->lastrun)));
 	}
 	irc_prefmsg (ns_botptr, cmdparams->source, __("End of list.", cmdparams->source));
