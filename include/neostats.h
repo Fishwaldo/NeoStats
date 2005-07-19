@@ -397,12 +397,12 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 #define MAXINFO			128
 #define B64SIZE			16
 
-#define KEYLEN		(32 + 1)
+#define KEYLEN			(32 + 1)
 
 /* MAXCHANLENLIST
  * the max length a string can be that holds channel lists 
  */
-#define MAXCHANLENLIST		1024 
+#define MAXCHANLENLIST	1024 
 
 /* MAXPATH 
  * used to determine buffer sizes for file system operations
@@ -439,7 +439,7 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 
 #define IsNeoStatsSynched()		me.synched
 
-#define IsModuleSynched()	GET_CUR_MODULE()->synched
+#define IsModuleSynched()		GET_CUR_MODULE()->synched
 
 /* Unified return values and error system */
 
@@ -495,21 +495,21 @@ typedef enum NS_EXCLUDE {
 
 
 /* NeoStats levels */
-#define NS_ULEVEL_ROOT	200
-#define NS_ULEVEL_ADMIN	185
-#define NS_ULEVEL_OPER	50
-#define NS_ULEVEL_LOCOPER 40
-#define NS_ULEVEL_REG	10
+#define NS_ULEVEL_ROOT		200
+#define NS_ULEVEL_ADMIN		185
+#define NS_ULEVEL_OPER		50
+#define NS_ULEVEL_LOCOPER	40
+#define NS_ULEVEL_REG		10
 
 /* transfer stuff */
 typedef enum NS_TRANSFER {
-	NS_FILE=0,
-	NS_MEMORY=1,
+	NS_FILE = 0,
+	NS_MEMORY,
 } NS_TRANSFER;
 
 #define SEGV_LOCATION_BUFSIZE	255
-#define SET_SEGV_LOCATION() ircsnprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s", __FILE__, __LINE__, __PRETTY_FUNCTION__ ); 
-#define SET_SEGV_LOCATION_EXTRA(debug_text) ircsnprintf(segv_location,SEGV_LOCATION_BUFSIZE,"%s %d %s %s", __FILE__, __LINE__, __PRETTY_FUNCTION__,(debug_text) ); 
+#define SET_SEGV_LOCATION() ircsnprintf( segv_location, SEGV_LOCATION_BUFSIZE, "%s %d %s", __FILE__, __LINE__, __PRETTY_FUNCTION__ ); 
+#define SET_SEGV_LOCATION_EXTRA( debug_text ) ircsnprintf( segv_location, SEGV_LOCATION_BUFSIZE, "%s %d %s %s", __FILE__, __LINE__, __PRETTY_FUNCTION__, (debug_text) ); 
 #define CLEAR_SEGV_LOCATION() segv_location[0]='\0';
 
 EXPORTVAR extern char segv_location[SEGV_LOCATION_BUFSIZE];

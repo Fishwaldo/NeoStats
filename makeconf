@@ -564,7 +564,7 @@ Servers {
 ########################################
 
 
-ServiceRoots {
+ServiceRoot {
 #MASK="<nick!ident@host>" [REQUIRED]
 #    Who should get master access to manage NeoStats regardless of 
 #    authentication systems. Only one entry allowed. e.g.

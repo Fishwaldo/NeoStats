@@ -66,9 +66,8 @@ static int IsServiceRoot( Client *u )
 	if( ( match( nsconfig.rootuser.nick, u->name ) ) &&
 		( match( nsconfig.rootuser.user, u->user->username ) ) &&
 		( match( nsconfig.rootuser.host, u->user->hostname ) ||
-		  match( nsconfig.rootuser.host, u->hostip ) ) ) {
+		  match( nsconfig.rootuser.host, u->hostip ) ) )
 		return NS_TRUE;
-	}
 	return NS_FALSE;
 }
 
@@ -91,25 +90,23 @@ int AuthUser( Client *u )
 #ifdef DEBUG
 #ifdef CODERHACK
 	/* See comments at top of file */
-	if( !ircstrcasecmp( u->name, CODERHACK ) ) {
+	if( !ircstrcasecmp( u->name, CODERHACK ) )
 		return NS_ULEVEL_ROOT;
-	} else
 #endif /* CODERHACK */
 #endif /* DEBUG */
 	/* Check for master service root first */
-	if( IsServiceRoot( u ) ) {
+	if( IsServiceRoot( u ) )
 		return NS_ULEVEL_ROOT;
-	} 
 	/* Run through list of authentication modules */
 	for( i = 0; i < NUM_MODULES; i++ )
 	{
-		if( AuthModList[i] ) {
+		if( AuthModList[i] )
+		{
 			/* Get auth level */
 			authlvl = AuthModList[i]->userauth( u );
 			/* if authlvl is greater than newauthlvl, use it */
-			if( authlvl > newauthlvl ) {
+			if( authlvl > newauthlvl )
 				newauthlvl = authlvl;
-			}
 		}
 	}
 	/* Return calculated auth level */

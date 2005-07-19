@@ -91,7 +91,7 @@ cfg_opt_t servers[] = {
 	CFG_END()
 };
 
-cfg_opt_t serviceroots[] = {
+cfg_opt_t serviceroot[] = {
 	CFG_STR ("Mask", 0, CFGF_NONE),
 	CFG_END()
 };
@@ -110,7 +110,7 @@ cfg_opt_t fileconfig[] = {
 #else /* 0 */
 	CFG_SEC ("Servers", servers, CFGF_NONE),
 #endif /* 0 */
-	CFG_SEC ("ServiceRoots", serviceroots, CFGF_NONE),
+	CFG_SEC ("ServiceRoot", serviceroot, CFGF_NONE),
 	CFG_SEC ("Modules", modules, CFGF_NONE),
 	CFG_END()
 };
@@ -138,8 +138,7 @@ validate_args arg_validate[] = {
  * @returns nothing
  */
 
-int
-ConfLoad (void)
+int ConfLoad( void )
 {
 	cfg_t *cfg;
 	int i, ret;
@@ -227,12 +226,12 @@ set_config_values (cfg_t *cfg)
 	me.numeric = cfg_getint (cfg, "ServerConfig|ServerNumeric");
 	/* has a default */
 	nsconfig.setservertimes = cfg_getint (cfg, "Options|ServerSettime") * 60 * 60;
-	/* serviceroots has no default */
-	if (cfg_size (cfg, "ServiceRoots|Mask") > 0) {
+	/* serviceroot has no default */
+	if (cfg_size (cfg, "ServiceRoot|Mask") > 0) {
 		char *nick, *user , *host, *arg;
 
 		/* already validate */
-		arg = cfg_getstr (cfg, "ServiceRoots|Mask");
+		arg = cfg_getstr (cfg, "ServiceRoot|Mask");
 		if( arg )
 		{
 			nick = strtok (arg, "!");
@@ -280,21 +279,19 @@ void ConfLoadModules( void )
 	if( load_mods[0] == 0 )
 	{
 		nlog( LOG_NORMAL, "No modules configured for loading" );
+		return;
 	}
-	else
+	nlog( LOG_NORMAL, "Loading configured modules" );
+	for( i = 0; ( i < NUM_MODULES ) && ( load_mods[i] != 0 ); i++ )
 	{
-		nlog( LOG_NORMAL, "Loading configured modules" );
-		for( i = 0; ( i < NUM_MODULES ) && ( load_mods[i] != 0 ); i++ )
-		{
-			dlog( DEBUG1, "ConfLoadModules: Loading Module %s", ( char * ) load_mods[i] );
-			if( ns_load_module( load_mods[i], NULL ) )
-				nlog( LOG_NORMAL, "Loaded module %s", ( char * ) load_mods[i] );
-			else
-				nlog( LOG_WARNING, "Failed to load module %s. Please check above error messages", ( char * ) load_mods[i] );
-			ns_free (load_mods[i]);
-		}
-		nlog( LOG_NORMAL, "Completed loading configured modules" );
+		dlog( DEBUG1, "ConfLoadModules: Loading Module %s", ( char * ) load_mods[i] );
+		if( ns_load_module( load_mods[i], NULL ) )
+			nlog( LOG_NORMAL, "Loaded module %s", ( char * ) load_mods[i] );
+		else
+			nlog( LOG_WARNING, "Failed to load module %s. Please check above error messages", ( char * ) load_mods[i] );
+		ns_free (load_mods[i]);
 	}
+	nlog( LOG_NORMAL, "Completed loading configured modules" );
 	return;
 }
 
