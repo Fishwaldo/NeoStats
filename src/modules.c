@@ -100,6 +100,8 @@ int SynchModule (Module* module_ptr)
 		SET_SEGV_LOCATION();
 		module_ptr->synched = 1;
 #ifdef USE_PERL
+	} else {
+		perl_sync_module(module_ptr);
 	}
 #endif
 	return err;

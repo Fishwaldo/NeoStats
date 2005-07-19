@@ -8,7 +8,7 @@
 # First thing that you must ensure happens (ie, first command) is to register this script
 # Using the following command:
 
-NeoStats::register( "Test", "1.0", "Test Script 1 description" );
+NeoStats::register( "Test", "1.0", "Test Script 1 description", "setupbot", "shutdownbot");
 
 # Events make up the core communications of NeoStats, here you register the events your 
 # Interested in, and the function to call. A optional third arguement ($options) allows you
@@ -315,14 +315,21 @@ sub event_delban {
 
 sub setupbot {
 	my $botinfo;
+	NeoStats::print("Setup");
 	$botinfo->{nick} = "Fishy";
 	$botinfo->{altnick} = "Fishy2";
 	$botinfo->{ident} = "fish";
 	$botinfo->{host} = "Host.com";
 	$botinfo->{gecos} = "My Gecos";
-	NeoStats::AddBot($botinfo, 0);
+	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
+	$botinfo->{nick} = "fishy2";
+	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
+	NeoStats::print("Added Second Bot $botinfo->{nick}");
+	NeoStats::DelBot($botinfo->{nick});
+	
 }
 
+sub shutdownbot {
+	NeoStats::Print("Shutdown");
+}
 
-
-setupbot();

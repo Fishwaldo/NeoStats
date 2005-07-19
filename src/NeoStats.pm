@@ -43,19 +43,27 @@ use Symbol();
   our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 
   sub register {
+    if (@_ != 5) {
+      NeoStats::print("Invalid Number of arguments to register");
+      return NeoStats::NS_FAILURE;
+    }
     my ($package) = caller;
     my $pkg_info = NeoStats::Embed::pkg_info( $package );
     my $filename = $pkg_info->{filename};
 
-    my ($name, $version, $description, $callback) = @_;
+    my ($name, $version, $description, $startupcb, $shutdowncb) = @_;
     $description = "" unless defined $description;
 
-    $pkg_info->{shutdown} = $callback;
+
     $pkg_info->{name} = $name;
     $pkg_info->{version} = $version;
     $pkg_info->{description} = $description;
     $pkg_info->{gui_entry} =
       NeoStats::Internal::register( $pkg_info->{name}, $pkg_info->{version}, $pkg_info->{description});
+    $startupcb = NeoStats::Embed::fix_callback( $package, $startupcb );
+    $shutdowncb = NeoStats::Embed::fix_callback( $package, $shutdowncb );
+    $pkg_info->{shutdown} = $shutdowncb;
+    $pkg_info->{startup} = $startupcb;
 
     # keep with old behavior
     return NeoStats::NS_SUCCESS;
@@ -64,7 +72,10 @@ use Symbol();
 
 
   sub hook_event {
-    return undef unless @_ >= 2;
+    if (@_ < 2) {
+      NeoStats::print("Invalid Number of arguments to hook_event");
+      return NeoStats::NS_FAILURE;
+    }
 
     my $event = shift;
     my $callback = shift;
@@ -95,7 +106,10 @@ use Symbol();
 
 # AddBot(botinfo, botflag)
   sub AddBot {
-    return undef unless @_ >= 2;
+    if (@_ < 2) {
+      NeoStats::print("Invalid Number of arguments to AddBot");
+      return NeoStats::NS_FAILURE;
+    }
 
     my $botinfo = shift;
     my $botflag = shift;
@@ -127,16 +141,25 @@ use Symbol();
       return NeoStats::NS_FAILURE;
     }    
     
-    my $pkg_info = NeoStats::Embed::pkg_info( $package );
     my $bot =  NeoStats::Internal::AddBot( $botinfo, $botflag, $data);
     if ( defined ( $bot )) {
-      push @{$pkg_info->{bots}}, $bot;
       return NeoStats::NS_SUCCESS;
     } else {
       return NeoStats::NS_FAILURE;
     }
   }
-
+  sub DelBot {
+    if (@_ < 1) {
+      NeoStats::print("Invalid Number of arguments to DelBot");
+      return NeoStats::NS_FAILURE;
+    }
+    my $botname = shift;
+    my $reason = shift;
+    if (!defined($reason)) {
+      $reason = "Unknown";
+    }
+    return NeoStats::Internal::DelBot($botname, $reason);
+  }    
 
   sub hook_server {
     return undef unless @_ >= 2;
@@ -624,20 +647,21 @@ $SIG{__WARN__} = sub {
     return NeoStats::NS_SUCCESS;
   }
 
-#   sub auto_load {
-
-#     my $dir = NeoStats::get_info( "NeoStatsdirfs" ) || NeoStats::get_info( "NeoStatsdir" );
-#     if( opendir my $dir_handle, $dir ) {
-#       my @files = readdir $dir_handle;
-
-#       for( @files ) {
-#         my $fullpath = File::Spec->catfile( $dir, $_ );
-#         load( $fullpath ) if $fullpath =~ m/\.pl$/i;
-#       }
-#       closedir $dir_handle;
-#     }
-    
-#   }
+  sub sync {
+    my $file = shift @_;
+    my $package = file2pkg( $file );
+    my $pkg_info = pkg_info( $package );
+    if( exists $pkg_info->{startup} ) {
+        if( ref $pkg_info->{startup} eq 'CODE' ) {
+          $pkg_info->{startup}->();
+        } elsif( $pkg_info->{startup} ) {
+          eval {
+            no strict 'refs';
+            &{$pkg_info->{startup}};
+          };
+        }
+      }
+  }    
 
 
 }

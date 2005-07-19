@@ -1139,6 +1139,8 @@ typedef struct _Bot {
 	int set_ulevel;
 	/* Link back to user struct associated with this bot*/
 	Client *u;
+	/* link back to BotInfo struct so if we have a module that needs to free it, it can be referenced */
+	BotInfo *botinfo;
 	/* pointer for module use */
 	void *moddata;
 }_Bot;

@@ -115,6 +115,14 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 }
 
 int
+perl_sync_module(Module *mod) {
+	mod->insynch = 1;
+	execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::sync", 0)),1, mod->pm->filename);
+	mod->synched = 1;
+	return NS_SUCCESS;
+}
+
+int
 perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 	int ret = NS_FAILURE;
 	switch (evt) {
@@ -604,6 +612,8 @@ XS (XS_NeoStats_AddBot)
 	SV *ret;
 	int flags;
 	SV *value;
+	BotInfo *bi;
+	Bot *bot;
 
 	dXSARGS;
 	mod = GET_CUR_MODULE();
@@ -617,13 +627,27 @@ XS (XS_NeoStats_AddBot)
 			 XSRETURN_EMPTY;
 		}
 		rethash = (HV*)SvRV(ret);
-		value = *hv_fetch(rethash, "nick", strlen("nick"), FALSE);
-		printf("Nick: %s\n", SvPV_nolen(value));
-		value = *hv_fetch(rethash, "altnick", strlen("altnick"), FALSE);
-		printf("AltNick: %s\n", SvPV_nolen(value));
 		dump_hash(rethash);
-
-
+		bi = ns_malloc(sizeof(BotInfo));
+		value = *hv_fetch(rethash, "nick", strlen("nick"), FALSE);
+		strncpy(bi->nick, SvPV_nolen(value), MAXNICK);
+		value = *hv_fetch(rethash, "altnick", strlen("altnick"), FALSE);
+		strncpy(bi->altnick, SvPV_nolen(value), MAXNICK);
+		value = *hv_fetch(rethash, "ident", strlen("ident"), FALSE);
+		strncpy(bi->user, SvPV_nolen(value), MAXUSER);
+		value = *hv_fetch(rethash, "host", strlen("host"), FALSE);
+		strncpy(bi->host, SvPV_nolen(value), MAXHOST);
+		value = *hv_fetch(rethash, "gecos", strlen("gecos"), FALSE);
+		strncpy(bi->realname, SvPV_nolen(value), MAXREALNAME);
+		bi->flags = (int) SvIV (ST (1));
+		bi->bot_cmd_list = NULL;
+		bi->bot_setting_list = NULL;
+		if ((bot = AddBot(bi)) == NULL) {
+			free(bi);
+			XSRETURN_EMPTY;
+		}
+		bot->botinfo = bi;
+		XSRETURN_UV (PTR2UV (bot));
 	}
 exit(-1);
 	XSRETURN_EMPTY;
@@ -645,6 +669,29 @@ dump_hash(HV *rethash) {
 	}
 }
 
+
+static
+XS (XS_NeoStats_DelBot)
+{
+	Module *mod;
+	dXSARGS;
+	Bot *bot;
+
+
+	if (items != 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::DelBot(botname, quitreason)");
+	} else {
+		mod = GET_CUR_MODULE();
+		if (!mod) {
+			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
+			XSRETURN_EMPTY;
+		}
+		bot = FindBot(SvPV_nolen(ST(0)));
+		ns_free(bot->botinfo);
+		irc_quit(bot, SvPV_nolen(ST(1)));
+		XSRETURN_UV( NS_SUCCESS);
+	}
+}
 
 
 
@@ -968,6 +1015,7 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::hook_event", XS_NeoStats_hook_event, __FILE__);
 	newXS ("NeoStats::Internal::unhook_event", XS_NeoStats_unhook_event, __FILE__);
 	newXS ("NeoStats::Internal::AddBot", XS_NeoStats_AddBot, __FILE__);
+	newXS ("NeoStats::Internal::DelBot", XS_NeoStats_DelBot, __FILE__);
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);
@@ -1022,6 +1070,22 @@ xs_init (pTHX)
 	newCONSTSUB (stash, "EVENT_DCCCHATMSG", newSViv (EVENT_DCCCHATMSG));
 	newCONSTSUB (stash, "EVENT_ADDBAN", newSViv (EVENT_ADDBAN));
 	newCONSTSUB (stash, "EVENT_DELBAN", newSViv (EVENT_DELBAN));
+	
+	newCONSTSUB (stash, "EVENT_FLAG_DISABLED", newSViv (EVENT_FLAG_DISABLED));
+	newCONSTSUB (stash, "EVENT_FLAG_IGNORE_SYNCH", newSViv (EVENT_FLAG_IGNORE_SYNCH));
+	newCONSTSUB (stash, "EVENT_FLAG_USE_EXCLUDE", newSViv (EVENT_FLAG_USE_EXCLUDE));
+	newCONSTSUB (stash, "EVENT_FLAG_EXCLUDE_ME", newSViv (EVENT_FLAG_EXCLUDE_ME));
+	newCONSTSUB (stash, "EVENT_FLAG_EXCLUDE_MODME", newSViv (EVENT_FLAG_EXCLUDE_MODME));
+
+
+	newCONSTSUB (stash, "BOT_FLAG_ONLY_OPERS", newSViv (BOT_FLAG_ONLY_OPERS));
+	newCONSTSUB (stash, "BOT_FLAG_RESTRICT_OPERS", newSViv (BOT_FLAG_RESTRICT_OPERS));
+	newCONSTSUB (stash, "BOT_FLAG_DEAF", newSViv (BOT_FLAG_DEAF));
+	newCONSTSUB (stash, "BOT_FLAG_SERVICEBOT", newSViv (BOT_FLAG_SERVICEBOT));
+	newCONSTSUB (stash, "BOT_FLAG_PERSIST", newSViv (BOT_FLAG_PERSIST));
+	newCONSTSUB (stash, "BOT_FLAG_NOINTRINSICLEVELS", newSViv (BOT_FLAG_NOINTRINSICLEVELS));
+	newCONSTSUB (stash, "BOT_COMMON_HOST", newSVpv (BOT_COMMON_HOST, strlen(BOT_COMMON_HOST)));
+
 
 
 	newCONSTSUB (stash, "NS_SUCCESS", newSViv (NS_SUCCESS));
@@ -1086,13 +1150,9 @@ Module *load_perlmodule (const char *filename, Client *u)
 	   perl_definition array.
 	 */
 	eval_pv (perl_definitions, TRUE);
-	mod->insynch = 1;
+	mod->insynch = 0;
 	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
 								1, (char *)filename)) {
-#if 0
-	if (!execute_perl (mod, sv_2mortal (newSVpv ("pkg_load", 0)),
-								3, (char *)filename, (char *)filename, (char *)filename)) {
-#endif
 		/* XXX if we are here, check that pm->mod->info has something, otherwise the script didnt register */
 		if (!mod->info->name[0]) {
 			load_module_error(u, __("Perl Module %s didn't register. Unloading", u), filename);
@@ -1101,7 +1161,6 @@ Module *load_perlmodule (const char *filename, Client *u)
 			return NULL;
 		}		
 		/* it loaded ok */
-		mod->synched = 1;
 	} else {
 		load_module_error(u, __("Errors in Perl Module %s", u), filename);
 		unload_perlmod(mod);
@@ -1109,7 +1168,9 @@ Module *load_perlmodule (const char *filename, Client *u)
 		return NULL;	
 	}
 	assign_mod_number(mod);
-
+	SET_RUN_LEVEL(mod);
+	DBAOpenDatabase();
+	RESET_RUN_LEVEL();
 	insert_module(mod);
 
 	cmd = ns_calloc (sizeof(CmdParams));
