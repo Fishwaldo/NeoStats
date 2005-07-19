@@ -61,6 +61,20 @@ thread_mbox (char *str)
 
 #endif
 
+static void
+dump_hash(HV *rethash) {
+	char *key;
+	SV *value;
+	int keycount;
+	I32 *keylen;
+
+	keycount = hv_iterinit(rethash);
+	printf("%d items in call\n",keycount);
+	while(keycount-- != 0) {
+		value = hv_iternextsv(rethash, &key, &keylen);
+		printf("Return (%s) -> (%s)\n",key,SvPV_nolen(value));
+	}
+}
 
 
 
@@ -282,222 +296,48 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 	return ret;
 }
 
-
-#if 0
-
-static int
-generic_cb (int fd, int flags, void *userdata)
-{
-	HookData *data = (HookData *) userdata;
-
-	dSP;
-	ENTER;
-	SAVETMPS;
-
-	PUSHMARK (SP);
-	XPUSHs (data->userdata);
-	PUTBACK;
-
-	call_sv (data->callback, G_EVAL);
-	SPAGAIN;
-	if (SvTRUE (ERRSV)) {
-		xchat_printf (ph, "Error in generic callback %s", SvPV_nolen (ERRSV));
-		POPs;							  /* remove undef from the top of the stack */
-	}
-
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-
-	return XCHAT_EAT_ALL;
+/* encode a Client Structure into a perl Hash */
+HV *perl_encode_client(Client *u) {
+	HV *client;
+	
+	client = newHV();
+	
+	hv_store(client, "nick", 4, 
+		newSVpv(u->name, strlen(u->name)), 0);
+	hv_store(client, "username", 8, 
+		newSVpv(u->user->username, strlen(u->user->username)), 0);
+	hv_store(client, "hostname", 8, 
+		newSVpv(u->user->hostname, strlen(u->user->hostname)), 0);
+	hv_store(client, "vhost", 5, 
+		newSVpv(u->user->hostname, strlen(u->user->hostname)), 0);
+	hv_store(client, "awaymsg", 7, 
+		newSVpv(u->user->awaymsg, strlen(u->user->awaymsg)), 0);
+	hv_store(client, "swhois", 6, 
+		newSVpv(u->user->swhois, strlen(u->user->swhois)), 0);
+	hv_store(client, "userhostmask", 12, 
+		newSVpv(u->user->userhostmask, strlen(u->user->userhostmask)), 0);
+	hv_store(client, "uservhostmask", 13, 
+		newSVpv(u->user->uservhostmask, strlen(u->user->uservhostmask)), 0);
+	hv_store(client, "is_away", 7, 
+		newSViv(u->user->is_away), 0);
+	hv_store(client, "umodes", 6, 
+		newSVpv(u->user->modes, strlen(u->user->modes)), 0);
+	hv_store(client, "Umode", 5, 
+		newSViv(u->user->Umode), 0);
+	hv_store(client, "smodes", 6, 
+		newSVpv(u->user->smodes, strlen(u->user->smodes)), 0);
+	hv_store(client, "Smode", 5, 
+		newSViv(u->user->Smode), 0);
+	hv_store(client, "Ulevel", 6, 
+		newSViv(u->user->ulevel), 0);
+	return (client);
 }
 
-static int
-timer_cb (void *userdata)
-{
-	HookData *data = (HookData *) userdata;
-	int retVal = 0;
-	int count = 0;
 
-	dSP;
-	ENTER;
-	SAVETMPS;
-
-	PUSHMARK (SP);
-	XPUSHs (data->userdata);
-	PUTBACK;
-
-	count = call_sv (data->callback, G_EVAL);
-	SPAGAIN;
-
-	if (SvTRUE (ERRSV)) {
-		xchat_printf (ph, "Error in timer callback %s", SvPV_nolen (ERRSV));
-		POPs;							  /* remove undef from the top of the stack */
-		retVal = XCHAT_EAT_ALL;
-	} else {
-		if (count != 1) {
-			xchat_print (ph, "Timer handler should only return 1 value.");
-			retVal = XCHAT_EAT_NONE;
-		} else {
-			retVal = POPi;
-			if (retVal == 0) {
-				/* if 0 is return the timer is going to get unhooked */
-				PUSHMARK (SP);
-				XPUSHs (sv_2mortal (newSVuv (PTR2UV (data->hook))));
-				PUTBACK;
-
-				call_pv ("NeoStats::unhook", G_EVAL);
-				SPAGAIN;
-
-				SvREFCNT_dec (data->callback);
-
-				if (data->userdata) {
-					SvREFCNT_dec (data->userdata);
-				}
-				free (data);
-			}
-		}
-
-	}
-
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-
-	return retVal;
-}
-
-static int
-server_cb (char *word[], char *word_eol[], void *userdata)
-{
-	HookData *data = (HookData *) userdata;
-	int retVal = 0;
-	int count = 0;
-
-	/* these must be initialized after SAVETMPS */
-	AV *wd = NULL;
-	AV *wd_eol = NULL;
-
-	dSP;
-	ENTER;
-	SAVETMPS;
-
-	wd = newAV ();
-	sv_2mortal ((SV *) wd);
-	wd_eol = newAV ();
-	sv_2mortal ((SV *) wd_eol);
-
-	for (count = 1;
-		  (count < 32) && (word[count] != NULL) && (word[count][0] != 0);
-		  count++) {
-		av_push (wd, newSVpv (word[count], 0));
-	}
-
-	for (count = 1; (count < 32) && (word_eol[count] != NULL)
-		  && (word_eol[count][0] != 0); count++) {
-		av_push (wd_eol, newSVpv (word_eol[count], 0));
-	}
-
-	/*               xchat_printf (ph, */
-	/*                               "Recieved %d words in server callback", av_len (wd)); */
-	PUSHMARK (SP);
-	XPUSHs (newRV_noinc ((SV *) wd));
-	XPUSHs (newRV_noinc ((SV *) wd_eol));
-	XPUSHs (data->userdata);
-	PUTBACK;
-
-	count = call_sv (data->callback, G_EVAL);
-	SPAGAIN;
-	if (SvTRUE (ERRSV)) {
-		xchat_printf (ph, "Error in server callback %s", SvPV_nolen (ERRSV));
-		POPs;							  /* remove undef from the top of the stack */
-		retVal = XCHAT_EAT_NONE;
-	} else {
-		if (count != 1) {
-			xchat_print (ph, "Server handler should only return 1 value.");
-			retVal = XCHAT_EAT_NONE;
-		} else {
-			retVal = POPi;
-		}
-
-	}
-
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-
-	return retVal;
-}
-
-static int
-command_cb (char *word[], char *word_eol[], void *userdata)
-{
-	HookData *data = (HookData *) userdata;
-	int retVal = 0;
-	int count = 0;
-
-	/* these must be initialized after SAVETMPS */
-	AV *wd = NULL;
-	AV *wd_eol = NULL;
-
-	dSP;
-	ENTER;
-	SAVETMPS;
-
-	wd = newAV ();
-	sv_2mortal ((SV *) wd);
-	wd_eol = newAV ();
-	sv_2mortal ((SV *) wd_eol);
-
-	for (count = 1;
-		  (count < 32) && (word[count] != NULL) && (word[count][0] != 0);
-		  count++) {
-		av_push (wd, newSVpv (word[count], 0));
-	}
-
-	for (count = 1;
-		  (count < 32) && (word_eol[count] != NULL) &&
-		  (word_eol[count][0] != 0); count++) {
-		av_push (wd_eol, newSVpv (word_eol[count], 0));
-	}
-
-	/*               xchat_printf (ph, "Recieved %d words in command callback", */
-	/*                               av_len (wd)); */
-	PUSHMARK (SP);
-	XPUSHs (newRV_noinc ((SV *) wd));
-	XPUSHs (newRV_noinc ((SV *) wd_eol));
-	XPUSHs (data->userdata);
-	PUTBACK;
-
-	count = call_sv (data->callback, G_EVAL);
-	SPAGAIN;
-	if (SvTRUE (ERRSV)) {
-		xchat_printf (ph, "Error in command callback %s", SvPV_nolen (ERRSV));
-		POPs;							  /* remove undef from the top of the stack */
-		retVal = XCHAT_EAT_NONE;
-	} else {
-		if (count != 1) {
-			xchat_print (ph, "Command handler should only return 1 value.");
-			retVal = XCHAT_EAT_NONE;
-		} else {
-			retVal = POPi;
-		}
-
-	}
-
-	PUTBACK;
-	FREETMPS;
-	LEAVE;
-
-	return retVal;
-}
-
-/* custom IRC perl functions for scripting */
 
 /* NeoStats::Internal::register (scriptname, version, desc)
  *
  */
-#endif
 
 static
 XS (XS_NeoStats_register)
@@ -649,25 +489,10 @@ XS (XS_NeoStats_AddBot)
 		bot->botinfo = bi;
 		XSRETURN_UV (PTR2UV (bot));
 	}
-exit(-1);
 	XSRETURN_EMPTY;
 }
 
 
-static void
-dump_hash(HV *rethash) {
-	char *key;
-	SV *value;
-	int keycount;
-	I32 *keylen;
-
-	keycount = hv_iterinit(rethash);
-	printf("%d items in call\n",keycount);
-	while(keycount-- != 0) {
-		value = hv_iternextsv(rethash, &key, &keylen);
-		printf("Return (%s) -> (%s)\n",key,SvPV_nolen(value));
-	}
-}
 
 
 static
@@ -694,211 +519,38 @@ XS (XS_NeoStats_DelBot)
 }
 
 
+static
+XS (XS_NeoStats_FindUser)
+{
+	Module *mod;
+	Client *u;
+	SV *client;
 
+	dXSARGS;
 
-
-
-
-
-
+	if (items != 1) {
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::FindUser(nick)");
+	} else {
+		SP -= items; /* remove args from the stack */
+		mod = GET_CUR_MODULE();
+		if (!mod) {
+			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
+			XSRETURN_EMPTY;
+		}
+		u = FindUser(SvPV_nolen(ST(0)));
+		if (!u) {
+			XSRETURN_EMPTY;
+		}
+		/* create a hash with the users details filled in */
+		client = (SV *)perl_encode_client(u);
+		sv_2mortal(client);
+		XPUSHs(newRV_noinc((SV *)client));
+		PUTBACK;
+		XSRETURN(1);
+	}
+}
 
 #if 0
-static
-XS (XS_Xchat_emit_print)
-{
-	char *event_name;
-	int RETVAL;
-	int count;
-
-	dXSARGS;
-	if (items < 1) {
-		xchat_print (ph, "Usage: NeoStats::emit_print(event_name, ...)");
-	} else {
-		event_name = (char *) SvPV_nolen (ST (0));
-		RETVAL = 0;
-
-		/* we need to figure out the number of defined values passed in */
-		for (count = 0; count < items; count++) {
-			if (!SvOK (ST (count))) {
-				break;
-			}
-		}
-
-		switch (count) {
-		case 1:
-			RETVAL = xchat_emit_print (ph, event_name, NULL);
-			break;
-		case 2:
-			RETVAL = xchat_emit_print (ph, event_name,
-												SvPV_nolen (ST (1)), NULL);
-			break;
-		case 3:
-			RETVAL = xchat_emit_print (ph, event_name,
-												SvPV_nolen (ST (1)),
-												SvPV_nolen (ST (2)), NULL);
-			break;
-		case 4:
-			RETVAL = xchat_emit_print (ph, event_name,
-												SvPV_nolen (ST (1)),
-												SvPV_nolen (ST (2)),
-												SvPV_nolen (ST (3)), NULL);
-			break;
-		case 5:
-			RETVAL = xchat_emit_print (ph, event_name,
-												SvPV_nolen (ST (1)),
-												SvPV_nolen (ST (2)),
-												SvPV_nolen (ST (3)),
-												SvPV_nolen (ST (4)), NULL);
-			break;
-
-		}
-
-		XSRETURN_UV (RETVAL);
-	}
-}
-/* NeoStats::Internal::hook_event(name, callback, userdata) */
-static
-XS (XS_NeoStats_hook_event)
-{
-
-	char *name;
-	int pri;
-	SV *callback;
-	SV *userdata;
-	xchat_hook *hook;
-	HookData *data;
-
-	dXSARGS;
-
-	if (items != 3) {
-		xchat_print (ph,
-						 "Usage: NeoStats::Internal::hook_event(name, callback, userdata)");
-	} else {
-		name = SvPV_nolen (ST (0));
-		callback = ST (1);
-		userdata = ST (2);
-		data = NULL;
-		data = malloc (sizeof (HookData));
-		if (data == NULL) {
-			XSRETURN_UNDEF;
-		}
-
-		data->callback = sv_mortalcopy (callback);
-		SvREFCNT_inc (data->callback);
-		data->userdata = sv_mortalcopy (userdata);
-		SvREFCNT_inc (data->userdata);
-		hook = xchat_hook_server (ph, name, pri, server_cb, data);
-
-		XSRETURN_UV (PTR2UV (hook));
-	}
-}
-
-/* NeoStats::Internal::hook_command(name, callback, help_text, userdata) */
-static
-XS (XS_Xchat_hook_command)
-{
-	char *name;
-	int pri;
-	SV *callback;
-	char *help_text;
-	SV *userdata;
-	xchat_hook *hook;
-	HookData *data;
-
-	dXSARGS;
-
-	if (items != 4) {
-		xchat_print (ph,
-						 "Usage: NeoStats::Internal::hook_command(name, callback, help_text, userdata)");
-	} else {
-		name = SvPV_nolen (ST (0));
-		callback = ST (1);
-		help_text = SvPV_nolen (ST (2));
-		userdata = ST (3);
-		data = NULL;
-
-		data = malloc (sizeof (HookData));
-		if (data == NULL) {
-			XSRETURN_UNDEF;
-		}
-
-		data->callback = sv_mortalcopy (callback);
-		SvREFCNT_inc (data->callback);
-		data->userdata = sv_mortalcopy (userdata);
-		SvREFCNT_inc (data->userdata);
-		hook = xchat_hook_command (ph, name, pri, command_cb, help_text, data);
-
-		XSRETURN_UV (PTR2UV (hook));
-	}
-
-}
-
-/* NeoStats::Internal::hook_timer(timeout, callback, userdata) */
-static
-XS (XS_Xchat_hook_timer)
-{
-	int timeout;
-	SV *callback;
-	SV *userdata;
-	xchat_hook *hook;
-	HookData *data;
-
-	dXSARGS;
-
-	if (items != 3) {
-		xchat_print (ph,
-						 "Usage: NeoStats::Internal::hook_timer(timeout, callback, userdata)");
-	} else {
-		timeout = (int) SvIV (ST (0));
-		callback = ST (1);
-		data = NULL;
-		userdata = ST (2);
-
-		data = malloc (sizeof (HookData));
-		if (data == NULL) {
-			XSRETURN_UNDEF;
-		}
-
-		data->callback = sv_mortalcopy (callback);
-		SvREFCNT_inc (data->callback);
-		data->userdata = sv_mortalcopy (userdata);
-		SvREFCNT_inc (data->userdata);
-		hook = xchat_hook_timer (ph, timeout, timer_cb, data);
-		data->hook = hook;
-
-		XSRETURN_UV (PTR2UV (hook));
-	}
-}
-
-static
-XS (XS_Xchat_unhook)
-{
-	xchat_hook *hook;
-	HookData *userdata;
-	int retCount = 0;
-	dXSARGS;
-	if (items != 1) {
-		xchat_print (ph, "Usage: NeoStats::unhook(hook)");
-	} else {
-		hook = INT2PTR (xchat_hook *, SvUV (ST (0)));
-		userdata = (HookData *) xchat_unhook (ph, hook);
-
-		if (userdata != NULL) {
-			if (userdata->callback) {
-				SvREFCNT_dec (userdata->callback);
-			}
-
-			if (userdata->userdata) {
-				XPUSHs (sv_mortalcopy (userdata->userdata));
-				SvREFCNT_dec (userdata->userdata);
-				retCount = 1;
-			}
-		}
-		free (userdata);
-		XSRETURN (retCount);
-	}
-	XSRETURN_EMPTY;
-}
 
 static
 XS (XS_Xchat_get_list)
@@ -1016,6 +668,8 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::unhook_event", XS_NeoStats_unhook_event, __FILE__);
 	newXS ("NeoStats::Internal::AddBot", XS_NeoStats_AddBot, __FILE__);
 	newXS ("NeoStats::Internal::DelBot", XS_NeoStats_DelBot, __FILE__);
+	newXS ("NeoStats::Internal::FindUser", XS_NeoStats_FindUser, __FILE__);
+
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);

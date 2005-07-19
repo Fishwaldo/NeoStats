@@ -161,6 +161,17 @@ use Symbol();
     return NeoStats::Internal::DelBot($botname, $reason);
   }    
 
+  sub FindUser {
+    if (@_ < 1) {
+      NeoStats::print("Invalid Number of arguments to FindUser");
+      return NeoStats::NS_FAILURE;
+    }
+    my $nick = shift;
+    return NeoStats::Internal::FindUser($nick);
+  }
+
+
+
   sub hook_server {
     return undef unless @_ >= 2;
 

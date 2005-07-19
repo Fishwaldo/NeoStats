@@ -102,6 +102,8 @@ sub event_pong {
 sub event_signon {
 	my ($source) = @_;
 	NeoStats::print ("Signon $source");
+	my $user = NeoStats::FindUser($source);
+	NeoStats::print ("Host: $user->{hostname}");
 }
 
 sub event_quit {
