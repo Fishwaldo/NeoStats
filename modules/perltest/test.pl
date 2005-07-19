@@ -82,6 +82,8 @@ sub event_moduleunload {
 sub event_server {
 	my ($test) = @_;
 	NeoStats::print ("New Server $test");
+	my $server = NeoStats::FindServer($test);
+	NeoStats::print ("Server Uplink $test->{uplink}");
 }
 
 sub event_squit {
@@ -104,6 +106,7 @@ sub event_signon {
 	NeoStats::print ("Signon $source");
 	my $user = NeoStats::FindUser($source);
 	NeoStats::print ("Host: $user->{hostname}");
+	NeoStats::print ("Server $user->{server}");
 }
 
 sub event_quit {
@@ -174,6 +177,8 @@ sub event_delchan {
 sub event_join {
 	my ($channel, $source) = @_;
 	NeoStats::print ("Join $channel: $source");
+	my $chan = NeoStats::FindChan($channel);
+	NeoStats::print ("Channel users $chan->{users}");
 }
 
 sub event_part {

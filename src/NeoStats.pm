@@ -103,6 +103,12 @@ use Symbol();
       return NeoStats::NS_FAILURE;
     }
   }
+  
+  sub unhook_event {
+    NeoStats::print("todo");
+    return NeoStats::NS_FAILURE;
+  }
+
 
 # AddBot(botinfo, botflag)
   sub AddBot {
@@ -170,167 +176,24 @@ use Symbol();
     return NeoStats::Internal::FindUser($nick);
   }
 
-
-
-  sub hook_server {
-    return undef unless @_ >= 2;
-
-    my $message = shift;
-    my $callback = shift;
-    my $options = shift;
-    my ($package) = caller;
-    ($package) = caller(1) if $package eq 'IRC';
-    $callback = NeoStats::Embed::fix_callback( $package, $callback );
-    my ($priority, $data) = ( NeoStats::PRI_NORM, undef );
-  
-    if ( ref( $options ) eq 'HASH' ) {
-      if ( exists( $options->{priority} ) && defined( $options->{priority} ) ) {
-        $priority = $options->{priority};
-      }
-      if ( exists( $options->{data} ) && defined( $options->{data} ) ) {
-        $data = $options->{data};
-      }
+  sub FindServer {
+    if (@_ < 1) {
+      NeoStats::print("Invalid Number of arguments to FindServer");
+      return NeoStats::NS_FAILURE;
     }
-    
-    my $pkg_info = NeoStats::Embed::pkg_info( $package );
-    my $hook =  NeoStats::Internal::hook_server( $message, $priority, $callback, $data);
-    push @{$pkg_info->{hooks}}, $hook if defined $hook;
-    return $hook;
-
+    my $name = shift;
+    return NeoStats::Internal::FindServer($name);
   }
 
-  sub hook_command {
-    return undef unless @_ >= 2;
-
-    my $command = shift;
-    my $callback = shift;
-    my $options = shift;
-    my ($package) = caller;
-    ($package) = caller(1) if $package eq 'IRC';
-    $callback = NeoStats::Embed::fix_callback( $package, $callback );
-    my ($priority, $help_text, $data) = ( NeoStats::PRI_NORM, '', undef );
-
-    if ( ref( $options ) eq 'HASH' ) {
-      if ( exists( $options->{priority} ) && defined( $options->{priority} ) ) {
-        $priority = $options->{priority};
-      }
-      if ( exists( $options->{help_text} ) && defined( $options->{help_text} ) ) {
-        $help_text = $options->{help_text};
-      }
-      if ( exists( $options->{data} ) && defined( $options->{data} ) ) {
-        $data = $options->{data};
-      }
+  sub FindChan {
+    if (@_ < 1) {
+      NeoStats::print("Invalid Number of arguments to FindChannel");
+      return NeoStats::NS_FAILURE;
     }
-
-    my $pkg_info = NeoStats::Embed::pkg_info( $package );
-    my $hook = NeoStats::Internal::hook_command( $command, $priority, $callback,
-                                     $help_text, $data);
-    push @{$pkg_info->{hooks}}, $hook if defined $hook;
-    return $hook;
-
-  }
-
-  sub hook_print {
-    return undef unless @_ >= 2;
-
-    my $event = shift;
-    my $callback = shift;
-    my $options = shift;
-    my ($package) = caller;
-    ($package) = caller(1) if $package eq 'IRC';
-    $callback = NeoStats::Embed::fix_callback( $package, $callback );
-    my ($priority, $data) = ( NeoStats::PRI_NORM, undef );
-
-    if ( ref( $options ) eq 'HASH' ) {
-      if ( exists( $options->{priority} ) && defined( $options->{priority} ) ) {
-        $priority = $options->{priority};
-      }
-      if ( exists( $options->{data} ) && defined( $options->{data} ) ) {
-        $data = $options->{data};
-      }
-    }
-
-    my $pkg_info = NeoStats::Embed::pkg_info( $package );
-    my $hook =  NeoStats::Internal::hook_print( $event, $priority, $callback, $data);
-    push @{$pkg_info->{hooks}}, $hook if defined $hook;
-    return $hook;
-
-  }
-
-
-  sub hook_timer {
-    return undef unless @_ >= 2;
-
-    my ($timeout, $callback, $data) = @_;
-    my ($package) = caller;
-    ($package) = caller(1) if $package eq 'IRC';
-    $callback = NeoStats::Embed::fix_callback( $package, $callback );
- 
-    if ( ref( $data ) eq 'HASH' && exists( $data->{data} )
-         && defined( $data->{data} ) ) {
-      $data = $data->{data};
-    }
-
-    my $pkg_info = NeoStats::Embed::pkg_info( $package );
-    my $hook = NeoStats::Internal::hook_timer( $timeout, $callback, $data );
-    push @{$pkg_info->{hooks}}, $hook if defined $hook;
-    return $hook;
-
-  }
-
-  sub hook_fd {
-    return undef unless @_ >= 2;
-    my ($fd, $callback, $options) = @_;
-    return undef unless defined $fd && defined $callback;
-    my $fileno = fileno $fd;
-    return undef unless defined $fileno; # no underlying fd for this handle
-    
-    my ($package) = caller;
-    ($package) = caller(1) if $package eq 'IRC';
-
-    $callback = NeoStats::Embed::fix_callback( $package, $callback );
-    
-    my ($flags, $data) = (NeoStats::FD_READ, undef);
-    
-    if( ref( $options ) eq 'HASH' ) {
-      if( exists( $options->{flags} ) && defined( $options->{flags} ) ) {
-        $flags = $options->{flags};
-      }
-      if( exists( $options->{data} ) && defined( $options->{data} ) ) {
-        $data = $options->{data};
-      }
-    }
-    
-    my $cb = sub {
-      my $userdata = shift;
-      no strict 'refs';
-      return &{$userdata->{CB}}($userdata->{FD}, $userdata->{FLAGS},
-			       $userdata->{DATA},
-                              );
-    };
-    
-    my $pkg_info = NeoStats::Embed::pkg_info( $package );
-    my $hook = NeoStats::Internal::hook_fd( $fileno, $cb, $flags,
-                                         { DATA => $data, FD => $fd, CB => $callback,
-                                           FLAGS => $flags,
-                                         } );
-    push @{$pkg_info->{hooks}}, $hook if defined $hook;
-    return $hook;
+    my $name = shift;
+    return NeoStats::Internal::FindChannel($name);
   }
   
-  sub unhook {
-    my $hook = shift @_;
-    my $package = shift @_;
-    ($package) = caller unless $package;
-    my $pkg_info = NeoStats::Embed::pkg_info( $package );
-
-    if( $hook =~ /^\d+$/ && grep { $_ == $hook } @{$pkg_info->{hooks}} ) {
-      $pkg_info->{hooks} = [grep { $_ != $hook } @{$pkg_info->{hooks}}];
-      return NeoStats::Internal::unhook( $hook );
-    }
-
-    return ();
-  }
 
   sub print {
 
@@ -343,131 +206,13 @@ use Symbol();
         $text = join "", @$text;
       }
     }
-
-  
-    if ( @_ >= 1 ) {
-      my $channel = shift @_;
-      my $server = shift @_;
-      my $old_ctx = NeoStats::get_context();
-      my $ctx = NeoStats::find_context( $channel, $server );
-    
-      if ( $ctx ) {
-        NeoStats::set_context( $ctx );
-        NeoStats::Internal::debug( $text );
-        NeoStats::set_context( $old_ctx );
-        return 1;
-      } else {
-        return 0;
-      }
-    } else {
-      NeoStats::Internal::debug( $text );
-      return 1;
-    }
-
+    NeoStats::Internal::debug( $text );
+    return 1;
   }
 
   sub printf {
     my $format = shift;
     NeoStats::print( sprintf( $format, @_ ) );
-  }
-
-  sub command {
-
-    my $command = shift;
-    my @commands;
-    if ( ref( $command ) eq 'ARRAY' ) {
-      @commands = @$command;
-    } else {
-      @commands = ($command);
-    }
-    if ( @_ >= 1 ) {
-      my ($channel, $server) = @_;
-      my $old_ctx = NeoStats::get_context();
-      my $ctx = NeoStats::find_context( $channel, $server );
-
-      if ( $ctx ) {
-        NeoStats::set_context( $ctx );
-        NeoStats::Internal::command( $_ ) foreach @commands;
-        NeoStats::set_context( $old_ctx );
-        return 1;
-      } else {
-        return 0;
-      }
-    } else {
-      NeoStats::Internal::command( $_ ) foreach @commands;
-      return 1;
-    }
-
-  }
-
-  sub commandf {
-    my $format = shift;
-    NeoStats::command( sprintf( $format, @_ ) );
-  }
-
-  sub set_context {
-    my $context;
-
-    if ( @_ == 2 ) {
-      my ($channel, $server) = @_;
-      $context = NeoStats::find_context( $channel, $server );
-    } elsif ( @_ == 1 ) {
-      if ( $_[0] =~ /^\d+$/ ) {
-        $context = $_[0];
-      } else {
-        $context = NeoStats::find_context( $_[0] );
-      }
-    }
-
-    return $context ? NeoStats::Internal::set_context( $context ) : 0;
-  }
-
-  sub get_info {
-    my $id = shift;
-    my $info;
-  
-    if ( defined( $id ) ) {
-      if ( grep { $id eq $_ } qw(state_cursor) ) {
-        $info = NeoStats::get_prefs( $id );
-      } else {
-        $info = NeoStats::Internal::get_info( $id );
-      }
-    }
-    return $info;
-  }
-
-  sub user_info {
-    my $nick = shift @_ || NeoStats::get_info( "nick" );
-    my $user;
-
-    for (NeoStats::get_list( "users" ) ) {
-      if ( NeoStats::nickcmp( $_->{nick}, $nick ) == 0 ) {
-        $user = $_;
-        last;
-      }
-    }
-    return $user;
-  }
-
-  sub context_info {
-    my $ctx = shift @_ || NeoStats::get_context;
-    my $old_ctx = NeoStats::get_context;
-    my @fields = (qw(away channel host inputbox libdirfs network nick server),
-                  qw(topic version win_status NeoStatsdir NeoStatsdirfs state_cursor),
-                 );
-
-    if (NeoStats::set_context( $ctx )) {
-      my %info;
-      for my $field ( @fields ) {
-        $info{$field} = NeoStats::get_info( $field );
-      }
-      NeoStats::set_context( $old_ctx );
-    
-      return %info if wantarray;
-      return \%info;
-    } else {
-      return undef;
-    }
   }
 
   sub strip_code {

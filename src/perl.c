@@ -207,7 +207,8 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name);
 			break;
 		case EVENT_PART:
-			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
+			/* XXX Something wrong here */
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_PARTBOT:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
@@ -318,6 +319,8 @@ HV *perl_encode_client(Client *u) {
 		newSVpv(u->user->userhostmask, strlen(u->user->userhostmask)), 0);
 	hv_store(client, "uservhostmask", 13, 
 		newSVpv(u->user->uservhostmask, strlen(u->user->uservhostmask)), 0);
+	hv_store(client, "server", 6, 
+		newSVpv(u->uplink->name, strlen(u->uplink->name)), 0);
 	hv_store(client, "is_away", 7, 
 		newSViv(u->user->is_away), 0);
 	hv_store(client, "umodes", 6, 
@@ -330,6 +333,57 @@ HV *perl_encode_client(Client *u) {
 		newSViv(u->user->Smode), 0);
 	hv_store(client, "Ulevel", 6, 
 		newSViv(u->user->ulevel), 0);
+	return (client);
+}
+
+/* encode a Server Structure into a perl Hash */
+HV *perl_encode_server(Client *u) {
+	HV *client;
+	
+	client = newHV();
+	
+	hv_store(client, "name", 4, 
+		newSVpv(u->name, strlen(u->name)), 0);
+	hv_store(client, "uplink", 6, 
+		newSVpv(u->uplinkname, strlen(u->uplinkname)), 0);
+	hv_store(client, "users", 5, 
+		newSViv(u->server->users), 0);
+	hv_store(client, "awaycount", 9, 
+		newSViv(u->server->awaycount), 0);
+	hv_store(client, "hops", 4, 
+		newSViv(u->server->hops), 0);
+	hv_store(client, "ping", 4, 
+		newSViv(u->server->ping), 0);
+	hv_store(client, "uptime", 6, 
+		newSViv(u->server->uptime), 0);
+	return (client);
+}
+
+/* encode a Client Structure into a perl Hash */
+HV *perl_encode_channel(Channel *c) {
+	HV *client;
+	
+	client = newHV();
+	
+	hv_store(client, "name", 4, 
+		newSVpv(c->name, strlen(c->name)), 0);
+	hv_store(client, "topic", 5, 
+		newSVpv(c->topic, strlen(c->topic)), 0);
+	hv_store(client, "topicowner", 10, 
+		newSVpv(c->topicowner, strlen(c->topicowner)), 0);
+	hv_store(client, "topictime", 9, 
+		newSViv(c->topictime), 0);
+	hv_store(client, "users", 5, 
+		newSViv(c->users), 0);
+	hv_store(client, "modes", 5, 
+		newSViv(c->modes), 0);
+	hv_store(client, "limit", 5, 
+		newSViv(c->limit), 0);
+	hv_store(client, "key", 3, 
+		newSVpv(c->key, strlen(c->key)), 0);
+	hv_store(client, "createtime", 10, 
+		newSViv(c->creationtime), 0);
+	/* XXX todo: Encode Mode Params */
 	return (client);
 }
 
@@ -550,6 +604,69 @@ XS (XS_NeoStats_FindUser)
 	}
 }
 
+static
+XS (XS_NeoStats_FindServer)
+{
+	Module *mod;
+	Client *u;
+	SV *client;
+
+	dXSARGS;
+
+	if (items != 1) {
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::FindServer(name)");
+	} else {
+		SP -= items; /* remove args from the stack */
+		mod = GET_CUR_MODULE();
+		if (!mod) {
+			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
+			XSRETURN_EMPTY;
+		}
+		u = FindServer(SvPV_nolen(ST(0)));
+		if (!u) {
+			XSRETURN_EMPTY;
+		}
+		/* create a hash with the users details filled in */
+		client = (SV *)perl_encode_server(u);
+		sv_2mortal(client);
+		XPUSHs(newRV_noinc((SV *)client));
+		PUTBACK;
+		XSRETURN(1);
+	}
+}
+
+
+static
+XS (XS_NeoStats_FindChannel)
+{
+	Module *mod;
+	Channel *c;
+	SV *client;
+
+	dXSARGS;
+
+	if (items != 1) {
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::FindServer(name)");
+	} else {
+		SP -= items; /* remove args from the stack */
+		mod = GET_CUR_MODULE();
+		if (!mod) {
+			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
+			XSRETURN_EMPTY;
+		}
+		c = FindChannel(SvPV_nolen(ST(0)));
+		if (!c) {
+			XSRETURN_EMPTY;
+		}
+		/* create a hash with the users details filled in */
+		client = (SV *)perl_encode_channel(c);
+		sv_2mortal(client);
+		XPUSHs(newRV_noinc((SV *)client));
+		PUTBACK;
+		XSRETURN(1);
+	}
+}
+
 #if 0
 
 static
@@ -669,6 +786,8 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::AddBot", XS_NeoStats_AddBot, __FILE__);
 	newXS ("NeoStats::Internal::DelBot", XS_NeoStats_DelBot, __FILE__);
 	newXS ("NeoStats::Internal::FindUser", XS_NeoStats_FindUser, __FILE__);
+	newXS ("NeoStats::Internal::FindServer", XS_NeoStats_FindServer, __FILE__);
+	newXS ("NeoStats::Internal::FindChannel", XS_NeoStats_FindChannel, __FILE__);
 
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
