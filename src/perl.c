@@ -98,11 +98,11 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 
 	sv = GvSV (gv_fetchpv ("@", TRUE, SVt_PV));
 	if (SvTRUE (sv)) {
-		nlog(LOG_WARNING, "Perl error: %s\n", SvPV(sv, count)); 
+		nlog(LOG_WARNING, "Perl error: %s", SvPV(sv, count)); 
 		POPs;							  /* remove undef from the top of the stack */
 	} else if (count != 1) {
 		nlog(LOG_WARNING, "Perl error: expected 1 value from %s, "
-						  "got: %d\n", (char *)function, count);
+						  "got: %d", (char *)function, count);
 	} else {
 		ret_value = POPi;
 	}
@@ -1138,12 +1138,12 @@ Module *load_perlmodule (const char *filename, Client *u)
 	mod->info->name = ns_malloc(strlen("NeoStats")+1);
 	ircsnprintf((char *)mod->info->name, strlen("NeoStats")+1, "NeoStats");
 
-	PL_perl_destruct_level = 2;
+	PL_perl_destruct_level = 1;
 	mod->pm->my_perl = perl_alloc ();
-	PL_perl_destruct_level = 2;
+	PL_perl_destruct_level = 1;
 	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 	perl_construct (mod->pm->my_perl);
-	PL_perl_destruct_level = 2;
+	PL_perl_destruct_level = 1;
 	perl_parse (mod->pm->my_perl, xs_init, 4, perl_args, NULL);
 	/*
 	   Now initialising the perl interpreter by loading the
@@ -1199,7 +1199,7 @@ void unload_perlmod(Module *mod) {
 		PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 		/* because segv handler doesn't handle perl well yet */
 		RESET_RUN_LEVEL()
-		PL_perl_destruct_level = 2;
+		PL_perl_destruct_level = 1;
 		perl_destruct ((PMI *)mod->pm->my_perl);
 
 		perl_free ((PMI *)mod->pm->my_perl);

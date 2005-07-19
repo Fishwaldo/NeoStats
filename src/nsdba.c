@@ -142,16 +142,17 @@ void FiniDBA( void )
 	hash_scan_begin( &ds, dbhash );
 	while(( node = hash_scan_next( &ds ) ) != NULL  ) {
 		dbe = (dbentry *) hnode_get( node );
+		dlog(DEBUG1, "Closing Database %s", dbe->name);
 		hash_scan_begin( &ts, dbe->tablehash );
 		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
 			tbe = (tableentry *) hnode_get( tnode );
 			DBACloseTable( tbe->table );
-			hash_delete( dbe->tablehash, tnode );
+			hash_scan_delete( dbe->tablehash, tnode );
 			hnode_destroy( tnode );
 			ns_free( tbe );
 		}
 		hash_destroy( dbe->tablehash );
-		hash_delete( dbhash, node );
+		hash_scan_delete( dbhash, node );
 		hnode_destroy( node );
 		ns_free( dbe );
 	}
@@ -173,8 +174,9 @@ int DBAOpenDatabase( void )
 
 	dlog( DEBUG1, "DBAOpenDatabase %s", GET_CUR_MODNAME() );
 	dbe = ns_calloc( sizeof( dbentry ) );
+	strlcpy(dbe->name, GET_CUR_MODNAME(), MAX_MOD_NAME);
 	dbe->tablehash = hash_create( -1, 0, 0 );
-	hnode_create_insert( dbhash, dbe, GET_CUR_MODNAME() );
+	hnode_create_insert( dbhash, dbe, dbe->name);
 	return NS_SUCCESS;
 }
 
