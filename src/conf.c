@@ -127,7 +127,7 @@ validate_args arg_validate[] = {
 	{"Options|RootNick", &cb_verify_mask},
 	{"Options|NOLOAD", &cb_noload},
 	{"Servers|IpAddress", &cb_verify_host},
-	{"ServiceRoots|Mask", &cb_verify_mask},
+	{"ServiceRoot|Mask", &cb_verify_mask},
 	{"Modules|ModuleName", &cb_verify_file}
 };
 
