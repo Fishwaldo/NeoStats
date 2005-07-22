@@ -297,6 +297,13 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 	return ret;
 }
 
+int
+perl_command_cb(CmdParams *cmdparams) {
+
+
+}
+
+
 /* encode a Client Structure into a perl Hash */
 HV *perl_encode_client(Client *u) {
 	HV *client;
@@ -541,7 +548,7 @@ XS (XS_NeoStats_AddBot)
 			XSRETURN_EMPTY;
 		}
 		bot->botinfo = bi;
-		XSRETURN_UV (PTR2UV (bot));
+		XSRETURN_PV (bot->name);
 	}
 	XSRETURN_EMPTY;
 }
@@ -646,7 +653,7 @@ XS (XS_NeoStats_FindChannel)
 	dXSARGS;
 
 	if (items != 1) {
-		nlog(LOG_WARNING, "Usage: NeoStats::Internal::FindServer(name)");
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::FindChannel(name)");
 	} else {
 		SP -= items; /* remove args from the stack */
 		mod = GET_CUR_MODULE();
@@ -665,6 +672,66 @@ XS (XS_NeoStats_FindChannel)
 		PUTBACK;
 		XSRETURN(1);
 	}
+}
+
+static
+XS (XS_NeoStats_AddCommand)
+{
+	Module *mod;
+	HV * rethash;
+	SV *ret;
+	int flags;
+	SV *value;
+	bot_cmd *bc;
+	Bot *bot;
+	char *temp[] = { "Test Command", "Test Command Two", NULL};
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:AddCommand(bot, botcmd, callback)");
+	} else {
+		ret = ST(1);
+		if(SvTYPE(SvRV(ret))!=SVt_PVHV) {
+			 dlog(DEBUG1, "XS_NeoStats_AddCommand: unsuported input %lu, must %i", SvTYPE(SvRV(ret)), SVt_PVHV);
+			 XSRETURN_EMPTY;
+		}
+		rethash = (HV*)SvRV(ret);
+		dump_hash(rethash);
+		bc = ns_malloc(sizeof(bot_cmd));
+		value = *hv_fetch(rethash, "cmd", strlen("cmd"), FALSE);
+		bc->cmd = malloc(SvLEN(value)+1);
+		strlcpy((char *)bc->cmd, SvPV_nolen(value), SvLEN(value)+1);
+		value = *hv_fetch(rethash, "minparams", strlen("minparams"), FALSE);
+		bc->minparams = SvIV(value);
+		value = *hv_fetch(rethash, "ulevel", strlen("ulevel"), FALSE);
+		bc->ulevel = SvIV(value);
+#if 0
+/* XXX TODO */
+		value = *hv_fetch(rethash, "helptext", strlen("helptext"), FALSE);
+		strlcpy(bc->helptext, SvPV_nolen(value), MAXHOST);
+#endif
+		bc->helptext = temp;
+		value = *hv_fetch(rethash, "flags", strlen("flags"), FALSE);
+		bc->flags = SvIV(value);
+
+		bc->moddata = malloc(SvLEN(ST(2))+1);
+		strlcpy(bc->moddata, SvPV_nolen(ST(2)), SvLEN(ST(2))+1);
+		bc->modptr = mod;
+		bc->handler = perl_command_cb;
+printf("Adding %s to bot %s\n", bc->cmd, SvPV_nolen(ST(0)));
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			if (bot->botcmds == NULL) {
+				bot->botcmds = hash_create(-1, 0, 0);
+			}
+			XSRETURN_UV(add_bot_cmd(bot->botcmds, bc));
+		} else {
+printf("Empty\n");
+			XSRETURN_EMPTY;
+		}
+	}
+	XSRETURN_UV(NS_FAILURE);
 }
 
 #if 0
@@ -788,6 +855,7 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::FindUser", XS_NeoStats_FindUser, __FILE__);
 	newXS ("NeoStats::Internal::FindServer", XS_NeoStats_FindServer, __FILE__);
 	newXS ("NeoStats::Internal::FindChannel", XS_NeoStats_FindChannel, __FILE__);
+	newXS ("NeoStats::Internal::AddCommand", XS_NeoStats_AddCommand, __FILE__);
 
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {

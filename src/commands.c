@@ -202,7 +202,7 @@ void check_cmd_result( CmdParams *cmdparams, int cmdret, char *extra )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr ) 
+int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr ) 
 {
 	bot_cmd *hashentry;
 	char confcmd[32];
@@ -247,7 +247,7 @@ static int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr ) 
+int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr ) 
 {
 	hnode_t *cmdnode;
 	
@@ -257,6 +257,12 @@ static int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 		dlog( DEBUG3, "deleting command %s from services bot",( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
 		hash_delete( cmd_hash, cmdnode );
 		hnode_destroy( cmdnode );
+#if USE_PERL
+		if (IS_PERL_MOD(cmd_ptr->modptr)) {
+			ns_free(cmd_ptr->cmd);
+			ns_free(cmd_ptr->moddata);
+		}
+#endif
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;

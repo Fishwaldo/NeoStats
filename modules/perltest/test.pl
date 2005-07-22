@@ -328,12 +328,26 @@ sub setupbot {
 	$botinfo->{ident} = "fish";
 	$botinfo->{host} = "Host.com";
 	$botinfo->{gecos} = "My Gecos";
-	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
+	my $bot = NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
 	$botinfo->{nick} = "fishy2";
 	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
 	NeoStats::print("Added Second Bot $botinfo->{nick}");
 	NeoStats::DelBot($botinfo->{nick});
-	
+
+
+#	add a command
+	my $cmd;
+	$cmd = {
+		cmd => 'test',
+		minparams => '1',
+		ulevel => '0',
+		flags => '0',
+	};
+	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
+}
+
+sub cmd_cb_test {
+	NeoStats::print("Got Test Command");
 }
 
 sub shutdownbot {

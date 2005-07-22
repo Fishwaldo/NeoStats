@@ -149,7 +149,7 @@ use Symbol();
     
     my $bot =  NeoStats::Internal::AddBot( $botinfo, $botflag, $data);
     if ( defined ( $bot )) {
-      return NeoStats::NS_SUCCESS;
+      return $bot;
     } else {
       return NeoStats::NS_FAILURE;
     }
@@ -194,6 +194,47 @@ use Symbol();
     return NeoStats::Internal::FindChannel($name);
   }
   
+  sub AddCmd {
+    if (@_ < 3) {
+      NeoStats::print("Invalid Number of arguments to AddCmd");
+      return NeoStats::NS_FAILURE;
+    }
+
+    my $bot = shift;
+    my $botcmd = shift;
+    my $callback = shift;
+    my $data = shift;
+    my ($package) = caller;
+    $callback = NeoStats::Embed::fix_callback( $package, $callback );
+  
+    if (!ref( $botcmd ) eq 'HASH' ) {
+      NeoStats::print("Botcmd is not a hash");
+      return NeoStats::NS_FAILURE;
+    }
+    if ((!exists( $botcmd->{cmd} )) || (!defined( $botcmd->{cmd} ))) {
+      NeoStats::print("Botinfo->{cmd} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    if ((!exists( $botcmd->{minparams} )) || (!defined( $botcmd->{minparams} ))) {
+      NeoStats::print("Botinfo->{minparams} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    if ((!exists( $botcmd->{ulevel} )) || (!defined( $botcmd->{ulevel} ))) {
+      NeoStats::print("Bot->{ulevel} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+#XXX TODO
+#    if ((!exists( $botcmd->{helptext} )) || (!defined( $botcmd->{helptext} ))) {
+#      NeoStats::print("Botinfo->{host} not defined");
+#      return NeoStats::NS_FAILURE;
+#    }    
+    if ((!exists( $botcmd->{flags} )) || (!defined( $botcmd->{flags} ))) {
+      NeoStats::print("Botinfo->{flags} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    my $ret =  NeoStats::Internal::AddCommand( $bot, $botcmd, $callback);
+    return $ret;
+  }
 
   sub print {
 
