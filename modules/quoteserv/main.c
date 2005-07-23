@@ -21,6 +21,11 @@
 ** $Id$
 */
 
+/*  TODO:
+ *  - Database sanity checking
+ *  - Free allocs made during database load
+ */
+
 #include "neostats.h"
 #include "quoteserv.h"
 
@@ -38,12 +43,14 @@ static int qs_cmd_list( CmdParams *cmdparams );
 static int qs_cmd_del( CmdParams *cmdparams );
 static int qs_cmd_quote( CmdParams* cmdparams );
 
-/** Settings function prototypes */
-static int qs_set_exclusions( CmdParams *cmdparams, SET_REASON reason );
+/** Set callbacks */
+static int qs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason );
+static int qs_set_signonquote_cb( CmdParams *cmdparams, SET_REASON reason );
 
 /** Event function prototypes */
 static int event_signon( CmdParams *cmdparams );
 
+/** Configuration variables */
 int signonquote = 0;
 int useexclusions = 0;
 
@@ -87,9 +94,9 @@ static bot_cmd qs_commands[]=
 /** Bot setting table */
 static bot_setting qs_settings[]=
 {
-	{"SIGNONQUOTE",	&signonquote,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_signonquote,	NULL,			( void* )0	},
-	{"EXCLUSIONS",	&useexclusions,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_exclusions,	qs_set_exclusions,	( void* )0	},
-	{NULL,		NULL,		0,			0, 0, 		0,			NULL,			NULL,			NULL		},
+	{ "SIGNONQUOTE",	&signonquote,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	help_set_signonquote,	qs_set_signonquote_cb,	( void* )0	},
+	{ "EXCLUSIONS",		&useexclusions,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	help_set_exclusions,	qs_set_exclusions_cb,	( void* )0	},
+	{ NULL,				NULL,			0,					0, 0, 	0,				 NULL,	NULL,			NULL		},
 };
 
 /** BotInfo */
@@ -188,7 +195,7 @@ int ModInit( void )
 	qshash = hash_create( -1, 0, 0 );
 	if( !qshash ) {
 		nlog( LOG_CRITICAL, "Unable to create database hash" );
-		return -1;
+		return NS_FAILURE;
 	}
 	DBAFetchRows( "databases", load_database );
 	ModuleConfig( qs_settings );
@@ -248,8 +255,6 @@ int ModFini( void )
  *
  *  @param cmdparams
  *    cmdparams->av[0] = database
- *    cmdparams->av[1] = nick
- *    cmdparams->av[2] = optional channel
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -319,9 +324,9 @@ static int qs_cmd_list( CmdParams *cmdparams )
 /** @brief qs_cmd_del
  *
  *  Command handler for DEL
- *    cmdparams->av[0] = database to delete
  *
  *  @param cmdparams
+ *    cmdparams->av[0] = database to delete
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
@@ -356,9 +361,11 @@ static int qs_cmd_del( CmdParams *cmdparams )
 
 /** @brief do_quote
  *
- *  do_quote
+ *  Send a quote to a client
  *
- *  @
+ *  @param target to send quote
+ *  @param which quote type
+ *  @param reporterror flag whether to report errors to target
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -401,7 +408,8 @@ static int do_quote( Client *target, char *which, int reporterror )
 		}
 	}
 	/* return if no records in selected database */
-	if (db->stringcount < 1)
+	/* TODO: This should be checked at DB load time, not during command execution! */
+	if( db->stringcount < 1 )
 		return NS_FAILURE;
 	randno = hrand( db->stringcount, 1 );	
 	if( db->prefixstring )
@@ -410,16 +418,16 @@ static int do_quote( Client *target, char *which, int reporterror )
 		flag |= 1 << 1;
 	switch( flag )
 	{
-		case 3:
+		case 3: /* have prefix and suffix */
 			irc_prefmsg( qs_bot, target, "%s %s %s", db->prefixstring, db->stringlist[randno], db->suffixstring );
 			break;
-		case 2:
+		case 2: /* have suffix */
 			irc_prefmsg( qs_bot, target, "%s %s", db->stringlist[randno], db->suffixstring );
 			break;
-		case 1:
+		case 1: /* have suffix */
 			irc_prefmsg( qs_bot, target, "%s %s", db->prefixstring, db->stringlist[randno] );
 			break;
-		case 0:
+		case 0: /* no prefix or suffix */
 		default:
 			irc_prefmsg( qs_bot, target, db->stringlist[randno] );
 	}
@@ -428,11 +436,10 @@ static int do_quote( Client *target, char *which, int reporterror )
 
 /** @brief qs_cmd_quote
  *
- *  qs_cmd_quote
- *    cmdparams->av[0] = target nick
- *    cmdparams->av[1 - cmdparams->ac] = message
+ *  QUOTE command handler
  *
  *  @cmdparams pointer to commands param struct
+ *    cmdparams->av[0] = target nick
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -442,10 +449,10 @@ static int qs_cmd_quote( CmdParams* cmdparams )
 	return do_quote( cmdparams->source, cmdparams->av[0], 1 );
 }
 
-/** @brief event_part
+/** @brief event_signon
  *
- *  part event handler
- *  manage limit on channels
+ *  signon event handler
+ *  Send quote on signon if enabled
  *
  *  @cmdparams pointer to commands param struct
  *
@@ -454,19 +461,52 @@ static int qs_cmd_quote( CmdParams* cmdparams )
 
 static int event_signon( CmdParams *cmdparams )
 {
-	if (signonquote)
-		return do_quote( cmdparams->source, "random", 0 );
-	else
-		return NS_SUCCESS;
+	return do_quote( cmdparams->source, "random", 0 );
 }
 
-/*
- * Enable/Disable Global Exclusions
-*/
-static int qs_set_exclusions( CmdParams *cmdparams, SET_REASON reason )
+/** @brief cs_set_exclusions_cb
+ *
+ *  Set callback for exclusions
+ *  Enable or disable exclude event flag
+ *
+ *  @cmdparams pointer to commands param struct
+ *  @cmdparams reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int qs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
+	{
 		SetAllEventFlags( EVENT_FLAG_USE_EXCLUDE, useexclusions );
+	}
 	return NS_SUCCESS;
 }
 
+/** @brief qs_set_signonquote_cb
+ *
+ *  Set callback for signonquote
+ *  Enable or disable events associated with signonquote
+ *
+ *  @cmdparams pointer to commands param struct
+ *  @cmdparams reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int qs_set_signonquote_cb( CmdParams *cmdparams, SET_REASON reason )
+{
+	if( reason == SET_LOAD || reason == SET_CHANGE )
+	{
+		if( signonquote )
+		{
+			EnableEvent( EVENT_SIGNON );
+		}
+		else
+		{
+			DisableEvent( EVENT_SIGNON );
+		}
+	}
+	return NS_SUCCESS;
+}
