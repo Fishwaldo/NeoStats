@@ -236,6 +236,17 @@ use Symbol();
     return $ret;
   }
 
+  sub DelCmd {
+    if (@_ < 2) {
+      NeoStats::print("Invalid Number of arguments to DelCmd");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $botcmd = shift;
+NeoStats::print("$bot $botcmd");
+    return NeoStats::Internal::DelCommand($bot, $botcmd);
+  }
+
   sub print {
 
     my $text = shift @_;

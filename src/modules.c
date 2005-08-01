@@ -405,6 +405,7 @@ Module *ns_load_module(const char *modfilename, Client * u)
 	char path[255];
 	char loadmodname[255];
 	struct stat buf;
+	Module *mod;
 
 	strlcpy (loadmodname, modfilename, 255);
 	strlwr (loadmodname);
@@ -415,7 +416,12 @@ Module *ns_load_module(const char *modfilename, Client * u)
 #ifdef USE_PERL
 	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT);
 	if (stat(path, &buf) != -1) {
-		return load_perlmodule(path, u);
+		mod = load_perlmodule(path, u);
+		mod->info->build_date = ns_malloc(10);
+		strftime((char *)mod->info->build_date, 9, "%d/%m/%y", gmtime(&buf.st_mtime));
+		mod->info->build_time = ns_malloc(11);
+		strftime((char *)mod->info->build_time, 10, "%H:%M", gmtime(&buf.st_mtime));
+		return mod;
 	}
 #endif
 	/* if we get here, ehhh, doesn't exist */

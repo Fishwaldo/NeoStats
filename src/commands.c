@@ -243,6 +243,25 @@ int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	return NS_SUCCESS;
 }
 
+/** @brief find_bot_cmd finds the bot command structure
+ *
+ * @return bot_cmd structure or NULL if not found
+ */
+ 
+
+bot_cmd *find_bot_cmd( Bot *bot_ptr, char *cmd) 
+{
+	hnode_t *cmdnode;
+	
+	/* Find the command */
+	cmdnode = hash_lookup( bot_ptr->botcmds, cmd );
+	if( cmdnode ) {
+		return hnode_get(cmdnode);
+	}
+	return NULL;
+}	
+
+
 /** @brief del_bot_cmd deltes a single command to the command hash
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -735,7 +754,13 @@ Client * FindValidUser( Bot* botptr, Client * sourceuser, const char *target_nic
 static int bot_cmd_about( CmdParams *cmdparams )
 {
 	if( cmdparams->bot->moduleptr ) {
-		irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text );
+		if (IS_STD_MOD(cmdparams->bot->moduleptr)) {
+			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text );
+#if USE_PERL
+		} else {
+			irc_prefmsg(cmdparams->bot, cmdparams->source, "Not Available");
+#endif
+		}
 	}
 	return NS_SUCCESS;
 }
@@ -760,8 +785,14 @@ static int bot_cmd_version( CmdParams *cmdparams )
 static int bot_cmd_credits( CmdParams *cmdparams )
 {
 	if( cmdparams->bot->moduleptr ) {
-		irc_prefmsg_list( cmdparams->bot, cmdparams->source, 
-			cmdparams->bot->moduleptr->info->copyright );
+		if (IS_STD_MOD(cmdparams->bot->moduleptr)) {
+			irc_prefmsg_list( cmdparams->bot, cmdparams->source, 
+				cmdparams->bot->moduleptr->info->copyright );
+#if USE_PERL
+		} else {
+			irc_prefmsg(cmdparams->bot, cmdparams->source, "Not Available");
+#endif
+		}
 	}
 	return NS_SUCCESS;
 }

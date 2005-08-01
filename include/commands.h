@@ -27,6 +27,9 @@
 int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
 int del_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
 int del_all_bot_cmds( Bot* bot_ptr );
+int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr );
+bot_cmd *find_bot_cmd( Bot *bot_ptr, char *cmd);
+int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr );
 int run_bot_cmd( CmdParams * cmdparams, int ischancmd );
 int getuserlevel( CmdParams *cmdparams );
 void msg_permission_denied( CmdParams *cmdparams, char *subcommand );

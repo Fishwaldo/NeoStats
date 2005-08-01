@@ -344,6 +344,14 @@ sub setupbot {
 		flags => '0',
 	};
 	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
+	$cmd = {
+		cmd => 'test2',
+		minparams => '1',
+		ulevel => '0',
+		flags => '0',
+	};
+	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
+	NeoStats::print(NeoStats::DelCmd($bot, $cmd->{cmd}));
 }
 
 sub cmd_cb_test {

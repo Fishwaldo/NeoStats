@@ -28,6 +28,7 @@
 #include "neostats.h"
 #include "services.h"
 #include "modules.h"
+#include "commands.h"
 #undef _
 #define PERLDEFINES
 #include "perlmod.h"
@@ -300,7 +301,7 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 int
 perl_command_cb(CmdParams *cmdparams) {
 
-
+	return NS_SUCCESS;
 }
 
 
@@ -419,6 +420,7 @@ XS (XS_NeoStats_register)
 		mod->info->version = SvPV_nolen (ST (1));
 		mod->info->description = SvPV_nolen (ST (2));
 #if 0
+XXX TODO Credits and about 
 		name = SvPV_nolen (ST (0));
 		version = SvPV_nolen (ST (1));
 		desc = SvPV_nolen (ST (2));
@@ -680,7 +682,6 @@ XS (XS_NeoStats_AddCommand)
 	Module *mod;
 	HV * rethash;
 	SV *ret;
-	int flags;
 	SV *value;
 	bot_cmd *bc;
 	Bot *bot;
@@ -719,20 +720,38 @@ XS (XS_NeoStats_AddCommand)
 		strlcpy(bc->moddata, SvPV_nolen(ST(2)), SvLEN(ST(2))+1);
 		bc->modptr = mod;
 		bc->handler = perl_command_cb;
-printf("Adding %s to bot %s\n", bc->cmd, SvPV_nolen(ST(0)));
 		bot = FindBot(SvPV_nolen(ST(0)));
 		if (bot) {
 			if (bot->botcmds == NULL) {
 				bot->botcmds = hash_create(-1, 0, 0);
 			}
 			XSRETURN_UV(add_bot_cmd(bot->botcmds, bc));
-		} else {
-printf("Empty\n");
-			XSRETURN_EMPTY;
 		}
 	}
 	XSRETURN_UV(NS_FAILURE);
 }
+
+static
+XS (XS_NeoStats_DelCommand)
+{
+	Module *mod;
+	Bot *bot;
+	bot_cmd *cmd_ptr = NULL;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:DelCommand(bot, botcmd)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot)
+			cmd_ptr = find_bot_cmd(bot, SvPV_nolen(ST(1)));
+		if (cmd_ptr) 
+			XSRETURN_UV(del_bot_cmd(bot->botcmds, cmd_ptr));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
 
 #if 0
 
@@ -856,6 +875,7 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::FindServer", XS_NeoStats_FindServer, __FILE__);
 	newXS ("NeoStats::Internal::FindChannel", XS_NeoStats_FindChannel, __FILE__);
 	newXS ("NeoStats::Internal::AddCommand", XS_NeoStats_AddCommand, __FILE__);
+	newXS ("NeoStats::Internal::DelCommand", XS_NeoStats_DelCommand, __FILE__);
 
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
@@ -1050,6 +1070,10 @@ void unload_perlmod(Module *mod) {
 		free((void *)mod->info->description);
 
 		free((void *)mod->info->version);
+		
+		free((void *)mod->info->build_date);
+		
+		free((void *)mod->info->build_time);
 
 		free(mod->info);
 		
