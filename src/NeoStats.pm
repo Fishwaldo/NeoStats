@@ -44,7 +44,7 @@ use Symbol();
 
   sub register {
     if (@_ != 5) {
-      NeoStats::print("Invalid Number of arguments to register");
+      NeoStats::debug("Invalid Number of arguments to register");
       return NeoStats::NS_FAILURE;
     }
     my ($package) = caller;
@@ -73,7 +73,7 @@ use Symbol();
 
   sub hook_event {
     if (@_ < 2) {
-      NeoStats::print("Invalid Number of arguments to hook_event");
+      NeoStats::debug("Invalid Number of arguments to hook_event");
       return NeoStats::NS_FAILURE;
     }
 
@@ -105,7 +105,7 @@ use Symbol();
   }
   
   sub unhook_event {
-    NeoStats::print("todo");
+    NeoStats::debug("todo");
     return NeoStats::NS_FAILURE;
   }
 
@@ -113,7 +113,7 @@ use Symbol();
 # AddBot(botinfo, botflag)
   sub AddBot {
     if (@_ < 2) {
-      NeoStats::print("Invalid Number of arguments to AddBot");
+      NeoStats::debug("Invalid Number of arguments to AddBot");
       return NeoStats::NS_FAILURE;
     }
 
@@ -127,23 +127,23 @@ use Symbol();
       return NeoStats::NS_FAILURE;
     }
     if ((!exists( $botinfo->{nick} )) || (!defined( $botinfo->{nick} ))) {
-      NeoStats::print("Botinfo->{nick} not defined");
+      NeoStats::debug("Botinfo->{nick} not defined");
       return NeoStats::NS_FAILURE;
     }    
     if ((!exists( $botinfo->{altnick} )) || (!defined( $botinfo->{altnick} ))) {
-      NeoStats::print("Botinfo->{altnick} not defined");
+      NeoStats::debug("Botinfo->{altnick} not defined");
       return NeoStats::NS_FAILURE;
     }    
     if ((!exists( $botinfo->{ident} )) || (!defined( $botinfo->{ident} ))) {
-      NeoStats::print("Botinfo->{ident} not defined");
+      NeoStats::debug("Botinfo->{ident} not defined");
       return NeoStats::NS_FAILURE;
     }    
     if ((!exists( $botinfo->{host} )) || (!defined( $botinfo->{host} ))) {
-      NeoStats::print("Botinfo->{host} not defined");
+      NeoStats::debug("Botinfo->{host} not defined");
       return NeoStats::NS_FAILURE;
     }    
     if ((!exists( $botinfo->{gecos} )) || (!defined( $botinfo->{gecos} ))) {
-      NeoStats::print("Botinfo->{gecos} not defined");
+      NeoStats::debug("Botinfo->{gecos} not defined");
       return NeoStats::NS_FAILURE;
     }    
     
@@ -156,7 +156,7 @@ use Symbol();
   }
   sub DelBot {
     if (@_ < 1) {
-      NeoStats::print("Invalid Number of arguments to DelBot");
+      NeoStats::debug("Invalid Number of arguments to DelBot");
       return NeoStats::NS_FAILURE;
     }
     my $botname = shift;
@@ -169,7 +169,7 @@ use Symbol();
 
   sub FindUser {
     if (@_ < 1) {
-      NeoStats::print("Invalid Number of arguments to FindUser");
+      NeoStats::debug("Invalid Number of arguments to FindUser");
       return NeoStats::NS_FAILURE;
     }
     my $nick = shift;
@@ -178,7 +178,7 @@ use Symbol();
 
   sub FindServer {
     if (@_ < 1) {
-      NeoStats::print("Invalid Number of arguments to FindServer");
+      NeoStats::debug("Invalid Number of arguments to FindServer");
       return NeoStats::NS_FAILURE;
     }
     my $name = shift;
@@ -187,7 +187,7 @@ use Symbol();
 
   sub FindChan {
     if (@_ < 1) {
-      NeoStats::print("Invalid Number of arguments to FindChannel");
+      NeoStats::debug("Invalid Number of arguments to FindChannel");
       return NeoStats::NS_FAILURE;
     }
     my $name = shift;
@@ -196,7 +196,7 @@ use Symbol();
   
   sub AddCmd {
     if (@_ < 3) {
-      NeoStats::print("Invalid Number of arguments to AddCmd");
+      NeoStats::debug("Invalid Number of arguments to AddCmd");
       return NeoStats::NS_FAILURE;
     }
 
@@ -208,28 +208,28 @@ use Symbol();
     $callback = NeoStats::Embed::fix_callback( $package, $callback );
   
     if (!ref( $botcmd ) eq 'HASH' ) {
-      NeoStats::print("Botcmd is not a hash");
+      NeoStats::debug("Botcmd is not a hash");
       return NeoStats::NS_FAILURE;
     }
     if ((!exists( $botcmd->{cmd} )) || (!defined( $botcmd->{cmd} ))) {
-      NeoStats::print("Botinfo->{cmd} not defined");
+      NeoStats::debug("Botinfo->{cmd} not defined");
       return NeoStats::NS_FAILURE;
     }    
     if ((!exists( $botcmd->{minparams} )) || (!defined( $botcmd->{minparams} ))) {
-      NeoStats::print("Botinfo->{minparams} not defined");
+      NeoStats::debug("Botinfo->{minparams} not defined");
       return NeoStats::NS_FAILURE;
     }    
     if ((!exists( $botcmd->{ulevel} )) || (!defined( $botcmd->{ulevel} ))) {
-      NeoStats::print("Bot->{ulevel} not defined");
+      NeoStats::debug("Bot->{ulevel} not defined");
       return NeoStats::NS_FAILURE;
     }    
 #XXX TODO
 #    if ((!exists( $botcmd->{helptext} )) || (!defined( $botcmd->{helptext} ))) {
-#      NeoStats::print("Botinfo->{host} not defined");
+#      NeoStats::debug("Botinfo->{host} not defined");
 #      return NeoStats::NS_FAILURE;
 #    }    
     if ((!exists( $botcmd->{flags} )) || (!defined( $botcmd->{flags} ))) {
-      NeoStats::print("Botinfo->{flags} not defined");
+      NeoStats::debug("Botinfo->{flags} not defined");
       return NeoStats::NS_FAILURE;
     }    
     my $ret =  NeoStats::Internal::AddCommand( $bot, $botcmd, $callback);
@@ -238,16 +238,36 @@ use Symbol();
 
   sub DelCmd {
     if (@_ < 2) {
-      NeoStats::print("Invalid Number of arguments to DelCmd");
+      NeoStats::debug("Invalid Number of arguments to DelCmd");
       return NeoStats::NS_FAILURE;
     }
     my $bot = shift;
     my $botcmd = shift;
-NeoStats::print("$bot $botcmd");
     return NeoStats::Internal::DelCommand($bot, $botcmd);
   }
 
-  sub print {
+  sub PrefMsg {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to PreMsg");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $message = shift;
+    return NeoStats::Internal::Prefmsg($bot, $target, $message);
+  }
+
+  sub ChanAlert {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguments to ChanAlert");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $message = shift;
+    return NeoStats::Internal::ChanAlert($bot, $message);
+  }
+
+  sub debug {
 
     my $text = shift @_;
     return 1 unless $text;
@@ -264,7 +284,7 @@ NeoStats::print("$bot $botcmd");
 
   sub printf {
     my $format = shift;
-    NeoStats::print( sprintf( $format, @_ ) );
+    NeoStats::debug( sprintf( $format, @_ ) );
   }
 
   sub strip_code {
@@ -296,7 +316,7 @@ $SIG{__WARN__} = sub {
   if( $pkg_info ) {
     $message =~ s/\(eval \d+\)/$pkg_info->{filename}/;
   }
-  NeoStats::print( $message );
+  NeoStats::debug( $message );
 };
 
 {
@@ -353,8 +373,8 @@ $SIG{__WARN__} = sub {
 #    if ( exists $scripts{$package} ) {
 #      my $pkg_info = pkg_info( $package );
 #      my $filename = File::Basename::basename( $pkg_info->{filename} );
-#      NeoStats::print( qq{'$filename' already loaded from '$pkg_info->{filename}'.\n} );
-#      NeoStats::print( 'If this is a different script then it rename and try loading it again.' );
+#      NeoStats::debug( qq{'$filename' already loaded from '$pkg_info->{filename}'.\n} );
+#      NeoStats::debug( 'If this is a different script then it rename and try loading it again.' );
 #      return 2;
 #    }
 
@@ -366,7 +386,7 @@ $SIG{__WARN__} = sub {
         my $original_package = $1;
 
         if ( $replacements > 1 ) {
-          NeoStats::print( "Too many package defintions, only 1 is allowed\n" );
+          NeoStats::debug( "Too many package defintions, only 1 is allowed\n" );
           return 1;
         }
 
@@ -386,7 +406,7 @@ $SIG{__WARN__} = sub {
 
       if ( $@ ) {
         # something went wrong
-        NeoStats::print( "Error loading '$file':\n$@\n" );
+        NeoStats::debug( "Error loading '$file':\n$@\n" );
 
         # make sure the script list doesn't contain false information
         unload( $scripts{$package}{filename} );
@@ -394,7 +414,7 @@ $SIG{__WARN__} = sub {
       }
 
     } else {
-      NeoStats::print( "Error opening '$file': $!\n" );
+      NeoStats::debug( "Error opening '$file': $!\n" );
       return 2;
     }
     

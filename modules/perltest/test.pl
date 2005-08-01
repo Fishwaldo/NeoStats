@@ -8,6 +8,8 @@
 # First thing that you must ensure happens (ie, first command) is to register this script
 # Using the following command:
 
+my $bot;
+
 NeoStats::register( "Test", "1.0", "Test Script 1 description", "setupbot", "shutdownbot");
 
 # Events make up the core communications of NeoStats, here you register the events your 
@@ -71,267 +73,267 @@ NeoStats::hook_event(NeoStats::EVENT_DELBAN, "event_delban");
 
 sub event_moduleload {
 	my ($param1) = @_;
-	NeoStats::print("New Module Loaded: $param1");
+	NeoStats::debug("New Module Loaded: $param1");
 }
 
 sub event_moduleunload {
 	my ($param1) = @_;
-	NeoStats::print("Module Unloaded: $param1");
+	NeoStats::debug("Module Unloaded: $param1");
 }
 
 sub event_server {
 	my ($test) = @_;
-	NeoStats::print ("New Server $test");
+	NeoStats::debug ("New Server $test");
 	my $server = NeoStats::FindServer($test);
-	NeoStats::print ("Server Uplink $test->{uplink}");
+	NeoStats::debug ("Server Uplink $test->{uplink}");
 }
 
 sub event_squit {
 	my ($server, $msg) = @_;
-	NeoStats::print ("Server $server Squit: $msg");
+	NeoStats::debug ("Server $server Squit: $msg");
 }
 
 sub event_ping {
 	my ($source) = @_;
-	NeoStats::print ("Ping $source");
+	NeoStats::debug ("Ping $source");
 }
 
 sub event_pong {
 	my ($source) = @_;
-	NeoStats::print ("Pong $source");
+	NeoStats::debug ("Pong $source");
 }
 
 sub event_signon {
 	my ($source) = @_;
-	NeoStats::print ("Signon $source");
+	NeoStats::debug ("Signon $source");
 	my $user = NeoStats::FindUser($source);
-	NeoStats::print ("Host: $user->{hostname}");
-	NeoStats::print ("Server $user->{server}");
+	NeoStats::debug ("Host: $user->{hostname}");
+	NeoStats::debug ("Server $user->{server}");
 }
 
 sub event_quit {
 	my ($source, $msg) = @_;
-	NeoStats::print ("Quit $source: $msg");
+	NeoStats::debug ("Quit $source: $msg");
 }
 
 sub event_nickip {
 	my ($source) = @_;
-	NeoStats::print ("NickIP $source");
+	NeoStats::debug ("NickIP $source");
 }
 
 sub event_kill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("KILL $target by $source: $msg");
+	NeoStats::debug ("KILL $target by $source: $msg");
 }
 
 sub event_globalkill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("GLOBALKILL $target by $source: $msg");
+	NeoStats::debug ("GLOBALKILL $target by $source: $msg");
 }
 
 sub event_localkill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("LOCALKILL $target by $source: $msg");
+	NeoStats::debug ("LOCALKILL $target by $source: $msg");
 }
 
 sub event_serverkill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("SEVERKILL $target by $source: $msg");
+	NeoStats::debug ("SEVERKILL $target by $source: $msg");
 }
 
 sub event_botkill {
 	my ($target, $msg) = @_;
-	NeoStats::print ("BOTKILL $target: $msg");
+	NeoStats::debug ("BOTKILL $target: $msg");
 }
 
 sub event_nick {
 	my ($source, $target) = @_;
-	NeoStats::print ("NICKChange $source: $target");
+	NeoStats::debug ("NICKChange $source: $target");
 }
 
 sub event_away {
 	my ($source) = @_;
-	NeoStats::print ("AwayChange $source");
+	NeoStats::debug ("AwayChange $source");
 }
 
 sub event_umode {
 	my ($source, $mode) = @_;
-	NeoStats::print ("UMODE $source, $mode");
+	NeoStats::debug ("UMODE $source, $mode");
 }
 
 sub event_smode {
 	my ($source, $mode) = @_;
-	NeoStats::print ("SMODE $source, $mode");
+	NeoStats::debug ("SMODE $source, $mode");
 }
 
 sub event_newchan {
 	my ($channel) = @_;
-	NeoStats::print ("NewChan $channel");
+	NeoStats::debug ("NewChan $channel");
 }
 
 sub event_delchan {
 	my ($channel) = @_;
-	NeoStats::print ("DelChan $channel");
+	NeoStats::debug ("DelChan $channel");
 }
 
 sub event_join {
 	my ($channel, $source) = @_;
-	NeoStats::print ("Join $channel: $source");
+	NeoStats::debug ("Join $channel: $source");
 	my $chan = NeoStats::FindChan($channel);
-	NeoStats::print ("Channel users $chan->{users}");
+	NeoStats::debug ("Channel users $chan->{users}");
 }
 
 sub event_part {
 	my ($channel, $source, $msg) = @_;
-	NeoStats::print ("Part $channel: $source: $msg");
+	NeoStats::debug ("Part $channel: $source: $msg");
 }
 
 sub event_partbot {
 	my ($channel, $source, $msg) = @_;
-	NeoStats::print ("Partbot $channel: $source: $msg");
+	NeoStats::debug ("Partbot $channel: $source: $msg");
 }
 
 sub event_emptychan {
 	my ($channel, $source, $bot, $msg) = @_;
-	NeoStats::print ("Empty $channel $source $bot: $msg");
+	NeoStats::debug ("Empty $channel $source $bot: $msg");
 }
 
 sub event_kick {
 	my ($channel, $source, $target, $msg) = @_;
-	NeoStats::print ("Kick $channel $source $target: $msg");
+	NeoStats::debug ("Kick $channel $source $target: $msg");
 }
 
 sub event_kickbot {
 	my ($channel, $source, $target, $msg) = @_;
-	NeoStats::print ("Kickbot $channel $source $target: $msg");
+	NeoStats::debug ("Kickbot $channel $source $target: $msg");
 }
 
 sub event_topic {
 	my ($channel, $source) = @_;
-	NeoStats::print ("Topic $channel $source");
+	NeoStats::debug ("Topic $channel $source");
 }
 
 sub event_cmode {
-	NeoStats::print ("ToDO");
+	NeoStats::debug ("ToDO");
 }
 
 sub event_private {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("Privmsg $source $target: $msg");
+	NeoStats::debug ("Privmsg $source $target: $msg");
 }
 
 sub event_notice {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("NOTICE $source $target: $msg");
+	NeoStats::debug ("NOTICE $source $target: $msg");
 }
 
 sub event_cprivate {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("CPRIVATE $source $target: $msg");
+	NeoStats::debug ("CPRIVATE $source $target: $msg");
 }
 
 sub event_cnotice {
 	my ($source, $target, $msg) = @_;
-	NeoStats::print ("CNOTICE $source $target: $msg");
+	NeoStats::debug ("CNOTICE $source $target: $msg");
 }
 
 sub event_globops {
 	my ($source, $msg) = @_;
-	NeoStats::print ("GLOBOPS $source $msg");
+	NeoStats::debug ("GLOBOPS $source $msg");
 }
 
 sub event_chatops {
 	my ($source, $msg) = @_;
-	NeoStats::print ("CHATOPS $source: $msg");
+	NeoStats::debug ("CHATOPS $source: $msg");
 }
 
 sub event_wallops {
 	my ($source, $msg) = @_;
-	NeoStats::print ("WALLOPS $source: $msg");
+	NeoStats::debug ("WALLOPS $source: $msg");
 }
 
 sub event_ctcpversionrpl {
 	my ($source, $msg) = @_;
-	NeoStats::print ("CTCPVERSIONRPL $source: $msg");
+	NeoStats::debug ("CTCPVERSIONRPL $source: $msg");
 }
 
 sub event_ctcpversionreq {
 	my ($source) = @_;
-	NeoStats::print ("CTCPVERSIONREQ $source");
+	NeoStats::debug ("CTCPVERSIONREQ $source");
 }
 
 sub event_ctcpfingerrpl {
 	my ($source, $msg) = @_;
-	NeoStats::print ("CTCPFINGERRPL $source: $msg");
+	NeoStats::debug ("CTCPFINGERRPL $source: $msg");
 }
 
 sub event_ctcpfingerreq {
 	my ($source) = @_;
-	NeoStats::print ("CTCPFINGERREQ $source");
+	NeoStats::debug ("CTCPFINGERREQ $source");
 }
 
 sub event_ctcpactionreq {
 	my ($source) = @_;
-	NeoStats::print ("CTCPACTIONREQ $source");
+	NeoStats::debug ("CTCPACTIONREQ $source");
 }
 
 sub event_ctcptimerpl {
 	my ($source, $msg) = @_;
-	NeoStats::print ("CTCPTIMERPL $source: $msg");
+	NeoStats::debug ("CTCPTIMERPL $source: $msg");
 }
 
 sub event_ctcptimereq {
 	my ($source) = @_;
-	NeoStats::print ("CTCPTIMEREQ $source");
+	NeoStats::debug ("CTCPTIMEREQ $source");
 }
 
 sub event_ctcppingrpl {
 	my ($source, $msg) = @_;
-	NeoStats::print ("CTCPPINGRPL $source: $msg");
+	NeoStats::debug ("CTCPPINGRPL $source: $msg");
 }
 
 sub event_ctcppingreq {
 	my ($source) = @_;
-	NeoStats::print ("CTCPPINGREQ $source");
+	NeoStats::debug ("CTCPPINGREQ $source");
 }
 
 sub event_dccsend {
 	my ($source, $msg) = @_;
-	NeoStats::print ("DCCSEND $source: $msg");
+	NeoStats::debug ("DCCSEND $source: $msg");
 }
 
 sub event_dccchat {
 	my ($source, $msg) = @_;
-	NeoStats::print ("DCCCHAT $source: $msg");
+	NeoStats::debug ("DCCCHAT $source: $msg");
 }
 
 sub event_dccmsg {
 	my ($source, $msg) = @_;
-	NeoStats::print ("DCCMSG $source: $msg");
+	NeoStats::debug ("DCCMSG $source: $msg");
 }
 
 sub event_addban {
-	NeoStats::print ("AddBan");
+	NeoStats::debug ("AddBan");
 }
 
 sub event_delban {
-	NeoStats::print ("DelBan");
+	NeoStats::debug ("DelBan");
 }
 
 
 
 sub setupbot {
 	my $botinfo;
-	NeoStats::print("Setup");
+	NeoStats::debug("Setup");
 	$botinfo->{nick} = "Fishy";
 	$botinfo->{altnick} = "Fishy2";
 	$botinfo->{ident} = "fish";
 	$botinfo->{host} = "Host.com";
 	$botinfo->{gecos} = "My Gecos";
-	my $bot = NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
+	$bot = NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
 	$botinfo->{nick} = "fishy2";
 	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
-	NeoStats::print("Added Second Bot $botinfo->{nick}");
+	NeoStats::debug("Added Second Bot $botinfo->{nick}");
 	NeoStats::DelBot($botinfo->{nick});
 
 
@@ -351,14 +353,18 @@ sub setupbot {
 		flags => '0',
 	};
 	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
-	NeoStats::print(NeoStats::DelCmd($bot, $cmd->{cmd}));
+	NeoStats::debug(NeoStats::DelCmd($bot, $cmd->{cmd}));
+	NeoStats::ChanAlert($bot, "Loaded up and ready to rock and role");
 }
 
 sub cmd_cb_test {
-	NeoStats::print("Got Test Command");
+	my ($cmd, $who, $params) = @_;
+	NeoStats::debug("Got $cmd Command from $who: $params ");
+	NeoStats::PrefMsg($bot, $who, "You Sent me this: $params");
+	return NeoStats::NS_SUCCESS;
 }
 
 sub shutdownbot {
-	NeoStats::Print("Shutdown");
+	NeoStats::debug("Shutdown");
 }
 

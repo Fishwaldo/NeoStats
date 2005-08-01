@@ -300,8 +300,7 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 
 int
 perl_command_cb(CmdParams *cmdparams) {
-
-	return NS_SUCCESS;
+	return execute_perl(cmdparams->bot->moduleptr, sv_2mortal (newSVpv (cmdparams->cmd_ptr->moddata, 0)), 3, cmdparams->cmd_ptr->cmd, cmdparams->source->name, cmdparams->param);
 }
 
 
@@ -448,7 +447,7 @@ XS (XS_NeoStats_debug)
 
 	dXSARGS;
 	if (items != 1) {
-		nlog(LOG_WARNING, "Usage: NeoStats::Internal::print(text)");
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::debug(text)");
 	} else {
 		text = SvPV_nolen (ST (0));
 		nlog(LOG_WARNING, "%s", text);
@@ -530,7 +529,9 @@ XS (XS_NeoStats_AddBot)
 			 XSRETURN_EMPTY;
 		}
 		rethash = (HV*)SvRV(ret);
+#ifdef DEBUG
 		dump_hash(rethash);
+#endif
 		bi = ns_malloc(sizeof(BotInfo));
 		value = *hv_fetch(rethash, "nick", strlen("nick"), FALSE);
 		strncpy(bi->nick, SvPV_nolen(value), MAXNICK);
@@ -698,7 +699,9 @@ XS (XS_NeoStats_AddCommand)
 			 XSRETURN_EMPTY;
 		}
 		rethash = (HV*)SvRV(ret);
+#ifdef DEBUG
 		dump_hash(rethash);
+#endif
 		bc = ns_malloc(sizeof(bot_cmd));
 		value = *hv_fetch(rethash, "cmd", strlen("cmd"), FALSE);
 		bc->cmd = malloc(SvLEN(value)+1);
@@ -748,6 +751,50 @@ XS (XS_NeoStats_DelCommand)
 			cmd_ptr = find_bot_cmd(bot, SvPV_nolen(ST(1)));
 		if (cmd_ptr) 
 			XSRETURN_UV(del_bot_cmd(bot->botcmds, cmd_ptr));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Prefmsg)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Prefmsg(from, to, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			irc_prefmsg(bot, u, "%s", SvPV_nolen(ST(2)));
+			return XSRETURN_UV(NS_SUCCESS);
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_ChanAlert)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:ChanAlert(from, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			irc_chanalert(bot, "%s", SvPV_nolen(ST(1)));
+			return XSRETURN_UV(NS_SUCCESS);
+		}
+		
 	}
 	XSRETURN_UV(NS_FAILURE);
 }
@@ -876,6 +923,8 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::FindChannel", XS_NeoStats_FindChannel, __FILE__);
 	newXS ("NeoStats::Internal::AddCommand", XS_NeoStats_AddCommand, __FILE__);
 	newXS ("NeoStats::Internal::DelCommand", XS_NeoStats_DelCommand, __FILE__);
+	newXS ("NeoStats::Internal::Prefmsg", XS_NeoStats_Prefmsg, __FILE__);
+	newXS ("NeoStats::Internal::ChanAlert", XS_NeoStats_ChanAlert, __FILE__);
 
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
@@ -947,6 +996,12 @@ xs_init (pTHX)
 	newCONSTSUB (stash, "BOT_FLAG_NOINTRINSICLEVELS", newSViv (BOT_FLAG_NOINTRINSICLEVELS));
 	newCONSTSUB (stash, "BOT_COMMON_HOST", newSVpv (BOT_COMMON_HOST, strlen(BOT_COMMON_HOST)));
 
+	newCONSTSUB (stash, "NS_ERR_SYNTAX_ERROR", newSViv (NS_ERR_SYNTAX_ERROR));
+	newCONSTSUB (stash, "NS_ERR_NEED_MORE_PARAMS", newSViv(NS_ERR_NEED_MORE_PARAMS));
+	newCONSTSUB (stash, "NS_ERR_PARAM_OUT_OF_RANGE", newSViv(NS_ERR_PARAM_OUT_OF_RANGE));
+	newCONSTSUB (stash, "NS_ERR_UNKNOWN_COMMAND", newSViv(NS_ERR_UNKNOWN_COMMAND));
+	newCONSTSUB (stash, "NS_ERR_NO_PERMISSION", newSViv(NS_ERR_NO_PERMISSION));
+	
 
 
 	newCONSTSUB (stash, "NS_SUCCESS", newSViv (NS_SUCCESS));
