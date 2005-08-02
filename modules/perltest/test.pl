@@ -338,10 +338,10 @@ sub setupbot {
 
 
 #	add a command
-	my @helptext = ('Test Command Help', 'Test', 'Testing Command Help is a nice command');
+	my @helptext = ('Test Perl Module Interface', 'This Command Tests the Perl Module Interface', 'By Executing several of the Perl API commands against you (but it wont kill you!)');
 	my $cmd = {
-		cmd => 'test',
-		minparams => '1',
+		cmd => 'TESTAPI',
+		minparams => '0',
 		ulevel => '0',
 		flags => '0',
 	};
@@ -363,6 +363,30 @@ sub cmd_cb_test {
 	my ($cmd, $who, $params) = @_;
 	NeoStats::debug("Got $cmd Command from $who: $params ");
 	NeoStats::PrefMsg($bot, $who, "You Sent me this: $params");
+
+	# Now Exercise the perl Module API 
+	NeoStats::ChanAlert($bot, "PrivMsg: ".NeoStats::PrivMsg($bot, $who, "Testing PrivMsg"));
+	NeoStats::ChanAlert($bot, "Notice: ".NeoStats::Notice($bot, $who, "Testing Notice"));
+	NeoStats::ChanAlert($bot, "ChanPrivMsg: ".NeoStats::ChanPrivMsg($bot, "#services", "Testing ChanPrivMsg"));
+	NeoStats::ChanAlert($bot, "ChanNotice: ".NeoStats::ChanNotice($bot, "#services", "Testing ChanNotice"));
+	NeoStats::ChanAlert($bot, "Globops: ".NeoStats::Globops($bot, "Testing Globops"));
+	NeoStats::ChanAlert($bot, "Wallops: ".NeoStats::Wallops($bot, "Testing Wallops"));
+	NeoStats::ChanAlert($bot, "Numeric: ".NeoStats::Numeric(123, $who, "Testing Numeric"));
+	#XXX Todo to define UMODES
+	NeoStats::ChanAlert($bot, "Umode: ".NeoStats::Umode($bot, $bot, 0));
+	NeoStats::ChanAlert($bot, "Join: ".NeoStats::Join($bot, "#testing", "+t"));
+	NeoStats::ChanAlert($bot, "Invite: ".NeoStats::Invite($bot, "#testing", $who));
+	NeoStats::ChanAlert($bot, "SvsJoin: ".NeoStats::SvsJoin($bot, $who, "#testing"));
+	NeoStats::ChanAlert($bot, "CMode: ".NeoStats::SvsJoin($bot, "#testing", "+nl", "10"));
+	NeoStats::ChanAlert($bot, "ChanUserMode: ".NeoStats::ChanUserMode($bot, "#testing", "+o", $who));
+	NeoStats::ChanAlert($bot, "Topic: ".NeoStats::Topic($bot, "#testing", "My Lovely Topic"));
+	NeoStats::ChanAlert($bot, "Kick: ".NeoStats::Kick($bot, "#testing", $who, "Cause I like Kicks"));
+	NeoStats::ChanAlert($bot, "Part: ".NeoStats::Part($bot, "#testing", "Its a Boring Channel"));
+	NeoStats::ChanAlert($bot, "NickChange: ".NeoStats::NickChange($bot, "NewNick"));
+	NeoStats::ChanAlert($bot, "NickChange: ".NeoStats::NickChange("NewNick", $bot));
+	NeoStats::ChanAlert($bot, "Finished. All Commands Should have returned 1");		
+
+
 	return NeoStats::NS_SUCCESS;
 }
 

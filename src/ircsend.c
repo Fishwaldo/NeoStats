@@ -1169,7 +1169,7 @@ int irc_invite( const Bot *botptr, const Client *target, const char *chan )
 	return NS_SUCCESS;
 }
 
-/** @brief irc_invite
+/** @brief irc_topic
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */

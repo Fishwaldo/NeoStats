@@ -212,10 +212,12 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_PARTBOT:
-			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
+			/* XXX And here */
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_EMPTYCHAN:
-			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 4, cmdparams->channel->name, cmdparams->source->name, cmdparams->bot->name, cmdparams->param);
+			/* XXX And Here as well */
+//			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->channel->name, cmdparams->source->name, cmdparams->bot->name, cmdparams->param);
 			break;
 		case EVENT_KICK:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 4, cmdparams->channel->name, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
@@ -674,7 +676,6 @@ XS (XS_NeoStats_AddCommand)
 	bot_cmd *bc;
 	Bot *bot;
 	int i, j;
-	char *temp[] = { "Test Command", "Test Command Two", NULL};
 
 	dXSARGS;
 	mod = GET_CUR_MODULE();
@@ -773,8 +774,7 @@ XS (XS_NeoStats_Prefmsg)
 		bot = FindBot(SvPV_nolen(ST(0)));
 		u = FindUser(SvPV_nolen(ST(1)));
 		if (bot && u) {
-			irc_prefmsg(bot, u, "%s", SvPV_nolen(ST(2)));
-			return XSRETURN_UV(NS_SUCCESS);
+			XSRETURN_UV(irc_prefmsg(bot, u, "%s", SvPV_nolen(ST(2))));
 		}
 		
 	}
@@ -794,116 +794,552 @@ XS (XS_NeoStats_ChanAlert)
 	} else {
 		bot = FindBot(SvPV_nolen(ST(0)));
 		if (bot) {
-			irc_chanalert(bot, "%s", SvPV_nolen(ST(1)));
-			return XSRETURN_UV(NS_SUCCESS);
+			XSRETURN_UV(irc_chanalert(bot, "%s", SvPV_nolen(ST(1))));
 		}
 		
 	}
 	XSRETURN_UV(NS_FAILURE);
 }
 
-
-#if 0
-
 static
-XS (XS_Xchat_get_list)
+XS (XS_NeoStats_PrivMsg)
 {
-	SV *name;
-	HV *hash;
-	xchat_list *list;
-	const char *const *fields;
-	const char *field;
-	int i = 0;						  /* field index */
-	int count = 0;					  /* return value for scalar context */
-	U32 context;
+	Module *mod;
+	Bot *bot;
+	Client *u;
+
 	dXSARGS;
-
-	if (items != 1) {
-		xchat_print (ph, "Usage: NeoStats::get_list(name)");
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:PrivMsg(from, to, message)");
 	} else {
-		SP -= items;				  /*remove the argument list from the stack */
-
-		name = ST (0);
-
-		list = xchat_list_get (ph, SvPV_nolen (name));
-
-		if (list == NULL) {
-			XSRETURN_EMPTY;
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_privmsg(bot, u, "%s", SvPV_nolen(ST(2))));
 		}
-
-		context = GIMME_V;
-
-		if (context == G_SCALAR) {
-			while (xchat_list_next (ph, list)) {
-				count++;
-			}
-			xchat_list_free (ph, list);
-			XSRETURN_IV ((IV) count);
-		}
-
-		fields = xchat_list_fields (ph, SvPV_nolen (name));
-		while (xchat_list_next (ph, list)) {
-			i = 0;
-			hash = newHV ();
-			sv_2mortal ((SV *) hash);
-			while (fields[i] != NULL) {
-				switch (fields[i][0]) {
-				case 's':
-					field = xchat_list_str (ph, list, fields[i] + 1);
-					if (field != NULL) {
-						hv_store (hash, fields[i] + 1, strlen (fields[i] + 1),
-									 newSVpvn (field, strlen (field)), 0);
-						/*                                              xchat_printf (ph, */
-						/*                                                      "string: %s - %d - %s",  */
-						/*                                                      fields[i]+1, */
-						/*                                                      strlen(fields[i]+1), */
-						/*                                                      field, strlen(field) */
-						/*                                                              ); */
-					} else {
-						hv_store (hash, fields[i] + 1, strlen (fields[i] + 1),
-									 &PL_sv_undef, 0);
-						/*                                              xchat_printf (ph, */
-						/*                                                      "string: %s - %d - undef",       */
-						/*                                                              fields[i]+1, */
-						/*                                                              strlen(fields[i]+1) */
-						/*                                                              ); */
-					}
-					break;
-				case 'p':
-					/*                                       xchat_printf (ph, "pointer: %s", fields[i]+1); */
-					hv_store (hash, fields[i] + 1, strlen (fields[i] + 1),
-								 newSVuv (PTR2UV (xchat_list_str (ph, list,
-																			 fields[i] + 1)
-											 )), 0);
-					break;
-				case 'i':
-					hv_store (hash, fields[i] + 1, strlen (fields[i] + 1),
-								 newSVuv (xchat_list_int (ph, list, fields[i] + 1)),
-								 0);
-					/*                                       xchat_printf (ph, "int: %s - %d",fields[i]+1, */
-					/*                                                        xchat_list_int (ph, list, fields[i]+1) */
-					/*                                                       ); */
-					break;
-				case 't':
-					hv_store (hash, fields[i] + 1, strlen (fields[i] + 1),
-								 newSVnv (xchat_list_time (ph, list, fields[i] + 1)),
-								 0);
-					break;
-				}
-				i++;
-			}
-
-			XPUSHs (newRV_noinc ((SV *) hash));
-
-		}
-		xchat_list_free (ph, list);
-
-		PUTBACK;
-		return;
+		
 	}
+	XSRETURN_UV(NS_FAILURE);
 }
 
-#endif
+static
+XS (XS_NeoStats_Notice)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Notice(from, to, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_notice(bot, u, "%s", SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_ChanPrivMsg)
+{
+	Module *mod;
+	Bot *bot;
+
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:ChanPrivMsg(from, to, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot && FindChannel(SvPV_nolen(ST(1)))) {
+			XSRETURN_UV(irc_chanprivmsg(bot, SvPV_nolen(ST(1)), "%s", SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_ChanNotice)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:ChanNotice(from, to, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot && FindChannel(SvPV_nolen(ST(1)))) {
+			XSRETURN_UV(irc_channotice(bot, SvPV_nolen(ST(1)), "%s", SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Globops)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Globops(from, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_globops(bot, "%s", SvPV_nolen(ST(1))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Wallops)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Wallops(from, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_wallops(bot, "%s", SvPV_nolen(ST(1))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Numeric)
+{
+	Module *mod;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Numeric(numeric, to, message)");
+	} else {
+		XSRETURN_UV(irc_numeric(SvIV(ST(0)), SvPV_nolen(ST(1)), "%s", SvPV_nolen(ST(2))));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Umode)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Umode(bot, target, umode)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_umode(bot, SvPV_nolen(ST(1)), SvIV(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Join)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Join(bot, channel, cmode)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_join(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Part)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Part(bot, channel, <message>)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_part(bot, SvPV_nolen(ST(1)), items == 3 ? SvPV_nolen(ST(2)) : ""));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_NickChange)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:NickChange(bot, newnick)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_nickchange(bot, SvPV_nolen(ST(1))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_CMode)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:CMode(bot, chan, mode, <args>)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot && FindChannel(SvPV_nolen(ST(1)))) {
+			XSRETURN_UV(irc_cmode(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2)), items == 4 ? SvPV_nolen(ST(3)) : ""));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_ChanUserMode)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 4) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:ChanUserMode(bot, chan, mode, target)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot && FindChannel(SvPV_nolen(ST(1)))) {
+			XSRETURN_UV(irc_cmode(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2)), SvPV_nolen(ST(3))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Kill)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Kill(bot, target, reason)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_kill(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Kick)
+{
+	Module *mod;
+	Bot *bot;
+
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Kill(bot, chan, target, <reason>)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot && FindChannel(SvPV_nolen(ST(1)))) {
+			XSRETURN_UV(irc_kick(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2)), items == 4 ? SvPV_nolen(ST(3)) : "" ));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Invite)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Invite(bot, target, chan)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u && FindChannel(SvPV_nolen(ST(2)))) {
+			XSRETURN_UV(irc_invite(bot, u, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Topic)
+{
+	Module *mod;
+	Bot *bot;
+	Channel *c;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Topic(bot, chan, topic)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		c = FindChannel(SvPV_nolen(ST(1)));
+		if (bot && c) {
+			XSRETURN_UV(irc_topic(bot, c, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_SvsKill)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:SvsKill(bot, target, reason)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_svskill(bot, u, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_SvsMode)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:SvsMode(bot, target, mode)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_svsmode(bot, u, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_SvsHost)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:SvsHost(bot, target, host)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_svshost(bot, u, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_SvsJoin)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:SvsJoin(bot, target, chan)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_svsjoin(bot, u, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_SvsPart)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:SvsPart(bot, target, chan)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_svspart(bot, u, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Swhois)
+{
+	Module *mod;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Swhois(target, swhois)");
+	} else {
+		XSRETURN_UV(irc_swhois(SvPV_nolen(ST(0)), SvPV_nolen(ST(1))));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_SvsNick)
+{
+	Module *mod;
+	Bot *bot;
+	Client *u;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:SvsNick(bot, target, newnick)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		u = FindUser(SvPV_nolen(ST(1)));
+		if (bot && u) {
+			XSRETURN_UV(irc_svsnick(bot, u, SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_SMO)
+{
+	Module *mod;
+	Bot *bot;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:SMO(bot, umodetarget, message)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_smo(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Akill)
+{
+	Module *mod;
+	Bot *bot;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 5) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Akill(bot, host, ident, length, reason)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_akill(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2)), SvIV(ST(3)), SvPV_nolen(ST(4))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_Rakill)
+{
+	Module *mod;
+	Bot *bot;
+	dXSARGS;
+	mod = GET_CUR_MODULE();
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:Rakill(bot, host, ident)");
+	} else {
+		bot = FindBot(SvPV_nolen(ST(0)));
+		if (bot) {
+			XSRETURN_UV(irc_rakill(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2))));
+		}
+		
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
 
 /* xs_init is the second argument perl_parse. As the name hints, it
    initializes XS subroutines (see the perlembed manpage) */
@@ -928,6 +1364,33 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::DelCommand", XS_NeoStats_DelCommand, __FILE__);
 	newXS ("NeoStats::Internal::Prefmsg", XS_NeoStats_Prefmsg, __FILE__);
 	newXS ("NeoStats::Internal::ChanAlert", XS_NeoStats_ChanAlert, __FILE__);
+	newXS ("NeoStats::Internal::PrivMsg", XS_NeoStats_PrivMsg, __FILE__);
+	newXS ("NeoStats::Internal::Notice", XS_NeoStats_Notice, __FILE__);
+	newXS ("NeoStats::Internal::ChanPrivMsg", XS_NeoStats_ChanPrivMsg, __FILE__);
+	newXS ("NeoStats::Internal::ChanNotice", XS_NeoStats_ChanNotice, __FILE__);
+	newXS ("NeoStats::Internal::Globops", XS_NeoStats_Globops, __FILE__);
+	newXS ("NeoStats::Internal::Wallops", XS_NeoStats_Wallops, __FILE__);
+	newXS ("NeoStats::Internal::Numeric", XS_NeoStats_Numeric, __FILE__);
+	newXS ("NeoStats::Internal::Umode", XS_NeoStats_Umode, __FILE__);
+	newXS ("NeoStats::Internal::Join", XS_NeoStats_Join, __FILE__);
+	newXS ("NeoStats::Internal::Part", XS_NeoStats_Part, __FILE__);
+	newXS ("NeoStats::Internal::NickChange", XS_NeoStats_NickChange, __FILE__);
+	newXS ("NeoStats::Internal::CMode", XS_NeoStats_CMode, __FILE__);
+	newXS ("NeoStats::Internal::ChanUserMode", XS_NeoStats_ChanUserMode, __FILE__);
+	newXS ("NeoStats::Internal::Kill", XS_NeoStats_Kill, __FILE__);
+	newXS ("NeoStats::Internal::Kick", XS_NeoStats_Kick, __FILE__);
+	newXS ("NeoStats::Internal::Invite", XS_NeoStats_Invite, __FILE__);
+	newXS ("NeoStats::Internal::Topic", XS_NeoStats_Topic, __FILE__);
+	newXS ("NeoStats::Internal::SvsKill", XS_NeoStats_SvsKill, __FILE__);
+	newXS ("NeoStats::Internal::SvsMode", XS_NeoStats_SvsMode, __FILE__);
+	newXS ("NeoStats::Internal::SvsHost", XS_NeoStats_SvsHost, __FILE__);
+	newXS ("NeoStats::Internal::SvsJoin", XS_NeoStats_SvsJoin, __FILE__);
+	newXS ("NeoStats::Internal::SvsPart", XS_NeoStats_SvsPart, __FILE__);
+	newXS ("NeoStats::Internal::Swhois", XS_NeoStats_Swhois, __FILE__);
+	newXS ("NeoStats::Internal::SvsNick", XS_NeoStats_SvsNick, __FILE__);
+	newXS ("NeoStats::Internal::SMO", XS_NeoStats_SMO, __FILE__);
+	newXS ("NeoStats::Internal::Akill", XS_NeoStats_Akill, __FILE__);
+	newXS ("NeoStats::Internal::Rakill", XS_NeoStats_Rakill, __FILE__);
 
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {

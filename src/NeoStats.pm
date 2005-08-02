@@ -267,6 +267,304 @@ use Symbol();
     return NeoStats::Internal::ChanAlert($bot, $message);
   }
 
+  sub PrivMsg {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to PrivMsg");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $to = shift;
+    my $message = shift;
+    return NeoStats::Internal::PrivMsg($bot, $to, $message);
+  }
+
+  sub Notice {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Notice");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $to = shift;
+    my $message = shift;
+    return NeoStats::Internal::Notice($bot, $to, $message);
+  }
+
+  sub ChanPrivMsg {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to ChanPrivMsg");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $to = shift;
+    my $message = shift;
+    return NeoStats::Internal::ChanPrivMsg($bot, $to, $message);
+  }
+
+  sub ChanNotice {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to ChanNotice");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $to = shift;
+    my $message = shift;
+    return NeoStats::Internal::ChanNotice($bot, $to, $message);
+  }
+
+  sub Globops {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguments to Globops");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $message = shift;
+    return NeoStats::Internal::Globops($bot, $message);
+  }
+
+  sub Wallops {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguments to Wallops");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $message = shift;
+    return NeoStats::Internal::Globops($bot, $message);
+  }
+
+  sub Numeric {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Numeric");
+      return NeoStats::NS_FAILURE;
+    }
+    my $numeric = shift;
+    my $target = shift;
+    my $message = shift;
+    return NeoStats::Internal::Numeric($numeric, $target, $message);
+  }
+
+  sub Umode {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Umode");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $umode = shift;
+    return NeoStats::Internal::Umode($bot, $target, $umode);
+  }
+
+  sub Join {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Cmode");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $channel = shift;
+    my $cmode = shift;
+    return NeoStats::Internal::Join($bot, $channel, $cmode);
+  }
+
+  sub Part {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguments to Part");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $channel = shift;
+    my $message = shift;
+    return NeoStats::Internal::Part($bot, $channel, $message);
+  }
+
+  sub NickChange {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguments to NickChange");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $newnick = shift;
+    return NeoStats::Internal::NickChange($bot, $newnick);
+  }
+
+  sub CMode {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to CMode");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $chan = shift;
+    my $modes = shift;
+    my $args = shift;
+    return NeoStats::Internal::CMode($bot, $chan, $modes, $args);
+  }
+
+  sub ChanUserMode {
+    if (@_ < 4) {
+      NeoStats::debug("Invalid Number of arguments to ChanUserMode");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $chan = shift;
+    my $modes = shift;
+    my $target = shift;
+    return NeoStats::Internal::ChanUserMode($bot, $chan, $modes, $target);
+  }
+
+  sub Kill {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Kill");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $reason = shift;
+    return NeoStats::Internal::Kill($bot, $target, $reason);
+  }
+
+  sub Kick {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Kick");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $chan = shift;
+    my $target = shift;
+    my $reason = shift;
+    return NeoStats::Internal::Kick($bot, $chan, $target, $reason);
+  }
+
+  sub Invite {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Invite");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $chan = shift;
+    my $target = shift;
+    return NeoStats::Internal::Invite($bot, $chan, $target);
+  }
+
+  sub Topic {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to Topic");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $chan = shift;
+    my $topic = shift;
+    return NeoStats::Internal::Topic($bot, $chan, $topic);
+  }
+
+  sub SvsKill {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SvsKill");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $reason = shift;
+    return NeoStats::Internal::SvsKill($bot, $target, $reason);
+  }
+
+  sub SvsMode {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SvsMode");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $mode = shift;
+    return NeoStats::Internal::SvsKill($bot, $target, $mode);
+  }
+
+  sub SvsHost {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SvsHost");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $host = shift;
+    return NeoStats::Internal::SvsHost($bot, $target, $host);
+  }
+
+  sub SvsJoin {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SvsJoin");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $chan = shift;
+    return NeoStats::Internal::SvsJoin($bot, $target, $chan);
+  }
+
+  sub SvsPart {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SvsPart");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $chan = shift;
+    return NeoStats::Internal::SvsPart($bot, $target, $chan);
+  }
+
+  sub Swhois {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguments to Swhois");
+      return NeoStats::NS_FAILURE;
+    }
+    my $target = shift;
+    my $swhois = shift;
+    return NeoStats::Internal::Swhois($target, $swhois);
+  }
+
+  sub SvsNick {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SvsNick");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $target = shift;
+    my $newnick = shift;
+    return NeoStats::Internal::SvsNick($bot, $target, $newnick);
+  }
+
+  sub SMO {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SMO");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $umodetarget = shift;
+    my $message = shift;
+    return NeoStats::Internal::SMO($bot, $umodetarget, $message);
+  }
+
+  sub Akill {
+    if (@_ < 5) {
+      NeoStats::debug("Invalid Number of arguments to SMO");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $host = shift;
+    my $ident = shift;
+    my $length = shift;
+    my $message = shift;
+    return NeoStats::Internal::Akill($bot, $host, $ident, $length, $message);
+  }
+
+  sub Rakill {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguments to SMO");
+      return NeoStats::NS_FAILURE;
+    }
+    my $bot = shift;
+    my $host = shift;
+    my $ident = shift;
+    return NeoStats::Internal::Rakill($bot, $host, $ident);
+  }
+
   sub debug {
 
     my $text = shift @_;
