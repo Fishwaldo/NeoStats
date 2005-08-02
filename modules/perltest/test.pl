@@ -338,13 +338,14 @@ sub setupbot {
 
 
 #	add a command
-	my $cmd;
-	$cmd = {
+	my @helptext = ('Test Command Help', 'Test', 'Testing Command Help is a nice command');
+	my $cmd = {
 		cmd => 'test',
 		minparams => '1',
 		ulevel => '0',
 		flags => '0',
 	};
+	$cmd->{helptext} = \@helptext;
 	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
 	$cmd = {
 		cmd => 'test2',
@@ -352,6 +353,7 @@ sub setupbot {
 		ulevel => '0',
 		flags => '0',
 	};
+	$cmd->{helptext} = \@helptext;
 	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
 	NeoStats::debug(NeoStats::DelCmd($bot, $cmd->{cmd}));
 	NeoStats::ChanAlert($bot, "Loaded up and ready to rock and role");

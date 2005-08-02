@@ -418,20 +418,6 @@ XS (XS_NeoStats_register)
 		mod->info->name = SvPV_nolen (ST (0));
 		mod->info->version = SvPV_nolen (ST (1));
 		mod->info->description = SvPV_nolen (ST (2));
-#if 0
-XXX TODO Credits and about 
-		name = SvPV_nolen (ST (0));
-		version = SvPV_nolen (ST (1));
-		desc = SvPV_nolen (ST (2));
-		mod->info->name = os_malloc(strlen(name)+1);
-		strlcpy((char *)mod->info->name, name, strlen(name)+1);
-
-		mod->info->description = os_malloc(strlen(desc)+1);
-		strlcpy((char *)mod->info->description, desc, strlen(desc)+1);
-
-		mod->info->version = os_malloc(strlen(version)+1);
-		strlcpy((char *)mod->info->version, version, strlen(version)+1);
-#endif		
 
 		XSRETURN_UV (PTR2UV (mod));
 
@@ -684,8 +670,10 @@ XS (XS_NeoStats_AddCommand)
 	HV * rethash;
 	SV *ret;
 	SV *value;
+	AV *helptext;
 	bot_cmd *bc;
 	Bot *bot;
+	int i, j;
 	char *temp[] = { "Test Command", "Test Command Two", NULL};
 
 	dXSARGS;
@@ -704,18 +692,33 @@ XS (XS_NeoStats_AddCommand)
 #endif
 		bc = ns_malloc(sizeof(bot_cmd));
 		value = *hv_fetch(rethash, "cmd", strlen("cmd"), FALSE);
-		bc->cmd = malloc(SvLEN(value)+1);
+		bc->cmd = ns_malloc(SvLEN(value)+1);
 		strlcpy((char *)bc->cmd, SvPV_nolen(value), SvLEN(value)+1);
 		value = *hv_fetch(rethash, "minparams", strlen("minparams"), FALSE);
 		bc->minparams = SvIV(value);
 		value = *hv_fetch(rethash, "ulevel", strlen("ulevel"), FALSE);
 		bc->ulevel = SvIV(value);
-#if 0
-/* XXX TODO */
+
 		value = *hv_fetch(rethash, "helptext", strlen("helptext"), FALSE);
-		strlcpy(bc->helptext, SvPV_nolen(value), MAXHOST);
-#endif
-		bc->helptext = temp;
+		/* make sure its a array */
+		if (SvTYPE(SvRV(value)) != SVt_PVAV) {
+			dlog(DEBUG1, "XS_NeoStats_AddCommand: Helptext field is not a array");
+			ns_free(bc->cmd);
+			ns_free(bc);
+			XSRETURN_EMPTY;
+		}
+		/* ok, lets setup the array */
+		helptext = (AV*)SvRV(value);
+		j = 0;
+		for (i =0; i <= av_len(helptext); i++) {
+			/* ok, try to follow me here:
+			 * we extract each member of the array (av_fetch)
+			 * and convert it to a string (SvPV_nolen)
+			 * then make a copy (malloc'ed) of it (strdup)
+			 * and put it on the end of the array of helptext strings (AddStringToList)!
+			 */
+			AddStringToList(&bc->helptext, strdup(SvPV_nolen(*av_fetch(helptext, i, FALSE))), &j);
+		}
 		value = *hv_fetch(rethash, "flags", strlen("flags"), FALSE);
 		bc->flags = SvIV(value);
 

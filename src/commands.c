@@ -254,6 +254,9 @@ bot_cmd *find_bot_cmd( Bot *bot_ptr, char *cmd)
 	hnode_t *cmdnode;
 	
 	/* Find the command */
+	if (!bot_ptr->botcmds) {
+		return NULL;
+	}
 	cmdnode = hash_lookup( bot_ptr->botcmds, cmd );
 	if( cmdnode ) {
 		return hnode_get(cmdnode);
@@ -280,6 +283,8 @@ int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 		if (IS_PERL_MOD(cmd_ptr->modptr)) {
 			ns_free(cmd_ptr->cmd);
 			ns_free(cmd_ptr->moddata);
+			/* XXX is this correct on a array of strings? */
+			ns_free(cmd_ptr->helptext);
 		}
 #endif
 		return NS_SUCCESS;

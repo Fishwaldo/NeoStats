@@ -220,14 +220,14 @@ use Symbol();
       return NeoStats::NS_FAILURE;
     }    
     if ((!exists( $botcmd->{ulevel} )) || (!defined( $botcmd->{ulevel} ))) {
-      NeoStats::debug("Bot->{ulevel} not defined");
+      NeoStats::debug("Botinfo->{ulevel} not defined");
       return NeoStats::NS_FAILURE;
     }    
-#XXX TODO
-#    if ((!exists( $botcmd->{helptext} )) || (!defined( $botcmd->{helptext} ))) {
-#      NeoStats::debug("Botinfo->{host} not defined");
-#      return NeoStats::NS_FAILURE;
-#    }    
+    if ((!exists( $botcmd->{helptext} )) || (!defined( $botcmd->{helptext} ))) {
+      NeoStats::debug("Botinfo->{helptext} not defined");
+      return NeoStats::NS_FAILURE;
+    }    
+    #XXX Need to check size of the helptext array to make sure at least 2 lines 
     if ((!exists( $botcmd->{flags} )) || (!defined( $botcmd->{flags} ))) {
       NeoStats::debug("Botinfo->{flags} not defined");
       return NeoStats::NS_FAILURE;
