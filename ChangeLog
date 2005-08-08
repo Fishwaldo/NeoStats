@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Perl 5.8.0 doesn't have XSRETURN_UV, so it does now via our checks (F)
  - Perl Module Support now has most functionality of standard C Modules.
    Need to fix up NeoStats.pm to do lots of sanity checking first though (F)
  - Fix a crash on shutdown in nsdba relating to not statically storing the hash key (F)

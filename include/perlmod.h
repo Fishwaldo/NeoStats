@@ -30,6 +30,16 @@
 #include <perl.h>
 #include <XSUB.h>
 
+
+/* to get around perl 5.8.0 issues */
+#ifndef XST_mUV
+#define XST_mUV(i,v)  (ST(i) = sv_2mortal(newSVuv(v))  )
+#endif
+
+#ifndef XSRETURN_UV
+#define XSRETURN_UV(v) STMT_START { XST_mUV(0,v);  XSRETURN(1); } STMT_END
+#endif
+
 typedef struct PerlEvent {
 	SV *callback;
 	SV *userdata;
