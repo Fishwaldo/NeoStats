@@ -1,6 +1,6 @@
 # Script to generate SVN version information
 
-id=`svn info |grep 'Revision:'`
+id=`svn info ..|grep 'Revision:'`
 id=`echo $id |sed 's/.* Revision: \(.*\) .* Exp .*/\1/'`
 
 if test -r version.h
