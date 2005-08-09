@@ -25,7 +25,10 @@
 #define _PERLMOD_H_
 
 #ifdef PERLDEFINES
+#ifdef WIN32
+/* I have no idea why... */
 #define _POSIX_
+#endif
 #include <EXTERN.h>
 #define WIN32IOP_H
 #include <perl.h>
