@@ -1295,7 +1295,7 @@ XS (XS_NeoStats_SMO)
 	} else {
 		bot = FindBot(SvPV_nolen(ST(0)));
 		if (bot) {
-			XSRETURN_UV(irc_smo(bot, SvPV_nolen(ST(1)), SvPV_nolen(ST(2))));
+			XSRETURN_UV(irc_smo(bot->name, SvPV_nolen(ST(1)), SvPV_nolen(ST(2))));
 		}
 		
 	}

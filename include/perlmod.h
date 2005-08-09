@@ -60,5 +60,8 @@ void PerlModFini(Module *mod);
 void unload_perlmod(Module *mod);
 void ns_cmd_modperlist(CmdParams *cmd);
 Module *load_perlmodule(const char *filename, Client *u);
+int perl_sync_module(Module *mod);
+int perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr);
+
 
 #endif /* _PERLMOD_H_ */

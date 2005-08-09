@@ -1227,6 +1227,7 @@ EXPORTFUNC int irc_chanalert( const Bot *botptr, const char *fmt, ...) __attribu
 EXPORTFUNC int irc_globops( const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC int irc_wallops( const Bot *botptr, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC int irc_numeric( const int numeric, const char *target, const char *data, ...) __attribute__((format(printf,3,4))); /* 3=format 4=params */
+EXPORTFUNC int irc_smo( const char *source, const char *umodetarget, const char *msg );
 
 /*  General irc actions for join/part channels etc
  */
