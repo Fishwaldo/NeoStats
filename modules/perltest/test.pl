@@ -73,251 +73,251 @@ NeoStats::hook_event(NeoStats::EVENT_DELBAN, "event_delban");
 
 sub event_moduleload {
 	my ($param1) = @_;
-	NeoStats::debug("New Module Loaded: $param1");
+	NeoStats::ChanAlert($bot, "New Module Loaded: $param1");
 }
 
 sub event_moduleunload {
 	my ($param1) = @_;
-	NeoStats::debug("Module Unloaded: $param1");
+	NeoStats::ChanAlert($bot, "Module Unloaded: $param1");
 }
 
 sub event_server {
 	my ($test) = @_;
-	NeoStats::debug ("New Server $test");
+	NeoStats::ChanAlert($bot, "New Server $test");
 	my $server = NeoStats::FindServer($test);
-	NeoStats::debug ("Server Uplink $test->{uplink}");
+	NeoStats::ChanAlert($bot, "Server Uplink $test->{uplink}");
 }
 
 sub event_squit {
 	my ($server, $msg) = @_;
-	NeoStats::debug ("Server $server Squit: $msg");
+	NeoStats::ChanAlert($bot, "Server $server Squit: $msg");
 }
 
 sub event_ping {
 	my ($source) = @_;
-	NeoStats::debug ("Ping $source");
+	NeoStats::ChanAlert($bot, "Ping $source");
 }
 
 sub event_pong {
 	my ($source) = @_;
-	NeoStats::debug ("Pong $source");
+	NeoStats::ChanAlert($bot, "Pong $source");
 }
 
 sub event_signon {
 	my ($source) = @_;
-	NeoStats::debug ("Signon $source");
+	NeoStats::ChanAlert($bot, "Signon $source");
 	my $user = NeoStats::FindUser($source);
-	NeoStats::debug ("Host: $user->{hostname}");
-	NeoStats::debug ("Server $user->{server}");
+	NeoStats::ChanAlert($bot, "Host: $user->{hostname}");
+	NeoStats::ChanAlert($bot, "Server $user->{server}");
 }
 
 sub event_quit {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("Quit $source: $msg");
+	NeoStats::ChanAlert($bot, "Quit $source: $msg");
 }
 
 sub event_nickip {
 	my ($source) = @_;
-	NeoStats::debug ("NickIP $source");
+	NeoStats::ChanAlert($bot, "NickIP $source");
 }
 
 sub event_kill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("KILL $target by $source: $msg");
+	NeoStats::ChanAlert($bot, "KILL $target by $source: $msg");
 }
 
 sub event_globalkill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("GLOBALKILL $target by $source: $msg");
+	NeoStats::ChanAlert($bot, "GLOBALKILL $target by $source: $msg");
 }
 
 sub event_localkill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("LOCALKILL $target by $source: $msg");
+	NeoStats::ChanAlert($bot, "LOCALKILL $target by $source: $msg");
 }
 
 sub event_serverkill {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("SEVERKILL $target by $source: $msg");
+	NeoStats::ChanAlert($bot, "SEVERKILL $target by $source: $msg");
 }
 
 sub event_botkill {
 	my ($target, $msg) = @_;
-	NeoStats::debug ("BOTKILL $target: $msg");
+	NeoStats::ChanAlert($bot, "BOTKILL $target: $msg");
 }
 
 sub event_nick {
 	my ($source, $target) = @_;
-	NeoStats::debug ("NICKChange $source: $target");
+	NeoStats::ChanAlert($bot, "NICKChange $source: $target");
 }
 
 sub event_away {
 	my ($source) = @_;
-	NeoStats::debug ("AwayChange $source");
+	NeoStats::ChanAlert($bot, "AwayChange $source");
 }
 
 sub event_umode {
 	my ($source, $mode) = @_;
-	NeoStats::debug ("UMODE $source, $mode");
+	NeoStats::ChanAlert($bot, "UMODE $source, $mode");
 }
 
 sub event_smode {
 	my ($source, $mode) = @_;
-	NeoStats::debug ("SMODE $source, $mode");
+	NeoStats::ChanAlert($bot, "SMODE $source, $mode");
 }
 
 sub event_newchan {
 	my ($channel) = @_;
-	NeoStats::debug ("NewChan $channel");
+	NeoStats::ChanAlert($bot, "NewChan $channel");
 }
 
 sub event_delchan {
 	my ($channel) = @_;
-	NeoStats::debug ("DelChan $channel");
+	NeoStats::ChanAlert($bot, "DelChan $channel");
 }
 
 sub event_join {
 	my ($channel, $source) = @_;
-	NeoStats::debug ("Join $channel: $source");
+	NeoStats::ChanAlert($bot, "Join $channel: $source");
 	my $chan = NeoStats::FindChan($channel);
-	NeoStats::debug ("Channel users $chan->{users}");
+	NeoStats::ChanAlert($bot, "Channel users $chan->{users}");
 }
 
 sub event_part {
 	my ($channel, $source, $msg) = @_;
-	NeoStats::debug ("Part $channel: $source: $msg");
+	NeoStats::ChanAlert($bot, "Part $channel: $source: $msg");
 }
 
 sub event_partbot {
 	my ($channel, $source, $msg) = @_;
-	NeoStats::debug ("Partbot $channel: $source: $msg");
+	NeoStats::ChanAlert($bot, "Partbot $channel: $source: $msg");
 }
 
 sub event_emptychan {
 	my ($channel, $source, $bot, $msg) = @_;
-	NeoStats::debug ("Empty $channel $source $bot: $msg");
+	NeoStats::ChanAlert($bot, "Empty $channel $source $bot: $msg");
 }
 
 sub event_kick {
 	my ($channel, $source, $target, $msg) = @_;
-	NeoStats::debug ("Kick $channel $source $target: $msg");
+	NeoStats::ChanAlert($bot, "Kick $channel $source $target: $msg");
 }
 
 sub event_kickbot {
 	my ($channel, $source, $target, $msg) = @_;
-	NeoStats::debug ("Kickbot $channel $source $target: $msg");
+	NeoStats::ChanAlert($bot, "Kickbot $channel $source $target: $msg");
 }
 
 sub event_topic {
 	my ($channel, $source) = @_;
-	NeoStats::debug ("Topic $channel $source");
+	NeoStats::ChanAlert($bot, "Topic $channel $source");
 }
 
 sub event_cmode {
-	NeoStats::debug ("ToDO");
+	NeoStats::ChanAlert($bot, "ToDO");
 }
 
 sub event_private {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("Privmsg $source $target: $msg");
+	NeoStats::ChanAlert($bot, "Privmsg $source $target: $msg");
 }
 
 sub event_notice {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("NOTICE $source $target: $msg");
+	NeoStats::ChanAlert($bot, "NOTICE $source $target: $msg");
 }
 
 sub event_cprivate {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("CPRIVATE $source $target: $msg");
+	NeoStats::ChanAlert($bot, "CPRIVATE $source $target: $msg");
 }
 
 sub event_cnotice {
 	my ($source, $target, $msg) = @_;
-	NeoStats::debug ("CNOTICE $source $target: $msg");
+	NeoStats::ChanAlert($bot, "CNOTICE $source $target: $msg");
 }
 
 sub event_globops {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("GLOBOPS $source $msg");
+	NeoStats::ChanAlert($bot, "GLOBOPS $source $msg");
 }
 
 sub event_chatops {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("CHATOPS $source: $msg");
+	NeoStats::ChanAlert($bot, "CHATOPS $source: $msg");
 }
 
 sub event_wallops {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("WALLOPS $source: $msg");
+	NeoStats::ChanAlert($bot, "WALLOPS $source: $msg");
 }
 
 sub event_ctcpversionrpl {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("CTCPVERSIONRPL $source: $msg");
+	NeoStats::ChanAlert($bot, "CTCPVERSIONRPL $source: $msg");
 }
 
 sub event_ctcpversionreq {
 	my ($source) = @_;
-	NeoStats::debug ("CTCPVERSIONREQ $source");
+	NeoStats::ChanAlert($bot, "CTCPVERSIONREQ $source");
 }
 
 sub event_ctcpfingerrpl {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("CTCPFINGERRPL $source: $msg");
+	NeoStats::ChanAlert($bot, "CTCPFINGERRPL $source: $msg");
 }
 
 sub event_ctcpfingerreq {
 	my ($source) = @_;
-	NeoStats::debug ("CTCPFINGERREQ $source");
+	NeoStats::ChanAlert($bot, "CTCPFINGERREQ $source");
 }
 
 sub event_ctcpactionreq {
 	my ($source) = @_;
-	NeoStats::debug ("CTCPACTIONREQ $source");
+	NeoStats::ChanAlert($bot, "CTCPACTIONREQ $source");
 }
 
 sub event_ctcptimerpl {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("CTCPTIMERPL $source: $msg");
+	NeoStats::ChanAlert($bot, "CTCPTIMERPL $source: $msg");
 }
 
 sub event_ctcptimereq {
 	my ($source) = @_;
-	NeoStats::debug ("CTCPTIMEREQ $source");
+	NeoStats::ChanAlert($bot, "CTCPTIMEREQ $source");
 }
 
 sub event_ctcppingrpl {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("CTCPPINGRPL $source: $msg");
+	NeoStats::ChanAlert($bot, "CTCPPINGRPL $source: $msg");
 }
 
 sub event_ctcppingreq {
 	my ($source) = @_;
-	NeoStats::debug ("CTCPPINGREQ $source");
+	NeoStats::ChanAlert($bot, "CTCPPINGREQ $source");
 }
 
 sub event_dccsend {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("DCCSEND $source: $msg");
+	NeoStats::ChanAlert($bot, "DCCSEND $source: $msg");
 }
 
 sub event_dccchat {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("DCCCHAT $source: $msg");
+	NeoStats::ChanAlert($bot, "DCCCHAT $source: $msg");
 }
 
 sub event_dccmsg {
 	my ($source, $msg) = @_;
-	NeoStats::debug ("DCCMSG $source: $msg");
+	NeoStats::ChanAlert($bot, "DCCMSG $source: $msg");
 }
 
 sub event_addban {
-	NeoStats::debug ("AddBan");
+	NeoStats::ChanAlert($bot, "AddBan");
 }
 
 sub event_delban {
-	NeoStats::debug ("DelBan");
+	NeoStats::ChanAlert($bot, "DelBan");
 }
 
 

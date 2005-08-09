@@ -208,16 +208,13 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name);
 			break;
 		case EVENT_PART:
-			/* XXX Something wrong here */
-			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, (cmdparams->param == NULL ? 2 : 3), cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_PARTBOT:
-			/* XXX And here */
-			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, (cmdparams->param == NULL ? 2 : 3), cmdparams->channel->name, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_EMPTYCHAN:
-			/* XXX And Here as well */
-//			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 3, cmdparams->channel->name, cmdparams->source->name, cmdparams->bot->name, cmdparams->param);
+			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->channel->name, cmdparams->bot->name);
 			break;
 		case EVENT_KICK:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 4, cmdparams->channel->name, cmdparams->source->name, cmdparams->target->name, cmdparams->param);
@@ -1564,7 +1561,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	mod->info = ns_calloc(sizeof(ModuleInfo));
 	mod->modtype = MOD_PERL;
 	strlcpy(mod->pm->filename, filename, MAXPATH);
-	/*XXX  this is a temp solution till we get fully loaded. Its Bad */
+	/* this is a temp solution till we get fully loaded. Its Bad */
 	mod->info->name = ns_malloc(strlen("NeoStats")+1);
 	ircsnprintf((char *)mod->info->name, strlen("NeoStats")+1, "NeoStats");
 
@@ -1583,7 +1580,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	mod->insynch = 0;
 	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
 								1, (char *)filename)) {
-		/* XXX if we are here, check that pm->mod->info has something, otherwise the script didnt register */
+		/* if we are here, check that pm->mod->info has something, otherwise the script didnt register */
 		if (!mod->info->name[0]) {
 			load_module_error(u, __("Perl Module %s didn't register. Unloading", u), filename);
 			unload_perlmod(mod);
