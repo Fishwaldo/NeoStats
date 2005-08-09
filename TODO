@@ -4,37 +4,7 @@ NeoStats - TODO Log:
 http://bugs.neostats.net)
 
 
-Shmad:
-------
-
-Fish:
------
-fnmatch is Baaaad news... find a good ircmatch function and port it over... 
-
-unkline on Hybrid7
-
-vhost code in NeoIRCd needs to be implemented for bots that are +x
-
-
-2.6.0 Series - 
-------------
-
-Re-Do the send/recv code... Its Horrible.. (Backup Server links etc can
-then be implemented)
-
-Move all the stuff in ircd.c into relevent ircd support files. ircd.c is
-getting just way to hard to manage now and will get worse as
-we add aditional IRCd support.
-
-Redo Config files. I pretty much got Bison/Flex figured out... 
-
-libwebserver module :)
-
-make NeoStats Bot commands list based, so it can be extended via other
-modules
-
-DCC chat interface???
-
-Language File support
-
-do some nice cleanups of code in do_exit... 
+LIMITSERV: doesn't join channels correctly on add etc.
+QUOTESERV: hangs when loading a database. 
+SecureServ: version scans default to disabled.
+SecureServ: Version scans are fubar.
