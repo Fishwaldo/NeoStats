@@ -101,13 +101,13 @@ int SynchModule (Module* module_ptr)
 		module_ptr->synched = 1;
 #ifdef USE_PERL
 	} else {
-		perl_sync_module(module_ptr);
+		err = perl_sync_module(module_ptr);
 	}
 #endif
 	return err;
 }
 	
-/** @brief SynchModule 
+/** @brief SynchAllModule 
  *
  * 
  *
@@ -533,6 +533,7 @@ unload_module (const char *modname, Client * u)
 	 */
 	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
 	hash_delete (modulehash, modnode);		
+	hnode_destroy (modnode);
 
 	/* now determine if its perl, or standard module */
 	if (IS_STD_MOD(mod_ptr)) {
@@ -553,7 +554,6 @@ unload_module (const char *modname, Client * u)
 	 * can still send messages during ModFini 
 	 */
 	DelModuleBots (mod_ptr);
-	hnode_destroy (modnode);
 	/* Close module */
 	irc_globops (NULL, _("%s Module unloaded"), modname);
 	SET_RUN_LEVEL(mod_ptr);
@@ -566,9 +566,11 @@ unload_module (const char *modname, Client * u)
 	SendAllModuleEvent(EVENT_MODULEUNLOAD, cmdparams);
 	ns_free(cmdparams);
 	RESET_RUN_LEVEL();
-#ifndef VALGRIND
+
 	SET_RUN_LEVEL(mod_ptr);
 	DBACloseDatabase ();
+
+
 	if (IS_STD_MOD(mod_ptr)) {
 		ns_dlclose (mod_ptr->handle);
 #ifdef USE_PERL
@@ -577,7 +579,6 @@ unload_module (const char *modname, Client * u)
 #endif
 	}
 	RESET_RUN_LEVEL();
-#endif
 	ns_free (mod_ptr);
 	/* free the module number */
 	if (moduleindex >= 0) {

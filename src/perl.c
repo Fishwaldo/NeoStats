@@ -417,9 +417,9 @@ XS (XS_NeoStats_register)
 			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
 			XSRETURN_EMPTY;
 		}
-		mod->info->name = SvPV_nolen (ST (0));
-		mod->info->version = SvPV_nolen (ST (1));
-		mod->info->description = SvPV_nolen (ST (2));
+		mod->info->name = strndup(SvPV_nolen (ST (0)), sv_len(ST (0)));
+		mod->info->version = strndup(SvPV_nolen (ST (1)), sv_len(ST (1)));
+		mod->info->description = strndup(SvPV_nolen (ST (2)), sv_len(ST(2)));
 
 		XSRETURN_UV (PTR2UV (mod));
 
@@ -1555,6 +1555,11 @@ Module *load_perlmodule (const char *filename, Client *u)
 	RESET_RUN_LEVEL();
 	insert_module(mod);
 
+
+	if (IsNeoStatsSynched()) {
+		SynchModule(mod);
+	}		
+
 	cmd = ns_calloc (sizeof(CmdParams));
 	cmd->param = (char*)mod->info->name;
 	SendAllModuleEvent(EVENT_MODULELOAD, cmd);
@@ -1580,7 +1585,7 @@ void PerlModFini(Module *mod) {
 void unload_perlmod(Module *mod) {
 		PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 		/* because segv handler doesn't handle perl well yet */
-		RESET_RUN_LEVEL()
+//		RESET_RUN_LEVEL()
 		PL_perl_destruct_level = 1;
 		perl_destruct ((PMI *)mod->pm->my_perl);
 
