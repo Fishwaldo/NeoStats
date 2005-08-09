@@ -29,11 +29,12 @@
 #include "services.h"
 #include "modules.h"
 #include "commands.h"
+//#include <sys/types.h>
+//#include <dirent.h>
 #undef _
 #define PERLDEFINES
 #include "perlmod.h"
-#include <sys/types.h>
-#include <dirent.h>
+
 
 extern void boot_DynaLoader (pTHX_ CV * cv);
 static void dump_hash(HV *rethash);
@@ -41,26 +42,7 @@ static void dump_hash(HV *rethash);
 
 
 
-#ifdef WIN32
-/* TODO: Mark, I got no idea about this win32 stuff, I'll leave it here for you to look at */
-static DWORD
-child (char *str)
-{
-	MessageBoxA (0, str, "Perl DLL Error",
-					 MB_OK | MB_ICONHAND | MB_SETFOREGROUND | MB_TASKMODAL);
-	return 0;
-}
 
-static void
-thread_mbox (char *str)
-{
-	DWORD tid;
-
-	CloseHandle (CreateThread (NULL, 0, (LPTHREAD_START_ROUTINE) child,
-										str, 0, &tid));
-}
-
-#endif
 
 static void
 dump_hash(HV *rethash) {
@@ -91,13 +73,15 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 	va_list args;
 	char *tmpstr[10];
 
-	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
-	SET_RUN_LEVEL(mod);
-
 	dSP;
 	ENTER;
 	SAVETMPS;
 	PUSHMARK (SP);
+
+	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
+	SET_RUN_LEVEL(mod);
+
+
 
 	va_start(args, numargs);
 	for (count = 0; count < numargs; count++) {
@@ -1545,11 +1529,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	if (!lib) {
 		lib = LoadLibrary (PERL_DLL);
 		if (!lib) {
-			thread_mbox ("Cannot open " PERL_DLL "\n\n"
-							 "You must have ActivePerl installed in order to\n"
-							 "run perl scripts.\n\n"
-							 "http://www.activestate.com/ActivePerl/\n\n"
-							 "Make sure perl's bin directory is in your PATH.");
+			nlog(LOG_WARNING, "Warning, Could not load ActivePerl. Please see documentation");
 			return NULL;
 		}
 		FreeLibrary (lib);

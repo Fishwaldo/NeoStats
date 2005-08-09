@@ -540,7 +540,8 @@
 #define S_ISREG(mode) ((mode) & _S_IFREG ? 1 : 0)
 #define R_OK 04
 typedef int int_t;
-typedef int_t mode_t; 
+/* perl uses a different typedef, this will avoid it */
+typedef unsigned short mode_t; 
 
 /* Disable warning for:
    warning C4267: 'function' : conversion from 'size_t' to 'const int', possible loss of data */

@@ -25,6 +25,7 @@
 #define _PERLMOD_H_
 
 #ifdef PERLDEFINES
+#define _POSIX_
 #include <EXTERN.h>
 #define WIN32IOP_H
 #include <perl.h>
