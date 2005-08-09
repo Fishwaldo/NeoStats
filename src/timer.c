@@ -229,6 +229,11 @@ DelTimer (const char *name)
 		dlog(DEBUG2, "DelTimer: removed timer %s for module %s", name, timer->moduleptr->info->name);
 		hash_delete (timerhash, tn);
 		hnode_destroy (tn);
+#ifdef USE_PERL
+		if (IS_PERL_MOD(timer->moduleptr)) {
+			ns_free(timer->userptr);
+		}
+#endif
 		ns_free (timer);
 		return NS_SUCCESS;
 	}

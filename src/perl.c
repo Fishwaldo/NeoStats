@@ -305,6 +305,13 @@ perl_command_cb(CmdParams *cmdparams) {
 	return execute_perl(cmdparams->bot->moduleptr, sv_2mortal (newSVpv (cmdparams->cmd_ptr->moddata, 0)), 3, cmdparams->cmd_ptr->cmd, cmdparams->source->name, cmdparams->param);
 }
 
+int
+perl_timer_cb( void *userptr) {
+	Module *mod;
+	mod = GET_CUR_MODULE();
+
+	return execute_perl(mod, sv_2mortal(newSVpv((char *)userptr, 0)), 0);
+}
 
 /* encode a Client Structure into a perl Hash */
 HV *perl_encode_client(Client *u) {
@@ -1341,6 +1348,38 @@ XS (XS_NeoStats_Rakill)
 }
 
 
+
+static
+XS (XS_NeoStats_AddTimer)
+{
+	Module *mod;
+	dXSARGS;
+	
+	mod = GET_CUR_MODULE();
+	if (items < 4) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:AddTimer(type, name, interval, callback)");
+	} else {
+		XSRETURN_UV(AddTimer(SvIV(ST(0)), perl_timer_cb, SvPV_nolen(ST(1)), SvIV(ST(2)), strndup(SvPV_nolen(ST(3)), sv_len(ST(3)))));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS (XS_NeoStats_DelTimer)
+{
+	Module *mod;
+	dXSARGS;
+	
+	mod = GET_CUR_MODULE();
+	if (items < 1) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:DelTimer(name)");
+	} else {
+		XSRETURN_UV(DelTimer(SvPV_nolen(ST(0))));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+
 /* xs_init is the second argument perl_parse. As the name hints, it
    initializes XS subroutines (see the perlembed manpage) */
 static void
@@ -1391,6 +1430,8 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::SMO", XS_NeoStats_SMO, __FILE__);
 	newXS ("NeoStats::Internal::Akill", XS_NeoStats_Akill, __FILE__);
 	newXS ("NeoStats::Internal::Rakill", XS_NeoStats_Rakill, __FILE__);
+	newXS ("NeoStats::Internal::AddTimer", XS_NeoStats_AddTimer, __FILE__);
+	newXS ("NeoStats::Internal::DelTimer", XS_NeoStats_DelTimer, __FILE__);
 
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {

@@ -543,7 +543,7 @@ use Symbol();
 
   sub Akill {
     if (@_ < 5) {
-      NeoStats::debug("Invalid Number of arguments to SMO");
+      NeoStats::debug("Invalid Number of arguments to Akill");
       return NeoStats::NS_FAILURE;
     }
     my $bot = shift;
@@ -556,13 +556,36 @@ use Symbol();
 
   sub Rakill {
     if (@_ < 3) {
-      NeoStats::debug("Invalid Number of arguments to SMO");
+      NeoStats::debug("Invalid Number of arguments to Rakill");
       return NeoStats::NS_FAILURE;
     }
     my $bot = shift;
     my $host = shift;
     my $ident = shift;
     return NeoStats::Internal::Rakill($bot, $host, $ident);
+  }
+
+  sub AddTimer {
+    if (@_ < 4) {
+      NeoStats::debug("Invalid Number of arguments to AddTimer");
+      return NeoStats::NS_FAILURE;
+    }
+    my $type = shift;
+    my $name = shift;
+    my $interval = shift;
+    my $callback = shift;
+    my ($package) = caller;
+    $callback = NeoStats::Embed::fix_callback( $package, $callback );
+    return NeoStats::Internal::AddTimer($type, $name, $interval, $callback);
+  }
+
+  sub DelTimer {
+    if (@_ < 1) {
+      NeoStats::debug("Invalid Number of arguments to DelTimer");
+      return NeoStats::NS_FAILURE;
+    }
+    my $name = shift;
+    return NeoStats::Internal::DelTimer($name);
   }
 
   sub debug {

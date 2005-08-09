@@ -357,6 +357,14 @@ sub setupbot {
 	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
 	NeoStats::debug(NeoStats::DelCmd($bot, $cmd->{cmd}));
 	NeoStats::ChanAlert($bot, "Loaded up and ready to rock and role");
+
+	NeoStats::AddTimer(NeoStats::TIMER_TYPE_INTERVAL, "Test Timer", 10, "timer_cb");
+
+}
+
+sub timer_cb {
+	NeoStats::ChanAlert($bot, "Timer Alert");
+	return NeoStats::NS_SUCCESS;
 }
 
 sub cmd_cb_test {
