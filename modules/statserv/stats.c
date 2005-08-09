@@ -241,7 +241,7 @@ announce_lag(const char *msg, ...)
 	announce(StatServ.lagalert, announce_buf);
 }
 
-int ResetStatistics (void)
+int ResetStatistics (void *userptr)
 {
 	SET_SEGV_LOCATION();
 	dlog (DEBUG1, "Reset Statistics");
@@ -252,7 +252,7 @@ int ResetStatistics (void)
 	return NS_SUCCESS;
 }
 
-int AverageStatistics (void)
+int AverageStatistics (void *userptr)
 {
 	SET_SEGV_LOCATION();
 	dlog (DEBUG1, "Average Statistics");

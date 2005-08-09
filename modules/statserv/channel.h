@@ -62,7 +62,7 @@ int ss_event_part( CmdParams *cmdparams );
 int ss_event_topic( CmdParams *cmdparams );
 int ss_event_kick( CmdParams *cmdparams );
 int ss_cmd_channel( CmdParams *cmdparams );
-int DelOldChan( void );
+int DelOldChan( void* );
 void InitChannelStats( void );
 void FiniChannelStats( void );
 void SaveChanStats( void );

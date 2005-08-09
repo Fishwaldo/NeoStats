@@ -180,7 +180,7 @@ static void del_vhost( vhostentry *vhost )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ExpireOldHosts( void )
+int ExpireOldHosts( void *userptr )
 {
 	lnode_t *hn, *hn2;
 	vhostentry *vhe;
@@ -320,7 +320,7 @@ static int hs_set_expire_cb( CmdParams* cmdparams, SET_REASON reason )
 	if( reason == SET_CHANGE )
 	{
 		if( hs_cfg.expire ) {
-			AddTimer( TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200 );
+			AddTimer( TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200, NULL );
 		} else {
 			DelTimer( "ExpireOldHosts" );
 		}
@@ -455,7 +455,7 @@ int ModSynch( void )
 		return NS_FAILURE;
 	}
 	if( hs_cfg.expire ) {
-		AddTimer( TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200 );
+		AddTimer( TIMER_TYPE_INTERVAL, ExpireOldHosts, "ExpireOldHosts", 7200, NULL );
 	}
 	if( !HaveUmodeRegNick() ) 
 	{

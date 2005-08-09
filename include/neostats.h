@@ -831,7 +831,7 @@ typedef struct bot_setting {
 /** @brief Message function types
  * 
  */
-typedef int (*timer_handler) ( void );
+typedef int (*timer_handler) ( void* );
 
 /* Event system flags */
 #define	EVENT_FLAG_DISABLED			0x00000001	/* Event is disabled */
@@ -1094,6 +1094,8 @@ typedef struct Timer {
 	time_t lastrun;
 	/** Timer handler */
 	timer_handler handler;
+	/** Pointer to user suplied context */
+	void *userptr;
 } Timer;
 
 /** @brief BotInfo structure
@@ -1149,7 +1151,7 @@ typedef struct _Bot {
 EXPORTFUNC int ModuleConfig( bot_setting *bot_settings );
 
 /* Add a new timer callback to NeoStats */
-EXPORTFUNC int AddTimer( TIMER_TYPE type, timer_handler handler, const char *name, int interval );
+EXPORTFUNC int AddTimer( TIMER_TYPE type, timer_handler handler, const char *name, int interval, void *userptr );
 /* Delete a timer callback from NeoStats */
 EXPORTFUNC int DelTimer( const char *timer_name );
 /* Change timer callback interval counter */

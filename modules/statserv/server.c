@@ -215,7 +215,7 @@ static void makemap(char *uplink, Client * u, int level)
 			irc_prefmsg (ss_bot, u,
 				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
 				ss->name, s->server->users, (int)ss->users.alltime.max,
-				ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
+				ss->opers.current, ss->opers.alltime.max, (int)s->server->ping, ss->highest_ping);
 			makemap(s->name, u, level + 1);
 		} else if ((level > 0) && (s->uplink) &&  !ircstrcasecmp (s->uplink->name, uplink)) {
 			if (StatServ.exclusions && IsExcluded(s)) {
@@ -227,7 +227,7 @@ static void makemap(char *uplink, Client * u, int level)
 				irc_prefmsg (ss_bot, u,
 					"\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]", 
 					ss->name, s->server->users, (int)ss->users.alltime.max,
-					ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
+					ss->opers.current, ss->opers.alltime.max, (int)s->server->ping, ss->highest_ping);
 			}
 			else
 			{
@@ -238,7 +238,7 @@ static void makemap(char *uplink, Client * u, int level)
 				irc_prefmsg (ss_bot, u,
 					"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
 					buf, ss->name, s->server->users, (int)ss->users.alltime.max,
-					ss->opers.current, ss->opers.alltime.max, s->server->ping, ss->highest_ping);
+					ss->opers.current, ss->opers.alltime.max, (int)s->server->ping, ss->highest_ping);
 			}
 			makemap(s->name, u, level + 1);
 		}
@@ -386,7 +386,7 @@ static int ss_cmd_server_stats (CmdParams *cmdparams)
 	irc_prefmsg (ss_bot, cmdparams->source, "Higest ping: %-3d at %s",
 		(int)ss->highest_ping, sftime(ss->ts_highest_ping));
 	if (s) {
-		irc_prefmsg (ss_bot, cmdparams->source, "Current Ping: %-3d", s->server->ping);
+		irc_prefmsg (ss_bot, cmdparams->source, "Current Ping: %-3d", (int)s->server->ping);
 	}
 	if (ss->splits.alltime.runningtotal >= 1) {
 		irc_prefmsg (ss_bot, cmdparams->source, 

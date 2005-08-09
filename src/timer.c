@@ -179,7 +179,7 @@ FindTimer (const char *name)
  * @return NS_SUCCESS if added, NS_FAILURE if not 
 */
 int
-AddTimer (TIMER_TYPE type, timer_handler handler, const char *name, int interval)
+AddTimer (TIMER_TYPE type, timer_handler handler, const char *name, int interval, void *userptr)
 {
 	Timer *timer;
 	Module* moduleptr;
@@ -201,6 +201,7 @@ AddTimer (TIMER_TYPE type, timer_handler handler, const char *name, int interval
 		timer->lastrun = me.now;
 		timer->moduleptr = moduleptr;
 		timer->handler = handler;
+		timer->userptr = userptr;
 		dlog (DEBUG2, "AddTimer: Module %s added timer %s", moduleptr->info->name, name);
 		return NS_SUCCESS;
 	}
@@ -373,7 +374,7 @@ run_mod_timers (int ismidnight)
 			if (setjmp (sigvbuf) == 0) {
 				dlog (DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name);
 				SET_RUN_LEVEL (timer->moduleptr);
-				if (timer->handler () < 0) {
+				if (timer->handler (timer->userptr) < 0) {
 					dlog (DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name);
 					hash_scan_delete (timerhash, tn);
 					hnode_destroy (tn);

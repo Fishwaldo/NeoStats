@@ -135,7 +135,7 @@ static BotInfo ss_botinfo =
 	ss_settings,
 };
 
-int SaveStats(void)
+int SaveStats(void *userptr)
 {
 	SET_SEGV_LOCATION();
 	SaveServerStats ();
@@ -191,21 +191,21 @@ int ModSynch (void)
 		return NS_FAILURE;
 	}
 	/* Timer to save the database */
-	AddTimer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME);
+	AddTimer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME, NULL);
 	/* Timer to output html */
 	if (StatServ.html) {
-		AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
+		AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime, NULL);
 		/* Initial output at load */
-		ss_html ();
+		ss_html ( NULL );
 	}
 	/* Timer to reset timeslice stats */
-	AddTimer (TIMER_TYPE_MIDNIGHT, ResetStatistics, "ResetStatistics", 0);
+	AddTimer (TIMER_TYPE_MIDNIGHT, ResetStatistics, "ResetStatistics", 0, NULL);
 	/* Timer to average stats */
-	AddTimer (TIMER_TYPE_INTERVAL, AverageStatistics, "AverageStatistics", TS_ONE_HOUR);
+	AddTimer (TIMER_TYPE_INTERVAL, AverageStatistics, "AverageStatistics", TS_ONE_HOUR, NULL);
 	/* Initial average at load */
-	AverageStatistics();
+	AverageStatistics( NULL );
 	/* Timer to delete old channels */
-	AddTimer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", TS_ONE_HOUR);
+	AddTimer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", TS_ONE_HOUR, NULL);
 	return NS_SUCCESS;
 }
 
@@ -240,7 +240,7 @@ static int ss_set_html_cb (CmdParams *cmdparams, SET_REASON reason)
 			return NS_SUCCESS;
 		}
 		if (StatServ.html) {
-			AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime);
+			AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime, NULL);
 		} else {
 			DelTimer ("ss_html");
 		}
@@ -261,7 +261,7 @@ static int ss_set_htmlpath_cb (CmdParams *cmdparams, SET_REASON reason)
 			return NS_SUCCESS;
 		}
 		fclose (opf);
-		ss_html ();
+		ss_html (NULL);
 	}
 	return NS_SUCCESS;
 }

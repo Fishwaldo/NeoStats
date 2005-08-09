@@ -142,9 +142,9 @@ static void serverlistdetailhandler( serverstat *ss, void *v )
 		( int )ss->highest_ping, sftime( ss->ts_highest_ping ) );
 	if( ss->s )
 		os_fprintf( opf, "<tr><td>Current Ping</td><td colspan = 2>%d</td></tr>",
-			ss->s->server->ping );
+			(int)ss->s->server->ping );
 	os_fprintf( opf, "<tr><td>Server Splits</td><td colspan = 2>%d</td></tr>",
-		ss->splits.alltime.runningtotal );
+		(int)ss->splits.alltime.runningtotal );
 }
 
 static void html_srvlistdet( void )
@@ -402,7 +402,7 @@ void get_map( char *uplink, int level )
 			os_fprintf( opf, "<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>" );
 			os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-				s->server->ping,( int )ss->highest_ping );
+				(int)s->server->ping,( int )ss->highest_ping );
 			get_map( s->name, level + 1 );
 		} else if( ( level > 0 ) && !ircstrcasecmp( uplink, s->uplinkname ) ) {
 			if( StatServ.exclusions && IsExcluded( s ) ) {
@@ -413,7 +413,7 @@ void get_map( char *uplink, int level )
 			{
 				os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 					ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-					s->server->ping,( int )ss->highest_ping );
+					(int)s->server->ping,( int )ss->highest_ping );
 			}
 			else
 			{
@@ -423,7 +423,7 @@ void get_map( char *uplink, int level )
 				}
 				os_fprintf( opf, "<tr><td>%s\\_%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 					buf, ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-					s->server->ping,( int )ss->highest_ping );
+					(int)s->server->ping,( int )ss->highest_ping );
 			}
 			get_map( s->name, level + 1 );
 		}
@@ -436,7 +436,7 @@ static void html_map( void )
 	os_fputs( "</TABLE>\n", opf );
 }
 
-int ss_html( void )
+int ss_html( void *userptr )
 {
 #define HTMLREADBUFSIZE 512
 	static char buf[HTMLREADBUFSIZE];
@@ -495,6 +495,6 @@ int ss_cmd_forcehtml( CmdParams *cmdparams )
 {
 	nlog( LOG_NOTICE, "%s!%s@%s forced an update of the HTML file.",
 		    cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname );
-	ss_html();
+	ss_html( NULL);
 	return NS_SUCCESS;
 }

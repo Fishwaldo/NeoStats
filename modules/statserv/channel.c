@@ -389,7 +389,7 @@ static int del_chan( void *data, int size )
 	return NS_FALSE;
 }
 
-int DelOldChan( void )
+int DelOldChan( void *userptr )
 {
 	time_t start;
 

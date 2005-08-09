@@ -25,6 +25,6 @@
 #define _HTMLSTATS_H_
 
 int ss_cmd_forcehtml (CmdParams *cmdparams);
-int ss_html (void);
+int ss_html (void *);
 
 #endif /* _HTMLSTATS_H_ */
