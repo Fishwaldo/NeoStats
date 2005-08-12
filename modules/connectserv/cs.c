@@ -32,7 +32,7 @@
 #include "cs.h"
 
 /* Uncomment this line to enable colours in ConnectServ channel messages */
-/* #define ENABLE_COLOUR_SUPPORT */
+#define ENABLE_COLOUR_SUPPORT
 
 /** local structures */
 /** Configuration structure  */

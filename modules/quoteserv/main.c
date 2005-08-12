@@ -375,7 +375,7 @@ static int do_quote( Client *target, char *which, int reporterror )
 	int randno;
 	
 	SET_SEGV_LOCATION();
-	if((which) && ( ircstrcasecmp( which, "random" ) == 0 ))
+	if((which == NULL) || ( ircstrcasecmp( which, "random" ) == 0 ))
 	{
 		hnode_t *hn;
 		hscan_t hs;
