@@ -637,9 +637,13 @@ typedef struct tme {
 	struct sockaddr_in srvip;
 	time_t tslastping;
 	time_t ulag;
+	unsigned int versionscan;
 } tme;
 
 EXPORTVAR extern tme me;
+
+
+
 
 /** @brief Bans structure
  *  

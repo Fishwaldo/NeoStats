@@ -48,7 +48,6 @@ typedef struct config {
 	time_t splittime;
 	time_t msgsampletime;
 	unsigned int msgthreshold;
-	unsigned int versionscan;
 	unsigned int r_time;
 	char pass[MAXPASS];
 	unsigned int debug;

@@ -161,7 +161,7 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	}
 	ns_free (cmdparams);
 	/* Send CTCP VERSION request if we are configured to do so */
-	if (IsNeoStatsSynched() && nsconfig.versionscan && !IsExcluded(u) && !IsMe(u)) {
+	if (IsNeoStatsSynched() && me.versionscan && !IsExcluded(u) && !IsMe(u)) {
 		irc_ctcp_version_req (ns_botptr, u);
 	}
 	return u;
