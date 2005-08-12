@@ -87,7 +87,7 @@ static bot_cmd qs_commands[]=
 	{"ADD",		qs_cmd_add,	1,	NS_ULEVEL_ADMIN,	qs_help_add},
 	{"DEL",		qs_cmd_del,	1, 	NS_ULEVEL_ADMIN,	qs_help_del},
 	{"LIST",		qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
-	{"QUOTE",	qs_cmd_quote,	1, 	0,		qs_help_quote},
+	{"QUOTE",	qs_cmd_quote,	0, 	0,		qs_help_quote},
 	{NULL,		NULL,		0, 	0,		NULL}
 };
 
@@ -375,7 +375,7 @@ static int do_quote( Client *target, char *which, int reporterror )
 	int randno;
 	
 	SET_SEGV_LOCATION();
-	if( ircstrcasecmp( which, "random" ) == 0 )
+	if((which) && ( ircstrcasecmp( which, "random" ) == 0 ))
 	{
 		hnode_t *hn;
 		hscan_t hs;
@@ -444,7 +444,7 @@ static int do_quote( Client *target, char *which, int reporterror )
 
 static int qs_cmd_quote( CmdParams* cmdparams )
 {
-	return do_quote( cmdparams->source, cmdparams->av[0], 1 );
+	return do_quote( cmdparams->source, cmdparams->ac >= 1 ? cmdparams->av[0] : NULL, 1 );
 }
 
 /** @brief event_signon

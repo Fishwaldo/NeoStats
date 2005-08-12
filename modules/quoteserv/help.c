@@ -56,7 +56,7 @@ const char *qs_help_list[] = {
 
 const char *qs_help_quote[] = {
 	"Fetch quote",
-	"Syntax: \2QUOTE\2",
+	"Syntax: \2QUOTE <optional database>\2",
 	"",
 	"Get quote.",
 	NULL
