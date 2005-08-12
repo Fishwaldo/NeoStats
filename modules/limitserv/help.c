@@ -59,3 +59,9 @@ const char *help_set_join[] = {
 	"Whether to join channels managed by limitserv",
 	NULL
 };
+
+const char *help_set_limitbuffer[] = {
+	"\2LIMITBUFFER <number>\2",
+	"Sets the number of extra user slots allocated when adjusting the limit",
+	NULL
+};

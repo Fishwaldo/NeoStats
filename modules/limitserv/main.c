@@ -29,6 +29,7 @@ typedef struct ls_channel {
 }ls_channel;
 
 int joinchannels = 0;
+int limitbuffer = 1;
 
 /** Bot command function prototypes */
 static int cmd_add( CmdParams *cmdparams );
@@ -41,6 +42,7 @@ static int event_part( CmdParams *cmdparams );
 
 /** Setting callback prototypes */
 static int set_join_cb( CmdParams* cmdparams, SET_REASON reason );
+static int set_limitbuffer_cb( CmdParams* cmdparams, SET_REASON reason );
 
 
 /** hash to store ls_channel and bot info */
@@ -82,7 +84,8 @@ static bot_cmd ls_commands[]=
 /** Bot setting table */
 static bot_setting ls_settings[]=
 {
-	{"JOIN",	&joinchannels,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void* )0	},
+	{"JOIN",		&joinchannels,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void* )0	},
+	{"LIMITBUFFER", 	&limitbuffer, 	SET_TYPE_INT,	0, 100,		NS_ULEVEL_ADMIN, NULL,	help_set_limitbuffer, set_limitbuffer_cb, (void *)1	},
 	{NULL,		NULL,			0,					0, 0, 		0,				 NULL,	NULL,			NULL	},
 };
 
@@ -121,13 +124,18 @@ static void ManageLimit( char *name, int users, int curlimit, int add )
 	static char limitsize[10];
 	int limit;
 
-	limit = curlimit;
+	if (curlimit > 0) {
+		limit = curlimit;
+	} else {
+		limit = users;
+	}
 	if( add )
-		limit++;
+		limit = users + limitbuffer;
 	else
-		limit--;
+		limit = users - limitbuffer;
+
 	if( limit <= users )
-		limit = ( users + 1 );
+		limit = ( users + limitbuffer );
 	ircsnprintf( limitsize, 10, "%d", limit );	
 	irc_cmode( ls_bot, name, "+l", limitsize );
 }
@@ -143,24 +151,24 @@ static void ManageLimit( char *name, int users, int curlimit, int add )
 
 static void JoinChannels( void )
 {
-	ls_channel *db;
-	hnode_t *hn;
-	hscan_t hs;
+       ls_channel *db;
+       hnode_t *hn;
+       hscan_t hs;
 
-	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
-	{
-		Channel *c;
+       hash_scan_begin( &hs, qshash );
+       while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+       {
+               Channel *c;
 
-		db =( ( ls_channel * )hnode_get( hn ) );
-		c = FindChannel( db->name );
-		if( c )
-		{
-			if( joinchannels )
-				irc_join (ls_bot, db->name, "+o");
-			ManageLimit( db->name, c->users, 0, 1 );
-		}
-	}
+               db =( ( ls_channel * )hnode_get( hn ) );
+               c = FindChannel( db->name );
+               if( c )
+               {
+                       if( joinchannels )
+                               irc_join (ls_bot, db->name, "+o");
+                       ManageLimit( db->name, c->users, 0, 1 );
+               }
+       }
 }
 
 /** @brief PartChannels
@@ -443,6 +451,28 @@ static int set_join_cb( CmdParams* cmdparams, SET_REASON reason )
 			JoinChannels();
 		else
 			PartChannels();
+	}
+	return NS_SUCCESS;
+}
+
+static int set_limitbuffer_cb( CmdParams* cmdparams, SET_REASON reason )
+{
+	ls_channel *db;
+	hnode_t *hn;
+	hscan_t hs;
+
+	SET_SEGV_LOCATION();
+	if( reason == SET_CHANGE )
+	{
+		hash_scan_begin( &hs, qshash );
+		while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+		{
+			Channel *c;
+			db =( ( ls_channel * )hnode_get( hn ) );
+			c = FindChannel( db->name );
+			if( c )
+				ManageLimit( db->name, c->users, cmdparams->channel->limit, 1 );
+		}
 	}
 	return NS_SUCCESS;
 }

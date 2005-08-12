@@ -28,3 +28,4 @@ extern const char *help_del[];
 extern const char *help_list[];
 
 extern const char *help_set_join[];
+extern const char *help_set_limitbuffer[];

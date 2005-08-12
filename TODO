@@ -5,6 +5,5 @@ http://bugs.neostats.net)
 
 
 LIMITSERV: doesn't join channels correctly on add etc.
-QUOTESERV: hangs when loading a database. 
 SecureServ: version scans default to disabled.
 SecureServ: Version scans are fubar.
