@@ -84,11 +84,11 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd qs_commands[]=
 {
-	{"ADD",		qs_cmd_add,		1,	NS_ULEVEL_ADMIN,	qs_help_add},
-	{"DEL",		qs_cmd_del,		1, 	NS_ULEVEL_ADMIN,	qs_help_del},
-	{"LIST",	qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
-	{"QUOTE",	qs_cmd_quote,	1, 	NS_ULEVEL_ADMIN,	qs_help_quote},
-	{NULL,		NULL,			0, 	0,					NULL}
+	{"ADD",		qs_cmd_add,	1,	NS_ULEVEL_ADMIN,	qs_help_add},
+	{"DEL",		qs_cmd_del,	1, 	NS_ULEVEL_ADMIN,	qs_help_del},
+	{"LIST",		qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
+	{"QUOTE",	qs_cmd_quote,	1, 	0,		qs_help_quote},
+	{NULL,		NULL,		0, 	0,		NULL}
 };
 
 /** Bot setting table */
@@ -133,7 +133,6 @@ static int qs_read_database( database *db )
 	static char filename[MAXPATH];
 	static char buf[BUFSIZE*4];
 	FILE *fp;
-	int commandreadcount = 0;
 	char *ptr;
 
 	strlcpy( filename, "data/", MAXPATH );
@@ -146,14 +145,13 @@ static int qs_read_database( database *db )
 		/* comment char */
 		if( buf[0] == '#' )
 			continue;
-		dlog( DEBUG1, "read %s", buf );
-		ptr = ns_malloc( strlen( buf ) );
-		strcpy( ptr, buf );
-		strip( ptr );
+		ptr = strdup(buf);
+		strip(ptr);
+		dlog( DEBUG1, "read %s", ptr );
 		if( ircstrncasecmp( buf, "PREFIX:", 7 ) == 0 )
-			db->prefixstring = ptr + 7;
+			db->prefixstring = strdup(ptr + 7);
 		else if( ircstrncasecmp( buf, "SUFFIX:", 7 ) == 0 )
-			db->suffixstring = ptr + 7;
+			db->suffixstring = strdup(ptr + 7);
 		else
 			AddStringToList( &db->stringlist, ptr, &db->stringcount );
 	}	
@@ -373,7 +371,7 @@ static int qs_cmd_del( CmdParams *cmdparams )
 static int do_quote( Client *target, char *which, int reporterror )
 {
 	int flag = 0;
-	database *db;
+	database *db = NULL;
 	int randno;
 	
 	SET_SEGV_LOCATION();
@@ -401,11 +399,11 @@ static int do_quote( Client *target, char *which, int reporterror )
 	else
 	{
 		db = (database *)hnode_find( qshash, which );
-		if (!db) {
-			if( reporterror )
-				irc_prefmsg( qs_bot, target, "%s not available", which );
-			return NS_SUCCESS;
-		}
+	}
+	if (!db) {
+		if( reporterror )
+			irc_prefmsg( qs_bot, target, "%s not available", which );
+		return NS_SUCCESS;
 	}
 	/* return if no records in selected database */
 	/* TODO: This should be checked at DB load time, not during command execution! */
