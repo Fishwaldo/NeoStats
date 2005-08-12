@@ -715,6 +715,10 @@ void AddEventList (ModuleEvent *eventlistptr)
 	}
 	while (eventlistptr->event != EVENT_NULL) {
 		mod_ptr->event_list[eventlistptr->event] = eventlistptr;
+		if (eventlistptr->event == EVENT_NICKIP)
+		{
+			me.want_nickip = 1; 		
+		}
 		eventlistptr ++;
 	}
 }

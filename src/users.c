@@ -127,7 +127,6 @@ Client *AddUser (const char *nick, const char *user, const char *host,
 	} else if (!(ircd_srv.protocol&PROTOCOL_NICKIP) && me.want_nickip == 1) {
 		ipaddress = process_ip (u->name, host);
 	}
-
 	u->tsconnect = TS ? strtoul (TS, NULL, 10) : me.now;
 	if( ( time( NULL ) - u->tsconnect ) > nsconfig.splittime )
 		u->flags |= NS_FLAGS_NETJOIN;
