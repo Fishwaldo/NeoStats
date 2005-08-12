@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - CTCP version scans are now more flexible in (F)
  - This will make the version.h file reflect the current SVN Revision, not
    the include SVN revision number (F)
  - Perl 5.8.0 doesn't have XSRETURN_UV, so it does now via our checks (F)
