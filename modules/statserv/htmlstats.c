@@ -469,7 +469,7 @@ int ss_html( void *userptr )
 			}		
 			htmlfuncptr++;
 		}
-		buftemp = strstr( bufptr, "</HTML>" );
+		buftemp = strcasestr( bufptr, "</html>" );
 		if( buftemp ) {
 			os_fwrite( bufptr,( int )buftemp -( int )bufptr, 1, opf );
 			put_copyright();
@@ -477,14 +477,13 @@ int ss_html( void *userptr )
 			os_fputs( bufptr, opf );
 		} else {
 			os_fputs( bufptr, opf );
-			put_copyright();
 		}
 	}
 	os_fclose( tpl );
 	os_fclose( opf );
 #ifndef WIN32
-    /* update the umode so others can read it */
-    chmod(StatServ.htmlpath, S_IRUSR|S_IRGRP|S_IROTH);
+    /* update the umode so others can read it and owner can overwrite it */
+    chmod(StatServ.htmlpath, S_IRUSR+S_IWUSR|S_IRGRP|S_IROTH);
 #endif /* WIN32 */
 
 
