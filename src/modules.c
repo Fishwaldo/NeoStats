@@ -269,7 +269,6 @@ Module *load_stdmodule (const char *modfilename, Client * u)
 {
 	int err;
 	void *handle;
-	int moduleindex = 0;
 	ModuleInfo *infoptr = NULL;
 	ModuleEvent *eventlistptr = NULL;
 	Module *mod_ptr = NULL;
@@ -359,7 +358,6 @@ Module *load_stdmodule (const char *modfilename, Client * u)
 	}
 	/* assign a module number to this module */
 	assign_mod_number(mod_ptr);
-	dlog(DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name);
 
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL(mod_ptr);
@@ -405,7 +403,6 @@ Module *ns_load_module(const char *modfilename, Client * u)
 	char path[255];
 	char loadmodname[255];
 	struct stat buf;
-	Module *mod;
 
 	strlcpy( loadmodname, modfilename, 255 );
 	strlwr( loadmodname );
@@ -416,6 +413,7 @@ Module *ns_load_module(const char *modfilename, Client * u)
 #ifdef USE_PERL
 	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT);
 	if (stat(path, &buf) != -1) {
+		Module *mod;
 		mod = load_perlmodule(path, u);
 		mod->info->build_date = ns_malloc(10);
 		strftime((char *)mod->info->build_date, 9, "%d/%m/%y", gmtime(&buf.st_mtime));
@@ -437,14 +435,15 @@ Module *ns_load_module(const char *modfilename, Client * u)
  * @return Nothing 
  */
 
-void 
-assign_mod_number(Module *mod_ptr) {
+void assign_mod_number( Module *mod_ptr )
+{
 	int moduleindex = 0;
 
 	while (ModList[moduleindex] != NULL)
 		moduleindex++;
 	ModList[moduleindex] = mod_ptr;
 	mod_ptr->modnum = moduleindex;
+	dlog(DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name);
 }
 
 /** @brief insert module pointer into module hash. 
@@ -524,10 +523,7 @@ unload_module (const char *modname, Client * u)
 	/* Delete any sockets used by this module */
 	del_sockets (mod_ptr);
 	/* Delete any associated event list */
-	if (mod_ptr->event_list) {
-		ns_free (mod_ptr->event_list);
-		mod_ptr->event_list = NULL;
-	}
+	FreeEventList( mod_ptr );
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
 	 */
@@ -756,6 +752,19 @@ void DeleteEventList (ModuleEvent *eventlistptr)
 			mod_ptr->event_list[eventlistptr->event] = NULL;
 		eventlistptr++;
 	}
+}
+
+/** @brief 
+ *
+ * 
+ *
+ * @return none
+ */
+void FreeEventList( Module* mod_ptr )
+{
+	if( mod_ptr->event_list )
+		ns_free( mod_ptr->event_list );
+	mod_ptr->event_list = NULL;
 }
 
 /** @brief 

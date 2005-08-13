@@ -40,5 +40,5 @@ int SynchAllModules( void );
 void assign_mod_number( Module *mod_ptr );
 void insert_module( Module *mod_ptr );
 void load_module_error( const Client *target, const char *module_name, const char *fmt, ... );
-
+void FreeEventList( Module* mod_ptr );
 #endif /* _MODULES_H_ */

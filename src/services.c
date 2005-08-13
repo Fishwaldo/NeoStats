@@ -185,7 +185,7 @@ static int services_event_ctcpversion( CmdParams *cmdparams )
  *
  *  init NeoStats core
  *
- * @return none
+ *  @return none
  */
 void InitServices( void )
 {
@@ -196,11 +196,11 @@ void InitServices( void )
  *
  *  fini NeoStats core
  *
- * @return none
+ *  @return none
  */
 void FiniServices( void )
 {
-	free(GET_CUR_MODULE()->event_list);
+	FreeEventList( &ns_module );
 }
 
 /** @brief init_services_bot
