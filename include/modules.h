@@ -37,8 +37,8 @@ void SendAllModuleEvent( Event event, CmdParams* cmdparams );
 void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr );
 int SynchModule( Module* module_ptr );
 int SynchAllModules( void );
-void assign_mod_number(Module *mod_ptr);
-void insert_module(Module *mod_ptr);
-void load_module_error(const Client *target, const char *fmt, ...);
+void assign_mod_number( Module *mod_ptr );
+void insert_module( Module *mod_ptr );
+void load_module_error( const Client *target, const char *module_name, const char *fmt, ... );
 
 #endif /* _MODULES_H_ */
