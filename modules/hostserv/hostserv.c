@@ -387,10 +387,12 @@ static int hs_event_umode( CmdParams *cmdparams )
 		default:
 			if( *modes == UmodeChRegNick ) {
 				if( add ) {
+#if 0
 					if( IsUserSetHosted( cmdparams->source ) ) {
 						dlog( DEBUG2, "not setting hidden host on %s", cmdparams->av[0] );
 						return -1;
 					}
+#endif
 					dlog( DEBUG2, "Regnick Mode on %s", cmdparams->av[0] );
 					ircsnprintf( vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom );
 					irc_svshost( hs_bot, cmdparams->source, vhost );
