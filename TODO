@@ -4,14 +4,10 @@ NeoStats - TODO Log:
 http://bugs.neostats.net)
 
 
-/msg neostats access  - causes segv
 <StatServ> rollergirl.sg.as.irc-chat.net is lagged out with a ping of 1123867742
 
 =FloodServ= HOST: - default host is always empty
 
-unloading connectserv segv's neostats
-
 My NeoStats is using 29Mb of memory on 150 users.... most modules loaded. Valgrind is overdue
 just to check memory allocations
 
-hostserv unet style vhosts is broken?
