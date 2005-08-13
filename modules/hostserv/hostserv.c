@@ -372,13 +372,11 @@ static int hs_event_umode( CmdParams *cmdparams )
 	char vhost[MAXHOST];
 
 	SET_SEGV_LOCATION();
-printf("i'm here \n");
 	if( IsOper( cmdparams->source ) && hs_cfg.operhosts == 0 ) 
 		return NS_SUCCESS;
 	/* first, find if its a regnick mode */
 	modes = cmdparams->param;
 	while( *modes ) {
-printf("%c %c\n", *modes, UmodeChRegNick);
 		switch( *modes ) {
 		case '+':
 			add = 1;
