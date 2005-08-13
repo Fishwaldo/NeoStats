@@ -125,6 +125,24 @@ static ModeDesc SmodeDesc[] = {
 	{0, 0},
 };
 
+/** @brief BuildModeCharMap
+ *
+ *  Build internal mode tables by translating the protocol information
+ *  into a faster indexed lookup table
+ *
+ *  @return 
+ */
+void BuildModeCharMap( char *mode_char_map, char mode, unsigned int mask )
+{
+    int bitcount = 0;
+	
+	while( mask >>= 1 )
+		bitcount ++;
+	if( bitcount < 31 )
+		mode_char_map[bitcount] = mode;
+    int bitcount = 0;
+}
+
 /** @brief BuildModeTable
  *
  *  Build internal mode tables by translating the protocol information
@@ -132,7 +150,9 @@ static ModeDesc SmodeDesc[] = {
  *
  * @return 
  */
-unsigned int BuildModeTable (mode_data * dest, const mode_init * src, unsigned int flagall)
+
+
+unsigned int BuildModeTable( char *mode_char_map, mode_data * dest, const mode_init * src, unsigned int flagall )
 {
 	unsigned int maskall = 0;
 
@@ -145,6 +165,7 @@ unsigned int BuildModeTable (mode_data * dest, const mode_init * src, unsigned i
 		dest[(int)src->mode].sjoin = src->sjoin;
 		/* Build supported modes mask */
 		maskall |= src->mask;
+		BuildModeCharMap( mode_char_map, src->mode, src->mask );
 		src ++;
 	}
 	return maskall;
@@ -163,33 +184,30 @@ InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const
 	/* build cmode lookup table */
 	os_memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
 	dlog(DEBUG4, "Build channel mode table...");
-	ircd_supported_cmodes |= BuildModeTable( ircd_cmodes, chan_modes_default, 0 );
+	ircd_supported_cmodes |= BuildModeTable( ircd_cmode_char_map, ircd_cmodes, chan_modes_default, 0 );
 	if( chan_modes )
-		ircd_supported_cmodes |= BuildModeTable( ircd_cmodes, chan_modes, 0 );
+		ircd_supported_cmodes |= BuildModeTable( ircd_cmode_char_map, ircd_cmodes, chan_modes, 0 );
 	/* build cumode lookup table */
 	dlog(DEBUG4, "Build channel user mode table...");
-	ircd_supported_cumodes |= BuildModeTable( ircd_cmodes, chan_umodes_default, NICKPARAM );
+	ircd_supported_cumodes |= BuildModeTable( ircd_cmode_char_map, ircd_cmodes, chan_umodes_default, NICKPARAM );
 	if( chan_umodes )
-		ircd_supported_cumodes |= BuildModeTable( ircd_cmodes, chan_umodes, NICKPARAM );
+		ircd_supported_cumodes |= BuildModeTable( ircd_cmode_char_map, ircd_cmodes, chan_umodes, NICKPARAM );
 	/* build umode lookup table */
 	os_memset(&ircd_umodes, 0, sizeof(ircd_umodes));
 	dlog(DEBUG4, "Build user mode table...");
-	ircd_supported_umodes |= BuildModeTable( ircd_umodes, user_umodes_default, 0 );
+	ircd_supported_umodes |= BuildModeTable( ircd_umode_char_map, ircd_umodes, user_umodes_default, 0 );
 	if( user_umodes )
-		ircd_supported_umodes |= BuildModeTable( ircd_umodes, user_umodes, 0 );
+		ircd_supported_umodes |= BuildModeTable( ircd_umode_char_map, ircd_umodes, user_umodes, 0 );
 	/* build smode lookup table */
 	if (user_smodes) {
 		os_memset(&ircd_smodes, 0, sizeof(ircd_smodes));
 		dlog(DEBUG4, "Build user smode table...");
-		ircd_supported_smodes = BuildModeTable( ircd_smodes, user_smodes, 0 );
+		ircd_supported_smodes = BuildModeTable( ircd_smode_char_map, ircd_smodes, user_smodes, 0 );
 	}
-#if 0
-/* XXX Currently broken */
 	/* Check for registered nick support */
 	if(ircd_supported_umodes & UMODE_REGNICK) {
 		UmodeChRegNick = UmodeMaskToChar(UMODE_REGNICK);
 	}
-#endif
 	/* preset our umode mask so we do not have to calculate in real time */
 	me.servicesumodemask = UmodeStringToMask(me.servicesumode);
 	return NS_SUCCESS;
