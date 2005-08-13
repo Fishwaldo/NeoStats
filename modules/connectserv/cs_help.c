@@ -89,3 +89,10 @@ const char *cs_help_set_servwatch[] =
 	"Report server joins and quits.",
 	NULL
 };
+
+const char *cs_help_set_colour[] = 
+{
+	"COLOUR <ON|OFF>",
+	"Turn on or off Colour reporting.",
+	NULL
+};

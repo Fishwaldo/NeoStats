@@ -32,3 +32,4 @@ extern const char *cs_help_set_modewatch[];
 extern const char *cs_help_set_nickwatch[];
 extern const char *cs_help_set_awaywatch[];
 extern const char *cs_help_set_servwatch[];
+extern const char *cs_help_set_colour[];
