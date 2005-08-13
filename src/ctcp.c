@@ -141,8 +141,8 @@ static int ctcp_req_version( CmdParams* cmdparams )
 static int ctcp_rpl_version( CmdParams* cmdparams )
 {
 	dlog( DEBUG5, "RX: CTCP VERSION reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
-	/* because all modules might be interested */
-	SendAllModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams);
+	/*SendAllModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams);*/
+	SendModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
@@ -163,7 +163,8 @@ static int ctcp_req_finger( CmdParams* cmdparams )
 static int ctcp_rpl_finger( CmdParams* cmdparams )
 {
 	dlog( DEBUG5, "RX: CTCP FINGER reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
-	SendAllModuleEvent( EVENT_CTCPFINGERRPL, cmdparams);
+	/*SendAllModuleEvent( EVENT_CTCPFINGERRPL, cmdparams);*/
+	SendModuleEvent( EVENT_CTCPFINGERRPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
@@ -219,7 +220,8 @@ static int ctcp_req_time( CmdParams* cmdparams )
 static int ctcp_rpl_time( CmdParams* cmdparams )
 {
 	dlog( DEBUG5, "RX: CTCP TIME reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
-	SendAllModuleEvent( EVENT_CTCPTIMERPL, cmdparams);
+	/*SendAllModuleEvent( EVENT_CTCPTIMERPL, cmdparams);*/
+	SendModuleEvent( EVENT_CTCPTIMERPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 
@@ -240,7 +242,8 @@ static int ctcp_req_ping( CmdParams* cmdparams )
 static int ctcp_rpl_ping( CmdParams* cmdparams )
 {
 	dlog( DEBUG5, "RX: CTCP PING reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
-	SendAllModuleEvent( EVENT_CTCPPINGRPL, cmdparams);
+	/*SendAllModuleEvent( EVENT_CTCPPINGRPL, cmdparams);*/
+	SendModuleEvent( EVENT_CTCPPINGRPL, cmdparams, cmdparams->bot->moduleptr );
 	return NS_SUCCESS;
 }
 

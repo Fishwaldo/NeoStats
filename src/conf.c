@@ -144,7 +144,7 @@ int ConfLoad( void )
 	int i, ret;
 
 	/* Read in the Config File */
-	printf ("Reading the Config File. Please wait.....\n");
+	printf ("Reading the Config File. Please wait ...\n");
 	cfg = cfg_init (fileconfig, CFGF_NOCASE);
 	for (i = 0; i < ARRAYLEN (arg_validate); i++) {
 		cfg_set_validate_func (cfg, arg_validate[i].name, arg_validate[i].cb);
@@ -170,7 +170,6 @@ int ConfLoad( void )
 		cfg_free (cfg);
 		return NS_FAILURE;
 	}
-	printf ("-----------------------------------------------\n");
 	set_config_values (cfg);
 	cfg_free (cfg);
 	printf ("Sucessfully loaded config file, booting NeoStats\n");
@@ -392,26 +391,26 @@ int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt )
 {
 	char *file = opt->values[0]->string;
-	char buf2[MAXPATH];
-	struct stat buf;
+	static char buf[MAXPATH];
+	struct stat fileinfo;
 
-	ircsnprintf( buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_STDEXT );
-	if( stat( buf2, &buf ) == -1 )
+	ircsnprintf( buf, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_STDEXT );
+	if( stat( buf, &fileinfo ) == -1 )
 	{
 #ifdef USE_PERL
-		ircsnprintf( buf2, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_PERLEXT );
-		if( stat( buf2, &buf ) == -1 )
+		ircsnprintf( buf, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_PERLEXT );
+		if( stat( buf, &fileinfo ) == -1 )
 		{
 #endif
-			cfg_error( cfg, "File %s Specified in Option %s is Invalid: %s", buf2, opt->name, strerror( errno ) );
+			cfg_error( cfg, "Unable to find file %s specified in option %s: %s", buf, opt->name, strerror( errno ) );
 			return CFG_PARSE_ERROR;
 #ifdef USE_PERL
 		}
 #endif
 	}
-	if( !S_ISREG( buf.st_mode ) )
+	if( !S_ISREG( fileinfo.st_mode ) )
 	{
-		cfg_error( cfg, "File %s Specified in Option %s is Invalid: Not a Regular File", buf2, opt->name );
+		cfg_error( cfg, "File %s specified in option %s is not a regular file", buf, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
