@@ -90,6 +90,21 @@ const char version_time[] = __TIME__;
 static int attempts = 0;
 jmp_buf sigvbuf;
 
+/** @brief update_time_now
+ *
+ *  update the me.now struct entries
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+void update_time_now( void )
+{
+	me.now = time(NULL);
+	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
+}
+
 /** @brief get_options
  *
  *  Processes command line options
@@ -173,8 +188,8 @@ static int InitMe( void )
 	/* our default lang is always -1 */
 	me.lang = -1;
 	me.numeric = 1;
-	me.now = me.ts_boot = time( NULL );
-	ircsnprintf( me.strnow, STR_TIME_T_SIZE, "%lu", ( long )me.now );
+	update_time_now();
+	me.ts_boot = me.now;
 	/* Clear config */
 	os_memset( &nsconfig, 0 , sizeof( config ) );
 	/* Default reconnect time */

@@ -123,16 +123,6 @@ static OS_SOCKET ConnectTo (char *host, int port)
 	return s;
 }
 
-/** @brief update the me.now struct 
- * @param none
- * @return none
- */
-static void 
-update_time() {
-	me.now = time(NULL);
-	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
-}
-
 #define CURLHACK 1
 /** @brief main recv loop
  *
@@ -157,7 +147,7 @@ read_loop ()
 	me.lastmsg = me.now;
 	while (1) { /* loop till we get a error */
 		SET_SEGV_LOCATION();
-		update_time();
+		update_time_now();
 #if CURLHACK
         event_loop(EVLOOP_ONCE);
 #else

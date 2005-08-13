@@ -118,9 +118,7 @@ void report_segfault( const char* modulename )
 		irc_globops( NULL, _( "Segmentation fault. Server terminating. Refer to segfault.log." ) );
 		nlog( LOG_CRITICAL, "Segmentation fault. Server terminating. Refer to segfault.log." );
 	}
-
-	me.now = time(NULL);
-	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", me.now);
+	update_time_now();
 	strftime (segfault_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime (&me.now));
 	os_fprintf( segfault, "------------------------SEGFAULT REPORT-------------------------\n" );
 	os_fprintf( segfault, "Please view the README for how to submit a bug report\n" );

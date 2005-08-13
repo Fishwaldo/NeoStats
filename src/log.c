@@ -127,8 +127,7 @@ static void make_log_filename( char *modname, char *logname )
 static void make_log_timestring( void )
 {
 	/* we update me.now here, because some functions might be busy and not call the loop a lot */
-	me.now = time( NULL );
-	ircsnprintf( me.strnow, STR_TIME_T_SIZE, "%lu", me.now );
+	update_time_now();
 	strftime( log_fmttime, TIMEBUFSIZE, "%d/%m/%Y[%H:%M:%S]", localtime( &me.now ) );
 }
 

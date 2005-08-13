@@ -42,5 +42,6 @@ typedef enum {
 }NS_EXIT_TYPE;
 
 void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg ) __attribute__( ( noreturn ) );
+void update_time_now( void );
 
 #endif /* _MAIN_H_ */
