@@ -105,10 +105,12 @@ void update_time_now( void )
 	ircsnprintf (me.strnow, STR_TIME_T_SIZE, "%lu", (long)me.now);
 }
 
+#ifndef WIN32
 /** @brief get_options
  *
  *  Processes command line options
  *  NeoStats core use only.
+ *  Not used in Win32.
  *
  *  @param argc count of command line parameters
  *  @param argv array of command line parameters
@@ -116,7 +118,6 @@ void update_time_now( void )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-#ifndef WIN32
 static int get_options( int argc, char **argv )
 {
 	int c;
@@ -171,7 +172,7 @@ static int get_options( int argc, char **argv )
 
 /** @brief InitMe
  *
- *  init me structure
+ *  init me structure and set pre config defaults
  *  NeoStats core use only.
  *
  *  @param none
@@ -181,7 +182,6 @@ static int get_options( int argc, char **argv )
 
 static int InitMe( void )
 {
-	/* set some defaults before we parse the config file */
 	os_memset( &me, 0, sizeof( me ) );
 	/* initialise version */
 	strlcpy( me.version, NEOSTATS_VERSION, VERSIONSIZE );
@@ -291,10 +291,12 @@ void FiniCore( void )
 	FiniIrcd();
 }
 
-/** @brief InitCore
+#ifndef WIN32
+/** @brief print_copyright
  *
  *  print copyright notice
  *  NeoStats core use only.
+ *  Not used on Win32
  *
  *  @param none
  *
@@ -310,6 +312,7 @@ static void print_copyright( void )
 	printf( "Mark Hetherington (m@neostats.net)\n" );
 	printf( "-----------------------------------------------\n\n" );
 }
+#endif /* !WIN32 */
 
 /** @brief main
  *
@@ -338,6 +341,11 @@ int main( int argc, char *argv[] )
 	/* get our commandline options */
 	if( get_options( argc, argv ) != NS_SUCCESS )
 		return EXIT_FAILURE;
+	/* keep quiet if we are told to : ) */
+	if( !nsconfig.quiet ) 
+		print_copyright();
+    /* make sure any files we create are not group/world readable (password info?) */
+    umask(077);
 #endif /* !WIN32 */
 #if 0
 	/* Change to the working Directory */
@@ -349,11 +357,6 @@ int main( int argc, char *argv[] )
 	}
 #endif
 
-#ifndef WIN32
-    /* make sure any files we create are not group/world readable (password info?) */
-    umask(077);
-#endif
-
 	/* Init run level to NeoStats core */
 	RunModule[0] = &ns_module;
 	/* before we do anything, make sure logging is setup */
@@ -361,9 +364,6 @@ int main( int argc, char *argv[] )
 		return EXIT_FAILURE;
 	/* our crash trace variables */
 	SET_SEGV_LOCATION();
-	/* keep quiet if we are told to : ) */
-	if( !nsconfig.quiet ) 
-		print_copyright();
     /* init the major subsystems and config first */
 	/* prepare to catch errors */
 	InitSignals();
@@ -376,6 +376,8 @@ int main( int argc, char *argv[] )
 	/* initialize Lang Subsystem */
 	ircsnprintf( dbpath, MAXPATH, "%s/data/lang.db", NEO_PREFIX );
 	LANGinit( 1, dbpath, NULL );
+#endif /* !WIN32 */
+#ifndef WIN32
 #ifndef DEBUG
 	/* if we are compiled with debug, or forground switch was specified, DONT FORK */
 	if( !nsconfig.foreground )
@@ -450,7 +452,7 @@ int main( int argc, char *argv[] )
 	InitUpdate();
 	Connect();
 #ifdef WIN32
-	return 0;
+	return EXIT_SUCCESS;
 #else /* WIN32 */
 	do_reconnect();
 	/* We should never reach here but the compiler does not realise and may
@@ -472,12 +474,10 @@ int main( int argc, char *argv[] )
  */
 static void do_reconnect( void )
 {
-	if( nsconfig.r_time > 0 ) {
+	if( nsconfig.r_time > 0 )
 		nlog( LOG_NOTICE, "Reconnecting to the server in %d seconds (Attempt %i)", nsconfig.r_time, attempts );
-	}
-	else {
+	else
 		nlog( LOG_NOTICE, "Reconnect time is zero, shutting down" );
-	}
 	do_exit( NS_EXIT_RECONNECT, NULL );
 }
 

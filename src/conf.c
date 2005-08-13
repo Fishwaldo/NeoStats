@@ -45,7 +45,6 @@ typedef struct validate_args {
 static void *load_mods[NUM_MODULES];
 
 static void cb_module( char *name );
-static void set_config_values( cfg_t *cfg );
 static int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt );
@@ -131,54 +130,49 @@ validate_args arg_validate[] = {
 	{"Modules|ModuleName", &cb_verify_file}
 };
 
-/** @brief Load configuration file
+/** @brief ConfParseError
  *
- * Parses the configuration file
+ *  Report configuration parse error 
  *
- * @returns nothing
+ *  @param err error value from parse 
+ *
+ *  @return none
  */
 
-int ConfLoad( void )
+static void ConfParseError( int err )
 {
-	cfg_t *cfg;
-	int i, ret;
-
-	/* Read in the Config File */
-	printf ("Reading the Config File. Please wait ...\n");
-	cfg = cfg_init (fileconfig, CFGF_NOCASE);
-	for (i = 0; i < ARRAYLEN (arg_validate); i++) {
-		cfg_set_validate_func (cfg, arg_validate[i].name, arg_validate[i].cb);
-	}
-	if ((ret = cfg_parse (cfg, CONFIG_NAME)) != 0) {
-		printf ("***************************************************\n");
-		printf ("*                  Error!                         *\n");
-		printf ("*                                                 *\n");
-		switch (ret) {
+#ifndef WIN32
+	printf( "***************************************************\n" );
+	printf( "*                  Error!                         *\n" );
+	printf( "*                                                 *\n" );
+	switch( err )
+	{
 		case CFG_FILE_ERROR:
-			printf ("*           Config file not found                 *\n");
+			printf( "*           Config file not found                 *\n" );
 			break;
 		case CFG_PARSE_ERROR:
-			printf ("*            Config Parse Error                   *\n");
+			printf( "*            Config Parse Error                   *\n" );
 			break;
 		default:
-			printf ("*               Unknown Error                     *\n");
+			printf( "*               Unknown Error                     *\n" );
 			break;
-		}
-		printf ("*                                                 *\n");
-		printf ("*             NeoStats NOT Started                *\n");
-		printf ("***************************************************\n");
-		cfg_free (cfg);
-		return NS_FAILURE;
 	}
-	set_config_values (cfg);
-	cfg_free (cfg);
-	printf ("Sucessfully loaded config file, booting NeoStats\n");
-	printf ("If NeoStats does not connect, please check logs/neostats-<date>.log for further information\n");
-	return NS_SUCCESS;
+	printf ( "*                                                 *\n" );
+	printf ( "*             NeoStats NOT Started                *\n" );
+	printf ( "***************************************************\n" );
+#endif /* WIN32 */
 }
 
-void
-set_config_values (cfg_t *cfg)
+/** @brief set_config_values
+ *
+ *  set initial NeoStats config based on config file
+ *
+ *  @param cfg pointer to config struct
+ *
+ *  @return NS_SUCCESS or NS_FAILURE
+ */
+
+static int set_config_values( cfg_t *cfg )
 {
 	int i;
 	/* Server name has a default */
@@ -261,6 +255,41 @@ set_config_values (cfg_t *cfg)
 	dlog( DEBUG6, "-----------------------------------------------" );
 }
 
+/** @brief ConfLoad
+ *
+ *  Load and parse configuration file
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS or NS_FAILURE
+ */
+
+int ConfLoad( void )
+{
+	cfg_t *cfg;
+	int i, ret;
+
+#ifndef WIN32
+	printf( "Reading the Config File. Please wait ...\n" );
+#endif /* WIN32 */
+	cfg = cfg_init (fileconfig, CFGF_NOCASE);
+	for( i = 0; i < ARRAYLEN (arg_validate); i++ )
+		cfg_set_validate_func (cfg, arg_validate[i].name, arg_validate[i].cb);
+	if( ( ret = cfg_parse( cfg, CONFIG_NAME ) ) != 0 )
+	{
+		ConfParseError( ret );
+		cfg_free( cfg );
+		return NS_FAILURE;
+	}
+	set_config_values( cfg );
+	cfg_free( cfg );
+#ifndef WIN32
+	printf( "Sucessfully loaded config file, booting NeoStats\n" );
+	printf( "If NeoStats does not connect, please check logs/neostats-<date>.log for further information\n" );
+#endif /* WIN32 */
+	return NS_SUCCESS;
+}
+
 /** @brief ConfLoadModules 
  *
  *  Load the modules that selected by the configuration file
@@ -305,7 +334,7 @@ void ConfLoadModules( void )
  *  @return none
  */
 
-int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt )
 {
 	if( ValidateChannel( opt->values[0]->string ) == NS_FAILURE )
 	{
@@ -325,7 +354,7 @@ int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt )
 {
 	long int num = opt->values[0]->number;
 
@@ -347,7 +376,7 @@ int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 {
 	OS_SOCKET s;
 	struct hostent *hp;
@@ -388,7 +417,7 @@ int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt )
 {
 	char *file = opt->values[0]->string;
 	static char buf[MAXPATH];
@@ -426,7 +455,7 @@ int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt )
 {
 	return CFG_SUCCESS;
 }
@@ -441,7 +470,7 @@ int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt )
 {
 	char *value = opt->values[0]->string;
 	if( strstr( value, "!" ) && !strstr( value, "@" ) )
@@ -462,7 +491,7 @@ int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_noload( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_noload( cfg_t *cfg, cfg_opt_t *opt )
 {
 	if( opt->values[0]->boolean == cfg_true )
 	{
@@ -482,7 +511,7 @@ int cb_noload( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt )
 {
 	if( ValidateHost( opt->values[0]->string ) == NS_FAILURE )
 	{
@@ -502,7 +531,7 @@ int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt )
+static int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt )
 {
 	long int time = opt->values[0]->number;
 
@@ -523,7 +552,7 @@ int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt )
  *  @return none
  */
 
-void cb_module( char *name )
+static void cb_module( char *name )
 {
 	int i;
 
