@@ -269,9 +269,11 @@ void FiniCore( void )
 	FiniBans();
 	FiniDns();
 	FiniModules();
-	FiniSocks();
+	FiniServices();
 	FiniBots();
 	FiniTimers();
+	FiniSocks();
+	FiniIrcd();
 }
 
 /** @brief InitCore

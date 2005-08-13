@@ -514,6 +514,7 @@ void FiniSocks (void)
 		me.servsock = NULL;
 	}
 	hash_destroy(sockethash);
+	event_fini();
 }
 
 /** @brief create a new socket

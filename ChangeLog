@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - First round of memory cleanups with Valgrind (F)
+ - Create a runvalgrind.sh file with NeoStats suppressions for memory
+   checking (F)
  - Sync up libevent to distribution of 1.1a (F)
  - Make QuoteServ take a optional database for Quote Command (F)
  - Fix up triggering WANT_NICKIP code (F)

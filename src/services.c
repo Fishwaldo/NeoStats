@@ -200,7 +200,7 @@ void InitServices( void )
  */
 void FiniServices( void )
 {
-	del_services_set_list (ns_debugsettings);
+	free(GET_CUR_MODULE()->event_list);
 }
 
 /** @brief init_services_bot

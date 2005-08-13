@@ -327,4 +327,5 @@ void FiniDCC( void )
 		dccnode = list_next( dcclist, dccnode );
 	}
 	list_destroy_nodes( dcclist );
+	list_destroy(dcclist);
 }

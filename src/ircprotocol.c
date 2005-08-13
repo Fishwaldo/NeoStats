@@ -332,6 +332,11 @@ int InitIrcd( void )
 	return NS_SUCCESS;
 }
 
+int FiniIrcd ( void ) {
+	ns_dlclose(protocol_module_handle);
+	return NS_SUCCESS;
+}
+
 /** @brief HaveFeature
  *
  *  @return 1 if have else 0

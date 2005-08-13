@@ -179,6 +179,12 @@ event_init(void)
 }
 
 int
+event_fini(void)
+{
+	return event_priority_fini(current_base->nactivequeues);
+}
+
+int
 event_priority_init(int npriorities)
 {
   return event_base_priority_init(current_base, npriorities);
@@ -191,13 +197,13 @@ event_base_priority_init(struct event_base *base, int npriorities)
 
 	if (base->event_count_active)
 		return (-1);
-
 	if (base->nactivequeues && npriorities != base->nactivequeues) {
 		for (i = 0; i < base->nactivequeues; ++i) {
 			free(base->activequeues[i]);
 		}
 		free(base->activequeues);
 	}
+
 
 	/* Allocate our priority queues */
 	base->nactivequeues = npriorities;
@@ -215,6 +221,29 @@ event_base_priority_init(struct event_base *base, int npriorities)
 
 	return (0);
 }
+
+int
+event_priority_fini(int npriorities)
+{
+	return event_base_priority_fini(current_base, npriorities);
+}
+
+int
+event_base_priority_fini(struct event_base *base, int npriorities)
+{
+	int i;
+	
+	if (base->event_count_active)
+		return (-1);
+	for (i = 0; i < base->nactivequeues; ++i) {
+		free(base->activequeues[i]);
+	}
+	free(base->activequeues);
+	free(base);
+	return (0);
+}
+
+
 
 int
 event_haveevents(struct event_base *base)

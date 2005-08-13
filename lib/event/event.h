@@ -129,6 +129,8 @@ struct eventop {
 #define TIMEOUT_DEFAULT	{5, 0}
 
 void *event_init(void);
+int event_fini(void);
+
 int event_dispatch(void);
 int event_base_dispatch(struct event_base *);
 
@@ -190,7 +192,9 @@ const char *event_get_method(void);
 /* These functions deal with event priorities */
 
 int	event_priority_init(int);
+int	event_priority_fini(int);
 int	event_base_priority_init(struct event_base *, int);
+int	event_base_priority_fini(struct event_base *, int);
 int	event_priority_set(struct event *, int);
 
 /* These functions deal with buffering input and output */

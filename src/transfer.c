@@ -59,6 +59,7 @@ int InitCurl(void)
 
 void FiniCurl(void) 
 {
+	curl_multi_cleanup(curlmultihandle);
 	list_destroy_auto (activetransfers);
 }
 

@@ -49,14 +49,10 @@ static char msg_sigterm[] = "SIGTERM received, shutting down server.";
 
 RETSIGTYPE sigterm_handler( int signum )
 {
-#ifdef VALGRIND
-	exit( NS_SUCCESS );
-#else /* VALGRIND */
 	nlog( LOG_CRITICAL, msg_sigterm );
 	/* XXX-Mark something is wrong with irc_globops */
 	irc_globops( NULL, msg_sigterm );
 	do_exit( NS_EXIT_NORMAL, msg_sigterm );
-#endif /* VALGRIND */
 }
 
 /** @brief SIGHUP handler

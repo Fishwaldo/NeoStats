@@ -104,11 +104,15 @@ void *ns_dlopen (const char *file, int mode)
 
 int ns_dlclose (void *handle)
 {
+#ifndef VALGRIND
 #ifdef WIN32
 	FreeLibrary((HMODULE)handle);
 	return 0;
 #else
 	return (dlclose (handle));
+#endif
+#else
+	return NS_SUCCESS;
 #endif
 }
 

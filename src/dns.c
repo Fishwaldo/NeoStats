@@ -252,8 +252,7 @@ void FiniDns (void)
 	list_destroy (dnsqueue);
 	event_del(dnstimeout);
 	free(dnstimeout);
-
-	free(ads);
+	adns_finish(ads);
 }
 /** @brief Canx any DNS queries for modules we might be unloading
  * 

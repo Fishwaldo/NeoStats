@@ -234,6 +234,7 @@ int ModFini( void )
 	database *db;
 	hnode_t *hn;
 	hscan_t hs;
+	int i;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
@@ -241,6 +242,12 @@ int ModFini( void )
 		db =( ( database * )hnode_get( hn ) );
 		hash_delete( qshash, hn );
 		hnode_destroy( hn );
+		ns_free(db->prefixstring);
+		ns_free(db->suffixstring);
+		for (i = 0; i < db->stringcount; i++) {
+			ns_free(db->stringlist[i]);
+		}
+		ns_free(db->stringlist);
 		ns_free( db );
 	}
 	hash_destroy( qshash );

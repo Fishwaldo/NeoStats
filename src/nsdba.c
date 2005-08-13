@@ -65,6 +65,7 @@ static dbm_sym dbm_sym_table[] =
 
 static hash_t *dbhash;
 static char dbname[MAXPATH];
+void *dbm_module_handle;
 
 /** @brief InitDBAMSymbols
  *
@@ -78,7 +79,6 @@ static char dbname[MAXPATH];
 static int InitDBAMSymbols( void )
 {
 	static char dbm_path[MAXPATH];
-	void *dbm_module_handle;
 	dbm_sym *pdbm_sym;
 
 	ircsnprintf( dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_STDEXT );
@@ -157,6 +157,8 @@ void FiniDBA( void )
 		ns_free( dbe );
 	}
 	hash_destroy( dbhash );
+	ns_dlclose(dbm_module_handle);
+
 }
 
 /** @brief DBAOpenDatabase
@@ -204,7 +206,7 @@ int DBACloseDatabase( void )
 		hash_scan_begin( &ts, dbe->tablehash );
 		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
 			tbe = (tableentry *) hnode_get( tnode );
-			DBACloseTable( tbe->table );
+			DBMCloseTable( tbe->handle );
 			hash_delete( dbe->tablehash, tnode );
 			hnode_destroy( tnode );
 			ns_free( tbe );

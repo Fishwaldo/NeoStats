@@ -105,6 +105,7 @@ int InitModExcludes(Module *mod_ptr)
 
 void FiniExcludes(void) 
 {
+	DBACloseTable("exclusions");
 	list_destroy_auto (exclude_list);
 }
 
