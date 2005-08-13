@@ -183,10 +183,13 @@ InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const
 		dlog(DEBUG4, "Build user smode table...");
 		ircd_supported_smodes = BuildModeTable( ircd_smodes, user_smodes, 0 );
 	}
+#if 0
+/* XXX Currently broken */
 	/* Check for registered nick support */
 	if(ircd_supported_umodes & UMODE_REGNICK) {
 		UmodeChRegNick = UmodeMaskToChar(UMODE_REGNICK);
 	}
+#endif
 	/* preset our umode mask so we do not have to calculate in real time */
 	me.servicesumodemask = UmodeStringToMask(me.servicesumode);
 	return NS_SUCCESS;
