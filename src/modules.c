@@ -245,7 +245,7 @@ ModulesVersion (const char* nick, const char *remoteserver)
  * @return none
  */
 
-void load_module_error(const Client *target, const char *fmt, ...)
+void load_module_error( const Client *target, const char *module_name, const char *fmt, ... )
 {
 	static char buf[BUFSIZE];
 	va_list ap;
@@ -254,7 +254,7 @@ void load_module_error(const Client *target, const char *fmt, ...)
 	ircvsnprintf (buf, BUFSIZE, fmt, ap);
 	va_end (ap);
 	if (target) {
-		irc_prefmsg (ns_botptr, target, buf);
+		irc_prefmsg (ns_botptr, target, __("Unable to load module %s: %s", u), module_name, buf);
 	}
 	nlog (LOG_WARNING, buf);
 }
@@ -278,52 +278,52 @@ Module *load_stdmodule (const char *modfilename, Client * u)
 
 	SET_SEGV_LOCATION();
 	if (hash_isfull (modulehash)) {
-		load_module_error (u, __("Unable to load module: module list is full", u));
+		load_module_error( u, modfilename, __("module list is full", u) );
 		return NULL;
 	} 
 	handle = ns_dlopen (modfilename, RTLD_NOW || RTLD_GLOBAL);
 	if (!handle) {
-		load_module_error (u, __("Unable to load module: %s %s", u), ns_dlerrormsg, modfilename);
+		load_module_error( u, modfilename, ns_dlerrormsg, modfilename );
 		return NULL;
 	}
 	infoptr = ns_dlsym (handle, "module_info");
 	if(infoptr == NULL) {
-		load_module_error (u, __("Unable to load module: %s missing module_info", u), modfilename);
+		load_module_error( u, modfilename, __("missing module_info", u) );
 		ns_dlclose (handle);
 		return NULL;
 	}
 	/* Check module was built for this version of NeoStats */
 	if( ircstrncasecmp (NEOSTATS_VERSION, infoptr->neostats_version, VERSIONSIZE) !=0 ) {
-		load_module_error (u, __("Unable to load module: %s was built with an old version of NeoStats and must be rebuilt.", u), modfilename);
+		load_module_error( u, modfilename, __("module built with an old version of NeoStats and must be rebuilt.", u)  );
 		ns_dlclose (handle);
 		return NULL;
 	}
 	if( !infoptr->copyright || ircstrcasecmp (infoptr->copyright[0], "Copyright (c) <year>, <your name>") ==0 ) {
-		load_module_error (u, __("Unable to load module: missing copyright text.", u), modfilename);
+		load_module_error( u, modfilename, __("missing copyright text.", u) );
 		ns_dlclose (handle);
 		return NULL;
 	}	
 	if( !infoptr->about_text || ircstrcasecmp (infoptr->about_text[0], "About your module") ==0 ) {
-		load_module_error (u, __("Unable to load module: missing about text.", u), modfilename);
+		load_module_error( u, modfilename, __("missing about text.", u) );
 		ns_dlclose (handle);
 		return NULL;
 	}	
 	/* Check that the Module hasn't already been loaded */
 	if (hash_lookup (modulehash, infoptr->name)) {
 		ns_dlclose (handle);
-		load_module_error (u, __("Unable to load module: %s already loaded", u), infoptr->name);
+		load_module_error( u, modfilename, __("already loaded", u) );
 		return NULL;
 	}
 	/* Check we have require PROTOCOL/FEATURE support for module */
 	if((infoptr->features & ircd_srv.features) != infoptr->features) {
-		load_module_error (u, __("Unable to load module: %s Required module features not available on this IRCd.", u), modfilename);
+		load_module_error( u, modfilename, __("Required module features not available on this IRCd.", u), modfilename );
 		ns_dlclose (handle);
 		return NULL;
 	}
 	/* Lookup ModInit (replacement for library __init() call */
 	ModInit = ns_dlsym ((int *) handle, "ModInit");
 	if (!ModInit) {
-		load_module_error (u, __("Unable to load module: %s missing ModInit.", u), mod_ptr->info->name);
+		load_module_error( u, modfilename, __("missing ModInit.", u) );
 		ns_dlclose (handle);
 		return NULL;
 	}
@@ -347,7 +347,7 @@ Module *load_stdmodule (const char *modfilename, Client * u)
     /* For Auth modules, register auth function */
 	if (infoptr->flags & MODULE_FLAG_AUTH) {
 		if (AddAuthModule (mod_ptr) != NS_SUCCESS) {
-			load_module_error (u, __("Unable to load auth module: %s missing ModAuthUser function",u), infoptr->name);
+			load_module_error( u, modfilename, __("Unable to load auth module: %s missing ModAuthUser function",u), infoptr->name );
 			unload_module(mod_ptr->info->name, NULL);
 			return NULL;
 		}
@@ -367,7 +367,7 @@ Module *load_stdmodule (const char *modfilename, Client * u)
 	err = (*ModInit) (); 
 	RESET_RUN_LEVEL();
 	if (err < 1 || mod_ptr->error) {
-		load_module_error (u, __("Unable to load module: %s. See %s.log for further information.",u), mod_ptr->info->name, mod_ptr->info->name);
+		load_module_error( u, modfilename, __("See %s.log for further information.",u), mod_ptr->info->name );
 		unload_module(mod_ptr->info->name, NULL);
 		return NULL;
 	}
@@ -381,7 +381,7 @@ Module *load_stdmodule (const char *modfilename, Client * u)
 	if (IsNeoStatsSynched()) {
 		if (SynchModule (mod_ptr) != NS_SUCCESS || mod_ptr->error)
 		{
-			load_module_error (u, __("Unable to load module: %s. See %s.log for further information.", u), mod_ptr->info->name, mod_ptr->info->name);
+			load_module_error( u, modfilename, __("See %s.log for further information.", u), mod_ptr->info->name );
 			unload_module(mod_ptr->info->name, NULL);
 			return NULL;
 		}
@@ -407,9 +407,9 @@ Module *ns_load_module(const char *modfilename, Client * u)
 	struct stat buf;
 	Module *mod;
 
-	strlcpy (loadmodname, modfilename, 255);
-	strlwr (loadmodname);
-	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_STDEXT);
+	strlcpy( loadmodname, modfilename, 255 );
+	strlwr( loadmodname );
+	ircsnprintf( path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_STDEXT );
 	if (stat(path, &buf) != -1) {
 		return load_stdmodule(path, u);
 	}
@@ -425,7 +425,7 @@ Module *ns_load_module(const char *modfilename, Client * u)
 	}
 #endif
 	/* if we get here, ehhh, doesn't exist */
-	load_module_error (u, __("Unable to load module: %s", u), modfilename);
+	load_module_error( u, modfilename, __("Module file not found", u));
 	return NULL;
 
 }

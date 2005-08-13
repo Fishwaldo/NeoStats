@@ -1562,14 +1562,14 @@ Module *load_perlmodule (const char *filename, Client *u)
 								1, (char *)filename)) {
 		/* if we are here, check that pm->mod->info has something, otherwise the script didnt register */
 		if (!mod->info->name[0]) {
-			load_module_error(u, __("Perl Module %s didn't register. Unloading", u), filename);
+			load_module_error(u, filename, __("Perl Module didn't register.", u));
 			unload_perlmod(mod);
 			free(mod);
 			return NULL;
 		}		
 		/* it loaded ok */
 	} else {
-		load_module_error(u, __("Errors in Perl Module %s", u), filename);
+		load_module_error(u, filename, __("Errors in Perl Module", u));
 		unload_perlmod(mod);
 		free(mod);
 		return NULL;	
