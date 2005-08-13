@@ -25,7 +25,7 @@
 
 int InitIrcd( void );
 int FiniIrcd( void );
-int irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink );
+int irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const time_t tsboot, const time_t tslink );
 int irc_nick( const char *nick, const char *user, const char *host, const char *realname, const char *modes );
 int irc_server( const char *name, const int numeric, const char *infoline );
 int irc_squit( const char *server, const char *quitmsg );

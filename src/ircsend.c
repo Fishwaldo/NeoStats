@@ -92,7 +92,7 @@ static void( *irc_send_pong )( const char *reply );
 static void( *irc_send_server )( const char *source, const char *name, const int numeric, const char *infoline );
 static void( *irc_send_squit )( const char *server, const char *quitmsg );
 static void( *irc_send_nick )( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname );
-static void( *irc_send_server_connect )( const char *name, const int numeric, const char *infoline, const char *pass, unsigned long tsboot, unsigned long tslink );
+static void( *irc_send_server_connect )( const char *name, const int numeric, const char *infoline, const char *pass, time_t tsboot, time_t tslink );
 static void( *irc_send_netinfo )( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 static void( *irc_send_snetinfo )( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
 static void( *irc_send_svinfo )( const int tscurrent, const int tsmin, const unsigned long tsnow );
@@ -640,7 +640,7 @@ static void unsupported_cmd( const char *cmd )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
+int irc_connect( const char *name, const int numeric, const char *infoline, const char *pass, const time_t tsboot, const time_t tslink )
 {
 	irc_send_server_connect( name, numeric, infoline, pass, tsboot, tslink );
 	return NS_SUCCESS;

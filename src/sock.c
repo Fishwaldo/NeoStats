@@ -197,7 +197,7 @@ void Connect( void )
 	} else {
 		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, irc_sock_error, NULL);
 		/* Call the IRC specific function send_server_connect to login as a server to IRC */
-		irc_connect (me.name, me.numeric, me.infoline, nsconfig.pass, (unsigned long)me.ts_boot, (unsigned long)me.now);
+		irc_connect (me.name, me.numeric, me.infoline, nsconfig.pass, me.ts_boot, me.now);
 #ifndef WIN32
 		read_loop ();
 #endif

@@ -133,6 +133,7 @@ validate_args arg_validate[] = {
 /** @brief ConfParseError
  *
  *  Report configuration parse error 
+ *  Config subsystem use only
  *
  *  @param err error value from parse 
  *
@@ -166,6 +167,7 @@ static void ConfParseError( int err )
 /** @brief set_config_values
  *
  *  set initial NeoStats config based on config file
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config struct
  *
@@ -183,15 +185,19 @@ static int set_config_values( cfg_t *cfg )
 	/* Connect To */
 	if (cfg_size (cfg, "Servers|IpAddress") <= 0)
 	{
+#ifndef WIN32
 		printf ("ERROR: No Server was configured for Linking. Please fix this\n");
-		exit (-1);
+#endif /* WIN32 */
+		return NS_FAILURE;
 	}
 	strlcpy (me.uplink, cfg_getstr (cfg, "Servers|IpAddress"), sizeof (me.uplink));
 	/* Connect Pass */
 	if (cfg_size (cfg, "Servers|Password") <= 0)
 	{
+#ifndef WIN32
 		printf ("ERROR: No Password was specified for Linking. Please fix this\n");
-		exit (-1);
+#endif /* WIN32 */
+		return NS_FAILURE;
 	}
 	strlcpy (nsconfig.pass, cfg_getstr (cfg, "Servers|Password"), sizeof (nsconfig.pass));
 	dlog( DEBUG6, "NeoStats ServerName: %s", me.name );
@@ -253,6 +259,7 @@ static int set_config_values( cfg_t *cfg )
 		dlog( DEBUG6, "                     %s", cfg_getnstr( cfg, "Modules|ModuleName", i ));
 	}	
 	dlog( DEBUG6, "-----------------------------------------------" );
+	return NS_SUCCESS;
 }
 
 /** @brief ConfLoad
@@ -281,7 +288,11 @@ int ConfLoad( void )
 		cfg_free( cfg );
 		return NS_FAILURE;
 	}
-	set_config_values( cfg );
+	if( set_config_values( cfg ) != NS_SUCCESS )
+	{
+		cfg_free( cfg );
+		return NS_FAILURE;
+	}
 	cfg_free( cfg );
 #ifndef WIN32
 	printf( "Sucessfully loaded config file, booting NeoStats\n" );
@@ -327,6 +338,7 @@ void ConfLoadModules( void )
 /** @brief cb_verify_chan
  *
  *  Verify channel name configuration value
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -347,6 +359,7 @@ static int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_verify_numeric
  *
  *  Verify server numeric configuration value
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -369,6 +382,7 @@ static int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_verify_bind
  *
  *  Verify bindto configuration value
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -410,6 +424,7 @@ static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_verify_file
  *
  *  Verify file exists
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -448,6 +463,7 @@ static int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_verify_log
  *
  *  Verify log filename format configuration value
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -484,6 +500,7 @@ static int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_noload
  *
  *  Verify NOLOAD configuration value
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -504,6 +521,7 @@ static int cb_noload( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_verify_host
  *
  *  Verify hostname/ip address configuration value
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -524,6 +542,7 @@ static int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_verify_settime
  *
  *  Verify settime configuration value
+ *  Config subsystem use only
  *
  *  @param cfg pointer to config structure
  *  @param opt pointer to option
@@ -546,6 +565,7 @@ static int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt )
 /** @brief cb_module
  *
  *  Add module to list of modules to load
+ *  Config subsystem use only
  *
  *  @param name of module
  *

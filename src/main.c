@@ -531,8 +531,8 @@ void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
 		execve( "./bin/neostats", NULL, NULL );
 		return_code = EXIT_FAILURE;	/* exit code to error */
 	}
-#endif /* !WIN32 */
 	remove( PID_FILENAME );
+#endif /* !WIN32 */
 	exit( return_code );
 }
 
