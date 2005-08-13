@@ -43,6 +43,9 @@
 #include <stdarg.h>
 #endif
 
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 #include "event.h"
 
 /* prototypes */
