@@ -469,7 +469,7 @@ int ss_html( void *userptr )
 			}		
 			htmlfuncptr++;
 		}
-		buftemp = strcasestr( bufptr, "</html>" );
+		buftemp = strstr( bufptr, "</html>" );
 		if( buftemp ) {
 			os_fwrite( bufptr,( int )buftemp -( int )bufptr, 1, opf );
 			put_copyright();
