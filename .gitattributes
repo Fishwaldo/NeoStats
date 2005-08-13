@@ -285,6 +285,7 @@ lib/curl/urldata.h -text
 lib/curl/version.c -text
 lib/event/Makefile.am -text
 lib/event/Makefile.in -text
+lib/event/VERSION -text
 lib/event/WIN32-Code/WIN32-Code/CVS/Entries -text
 lib/event/WIN32-Code/WIN32-Code/CVS/Repository -text
 lib/event/WIN32-Code/WIN32-Code/CVS/Root -text
@@ -337,7 +338,6 @@ lib/event/WIN32-Prj/time_test/time_test/CVS/Repository -text
 lib/event/WIN32-Prj/time_test/time_test/CVS/Root -text
 lib/event/WIN32-Prj/time_test/time_test/time_test.dsp -text
 lib/event/buffer.c -text
-lib/event/compat/err.h -text
 lib/event/compat/sys/_time.h -text
 lib/event/compat/sys/queue.h -text
 lib/event/compat/sys/tree.h -text

@@ -6,7 +6,7 @@ INCLUDES 		= -Icompat
 EXTRA_DIST = err.c event.h event-internal.h evsignal.h \
 	kqueue.c epoll_sub.c epoll.c select.c rtsig.c poll.c signal.c \
 	devpoll.c log.c log.h\
-	compat/err.h compat/sys/queue.h compat/sys/tree.h compat/sys/_time.h \
+	compat/sys/queue.h compat/sys/tree.h compat/sys/_time.h \
 	WIN32-Code/config.h WIN32-Code/misc.c \
 	WIN32-Code/win32.c WIN32-Code/misc.h \
 	WIN32-Prj/libevent.dsp \
