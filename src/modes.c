@@ -140,7 +140,6 @@ void BuildModeCharMap( char *mode_char_map, char mode, unsigned int mask )
 		bitcount ++;
 	if( bitcount < 31 )
 		mode_char_map[bitcount] = mode;
-    int bitcount = 0;
 }
 
 /** @brief BuildModeTable
