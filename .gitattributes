@@ -567,6 +567,7 @@ src/win32/resource.h -text
 src/win32/winmain.c -text
 tools/generate_header -text
 tools/neostats.suppression -text
+tools/runvalgrind.sh -text
 tools/sqlphp/README -text
 tools/sqlphp/rta_tables.php -text
 tools/sqlphp/rta_view.php -text
