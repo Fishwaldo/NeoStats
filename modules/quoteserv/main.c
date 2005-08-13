@@ -84,11 +84,11 @@ ModuleInfo module_info = {
 /** Bot comand table */
 static bot_cmd qs_commands[]=
 {
-	{"ADD",		qs_cmd_add,	1,	NS_ULEVEL_ADMIN,	qs_help_add},
-	{"DEL",		qs_cmd_del,	1, 	NS_ULEVEL_ADMIN,	qs_help_del},
-	{"LIST",		qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
+	{"ADD",		qs_cmd_add,		1,	NS_ULEVEL_ADMIN,	qs_help_add},
+	{"DEL",		qs_cmd_del,		1, 	NS_ULEVEL_ADMIN,	qs_help_del},
+	{"LIST",	qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
 	{"QUOTE",	qs_cmd_quote,	0, 	0,		qs_help_quote},
-	{NULL,		NULL,		0, 	0,		NULL}
+	{NULL,		NULL,			0, 	0,		NULL}
 };
 
 /** Bot setting table */
@@ -145,6 +145,7 @@ static int qs_read_database( database *db )
 		/* comment char */
 		if( buf[0] == '#' )
 			continue;
+		/* TODO: memory leak if prefix/suffix used due to multiple strdup calls */
 		ptr = strdup(buf);
 		strip(ptr);
 		dlog( DEBUG1, "read %s", ptr );
@@ -239,15 +240,15 @@ int ModFini( void )
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		db =( ( database * )hnode_get( hn ) );
+		db = ( ( database * )hnode_get( hn ) );
 		hash_delete( qshash, hn );
 		hnode_destroy( hn );
-		ns_free(db->prefixstring);
-		ns_free(db->suffixstring);
+		ns_free( db->prefixstring );
+		ns_free( db->suffixstring );
 		for (i = 0; i < db->stringcount; i++) {
-			ns_free(db->stringlist[i]);
+			ns_free( db->stringlist[i] );
 		}
-		ns_free(db->stringlist);
+		ns_free( db->stringlist );
 		ns_free( db );
 	}
 	hash_destroy( qshash );
@@ -382,7 +383,11 @@ static int do_quote( Client *target, char *which, int reporterror )
 	int randno;
 	
 	SET_SEGV_LOCATION();
-	if((which == NULL) || ( ircstrcasecmp( which, "random" ) == 0 ))
+	if( which != NULL )
+	{
+		db = (database *)hnode_find( qshash, which );
+	}
+	else
 	{
 		hnode_t *hn;
 		hscan_t hs;
@@ -390,26 +395,23 @@ static int do_quote( Client *target, char *which, int reporterror )
 		int i = 0;
 		
 		/* return if no databases defined */
-		if (hash_count( qshash ) < 1)
-			return NS_FAILURE;
-		randdb = hrand( hash_count( qshash ) , 1 );	
-		hash_scan_begin( &hs, qshash );
-		while( ( hn = hash_scan_next( &hs ) ) != NULL )
+		if (hash_count( qshash ) >= 1)
 		{
-			i++;
-			db =( database * )hnode_get( hn );
-			if( i == randdb )
-				break;
-		}
-		
+			randdb = hrand( hash_count( qshash ) , 1 );	
+			hash_scan_begin( &hs, qshash );
+			while( ( hn = hash_scan_next( &hs ) ) != NULL )
+			{
+				i++;
+				db =( database * )hnode_get( hn );
+				if( i == randdb )
+					break;
+			}
+		}		
 	}
-	else
+	if (!db)
 	{
-		db = (database *)hnode_find( qshash, which );
-	}
-	if (!db) {
 		if( reporterror )
-			irc_prefmsg( qs_bot, target, "%s not available", which );
+			irc_prefmsg( qs_bot, target, "not available" );
 		return NS_SUCCESS;
 	}
 	/* return if no records in selected database */
@@ -466,7 +468,7 @@ static int qs_cmd_quote( CmdParams* cmdparams )
 
 static int event_signon( CmdParams *cmdparams )
 {
-	return do_quote( cmdparams->source, "random", 0 );
+	return do_quote( cmdparams->source, NULL, 0 );
 }
 
 /** @brief cs_set_exclusions_cb

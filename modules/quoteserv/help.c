@@ -56,9 +56,11 @@ const char *qs_help_list[] = {
 
 const char *qs_help_quote[] = {
 	"Fetch quote",
-	"Syntax: \2QUOTE <optional database>\2",
+	"Syntax: \2QUOTE [database]\2",
 	"",
-	"Get quote.",
+	"Get a random quote from all loaded databases.",
+	"The optional database parameter allows selection of a random quote",
+	"from that database.",
 	NULL
 };
 
