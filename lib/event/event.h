@@ -32,7 +32,10 @@ extern "C" {
 #endif
 
 #ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+typedef unsigned char u_char;
 #endif
 
 #define EVLIST_TIMEOUT	0x01
@@ -80,8 +83,8 @@ struct event {
 
 	struct event_base *ev_base;
 #ifdef WIN32
-	HANDLE ev_fd;
-	OVERLAPPED overlap;
+         HANDLE ev_fd;
+         OVERLAPPED overlap;
 #else
 	int ev_fd;
 #endif
@@ -142,9 +145,9 @@ int event_base_set(struct event_base *, struct event *);
 #define EVLOOP_ONCE	0x01
 #define EVLOOP_NONBLOCK	0x02
 int event_loop(int);
-char *event_show_method();
 int event_base_loop(struct event_base *, int);
 int event_loopexit(struct timeval *);	/* Causes the loop to exit */
+int event_base_loopexit(struct event_base *, struct timeval *);
 
 #define evtimer_add(ev, tv)		event_add(ev, tv)
 #define evtimer_set(ev, cb, arg)	event_set(ev, -1, 0, cb, arg)
@@ -179,6 +182,10 @@ int event_pending(struct event *, short, struct timeval *);
 #else
 #define event_initialized(ev)		((ev)->ev_flags & EVLIST_INIT)
 #endif
+
+/* Some simple debugging functions */
+const char *event_get_version(void);
+const char *event_get_method(void);
 
 /* These functions deal with event priorities */
 
@@ -248,7 +255,8 @@ int bufferevent_enable(struct bufferevent *bufev, short event);
 int bufferevent_disable(struct bufferevent *bufev, short event);
 void bufferevent_settimeout(struct bufferevent *bufev,
     int timeout_read, int timeout_write);
-void bufferevent_setwatermark(struct bufferevent *bufev, short events, size_t lowmark, size_t highmark);
+void bufferevent_setwatermark(struct bufferevent *bufev, 
+    short events, size_t lowmark, size_t highmark);
 
 #define EVBUFFER_LENGTH(x)	(x)->off
 #define EVBUFFER_DATA(x)	(x)->buffer
@@ -260,6 +268,7 @@ void evbuffer_free(struct evbuffer *);
 int evbuffer_expand(struct evbuffer *, size_t);
 int evbuffer_add(struct evbuffer *, void *, size_t);
 int evbuffer_remove(struct evbuffer *, void *, size_t);
+char *evbuffer_readline(struct evbuffer *);
 int evbuffer_add_buffer(struct evbuffer *, struct evbuffer *);
 int evbuffer_add_printf(struct evbuffer *, char *fmt, ...);
 void evbuffer_drain(struct evbuffer *, size_t);
@@ -267,6 +276,7 @@ int evbuffer_write(struct evbuffer *, int);
 int evbuffer_read(struct evbuffer *, int, int);
 u_char *evbuffer_find(struct evbuffer *, u_char *, size_t);
 void evbuffer_setcb(struct evbuffer *, void (*)(struct evbuffer *, size_t, size_t, void *), void *);
+
 #ifdef __cplusplus
 }
 #endif

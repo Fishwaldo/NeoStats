@@ -24,13 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #ifdef HAVE_DEVPOLL
-
 #include <sys/types.h>
 #include <sys/resource.h>
 #ifdef HAVE_SYS_TIME_H
@@ -52,9 +50,6 @@
 #include "event.h"
 #include "evsignal.h"
 #include "log.h"
-
-
-
 
 extern volatile sig_atomic_t evsignal_caught;
 
@@ -150,7 +145,7 @@ devpoll_init(void)
 
 	/* Initialize the kernel queue */
 	if ((dpfd = open("/dev/poll", O_RDWR)) == -1) {
-                event_warn("%s: open: /dev/poll", __func__);
+                event_warn("open: /dev/poll");
 		free(devpollop);
 		return (NULL);
 	}
@@ -204,7 +199,7 @@ devpoll_recalc(struct event_base *base, void *arg, int max)
 
 		fds = realloc(devpollop->fds, nfds * sizeof(struct evdevpoll));
 		if (fds == NULL) {
-			event_warn("%s: realloc", __func__);
+			event_warn("realloc");
 			return (-1);
 		}
 		devpollop->fds = fds;
@@ -244,7 +239,7 @@ devpoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 	if (res == -1) {
 		if (errno != EINTR) {
-			event_warn("%s: ioctl: DP_POLL", __func__);
+			event_warn("ioctl: DP_POLL");
 			return (-1);
 		}
 
@@ -407,4 +402,4 @@ devpoll_del(void *arg, struct event *ev)
 
 	return (0);
 }
-#endif
+#endif 

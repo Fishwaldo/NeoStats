@@ -25,14 +25,16 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#ifdef HAVE_VASPRINTF
+/* If we have vasprintf, we need to define this before we include stdio.h. */
+#define _GNU_SOURCE
+#endif
 
+#include <sys/types.h>
 
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
@@ -174,9 +176,56 @@ evbuffer_remove(struct evbuffer *buf, void *data, size_t datlen)
 	return (nread);
 }
 
+/*
+ * Reads a line terminated by either '\r\n', '\n\r' or '\r' or '\n'.
+ * The returned buffer needs to be freed by the called.
+ */
+
+char *
+evbuffer_readline(struct evbuffer *buffer)
+{
+	char *data = EVBUFFER_DATA(buffer);
+	size_t len = EVBUFFER_LENGTH(buffer);
+	char *line;
+	int i;
+
+	for (i = 0; i < len; i++) {
+		if (data[i] == '\r' || data[i] == '\n')
+			break;
+	}
+	
+	if (i == len)
+		return (NULL);
+
+	if ((line = malloc(i + 1)) == NULL) {
+		fprintf(stderr, "%s: out of memory\n", __func__);
+		evbuffer_drain(buffer, i);
+		return (NULL);
+	}
+
+	memcpy(line, data, i);
+	line[i] = '\0';
+
+	/*
+	 * Some protocols terminate a line with '\r\n', so check for
+	 * that, too.
+	 */
+	if ( i < len - 1 ) {
+		char fch = data[i], sch = data[i+1];
+
+		/* Drain one more character if needed */
+		if ( (sch == '\r' || sch == '\n') && sch != fch )
+			i += 1;
+	}
+
+	evbuffer_drain(buffer, i + 1);
+
+	return (line);
+}
+
 /* Adds data to an event buffer */
 
-static void
+static inline void
 evbuffer_align(struct evbuffer *buf)
 {
 	memmove(buf->orig_buffer, buf->buffer, buf->off);
@@ -278,16 +327,11 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	u_char *p;
 	size_t oldoff = buf->off;
 	int n = EVBUFFER_MAX_READ;
-#ifdef WIN32
-	/*DWORD dwBytesRead;*/
-#endif
 
 #ifndef WIN32
-#ifdef FIONREAD
-	if (ioctl(fd, FIONREAD, &n) == -1)
+	if (ioctl(fd, FIONREAD, &n) == -1 || n == 0)
 		n = EVBUFFER_MAX_READ;
 #endif	
-#endif
 	if (howmuch < 0 || howmuch > n)
 		howmuch = n;
 
@@ -305,13 +349,12 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	if (n == 0)
 		return (0);
 #else
-	n = recv( fd, p, howmuch, 0 ); /*ReadFile((HANDLE)fd, p, howmuch, &dwBytesRead, NULL);*/
+	n = recv( fd, p, howmuch, 0 ); 
 	errno = GetLastError();
-	if (n == 0)
+	if (n == -1)
 		return (-1);
 	if (n == 0)
 		return (0);
-	/*n = dwBytesRead;*/
 #endif
 
 	buf->off += n;
@@ -327,10 +370,7 @@ int
 evbuffer_write(struct evbuffer *buffer, int fd)
 {
 	int n;
-#ifdef WIN32
-	/*DWORD dwBytesWritten;*/
-#endif
-
+	
 #ifndef WIN32
 	n = write(fd, buffer->buffer, buffer->off);
 	if (n == -1)
@@ -339,13 +379,12 @@ evbuffer_write(struct evbuffer *buffer, int fd)
 		return (0);
 #else
 	n = send( fd, buffer->buffer, buffer->off, 0 );
-	/*WriteFile((HANDLE)fd, buffer->buffer, buffer->off, &dwBytesWritten, NULL);*/
-	if (n == 0)
+	if (n == -1)
 		return (-1);
 	if (n == 0)
 		return (0);
-	/*n = dwBytesWritten;*/
 #endif
+
 	evbuffer_drain(buffer, n);
 
 	return (n);

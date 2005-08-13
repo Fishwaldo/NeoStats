@@ -4,7 +4,6 @@
 
 #ifdef HAVE_RTSIG
 
-
 /* Enable F_SETSIG and F_SETOWN */
 #define _GNU_SOURCE
 
@@ -32,7 +31,6 @@
 
 #include "event.h"
 #include "log.h"
-
 extern struct event_list signalqueue;
 
 struct rtsigop {
@@ -437,4 +435,5 @@ rtsig_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 	return (0);
 }
+
 #endif

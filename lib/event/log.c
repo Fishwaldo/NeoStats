@@ -37,20 +37,31 @@
  * SUCH DAMAGE.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <errno.h>
-#ifndef WIN32
+#endif
+
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+#include "misc.h"
+#endif
+#include <sys/types.h>
+#include <sys/tree.h>
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #else
 #include <sys/_time.h>
 #endif
-#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#include <errno.h>
 #include "event.h"
+
+#include "log.h"
 
 static void _warn_helper(int severity, int log_errno, const char *fmt,
                          va_list ap);
@@ -74,6 +85,17 @@ event_vsnprintf(char *str, size_t size, const char *format, va_list args)
 		return -1;
 	}
 	return r;
+}
+
+static int
+event_snprintf(char *str, size_t size, const char *format, ...)
+{
+    va_list ap;
+    int r;
+    va_start(ap, format);
+    r = event_vsnprintf(str, size, format, ap);
+    va_end(ap);
+    return r;
 }
 
 void
@@ -142,15 +164,21 @@ static void
 _warn_helper(int severity, int log_errno, const char *fmt, va_list ap)
 {
 	char buf[1024];
+	size_t len;
 
 	if (fmt != NULL)
 		event_vsnprintf(buf, sizeof(buf), fmt, ap);
 	else
 		buf[0] = '\0';
+
 	if (log_errno >= 0) {
-	    strncat(buf, ": ", 1024);
-	    strncat(buf, strerror(log_errno), 1024);
-    }
+		len = strlen(buf);
+		if (len < sizeof(buf) - 3) {
+			event_snprintf(buf + len, sizeof(buf) - len, ": %s",
+			    strerror(log_errno));
+		}
+	}
+
 	event_log(severity, buf);
 }
 

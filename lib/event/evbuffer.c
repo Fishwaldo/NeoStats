@@ -45,6 +45,11 @@
 
 #include "event.h"
 
+/* prototypes */
+
+void bufferevent_setwatermark(struct bufferevent *, short, size_t, size_t);
+void bufferevent_read_pressure_cb(struct evbuffer *, size_t, size_t, void *);
+
 static int
 bufferevent_add(struct event *ev, int timeout)
 {
@@ -96,7 +101,7 @@ bufferevent_readcb(int fd, short event, void *arg)
 	res = evbuffer_read(bufev->input, fd, -1);
 	if (res == -1) {
 #ifdef WIN32
-		errno = WSAGetLastError();
+                  errno = WSAGetLastError();
 #endif
 		if (errno == EAGAIN || errno == EINTR)
 			goto reschedule;
@@ -139,11 +144,9 @@ bufferevent_readcb(int fd, short event, void *arg)
 
 #ifdef WIN32
 #ifndef EINPROGRESS
-//#define EINPROGRESS WSAEWOULDBLOCK
 #define EINPROGRESS WSAEINPROGRESS
 #endif
 #endif
-
 
 static void
 bufferevent_writecb(int fd, short event, void *arg)
@@ -161,7 +164,7 @@ bufferevent_writecb(int fd, short event, void *arg)
 	    res = evbuffer_write(bufev->output, fd);
 	    if (res == -1) {
 #ifdef WIN32
-		errno = WSAGetLastError();
+	             errno = WSAGetLastError();
 #endif
 		    if (errno == EAGAIN ||
 			errno == EINTR ||
@@ -250,6 +253,8 @@ bufferevent_priority_set(struct bufferevent *bufev, int priority)
 
 	return (0);
 }
+
+/* Closing the file descriptor is the responsibility of the caller */
 
 void
 bufferevent_free(struct bufferevent *bufev)

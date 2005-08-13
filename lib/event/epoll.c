@@ -29,8 +29,6 @@
 #endif
 
 #ifdef HAVE_EPOLL
-
-
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/resource.h>
@@ -54,7 +52,6 @@
 #include "event.h"
 #include "evsignal.h"
 #include "log.h"
-
 
 extern volatile sig_atomic_t evsignal_caught;
 
@@ -119,7 +116,7 @@ epoll_init(void)
 	/* Initalize the kernel queue */
 
 	if ((epfd = epoll_create(nfiles)) == -1) {
-                event_warn("%s: epoll_create", __func__);
+                event_warn("epoll_create");
 		return (NULL);
 	}
 
@@ -166,7 +163,7 @@ epoll_recalc(struct event_base *base, void *arg, int max)
 
 		fds = realloc(epollop->fds, nfds * sizeof(struct evepoll));
 		if (fds == NULL) {
-			event_warn("%s: realloc", __func__);
+			event_warn("realloc");
 			return (-1);
 		}
 		epollop->fds = fds;
@@ -197,7 +194,7 @@ epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 	if (res == -1) {
 		if (errno != EINTR) {
-			event_warn("%s: epoll_wait", __func__);
+			event_warn("epoll_wait");
 			return (-1);
 		}
 
@@ -253,7 +250,7 @@ int
 epoll_add(void *arg, struct event *ev)
 {
 	struct epollop *epollop = arg;
-	struct epoll_event epev;
+	struct epoll_event epev = {0, {0}};
 	struct evepoll *evep;
 	int fd, op, events;
 
@@ -301,7 +298,7 @@ int
 epoll_del(void *arg, struct event *ev)
 {
 	struct epollop *epollop = arg;
-	struct epoll_event epev;
+	struct epoll_event epev = {0, {0}};
 	struct evepoll *evep;
 	int fd, events, op;
 	int needwritedelete = 1, needreaddelete = 1;
@@ -337,13 +334,13 @@ epoll_del(void *arg, struct event *ev)
 	epev.events = events;
 	epev.data.ptr = evep;
 
-	if (epoll_ctl(epollop->epfd, op, fd, &epev) == -1)
-		return (-1);
-
 	if (needreaddelete)
 		evep->evread = NULL;
 	if (needwritedelete)
 		evep->evwrite = NULL;
+
+	if (epoll_ctl(epollop->epfd, op, fd, &epev) == -1)
+		return (-1);
 
 	return (0);
 }

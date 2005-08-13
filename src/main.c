@@ -417,7 +417,7 @@ int main( int argc, char *argv[] )
   	 */
 	if( InitCore() != NS_SUCCESS )
 		return EXIT_FAILURE;
-	dlog( DEBUG1, "NeoStats will use %s", event_show_method() );
+	dlog( DEBUG1, "NeoStats will use %s", event_get_method() );
 	nlog( LOG_NOTICE, "NeoStats \"%s\" started.", me.version );
 #ifdef WIN32
 	/* override pcre lib malloc calls with our own version */

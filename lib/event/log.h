@@ -27,15 +27,14 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 
-#undef EVENT_DEBUG
-
 void event_err(int eval, const char *fmt, ...);
 void event_warn(const char *fmt, ...);
 void event_errx(int eval, const char *fmt, ...);
 void event_warnx(const char *fmt, ...);
 void event_msgx(const char *fmt, ...);
 void _event_debugx(const char *fmt, ...);
-#ifdef EVENT_DEBUG
+#undef USE_DEBUG
+#ifdef USE_DEBUG
 #define event_debug(x) _event_debugx x
 #else
 #define event_debug(x)

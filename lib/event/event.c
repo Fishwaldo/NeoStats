@@ -49,7 +49,6 @@
 #endif
 #include <errno.h>
 #include <string.h>
-#include <err.h>
 #include <assert.h>
 
 #include "event.h"
@@ -111,7 +110,7 @@ struct event_base *current_base = NULL;
 
 /* Handle signals - This is a deprecated interface */
 int (*event_sigcb)(void);	/* Signal callback when gotsig is set */
-int event_gotsig;		/* Set in signal handler */
+volatile int event_gotsig;	/* Set in signal handler */
 
 /* Prototypes */
 static void	event_queue_insert(struct event_base *, struct event *, int);
@@ -177,10 +176,6 @@ event_init(void)
 	event_base_priority_init(current_base, 1);
 
 	return (current_base);
-}
-
-char *event_show_method() {
-	return current_base->evsel->name;
 }
 
 int
@@ -297,6 +292,13 @@ event_loopexit(struct timeval *tv)
 		    current_base, tv));
 }
 
+int
+event_base_loopexit(struct event_base *event_base, struct timeval *tv)
+{
+	return (event_once(-1, EV_TIMEOUT, event_loopexit_cb,
+		    event_base, tv));
+}
+
 /* not thread safe */
 
 int
@@ -354,8 +356,10 @@ event_base_loop(struct event_base *base, int flags)
 			timerclear(&tv);
 		
 		/* If we have no events, we just exit */
-		if (!event_haveevents(base))
+		if (!event_haveevents(base)) {
+			event_debug(("%s: no events registered.", __func__));
 			return (1);
+		}
 
 		res = evsel->dispatch(base, evbase, &tv);
 
@@ -375,6 +379,7 @@ event_base_loop(struct event_base *base, int flags)
 			return (-1);
 	}
 
+	event_debug(("%s: asked to terminate loop.", __func__));
 	return (0);
 }
 
@@ -430,6 +435,7 @@ event_once(int fd, short events,
 		event_set(&eonce->ev, fd, events, event_once_cb, eonce);
 	} else {
 		/* Bad event combination */
+		free(eonce);
 		return (-1);
 	}
 
@@ -470,7 +476,7 @@ event_base_set(struct event_base *base, struct event *ev)
 		return (-1);
 
 	ev->ev_base = base;
-	ev->ev_pri = current_base->nactivequeues/2;
+	ev->ev_pri = base->nactivequeues/2;
 
 	return (0);
 }
@@ -788,4 +794,23 @@ event_queue_insert(struct event_base *base, struct event *ev, int queue)
 	default:
 		event_errx(1, "%s: unknown queue %x", __func__, queue);
 	}
+}
+
+/* Functions for debugging */
+
+const char *
+event_get_version(void)
+{
+	return (VERSION);
+}
+
+/* 
+ * No thread-safe interface needed - the information should be the same
+ * for all threads.
+ */
+
+const char *
+event_get_method(void)
+{
+	return (current_base->evsel->name);
 }
