@@ -176,6 +176,7 @@ ModuleEvent neostats_events[] = {
  */
 static int services_event_ctcpversion( CmdParams *cmdparams )
 {
+         dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
 	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
 	SendAllModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams );
 	return NS_SUCCESS;
