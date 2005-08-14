@@ -106,6 +106,28 @@ void update_time_now( void )
 }
 
 #ifndef WIN32
+/** @brief print_copyright
+ *
+ *  print copyright notice
+ *  NeoStats core use only.
+ *  Not used on Win32
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void print_copyright( void )
+{
+	printf( "-----------------------------------------------\n" );
+	printf( "Copyright: NeoStats Group. 2000-2005\n" );
+	printf( "Justin Hammond (fish@neostats.net)\n" );
+	printf( "Mark Hetherington (m@neostats.net)\n" );
+	printf( "-----------------------------------------------\n\n" );
+}
+#endif /* !WIN32 */
+
+#ifndef WIN32
 /** @brief get_options
  *
  *  Processes command line options
@@ -138,11 +160,7 @@ static int get_options( int argc, char **argv )
 			printf( "NeoStats: http://www.neostats.net\n" );
 			printf( "Version:  %s\n", me.version );
 			printf( "Compiled: %s at %s\n", ns_module_info.build_date, ns_module_info.build_time );
-			printf( "-----------------------------------------------\n" );
-			printf( "Copyright: NeoStats Group. 2000-2005\n" );
-			printf( "Justin Hammond (fish@neostats.net)\n" );
-			printf( "Mark Hetherington (m@neostats.net)\n" );
-			printf( "-----------------------------------------------\n\n" );
+			print_copyright();
 			return NS_FAILURE;
 		case 'd':
 			level = atoi( optarg );
@@ -291,29 +309,6 @@ void FiniCore( void )
 	FiniIrcd();
 }
 
-#ifndef WIN32
-/** @brief print_copyright
- *
- *  print copyright notice
- *  NeoStats core use only.
- *  Not used on Win32
- *
- *  @param none
- *
- *  @return none
- */
-
-static void print_copyright( void )
-{
-	printf( "NeoStats %s Loading...\n", me.version );
-	printf( "-----------------------------------------------\n" );
-	printf( "Copyright: NeoStats Group. 2000-2005\n" );
-	printf( "Justin Hammond (fish@neostats.net)\n" );
-	printf( "Mark Hetherington (m@neostats.net)\n" );
-	printf( "-----------------------------------------------\n\n" );
-}
-#endif /* !WIN32 */
-
 /** @brief main
  *
  *  Program entry point
@@ -342,8 +337,11 @@ int main( int argc, char *argv[] )
 	if( get_options( argc, argv ) != NS_SUCCESS )
 		return EXIT_FAILURE;
 	/* keep quiet if we are told to : ) */
-	if( !nsconfig.quiet ) 
+	if( !nsconfig.quiet )
+	{
+		printf( "NeoStats %s Loading...\n", me.version );
 		print_copyright();
+	}
     /* make sure any files we create are not group/world readable (password info?) */
     umask(077);
 #endif /* !WIN32 */
