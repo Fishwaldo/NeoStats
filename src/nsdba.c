@@ -65,7 +65,7 @@ static dbm_sym dbm_sym_table[] =
 
 static hash_t *dbhash;
 static char dbname[MAXPATH];
-void *dbm_module_handle;
+static void *dbm_module_handle;
 
 /** @brief InitDBAMSymbols
  *
@@ -84,15 +84,20 @@ static int InitDBAMSymbols( void )
 	ircsnprintf( dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_STDEXT );
 	nlog( LOG_NORMAL, "Using dbm module %s", dbm_path );
 	dbm_module_handle = ns_dlopen( dbm_path, RTLD_NOW || RTLD_GLOBAL );
-	if( !dbm_module_handle ) {
-		dlog( DEBUG1, "DBA init %s failed!", dbm_path );
-		nlog( LOG_CRITICAL, "Unable to load dbm module %s", dbm_path );
+	if( !dbm_module_handle )
+	{
+		nlog( LOG_CRITICAL, "Unable to load dbm module %s: file not found", dbm_path );
 		return NS_FAILURE;	
 	}
 	pdbm_sym = dbm_sym_table;
 	while( pdbm_sym->ptr )
 	{
 		*pdbm_sym->ptr = ns_dlsym( dbm_module_handle, pdbm_sym->sym );
+		if( *pdbm_sym->ptr == NULL)
+		{
+			nlog( LOG_CRITICAL, "Unable to load dbm module %s: missing handler for %s", dbm_path, pdbm_sym->sym );
+			return NS_FAILURE;	
+		}
 		pdbm_sym ++;
 	}
 	return NS_SUCCESS;
@@ -109,11 +114,11 @@ static int InitDBAMSymbols( void )
 
 int InitDBA( void )
 {
-	if( InitDBAMSymbols() != NS_SUCCESS ) {
+	if( InitDBAMSymbols() != NS_SUCCESS )
 		return NS_FAILURE;
-	}	
 	dbhash = hash_create( -1, 0, 0 );
-	if( !dbhash ) {
+	if( !dbhash )
+	{
 		nlog( LOG_CRITICAL, "Unable to create db hash" );
 		return NS_FAILURE;
 	}
@@ -140,13 +145,15 @@ void FiniDBA( void )
 	hscan_t ts;
 
 	hash_scan_begin( &ds, dbhash );
-	while(( node = hash_scan_next( &ds ) ) != NULL  ) {
+	while( ( node = hash_scan_next( &ds ) ) != NULL  )
+	{
 		dbe = (dbentry *) hnode_get( node );
-		dlog(DEBUG1, "Closing Database %s", dbe->name);
+		dlog(DEBUG5, "Closing Database %s", dbe->name);
 		hash_scan_begin( &ts, dbe->tablehash );
-		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
+		while(( tnode = hash_scan_next( &ts ) ) != NULL  )
+		{
 			tbe = (tableentry *) hnode_get( tnode );
-			dlog(DEBUG1, "Closing Table %s", tbe->name);
+			dlog(DEBUG5, "Closing Table %s", tbe->name);
 			DBACloseTable( tbe->table );
 			hash_scan_delete( dbe->tablehash, tnode );
 			hnode_destroy( tnode );
@@ -158,8 +165,7 @@ void FiniDBA( void )
 		ns_free( dbe );
 	}
 	hash_destroy( dbhash );
-	ns_dlclose(dbm_module_handle);
-
+	ns_dlclose( dbm_module_handle );
 }
 
 /** @brief DBAOpenDatabase
@@ -175,10 +181,20 @@ int DBAOpenDatabase( void )
 {
 	dbentry *dbe;
 
-	dlog( DEBUG1, "DBAOpenDatabase %s", GET_CUR_MODNAME() );
+	dlog( DEBUG5, "DBAOpenDatabase %s", GET_CUR_MODNAME() );
+	if( hash_isfull( dbhash ) )
+	{
+		nlog (LOG_CRITICAL, "DBAOpenDatabase: db hash is full");
+		return NS_FAILURE;
+	}
 	dbe = ns_calloc( sizeof( dbentry ) );
-	strlcpy(dbe->name, GET_CUR_MODNAME(), MAX_MOD_NAME);
+	strlcpy( dbe->name, GET_CUR_MODNAME(), MAX_MOD_NAME );
 	dbe->tablehash = hash_create( -1, 0, 0 );
+	if( !dbe->tablehash )
+	{
+		nlog( LOG_CRITICAL, "DBAOpenDatabase: Unable to create table hash" );
+		return NS_FAILURE;
+	}
 	hnode_create_insert( dbhash, dbe, dbe->name);
 	return NS_SUCCESS;
 }
@@ -200,15 +216,17 @@ int DBACloseDatabase( void )
 	hnode_t *tnode;
 	hscan_t ts;
 
-	dlog( DEBUG1, "DBACloseDatabase %s", GET_CUR_MODNAME() );
+	dlog( DEBUG5, "DBACloseDatabase %s", GET_CUR_MODNAME() );
 	node = hash_lookup( dbhash, GET_CUR_MODNAME() );
-	if (node) {
+	if (node)
+	{
 		dbe = ( dbentry* )hnode_get( node );
-		dlog(DEBUG1, "Closing Database %s", dbe->name);
+		dlog(DEBUG5, "Closing Database %s", dbe->name);
 		hash_scan_begin( &ts, dbe->tablehash );
-		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
+		while(( tnode = hash_scan_next( &ts ) ) != NULL  )
+		{
 			tbe = (tableentry *) hnode_get( tnode );
-			dlog(DEBUG1, "Closing Table %s", tbe->name);
+			dlog(DEBUG5, "Closing Table %s", tbe->name);
 			DBMCloseTable( tbe->handle );
 			hash_delete( dbe->tablehash, tnode );
 			hnode_destroy( tnode );
@@ -236,16 +254,19 @@ int DBAOpenTable( char *table )
 	dbentry *dbe;
 	tableentry *tbe;
 
-	dlog( DEBUG1, "DBAOpenTable %s", table );
+	dlog( DEBUG5, "DBAOpenTable %s", table );
 	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
-	if( !dbe ) {
+	if( !dbe )
+	{
+		nlog( LOG_WARNING, "Database %s for table %s not open", GET_CUR_MODNAME(), table );
 		return NS_FAILURE;
 	}
 	tbe = ns_calloc( sizeof( tableentry ) );
 	strlcpy( tbe->table, table, MAX_MOD_NAME );
 	ircsnprintf( tbe->name, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
 	tbe->handle = DBMOpenTable( tbe->name );
-	if( !tbe->handle ) {
+	if( !tbe->handle )
+	{
 		ns_free( tbe );
 		FATAL_ERROR( "DBAOpenTable failed. Check log file for details" );
 		return NS_FAILURE;
@@ -257,6 +278,7 @@ int DBAOpenTable( char *table )
 /** @brief DBAFetchTableEntry
  *
  *  Get table entry info
+ *  DBA subsystem use only
  *
  *  @param table name
  *
@@ -268,12 +290,21 @@ static tableentry *DBAFetchTableEntry( char *table )
 	dbentry *dbe;
 	tableentry *tbe;
 
+	dlog( DEBUG5, "DBAFetchTableEntry %s", table );
 	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
+	if( !dbe )
+	{
+		nlog( LOG_WARNING, "Database %s for table %s not open", GET_CUR_MODNAME(), table );
+		return NULL;
+	}
 	ircsnprintf( dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
 	tbe = (tableentry *)hnode_find( dbe->tablehash, dbname );
-	if( !tbe ) {
+	if( !tbe )
+	{
 		DBAOpenTable( table );
 		tbe = (tableentry *)hnode_find( dbe->tablehash, dbname );
+		if( !tbe )
+			nlog( LOG_WARNING, "Open table failed for %s %s", dbname, table );
 	}
 	return tbe;
 }
@@ -293,14 +324,17 @@ int DBACloseTable( char *table )
 	tableentry *tbe;
 	hnode_t *node;
 
-	dlog( DEBUG1, "DBACloseTable %s", table );
+	dlog( DEBUG5, "DBACloseTable %s", table );
 	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
-	if( !dbe ) {
+	if( !dbe )
+	{
+		nlog( LOG_WARNING, "Database %s for table %s not open", GET_CUR_MODNAME(), table );
 		return NS_FAILURE;
 	}
 	ircsnprintf( dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
 	node = hash_lookup( dbhash, dbname );
-	if( node ) {
+	if( node )
+	{
 		tbe = (tableentry *)hnode_get( node );
 		DBMCloseTable( tbe->handle );
 		hash_delete( dbhash, node );
@@ -326,12 +360,11 @@ int DBAFetch( char *table, char *key, void *data, int size )
 {
 	tableentry *tbe;
 
-	dlog( DEBUG1, "DBAFetch %s %s", table, key );
+	dlog( DEBUG5, "DBAFetch %s %s", table, key );
 	tbe = DBAFetchTableEntry( table );
-	if( tbe ) {
-		return DBMGetData( tbe->handle, key, data, size );
-	}
-	return NS_FAILURE;
+	if( !tbe )
+		return NS_FAILURE;
+	return DBMGetData( tbe->handle, key, data, size );
 }
 
 /** @brief DBAStore
@@ -350,13 +383,11 @@ int DBAStore( char *table, char *key, void *data, int size )
 {
 	tableentry *tbe;
 
-	dlog( DEBUG1, "DBAStore %s %s", table, key );
+	dlog( DEBUG5, "DBAStore %s %s", table, key );
 	tbe = DBAFetchTableEntry( table );
-	if( !tbe ) {
+	if( !tbe )
 		return NS_FAILURE;
-	}
-	DBMSetData( tbe->handle, key, data, size );
-	return NS_SUCCESS;
+	return DBMSetData( tbe->handle, key, data, size );
 }
 
 /** @brief DBAFetchRows
@@ -366,18 +397,17 @@ int DBAStore( char *table, char *key, void *data, int size )
  *  @param table name
  *  @param handler for records
  *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ *  @return number of rows processed by handler
  */
 
 int DBAFetchRows( char *table, DBRowHandler handler )
 {
 	tableentry *tbe;
 
-	dlog( DEBUG1, "DBAFetchRows %s", table );
+	dlog( DEBUG5, "DBAFetchRows %s", table );
 	tbe = DBAFetchTableEntry( table );
-	if( !tbe ) {
+	if( !tbe )
 		return 0;
-	}
 	return DBMGetTableRows( tbe->handle, handler );	
 }
 
@@ -395,11 +425,9 @@ int DBADelete( char *table, char *key )
 {
 	tableentry *tbe;
 
-	dlog( DEBUG1, "DBADelete %s %s", table, key );
+	dlog( DEBUG5, "DBADelete %s %s", table, key );
 	tbe = DBAFetchTableEntry( table );
-	if( !tbe ) {
+	if( !tbe )
 		return NS_FAILURE;
-	}
-	DBMDelData( tbe->handle, key );
-	return NS_SUCCESS;
+	return DBMDelData( tbe->handle, key );
 }
