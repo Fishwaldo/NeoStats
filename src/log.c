@@ -86,7 +86,9 @@ int InitLogs( void )
 	SET_SEGV_LOCATION();
 	logs = hash_create( -1, 0, 0 );
 	if( !logs ) {
+#ifndef WIN32
 		printf( "ERROR: Can't initialize log subsystem." );
+#endif /* WIN32 */
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
