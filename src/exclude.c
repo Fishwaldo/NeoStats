@@ -25,7 +25,10 @@
  */
 
 /*  TODO:
+ *  - nothing at present
+ *  TOCONSIDER:
  *  - Real time exclusions??? possibly optional.
+ *  - move excludelists and bot_cmd_lists arrays into Module struct???
  */
 
 #include "neostats.h"
@@ -34,465 +37,753 @@
 #include "ircstring.h"
 #include "helpstrings.h"
 
-int mod_cmd_exclude(CmdParams *cmdparams);
+/* Prototype for module exclude command handler */
+static int mod_cmd_exclude( CmdParams *cmdparams );
 
-/* this is the size of the mod exclude list */
+/* Exclude types */
+typedef enum NS_EXCLUDE
+{
+	NS_EXCLUDE_HOST	= 0,
+	NS_EXCLUDE_SERVER,
+	NS_EXCLUDE_CHANNEL,
+	NS_EXCLUDE_USERHOST,
+	NS_EXCLUDE_MAX,
+} NS_EXCLUDE;
+
+/* Maximum size of module exclude lists */
 #define MAX_MOD_EXCLUDES		100
 
-/* this is the list of excluded hosts/servers */
+/* Exclude struct */
+typedef struct Exclude
+{
+	NS_EXCLUDE type;
+	char pattern[USERHOSTLEN];
+	char addedby[MAXNICK];
+	char reason[MAXREASON];
+	time_t addedon;
+} Exclude;
+
+/* Global exclusion list */
 static list_t *exclude_list;
+/* Module exclusion list array */
 static list_t *excludelists[NUM_MODULES];
+/* Module exclusion command array */
 static bot_cmd *bot_cmd_lists[NUM_MODULES];
 
-const char* ExcludeDesc[NS_EXCLUDE_MAX] = {
+/* String descriptions of exclude types */
+const char* ExcludeDesc[NS_EXCLUDE_MAX] =
+{
 	"Host",
 	"Server",
 	"Channel",
 	"Userhost"
 };
 
-bot_cmd mod_exclude_commands[]=
+/* Template bot exclude command struture */
+bot_cmd mod_exclude_commands[] =
 {
 	{"EXCLUDE",	mod_cmd_exclude,1,	NS_ULEVEL_ADMIN,ns_help_exclude},
 	{NULL,		NULL,			0, 	0,				NULL}
 };
 
-static void new_exclude(list_t *elist, void *data)
-{
-	Exclude *e;
+/** @brief new_exclude
+ *
+ *  Add an exclude to the selected exclude list
+ *  Exclusion sub system use only
+ *
+ *  @param exclude_list exclude list to add to
+ *  @param data exclude data
+ *
+ *  @return none
+ */
 
-	e = ns_calloc(sizeof(Exclude));
-	os_memcpy (e, data, sizeof(Exclude));
-	lnode_create_append (elist, e);
-	dlog(DEBUG2, "Added exclusion %s (%d) by %s on %d", e->pattern, e->type, e->addedby, (int)e->addedon);
+static void new_exclude( list_t *exclude_list, void *data )
+{
+	Exclude *exclude;
+
+	exclude = ns_calloc( sizeof( Exclude ) );
+	os_memcpy( exclude, data, sizeof( Exclude ) );
+	lnode_create_append( exclude_list, exclude );
+	dlog( DEBUG2, "Added exclusion %s( %d ) by %s on %d", exclude->pattern, exclude->type, exclude->addedby,( int )exclude->addedon );
 }
+
+/** @brief new_global_exclude
+ *
+ *  Database row handler to load global exclude data
+ *  Exclusion sub system use only
+ *
+ *  @param data exclude data
+ *  @param size of data
+ *
+ *  @return none
+ */
 
 static int new_global_exclude( void *data, int size )
 {
-	new_exclude(exclude_list, data);
+	new_exclude( exclude_list, data );
 	return NS_FALSE;
 }
 
-static int new_mod_exclude( void *data, int size)
-{
-	new_exclude(excludelists[GET_CUR_MODNUM()], data);
-	return NS_FALSE;
-}
-
-/* @brief initilize the exlusion list
- * 
- * @returns int specifing success/failure
+/** @brief new_mod_exclude
+ *
+ *  Database row handler to load module exclude data
+ *  Exclusion sub system use only
+ *
+ *  @param data exclude data
+ *  @param size of data
+ *
+ *  @return none
  */
-int InitExcludes(void) 
+
+static int new_mod_exclude( void *data, int size )
 {
-	exclude_list = list_create(-1);
-	DBAFetchRows ("exclusions", new_global_exclude);
+	new_exclude( excludelists[GET_CUR_MODNUM()], data );
+	return NS_FALSE;
+}
+
+/** @brief InitExcludes
+ *
+ *  Initialise global exclusion system and load existing exclusions
+ *  NeoStats core use only
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int InitExcludes( void ) 
+{
+	exclude_list = list_create( -1 );
+	DBAFetchRows( "exclusions", new_global_exclude );
 	return NS_SUCCESS;
 } 
 
-int InitModExcludes(Module *mod_ptr)
+/** @brief InitModExcludes
+ *
+ *  Initialise module exclusion system and load existing exclusions
+ *  NeoStats core use only
+ *
+ *  @param mod_ptr pointer to module to initialise
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int InitModExcludes( Module *mod_ptr )
 {
 	SET_SEGV_LOCATION();
-	/* init the exclusions list */
-	SET_RUN_LEVEL(mod_ptr);
-	excludelists[mod_ptr->modnum] = list_create(MAX_MOD_EXCLUDES);
+	SET_RUN_LEVEL( mod_ptr );
+	excludelists[mod_ptr->modnum] = list_create( MAX_MOD_EXCLUDES );
 	bot_cmd_lists[mod_ptr->modnum] = ns_malloc( sizeof( mod_exclude_commands ) );
 	os_memcpy( bot_cmd_lists[mod_ptr->modnum], mod_exclude_commands, sizeof( mod_exclude_commands ) );
-	DBAFetchRows ("exclusions", new_mod_exclude);
+	DBAFetchRows( "exclusions", new_mod_exclude );
 	RESET_RUN_LEVEL();
 	return NS_SUCCESS;
 }
 
-void FiniExcludes(void) 
+/** @brief FiniExcludes
+ *
+ *  Finish global exclusion system
+ *  NeoStats core use only
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void FiniExcludes( void )
 {
-	DBACloseTable("exclusions");
-	list_destroy_auto (exclude_list);
+	DBACloseTable( "exclusions" );
+	list_destroy_auto( exclude_list );
 }
 
-void FiniModExcludes(Module *mod_ptr)
+/** @brief FiniModExcludes
+ *
+ *  Finish global exclusion system
+ *  NeoStats core use only
+ *
+ *  @param mod_ptr pointer to module to initialise
+ *
+ *  @return none
+ */
+
+void FiniModExcludes( Module *mod_ptr )
 {
 	ns_free( bot_cmd_lists[mod_ptr->modnum] );
-	list_destroy_auto (excludelists[mod_ptr->modnum]);
+	list_destroy_auto( excludelists[mod_ptr->modnum] );
 }
 
-/* @brief add a entry to the exlusion list
- * 
- * @param u the user that sent the request
- * @param type the type of exclusion being added. Channel, Host or Server
- * @param pattern the actual pattern to use 
- * @returns nothing
+/** @brief AddBotExcludeCommands
+ *
+ *  Add exclude command list to bot that uses module exclusions
+ *  NeoStats core use only
+ *
+ *  @param botptr pointer to bot to add comands to
+ *
+ *  @return none
  */
-static int do_exclude_add(list_t *elist, CmdParams* cmdparams) 
+
+void AddBotExcludeCommands( Bot *botptr )
+{
+	add_bot_cmd_list( botptr, bot_cmd_lists[botptr->moduleptr->modnum] );
+}
+
+/** @brief do_exclude_add
+ *
+ *  EXCLUDE ADD command handler
+ *  Adds exclude to exclusion list
+ *  Exclusion sub system use only
+ *
+ *  @param exclude_list exclusion list to process
+ *  @param cmdparams
+ *    cmdparams->av[1] = type( one of HOST, CHANNEL, SERVER, USERHOST )
+ *    cmdparams->av[2] = mask
+ *    cmdparams->av[3..cmdparams->ac] = reason
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int do_exclude_add( list_t *exclude_list, CmdParams* cmdparams )
 {
 	NS_EXCLUDE type;
 	char *buf;
-	Exclude *e, *etst;
+	Exclude *exclude, *etst;
 	lnode_t *ln;
 	
-	if (cmdparams->ac < 4) {
+	if( cmdparams->ac < 4 )
 		return NS_ERR_NEED_MORE_PARAMS;
-	}
-	if (list_isfull(elist)) {
-		irc_prefmsg (cmdparams->bot, cmdparams->source, "Error, Exception list is full");
+	if( list_isfull( exclude_list ) )
+	{
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Error, Exception list is full" );
 		return NS_SUCCESS;
 	}
-	if (!ircstrcasecmp("HOST", cmdparams->av[1])) {
-		if (!index(cmdparams->av[2], '.')) {
-			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid host name");
+	if( !ircstrcasecmp( "HOST", cmdparams->av[1] ) )
+	{
+		if( !index( cmdparams->av[2], '.' ) )
+		{
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "Invalid host name" );
 			return NS_SUCCESS;
 		}
 		type = NS_EXCLUDE_HOST;
-	} else if (!ircstrcasecmp("CHANNEL", cmdparams->av[1])) {
-		if (cmdparams->av[2][0] != '#') {
-			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid channel name");
+	} 
+	else if( !ircstrcasecmp( "CHANNEL", cmdparams->av[1] ) )
+	{
+		if( cmdparams->av[2][0] != '#' )
+		{
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "Invalid channel name" );
 			return NS_SUCCESS;
 		}
 		type = NS_EXCLUDE_CHANNEL;
-	} else if (!ircstrcasecmp("SERVER", cmdparams->av[1])) {
-		if (!index(cmdparams->av[2], '.')) {
-			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid host name");
+	} 
+	else if( !ircstrcasecmp( "SERVER", cmdparams->av[1] ) )
+	{
+		if( !index( cmdparams->av[2], '.' ) )
+		{
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "Invalid host name" );
 			return NS_SUCCESS;
 		}
 		type = NS_EXCLUDE_SERVER;
-	} else if (!ircstrcasecmp("USERHOST", cmdparams->av[1])) {
-		if (!index(cmdparams->av[2], '!') || !index(cmdparams->av[2], '@')) {
-			irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid userhost mask");
+	} 
+	else if( !ircstrcasecmp( "USERHOST", cmdparams->av[1] ) )
+	{
+		if( !index( cmdparams->av[2], '!' ) || !index( cmdparams->av[2], '@' ) )
+		{
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "Invalid userhost mask" );
 			return NS_SUCCESS;
 		}
 		type = NS_EXCLUDE_USERHOST;
-	} else {
-		irc_prefmsg (cmdparams->bot, cmdparams->source, "Invalid exclude type");
+	} 
+	else
+	{
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Invalid exclude type" );
 		return NS_SUCCESS;
 	}
-	ln = list_first(elist);
-	while( ln != NULL  ) 
+	ln = list_first( exclude_list );
+	while( ln != NULL ) 
 	{
-		etst = lnode_get(ln);
-		if( etst->type == type ) {
-			if( match( etst->pattern, cmdparams->av[2] ) ) {
-				irc_prefmsg (cmdparams->bot, cmdparams->source, "Mask already matched by %s", etst->pattern);
+		etst = lnode_get( ln );
+		if( etst->type == type )
+		{
+			if( match( etst->pattern, cmdparams->av[2] ) )
+			{
+				irc_prefmsg( cmdparams->bot, cmdparams->source, "Mask already matched by %s", etst->pattern );
 				return NS_SUCCESS;
 			}
 		}
-		ln = list_next(elist, ln);
+		ln = list_next( exclude_list, ln );
 	}
-	e = ns_calloc (sizeof(Exclude));
-	e->type = type;
-	e->addedon = me.now;
-	strlcpy(e->pattern, collapse(cmdparams->av[2]), MAXHOST);
-	strlcpy(e->addedby, cmdparams->source->name, MAXNICK);
-	buf = joinbuf(cmdparams->av, cmdparams->ac, 3);
-	strlcpy(e->reason, buf, MAXREASON);
-	ns_free (buf);
-	/* if we get here, then e is valid */
-	lnode_create_append (elist, e);
-	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Added %s (%s) to exclusion list", cmdparams->source), e->pattern, cmdparams->av[1]);
-	if (nsconfig.cmdreport) {
-		irc_chanalert(cmdparams->bot, _("%s added %s (%s) to the exclusion list"), cmdparams->source->name, e->pattern, cmdparams->av[1]);
-	}
+	exclude = ns_calloc( sizeof( Exclude ) );
+	exclude->type = type;
+	exclude->addedon = me.now;
+	strlcpy( exclude->pattern, collapse( cmdparams->av[2] ), MAXHOST );
+	strlcpy( exclude->addedby, cmdparams->source->name, MAXNICK );
+	buf = joinbuf( cmdparams->av, cmdparams->ac, 3 );
+	strlcpy( exclude->reason, buf, MAXREASON );
+	ns_free( buf );
+	/* if we get here, then exclude is valid */
+	lnode_create_append( exclude_list, exclude );
+	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Added %s( %s ) to exclusion list", cmdparams->source ), exclude->pattern, cmdparams->av[1] );
+	if( nsconfig.cmdreport )
+		irc_chanalert( cmdparams->bot, _( "%s added %s( %s ) to the exclusion list" ), cmdparams->source->name, exclude->pattern, cmdparams->av[1] );
 	/* now save the exclusion list */
-	DBAStore ("exclusions", e->pattern, (void *)e, sizeof (Exclude));
+	DBAStore( "exclusions", exclude->pattern,( void * )exclude, sizeof( Exclude ) );
 	return NS_SUCCESS;
 } 
 
-static int ns_cmd_exclude_add(CmdParams* cmdparams) 
+/** @brief ns_cmd_exclude_add
+ *
+ *  EXCLUDE ADD command handler for global exclusions
+ *  Adds exclude to global exclusion list
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int ns_cmd_exclude_add( CmdParams* cmdparams ) 
 {
-	return do_exclude_add(exclude_list, cmdparams);
+	return do_exclude_add( exclude_list, cmdparams );
 } 
 
-static int mod_cmd_exclude_add(CmdParams *cmdparams)
+/** @brief mod_cmd_exclude_add
+ *
+ *  EXCLUDE ADD command handler for module exclusions
+ *  Adds exclude to module exclusion list
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int mod_cmd_exclude_add( CmdParams *cmdparams )
 {
-	return do_exclude_add(excludelists[cmdparams->bot->moduleptr->modnum], cmdparams);
+	return do_exclude_add( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
 }
 
-/* @brief del a entry from the exlusion list
- * 
- * @param u the user that sent the request
- * @param postition the position in the list that we are excluding
- * @returns nothing
+/** @brief do_exclude_del
+ *
+ *  EXCLUDE DEL command handler
+ *  Deletes exclusion from exclusion list
+ *  Exclusion sub system use only
+ *
+ *  @param exclude_list exclusion list to process
+ *  @param cmdparams
+ *    cmdparams->av[1] = mask
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int do_exclude_del(list_t *elist, CmdParams* cmdparams) 
+
+static int do_exclude_del( list_t *exclude_list, CmdParams* cmdparams ) 
 {
-	lnode_t *en;
-	Exclude *e;
+	lnode_t *node;
+	Exclude *exclude;
 	
-	if (cmdparams->ac < 2) {
+	if( cmdparams->ac < 2 )
 		return NS_ERR_NEED_MORE_PARAMS;
-	}
-	en = list_first(elist);
-	while (en != NULL) {
-		e = lnode_get(en);
-		if (ircstrcasecmp (e->pattern, cmdparams->av[1]) == 0) { 
-			list_delete(elist, en);
-			lnode_destroy(en);
-			DBADelete ("exclusions", e->pattern);
-			irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s delete from exclusion list",cmdparams->source), e->pattern);
-			ns_free(e);
+	node = list_first( exclude_list );
+	while( node != NULL )
+	{
+		exclude = lnode_get( node );
+		if( ircstrcasecmp( exclude->pattern, cmdparams->av[1] ) == 0 )
+		{
+			list_delete( exclude_list, node );
+			lnode_destroy( node );
+			DBADelete( "exclusions", exclude->pattern );
+			irc_prefmsg( cmdparams->bot, cmdparams->source, __( "%s delete from exclusion list",cmdparams->source ), exclude->pattern );
+			ns_free( exclude );
 			return NS_SUCCESS;
 		}
-		en = list_next(elist, en);
+		node = list_next( exclude_list, node );
 	}
 	/* if we get here, means that we never got a match */
-	irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s not found in the exclusion list",cmdparams->source), cmdparams->av[1]);
+	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "%s not found in the exclusion list",cmdparams->source ), cmdparams->av[1] );
 	return NS_SUCCESS;
 } 
 
-static int ns_cmd_exclude_del(CmdParams* cmdparams) 
-{
-	return do_exclude_del(exclude_list, cmdparams);
-} 
-
-static int mod_cmd_exclude_del(CmdParams *cmdparams)
-{
-	return do_exclude_del(excludelists[cmdparams->bot->moduleptr->modnum], cmdparams);
-}
-
-/* @brief list the entries from the exlusion list
- * 
- * @param u the user that sent the request
- * @param from the "user" that this message should come from, so we can call from modules
- * @returns nothing
- */
-static int do_exclude_list(list_t *elist, CmdParams* cmdparams) 
-{
-	lnode_t *en;
-	Exclude *e;
-	
-	irc_prefmsg(cmdparams->bot, cmdparams->source, __("Exclusion list:", cmdparams->source));
-	en = list_first(elist);
-	while (en != NULL) {
-		e = lnode_get(en);			
-		irc_prefmsg(cmdparams->bot, cmdparams->source, __("%s (%s) Added by %s on %s for %s", cmdparams->source), e->pattern, ExcludeDesc[e->type], e->addedby, sftime(e->addedon), e->reason);
-		en = list_next(elist, en);
-	}
-	irc_prefmsg(cmdparams->bot, cmdparams->source, __("End of list.", cmdparams->source));
-	return NS_SUCCESS;
-} 
-
-
-static int ns_cmd_exclude_list(CmdParams* cmdparams) 
-{
-	return do_exclude_list(exclude_list, cmdparams);
-} 
-
-static int mod_cmd_exclude_list(CmdParams *cmdparams)
-{
-	return do_exclude_list(excludelists[cmdparams->bot->moduleptr->modnum], cmdparams);
-}
-
-/** @brief EXCLUDE command handler
+/** @brief ns_cmd_exclude_del
  *
- *  maintain global exclusion list, which modules can take advantage off
- *   
- *  @param cmdparams structure with command information
- *  @returns none
+ *  EXCLUDE DEL global command handler
+ *  Deletes exclusion from global exclusion list
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_exclude (CmdParams* cmdparams) 
+static int ns_cmd_exclude_del( CmdParams* cmdparams ) 
 {
-	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
-		return ns_cmd_exclude_add(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
-		return ns_cmd_exclude_del(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-		return ns_cmd_exclude_list(cmdparams);
-	}
-	return NS_ERR_SYNTAX_ERROR;
+	return do_exclude_del( exclude_list, cmdparams );
+} 
+
+/** @brief mod_cmd_exclude_del
+ *
+ *  EXCLUDE DEL module command handler
+ *  Deletes exclusion from module exclusion list
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int mod_cmd_exclude_del( CmdParams *cmdparams )
+{
+	return do_exclude_del( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
 }
 
-int mod_cmd_exclude(CmdParams *cmdparams)
+/** @brief do_exclude_list
+ *
+ *  EXCLUDE LIST command handler
+ *  List exclusions
+ *  Exclusion sub system use only
+ *
+ *  @param exclude_list exclusion list to process
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int do_exclude_list( list_t *exclude_list, CmdParams* cmdparams ) 
+{
+	lnode_t *node;
+	Exclude *exclude;
+	
+	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Exclusion list:", cmdparams->source ) );
+	node = list_first( exclude_list );
+	while( node != NULL )
+	{
+		exclude = lnode_get( node );			
+		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "%s( %s ) Added by %s on %s for %s", cmdparams->source ), exclude->pattern, ExcludeDesc[exclude->type], exclude->addedby, sftime( exclude->addedon ), exclude->reason );
+		node = list_next( exclude_list, node );
+	}
+	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "End of list.", cmdparams->source ) );
+	return NS_SUCCESS;
+} 
+
+/** @brief ns_cmd_exclude_list
+ *
+ *  EXCLUDE LIST command handler
+ *  List global exclusions
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int ns_cmd_exclude_list( CmdParams* cmdparams ) 
+{
+	return do_exclude_list( exclude_list, cmdparams );
+} 
+
+/** @brief mod_cmd_exclude_list
+ *
+ *  EXCLUDE LIST command handler
+ *  List module exclusions
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int mod_cmd_exclude_list( CmdParams *cmdparams )
+{
+	return do_exclude_list( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
+}
+
+/** @brief ns_cmd_exclude
+ *
+ *  EXCLUDE command handler
+ *  Manage global exclusions
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *    cmdparams->av[0] = subcommand( one of ADD, DEL, LIST )
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ns_cmd_exclude( CmdParams* cmdparams ) 
 {
 	SET_SEGV_LOCATION();
-	if (!ircstrcasecmp(cmdparams->av[0], "ADD")) {
-		return mod_cmd_exclude_add(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "DEL")) {
-		return mod_cmd_exclude_del(cmdparams);
-	} else if (!ircstrcasecmp(cmdparams->av[0], "LIST")) {
-		return mod_cmd_exclude_list(cmdparams);
-	}
+	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
+		return ns_cmd_exclude_add( cmdparams );
+	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
+		return ns_cmd_exclude_del( cmdparams );
+	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+		return ns_cmd_exclude_list( cmdparams );
 	return NS_ERR_SYNTAX_ERROR;
 }
 
-/* @brief check if a user is matched against a exclusion
- * 
- * Modifies the flags field of the User struct to indicate if the user is matched
- * against a exclusion. This function is called when the user signs on
+/** @brief mod_cmd_exclude
  *
- * @param u the user to check
- * @returns nothing
+ *  EXCLUDE command handler
+ *  Manage module exclusions
+ *  Exclusion sub system use only
+ *
+ *  @param cmdparams
+ *    cmdparams->av[0] = subcommand( one of ADD, DEL, LIST )
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-void ns_do_exclude_user(Client *u) 
+static int mod_cmd_exclude( CmdParams *cmdparams )
 {
-	lnode_t *en;
-	Exclude *e;
+	SET_SEGV_LOCATION();
+	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
+		return ns_cmd_exclude_add( cmdparams );
+	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
+		return ns_cmd_exclude_del( cmdparams );
+	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+		return ns_cmd_exclude_list( cmdparams );
+	return NS_ERR_SYNTAX_ERROR;
+}
+
+/** @brief ns_do_exclude_user
+ *
+ *  Check user against global exclusion list and set appropriate flags 
+ *  on user connect
+ *  NeoStats core use only 
+ *
+ *  @param u pointer to Client struct of user to check
+ *
+ *  @return none
+ */
+
+void ns_do_exclude_user( Client *u ) 
+{
+	lnode_t *node;
+	Exclude *exclude;
 	
 	/* if the server is excluded, user is excluded as well */
-	if (u->uplink->flags & NS_FLAG_EXCLUDED) {
+	if( u->uplink->flags & NS_FLAG_EXCLUDED )
+	{
 	 	u->flags |= NS_FLAG_EXCLUDED;
 		return;
 	}	
-	en = list_first(exclude_list);
-	while (en != NULL) {
-		e = lnode_get(en);
-		if (e->type == NS_EXCLUDE_HOST) 
+	node = list_first( exclude_list );
+	while( node != NULL )
+	{
+		exclude = lnode_get( node );
+		switch( exclude->type )
 		{
-			if (match(e->pattern, u->user->hostname)) {
-				u->flags |= NS_FLAG_EXCLUDED;
-				return;
-			}
+			case NS_EXCLUDE_HOST:
+				if( match( exclude->pattern, u->user->hostname ) )
+				{
+					u->flags |= NS_FLAG_EXCLUDED;
+					return;
+				}
+				break;
+			case NS_EXCLUDE_USERHOST:
+				if( match( exclude->pattern, u->user->userhostmask ) )
+				{
+					u->flags |= NS_FLAG_EXCLUDED;
+					return;
+				}
+				break;
 		}
-		else if (e->type == NS_EXCLUDE_USERHOST) 
-		{
-			if (match(e->pattern, u->user->userhostmask)) {
-				u->flags |= NS_FLAG_EXCLUDED;
-				return;
-			}
-		}
-		en = list_next(exclude_list, en);
+		node = list_next( exclude_list, node );
 	}
 	/* if we are here, there is no match */
 	u->flags &= ~NS_FLAG_EXCLUDED;
 }
 
-/* @brief check if a server is matched against a exclusion
- * 
- * Modifies the flags field of the server struct to indicate if the server is matched
- * against a exclusion. This function is called when the server connects
+/** @brief ns_do_exclude_server
  *
- * @param s the Server to check
- * @returns nothing
+ *  Check server against global exclusion list and set appropriate flags
+ *  on server connect
+ *  NeoStats core use only
+ *
+ *  @param s pointer to Client struct of server to check
+ *
+ *  @return none
  */
 
-void ns_do_exclude_server(Client *s) 
+void ns_do_exclude_server( Client *s ) 
 {
-	lnode_t *en;
-	Exclude *e;
+	lnode_t *node;
+	Exclude *exclude;
 	
-	en = list_first(exclude_list);
-	while (en != NULL) {
-		e = lnode_get(en);
-		if (e->type == NS_EXCLUDE_SERVER) {
-			if (match(e->pattern, s->name)) {
+	node = list_first( exclude_list );
+	while( node != NULL )
+	{
+		exclude = lnode_get( node );
+		if( exclude->type == NS_EXCLUDE_SERVER )
+		{
+			if( match( exclude->pattern, s->name ) )
+			{
 				s->flags |= NS_FLAG_EXCLUDED;
 				return;
 			}
 		}
-		en = list_next(exclude_list, en);
+		node = list_next( exclude_list, node );
 	}
 	/* if we are here, there is no match */
 	s->flags &= ~NS_FLAG_EXCLUDED;
 }
 
-/* @brief check if a channel is matched against a exclusion
- * 
- * Modifies the flags field of the channel struct to indicate if the channel is matched
- * against a exclusion. This function is called when the channel is created
+/** @brief ns_do_exclude_chan
  *
- * @param c the channel to check
- * @returns nothing
+ *  Check channel against global exclusion list and set appropriate flags
+ *  on channel creation
+ *  NeoStats core use only
+ *
+ *  @param c pointer to Channel struct of channel to check
+ *
+ *  @return none
  */
 
-void ns_do_exclude_chan(Channel *c) 
+void ns_do_exclude_chan( Channel *c ) 
 {
-	lnode_t *en;
-	Exclude *e;
+	lnode_t *node;
+	Exclude *exclude;
 	
-	en = list_first(exclude_list);
-	while (en != NULL) {
-		e = lnode_get(en);
-		if (e->type == NS_EXCLUDE_CHANNEL) {
-			if (match(e->pattern, c->name)) {
+	node = list_first( exclude_list );
+	while( node != NULL )
+	{
+		exclude = lnode_get( node );
+		if( exclude->type == NS_EXCLUDE_CHANNEL )
+		{
+			if( match( exclude->pattern, c->name ) )
+			{
 				c->flags |= NS_FLAG_EXCLUDED;
 				return;
 			}
 		}
-		en = list_next(exclude_list, en);
+		node = list_next( exclude_list, node );
 	}
 	/* if we are here, there is no match */
 	c->flags &= ~NS_FLAG_EXCLUDED;
 }
 
-int ModIsServerExcluded(Client *s)
+/** @brief ModIsServerExcluded
+ *
+ *  Check whether server is excluded by module exclusion list
+ *  Module use
+ *
+ *  @param s pointer to Client struct of server to check
+ *
+ *  @return NS_TRUE if excluded else NS_FALSE if not
+ */
+
+int ModIsServerExcluded( Client *s )
 {
 	lnode_t *node;
-	Exclude *e;
+	Exclude *exclude;
 
-	node = list_first(excludelists[GET_CUR_MODNUM()]);
-	while (node) {
-		e = lnode_get(node);
-		if (e->type == NS_EXCLUDE_SERVER) {
-			if (match(e->pattern, s->name)) {
-				dlog (DEBUG1, "Matched server entry %s in exclusions", e->pattern);
+	node = list_first( excludelists[GET_CUR_MODNUM()] );
+	while( node )
+	{
+		exclude = lnode_get( node );
+		if( exclude->type == NS_EXCLUDE_SERVER )
+		{
+			if( match( exclude->pattern, s->name ) )
+			{
+				dlog( DEBUG1, "Matched server entry %s in exclusions", exclude->pattern );
 				return NS_TRUE;
 			}
 		}
-		node = list_next(excludelists[GET_CUR_MODNUM()], node);
+		node = list_next( excludelists[GET_CUR_MODNUM()], node );
 	}
 	return NS_FALSE;
 }
 
-int ModIsUserExcluded(Client *u) 
+/** @brief ModIsUserExcluded
+ *
+ *  Check whether user is excluded by module exclusion list
+ *  Module use
+ *
+ *  @param u pointer to Client struct of user to check
+ *
+ *  @return NS_TRUE if excluded else NS_FALSE if not
+ */
+
+int ModIsUserExcluded( Client *u ) 
 {
 	lnode_t *node;
-	Exclude *e;
+	Exclude *exclude;
 
 	SET_SEGV_LOCATION();
-	if (!ircstrcasecmp(u->uplink->name, me.name)) {
-		dlog (DEBUG1, "User %s Exclude. its Me!", u->name);
+	if( !ircstrcasecmp( u->uplink->name, me.name ) )
+	{
+		dlog( DEBUG1, "User %s Exclude. its Me!", u->name );
 		return NS_TRUE;
 	}
 	/* don't scan users from a server that is excluded */
-	node = list_first(excludelists[GET_CUR_MODNUM()]);
-	while (node) {
-		e = lnode_get(node);
-		if (e->type == NS_EXCLUDE_SERVER) {
-			dlog (DEBUG4, "Testing %s against server %s", u->uplink->name, e->pattern);
-			/* match a server */
-			if (match(e->pattern, u->uplink->name)) {
-				dlog (DEBUG1, "User %s excluded. Matched server entry %s in exclusions", u->name, e->pattern);
-				return NS_TRUE;
-			}
-		} else if (e->type == NS_EXCLUDE_HOST) {
-			dlog (DEBUG4, "Testing %s against host %s", u->user->hostname, e->pattern);
-			/* match a hostname */
-			if (match(e->pattern, u->user->hostname)) {
-				dlog (DEBUG1, "User %s is excluded. Matched host entry %s in exclusions", u->name, e->pattern);
-				return NS_TRUE;
-			}
-		}				
-		node = list_next(excludelists[GET_CUR_MODNUM()], node);
+	node = list_first( excludelists[GET_CUR_MODNUM()] );
+	while( node )
+	{
+		exclude = lnode_get( node );
+		switch( exclude->type )
+		{
+			case NS_EXCLUDE_SERVER:
+				dlog( DEBUG4, "Testing %s against server %s", u->uplink->name, exclude->pattern );
+				if( match( exclude->pattern, u->uplink->name ) )
+				{
+					dlog( DEBUG1, "User %s excluded. Matched server entry %s in exclusions", u->name, exclude->pattern );
+					return NS_TRUE;
+				}
+				break;
+			case NS_EXCLUDE_HOST:
+				dlog( DEBUG4, "Testing %s against host %s", u->user->hostname, exclude->pattern );
+				if( match( exclude->pattern, u->user->hostname ) )
+				{
+					dlog( DEBUG1, "User %s is excluded. Matched host entry %s in exclusions", u->name, exclude->pattern );
+					return NS_TRUE;
+				}
+				break;
+			case NS_EXCLUDE_USERHOST:
+				dlog( DEBUG4, "Testing %s against userhost %s", u->user->userhostmask, exclude->pattern );
+				if( match( exclude->pattern, u->user->userhostmask ) )
+				{
+					dlog( DEBUG1, "User %s is excluded. Matched userhost entry %s in exclusions", u->name, exclude->pattern );
+					return NS_TRUE;
+				}
+				break;
+		}
+		node = list_next( excludelists[GET_CUR_MODNUM()], node );
 	}
 	return NS_FALSE;
 }
 
-int ModIsChannelExcluded(Channel *c) 
+/** @brief ModIsChannelExcluded
+ *
+ *  Check whether channel is excluded by module exclusion list
+ *  Module use
+ *
+ *  @param u pointer to Channel struct of channel to check
+ *
+ *  @return NS_TRUE if excluded else NS_FALSE if not
+ */
+
+int ModIsChannelExcluded( Channel *c ) 
 {
 	lnode_t *node;
-	Exclude *e;
+	Exclude *exclude;
 
 	SET_SEGV_LOCATION();
-	if (IsServicesChannel ( c ) ) {
-		dlog (DEBUG1, "Services channel %s is exclude.", c->name);
+	if( IsServicesChannel( c ) )
+	{
+		dlog( DEBUG1, "Services channel %s is exclude.", c->name );
 		return NS_TRUE;
 	}
 	/* don't scan users from a server that is excluded */
-	node = list_first(excludelists[GET_CUR_MODNUM()]);
-	while (node) {
-		e = lnode_get(node);
-		if (e->type == NS_EXCLUDE_CHANNEL) {
-			/* match a channel */
-			if (match(e->pattern, c->name)) {
-				dlog (DEBUG1, "Channel %s exclude. Matched Channel entry %s in Excludeions", c->name, e->pattern);
+	node = list_first( excludelists[GET_CUR_MODNUM()] );
+	while( node )
+	{
+		exclude = lnode_get( node );
+		if( exclude->type == NS_EXCLUDE_CHANNEL )
+		{
+			if( match( exclude->pattern, c->name ) )
+			{
+				dlog( DEBUG1, "Channel %s exclude. Matched Channel entry %s in Excludeions", c->name, exclude->pattern );
 				return NS_TRUE;
 			}
 		}				
-		node = list_next(excludelists[GET_CUR_MODNUM()], node);
+		node = list_next( excludelists[GET_CUR_MODNUM()], node );
 	}
 	return NS_FALSE;
-}
-
-void AddBotExcludeCommands( Bot *botptr )
-{
-	add_bot_cmd_list( botptr, bot_cmd_lists[botptr->moduleptr->modnum] );
 }

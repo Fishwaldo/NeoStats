@@ -485,15 +485,6 @@ typedef enum NS_ERR {
 
 #define IsNetSplit( x ) ( ( x )->flags & NS_FLAGS_NETJOIN )
 
-typedef enum NS_EXCLUDE {
-	NS_EXCLUDE_HOST	= 0,
-	NS_EXCLUDE_SERVER,
-	NS_EXCLUDE_CHANNEL,
-	NS_EXCLUDE_USERHOST,
-	NS_EXCLUDE_MAX,
-} NS_EXCLUDE;
-
-
 /* NeoStats levels */
 #define NS_ULEVEL_ROOT		200
 #define NS_ULEVEL_ADMIN		185
