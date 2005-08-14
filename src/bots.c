@@ -712,7 +712,7 @@ Bot *AddBot( BotInfo *botinfo )
 			add_bot_info_settings( botptr, botinfo );
 		/* Create module exclusion command handlers if needed */
 		if( botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES )
-			add_bot_cmd_list( botptr, GetModExcludeCommands( botptr->moduleptr ) );
+			AddBotExcludeCommands( botptr );
 	}
 	return botptr;
 }

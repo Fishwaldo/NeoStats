@@ -492,7 +492,7 @@ int ModIsChannelExcluded(Channel *c)
 	return NS_FALSE;
 }
 
-bot_cmd *GetModExcludeCommands( Module *mod_ptr )
+void AddBotExcludeCommands( Bot *botptr )
 {
-	return bot_cmd_lists[mod_ptr->modnum];
+	add_bot_cmd_list( botptr, bot_cmd_lists[botptr->moduleptr->modnum] );
 }

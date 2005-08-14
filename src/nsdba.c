@@ -146,6 +146,7 @@ void FiniDBA( void )
 		hash_scan_begin( &ts, dbe->tablehash );
 		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
 			tbe = (tableentry *) hnode_get( tnode );
+			dlog(DEBUG1, "Closing Table %s", tbe->name);
 			DBACloseTable( tbe->table );
 			hash_scan_delete( dbe->tablehash, tnode );
 			hnode_destroy( tnode );
@@ -203,9 +204,11 @@ int DBACloseDatabase( void )
 	node = hash_lookup( dbhash, GET_CUR_MODNAME() );
 	if (node) {
 		dbe = ( dbentry* )hnode_get( node );
+		dlog(DEBUG1, "Closing Database %s", dbe->name);
 		hash_scan_begin( &ts, dbe->tablehash );
 		while(( tnode = hash_scan_next( &ts ) ) != NULL  ) {
 			tbe = (tableentry *) hnode_get( tnode );
+			dlog(DEBUG1, "Closing Table %s", tbe->name);
 			DBMCloseTable( tbe->handle );
 			hash_delete( dbe->tablehash, tnode );
 			hnode_destroy( tnode );
