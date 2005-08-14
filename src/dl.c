@@ -27,6 +27,10 @@
  *  @brief module functions
  */ 
 
+/*  TODO:
+ *  - Better Win32 error processing for failed modules
+ */
+
 #include "neostats.h"
 #include "dl.h"
 
@@ -39,7 +43,7 @@ void *ns_dlsym (void *handle, const char *name)
 
 	ret = (void*)GetProcAddress((HMODULE)handle, name);
 	return ret;
-#else
+#else /* WIN32 */
 #ifdef NEED_UNDERSCORE_PREFIX
 	static char sym[128];
 	void* ret;
@@ -63,10 +67,10 @@ void *ns_dlsym (void *handle, const char *name)
 		return NULL;
 	}
 	return ret;
-#else
+#else /* NEED_UNDERSCORE_PREFIX */
 	return (dlsym ((int *) handle, name));
-#endif
-#endif
+#endif /* NEED_UNDERSCORE_PREFIX */
+#endif /* WIN32 */
 }
 
 void *ns_dlopen (const char *file, int mode)
@@ -82,7 +86,7 @@ void *ns_dlopen (const char *file, int mode)
 	{
 	}
 	return ret;
-#else
+#else /* WIN32 */
 	void* ret;
 
 	/* reset error */
@@ -99,29 +103,29 @@ void *ns_dlopen (const char *file, int mode)
 		return NULL;
 	}
 	return ret;
-#endif
+#endif /* WIN32 */
 }
 
 int ns_dlclose (void *handle)
 {
-#ifndef VALGRIND
 #ifdef WIN32
 	FreeLibrary((HMODULE)handle);
 	return 0;
-#else
-	return (dlclose (handle));
-#endif
-#else
+#else /* WIN32 */
+#ifndef VALGRIND
+	return dlclose( handle );
+#else /* VALGRIND */
 	return NS_SUCCESS;
-#endif
+#endif /* VALGRIND */
+#endif /* WIN32 */
 }
 
 char *ns_dlerror (void)
 {
 #ifdef WIN32
 	return NULL;
-#else
+#else /* WIN32 */
 	return ((char *)dlerror ());
-#endif
+#endif /* WIN32 */
 }
 
