@@ -26,7 +26,7 @@
 #include "neostats.h"
 #include "protocol.h"
 #include "exclude.h"
-#include "modules.h"
+#include "nsevents.h"
 #include "servers.h"
 #include "services.h"
 #include "users.h"

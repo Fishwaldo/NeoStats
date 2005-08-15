@@ -160,6 +160,7 @@ include/modules.h -text
 include/neostats.h -text
 include/nsdba.h -text
 include/nsdbm.h -text
+include/nsevents.h -text
 include/numeric.h -text
 include/numerics.h -text
 include/perlmod.h -text
@@ -561,6 +562,7 @@ src/NeoStats.pm -text
 src/confuselexer.l -text
 src/neostats.pm.h -text
 src/neostats.vcproj -text
+src/nsevents.c -text
 src/win32/neostats.bmp -text
 src/win32/neostats.rc -text
 src/win32/resource.h -text

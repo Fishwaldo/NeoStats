@@ -34,7 +34,7 @@
 #include "channels.h"
 #include "exclude.h"
 #include "services.h"
-#include "modules.h"
+#include "nsevents.h"
 
 /* @brief hash and list sizes */
 #define CHANNEL_TABLE_SIZE	-1

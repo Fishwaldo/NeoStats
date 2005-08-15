@@ -21,21 +21,11 @@
 ** $Id$
 */
 
-#ifndef _MODULES_H_
-#define _MODULES_H_
+#ifndef _NSEVENTS_H_
+#define _NSEVENTS_H_
 
-extern jmp_buf sigvbuf;
+void SendAllModuleEvent( Event event, CmdParams* cmdparams );
+void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr );
+void FreeEventList( Module* mod_ptr );
 
-int InitModules( void );
-void FiniModules( void );
-Module *ns_load_module( const char *path, Client * u );
-int unload_module( const char *module_name, Client * u );
-void unload_modules( void );
-int ns_cmd_modlist( CmdParams* cmdparams );
-void ModulesVersion( const char* nick, const char *remoteserver );
-int SynchModule( Module* module_ptr );
-int SynchAllModules( void );
-void assign_mod_number( Module *mod_ptr );
-void insert_module( Module *mod_ptr );
-void load_module_error( const Client *target, const char *module_name, const char *fmt, ... );
-#endif /* _MODULES_H_ */
+#endif /* _NSEVENTS_H_ */

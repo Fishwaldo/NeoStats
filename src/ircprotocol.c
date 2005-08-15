@@ -30,7 +30,7 @@
 #include "ircrecv.h"
 #include "numerics.h"
 #include "modes.h"
-#include "modules.h"
+#include "nsevents.h"
 #include "dl.h"
 #include "bots.h"
 #include "commands.h"

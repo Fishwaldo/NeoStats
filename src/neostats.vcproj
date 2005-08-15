@@ -361,6 +361,9 @@
 				RelativePath=".\nsdba.c">
 			</File>
 			<File
+				RelativePath=".\nsevents.c">
+			</File>
+			<File
 				RelativePath=".\nsmemory.c">
 			</File>
 			<File
@@ -535,6 +538,9 @@
 			</File>
 			<File
 				RelativePath="..\include\nsdbm.h">
+			</File>
+			<File
+				RelativePath="..\include\nsevents.h">
 			</File>
 			<File
 				RelativePath="..\include\numeric.h">

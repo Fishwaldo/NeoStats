@@ -22,7 +22,7 @@
 */
 
 #include "neostats.h"
-#include "modules.h"
+#include "nsevents.h"
 #include "commands.h"
 #include "services.h"
 

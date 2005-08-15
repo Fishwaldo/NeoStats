@@ -30,7 +30,7 @@
 #include "users.h"
 #include "channels.h"
 #include "exclude.h"
-#include "modules.h"
+#include "nsevents.h"
 #include "bots.h"
 #include "auth.h"
 #include "services.h"

@@ -29,6 +29,7 @@
 #include "main.h"
 #include "bots.h"
 #include "modules.h"
+#include "nsevents.h"
 #include "modes.h"
 #include "users.h"
 #include "servers.h"

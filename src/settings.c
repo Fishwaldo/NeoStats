@@ -23,7 +23,6 @@
 
 #include "neostats.h"
 #include "helpstrings.h"
-#include "modules.h"
 #include "services.h"
 #include "ircstring.h"
 #include "commands.h"

@@ -6,8 +6,8 @@ include_HEADERS		=	neostats.h config.h version.h \
 						adns.h protocol.h perlmod.h
 
 noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
-				log.h services.h modes.h signals.h \
-				auth.h config.h.in  exclude.h  modules.h sock.h \
+				log.h services.h modes.h signals.h nsevents.h \
+				auth.h config.h.in exclude.h modules.h sock.h \
 				bans.h base64.h ctcp.h helpstrings.h support.h \
 				ircprotocol.h ircsend.h ircrecv.h \
 				bots.h dcc.h ircstring.h numeric.h timer.h \

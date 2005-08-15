@@ -22,7 +22,7 @@
 */
 
 #include "neostats.h"
-#include "modules.h"
+#include "nsevents.h"
 #include "protocol.h"
 #include "ircprotocol.h"
 #include "modes.h"

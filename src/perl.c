@@ -28,6 +28,7 @@
 #include "neostats.h"
 #include "services.h"
 #include "modules.h"
+#include "nsevents.h"
 #include "commands.h"
 //#include <sys/types.h>
 //#include <dirent.h>

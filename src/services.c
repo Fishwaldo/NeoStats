@@ -26,6 +26,7 @@
 #include "neostats.h"
 #include "main.h"
 #include "modules.h"
+#include "nsevents.h"
 #include "bots.h"
 #include "timer.h"
 #include "commands.h"

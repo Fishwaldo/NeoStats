@@ -27,7 +27,7 @@
  */
 
 #include "neostats.h"
-#include "modules.h"
+#include "nsevents.h"
 #include "services.h"
 
 /** Bans subsystem

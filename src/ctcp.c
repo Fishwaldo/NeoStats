@@ -22,7 +22,7 @@
 */
 
 #include "neostats.h"
-#include "modules.h"
+#include "nsevents.h"
 #include "ctcp.h"
 #include "dcc.h"
 

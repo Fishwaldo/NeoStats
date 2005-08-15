@@ -29,7 +29,7 @@
 #include "services.h"
 #include "users.h"
 #include "channels.h"
-#include "modules.h"
+#include "nsevents.h"
 
 #define MODE_TABLE_SIZE	256
 

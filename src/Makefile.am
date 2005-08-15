@@ -3,7 +3,7 @@ bin_PROGRAMS = neostats
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confuselexer.c nsdba.c \
 		conf.c dl.c dns.c exclude.c hash.c ircstring.c \
 		ircprotocol.c ircsend.c ircrecv.c \
-		lang.c list.c log.c main.c match.c misc.c modules.c \
+		lang.c list.c log.c main.c match.c misc.c modules.c nsevents.c \
 		helpstrings.c servers.c services.c signals.c sock.c support.c \
 		timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
 		base64.c numerics.c settings.c botinfo.c \

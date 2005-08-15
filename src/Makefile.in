@@ -62,13 +62,13 @@ PROGRAMS = $(bin_PROGRAMS)
 am__neostats_SOURCES_DIST = auth.c bans.c bots.c channels.c commands.c \
 	confuse.c confuselexer.c nsdba.c conf.c dl.c dns.c exclude.c \
 	hash.c ircstring.c ircprotocol.c ircsend.c ircrecv.c lang.c \
-	list.c log.c main.c match.c misc.c modules.c helpstrings.c \
-	servers.c services.c signals.c sock.c support.c timer.c \
-	transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c base64.c \
-	numerics.c settings.c botinfo.c adnscheck.c adnsevent.c \
-	adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c adnssetup.c \
-	adnstransmit.c adnstypes.c oscalls.c ossocket.c osfile.c \
-	updates.c perl.c neostats.pm.h
+	list.c log.c main.c match.c misc.c modules.c nsevents.c \
+	helpstrings.c servers.c services.c signals.c sock.c support.c \
+	timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
+	base64.c numerics.c settings.c botinfo.c adnscheck.c \
+	adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c \
+	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
+	osfile.c updates.c perl.c neostats.pm.h
 @DO_PERL_TRUE@am__objects_1 = perl.$(OBJEXT)
 am__objects_2 =
 am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
@@ -78,17 +78,18 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	ircstring.$(OBJEXT) ircprotocol.$(OBJEXT) ircsend.$(OBJEXT) \
 	ircrecv.$(OBJEXT) lang.$(OBJEXT) list.$(OBJEXT) log.$(OBJEXT) \
 	main.$(OBJEXT) match.$(OBJEXT) misc.$(OBJEXT) \
-	modules.$(OBJEXT) helpstrings.$(OBJEXT) servers.$(OBJEXT) \
-	services.$(OBJEXT) signals.$(OBJEXT) sock.$(OBJEXT) \
-	support.$(OBJEXT) timer.$(OBJEXT) transfer.$(OBJEXT) \
-	users.$(OBJEXT) modes.$(OBJEXT) ctcp.$(OBJEXT) dcc.$(OBJEXT) \
-	nsmemory.$(OBJEXT) base64.$(OBJEXT) numerics.$(OBJEXT) \
-	settings.$(OBJEXT) botinfo.$(OBJEXT) adnscheck.$(OBJEXT) \
-	adnsevent.$(OBJEXT) adnsgeneral.$(OBJEXT) adnsparse.$(OBJEXT) \
-	adnsquery.$(OBJEXT) adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) \
-	adnstransmit.$(OBJEXT) adnstypes.$(OBJEXT) oscalls.$(OBJEXT) \
-	ossocket.$(OBJEXT) osfile.$(OBJEXT) updates.$(OBJEXT) \
-	$(am__objects_1) $(am__objects_2)
+	modules.$(OBJEXT) nsevents.$(OBJEXT) helpstrings.$(OBJEXT) \
+	servers.$(OBJEXT) services.$(OBJEXT) signals.$(OBJEXT) \
+	sock.$(OBJEXT) support.$(OBJEXT) timer.$(OBJEXT) \
+	transfer.$(OBJEXT) users.$(OBJEXT) modes.$(OBJEXT) \
+	ctcp.$(OBJEXT) dcc.$(OBJEXT) nsmemory.$(OBJEXT) \
+	base64.$(OBJEXT) numerics.$(OBJEXT) settings.$(OBJEXT) \
+	botinfo.$(OBJEXT) adnscheck.$(OBJEXT) adnsevent.$(OBJEXT) \
+	adnsgeneral.$(OBJEXT) adnsparse.$(OBJEXT) adnsquery.$(OBJEXT) \
+	adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) adnstransmit.$(OBJEXT) \
+	adnstypes.$(OBJEXT) oscalls.$(OBJEXT) ossocket.$(OBJEXT) \
+	osfile.$(OBJEXT) updates.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/event/libevent.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -238,13 +239,13 @@ wi_PWD = @wi_PWD@
 neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
 	confuse.c confuselexer.c nsdba.c conf.c dl.c dns.c exclude.c \
 	hash.c ircstring.c ircprotocol.c ircsend.c ircrecv.c lang.c \
-	list.c log.c main.c match.c misc.c modules.c helpstrings.c \
-	servers.c services.c signals.c sock.c support.c timer.c \
-	transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c base64.c \
-	numerics.c settings.c botinfo.c adnscheck.c adnsevent.c \
-	adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c adnssetup.c \
-	adnstransmit.c adnstypes.c oscalls.c ossocket.c osfile.c \
-	updates.c $(am__append_1) $(am__append_2)
+	list.c log.c main.c match.c misc.c modules.c nsevents.c \
+	helpstrings.c servers.c services.c signals.c sock.c support.c \
+	timer.c transfer.c users.c modes.c ctcp.c dcc.c nsmemory.c \
+	base64.c numerics.c settings.c botinfo.c adnscheck.c \
+	adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c \
+	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
+	osfile.c updates.c $(am__append_1) $(am__append_2)
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event
 
@@ -353,6 +354,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modules.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsdba.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsevents.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsmemory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/numerics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/oscalls.Po@am__quote@
