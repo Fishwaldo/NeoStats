@@ -58,8 +58,7 @@ static hash_t *modulehash;
  * 
  * @return none
 */
-int 
-InitModules ()
+int InitModules( void )
 {
 	SET_SEGV_LOCATION();
 	modulehash = hash_create (NUM_MODULES, 0, 0);
@@ -94,7 +93,7 @@ int SynchModule (Module* module_ptr)
 		ModSynch = ns_dlsym ((int *) module_ptr->handle, "ModSynch");
 		if (ModSynch) {
 			SET_RUN_LEVEL(module_ptr);
-			err = (*ModSynch) (); 
+			err = (*ModSynch)(); 
 			RESET_RUN_LEVEL();
 		}
 		SET_SEGV_LOCATION();
@@ -133,72 +132,87 @@ int SynchAllModules (void)
 
 /** @brief SendModuleEvent
  *
- * 
+ *	Call event handler for a specific module
+ *  NeoStats core use only
  *
- * @return none
+ *  @param event to send
+ *  @param cmdparams
+ *  @param module_ptr pointer to module to raise event for
+ *
+ *  @return none
  */
-void
-SendModuleEvent (Event event, CmdParams* cmdparams, Module* module_ptr)
+
+void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr )
 {
 	SET_SEGV_LOCATION();
-	if (module_ptr->event_list) {
-		if ((IS_STD_MOD(module_ptr) && module_ptr->event_list[event] && module_ptr->event_list[event]->handler)
-#ifdef USE_PERL
-			|| (IS_PERL_MOD(module_ptr) && module_ptr->event_list[event])
-#endif
-			){
-			/* If we are not yet synched, check that the module supports 
-				* the event before we are synched. */
-			if (!module_ptr->synched && !(module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH)) {
-				dlog(DEBUG1, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event);
-				return;
-			}
-			if ((module_ptr->event_list[event]->flags & EVENT_FLAG_DISABLED)) {
-				dlog(DEBUG1, "Skipping module %s for event %d since it is disabled", module_ptr->info->name, event);
-				return;
-			}
-			if ((module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_ME) && IsMe (cmdparams->source) ) {
-				dlog(DEBUG1, "Skipping module %s for event %d since %s is excluded as a NeoStats client", module_ptr->info->name, event, cmdparams->source->name);
-				return;
-			}
-			if (module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_MODME) {
-				if (cmdparams->source && cmdparams->source->user && cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr) {
-					dlog(DEBUG1, "Skipping module %s for event %d since %s is excluded as a Module client", module_ptr->info->name, event, cmdparams->source->name);
-					return;
-				}
-			}			
-			if ((module_ptr->event_list[event]->flags & EVENT_FLAG_USE_EXCLUDE) && IsExcluded (cmdparams->source)) {
-				dlog(DEBUG1, "Skipping module %s for event %d since %s is excluded", module_ptr->info->name, event, cmdparams->source->name);
-				return;
-			}			
-			dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
-			SET_SEGV_LOCATION();
-			if (IS_STD_MOD(module_ptr)) {
-				if (setjmp (sigvbuf) == 0) {
-					SET_RUN_LEVEL(module_ptr);
-					module_ptr->event_list[event]->handler (cmdparams);
-					RESET_RUN_LEVEL();
-				} else {
-					nlog (LOG_CRITICAL, "setjmp() Failed, Can't call Module %s", module_ptr->info->name);
-				}
-#if USE_PERL
-			} else if (IS_PERL_MOD(module_ptr)) {
-				perl_event_cb(event, cmdparams, module_ptr);
-#endif
-			}			
-			SET_SEGV_LOCATION();
-		}
+	dlog( DEBUG5, "SendModuleEvent: event %d to module %s", event, module_ptr->info->name );
+	if( !module_ptr->event_list )
+	{
+		dlog( DEBUG5, "SendModuleEvent: module %s has no events associated with it", module_ptr->info->name );
+		return;
 	}
+	if ((IS_STD_MOD(module_ptr) && module_ptr->event_list[event] && module_ptr->event_list[event]->handler)
+#ifdef USE_PERL
+		|| (IS_PERL_MOD(module_ptr) && module_ptr->event_list[event])
+#endif
+		){
+		/* If we are not yet synched, check that the module supports 
+			* the event before we are synched. */
+		if (!module_ptr->synched && !(module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH)) {
+			dlog( DEBUG5, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event );
+			return;
+		}
+		if ((module_ptr->event_list[event]->flags & EVENT_FLAG_DISABLED)) {
+			dlog( DEBUG5, "Skipping module %s for event %d since it is disabled", module_ptr->info->name, event );
+			return;
+		}
+		if ((module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_ME) && IsMe (cmdparams->source) ) {
+			dlog( DEBUG5, "Skipping module %s for event %d since %s is excluded as a NeoStats client", module_ptr->info->name, event, cmdparams->source->name );
+			return;
+		}
+		if (module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_MODME) {
+			if (cmdparams->source && cmdparams->source->user && cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr) {
+				dlog( DEBUG5, "Skipping module %s for event %d since %s is excluded as a Module client", module_ptr->info->name, event, cmdparams->source->name );
+				return;
+			}
+		}			
+		if ((module_ptr->event_list[event]->flags & EVENT_FLAG_USE_EXCLUDE) && IsExcluded (cmdparams->source)) {
+			dlog( DEBUG5, "Skipping module %s for event %d since %s is excluded", module_ptr->info->name, event, cmdparams->source->name );
+			return;
+		}			
+		dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event);
+		SET_SEGV_LOCATION();
+		if (IS_STD_MOD(module_ptr)) {
+			if (setjmp (sigvbuf) == 0) {
+				SET_RUN_LEVEL(module_ptr);
+				module_ptr->event_list[event]->handler (cmdparams);
+				RESET_RUN_LEVEL();
+			} else {
+				nlog (LOG_CRITICAL, "setjmp() failed, not calling module %s", module_ptr->info->name);
+			}
+			return;
+#if USE_PERL
+		} else if (IS_PERL_MOD(module_ptr)) {
+			perl_event_cb(event, cmdparams, module_ptr);
+			return;
+#endif
+		}			
+	}
+	dlog( DEBUG5, "Module %s has no event handler for %d", module_ptr->info->name, event );
 }
 
 /** @brief SendAllModuleEvent
  *
- * 
+ *	Call event handler for all modules
+ *  NeoStats core use only
  *
- * @return none
+ *  @param event to send
+ *  @param cmdparams
+ *
+ *  @return none
  */
-void
-SendAllModuleEvent (Event event, CmdParams* cmdparams)
+
+void SendAllModuleEvent( Event event, CmdParams* cmdparams )
 {
 	Module *module_ptr;
 	hscan_t ms;
@@ -361,8 +375,8 @@ Module *load_stdmodule (const char *modfilename, Client * u)
 
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL(mod_ptr);
-	DBAOpenDatabase ();
-	err = (*ModInit) (); 
+	DBAOpenDatabase();
+	err = (*ModInit)(); 
 	RESET_RUN_LEVEL();
 	if (err < 1 || mod_ptr->error) {
 		load_module_error( u, modfilename, __("See %s.log for further information.",u), mod_ptr->info->name );
@@ -453,8 +467,8 @@ void assign_mod_number( Module *mod_ptr )
  * @return Nothing 
  */
 
-void 
-insert_module(Module *mod_ptr) {
+void insert_module(Module *mod_ptr)
+{
 	hnode_create_insert (modulehash, mod_ptr, mod_ptr->info->name);
 }
 
@@ -537,7 +551,7 @@ unload_module (const char *modname, Client * u)
 		ModFini = ns_dlsym ((int *) mod_ptr->handle, "ModFini");
 		if (ModFini) {
 			SET_RUN_LEVEL(mod_ptr);
-			(*ModFini) ();
+			(*ModFini)();
 			RESET_RUN_LEVEL();
 			SET_SEGV_LOCATION();
 		}
@@ -564,7 +578,7 @@ unload_module (const char *modname, Client * u)
 	RESET_RUN_LEVEL();
 
 	SET_RUN_LEVEL(mod_ptr);
-	DBACloseDatabase ();
+	DBACloseDatabase();
 
 
 	if (IS_STD_MOD(mod_ptr)) {
@@ -680,19 +694,17 @@ ModuleConfig(bot_setting* set_ptr)
  *
  * @return none
  */
-void AddEvent (ModuleEvent* event)
+void AddEvent( ModuleEvent* eventptr )
 {
 	Module* mod_ptr;
 
 	mod_ptr = GET_CUR_MODULE();
-	if (!mod_ptr->event_list) {
-		mod_ptr->event_list = ns_calloc ( sizeof(ModuleEvent) * EVENT_COUNT );
-	}
-	if (event->event == EVENT_NICKIP)
-	{
+	if( !mod_ptr->event_list )
+		mod_ptr->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
+	dlog( DEBUG5, "AddEvent: adding event %d to %s", eventptr->event, mod_ptr->info->name );
+	mod_ptr->event_list[eventptr->event] = eventptr;
+	if( eventptr->event == EVENT_NICKIP )
 		me.want_nickip = 1; 		
-	}
-	mod_ptr->event_list[event->event] = event;
 }
 
 /** @brief 
@@ -701,20 +713,11 @@ void AddEvent (ModuleEvent* event)
  *
  * @return none
  */
-void AddEventList (ModuleEvent *eventlistptr)
+void AddEventList( ModuleEvent *eventlistptr )
 {
-	Module* mod_ptr;
-
-	mod_ptr = GET_CUR_MODULE();
-	if (!mod_ptr->event_list) {
-		mod_ptr->event_list = ns_calloc ( sizeof(ModuleEvent*) * EVENT_COUNT );
-	}
-	while (eventlistptr->event != EVENT_NULL) {
-		mod_ptr->event_list[eventlistptr->event] = eventlistptr;
-		if (eventlistptr->event == EVENT_NICKIP)
-		{
-			me.want_nickip = 1; 		
-		}
+	while( eventlistptr->event != EVENT_NULL )
+	{
+		AddEvent( eventlistptr );
 		eventlistptr ++;
 	}
 }
@@ -725,14 +728,14 @@ void AddEventList (ModuleEvent *eventlistptr)
  *
  * @return none
  */
-void DeleteEvent (Event event)
+void DeleteEvent( Event event )
 {
 	Module* mod_ptr;
 
 	mod_ptr = GET_CUR_MODULE();
-	if (mod_ptr->event_list) {
+	if( mod_ptr->event_list )
 		mod_ptr->event_list[event] = NULL;
-	}
+	dlog( DEBUG5, "DeleteEvent: deleting event %d from %s", event, mod_ptr->info->name );
 }
 
 /** @brief 
@@ -741,15 +744,11 @@ void DeleteEvent (Event event)
  *
  * @return none
  */
-void DeleteEventList (ModuleEvent *eventlistptr)
+void DeleteEventList( ModuleEvent *eventlistptr )
 {
-	Module* mod_ptr;
-
-	mod_ptr = GET_CUR_MODULE();
-	while (eventlistptr->event)
+	while( eventlistptr->event )
 	{
-		if (mod_ptr->event_list[eventlistptr->event])
-			mod_ptr->event_list[eventlistptr->event] = NULL;
+		DeleteEvent( eventlistptr->event );
 		eventlistptr++;
 	}
 }

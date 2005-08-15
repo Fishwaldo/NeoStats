@@ -176,7 +176,7 @@ ModuleEvent neostats_events[] = {
  */
 static int services_event_ctcpversion( CmdParams *cmdparams )
 {
-         dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
+	dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
 	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
 	SendAllModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams );
 	return NS_SUCCESS;
@@ -380,15 +380,14 @@ static int ns_cmd_status( CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "%s status:", cmdparams->source ), ns_botptr->name );
-	if( uptime > TS_ONE_DAY ) {
+	if( uptime > TS_ONE_DAY )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_DAY,( uptime / TS_ONE_DAY == 1 ) ? "" : "s",( uptime / TS_ONE_HOUR ) % 24,( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE );
-	} else if( uptime > TS_ONE_HOUR ) {
+	else if( uptime > TS_ONE_HOUR )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_HOUR, uptime / TS_ONE_HOUR == 1 ? "" : "s",( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE,( uptime / 60 ) % TS_ONE_MINUTE == 1 ? "" : "s" );
-	} else if( uptime > TS_ONE_MINUTE ) {
+	else if( uptime > TS_ONE_MINUTE )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld minute%s, %ld second%s\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_MINUTE, uptime / TS_ONE_MINUTE == 1 ? "" : "s", uptime % TS_ONE_MINUTE, uptime % TS_ONE_MINUTE == 1 ? "" : "s" );
-	} else {
+	else
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%d second%s\2", cmdparams->source ), ns_botptr->name,( int )uptime, uptime == 1 ? "" : "s" );
-	}
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Sent %ld messages, %ld bytes", cmdparams->source ), me.SendM, me.SendBytes );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Received %ld messages, %ld bytes", cmdparams->source ), me.RcveM, me.RcveBytes );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Reconnect time: %d", cmdparams->source ), nsconfig.r_time );
@@ -442,11 +441,10 @@ static int ns_cmd_level( CmdParams *cmdparams )
 static int ns_cmd_load( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( ns_load_module( cmdparams->av[0], cmdparams->source ) ) {
+	if( ns_load_module( cmdparams->av[0], cmdparams->source ) )
 		irc_chanalert( ns_botptr, _( "%s loaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
-	} else {
+	else
 		irc_chanalert( ns_botptr, _( "%s tried to load module %s, but load failed" ), cmdparams->source->name, cmdparams->av[0] );
-	}
    	return NS_SUCCESS;
 }
 
@@ -460,12 +458,12 @@ static int ns_cmd_load( CmdParams *cmdparams )
 static int ns_cmd_unload( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( unload_module( cmdparams->av[0], cmdparams->source ) > 0 ) {
+	if( unload_module( cmdparams->av[0], cmdparams->source ) > 0 )
 		irc_chanalert( ns_botptr, _( "%s unloaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
-	}
    	return NS_SUCCESS;
 }
 
+#ifdef USE_RAW
 /** @brief RAW command handler
  *
  *  issue a RAW command
@@ -473,7 +471,6 @@ static int ns_cmd_unload( CmdParams *cmdparams )
  *  @param cmdparams structure with command information
  *  @returns none
  */
-#ifdef USE_RAW
 static int ns_cmd_raw( CmdParams *cmdparams )
 {
 	char *message;
