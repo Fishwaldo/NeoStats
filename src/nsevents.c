@@ -30,6 +30,63 @@
 #include "perlmod.h"
 #endif /* USE_PERL */
 
+/** String descriptions of events for debug use.
+  * must match enum in events.h
+  */
+static const char *EventStrings[] =
+{
+	"EVENT_MODULELOAD",
+	"EVENT_MODULEUNLOAD",
+	"EVENT_SERVER",
+	"EVENT_SQUIT",
+	"EVENT_PING",
+	"EVENT_PONG",
+	"EVENT_SIGNON",
+	"EVENT_QUIT",
+	"EVENT_NICKIP",
+	"EVENT_KILL",
+	"EVENT_LOCALKILL",
+	"EVENT_GLOBALKILL",
+	"EVENT_SERVERKILL",
+	"EVENT_BOTKILL",
+	"EVENT_NICK",
+	"EVENT_AWAY",
+	"EVENT_UMODE",
+	"EVENT_SMODE",
+	"EVENT_NEWCHAN",
+	"EVENT_DELCHAN",
+	"EVENT_JOIN",
+	"EVENT_PART",
+	"EVENT_PARTBOT",
+	"EVENT_EMPTYCHAN",
+	"EVENT_KICK",
+	"EVENT_KICKBOT",
+	"EVENT_TOPIC",
+	"EVENT_CMODE",
+	"EVENT_PRIVATE",
+	"EVENT_NOTICE",
+	"EVENT_CPRIVATE",
+	"EVENT_CNOTICE",
+	"EVENT_GLOBOPS",
+	"EVENT_CHATOPS",
+	"EVENT_WALLOPS",
+	"EVENT_CTCPVERSIONRPL",
+	"EVENT_CTCPVERSIONREQ",
+	"EVENT_CTCPFINGERRPL",
+	"EVENT_CTCPFINGERREQ",
+	"EVENT_CTCPACTIONREQ",
+	"EVENT_CTCPTIMERPL",
+	"EVENT_CTCPTIMEREQ",
+	"EVENT_CTCPPINGRPL",
+	"EVENT_CTCPPINGREQ",
+	"EVENT_DCCSEND",
+	"EVENT_DCCCHAT",
+	"EVENT_DCCCHATMSG",
+	"EVENT_ADDBAN",
+	"EVENT_DELBAN",
+	"EVENT_COUNT",
+};
+
 /** @brief SendModuleEvent
  *
  *	Call event handler for a specific module
@@ -45,72 +102,68 @@
 void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr )
 {
 	SET_SEGV_LOCATION();
-	dlog( DEBUG5, "SendModuleEvent: event %d to module %s", event, module_ptr->info->name );
+	dlog( DEBUG5, "SendModuleEvent: %s to module %s", EventStrings[event], module_ptr->info->name );
 	if( !module_ptr->event_list )
 	{
 		dlog( DEBUG5, "SendModuleEvent: module %s has no events associated with it", module_ptr->info->name );
 		return;
 	}
-	if( (IS_STD_MOD(module_ptr ) && module_ptr->event_list[event] && module_ptr->event_list[event]->handler )
-#ifdef USE_PERL
-		||( IS_PERL_MOD(module_ptr ) && module_ptr->event_list[event] )
-#endif
-		 ){
+	if( module_ptr->event_list[event] )
+	{
 		/* If we are not yet synched, check that the module supports 
 			* the event before we are synched. */
-		if( !module_ptr->synched && !(module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH ) )
+		if( !module_ptr->synched && !( module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH ) )
 		{
-			dlog( DEBUG5, "Skipping module %s for event %d since module is not yet synched", module_ptr->info->name, event );
+			dlog( DEBUG5, "Skipping module %s for %s since module is not yet synched", module_ptr->info->name, EventStrings[event] );
 			return;
 		}
-		if( (module_ptr->event_list[event]->flags & EVENT_FLAG_DISABLED ) )
+		if( ( module_ptr->event_list[event]->flags & EVENT_FLAG_DISABLED ) )
 		{
-			dlog( DEBUG5, "Skipping module %s for event %d since it is disabled", module_ptr->info->name, event );
+			dlog( DEBUG5, "Skipping module %s for %s since it is disabled", module_ptr->info->name, EventStrings[event] );
 			return;
 		}
-		if( (module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_ME ) && IsMe( cmdparams->source ) )
+		if( ( module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_ME ) && IsMe( cmdparams->source ) )
 		{
-			dlog( DEBUG5, "Skipping module %s for event %d since %s is excluded as a NeoStats client", module_ptr->info->name, event, cmdparams->source->name );
+			dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a NeoStats client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
 			return;
 		}
 		if( module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_MODME )
 		{
 			if( cmdparams->source && cmdparams->source->user && cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr )
 			{
-				dlog( DEBUG5, "Skipping module %s for event %d since %s is excluded as a Module client", module_ptr->info->name, event, cmdparams->source->name );
+				dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a Module client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
 				return;
 			}
 		}			
-		if( (module_ptr->event_list[event]->flags & EVENT_FLAG_USE_EXCLUDE ) && IsExcluded( cmdparams->source ) )
+		if( ( module_ptr->event_list[event]->flags & EVENT_FLAG_USE_EXCLUDE ) && IsExcluded( cmdparams->source ) )
 		{
-			dlog( DEBUG5, "Skipping module %s for event %d since %s is excluded", module_ptr->info->name, event, cmdparams->source->name );
+			dlog( DEBUG5, "Skipping module %s for %s since %s is excluded", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
 			return;
 		}			
-		dlog(DEBUG1, "Running module %s with event %d", module_ptr->info->name, event );
+		dlog( DEBUG1, "Running module %s with %s", module_ptr->info->name, EventStrings[event] );
 		SET_SEGV_LOCATION();
-		if( IS_STD_MOD(module_ptr ) )
+		if( IS_STD_MOD( module_ptr ) )
 		{
 			if( setjmp( sigvbuf ) == 0 )
 			{
-				SET_RUN_LEVEL(module_ptr );
+				SET_RUN_LEVEL( module_ptr );
 				module_ptr->event_list[event]->handler( cmdparams );
 				RESET_RUN_LEVEL();
 			}
 			else
 			{
-				nlog( LOG_CRITICAL, "setjmp() failed, not calling module %s", module_ptr->info->name );
+				nlog( LOG_CRITICAL, "SendModuleEvent: setjmp() failed, not calling module %s", module_ptr->info->name );
 			}
-			return;
-#if USE_PERL
 		}
-		else if( IS_PERL_MOD(module_ptr ) )
+#if USE_PERL
+		else if( IS_PERL_MOD( module_ptr ) )
 		{
-			perl_event_cb(event, cmdparams, module_ptr );
-			return;
-#endif
+			perl_event_cb( event, cmdparams, module_ptr );
 		}			
+#endif
+		return;
 	}
-	dlog( DEBUG5, "Module %s has no event handler for %d", module_ptr->info->name, event );
+	dlog( DEBUG5, "SendModuleEvent: %s has no event handler for %s", module_ptr->info->name, EventStrings[event] );
 }
 
 /** @brief SendAllModuleEvent
@@ -131,12 +184,13 @@ void SendAllModuleEvent( Event event, CmdParams* cmdparams )
 	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
+	dlog( DEBUG5, "SendAllModuleEvent: %s to all modules", EventStrings[event] );
 	hash_scan_begin( &ms, GetModuleHash() );
-	while( (mn = hash_scan_next( &ms ) ) != NULL )
+	while( ( mn = hash_scan_next( &ms ) ) != NULL )
 	{
 		module_ptr = hnode_get( mn );
 		if( module_ptr->event_list )
-			SendModuleEvent(event, cmdparams, module_ptr );
+			SendModuleEvent( event, cmdparams, module_ptr );
 	}
 }
 
@@ -155,14 +209,17 @@ void AddEvent( ModuleEvent* eventptr )
 	Module* mod_ptr;
 
 	if( !eventptr )
+	{
+		nlog( LOG_ERROR, "AddEvent: eventptr passed as NULL" );
 		return;
+	}
 	mod_ptr = GET_CUR_MODULE();
 	if( !mod_ptr->event_list )
 		mod_ptr->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
-	dlog( DEBUG5, "AddEvent: adding event %d to %s", eventptr->event, mod_ptr->info->name );
+	dlog( DEBUG5, "AddEvent: adding %s to %s", EventStrings[eventptr->event], mod_ptr->info->name );
 	if( !eventptr->handler )
 	{
-		nlog( LOG_ERROR, "AddEvent: missing handler for event %d in module %s", eventptr->event, mod_ptr->info->name );
+		nlog( LOG_ERROR, "AddEvent: missing handler for %s in module %s", EventStrings[eventptr->event], mod_ptr->info->name );
 		return;
 	}
 	mod_ptr->event_list[eventptr->event] = eventptr;
@@ -183,7 +240,10 @@ void AddEvent( ModuleEvent* eventptr )
 void AddEventList( ModuleEvent *eventlistptr )
 {
 	if( !eventlistptr )
+	{
+		nlog( LOG_ERROR, "AddEventList: eventlistptr passed as NULL" );
 		return;
+	}
 	while( eventlistptr->event != EVENT_NULL )
 	{
 		AddEvent( eventlistptr );
@@ -213,7 +273,7 @@ void DeleteEvent( Event event )
 	}
 	if( mod_ptr->event_list )
 		mod_ptr->event_list[event] = NULL;
-	dlog( DEBUG5, "DeleteEvent: deleting event %d from %s", event, mod_ptr->info->name );
+	dlog( DEBUG5, "DeleteEvent: deleting %s from %s", EventStrings[event], mod_ptr->info->name );
 }
 
 /** @brief DeleteEventList
@@ -229,7 +289,10 @@ void DeleteEvent( Event event )
 void DeleteEventList( ModuleEvent *eventlistptr )
 {
 	if( !eventlistptr )
+	{
+		nlog( LOG_ERROR, "DeleteEventList: eventlistptr passed as NULL" );
 		return;
+	}
 	while( eventlistptr->event )
 	{
 		DeleteEvent( eventlistptr->event );
@@ -250,8 +313,10 @@ void DeleteEventList( ModuleEvent *eventlistptr )
 void FreeEventList( Module* mod_ptr )
 {
 	if( mod_ptr->event_list )
+	{
 		ns_free( mod_ptr->event_list );
-	mod_ptr->event_list = NULL;
+		mod_ptr->event_list = NULL;
+	}
 }
 
 /** @brief SetAllEventFlags
@@ -271,17 +336,19 @@ void SetAllEventFlags( unsigned int flag, unsigned int enable )
 	ModuleEvent** eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
-	if( eventlistptr )
+	if( !eventlistptr )
 	{
-		for( i = 0; i < EVENT_COUNT; i++ )
+		nlog( LOG_ERROR, "SetAllEventFlags: %s has no eventlist", GET_CUR_MODULE()->info->name );
+		return;
+	}
+	for( i = 0; i < EVENT_COUNT; i++ )
+	{
+		if( eventlistptr[i] )
 		{
-			if( eventlistptr[i] )
-			{
-				if( enable )
-					eventlistptr[i]->flags |= flag;
-				else
-					eventlistptr[i]->flags &= ~flag;
-			}
+			if( enable )
+				eventlistptr[i]->flags |= flag;
+			else
+				eventlistptr[i]->flags &= ~flag;
 		}
 	}
 }
@@ -303,13 +370,20 @@ void SetEventFlags( Event event, unsigned int flag, unsigned int enable )
 	ModuleEvent** eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
-	if( eventlistptr )
+	if( !eventlistptr )
 	{
-		if( enable )
-			eventlistptr[event]->flags |= flag;
-		else
-			eventlistptr[event]->flags &= ~flag;
+		nlog( LOG_ERROR, "SetEventFlags: %s has no eventlist", GET_CUR_MODULE()->info->name );
+		return;
 	}
+	if( !eventlistptr[event] )
+	{
+		nlog( LOG_ERROR, "SetEventFlags: %s has no event %s", GET_CUR_MODULE()->info->name, EventStrings[event] );
+		return;
+	}
+	if( enable )
+		eventlistptr[event]->flags |= flag;
+	else
+		eventlistptr[event]->flags &= ~flag;
 }
 
 /** @brief EnableEvent
@@ -327,8 +401,17 @@ void EnableEvent( Event event )
 	ModuleEvent** eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
-	if( eventlistptr )
-		eventlistptr[event]->flags &= ~EVENT_FLAG_DISABLED;
+	if( !eventlistptr )
+	{
+		nlog( LOG_ERROR, "EnableEvent: %s has no eventlist", GET_CUR_MODULE()->info->name );
+		return;
+	}
+	if( !eventlistptr[event] )
+	{
+		nlog( LOG_ERROR, "EnableEvent: %s has no event %s", GET_CUR_MODULE()->info->name, EventStrings[event] );
+		return;
+	}
+	eventlistptr[event]->flags &= ~EVENT_FLAG_DISABLED;
 }
 
 /** @brief DisableEvent
@@ -346,6 +429,15 @@ void DisableEvent( Event event )
 	ModuleEvent** eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
-	if( eventlistptr )
-		eventlistptr[event]->flags |= EVENT_FLAG_DISABLED;
+	if( !eventlistptr )
+	{
+		nlog( LOG_ERROR, "DisableEvent: %s has no eventlist", GET_CUR_MODULE()->info->name );
+		return;
+	}
+	if( !eventlistptr[event] )
+	{
+		nlog( LOG_ERROR, "DisableEvent: %s has no event %s", GET_CUR_MODULE()->info->name, EventStrings[event] );
+		return;
+	}
+	eventlistptr[event]->flags |= EVENT_FLAG_DISABLED;
 }
