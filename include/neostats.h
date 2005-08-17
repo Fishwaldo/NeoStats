@@ -1362,12 +1362,12 @@ EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileorme
 /* Is the client marked away? */
 #define IsAway( x ) ( ( x ) && ( x->user->is_away ) )
 
-EXPORTFUNC int ValidateNick( char *nick );
-EXPORTFUNC int ValidateUser( char *username );
-EXPORTFUNC int ValidateHost( char *hostname );
-EXPORTFUNC int ValidateURL( char *url );
-EXPORTFUNC int ValidateChannel( char *channel_name );
-EXPORTFUNC int ValidateChannelKey( char *key );
+EXPORTFUNC int ValidateNick( const char *nick );
+EXPORTFUNC int ValidateUser( const char *username );
+EXPORTFUNC int ValidateHost( const char *hostname );
+EXPORTFUNC int ValidateURL( const char *url );
+EXPORTFUNC int ValidateChannel( const char *channel_name );
+EXPORTFUNC int ValidateChannelKey( const char *key );
 
 #define CONFIG_TABLE_NAME	"config"
 

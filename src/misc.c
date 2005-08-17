@@ -411,16 +411,13 @@ char *sftime( time_t stuff )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateNick( char *nick )
+int ValidateNick( const char *nick )
 {
-	char *ptr;
-
-	ptr = nick;
-	while( *ptr )
+	while( *nick )
 	{
-		if( !IsNickChar( *ptr ) )
+		if( !IsNickChar( *nick ) )
 			return NS_FAILURE;
-		ptr++;
+		nick++;
 	}
 	return NS_SUCCESS;
 }
@@ -434,16 +431,13 @@ int ValidateNick( char *nick )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateUser( char *username )
+int ValidateUser( const char *username )
 {
-	char *ptr;
-
-	ptr = username;
-	while( *ptr )
+	while( *username )
 	{
-		if( !IsUserChar( *ptr ) )
+		if( !IsUserChar( *username ) )
 			return NS_FAILURE;
-		ptr++;
+		username++;
 	}
 	return NS_SUCCESS;
 }
@@ -457,16 +451,13 @@ int ValidateUser( char *username )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateHost( char *hostname )
+int ValidateHost( const char *hostname )
 {
-	char *ptr;
-
-	ptr = hostname;
-	while( *ptr )
+	while( *hostname )
 	{
-		if( !IsHostChar( *ptr ) )
+		if( !IsHostChar( *hostname ) )
 			return NS_FAILURE;
-		ptr++;
+		hostname++;
 	}
 	return NS_SUCCESS;
 }
@@ -480,21 +471,18 @@ int ValidateHost( char *hostname )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateURL( char *url )
+int ValidateURL( const char *url )
 {
-	char *ptr;
-
 	/* URL must begin with http:// */
 	if( ircstrncasecmp( url, "http://", 7 ) != 0 )
 		return NS_FAILURE;
 	/* Get pointer to rest of URL to test */
-	ptr = url;
-	ptr += 7;
-	while( *ptr )
+	url += 7;
+	while( *url )
 	{
-		if( !IsURLChar( *ptr ) )
+		if( !IsURLChar( *url ) )
 			return NS_FAILURE;
-		ptr++;
+		url++;
 	}
 	return NS_SUCCESS;
 }
@@ -508,20 +496,17 @@ int ValidateURL( char *url )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateChannel( char *channel_name )
+int ValidateChannel( const char *channel_name )
 {
-	char *ptr;
-
-	ptr = channel_name;
 	/* Channel name must start with channel prefix */
-	if( !IsChanPrefix( *ptr ) )
+	if( !IsChanPrefix( *channel_name ) )
 		return NS_FAILURE;
-	ptr ++;
-	while( *ptr )
+	channel_name ++;
+	while( *channel_name )
 	{
-		if( !IsChanChar( *ptr ) )
+		if( !IsChanChar( *channel_name ) )
 			return NS_FAILURE;
-		ptr++;
+		channel_name++;
 	}
 	return NS_SUCCESS;
 }
@@ -535,16 +520,13 @@ int ValidateChannel( char *channel_name )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateChannelKey( char *key )
+int ValidateChannelKey( const char *key )
 {
-	char *ptr;
-
-	ptr = key;
-	while( *ptr )
+	while( *key )
 	{
-		if( !IsChanKeyChar( *ptr ) )
+		if( !IsChanKeyChar( *key ) )
 			return NS_FAILURE;
-		ptr++;
+		key++;
 	}
 	return NS_SUCCESS;
 }
