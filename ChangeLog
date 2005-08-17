@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - New macros NS_CMD_END() and NS_SETTING_END() for terminating command and set
+   lists. (M)
  - ConnectServ colour logging is now settable via IRC (F)
  - First round of memory cleanups with Valgrind (F)
  - Create a runvalgrind.sh file with NeoStats suppressions for memory

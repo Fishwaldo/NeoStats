@@ -116,7 +116,7 @@ static bot_cmd ns_commands[]=
 	{"CHANNELLIST",	ns_cmd_channellist,	0, 	NS_ULEVEL_ROOT,  	ns_help_channellist},
 	{"SERVERLIST",	ns_cmd_serverlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverlist},
 	{"BANLIST",		ns_cmd_banlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_banlist},
-	{NULL,			NULL,				0, 	0,					NULL}
+	NS_CMD_END()
 };
 
 /** Bot setting table */
@@ -135,7 +135,7 @@ static bot_setting ns_settings[]=
 	{"LOGLEVEL",		&nsconfig.loglevel,			SET_TYPE_INT,		1, 6, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_loglevel, NULL,( void* )5 },
 	{"RECVQ",			&nsconfig.recvq,			SET_TYPE_INT,		1024,10240000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_recvq, NULL, ( void*)2048}, 
 	{"DEBUGCHAN",		nsconfig.debugchan,			SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugchan, NULL,( void* )"#debug" },
-	{NULL,				NULL,						0,					0, 0, 			0,				 NULL,	NULL	},
+	NS_SETTING_END()
 };
 
 static bot_setting ns_debugsettings[]=
@@ -146,7 +146,7 @@ static bot_setting ns_debugsettings[]=
 	{"DEBUGMODULE",		nsconfig.debugmodule,		SET_TYPE_STRING,	0, MAX_MOD_NAME,NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugmodule, NULL,( void* )"all" },
 	{"DEBUGLEVEL",		&nsconfig.debuglevel,		SET_TYPE_INT,		1, 10, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debuglevel, NULL,( void* )0 },
 	{"DEBUGTOCHAN",		&nsconfig.debugtochan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugtochan, NULL,( void* )0 },
-	{NULL,				NULL,						0,					0, 0, 			0,				 NULL,	NULL	},
+	NS_SETTING_END()
 };
 
 /** Bot pointer */

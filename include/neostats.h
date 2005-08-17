@@ -747,6 +747,8 @@ typedef struct _bot_cmd {
 	Module			*modptr;	/* NeoStats internal use only */
 }_bot_cmd;
 
+#define NS_CMD_END() { NULL, NULL, 0, 0, NULL, 0, NULL, NULL }
+
 /** @brief flags for bots
  *  flags to influence how bots are managed
  *  e.g. restrict to opers
@@ -822,6 +824,7 @@ typedef struct bot_setting {
 	void			*defaultval;/* default value for setting */
 }bot_setting;
 
+#define NS_SETTING_END() { NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL, NULL }
 
 /** @brief Message function types
  * 

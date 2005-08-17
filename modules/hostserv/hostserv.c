@@ -105,7 +105,7 @@ static bot_cmd hs_commands[]=
 	{"VIEW",	hs_cmd_view,	1, 	NS_ULEVEL_OPER,		hs_help_view},
 	{"LOGIN",	hs_cmd_login,	2, 	0,					hs_help_login},
 	{"CHPASS",	hs_cmd_chpass,	3, 	0,					hs_help_chpass},
-	{NULL,		NULL,			0, 	0,					NULL}
+	NS_CMD_END()
 };
 
 /** Bot setting table */
@@ -117,7 +117,7 @@ static bot_setting hs_settings[]=
 	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_operhosts,	NULL,			( void* )0	},
 	{"VERBOSE",	&hs_cfg.verbose,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_verbose,	NULL,			( void* )1	},
 	{"ADDLEVEL",	&hs_cfg.addlevel,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_addlevel,	NULL,			( void* )NS_ULEVEL_LOCOPER },
-	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
+	NS_SETTING_END()
 };
 
 /** BotInfo */

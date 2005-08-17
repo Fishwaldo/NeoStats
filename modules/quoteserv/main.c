@@ -88,7 +88,7 @@ static bot_cmd qs_commands[]=
 	{"DEL",		qs_cmd_del,		1, 	NS_ULEVEL_ADMIN,	qs_help_del},
 	{"LIST",	qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
 	{"QUOTE",	qs_cmd_quote,	0, 	0,		qs_help_quote},
-	{NULL,		NULL,			0, 	0,		NULL}
+	NS_CMD_END()
 };
 
 /** Bot setting table */
@@ -96,7 +96,7 @@ static bot_setting qs_settings[]=
 {
 	{ "SIGNONQUOTE",	&signonquote,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	help_set_signonquote,	qs_set_signonquote_cb,	( void* )0	},
 	{ "EXCLUSIONS",		&useexclusions,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	help_set_exclusions,	qs_set_exclusions_cb,	( void* )0	},
-	{ NULL,				NULL,			0,					0, 0, 	0,				 NULL,	NULL,			NULL		},
+	NS_SETTING_END()
 };
 
 /** BotInfo */

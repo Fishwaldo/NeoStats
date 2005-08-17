@@ -63,7 +63,7 @@ ModuleInfo module_info =
 /** Bot setting table */
 static bot_setting operlog_settings[] =
 {
-	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+	NS_SETTING_END()
 };
 
 /** BotInfo */

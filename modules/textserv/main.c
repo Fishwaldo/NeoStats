@@ -106,13 +106,13 @@ static bot_cmd ts_commands[]=
 	{"ADD",		ts_cmd_add,	3,	NS_ULEVEL_ADMIN,	ts_help_add},
 	{"DEL",		ts_cmd_del,	1, 	NS_ULEVEL_ADMIN,	ts_help_del},
 	{"LIST",	ts_cmd_list,	0, 	0,			ts_help_list},
-	{NULL,		NULL,		0, 	0,			NULL}
+	NS_CMD_END()
 };
 
 /** Bot setting table */
 static bot_setting ts_settings[]=
 {
-	{NULL,		NULL,		0,	0,	0,	0,	NULL,	NULL,	NULL},
+	NS_SETTING_END()
 };
 
 /** Sub bot comand table template */
@@ -199,7 +199,7 @@ static bot_cmd ts_commandtemplatedelchanprivate[]=
 /** Sub bot setting table template */
 static bot_setting ts_settingstemplate[]=
 {
-	{NULL,		NULL,			0,			0, 0, 		0,				 NULL,		NULL,			NULL	},
+	NS_SETTING_END()
 };
 
 /** TextServ BotInfo */

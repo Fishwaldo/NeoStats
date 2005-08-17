@@ -167,7 +167,7 @@ static bot_cmd template_commands[]=
 	template_help_hello_world,		
 	},
 	/* End command list with a NULL entry */
-	{NULL,		NULL,					0, 	0,	NULL, 			NULL}
+	NS_CMD_END()
 };
 
 static int example_setting = 0;
@@ -201,7 +201,7 @@ static bot_setting template_settings[]=
 	( void* )1 
 	},
 	/* End setting list with a NULL entry */
-	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+	NS_SETTING_END()
 };
 
 /** Define information about our bot

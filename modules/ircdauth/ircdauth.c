@@ -139,7 +139,7 @@ static int auth_cmd_authmodelist( CmdParams* cmdparams )
 bot_cmd ircdauth_commands[] =
 {
 	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist},
-	{NULL,				NULL,					0, 	0,				NULL}
+	NS_CMD_END()
 };
 
 /** @brief ModInit

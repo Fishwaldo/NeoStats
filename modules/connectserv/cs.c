@@ -144,7 +144,7 @@ static bot_setting cs_settings[] =
 	{"EXCLUSIONS",	&cs_cfg.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_exclusions, cs_set_exclusions_cb,( void* )1 },
 	{"LOGGING",	&cs_cfg.logging,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_logging, NULL,( void* )1 },
 	{"COLOUR",	&cs_cfg.colour,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_colour, NULL,( void* )1 },
-	{NULL,			NULL,				0,					0, 0, 	0,				 NULL,			NULL,	NULL	},
+	NS_SETTING_END()
 };
 
 /** BotInfo */

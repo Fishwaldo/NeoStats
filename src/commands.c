@@ -65,7 +65,7 @@ static bot_cmd intrinsic_commands[]=
 	{"ABOUT",	bot_cmd_about,	0, 	0,	cmd_help_about},
 	{"CREDITS",	bot_cmd_credits,0, 	0,	cmd_help_credits},
 	{"LEVELS",	bot_cmd_levels,	0, 	0,	cmd_help_levels},
-	{NULL,		NULL,			0, 	0,	NULL}
+	NS_CMD_END()
 };
 
 /** @brief calc_cmd_ulevel calculate cmd ulevel

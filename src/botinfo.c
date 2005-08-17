@@ -38,7 +38,7 @@ static bot_setting bot_info_settings[]=
 	{"USER",	NULL,	SET_TYPE_USER,		0, MAXUSER, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_user, bot_set_user_cb, NULL },
 	{"HOST",	NULL,	SET_TYPE_HOST,		0, MAXHOST, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_host, bot_set_host_cb, NULL },
 	{"REALNAME",NULL,	SET_TYPE_REALNAME,	0, MAXREALNAME, NS_ULEVEL_ADMIN, NULL,	ns_help_set_realname, bot_set_realname_cb, NULL },
-	{NULL,		NULL,	0,					0, 0, 			0,				 NULL,	NULL,				NULL,	NULL },
+	NS_SETTING_END()
 };
 
 /** @brief bot_set_nick_cb

@@ -78,7 +78,7 @@ static bot_cmd ls_commands[]=
 	{"ADD",		cmd_add,	1,	NS_ULEVEL_ADMIN,	help_add},
 	{"DEL",		cmd_del,	1, 	NS_ULEVEL_ADMIN,	help_del},
 	{"LIST",	cmd_list,	0, 	NS_ULEVEL_ADMIN,	help_list},
-	{NULL,		NULL,		0, 	0,					NULL}
+	NS_CMD_END()
 };
 
 /** Bot setting table */
@@ -86,7 +86,7 @@ static bot_setting ls_settings[]=
 {
 	{"JOIN",		&joinchannels,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void* )0	},
 	{"LIMITBUFFER", 	&limitbuffer, 	SET_TYPE_INT,	0, 100,		NS_ULEVEL_ADMIN, NULL,	help_set_limitbuffer, set_limitbuffer_cb, (void *)1	},
-	{NULL,		NULL,			0,					0, 0, 		0,				 NULL,	NULL,			NULL	},
+	NS_SETTING_END()
 };
 
 /** Bot info */

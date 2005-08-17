@@ -90,7 +90,7 @@ static hash_t *accesshash;
 bot_cmd extauth_commands[] =
 {
 	{"ACCESS",	ea_cmd_access,	1,	NS_ULEVEL_ROOT, ea_help_access},
-	{NULL,		NULL,			0, 	0,				NULL}
+	NS_CMD_END()
 };
 
 /** @brief dbaccesslisthandler
