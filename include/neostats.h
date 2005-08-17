@@ -1379,12 +1379,12 @@ typedef int (*DBRowHandler) ( void *data, int size );
 /* DB API */
 EXPORTFUNC int DBAOpenDatabase( void );
 EXPORTFUNC int DBACloseDatabase( void );
-EXPORTFUNC int DBAOpenTable( char *table );
-EXPORTFUNC int DBACloseTable( char *table );
-EXPORTFUNC int DBAStore( char *table, char *key, void *data, int size );
-EXPORTFUNC int DBAFetch( char *table, char *key, void *data, int size );
-EXPORTFUNC int DBADelete( char *table, char * key );
-EXPORTFUNC int DBAFetchRows( char * table, DBRowHandler handler );
+EXPORTFUNC int DBAOpenTable( const char *table );
+EXPORTFUNC int DBACloseTable( const char *table );
+EXPORTFUNC int DBAStore( const char *table, char *key, void *data, int size );
+EXPORTFUNC int DBAFetch( const char *table, char *key, void *data, int size );
+EXPORTFUNC int DBADelete( const char *table, char * key );
+EXPORTFUNC int DBAFetchRows( const char * table, DBRowHandler handler );
 /* DB API Macros to wrap common types */
 #define DBAStoreBool( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )
 #define DBAStoreInt( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )

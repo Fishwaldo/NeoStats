@@ -27,20 +27,25 @@
 #include "neostats.h"
 
 #ifndef HAVE_STRNLEN
-/* @brief find length of string up to count max
+/** @brief strnlen
  *
- * @return length of string excluding NULL or count if longer
+ *  Find length of string up to count max
  *
+ *  @param src string to find length of
+ *  @param count limit of search
+ *
+ *  @return length of string excluding NULL or count if longer
  */
+
 size_t strnlen( const char * src, size_t count )
 {
 	size_t len;
 
 	/* Run through the string until we find NULL or reach count */
-	for( len = 0; len < count; len++, src++ ) {
-		if( *src == 0 ){
+	for( len = 0; len < count; len++, src++ )
+	{
+		if( *src == 0 )
 			return len;
-		}
 	}
 	/* src is longer or equal to count so return count */
 	return count;
@@ -48,11 +53,17 @@ size_t strnlen( const char * src, size_t count )
 #endif /* HAVE_STRNLEN */
 
 #ifndef HAVE_STRLCPY
-/* @brief copy up to size-1 characters from src to dst and NULL terminate
+/** @brief strlcpy
  *
- * @return total characters written to string.
+ *  Copy up to size-1 characters from src to dst and NULL terminate
  *
+ *  @param dst to copy to
+ *  @param src to copy from
+ *  @param count max size to copy
+ *
+ *  @return total characters written to string.
  */
+
 size_t strlcpy( char *dst, const char *src, size_t size )
 {
 	size_t copycount;
@@ -74,11 +85,18 @@ size_t strlcpy( char *dst, const char *src, size_t size )
 #endif /* HAVE_STRLCPY */
 
 #ifndef HAVE_STRLCAT
-/* @brief append at most size-len( dst )-1 chars from src to dst and NULL terminate
+
+/** @brief strlcat
  *
- * @return total characters written to string.
+ *  Append at most size-len( dst )-1 chars from src to dst and NULL terminate
  *
+ *  @param dst to copy to
+ *  @param src to copy from
+ *  @param count max size to copy
+ *
+ *  @return total characters written to string.
  */
+
 size_t strlcat( char *dst, const char *src, size_t size )
 {
 	size_t lendst;
@@ -116,14 +134,19 @@ size_t strlcat( char *dst, const char *src, size_t size )
 #endif /* HAVE_STRLCAT */
 
 #ifndef HAVE_STRNDUP
-/* @brief allocate RAM and duplicate the passed string into the created buffer. 
+/** @brief strndup
+ *
+ *  allocate RAM and duplicate the passed string into the created buffer. 
  *  Always NULL terminates the new string.
  *  Suitable for partial string copies.
  *  Returned string will be count + 1 in length
  *
- * @return pointer to new string or NULL if failed to allocate
+ *  @param src to copy from
+ *  @param count max size to copy
  *
+ *  @return pointer to new string or NULL if failed to allocate
  */
+
 char *strndup( const char *src, size_t count )
 {
 	char *dup;
@@ -139,14 +162,18 @@ char *strndup( const char *src, size_t count )
 	/* Return pointer to duplicated string */
 	return dup;
 }
-#endif
+#endif /* HAVE_STRNDUP */
 
 #ifndef HAVE_STRDUP
-/* @brief allocate RAM and duplicate the passed string into the created buffer. 
+/** @brief strdup
  *
- * @return pointer to new string or NULL if failed to allocate
+ *  allocate RAM and duplicate the passed string into the created buffer. 
  *
+ *  @param src to copy from
+ *
+ *  @return pointer to new string or NULL if failed to allocate
  */
+
 char *strdup( const char *src )
 {
 	char *dup;
@@ -161,28 +188,80 @@ char *strdup( const char *src )
 	/* Return pointer to duplicated string */
 	return dup;
 }
-#endif
+#endif /* HAVE_STRDUP */
+
+#ifndef HAVE_STRCASESTR
+/** @brief strcasestr
+ *
+ *  case insensitive sub string search
+ *
+ *  @param s1 string to search
+ *  @param s2 substring to locate
+ *
+ *  @return pointer to location of substring or NULL if not found
+ */
+
+char *strcasestr( const char *s1, const char *s2 )
+{
+	while( *s1 )
+	{
+		const char *ps1 = s1;
+		const char *ps2 = s2;
+
+		while( *ps2 )
+		{
+			if( toupper( *ps2 ) != toupper( *ps1 ) ) 
+				break;
+			ps2++;
+			ps1++;
+		}
+		if( !*ps2 ) 
+			return (char *) s1;
+		s1++;
+	}
+	return NULL;
+}
+#endif /* HAVE_STRCASESTR */
 
 #ifndef HAVE_INET_NTOP
+/** @brief inet_ntop
+ *
+ *  convert IPv4 addresses between binary and text form
+ *
+ *  @param af AF_INET
+ *  @param src buffer containing IPv4 address in network byte order
+ *  @param dst buffer to store result
+ *  @param size of dst
+ *
+ *  @return pointer to the buffer containing the text string if succeeds else NULL
+ */
+
 char *inet_ntop( int af, const unsigned char *src, char *dst, size_t size )
 { 
 	static const char *fmt = "%u.%u.%u.%u";
-	char tmp[sizeof ( "255.255.255.255" )];
+	char tmp[ sizeof( "255.255.255.255" )];
 
 	if ( ( size_t ) sprintf( tmp, fmt, src[0], src[1], src[2], src[3] ) >= size )
 		return NULL;
 	strlcpy( dst, tmp, size );
 	return dst;
 }
-#endif
+#endif /* HAVE_INET_NTOP */
 
 #ifndef HAVE_INET_ATON
-/* Convert from "a.b.c.d" IP address string into an in_addr structure.  
- * Return 0 on failure, 1 on success.
+/** @brief inet_ntop
+ *
+ *  Convert from "a.b.c.d" IP address string into an in_addr structure.  
+ *
+ *  @param 
+ *  @param 
+ *
+ *  @return 0 on failure, 1 on success.
  */
+
 int inet_aton( const char *name, struct in_addr *addr )
 {
     addr->s_addr = inet_addr( name );
     return ( addr->s_addr == INADDR_NONE  ? 0 : 1 );
 }
-#endif
+#endif /* HAVE_INET_ATON */

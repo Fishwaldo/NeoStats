@@ -249,7 +249,7 @@ int DBACloseDatabase( void )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBAOpenTable( char *table )
+int DBAOpenTable( const char *table )
 {
 	dbentry *dbe;
 	tableentry *tbe;
@@ -285,7 +285,7 @@ int DBAOpenTable( char *table )
  *  @return table entry or NULL for none
  */
 
-static tableentry *DBAFetchTableEntry( char *table )
+static tableentry *DBAFetchTableEntry( const char *table )
 {
 	dbentry *dbe;
 	tableentry *tbe;
@@ -318,7 +318,7 @@ static tableentry *DBAFetchTableEntry( char *table )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBACloseTable( char *table )
+int DBACloseTable( const char *table )
 {
 	dbentry *dbe;
 	tableentry *tbe;
@@ -356,7 +356,7 @@ int DBACloseTable( char *table )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBAFetch( char *table, char *key, void *data, int size )
+int DBAFetch( const char *table, char *key, void *data, int size )
 {
 	tableentry *tbe;
 
@@ -379,7 +379,7 @@ int DBAFetch( char *table, char *key, void *data, int size )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBAStore( char *table, char *key, void *data, int size )
+int DBAStore( const char *table, char *key, void *data, int size )
 {
 	tableentry *tbe;
 
@@ -400,7 +400,7 @@ int DBAStore( char *table, char *key, void *data, int size )
  *  @return number of rows processed by handler
  */
 
-int DBAFetchRows( char *table, DBRowHandler handler )
+int DBAFetchRows( const char *table, DBRowHandler handler )
 {
 	tableentry *tbe;
 
@@ -421,7 +421,7 @@ int DBAFetchRows( char *table, DBRowHandler handler )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBADelete( char *table, char *key )
+int DBADelete( const char *table, char *key )
 {
 	tableentry *tbe;
 

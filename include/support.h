@@ -37,8 +37,11 @@ EXPORTFUNC size_t strlcat( char *dst, const char *src, size_t size );
 EXPORTFUNC char *strndup( const char *src, size_t count );
 #endif /* HAVE_STRNDUP */
 #ifndef HAVE_STRDUP
-char *strdup( const char *src );
+EXPORTFUNC char *strdup( const char *src );
 #endif /* HAVE_STRDUP */
+#ifndef HAVE_STRCASESTR
+EXPORTFUNC char *strcasestr( const char *s1, const char *s2 );
+#endif /* HAVE_STRCASESTR */
 #ifndef HAVE_INET_NTOP
 EXPORTFUNC char *inet_ntop( int af, const unsigned char *src, char *dst, size_t size ); 
 #endif /* HAVE_INET_NTOP */
@@ -51,7 +54,7 @@ struct timezone {
 	int tz_dsttime;
 };
 
-int gettimeofday(struct timeval *tv, struct timezone *tz);
+EXPORTFUNC int gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif /* HAVE_GETTIMEOFDAY */
 
 

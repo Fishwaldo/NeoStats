@@ -22389,10 +22389,12 @@ rm -f conftest*
 
 
 
+
 for ac_func in socket \
                 select \
                 strdup \
                 strstr \
+                strcasestr \
                 strtok_r \
                 strftime \
                 uname \
