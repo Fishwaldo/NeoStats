@@ -150,6 +150,7 @@ static int qs_read_database( database *db )
 		len = strlen( buf );
 		if( len == 0 )
 			continue;
+		len++;
 		ptr = ns_malloc( len );
 		if( ircstrncasecmp( buf, "PREFIX:", 7 ) == 0 )
 		{
