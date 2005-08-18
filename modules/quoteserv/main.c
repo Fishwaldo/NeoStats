@@ -23,7 +23,6 @@
 
 /*  TODO:
  *  - Database sanity checking
- *  - Free allocs made during database load
  */
 
 #include "neostats.h"
@@ -142,19 +141,34 @@ static int qs_read_database( database *db )
 		return NS_SUCCESS;
 	while( os_fgets( buf, BUFSIZE*4, fp ) != NULL )
 	{
+		int len;
+		
 		/* comment char */
 		if( buf[0] == '#' )
 			continue;
-		/* TODO: memory leak if prefix/suffix used due to multiple strdup calls */
-		ptr = strdup(buf);
-		strip(ptr);
-		dlog( DEBUG1, "read %s", ptr );
+		dlog( DEBUG1, "read %s", buf );
+		len = strlen( buf );
+		if( len == 0 )
+			continue;
+		ptr = ns_malloc( len );
 		if( ircstrncasecmp( buf, "PREFIX:", 7 ) == 0 )
-			db->prefixstring = strdup(ptr + 7);
+		{
+			len -= 7;
+			strlcpy( ( ptr + 7 ), buf, len );
+			db->prefixstring = ptr;
+		}
 		else if( ircstrncasecmp( buf, "SUFFIX:", 7 ) == 0 )
-			db->suffixstring = strdup(ptr + 7);
+		{
+			len -= 7;
+			strlcpy( ( ptr + 7 ), buf, len );
+			db->suffixstring = len;
+		}
 		else
+		{
+			strlcpy( ptr, buf, len );
 			AddStringToList( &db->stringlist, ptr, &db->stringcount );
+		}
+		strip(ptr);
 	}	
 	os_fclose( fp );
 	return NS_SUCCESS;
