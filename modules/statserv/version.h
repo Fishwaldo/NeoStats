@@ -31,10 +31,10 @@ typedef struct ctcpversionstat {
 
 extern list_t *versionstatlist;
 
-int topcurrentversions(const void *key1, const void *key2);
-int ss_cmd_userversion(CmdParams *cmdparams);
-int ss_event_ctcpversion(CmdParams *cmdparams);
-void InitVersionStats (void);
-void FiniVersionStats (void);
+int topcurrentversions( const void *key1, const void *key2 );
+int ss_cmd_userversion( const CmdParams *cmdparams );
+int ss_event_ctcpversion( const CmdParams *cmdparams );
+void InitVersionStats( void );
+void FiniVersionStats( void );
 
 #endif /* _VERSION_H_ */

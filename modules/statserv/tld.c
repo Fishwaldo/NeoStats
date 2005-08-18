@@ -200,7 +200,7 @@ int new_tld( void *data, int size )
 
 int LoadTLDStats (void)
 {
-	DBAFetchRows ("TLD", new_tld);
+	DBAFetchRows (TLD_TABLE, new_tld);
 	return NS_SUCCESS;
 }
 
