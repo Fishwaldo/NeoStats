@@ -22,7 +22,7 @@
 */
 
 /*  TODO:
- *  - Database sanity checking
+ *  - Nothing at present
  */
 
 #include "neostats.h"
@@ -172,8 +172,35 @@ static int qs_read_database( database *db )
 		strip(ptr);
 	}	
 	os_fclose( fp );
+	if( db->stringcount < 1)
+		return NS_FAILURE;
 	return NS_SUCCESS;
 }
+
+
+/** @brief qs_free_database
+ *
+ *  Free a database file
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int qs_free_database( database *db )
+{
+	int i;
+
+	ns_free( db->prefixstring );
+	ns_free( db->suffixstring );
+	for (i = 0; i < db->stringcount; i++) {
+		ns_free( db->stringlist[i] );
+	}
+	ns_free( db->stringlist );
+	ns_free( db );
+	return NS_SUCCESS;
+}
+
 
 /** @brief load_database
  *
@@ -190,8 +217,10 @@ static int load_database( void *data, int size )
 
 	db = ns_calloc( sizeof( database ) );
 	os_memcpy( &db->name, data, MAXNICK );
-	hnode_create_insert( qshash, db, db->name );
-	qs_read_database( db );
+	if( qs_read_database( db ) == NS_FAILURE )
+		qs_free_database( db );
+	else
+		hnode_create_insert( qshash, db, db->name );
 	return NS_FALSE;
 }
 
@@ -250,7 +279,6 @@ int ModFini( void )
 	database *db;
 	hnode_t *hn;
 	hscan_t hs;
-	int i;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
@@ -258,13 +286,7 @@ int ModFini( void )
 		db = ( ( database * )hnode_get( hn ) );
 		hash_delete( qshash, hn );
 		hnode_destroy( hn );
-		ns_free( db->prefixstring );
-		ns_free( db->suffixstring );
-		for (i = 0; i < db->stringcount; i++) {
-			ns_free( db->stringlist[i] );
-		}
-		ns_free( db->stringlist );
-		ns_free( db );
+		qs_free_database( db );
 	}
 	hash_destroy( qshash );
 	return NS_SUCCESS;
@@ -304,8 +326,13 @@ static int qs_cmd_add( const CmdParams *cmdparams )
 	os_fclose( fp );
 	db = ns_calloc( sizeof( database ) );
 	strlcpy( db->name, cmdparams->av[0], MAXNICK );
+	if( qs_read_database( db ) == NS_FAILURE )
+	{
+		qs_free_database( db );
+		irc_prefmsg( qs_bot, cmdparams->source, "%s has no records, not added.", cmdparams->av[0] );
+		return NS_SUCCESS;
+	}
 	hnode_create_insert( qshash, db, db->name );
-	qs_read_database( db );
 	DBAStore( "databases", db->name,( void * )db->name, MAXNICK );
 	return NS_SUCCESS;
 }
@@ -429,10 +456,6 @@ static int do_quote( const Client *target, const char *which, int reporterror )
 			irc_prefmsg( qs_bot, target, "not available" );
 		return NS_SUCCESS;
 	}
-	/* return if no records in selected database */
-	/* TODO: This should be checked at DB load time, not during command execution! */
-	if( db->stringcount < 1 )
-		return NS_FAILURE;
 	randno = hrand( db->stringcount, 1 );	
 	if( db->prefixstring )
 		flag |= 1 << 0;
