@@ -48,8 +48,8 @@ struct cs_cfg
 /** Message structure */
 typedef struct msg
 {
-	const char *colour;
-	const char *nocolour;
+	const char *format;
+	const char *formatcolour;
 } msg;
 
 /** Message format lookup indices */
@@ -122,7 +122,7 @@ static const msg msg_format[]=
 	},
 };
 
-#define CS_MSG( x ) ( cs_cfg.colour == 1 ? msg_format[x].colour : msg_format[x].nocolour )
+#define CS_MSG( x ) ( cs_cfg.colour == 1 ? msg_format[x].formatcolour : msg_format[x].format )
 
 /** Bot event function prototypes */
 static int cs_event_signon( const CmdParams *cmdparams );
