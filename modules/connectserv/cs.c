@@ -24,18 +24,14 @@
 */
 
 /*  TODO:
- *  - Improve colour selection, should be configure time rather 
- *    than source change.
+ *  - Nothing at present
  */
 
 #include "neostats.h"
 #include "cs.h"
 
-/* Uncomment this line to enable colours in ConnectServ channel messages */
-#define ENABLE_COLOUR_SUPPORT
-
 /** local structures */
-/** Configuration structure  */
+/** Configuration structure */
 struct cs_cfg 
 { 
 	int sign_watch;
@@ -49,61 +45,106 @@ struct cs_cfg
 	int colour;
 } cs_cfg;
 
-
-typedef struct msg {
-	char colour[BUFSIZE];
-	char nocolour[BUFSIZE];
+/** Message structure */
+typedef struct msg
+{
+	const char *colour;
+	const char *nocolour;
 } msg;
 
+/** Message format lookup indices */
+typedef enum MSG_INDEX
+{
+	MSG_NICKCHANGE,
+	MSG_AWAY,
+	MSG_SIGNON,
+	MSG_SIGNOFF,
+	MSG_LOCALKILL,
+	MSG_GLOBALKILL,
+	MSG_SERVERKILL,
+	MSG_MODE,
+	MSG_MODE_SERV,
+	MSG_BOT,
+	MSG_SERVER,
+	MSG_SQUIT,
+} MSG_INDEX;
 
-static msg msg_nickchange ={"\2\0037NICK\2 user: \2%s\2 (%s@%s) changed their nick to \2%s\2\003",  
-			"\2NICK\2 %s (%s@%s) changed their nick to %s" };
-static msg msg_away = 	{"\2AWAY\2 %s (%s@%s) is %s away %s",
-	  	     	"\2AWAY\2 %s (%s@%s) is %s away %s"};
-static msg msg_signon = {"\2\0034SIGNON\2 user: \2%s\2 (%s@%s %s) at \2%s\2\003",
-			"\2SIGNON\2 %s (%s@%s %s) signed on at %s"};
-static msg msg_signoff ={"\2\0033SIGNOFF\2 user: %s (%s@%s %s) at %s %s\003",
-			"\2SIGNOFF\2 %s (%s@%s %s) signed off at %s %s"};
-static msg msg_localkill = 	{"\2\00312LOCAL KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003",
-				"\2LOCAL KILL\2 %s (%s@%s) killed by %s for \2%s\2"};
-static msg msg_globalkill = 	{"\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003",
-				"\2GLOBAL KILL\2 %s (%s@%s) killed by %s for \2%s\2"};
-static msg msg_serverkill = 	{"\2\00312SERVER KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003",
-				"\2SERVER KILL\2 %s (%s@%s) killed by %s for \2%s\2"};  
-static msg msg_mode = 	{"\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003",
-			"\2MODE\2 %s is %s a %s (%c%c)"};
-static msg msg_mode_serv = 	{"\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003",
-				"\2MODE\2 %s is %s a %s (%c%c) on %s"};
-static msg msg_bot = 	{"\2\00313BOT\2 %s is \2%s\2 a \2Bot\2 (%c%c)\003",
-			"\2BOT\2 %s is %s a Bot (%c%c)"};
-static msg msg_server = {"\2SERVER\2 %s joined the network at %s",
-			"\2SERVER\2 %s joined the network at %s"};
-static msg msg_squit = 	{"\2SERVER\2 %s left the network at %s for %s",
-			"\2SERVER\2 %s left the network at %s for %s"};
+/** Message format lookup table */
+static const msg msg_format[]=
+{	
+	{/* MSG_NICKCHANGE */
+	 /* NORMAL */ "\2NICK\2 %s (%s@%s) changed their nick to %s",
+	 /* COLOUR */ "\2\0037NICK\2 user: \2%s\2 (%s@%s) changed their nick to \2%s\2\003"
+	},	
+	{/* MSG_AWAY */
+	 /* NORMAL */ "\2AWAY\2 %s (%s@%s) is %s away %s",
+	 /* COLOUR */ "\2AWAY\2 %s (%s@%s) is %s away %s"
+	},	
+	{/* MSG_SIGNON */
+	 /* NORMAL */ "\2SIGNON\2 %s (%s@%s %s) signed on at %s",
+	 /* COLOUR */ "\2\0034SIGNON\2 user: \2%s\2 (%s@%s %s) at \2%s\2\003"
+	},	
+	{/* MSG_SIGNOFF */
+	 /* NORMAL */ "\2SIGNOFF\2 %s (%s@%s %s) signed off at %s %s",
+	 /* COLOUR */ "\2\0033SIGNOFF\2 user: %s (%s@%s %s) at %s %s\003"
+	},	
+	{/* MSG_LOCALKILL */
+	 /* NORMAL */ "\2LOCAL KILL\2 %s (%s@%s) killed by %s for \2%s\2",
+	 /* COLOUR */ "\2\00312LOCAL KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003"
+	},	
+	{/* MSG_GLOBALKILL */
+	 /* NORMAL */ "\2GLOBAL KILL\2 %s (%s@%s) killed by %s for \2%s\2",
+	 /* COLOUR */ "\2\00312GLOBAL KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003"
+	},	
+	{/* MSG_SERVERKILL */
+	 /* NORMAL */ "\2SERVER KILL\2 %s (%s@%s) killed by %s for \2%s\2",
+	 /* COLOUR */ "\2\00312SERVER KILL\2 user: \2%s\2 (%s@%s) killed by \2%s\2 for \2%s\2\003"
+	},	
+	{/* MSG_MODE */
+	 /* NORMAL */ "\2MODE\2 %s is %s a %s (%c%c)",
+	 /* COLOUR */ "\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c)\003"
+	},	
+	{/* MSG_MODE_SERV */
+	 /* NORMAL */ "\2MODE\2 %s is %s a %s (%c%c) on %s",
+	 /* COLOUR */ "\2\00313%s\2 is \2%s\2 a \2%s\2 (%c%c) on \2%s\2\003"
+	},	
+	{/* MSG_BOT */
+	 /* NORMAL */ "\2BOT\2 %s is %s a Bot (%c%c)",
+	 /* COLOUR */ "\2\00313BOT\2 %s is \2%s\2 a \2Bot\2 (%c%c)\003"
+	},	
+	{/* MSG_SERVER */
+	 /* NORMAL */ "\2SERVER\2 %s joined the network at %s",
+	 /* COLOUR */ "\2SERVER\2 %s joined the network at %s"
+	},	
+	{/* MSG_SQUIT */
+	 /* NORMAL */ "\2SERVER\2 %s left the network at %s for %s",
+	 /* COLOUR */ "\2SERVER\2 %s left the network at %s for %s"
+	},
+};
 
-#define GET_MSG(x) (cs_cfg.colour == 1 ? x.colour : x.nocolour)
+#define CS_MSG( x ) ( cs_cfg.colour == 1 ? msg_format[x].colour : msg_format[x].nocolour )
 
 /** Bot event function prototypes */
-static int cs_event_signon( CmdParams *cmdparams );
-static int cs_event_umode( CmdParams *cmdparams );
-static int cs_event_smode( CmdParams *cmdparams );
-static int cs_event_quit( CmdParams *cmdparams );
-static int cs_event_localkill( CmdParams *cmdparams );
-static int cs_event_globalkill( CmdParams *cmdparams );
-static int cs_event_serverkill( CmdParams *cmdparams );
-static int cs_event_nick( CmdParams *cmdparams );
-static int cs_event_away( CmdParams *cmdparams );
-static int cs_event_server( CmdParams *cmdparams );
-static int cs_event_squit( CmdParams *cmdparams );
+static int cs_event_signon( const CmdParams *cmdparams );
+static int cs_event_umode( const CmdParams *cmdparams );
+static int cs_event_smode( const CmdParams *cmdparams );
+static int cs_event_quit( const CmdParams *cmdparams );
+static int cs_event_localkill( const CmdParams *cmdparams );
+static int cs_event_globalkill( const CmdParams *cmdparams );
+static int cs_event_serverkill( const CmdParams *cmdparams );
+static int cs_event_nick( const CmdParams *cmdparams );
+static int cs_event_away( const CmdParams *cmdparams );
+static int cs_event_server( const CmdParams *cmdparams );
+static int cs_event_squit( const CmdParams *cmdparams );
 
 /** Set callbacks */
-static int cs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_serv_watch_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_sign_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_kill_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_mode_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_nick_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_away_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_serv_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 /** Bot pointer */
 static Bot *cs_bot;
@@ -143,7 +184,7 @@ static bot_setting cs_settings[] =
 	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_servwatch, cs_set_serv_watch_cb,( void* )1 },
 	{"EXCLUSIONS",	&cs_cfg.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_exclusions, cs_set_exclusions_cb,( void* )1 },
 	{"LOGGING",	&cs_cfg.logging,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_logging, NULL,( void* )1 },
-	{"COLOUR",	&cs_cfg.colour,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_colour, NULL,( void* )1 },
+	{"COLOUR",	&cs_cfg.colour,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_colour, NULL,( void* )0 },
 	NS_SETTING_END()
 };
 
@@ -240,7 +281,7 @@ int ModFini( void )
  *  @return none
  */
 
-void cs_report( const char *fmt, ... )
+static void cs_report( const char *fmt, ... )
 {
 	static char buf[BUFSIZE];
 	va_list ap;
@@ -263,11 +304,11 @@ void cs_report( const char *fmt, ... )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_signon( CmdParams *cmdparams )
+static int cs_event_signon( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	/* Print Connection Notice */
-	cs_report( GET_MSG(msg_signon), cmdparams->source->name, 
+	cs_report( CS_MSG( MSG_SIGNON ), cmdparams->source->name, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		cmdparams->source->info, cmdparams->source->uplink->name );
 	return NS_SUCCESS;
@@ -283,11 +324,11 @@ static int cs_event_signon( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_quit( CmdParams *cmdparams )
+static int cs_event_quit( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	/* Print Disconnection Notice */
-	cs_report( GET_MSG(msg_signoff), cmdparams->source->name, 
+	cs_report( CS_MSG( MSG_SIGNOFF ), cmdparams->source->name, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		cmdparams->source->info, cmdparams->source->uplink->name, 
 		cmdparams->param );
@@ -304,10 +345,10 @@ static int cs_event_quit( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_localkill( CmdParams *cmdparams )
+static int cs_event_localkill( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	cs_report( GET_MSG(msg_localkill), cmdparams->target->name, 
+	cs_report( CS_MSG( MSG_LOCALKILL ), cmdparams->target->name, 
 		cmdparams->target->user->username, cmdparams->target->user->hostname,
 		cmdparams->source->name, cmdparams->param );
 	return NS_SUCCESS;
@@ -323,10 +364,10 @@ static int cs_event_localkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_globalkill( CmdParams *cmdparams )
+static int cs_event_globalkill( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	cs_report( GET_MSG(msg_globalkill), cmdparams->target->name, 
+	cs_report( CS_MSG( MSG_GLOBALKILL ), cmdparams->target->name, 
 		cmdparams->target->user->username, cmdparams->target->user->hostname,
 		cmdparams->source->name, cmdparams->param );
 	return NS_SUCCESS;
@@ -342,10 +383,10 @@ static int cs_event_globalkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_serverkill( CmdParams *cmdparams )
+static int cs_event_serverkill( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	cs_report( GET_MSG(msg_serverkill), cmdparams->target->name, 
+	cs_report( CS_MSG( MSG_SERVERKILL ), cmdparams->target->name, 
 		cmdparams->target->user->username, cmdparams->target->user->hostname,
 		cmdparams->source->name, cmdparams->param );
 	return NS_SUCCESS;
@@ -360,11 +401,11 @@ static int cs_event_serverkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_report_mode( const char *modedesc, int serverflag, Client *u, int mask, int add, char mode )
+static int cs_report_mode( const char *modedesc, const int serverflag, const Client *u, const int mask, const int add, const char mode )
 {
 	if( serverflag ) 
 	{
-		cs_report( GET_MSG(msg_mode_serv), u->name, 
+		cs_report( CS_MSG( MSG_MODE_SERV ), u->name, 
 			add ? "now" : "no longer", 
 			modedesc,
 			add ? '+' : '-',
@@ -372,7 +413,7 @@ static int cs_report_mode( const char *modedesc, int serverflag, Client *u, int 
 	} 
 	else 
 	{
-		cs_report( GET_MSG(msg_mode), u->name, 
+		cs_report( CS_MSG( MSG_MODE ), u->name, 
 			add ? "now" : "no longer", 
 			modedesc,
 			add ? '+' : '-',
@@ -391,10 +432,10 @@ static int cs_report_mode( const char *modedesc, int serverflag, Client *u, int 
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_umode( CmdParams *cmdparams )
+static int cs_event_umode( const CmdParams *cmdparams )
 {
 	/* Mask of modes we will handle */
-	static unsigned int OperUmodes = 
+	static const unsigned int OperUmodes = 
 		UMODE_NETADMIN |
 		UMODE_TECHADMIN |
 		UMODE_ADMIN |
@@ -405,11 +446,12 @@ static int cs_event_umode( CmdParams *cmdparams )
 		UMODE_SERVICES;
 	int mask;
 	int add = 1;
-	char *modes;
+	const char *modes;
 
 	SET_SEGV_LOCATION();
 	modes = cmdparams->param;
-	while( *modes ) {
+	while( *modes )
+	{
 		switch( *modes ) 
 		{
 			case '+':
@@ -421,7 +463,7 @@ static int cs_event_umode( CmdParams *cmdparams )
 			default:
 				mask = UmodeCharToMask( *modes );
 				if( mask & UMODE_BOT )
-					cs_report( GET_MSG(msg_bot), cmdparams->source->name, add ? "now" : "no longer", add ? '+' : '-', *modes );			
+					cs_report( CS_MSG( MSG_BOT ), cmdparams->source->name, add ? "now" : "no longer", add ? '+' : '-', *modes );
 				else if( OperUmodes & mask )
 					cs_report_mode( GetUmodeDesc( mask ), IsServerOperMode( mask ), cmdparams->source, mask, add, *modes );
 				break;
@@ -441,10 +483,10 @@ static int cs_event_umode( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_smode( CmdParams *cmdparams )
+static int cs_event_smode( const CmdParams *cmdparams )
 {
 	/* Mask of modes we will handle */
-	static unsigned int OperSmodes =
+	static const unsigned int OperSmodes =
 		SMODE_NETADMIN |
 		SMODE_CONETADMIN |
 		SMODE_TECHADMIN |
@@ -454,11 +496,12 @@ static int cs_event_smode( CmdParams *cmdparams )
 		SMODE_GUESTADMIN;
 	int mask;
 	int add = 1;
-	char *modes;
+	const char *modes;
 
 	SET_SEGV_LOCATION();
 	modes = cmdparams->param;
-	while( *modes ) {
+	while( *modes )
+	{
 		switch( *modes ) 
 		{
 			case '+':
@@ -488,10 +531,10 @@ static int cs_event_smode( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_nick( CmdParams *cmdparams )
+static int cs_event_nick( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	cs_report( GET_MSG(msg_nickchange), cmdparams->param, 
+	cs_report( CS_MSG( MSG_NICKCHANGE ), cmdparams->param, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		cmdparams->source->name );
 	return NS_SUCCESS;
@@ -507,10 +550,10 @@ static int cs_event_nick( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_away( CmdParams *cmdparams )
+static int cs_event_away( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	cs_report( GET_MSG(msg_away), cmdparams->source->name, 
+	cs_report( CS_MSG( MSG_AWAY ), cmdparams->source->name, 
 		cmdparams->source->user->username, cmdparams->source->user->hostname, 
 		IsAway( cmdparams->source ) ? "now" : "no longer", cmdparams->source->user->awaymsg );
 	return NS_SUCCESS;
@@ -526,10 +569,10 @@ static int cs_event_away( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_server( CmdParams *cmdparams )
+static int cs_event_server( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	cs_report( GET_MSG(msg_server), cmdparams->source->name, cmdparams->source->uplink->name );
+	cs_report( CS_MSG( MSG_SERVER ), cmdparams->source->name, cmdparams->source->uplink->name );
 	return NS_SUCCESS;
 }
 
@@ -543,10 +586,10 @@ static int cs_event_server( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_squit( CmdParams *cmdparams )
+static int cs_event_squit( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	cs_report( GET_MSG(msg_squit), cmdparams->source->name, cmdparams->source->uplink->name, 
+	cs_report( CS_MSG( MSG_SQUIT ), cmdparams->source->name, cmdparams->source->uplink->name, 
 		cmdparams->param ? cmdparams->param : "reason unknown" );
 	return NS_SUCCESS;
 }
@@ -562,7 +605,7 @@ static int cs_event_squit( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -582,7 +625,7 @@ static int cs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_sign_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -611,7 +654,7 @@ static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_kill_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -642,7 +685,7 @@ static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_mode_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -671,7 +714,7 @@ static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_nick_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -698,7 +741,7 @@ static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_away_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -725,7 +768,7 @@ static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_serv_watch_cb( CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_serv_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
