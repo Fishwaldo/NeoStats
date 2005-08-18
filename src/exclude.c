@@ -38,7 +38,7 @@
 #include "helpstrings.h"
 
 /* Prototype for module exclude command handler */
-static int mod_cmd_exclude( CmdParams *cmdparams );
+static int mod_cmd_exclude( const CmdParams *cmdparams );
 
 /* Exclude types */
 typedef enum NS_EXCLUDE
@@ -97,7 +97,7 @@ bot_cmd mod_exclude_commands[] =
  *  @return none
  */
 
-static void new_exclude( list_t *exclude_list, void *data )
+static void new_exclude( list_t *exclude_list, const void *data )
 {
 	Exclude *exclude;
 
@@ -118,7 +118,7 @@ static void new_exclude( list_t *exclude_list, void *data )
  *  @return none
  */
 
-static int new_global_exclude( void *data, int size )
+static int new_global_exclude( const void *data, int size )
 {
 	new_exclude( exclude_list, data );
 	return NS_FALSE;
@@ -135,7 +135,7 @@ static int new_global_exclude( void *data, int size )
  *  @return none
  */
 
-static int new_mod_exclude( void *data, int size )
+static int new_mod_exclude( const void *data, int size )
 {
 	new_exclude( excludelists[GET_CUR_MODNUM()], data );
 	return NS_FALSE;
@@ -242,7 +242,7 @@ void AddBotExcludeCommands( Bot *botptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int do_exclude_add( list_t *exclude_list, CmdParams* cmdparams )
+static int do_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 {
 	NS_EXCLUDE type;
 	char *buf;
@@ -340,7 +340,7 @@ static int do_exclude_add( list_t *exclude_list, CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_exclude_add( CmdParams* cmdparams ) 
+static int ns_cmd_exclude_add( const CmdParams *cmdparams ) 
 {
 	return do_exclude_add( exclude_list, cmdparams );
 } 
@@ -356,7 +356,7 @@ static int ns_cmd_exclude_add( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int mod_cmd_exclude_add( CmdParams *cmdparams )
+static int mod_cmd_exclude_add( const CmdParams *cmdparams )
 {
 	return do_exclude_add( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
 }
@@ -374,7 +374,7 @@ static int mod_cmd_exclude_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int do_exclude_del( list_t *exclude_list, CmdParams* cmdparams ) 
+static int do_exclude_del( list_t *exclude_list, const CmdParams *cmdparams ) 
 {
 	lnode_t *node;
 	Exclude *exclude;
@@ -412,7 +412,7 @@ static int do_exclude_del( list_t *exclude_list, CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_exclude_del( CmdParams* cmdparams ) 
+static int ns_cmd_exclude_del( const CmdParams *cmdparams ) 
 {
 	return do_exclude_del( exclude_list, cmdparams );
 } 
@@ -428,7 +428,7 @@ static int ns_cmd_exclude_del( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int mod_cmd_exclude_del( CmdParams *cmdparams )
+static int mod_cmd_exclude_del( const CmdParams *cmdparams )
 {
 	return do_exclude_del( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
 }
@@ -445,7 +445,7 @@ static int mod_cmd_exclude_del( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int do_exclude_list( list_t *exclude_list, CmdParams* cmdparams ) 
+static int do_exclude_list( list_t *exclude_list, const CmdParams *cmdparams ) 
 {
 	lnode_t *node;
 	Exclude *exclude;
@@ -473,7 +473,7 @@ static int do_exclude_list( list_t *exclude_list, CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_exclude_list( CmdParams* cmdparams ) 
+static int ns_cmd_exclude_list( const CmdParams *cmdparams ) 
 {
 	return do_exclude_list( exclude_list, cmdparams );
 } 
@@ -489,7 +489,7 @@ static int ns_cmd_exclude_list( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int mod_cmd_exclude_list( CmdParams *cmdparams )
+static int mod_cmd_exclude_list( const CmdParams *cmdparams )
 {
 	return do_exclude_list( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
 }
@@ -506,7 +506,7 @@ static int mod_cmd_exclude_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_exclude( CmdParams* cmdparams ) 
+int ns_cmd_exclude( const CmdParams *cmdparams ) 
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
@@ -530,7 +530,7 @@ int ns_cmd_exclude( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int mod_cmd_exclude( CmdParams *cmdparams )
+static int mod_cmd_exclude( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
@@ -669,7 +669,7 @@ void ns_do_exclude_chan( Channel *c )
  *  @return NS_TRUE if excluded else NS_FALSE if not
  */
 
-int ModIsServerExcluded( Client *s )
+int ModIsServerExcluded( const Client *s )
 {
 	lnode_t *node;
 	Exclude *exclude;
@@ -701,7 +701,7 @@ int ModIsServerExcluded( Client *s )
  *  @return NS_TRUE if excluded else NS_FALSE if not
  */
 
-int ModIsUserExcluded( Client *u ) 
+int ModIsUserExcluded( const Client *u ) 
 {
 	lnode_t *node;
 	Exclude *exclude;
@@ -759,7 +759,7 @@ int ModIsUserExcluded( Client *u )
  *  @return NS_TRUE if excluded else NS_FALSE if not
  */
 
-int ModIsChannelExcluded( Channel *c ) 
+int ModIsChannelExcluded( const Channel *c ) 
 {
 	lnode_t *node;
 	Exclude *exclude;

@@ -559,7 +559,7 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 	return( tarindex );
 }
 
-int decode_ip( char *buf )
+int decode_ip( const char *buf )
 {
 	int len = strlen( buf );
 	char targ[25];

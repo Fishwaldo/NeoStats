@@ -33,6 +33,6 @@ void FiniModExcludes( Module *mod_ptr );
 void ns_do_exclude_chan( Channel *c );
 void ns_do_exclude_server( Client *s );
 void ns_do_exclude_user( Client *u );
-int ns_cmd_exclude( CmdParams* cmdparams );
+int ns_cmd_exclude( const CmdParams *cmdparams );
 
 #endif /* _EXCLUDE_H_ */

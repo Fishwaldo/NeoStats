@@ -121,7 +121,7 @@ int ModFini (void)
  *  @return authentication level for user
  */
 
-int ModAuthUser( Client * u )
+int ModAuthUser( const Client *u )
 {
 	return 0;
 }

@@ -75,7 +75,7 @@ static bot_cmd intrinsic_commands[]=
  *  @param pointer to command structure
  *  @return command user level requires
  */
-static int calc_cmd_ulevel( bot_cmd *cmd_ptr )
+static int calc_cmd_ulevel( const bot_cmd *cmd_ptr )
 {
 	if( cmd_ptr->ulevel > NS_ULEVEL_ROOT ) {
 		/* int pointer rather than value */
@@ -93,7 +93,7 @@ static int calc_cmd_ulevel( bot_cmd *cmd_ptr )
  *  @return command user level requires
  */
 
-int getuserlevel( CmdParams *cmdparams )
+int getuserlevel( const CmdParams *cmdparams )
 {
 	int ulevel = 0;
 	int modlevel = 0;
@@ -296,7 +296,7 @@ int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int add_bot_cmd_list( Bot* bot_ptr, bot_cmd *bot_cmd_list ) 
+int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list ) 
 {
 	if( !bot_cmd_list ) {
 		return NS_FAILURE;
@@ -550,8 +550,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int 
-bot_cmd_help_set( CmdParams *cmdparams, int userlevel )
+static int bot_cmd_help_set( CmdParams *cmdparams, int userlevel )
 {
 	hnode_t *setnode;
 	hscan_t hs;
@@ -594,8 +593,7 @@ static void bot_cmd_help_on_help( CmdParams *cmdparams )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int 
-bot_cmd_help( CmdParams *cmdparams )
+static int bot_cmd_help( CmdParams *cmdparams )
 {
 	char *curlevelmsg=NULL;
 	int donemsg=0;
@@ -733,9 +731,9 @@ bot_cmd_help( CmdParams *cmdparams )
 /**	Support function for command handlers to call to check that target nick 
  *	is not the bot and is on IRC. Done in core to avoid module code bloat.
  */ 
-Client * FindValidUser( Bot* botptr, Client * sourceuser, const char *target_nick )
+Client *FindValidUser( const Bot *botptr, const Client *sourceuser, const char *target_nick )
 {
-	Client * target;
+	Client *target;
 	
 	/* Check target user is on IRC */
 	target = FindUser( target_nick );

@@ -28,7 +28,7 @@
  *  User authentication based on nick!user@host masking
  */
 
-static int ea_cmd_access( CmdParams* cmdparams );
+static int ea_cmd_access( const CmdParams *cmdparams );
 
 /** Access list struct */
 typedef struct AccessEntry
@@ -136,7 +136,7 @@ static void LoadAccessList( void )
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int AccessAdd( CmdParams* cmdparams )
+static int AccessAdd( const CmdParams *cmdparams )
 {
 	int level = 0;
 	AccessEntry *access;
@@ -182,7 +182,7 @@ static int AccessAdd( CmdParams* cmdparams )
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int AccessDel( CmdParams *cmdparams )
+static int AccessDel( const CmdParams *cmdparams )
 {
 	hnode_t *node;
 
@@ -217,7 +217,7 @@ static int AccessDel( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int AccessList( CmdParams *cmdparams )
+static int AccessList( const CmdParams *cmdparams )
 {
 	hscan_t accessscan;
 	hnode_t *node;
@@ -244,7 +244,7 @@ static int AccessList( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int ea_cmd_access( CmdParams *cmdparams )
+static int ea_cmd_access( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) ) 
@@ -304,7 +304,7 @@ int ModSynch( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini( void)
+int ModFini( void )
 {
 	del_services_cmd_list( extauth_commands );
 	return NS_SUCCESS;
@@ -319,7 +319,7 @@ int ModFini( void)
  *  @return authentication level for user
  */
 
-int ModAuthUser( Client *u )
+int ModAuthUser( const Client *u )
 {
 	static char hostmask[USERHOSTLEN];
 	AccessEntry *access;

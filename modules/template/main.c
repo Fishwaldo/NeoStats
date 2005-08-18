@@ -138,7 +138,7 @@ ModuleInfo module_info =
  *  example command
  *  Just sends "Hello World!" to the services channel
  */
-static int template_hello_world( CmdParams* cmdparams )
+static int template_hello_world( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_chanalert( template_bot, "%s says \"Hello World!\"",
@@ -253,6 +253,7 @@ ModuleEvent module_events[] =
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
+
 int ModInit( void )
 {
 	return NS_SUCCESS;
@@ -288,8 +289,7 @@ int ModSynch( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini (void)
+int ModFini( void )
 {
 	return NS_SUCCESS;
 }
-

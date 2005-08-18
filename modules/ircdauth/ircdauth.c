@@ -90,7 +90,7 @@ static UserAuthModes user_auth_modes[] =
 	{UMODE_REGNICK,		NS_ULEVEL_REG},
 };
 
-const int user_auth_mode_count =( ( sizeof( user_auth_modes ) / sizeof( user_auth_modes[0] ) ) );
+const int user_auth_mode_count = ( ( sizeof( user_auth_modes ) / sizeof( user_auth_modes[0] ) ) );
 
 static UserAuthModes user_auth_smodes[] = 
 {
@@ -103,7 +103,7 @@ static UserAuthModes user_auth_smodes[] =
 	{SMODE_COADMIN,		NS_ULEVEL_OPER},
 };
 
-const int user_auth_smode_count =( ( sizeof( user_auth_smodes ) / sizeof( user_auth_smodes[0] ) ) );
+const int user_auth_smode_count = ( ( sizeof( user_auth_smodes ) / sizeof( user_auth_smodes[0] ) ) );
 
 /** @brief auth_cmd_authmodelist
  *
@@ -114,7 +114,7 @@ const int user_auth_smode_count =( ( sizeof( user_auth_smodes ) / sizeof( user_a
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int auth_cmd_authmodelist( CmdParams* cmdparams )
+static int auth_cmd_authmodelist( const CmdParams *cmdparams )
 {
 	int i;
 
@@ -183,7 +183,7 @@ int ModSynch( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini (void)
+int ModFini( void )
 {
 	del_services_cmd_list( ircdauth_commands );
 	return NS_SUCCESS;
@@ -198,7 +198,7 @@ int ModFini (void)
  *  @return authentication level for user
  */
 
-int ModAuthUser( Client * u )
+int ModAuthUser( const Client *u )
 {
 	int i, authlevel;
 

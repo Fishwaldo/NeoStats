@@ -1340,7 +1340,7 @@ EXPORTFUNC int del_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
 EXPORTFUNC int add_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
 EXPORTFUNC int del_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
 
-EXPORTFUNC Client *FindValidUser( Bot *botptr, Client *u, const char *target_nick );
+EXPORTFUNC Client *FindValidUser( const Bot *botptr, const Client *u, const char *target_nick );
 
 /* transfer.c stuff */
 typedef void (transfer_callback) ( void *data, int returncode, char *body, int bodysize );
@@ -1384,7 +1384,7 @@ EXPORTFUNC int DBACloseTable( const char *table );
 EXPORTFUNC int DBAStore( const char *table, char *key, void *data, int size );
 EXPORTFUNC int DBAFetch( const char *table, char *key, void *data, int size );
 EXPORTFUNC int DBADelete( const char *table, char * key );
-EXPORTFUNC int DBAFetchRows( const char * table, DBRowHandler handler );
+EXPORTFUNC int DBAFetchRows( const char *table, DBRowHandler handler );
 /* DB API Macros to wrap common types */
 #define DBAStoreBool( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )
 #define DBAStoreInt( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )
@@ -1534,20 +1534,20 @@ EXPORTFUNC struct tm* os_localtime( const time_t *timer );
 /* Socket functions */
 EXPORTFUNC int os_sock_close( OS_SOCKET sock );
 EXPORTFUNC int os_sock_write( OS_SOCKET s, const char *buf, int len );
-EXPORTFUNC int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen );
+EXPORTFUNC int os_sock_sendto( OS_SOCKET s, const char *buf, int len, int flags, const struct sockaddr* to, int tolen );
 EXPORTFUNC int os_sock_read( OS_SOCKET s, char *buf, int len );
-EXPORTFUNC int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int *fromlen );
+EXPORTFUNC int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockaddr *from, int *fromlen );
 EXPORTFUNC int os_sock_set_nonblocking( OS_SOCKET s );
 EXPORTFUNC int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen );
 EXPORTFUNC OS_SOCKET os_sock_socket( int socket_family, int socket_type, int protocol );
 EXPORTFUNC int os_sock_bind( OS_SOCKET s, const struct sockaddr* name, int namelen );
 EXPORTFUNC int os_sock_listen( OS_SOCKET s, int backlog );
-EXPORTFUNC int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval, int optlen );
-EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp );
+EXPORTFUNC int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char *optval, int optlen );
+EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void *argp );
 EXPORTVAR int os_sock_errno;
 EXPORTFUNC char *os_sock_getlasterrorstring( void );
 EXPORTFUNC char *os_sock_strerror( const int sockerrno );
-EXPORTFUNC int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, struct timeval* timeout );
+EXPORTFUNC int os_sock_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout );
 
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );
@@ -1582,11 +1582,11 @@ MODULEFUNC int ModFini( void );
 /* Module event interface */
 MODULEVAR extern ModuleEvent module_events[];  
 /* Module auth interface */
-MODULEFUNC int ModAuthUser( Client *u );
+MODULEFUNC int ModAuthUser( const Client *u );
 /* Module exclude interface */
-EXPORTFUNC int ModIsServerExcluded( Client *s );
-EXPORTFUNC int ModIsUserExcluded( Client *u );
-EXPORTFUNC int ModIsChannelExcluded( Channel *c );
+EXPORTFUNC int ModIsServerExcluded( const Client *s );
+EXPORTFUNC int ModIsUserExcluded( const Client *u );
+EXPORTFUNC int ModIsChannelExcluded( const Channel *c );
 
 /* Module data pointer interface */
 /* Module data pointer interface channel */
