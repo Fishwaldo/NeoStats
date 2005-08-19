@@ -32,86 +32,148 @@
 #include "version.h"
 #include "tld.h"
 
-#define WEEKNUM(t) (((t)->tm_yday + 7 - ((t)->tm_wday)) / 7)
+/** macro to calculate week number from time */
+#define WEEKNUM( t )( ( ( t )->tm_yday + 7 -( ( t )->tm_wday ) ) / 7 )
 
-void PreSaveStatistic (statistic *stat)
+/** @brief PreSaveStatistic
+ *
+ *  Update statistic time prior to save
+ *
+ *  @param stat pointer to stat to update
+ *
+ *  @return none
+ */
+
+void PreSaveStatistic( statistic *stat )
 {
 	struct tm *ltm;
 
-	ltm = localtime (&me.now);
+	ltm = localtime( &me.now );
 	stat->month = ltm->tm_mon;
-	stat->week = WEEKNUM(ltm);
+	stat->week = WEEKNUM( ltm );
 	stat->day = ltm->tm_yday;	
 }
 
-void PostLoadStatistic (statistic *stat)
+/** @brief PostLoadStatistic
+ *
+ *  Update statistic based on time post load
+ *
+ *  @param stat pointer to stat to update
+ *
+ *  @return none
+ */
+
+void PostLoadStatistic( statistic *stat )
 {
 	struct tm *ltm;
 
-	ltm = localtime (&me.now);
+	ltm = localtime( &me.now );
 	stat->current = 0;
-	if (stat->day != ltm->tm_yday) {
-		ResetStatisticEntry (&stat->daily, stat->current);
-	}
+	if( stat->day != ltm->tm_yday )
+		ResetStatisticEntry( &stat->daily, stat->current );
 	/* Only load weekly stats if week not changed */
-	if (stat->week != WEEKNUM(ltm)) {
-		ResetStatisticEntry (&stat->weekly, stat->current);
-	}
+	if( stat->week != WEEKNUM( ltm ) )
+		ResetStatisticEntry( &stat->weekly, stat->current );
 	/* Only load monthly stats if month not changed */
-	if (stat->month != ltm->tm_mon) {
-		ResetStatisticEntry (&stat->monthly, stat->current);
-	}
+	if( stat->month != ltm->tm_mon )
+		ResetStatisticEntry( &stat->monthly, stat->current );
 }
 
-void AverageStatisticEntry (statisticentry *stat, unsigned int current)
+/** @brief AverageStatisticEntry
+ *
+ *  Average statistic entry
+ *
+ *  @param stat pointer to stat to update
+ *  @param current value on network
+ *
+ *  @return none
+ */
+
+void AverageStatisticEntry( statisticentry *stat, unsigned int current )
 {
-	stat->average = (stat->max + current) / 2;
+	stat->average =( stat->max + current ) / 2;
 }
 
-void AverageStatistic (statistic *stat)
+/** @brief AverageStatistic
+ *
+ *  Average statistic
+ *
+ *  @param stat pointer to stat to update
+ *
+ *  @return none
+ */
+
+void AverageStatistic( statistic *stat )
 {
-	AverageStatisticEntry (&stat->daily, stat->current);
-	AverageStatisticEntry (&stat->weekly, stat->current);
-	AverageStatisticEntry (&stat->monthly, stat->current);
-	AverageStatisticEntry (&stat->alltime, stat->current);
+	AverageStatisticEntry( &stat->daily, stat->current );
+	AverageStatisticEntry( &stat->weekly, stat->current );
+	AverageStatisticEntry( &stat->monthly, stat->current );
+	AverageStatisticEntry( &stat->alltime, stat->current );
 }
 
-void ResetStatisticEntry (statisticentry *stat, unsigned int current)
+/** @brief ResetStatisticEntry
+ *
+ *  Reset statistic entry
+ *
+ *  @param stat pointer to stat to update
+ *  @param current value on network
+ *
+ *  @return none
+ */
+
+void ResetStatisticEntry( statisticentry *stat, unsigned int current )
 {
 	stat->runningtotal = current;
 	stat->max = current;
 	stat->ts_max = me.now;
 }
 
-void ResetStatistic (statistic *stat)
-{
-	struct tm *ts = gmtime(&me.now);
+/** @brief ResetStatistic
+ *
+ *  Reset statistic
+ *
+ *  @param stat pointer to stat to update
+ *  @param current value on network
+ *
+ *  @return none
+ */
 
-	/* Reset daily on first hour of day (i.e. midnight) */
-	if (ts->tm_hour == 0) {
-		ResetStatisticEntry (&stat->daily, stat->current);
-	}
+void ResetStatistic( statistic *stat )
+{
+	struct tm *ts = gmtime( &me.now );
+
+	/* Reset daily on first hour of day( i.e. midnight ) */
+	if( ts->tm_hour == 0 )
+		ResetStatisticEntry( &stat->daily, stat->current );
 	/* Reset weekly on first day of week */
-	if (ts->tm_wday == 0) {
-		ResetStatisticEntry (&stat->weekly, stat->current);
-	}
+	if( ts->tm_wday == 0 )
+		ResetStatisticEntry( &stat->weekly, stat->current );
 	/* Reset monthly on first day of month */
-	if (ts->tm_mday == 1) {
-		ResetStatisticEntry (&stat->monthly, stat->current);
-	}
+	if( ts->tm_mday == 1 )
+		ResetStatisticEntry( &stat->monthly, stat->current );
 }
 
-int IncStatisticEntry (statisticentry *stat, unsigned int current)
+/** @brief IncStatisticEntry
+ *
+ *  increment statistic entry
+ *
+ *  @param stat pointer to stat to update
+ *  @param current value on network
+ *
+ *  @return none
+ */
+
+int IncStatisticEntry( statisticentry *stat, unsigned int current )
 {
 	int isrecord = 0;
 
-	if (current > stat->max)
+	if( current > stat->max )
 	{
 		stat->max = current;
 		stat->ts_max = me.now;
 		isrecord = 1;
 	}
-	else if (current == stat->max)
+	else if( current == stat->max )
 	{
 		stat->ts_max = me.now;
 	}
@@ -119,48 +181,86 @@ int IncStatisticEntry (statisticentry *stat, unsigned int current)
 	return isrecord;
 }
 
-int IncStatistic (statistic *stat)
+/** @brief IncStatistic
+ *
+ *  increment statistic
+ *
+ *  @param stat pointer to stat to update
+ *
+ *  @return none
+ */
+
+int IncStatistic( statistic *stat )
 {
 	stat->current++;
-	IncStatisticEntry (&stat->daily, stat->current);
-	IncStatisticEntry (&stat->weekly, stat->current);
-	IncStatisticEntry (&stat->monthly, stat->current);
-	return IncStatisticEntry (&stat->alltime, stat->current);
+	IncStatisticEntry( &stat->daily, stat->current );
+	IncStatisticEntry( &stat->weekly, stat->current );
+	IncStatisticEntry( &stat->monthly, stat->current );
+	return IncStatisticEntry( &stat->alltime, stat->current );
 }
 
-void DecStatistic (statistic *stat)
+/** @brief DecStatistic
+ *
+ *  decrement statistic
+ *
+ *  @param stat pointer to stat to update
+ *
+ *  @return none
+ */
+
+void DecStatistic( statistic *stat )
 {
-	if (stat->current > 0) {
+	if( stat->current > 0 )
 		stat->current--;
-	}
 }
 
-int SetStatisticEntry (statisticentry *stat, unsigned int current, int diff)
+/** @brief SetStatisticEntry
+ *
+ *  set statistic entry
+ *
+ *  @param stat pointer to stat to update
+ *  @param current value on network
+ *  @param diff between stored and current
+ *
+ *  @return none
+ */
+
+int SetStatisticEntry( statisticentry *stat, unsigned int current, int diff )
 {
 	int isrecord = 0;
 
-	if (current > stat->max)
+	if( current > stat->max )
 	{
 		stat->max = current;
 		stat->ts_max = me.now;
 		isrecord = 1;
 	}
-	else if (current == stat->max)
+	else if( current == stat->max )
 	{
 		stat->ts_max = me.now;
 	}
 	/* Only adjust running total if diff is > 0 */
-	if (diff > 0) {
+	if( diff > 0 )
 		stat->runningtotal += diff;
-	}
 	return isrecord;
 }
 
-int SetStatistic (statistic *stat, int current)
+/** @brief SetStatistic
+ *
+ *  set statistic
+ *
+ *  @param stat pointer to stat to update
+ *  @param current value on network
+ *
+ *  @return none
+ */
+
+int SetStatistic( statistic *stat, int current )
 {
 	int diff = 0;
 
-	if (current != stat->current) {
+	if( current != stat->current )
+	{
 		/* Subtract this way so that diff is the correct sign for a 
 		 * later add to running total. I.e.
 		 *   current >  stat->current : +ve
@@ -170,115 +270,219 @@ int SetStatistic (statistic *stat, int current)
 		diff = current - stat->current;
 		stat->current = current;
 	}
-	SetStatisticEntry (&stat->daily, stat->current, diff);
-	SetStatisticEntry (&stat->weekly, stat->current, diff);
-	SetStatisticEntry (&stat->monthly, stat->current, diff);
-	return SetStatisticEntry (&stat->alltime, stat->current, diff);
+	SetStatisticEntry( &stat->daily, stat->current, diff );
+	SetStatisticEntry( &stat->weekly, stat->current, diff );
+	SetStatisticEntry( &stat->monthly, stat->current, diff );
+	return SetStatisticEntry( &stat->alltime, stat->current, diff );
 }
 
-static int check_interval()
+/** @brief check_interval
+ *
+ *  check interval between announcements
+ *
+ *  @param none
+ *
+ *  @return NS_TRUE if OK else NS_FALSE
+ */
+
+static int check_interval( void )
 {
 	static time_t lasttime;
 	static int count;
 
-	if (!IsModuleSynched()) {
-		return -1;
+	if( !IsModuleSynched() )
+		return NS_FALSE;
+	if( ( me.now - lasttime ) < StatServ.msginterval  )
+	{
+		if( ++count > StatServ.msglimit )
+			return NS_FALSE;
 	}
-	if ((me.now - lasttime) < StatServ.msginterval ) {
-		if (++count > StatServ.msglimit)
-			return -1;
-	} else {
+	else
+	{
 		lasttime = me.now;
 		count = 0;
 	}
-	return NS_SUCCESS;
+	return NS_TRUE;
 }
 
-static void
-announce(int announcetype, const char *msg)
+/** @brief announce
+ *
+ *  Make announcement of selected type
+ *
+ *  @param announcetype type of announcement
+ *  @param msg to send
+ *
+ *  @return none
+ */
+
+static void announce( int announcetype, const char *msg )
 {
-	switch(announcetype) {
+	switch( announcetype )
+	{
 		case 3:
-			irc_wallops (ss_bot, "%s", msg);
+			irc_wallops( ss_bot, "%s", msg );
 			break;
 		case 2:
-			irc_globops (ss_bot, "%s", msg);
+			irc_globops( ss_bot, "%s", msg );
 			break;
 		case 1:
 		default:
-			irc_chanalert (ss_bot, "%s", msg);
+			irc_chanalert( ss_bot, "%s", msg );
 			break;
 	}
 }
 
-void
-announce_record (const char *msg, ...)
+/** @brief announce_record
+ *
+ *  Make announcement
+ *
+ *  @param msg to send
+ *
+ *  @return none
+ */
+
+void announce_record( const char *msg, ... )
 {
 	static char announce_buf[BUFSIZE];
 	va_list ap;
 
-	if(StatServ.recordalert <= 0 || check_interval() < 0) {
+	if( StatServ.recordalert <= 0 || check_interval() < 0 )
 		return;
-	}
-	va_start (ap, msg);
-	ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
-	va_end (ap);
-	announce(StatServ.recordalert, announce_buf);
+	va_start( ap, msg );
+	ircvsnprintf( announce_buf, BUFSIZE, msg, ap );
+	va_end( ap );
+	announce( StatServ.recordalert, announce_buf );
 }
 
-void
-announce_lag(const char *msg, ...)
+/** @brief announce_lag
+ *
+ *  Make announcement
+ *
+ *  @param msg to send
+ *
+ *  @return none
+ */
+
+void announce_lag( const char *msg, ... )
 {
 	static char announce_buf[BUFSIZE];
 	va_list ap;
 
-	if(StatServ.lagalert <= 0 || check_interval() < 0) {
+	if( StatServ.lagalert <= 0 || check_interval() < 0 )
 		return;
-	}
-	va_start (ap, msg);
-	ircvsnprintf (announce_buf, BUFSIZE, msg, ap);
-	va_end (ap);
-	announce(StatServ.lagalert, announce_buf);
+	va_start( ap, msg );
+	ircvsnprintf( announce_buf, BUFSIZE, msg, ap );
+	va_end( ap );
+	announce( StatServ.lagalert, announce_buf );
 }
 
-int ResetStatistics (void *userptr)
+/** @brief ResetStatisticsTimer
+ *
+ *  Timer handler for rest of statistics
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ResetStatisticsTimer( void *userptr )
 {
 	SET_SEGV_LOCATION();
-	dlog (DEBUG1, "Reset Statistics");
-	ResetNetworkStatistics ();
-	ResetServerStatistics ();
-	ResetChannelStatistics ();
-	ResetTLDStatistics ();
+	dlog( DEBUG1, "Reset Statistics" );
+	ResetNetworkStatistics();
+	ResetServerStatistics();
+	ResetChannelStatistics();
+	ResetTLDStatistics();
 	return NS_SUCCESS;
 }
 
-int AverageStatistics (void *userptr)
+/** @brief AverageStatistics
+ *
+ *  Average of statistics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void AverageStatistics( void )
 {
 	SET_SEGV_LOCATION();
-	dlog (DEBUG1, "Average Statistics");
-	AverageNetworkStatistics ();
-	AverageServerStatistics ();
-	AverageChannelStatistics ();
-	AverageTLDStatistics ();
+	dlog( DEBUG1, "Average Statistics" );
+	AverageNetworkStatistics();
+	AverageServerStatistics();
+	AverageChannelStatistics();
+	AverageTLDStatistics();
+}
+
+/** @brief AverageStatisticsTimer
+ *
+ *  Timer handler for average of statistics
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int AverageStatisticsTimer( void *userptr )
+{
+	SET_SEGV_LOCATION();
+	AverageStatistics();
 	return NS_SUCCESS;
 }
 
-int GetAllTimePercent (statistic *stat)
+/** @brief GetAllTimePercent
+ *
+ *  Generate all time stat percent
+ *
+ *  @param stat pointer to stat to calculate
+ *
+ *  @return percent
+ */
+
+int GetAllTimePercent( statistic *stat )
 {
-	return (int)(((float) stat->current / (float) stat->alltime.max) * 100);
+	return( int )( ( ( float ) stat->current / ( float ) stat->alltime.max ) * 100 );
 }
 
-int GetDailyPercent (statistic *stat)
+/** @brief GetDailyPercent
+ *
+ *  Generate daily percent
+ *
+ *  @param stat pointer to stat to calculate
+ *
+ *  @return percent
+ */
+
+int GetDailyPercent( statistic *stat )
 {
-	return (int)(((float) stat->current / (float) stat->daily.max) * 100);
+	return( int )( ( ( float ) stat->current / ( float ) stat->daily.max ) * 100 );
 }
 
-int GetWeeklyPercent (statistic *stat)
+/** @brief GetWeeklyPercent
+ *
+ *  Generate weekly stat percent
+ *
+ *  @param stat pointer to stat to calculate
+ *
+ *  @return percent
+ */
+
+int GetWeeklyPercent( statistic *stat )
 {
-	return (int)(((float) stat->current / (float) stat->weekly.max) * 100);
+	return( int )( ( ( float ) stat->current / ( float ) stat->weekly.max ) * 100 );
 }
 
-int GetMonthlyPercent (statistic *stat)
+/** @brief GetMonthlyPercent
+ *
+ *  Generate monthly stat percent
+ *
+ *  @param stat pointer to stat to calculate
+ *
+ *  @return percent
+ */
+
+int GetMonthlyPercent( statistic *stat )
 {
-	return (int)(((float) stat->current / (float) stat->monthly.max) * 100);
+	return( int )( ( ( float ) stat->current / ( float ) stat->monthly.max ) * 100 );
 }

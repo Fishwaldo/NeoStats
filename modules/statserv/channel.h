@@ -46,7 +46,7 @@ typedef struct channelstat
 	statistic joins;
 }channelstat;
 
-typedef void (*ChannelStatHandler)( const channelstat *cs, const void *v );
+typedef void (*ChannelStatHandler)( channelstat *cs, const void *v );
 
 void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, const void *v );
 int topcurrentchannel( const void *key1, const void *key2 );
@@ -60,7 +60,7 @@ int ss_event_part( const CmdParams *cmdparams );
 int ss_event_topic( const CmdParams *cmdparams );
 int ss_event_kick( const CmdParams *cmdparams );
 int ss_cmd_channel( const CmdParams *cmdparams );
-int DelOldChan( void *v );
+int DelOldChanTimer( void *v );
 int InitChannelStats( void );
 void FiniChannelStats( void );
 void SaveChanStats( void );

@@ -26,8 +26,10 @@
 #include "stats.h"
 #include "version.h"
 
+/** CTCP version table name */
 #define CTCPVERSION_TABLE "CTCPVERSION"
 
+/** Client version list */
 static list_t *ctcp_version_list;
 
 /** @brief topcurrentversions
@@ -68,6 +70,20 @@ static ss_ctcp_version *findctcpversion( const char *name )
 	return cv;
 }
 
+/** @brief SaveClientVersion
+ *
+ *  Save client version stat
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+static void SaveClientVersion( const ss_ctcp_version *cv, const void *v )
+{
+	DBAStore( CTCPVERSION_TABLE, cv->name,( void *)cv, sizeof( ss_ctcp_version));
+	dlog( DEBUG2, "Save version %s", cv->name );
+}
+
 /** @brief SaveClientVersions
  *
  *  Save client version stats
@@ -79,17 +95,7 @@ static ss_ctcp_version *findctcpversion( const char *name )
 
 static void SaveClientVersions( void )
 {
-	ss_ctcp_version *cv;
-	lnode_t *cn;
-	
-	cn = list_first( ctcp_version_list );
-	while( cn != NULL )
-	{
-		cv = ( ss_ctcp_version * ) lnode_get( cn );
-		DBAStore( CTCPVERSION_TABLE, cv->name,( void *)cv, sizeof( ss_ctcp_version));
-		dlog( DEBUG2, "Save version %s", cv->name );
-		cn = list_next( ctcp_version_list, cn );
-	}
+	GetClientStats( SaveClientVersion, -1, NULL );
 }
 
 /** @brief new_ctcpversion
@@ -161,17 +167,20 @@ void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v 
 {
 	ss_ctcp_version *cv;
 	lnode_t *cn;
-	int i;
+	int count = 0;
 	
 	if( !list_is_sorted( ctcp_version_list, topcurrentversions ) )
 		list_sort( ctcp_version_list, topcurrentversions );
 	cn = list_first( ctcp_version_list );
-	for( i = 0; i < limit && cn; i++ )
+	while( cn != NULL )
 	{
-		cv = lnode_get( cn );
+		cv = ( ss_ctcp_version * ) lnode_get( cn );
 		handler( cv, v );	
 		cn = list_next( ctcp_version_list, cn );
+		if( limit != -1 && count >= limit )
+			break;
 	}
+
 }
 
 /** @brief ss_cmd_ctcpversion

@@ -35,9 +35,12 @@
 #include "GeoIP.h"
 #include "GeoIPCity.h"
 
+/** TLD table name */
 #define TLD_TABLE		"TLD"
+/** Unknown entry */
 #define UNKNOWN_COUNTRY_CODE	"???"
 
+/** TLD list */
 static list_t *tldstatlist;
 static GeoIP *gi;
 
@@ -56,12 +59,15 @@ void ResetTLDStatistics( void )
 	TLD *t;
 	
 	tn = list_first( tldstatlist );
-	while( tn != NULL ) {
+	while( tn != NULL )
+	{
 		t = lnode_get( tn );
 		ResetStatistic( &t->users );
-		if( t->users.current == 0 ) {
+		if( t->users.current == 0 )
+		{
 			/* don't delete the tld entry ??? as its our "unknown" entry */
-			if( ircstrcasecmp( t->tld, UNKNOWN_COUNTRY_CODE ) ) {
+			if( ircstrcasecmp( t->tld, UNKNOWN_COUNTRY_CODE ) )
+			{
 				tn2 = list_next( tldstatlist, tn );
 				ns_free( t );
 				list_delete( tldstatlist, tn );
@@ -259,6 +265,20 @@ int ss_event_nickip( const CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
+/** @brief SaveTLDStat
+ *
+ *  Save TLD stat
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void SaveTLDStat( const TLD *tld, const void *v )
+{
+	DBAStore( TLD_TABLE, tld->tld, ( void * )v, sizeof( TLD ) );
+}
+
 /** @brief SaveTLDStats
  *
  *  Save TLD stats
@@ -270,16 +290,7 @@ int ss_event_nickip( const CmdParams *cmdparams )
 
 void SaveTLDStats( void )
 {
-	lnode_t *tn;
-	TLD *t;
-	
-	tn = list_first( tldstatlist );
-	while( tn != NULL )
-	{
-		t = lnode_get( tn );
-		DBAStore( TLD_TABLE, t->tld, ( void * )t, sizeof( TLD ) );
-		tn = list_next( tldstatlist, tn );
-	}
+	GetTLDStats( SaveTLDStat, NULL );
 }
 
 /** @brief new_tld

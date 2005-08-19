@@ -47,10 +47,10 @@ typedef struct dbm_sym {
 
 static void *( *DBMOpenTable )( const char *name );
 static int ( *DBMCloseTable )( void *handle );
-static int ( *DBMGetData )( void *handle, char *key, void *data, int size );
-static int ( *DBMSetData )( void *handle, char *key, void *data, int size );
+static int ( *DBMGetData )( void *handle, const char *key, void *data, int size );
+static int ( *DBMSetData )( void *handle, const char *key, void *data, int size );
 static int ( *DBMGetTableRows )( void *handle, DBRowHandler handler );
-static int ( *DBMDelData )( void *handle, char *key );
+static int ( *DBMDelData )( void *handle, const char *key );
 
 static dbm_sym dbm_sym_table[] = 
 {
@@ -356,7 +356,7 @@ int DBACloseTable( const char *table )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBAFetch( const char *table, char *key, void *data, int size )
+int DBAFetch( const char *table, const char *key, void *data, int size )
 {
 	tableentry *tbe;
 
@@ -379,7 +379,7 @@ int DBAFetch( const char *table, char *key, void *data, int size )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBAStore( const char *table, char *key, void *data, int size )
+int DBAStore( const char *table, const char *key, void *data, int size )
 {
 	tableentry *tbe;
 
@@ -421,7 +421,7 @@ int DBAFetchRows( const char *table, DBRowHandler handler )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBADelete( const char *table, char *key )
+int DBADelete( const char *table, const char *key )
 {
 	tableentry *tbe;
 

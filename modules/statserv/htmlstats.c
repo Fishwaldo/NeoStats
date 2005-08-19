@@ -35,13 +35,16 @@
 #include <fcntl.h> 
 #endif /* HAVE_FCNTL_H */
 
+/** HTML output handler type */
 typedef void( *htmlhandler )( void );
 
+/** HTML handler table struct */
 typedef struct htmlfunc {
 	char* directive;
 	htmlhandler handler;
 }htmlfunc;
 
+/** HTML handler prototypes */
 static void html_map( void );
 static void html_srvlist( void );
 static void html_srvlistdet( void );
@@ -58,9 +61,12 @@ static void html_version( void );
 static void html_title( void );
 static void html_clientstats( void );
 
+/** Output file pointer */
 static FILE *opf;
+/** Output file template */
 static const char html_template[]="data/index.tpl";
 
+/** HTML handler lookup table */
 static htmlfunc htmlfuncs[]=
 {
 	{"!MAP!", html_map},
@@ -81,17 +87,44 @@ static htmlfunc htmlfuncs[]=
 	{NULL, NULL},
 };
 
+/** @brief html_title
+ *
+ *  HTML handler for title
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void html_title( void )
 {
 	os_fprintf( opf, "Network Statistics for %s", me.netname );
 }
+
+/** @brief html_version
+ *
+ *  HTML handler for version
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_version( void )
 {
 	os_fputs( me.version, opf );
 }
 
-void put_copyright( void )
+/** @brief put_copyright
+ *
+ *  HTML handler for copyright footer
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+static void put_copyright( void )
 {
 	os_fprintf( opf, "<br><br><center>Statistics last updated at %s<br>", sftime( time( NULL ) ) );
 	os_fprintf( opf, "<b>StatServ Information:</b>\n" );
@@ -102,6 +135,15 @@ void put_copyright( void )
 	os_fprintf( opf, "</center></html>\n" );
 }
 
+/** @brief serverlisthandler
+ *
+ *  HTML handler helper for srvlist
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void serverlisthandler( const serverstat *ss, const void *v )
 {
 	os_fprintf( opf, "<tr><td height=\"4\"></td>\n" );
@@ -109,12 +151,30 @@ static void serverlisthandler( const serverstat *ss, const void *v )
 		ss->name, ss->name,( ss->s ) ? "ONLINE" : "OFFLINE" );
 }
 
+/** @brief html_srvlist
+ *
+ *  HTML handler for srvlist
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void html_srvlist( void )
 {
 	os_fprintf( opf, "<table border=0><tr><th colspan = 2>Server name</th></tr>" );
 	GetServerStats( serverlisthandler, NULL );
 	os_fprintf( opf, "</table>" );
 }
+
+/** @brief serverlistdetailhandler
+ *
+ *  HTML handler helper for srvlistdet
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void serverlistdetailhandler( const serverstat *ss, const void *v )
 {
@@ -147,12 +207,30 @@ static void serverlistdetailhandler( const serverstat *ss, const void *v )
 		(int)ss->splits.alltime.runningtotal );
 }
 
+/** @brief html_srvlistdet
+ *
+ *  HTML handler for srvlistdet
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void html_srvlistdet( void )
 {
 	os_fprintf( opf, "<table border=0>" );
 	GetServerStats( serverlistdetailhandler, NULL );
 	os_fprintf( opf, "</table>" );
 }
+
+/** @brief html_netstats
+ *
+ *  HTML handler for netstats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_netstats( void )
 {
@@ -190,6 +268,15 @@ static void html_netstats( void )
 	os_fprintf( opf, "<td colspan=\"3\">%d</td></tr></table>\n", me.awaycount );
 }
 
+/** @brief html_dailystats
+ *
+ *  HTML handler for daily
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void html_dailystats( void )
 {
 	os_fprintf( opf, "<table border = 0>" );
@@ -224,6 +311,15 @@ static void html_dailystats( void )
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.servers.daily.ts_max ) );
 	os_fprintf( opf, "</tr></table>\n" );
 }
+
+/** @brief html_weeklystats
+ *
+ *  HTML handler for weekly
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_weeklystats( void )
 {
@@ -260,6 +356,15 @@ static void html_weeklystats( void )
 	os_fprintf( opf, "</tr></table>\n" );
 }
 
+/** @brief html_monthlystats
+ *
+ *  HTML handler for monthly
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void html_monthlystats( void )
 {
 	os_fprintf( opf, "<table border = 0>" );
@@ -295,11 +400,29 @@ static void html_monthlystats( void )
 	os_fprintf( opf, "</tr></table>\n" );
 }
 
+/** @brief top10membershandler
+ *
+ *  HTML handler helper for top10members
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void top10membershandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->c->users );
 }
+
+/** @brief html_channeltop10members
+ *
+ *  HTML handler for channeltop10members
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_channeltop10members( void )
 {
@@ -308,11 +431,29 @@ static void html_channeltop10members( void )
 	os_fprintf( opf, "</table>" );
 }
 
+/** @brief top10joinshandler
+ *
+ *  HTML handler helper for top10joins
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void top10joinshandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->users.alltime.runningtotal );
 }
+
+/** @brief html_channeltop10joins
+ *
+ *  HTML handler for channeltop10joins
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_channeltop10joins( void )
 {
@@ -321,11 +462,29 @@ static void html_channeltop10joins( void )
 	os_fprintf( opf, "</table>" );
 }
 
+/** @brief top10kickshandler
+ *
+ *  HTML handler helper for top10kicks
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void top10kickshandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->kicks.alltime.runningtotal );
 }
+
+/** @brief html_channeltop10kicks
+ *
+ *  HTML handler for channeltop10kicks
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_channeltop10kicks( void )
 {
@@ -334,11 +493,29 @@ static void html_channeltop10kicks( void )
 	os_fprintf( opf, "</table>" );
 }
 
+/** @brief top10topicshandler
+ *
+ *  HTML handler helper for top10topics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void top10topicshandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->topics.alltime.runningtotal );
 }
+
+/** @brief html_channeltop10topics
+ *
+ *  HTML handler for channeltop10topics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_channeltop10topics( void )
 {
@@ -347,11 +524,29 @@ static void html_channeltop10topics( void )
 	os_fprintf( opf, "</table>" );
 }
 
+/** @brief HTMLClientVersionReport
+ *
+ *  HTML handler helper for ClientVersionReport
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void HTMLClientVersionReport( const ss_ctcp_version *cv, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cv->name, cv->users.current );
 }
+
+/** @brief html_clientstats
+ *
+ *  HTML handler for clientstats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_clientstats( void )
 {
@@ -360,11 +555,29 @@ static void html_clientstats( void )
 	os_fprintf( opf, "</table>" );
 }
 
+/** @brief HTMLTLDReport
+ *
+ *  HTML handler helper for TLDReport
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void HTMLTLDReport( const TLD *tld, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td><td>%3d</td><td>%3d</td><td>%3d</td></tr>",
 		tld->tld, tld->country, tld->users.current, tld->users.daily.runningtotal, tld->users.weekly.runningtotal, tld->users.monthly.runningtotal, tld->users.alltime.runningtotal );
 }
+
+/** @brief html_tldmap
+ *
+ *  HTML handler for tldmap
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void html_tldmap( void )
 {
@@ -372,6 +585,15 @@ static void html_tldmap( void )
 	GetTLDStats( HTMLTLDReport, NULL );
 	os_fprintf( opf, "</table>" );
 }
+
+/** @brief get_map
+ *
+ *  HTML recursive handler to generate network map
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 static void get_map( char *uplink, int level )
 {
@@ -424,13 +646,31 @@ static void get_map( char *uplink, int level )
 	}
 }
 
+/** @brief html_map
+ *
+ *  HTML handler for map
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 static void html_map( void )
 {
 	get_map( "", 0 );
 	os_fputs( "</TABLE>\n", opf );
 }
 
-int ss_html( void *userptr )
+/** @brief HTMLOutput
+ *
+ *  output HTML file
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void HTMLOutput( void )
 {
 #define HTMLREADBUFSIZE 512
 	static char buf[HTMLREADBUFSIZE];
@@ -443,13 +683,13 @@ int ss_html( void *userptr )
 	if( !tpl ) {
 		nlog( LOG_WARNING, "Failed to open StatServ HTML template %s.", html_template );
 		irc_chanalert( ss_bot, "Failed to open StatServ HTML template %s.", html_template );
-		return NS_SUCCESS;
+		return;
 	}
 	opf = os_fopen( StatServ.htmlpath, "wt" );
 	if( !opf ) {
 		nlog( LOG_WARNING, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
 		irc_chanalert( ss_bot, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
-		return NS_SUCCESS;
+		return;
 	}
 	while( os_fgets( buf, HTMLREADBUFSIZE, tpl ) ) {
 		bufptr = buf;
@@ -479,15 +719,36 @@ int ss_html( void *userptr )
     /* update the umode so others can read it and owner can overwrite it */
     chmod(StatServ.htmlpath, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 #endif /* WIN32 */
+}
 
-
+/** @brief HTMLOutputTimer
+ *
+ *  Timer handler to output HTML file
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+int HTMLOutputTimer( void *userptr )
+{
+	HTMLOutput();
 	return NS_SUCCESS;
 }
 
-int ss_cmd_forcehtml( CmdParams *cmdparams )
+/** @brief ss_cmd_forcehtml
+ *
+ *  FORCEHTML command handler
+ *  Reports current statistics to requesting user
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_cmd_forcehtml( const CmdParams *cmdparams )
 {
 	nlog( LOG_NOTICE, "%s!%s@%s forced an update of the HTML file.",
 		    cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname );
-	ss_html( NULL);
+	HTMLOutput();
 	return NS_SUCCESS;
 }

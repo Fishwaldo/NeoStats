@@ -44,10 +44,11 @@ typedef struct statistic {
 
 void AverageStatisticEntry( statisticentry *stat, unsigned int current );
 void AverageStatistic( statistic *stat );
-int AverageStatistics( void *v );
+int AverageStatisticsTimer( void *v );
+void AverageStatistics( void );
 void ResetStatisticEntry( statisticentry *stat, unsigned int current );
 void ResetStatistic( statistic *stat );
-int ResetStatistics( void *v );
+int ResetStatisticsTimer( void *v );
 int IncStatisticEntry( statisticentry *stat, unsigned int current );
 int IncStatistic( statistic *stat );
 void DecStatisticEntry( statisticentry *stat, unsigned int current );

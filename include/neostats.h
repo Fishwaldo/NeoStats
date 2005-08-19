@@ -1381,9 +1381,9 @@ EXPORTFUNC int DBAOpenDatabase( void );
 EXPORTFUNC int DBACloseDatabase( void );
 EXPORTFUNC int DBAOpenTable( const char *table );
 EXPORTFUNC int DBACloseTable( const char *table );
-EXPORTFUNC int DBAStore( const char *table, char *key, void *data, int size );
-EXPORTFUNC int DBAFetch( const char *table, char *key, void *data, int size );
-EXPORTFUNC int DBADelete( const char *table, char * key );
+EXPORTFUNC int DBAStore( const char *table, const char *key, void *data, int size );
+EXPORTFUNC int DBAFetch( const char *table, const char *key, void *data, int size );
+EXPORTFUNC int DBADelete( const char *table, const char * key );
 EXPORTFUNC int DBAFetchRows( const char *table, DBRowHandler handler );
 /* DB API Macros to wrap common types */
 #define DBAStoreBool( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )

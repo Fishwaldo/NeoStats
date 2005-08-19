@@ -25,6 +25,7 @@
 #define _HTMLSTATS_H_
 
 int ss_cmd_forcehtml( const CmdParams *cmdparams );
-int ss_html( void *v );
+int HTMLOutputTimer( void *v );
+void HTMLOutput( void );
 
 #endif /* _HTMLSTATS_H_ */

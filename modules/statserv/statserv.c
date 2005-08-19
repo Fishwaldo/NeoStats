@@ -39,10 +39,11 @@
 #include "tld.h"
 #include "htmlstats.h"
 
-static int ss_set_htmltime_cb (CmdParams *cmdparams, SET_REASON reason);
-static int ss_set_exclusions_cb (CmdParams *cmdparams, SET_REASON reason);
-static int ss_set_html_cb (CmdParams *cmdparams, SET_REASON reason);
-static int ss_set_htmlpath_cb (CmdParams *cmdparams, SET_REASON reason);
+/** SET callback prototypes */
+static int ss_set_htmltime_cb( CmdParams *cmdparams, SET_REASON reason );
+static int ss_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason );
+static int ss_set_html_cb( CmdParams *cmdparams, SET_REASON reason );
+static int ss_set_htmlpath_cb( CmdParams *cmdparams, SET_REASON reason );
 
 /** Bot pointer */
 Bot *ss_bot;
@@ -108,17 +109,17 @@ static bot_cmd ss_commands[]=
 /** Bot setting table */
 static bot_setting ss_settings[]=
 {
-	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_html, ss_set_html_cb, (void *)0},
-	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN, NULL,		ss_help_set_htmlpath, ss_set_htmlpath_cb, (void *)""},
-	{"HTMLTIME",	&StatServ.htmltime,		SET_TYPE_INT,		600, TS_ONE_HOUR,		NS_ULEVEL_ADMIN, "seconds",	ss_help_set_htmltime, ss_set_htmltime_cb, (void*)TS_ONE_HOUR},
-	{"CHANNELTIME",	&StatServ.channeltime,	SET_TYPE_INT,		TS_ONE_DAY, 18144000,NS_ULEVEL_ADMIN, "seconds",	ss_help_set_channeltime, NULL, (void*)604800},
-	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_msginterval, NULL, (void *)TS_ONE_MINUTE},
-	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_msglimit, NULL, (void *)5},
-	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_lagtime, NULL, (void *)30},
-	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_lagalert, NULL, (void *)1},
-	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_recordalert, NULL, (void *)1},
-	{"EXCLUSIONS",	&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_exclusions, ss_set_exclusions_cb, (void *)0},
-	{"FLATMAP",		&StatServ.flatmap,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_flatmap, NULL, (void *)0},
+	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_html, ss_set_html_cb,( void * )0},
+	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN, NULL,		ss_help_set_htmlpath, ss_set_htmlpath_cb,( void * )""},
+	{"HTMLTIME",	&StatServ.htmltime,		SET_TYPE_INT,		600, TS_ONE_HOUR,		NS_ULEVEL_ADMIN, "seconds",	ss_help_set_htmltime, ss_set_htmltime_cb,( void* )TS_ONE_HOUR},
+	{"CHANNELTIME",	&StatServ.channeltime,	SET_TYPE_INT,		TS_ONE_DAY, 18144000,NS_ULEVEL_ADMIN, "seconds",	ss_help_set_channeltime, NULL,( void* )604800},
+	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_msginterval, NULL,( void * )TS_ONE_MINUTE},
+	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_msglimit, NULL,( void * )5},
+	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_lagtime, NULL,( void * )30},
+	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_lagalert, NULL,( void * )1},
+	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_recordalert, NULL,( void * )1},
+	{"EXCLUSIONS",	&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_exclusions, ss_set_exclusions_cb,( void * )0},
+	{"FLATMAP",		&StatServ.flatmap,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_flatmap, NULL,( void * )0},
 	NS_SETTING_END()
 };
 
@@ -135,12 +136,21 @@ static BotInfo ss_botinfo =
 	ss_settings,
 };
 
-int SaveStats(void *userptr)
+/** @brief SaveStatsTimer
+ *
+ *  Save stats timer handler
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int SaveStatsTimer( void *userptr )
 {
 	SET_SEGV_LOCATION();
-	SaveServerStats ();
-	SaveChanStats ();
-	SaveNetworkStats ();
+	SaveServerStats();
+	SaveChanStats();
+	SaveNetworkStats();
 	return NS_SUCCESS;
 }
 
@@ -160,7 +170,7 @@ int ModInit( void )
 	ModuleConfig( ss_settings );
 	if( StatServ.html && StatServ.htmlpath[0] == 0 )
 	{
-		nlog(LOG_NOTICE, "HTML stats disabled as HTML_PATH is not set");
+		nlog( LOG_NOTICE, "HTML stats disabled as HTML_PATH is not set" );
 		StatServ.html = 0;
 	}
 	InitNetworkStats();
@@ -186,30 +196,31 @@ int ModInit( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModSynch (void)
+int ModSynch( void )
 {
 	SET_SEGV_LOCATION();
 	/* RTA init must be in synch since core does not start 
 	   RTA during the init cycle when NeoStats first boots */
-	ss_bot = AddBot (&ss_botinfo);
-	if (!ss_bot)
+	ss_bot = AddBot( &ss_botinfo );
+	if( !ss_bot )
 		return NS_FAILURE;
 	/* Timer to save the database */
-	AddTimer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME, NULL);
+	AddTimer( TIMER_TYPE_INTERVAL, SaveStatsTimer, "SaveStatsTimer", DBSAVETIME, NULL );
 	/* Timer to output html */
-	if (StatServ.html) {
-		AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime, NULL);
+	if( StatServ.html )
+	{
+		AddTimer( TIMER_TYPE_INTERVAL, HTMLOutputTimer, "HTMLOutputTimer", StatServ.htmltime, NULL );
 		/* Initial output at load */
-		ss_html ( NULL );
+		HTMLOutput();
 	}
 	/* Timer to reset timeslice stats */
-	AddTimer (TIMER_TYPE_MIDNIGHT, ResetStatistics, "ResetStatistics", 0, NULL);
+	AddTimer( TIMER_TYPE_MIDNIGHT, ResetStatisticsTimer, "ResetStatisticsTimer", 0, NULL );
 	/* Timer to average stats */
-	AddTimer (TIMER_TYPE_INTERVAL, AverageStatistics, "AverageStatistics", TS_ONE_HOUR, NULL);
+	AddTimer( TIMER_TYPE_INTERVAL, AverageStatisticsTimer, "AverageStatisticsTimer", TS_ONE_HOUR, NULL );
 	/* Initial average at load */
-	AverageStatistics( NULL );
+	AverageStatistics();
 	/* Timer to delete old channels */
-	AddTimer (TIMER_TYPE_INTERVAL, DelOldChan, "DelOldChan", TS_ONE_HOUR, NULL);
+	AddTimer( TIMER_TYPE_INTERVAL, DelOldChanTimer, "DelOldChanTimer", TS_ONE_HOUR, NULL );
 	return NS_SUCCESS;
 }
 
@@ -222,7 +233,7 @@ int ModSynch (void)
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini (void)
+int ModFini( void )
 {
 	StatServ.shutdown = 1;
 	FiniServerStats();
@@ -233,57 +244,102 @@ int ModFini (void)
 	return NS_SUCCESS;
 }
 
-static int ss_set_html_cb (CmdParams *cmdparams, SET_REASON reason)
+/** @brief ss_set_html_cb
+ *
+ *  Set callback for SET HTML
+ *  Enable or disable html output
+ *
+ *  @cmdparams pointer to commands param struct
+ *  @cmdparams reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ss_set_html_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_CHANGE )
 	{
-		if (StatServ.html && StatServ.htmlpath[0] == 0) {
-			irc_prefmsg  (ss_bot, cmdparams->source, 
-				"You need to SET HTMLPATH. HTML output disabled.");
+		if( StatServ.html && StatServ.htmlpath[0] == 0 )
+		{
+			irc_prefmsg ( ss_bot, cmdparams->source, 
+				"You need to SET HTMLPATH. HTML output disabled." );
 			StatServ.html = 0;
 			return NS_SUCCESS;
 		}
-		if (StatServ.html) {
-			AddTimer (TIMER_TYPE_INTERVAL, ss_html, "ss_html", StatServ.htmltime, NULL);
-		} else {
-			DelTimer ("ss_html");
-		}
+		if( StatServ.html )
+			AddTimer( TIMER_TYPE_INTERVAL, HTMLOutputTimer, "HTMLOutputTimer", StatServ.htmltime, NULL );
+		else
+			DelTimer( "HTMLOutputTimer" );
 	}
 	return NS_SUCCESS;
 }
 
-static int ss_set_htmlpath_cb (CmdParams *cmdparams, SET_REASON reason)
+/** @brief ss_set_htmlpath_cb
+ *
+ *  Set callback for SET HTMLPATH
+ *  Change html output path
+ *
+ *  @cmdparams pointer to commands param struct
+ *  @cmdparams reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ss_set_htmlpath_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	FILE *opf;
 
 	if( reason == SET_CHANGE )
 	{
-		opf = os_fopen (StatServ.htmlpath, "wt");
-		if (!opf) {
-			irc_prefmsg (ss_bot, cmdparams->source, 
-				"Failed to open HTML output file %s. Check file permissions. HTML output disabled.", StatServ.htmlpath);
+		opf = os_fopen( StatServ.htmlpath, "wt" );
+		if( !opf )
+		{
+			irc_prefmsg( ss_bot, cmdparams->source, 
+				"Failed to open HTML output file %s. Check file permissions. HTML output disabled.", StatServ.htmlpath );
 			return NS_SUCCESS;
 		}
-		os_fclose (opf);
-		ss_html (NULL);
+		os_fclose( opf );
+		HTMLOutput();
 	}
 	return NS_SUCCESS;
 }
 
-static int ss_set_htmltime_cb (CmdParams *cmdparams, SET_REASON reason)
+/** @brief ss_set_htmltime_cb
+ *
+ *  Set callback for SET HTMLTIME
+ *  Change html output time
+ *
+ *  @cmdparams pointer to commands param struct
+ *  @cmdparams reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ss_set_htmltime_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_CHANGE )
 	{
-		SetTimerInterval ("ss_html", StatServ.htmltime);
+		SetTimerInterval( "HTMLOutputTimer", StatServ.htmltime );
 	}
 	return NS_SUCCESS;
 }
 
-static int ss_set_exclusions_cb (CmdParams *cmdparams, SET_REASON reason)
+/** @brief ss_set_exclusions_cb
+ *
+ *  Set callback for exclusions
+ *  Enable or disable exclude event flag
+ *
+ *  @cmdparams pointer to commands param struct
+ *  @cmdparams reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ss_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
-		SetAllEventFlags (EVENT_FLAG_USE_EXCLUDE, StatServ.exclusions);
+		SetAllEventFlags( EVENT_FLAG_USE_EXCLUDE, StatServ.exclusions );
 	}
 	return NS_SUCCESS;
 }

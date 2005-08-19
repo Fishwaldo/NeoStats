@@ -85,12 +85,15 @@ int ss_event_mode( const CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	ss = GetServerModValue( cmdparams->source->uplink );
-	if( !ss ) {
+	if( !ss )
+	{
 		nlog( LOG_WARNING, "Unable to find stats for %s", cmdparams->source->uplink->name );
 		return NS_SUCCESS;
 	}
-	while( *modes ) {
-		switch( *modes ) {
+	while( *modes )
+	{
+		switch( *modes )
+		{
 		case '+':
 			add = 1;
 			break;
@@ -99,12 +102,16 @@ int ss_event_mode( const CmdParams *cmdparams )
 			break;
 		case 'O':
 		case 'o':
-			if( add ) {
+			if( add )
+			{
 				dlog( DEBUG1, "Increasing OperCount for %s", ss->name );
 				AddNetworkOper();
 				AddServerOper( cmdparams->source );
-			} else {
-				if( IsOper( cmdparams->source ) ) {
+			}
+			else
+			{
+				if( IsOper( cmdparams->source ) )
+				{
 					dlog( DEBUG1, "Decreasing OperCount for %s", ss->name );
 					DelNetworkOper();
 					DelServerOper( cmdparams->source );
@@ -210,10 +217,13 @@ static int operlist( Client *u, const void * v )
 		return NS_FALSE;
 	if( operlistaway && IsAway( u ) )
 		return NS_FALSE;
-	if( !operlistserver ) {
+	if( !operlistserver )
+	{
 		irc_prefmsg( ss_bot, listu, "%-15s %-15s %-10d",
 			u->name, u->uplink->name, UserLevel( u ) );
-	} else {
+	}
+	else
+	{
 		if( ircstrcasecmp( operlistserver, u->uplink->name ) )
 			return NS_FALSE;
 		irc_prefmsg( ss_bot, listu, "%-15s %-15s %-10d", 
@@ -239,21 +249,25 @@ int ss_cmd_operlist( const CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	operlistaway = 0;
 	operlistserver = NULL;
-	if( cmdparams->ac == 0 ) {
+	if( cmdparams->ac == 0 )
+	{
 		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops:" );
 		irc_prefmsg( ss_bot, cmdparams->source, "ID  %-15s %-15s %-10s", 
 			"Nick", "Server", "Level" );
 	}
-	if( cmdparams->ac != 0 ) {
+	if( cmdparams->ac != 0 )
+	{
 		flags = cmdparams->av[0];
 		operlistserver = cmdparams->av[1];
 	}
-	if( flags && !ircstrcasecmp( flags, "NOAWAY" ) ) {
+	if( flags && !ircstrcasecmp( flags, "NOAWAY" ) )
+	{
 		operlistaway = 1;
 		flags = NULL;
 		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops( not away ):" );
 	}
-	if( !operlistaway && flags && strchr( flags, '.' ) ) {
+	if( !operlistaway && flags && strchr( flags, '.' ) )
+	{
 		operlistserver = flags;
 		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops on server %s", operlistserver );
 	}
@@ -278,9 +292,8 @@ static int botlist( const Client *u, const void * v )
 	Client *listu;
 
 	listu = ( Client * )v;
-	if IsBot( u ) { 
+	if IsBot( u )
 		irc_prefmsg( ss_bot, listu, "%-15s %s", u->name, u->uplink->name );
-	}
 	return NS_FALSE;
 }
 

@@ -26,8 +26,10 @@
 #include "stats.h"
 #include "network.h"
 
+/** Network table name */
 #define NETWORK_TABLE	"Network"
 
+/** Network stats */
 networkstat networkstats;
 
 /** @brief AverageNetworkStatistics 
@@ -39,13 +41,13 @@ networkstat networkstats;
  *  @return none
  */
 
-void AverageNetworkStatistics (void)
+void AverageNetworkStatistics( void )
 {
-	AverageStatistic (&networkstats.servers);
-	AverageStatistic (&networkstats.channels);
-	AverageStatistic (&networkstats.users);
-	AverageStatistic (&networkstats.opers);
-	AverageStatistic (&networkstats.kills);
+	AverageStatistic( &networkstats.servers );
+	AverageStatistic( &networkstats.channels );
+	AverageStatistic( &networkstats.users );
+	AverageStatistic( &networkstats.opers );
+	AverageStatistic( &networkstats.kills );
 }
 
 /** @brief ResetNetworkStatistics
@@ -57,143 +59,289 @@ void AverageNetworkStatistics (void)
  *  @return none
  */
 
-void ResetNetworkStatistics (void)
+void ResetNetworkStatistics( void )
 {
-	ResetStatistic (&networkstats.servers);
-	ResetStatistic (&networkstats.channels);
-	ResetStatistic (&networkstats.users);
-	ResetStatistic (&networkstats.opers);
-	ResetStatistic (&networkstats.kills);
+	ResetStatistic( &networkstats.servers );
+	ResetStatistic( &networkstats.channels );
+	ResetStatistic( &networkstats.users );
+	ResetStatistic( &networkstats.opers );
+	ResetStatistic( &networkstats.kills );
 }
 
-void AddNetworkServer (void)
+/** @brief AddNetworkServer
+ *
+ *  Add server to network stats
+ *  Report new record if previous ones beaten
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void AddNetworkServer( void )
 {
-	if (IncStatistic (&networkstats.servers)) {
-		announce_record ("\2NEW NETWORK RECORD\2 %d servers on the network",
-			networkstats.servers.current);
-	}
+	if( IncStatistic( &networkstats.servers ) )
+		announce_record( "\2NEW NETWORK RECORD\2 %d servers on the network",
+			networkstats.servers.current );
 }
 
-void DelNetworkServer (void)
+/** @brief DelNetworkServer
+ *
+ *  Delete server from network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void DelNetworkServer( void )
 {
-	DecStatistic (&networkstats.servers);
+	DecStatistic( &networkstats.servers );
 }
 
-void AddNetworkChannel (void)
+/** @brief AddNetworkChannel
+ *
+ *  Add channel to network stats
+ *  Report new record if previous ones beaten
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void AddNetworkChannel( void )
 {
-	if (IncStatistic (&networkstats.channels)) {
-		announce_record ("\2NEW NETWORK RECORD\2 %d channels on the network",
-		    networkstats.channels.current);
-	}
+	if( IncStatistic( &networkstats.channels ) )
+		announce_record( "\2NEW NETWORK RECORD\2 %d channels on the network",
+		    networkstats.channels.current );
 }
 
-void DelNetworkChannel (void)
+/** @brief DelNetworkChannel
+ *
+ *  Delete channel from network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void DelNetworkChannel( void )
 {
-	DecStatistic (&networkstats.channels);
+	DecStatistic( &networkstats.channels );
 }
 
-void AddNetworkUser (void)
+/** @brief AddNetworkUser
+ *
+ *  Add user to network stats
+ *  Report new record if previous ones beaten
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void AddNetworkUser( void )
 {
-	if (IncStatistic (&networkstats.users)) {
-		announce_record ("\2NEW NETWORK RECORD!\2 %d users on the network",
-			networkstats.users.current);
-	}
+	if( IncStatistic( &networkstats.users ) )
+		announce_record( "\2NEW NETWORK RECORD!\2 %d users on the network",
+			networkstats.users.current );
 }
 
-void DelNetworkUser (void)
+/** @brief DelNetworkUser
+ *
+ *  Delete user from network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void DelNetworkUser( void )
 {
-	DecStatistic (&networkstats.users);
+	DecStatistic( &networkstats.users );
 }
 
-void AddNetworkOper (void)
+/** @brief AddNetworkOper
+ *
+ *  Add oper to network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void AddNetworkOper( void )
 {
-	IncStatistic (&networkstats.opers);
+	IncStatistic( &networkstats.opers );
 }
 
-void DelNetworkOper (void)
+/** @brief DelNetworkOper
+ *
+ *  Delete oper from network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void DelNetworkOper( void )
 {
-	DecStatistic (&networkstats.opers);
+	DecStatistic( &networkstats.opers );
 }
 
-void AddNetworkKill (void)
+/** @brief AddNetworkKill
+ *
+ *  Add kill to network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void AddNetworkKill( void )
 {
-	IncStatistic (&networkstats.kills);
+	IncStatistic( &networkstats.kills );
 }
 
-void DelNetworkKill (void)
+/** @brief DelNetworkKill
+ *
+ *  Delete kill from network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void DelNetworkKill( void )
 {
-	DecStatistic (&networkstats.kills);
+	DecStatistic( &networkstats.kills );
 }
 
-int ss_cmd_netstats (const CmdParams *cmdparams)
+/** @brief ss_cmd_netstats
+ *
+ *  NETSTATS command handler
+ *  Reports current network statistics to requesting user
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_cmd_netstats( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_prefmsg(ss_bot, cmdparams->source, "Network Statistics:-----");
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Users: %d", networkstats.users.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Users: %d [%s]",
-		networkstats.users.alltime.max, sftime(networkstats.users.alltime.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Total Users Connected: %d",
-		networkstats.users.alltime.runningtotal);
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Channels %d", networkstats.channels.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Channels %d [%s]",
-		networkstats.channels.alltime.max, sftime(networkstats.channels.alltime.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Opers: %d", networkstats.opers.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Opers: %d [%s]",
-		networkstats.opers.alltime.max, sftime(networkstats.opers.alltime.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Users Set Away: %d", me.awaycount);
-	irc_prefmsg(ss_bot, cmdparams->source, "Current Servers: %d", networkstats.servers.current);
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Servers: %d [%s]",
-		networkstats.servers.alltime.max, sftime(networkstats.servers.alltime.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "End of list.");
+	irc_prefmsg( ss_bot, cmdparams->source, "Network Statistics:-----" );
+	irc_prefmsg( ss_bot, cmdparams->source, "Current Users: %d", networkstats.users.current );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Users: %d [%s]",
+		networkstats.users.alltime.max, sftime( networkstats.users.alltime.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "Total Users Connected: %d",
+		networkstats.users.alltime.runningtotal );
+	irc_prefmsg( ss_bot, cmdparams->source, "Current Channels %d", networkstats.channels.current );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Channels %d [%s]",
+		networkstats.channels.alltime.max, sftime( networkstats.channels.alltime.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "Current Opers: %d", networkstats.opers.current );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Opers: %d [%s]",
+		networkstats.opers.alltime.max, sftime( networkstats.opers.alltime.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "Users Set Away: %d", me.awaycount );
+	irc_prefmsg( ss_bot, cmdparams->source, "Current Servers: %d", networkstats.servers.current );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Servers: %d [%s]",
+		networkstats.servers.alltime.max, sftime( networkstats.servers.alltime.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
-int ss_cmd_daily (const CmdParams *cmdparams)
+/** @brief ss_cmd_daily
+ *
+ *  DAILY command handler
+ *  Reports current daily network statistics to requesting user
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_cmd_daily( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_prefmsg(ss_bot, cmdparams->source, "Daily Network Statistics:");
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Servers: %-2d %s",
-		networkstats.servers.daily.max, sftime(networkstats.servers.daily.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Users: %-2d %s", 
-		networkstats.users.daily.max, sftime(networkstats.users.daily.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Channel: %-2d %s", 
-		networkstats.channels.daily.max, sftime(networkstats.channels.daily.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Maximum Opers: %-2d %s", 
-		networkstats.opers.daily.max, sftime(networkstats.opers.daily.ts_max));
-	irc_prefmsg(ss_bot, cmdparams->source, "Total Users Connected: %-2d",
-		networkstats.users.daily.runningtotal);
-	irc_prefmsg(ss_bot, cmdparams->source, "End of Information.");
+	irc_prefmsg( ss_bot, cmdparams->source, "Daily Network Statistics:" );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Servers: %-2d %s",
+		networkstats.servers.daily.max, sftime( networkstats.servers.daily.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Users: %-2d %s", 
+		networkstats.users.daily.max, sftime( networkstats.users.daily.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Channel: %-2d %s", 
+		networkstats.channels.daily.max, sftime( networkstats.channels.daily.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Opers: %-2d %s", 
+		networkstats.opers.daily.max, sftime( networkstats.opers.daily.ts_max ) );
+	irc_prefmsg( ss_bot, cmdparams->source, "Total Users Connected: %-2d",
+		networkstats.users.daily.runningtotal );
+	irc_prefmsg( ss_bot, cmdparams->source, "End of Information." );
 	return NS_SUCCESS;
 }
 
-void LoadNetworkStats(void) 
+/** @brief LoadNetworkStats
+ *
+ *  Load network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void LoadNetworkStats( void ) 
 {
-	if (DBAFetch (NETWORK_TABLE, NETWORK_TABLE, &networkstats, sizeof (networkstats)) == NS_SUCCESS) 
+	if( DBAFetch( NETWORK_TABLE, NETWORK_TABLE, &networkstats, sizeof( networkstats ) ) == NS_SUCCESS ) 
 	{
-		PostLoadStatistic (&networkstats.servers);
-		PostLoadStatistic (&networkstats.channels);
-		PostLoadStatistic (&networkstats.users);
-		PostLoadStatistic (&networkstats.opers);
-		PostLoadStatistic (&networkstats.kills);
+		PostLoadStatistic( &networkstats.servers );
+		PostLoadStatistic( &networkstats.channels );
+		PostLoadStatistic( &networkstats.users );
+		PostLoadStatistic( &networkstats.opers );
+		PostLoadStatistic( &networkstats.kills );
 	}
 }
 
-void SaveNetworkStats(void)
+/** @brief SaveNetworkStats
+ *
+ *  Save network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void SaveNetworkStats( void )
 {
-	DBAStore (NETWORK_TABLE, NETWORK_TABLE, &networkstats, sizeof(networkstats));
-	PreSaveStatistic (&networkstats.servers);
-	PreSaveStatistic (&networkstats.channels);
-	PreSaveStatistic (&networkstats.users);
-	PreSaveStatistic (&networkstats.opers);
-	PreSaveStatistic (&networkstats.kills);
+	DBAStore( NETWORK_TABLE, NETWORK_TABLE, &networkstats, sizeof( networkstats ) );
+	PreSaveStatistic( &networkstats.servers );
+	PreSaveStatistic( &networkstats.channels );
+	PreSaveStatistic( &networkstats.users );
+	PreSaveStatistic( &networkstats.opers );
+	PreSaveStatistic( &networkstats.kills );
 }
 
-void InitNetworkStats (void)
+/** @brief InitVersionStats
+ *
+ *  Init version stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void InitNetworkStats( void )
 {
 	LoadNetworkStats();
 }
 
-void FiniNetworkStats (void)
+/** @brief FiniNetworkStats
+ *
+ *  Fini network stats
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void FiniNetworkStats( void )
 {
 	SaveNetworkStats();
 }
