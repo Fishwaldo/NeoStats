@@ -46,7 +46,6 @@ struct StatServ {
 	int channeltime;
 	int msginterval; 
 	int msglimit; 
-	int shutdown; 
 	int exclusions; 
 	int flatmap; 
 } StatServ;

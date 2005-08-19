@@ -419,7 +419,7 @@ static void top10membershandler( const channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
-	irc_prefmsg( ss_bot,cmdparams->source, "Channel %s Members %d", 
+	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Members %d", 
 		cs->name, cs->c->users );
 }
 
@@ -564,6 +564,30 @@ void SaveChanStats( void )
 {
 	channelstat *cs;
 	lnode_t *cn;
+
+	cn = list_first( channelstatlist );
+	while( cn )
+	{
+		cs = lnode_get( cn );
+		SaveChannel( cs );
+		cn = list_next( channelstatlist, cn );
+	}
+}
+
+/** @brief SaveChanStatsProgressive
+ *
+ *  Save channel stats progressively
+ *  Do we still need this functionality?
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void SaveChanStatsProgressive( void )
+{
+	channelstat *cs;
+	lnode_t *cn;
 	int limit;
     int count = 0;
 
@@ -574,7 +598,7 @@ void SaveChanStats( void )
 	{
 		cs = lnode_get( cn );
 		/* we are not shutting down, so do progressive save if we have more than 100 channels */
-		if( StatServ.shutdown == 0 && ( limit > 25 ) )
+		if( limit > 25 )
 		{
 			if( count > limit )
 				break;

@@ -149,7 +149,7 @@ int SaveStatsTimer( void *userptr )
 {
 	SET_SEGV_LOCATION();
 	SaveServerStats();
-	SaveChanStats();
+	SaveChanStatsProgressive();
 	SaveNetworkStats();
 	return NS_SUCCESS;
 }
@@ -166,7 +166,6 @@ int SaveStatsTimer( void *userptr )
 int ModInit( void )
 {
 	SET_SEGV_LOCATION();
-	StatServ.shutdown = 0;
 	ModuleConfig( ss_settings );
 	if( StatServ.html && StatServ.htmlpath[0] == 0 )
 	{
@@ -235,7 +234,6 @@ int ModSynch( void )
 
 int ModFini( void )
 {
-	StatServ.shutdown = 1;
 	FiniServerStats();
 	FiniChannelStats();
 	FiniTLDStatistics();

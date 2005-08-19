@@ -64,6 +64,7 @@ int DelOldChanTimer( void *v );
 int InitChannelStats( void );
 void FiniChannelStats( void );
 void SaveChanStats( void );
+void SaveChanStatsProgressive( void );
 void ResetChannelStatistics( void );
 void AverageChannelStatistics( void );
 
