@@ -672,7 +672,7 @@ int DelOldChanTimer( void *userptr )
  *  @return none
  */
 
-void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, void *v )
+void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, const void *v )
 {
 	int count = 0;
 	lnode_t *ln;
