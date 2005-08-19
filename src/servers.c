@@ -332,7 +332,7 @@ void FreeServerModPtr (Client* s)
 	}
 }
 
-void* GetServerModPtr (Client* s)
+void* GetServerModPtr (const Client* s)
 {
 	return s->modptr[GET_CUR_MODNUM()];
 }
@@ -360,7 +360,7 @@ void SetServerModValue (Client* s, void *data)
 	}
 }
 
-void *GetServerModValue (Client* s)
+void *GetServerModValue (const Client* s)
 {
 	if (s)
 	{

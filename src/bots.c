@@ -776,7 +776,7 @@ void FreeBotModPtr( Bot *pBot )
 	ns_free( pBot->moddata );
 }
 
-void* GetBotModPtr( Bot *pBot )
+void* GetBotModPtr( const Bot *pBot )
 {
 	return pBot->moddata;
 }
@@ -797,7 +797,7 @@ void SetBotModValue( Bot *pBot, void *data )
 	}
 }
 
-void *GetBotModValue( Bot *pBot )
+void *GetBotModValue( const Bot *pBot )
 {
 	if( pBot )
 	{

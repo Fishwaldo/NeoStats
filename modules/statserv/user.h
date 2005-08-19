@@ -24,14 +24,13 @@
 #ifndef _USER_H_
 #define _USER_H_
 
-void StatsAddUser(Client * u);
-int ss_event_signon (CmdParams *cmdparams);
-int ss_event_quit (CmdParams *cmdparams);
-int ss_event_mode (CmdParams *cmdparams);
-int ss_event_globalkill (CmdParams *cmdparams);
-int ss_event_serverkill (CmdParams *cmdparams);
-int ss_cmd_operlist (CmdParams *cmdparams);
-int ss_cmd_botlist (CmdParams *cmdparams);
-void InitUserStats (void);	
+int ss_event_signon( const CmdParams *cmdparams );
+int ss_event_quit( const CmdParams *cmdparams );
+int ss_event_mode( const CmdParams *cmdparams );
+int ss_event_globalkill( const CmdParams *cmdparams );
+int ss_event_serverkill( const CmdParams *cmdparams );
+int ss_cmd_operlist( const CmdParams *cmdparams );
+int ss_cmd_botlist( const CmdParams *cmdparams );
+void InitUserStats( void );	
 
 #endif /* _USER_H_ */

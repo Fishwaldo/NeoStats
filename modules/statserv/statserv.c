@@ -100,7 +100,7 @@ static bot_cmd ss_commands[]=
 	{"TLDMAP",		ss_cmd_tldmap,		0, 	0,		ss_help_tldmap},
 	{"OPERLIST",	ss_cmd_operlist,	0, 	0,		ss_help_operlist},
 	{"BOTLIST",		ss_cmd_botlist,		0, 	0,		ss_help_botlist},
-	{"USERVERSION",	ss_cmd_userversion,	0,	0,		ss_help_userversion},
+	{"CTCPVERSION",	ss_cmd_ctcpversion,	0,	0,		ss_help_ctcpversion},
 	{"FORCEHTML",	ss_cmd_forcehtml,	0, 	NS_ULEVEL_ADMIN,	ss_help_forcehtml},
 	NS_CMD_END()
 };
@@ -157,17 +157,22 @@ int ModInit( void )
 {
 	SET_SEGV_LOCATION();
 	StatServ.shutdown = 0;
-	ModuleConfig(ss_settings);
-	if (StatServ.html && StatServ.htmlpath[0] == 0) {
+	ModuleConfig( ss_settings );
+	if( StatServ.html && StatServ.htmlpath[0] == 0 )
+	{
 		nlog(LOG_NOTICE, "HTML stats disabled as HTML_PATH is not set");
 		StatServ.html = 0;
 	}
-	InitNetworkStats ();
-	InitChannelStats ();
-	InitServerStats ();
-	InitVersionStats ();
-	InitTLDStatistics ();	
-	InitUserStats ();	
+	InitNetworkStats();
+	if( InitChannelStats() == NS_FAILURE )
+		return NS_FAILURE;
+	if( InitServerStats() == NS_FAILURE )
+		return NS_FAILURE;
+	if( InitVersionStats() == NS_FAILURE )
+		return NS_FAILURE;
+	if( InitTLDStatistics() == NS_FAILURE )
+		return NS_FAILURE;
+	InitUserStats();	
 	return NS_SUCCESS;
 }
 
@@ -187,9 +192,8 @@ int ModSynch (void)
 	/* RTA init must be in synch since core does not start 
 	   RTA during the init cycle when NeoStats first boots */
 	ss_bot = AddBot (&ss_botinfo);
-	if (!ss_bot) {
+	if (!ss_bot)
 		return NS_FAILURE;
-	}
 	/* Timer to save the database */
 	AddTimer (TIMER_TYPE_INTERVAL, SaveStats, "SaveStats", DBSAVETIME, NULL);
 	/* Timer to output html */
@@ -221,10 +225,10 @@ int ModSynch (void)
 int ModFini (void)
 {
 	StatServ.shutdown = 1;
-	FiniServerStats ();
-	FiniChannelStats ();
-	FiniTLDStatistics ();
-	FiniVersionStats ();
+	FiniServerStats();
+	FiniChannelStats();
+	FiniTLDStatistics();
+	FiniVersionStats();
 	FiniNetworkStats();
 	return NS_SUCCESS;
 }

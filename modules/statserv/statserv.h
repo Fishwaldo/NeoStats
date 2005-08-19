@@ -74,9 +74,7 @@ extern const char *ss_help_set_htmltime[];
 extern const char *ss_help_set_channeltime[];
 extern const char *ss_help_set_lagalert[];
 extern const char *ss_help_set_recordalert[];
-extern const char *ss_help_userversion[];
-
-int sortusers(const void *v, const void *v2);
+extern const char *ss_help_ctcpversion[];
 
 void announce_record (const char *msg, ...);
 void announce_lag(const char *msg, ...);

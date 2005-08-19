@@ -29,7 +29,16 @@
 
 #define CHANNEL_TABLE	"Channel"
 
-list_t *channelstatlist;
+static list_t *channelstatlist;
+
+/** @brief AverageChannelStatistics
+ *
+ *  Average channel statistics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 void AverageChannelStatistics( void )
 {
@@ -46,6 +55,15 @@ void AverageChannelStatistics( void )
 		cn = list_next( channelstatlist, cn );
 	}
 }
+
+/** @brief ResetChannelStatistics
+ *
+ *  Reset channel statistics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 void ResetChannelStatistics( void )
 {
@@ -168,13 +186,13 @@ static int AddChannel( Channel* c, void *v )
 	return NS_FALSE;
 }
 
-int ss_event_newchan( CmdParams *cmdparams )
+int ss_event_newchan( const CmdParams *cmdparams )
 {
 	AddChannel( cmdparams->channel, NULL );
 	return NS_SUCCESS;
 }
 
-int ss_event_delchan( CmdParams *cmdparams )
+int ss_event_delchan( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 	lnode_t *ln;
@@ -194,7 +212,7 @@ int ss_event_delchan( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-int ss_event_join( CmdParams *cmdparams )
+int ss_event_join( const CmdParams *cmdparams )
 {										   
 	channelstat *cs;
 
@@ -209,7 +227,7 @@ int ss_event_join( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-int ss_event_part( CmdParams *cmdparams )
+int ss_event_part( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 
@@ -224,7 +242,7 @@ int ss_event_part( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-int ss_event_topic( CmdParams *cmdparams )
+int ss_event_topic( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 
@@ -238,7 +256,7 @@ int ss_event_topic( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-int ss_event_kick( CmdParams *cmdparams )
+int ss_event_kick( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 
@@ -253,7 +271,7 @@ int ss_event_kick( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-static void top10membershandler( channelstat *cs, void *v )
+static void top10membershandler( const channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
@@ -261,7 +279,7 @@ static void top10membershandler( channelstat *cs, void *v )
 		cs->name, cs->c->users );
 }
 
-static void top10joinshandler( channelstat *cs, void *v )
+static void top10joinshandler( const channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
@@ -269,7 +287,7 @@ static void top10joinshandler( channelstat *cs, void *v )
 		cs->name, cs->users.alltime.runningtotal );
 }
 
-static void top10kickshandler( channelstat *cs, void *v )
+static void top10kickshandler( const channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
@@ -277,7 +295,7 @@ static void top10kickshandler( channelstat *cs, void *v )
 		cs->name, cs->kicks.alltime.runningtotal );
 }
 
-static void top10topicshandler( channelstat *cs, void *v )
+static void top10topicshandler( const channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
@@ -285,7 +303,7 @@ static void top10topicshandler( channelstat *cs, void *v )
 		cs->name, cs->topics.alltime.runningtotal );
 }
 
-int ss_cmd_channel( CmdParams *cmdparams )
+int ss_cmd_channel( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 
@@ -400,10 +418,16 @@ int DelOldChan( void *userptr )
 	return NS_SUCCESS;
 }
 
-void InitChannelStats( void )
+int InitChannelStats( void )
 {
 	channelstatlist = list_create( -1 );
+	if( !channelstatlist )
+	{
+		nlog( LOG_CRITICAL, "Unable to create channel stat list" );
+		return NS_FAILURE;
+	}
 	GetChannelList( AddChannel, NULL );
+	return NS_SUCCESS;
 }
 
 void FiniChannelStats( void )
@@ -423,7 +447,7 @@ void FiniChannelStats( void )
 	list_destroy( channelstatlist );
 }
 
-void GetChannelStats( ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, void *v )
+void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, void *v )
 {
 	int i = 0;
 	lnode_t *ln;

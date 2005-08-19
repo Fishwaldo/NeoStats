@@ -34,24 +34,24 @@ typedef struct networkstat {
 
 extern networkstat networkstats;
 
-void AddNetworkServer (void);
-void AddNetworkChannel (void);
-void AddNetworkUser (void);
-void AddNetworkOper (void);
-void AddNetworkKill (void);
-void DelNetworkServer (void);
-void DelNetworkChannel (void);
-void DelNetworkUser (void);
-void DelNetworkOper (void);
-void DelNetworkKill (void);
-int ss_cmd_netstats (CmdParams *cmdparams);
-int ss_cmd_daily (CmdParams *cmdparams);
+void AddNetworkServer( void );
+void AddNetworkChannel( void );
+void AddNetworkUser( void );
+void AddNetworkOper( void );
+void AddNetworkKill( void );
+void DelNetworkServer( void );
+void DelNetworkChannel( void );
+void DelNetworkUser( void );
+void DelNetworkOper( void );
+void DelNetworkKill( void );
+int ss_cmd_netstats( const CmdParams *cmdparams );
+int ss_cmd_daily( const CmdParams *cmdparams );
 
-void AverageNetworkStatistics (void);
-void ResetNetworkStatistics (void);
-void InitNetworkStats (void);
-void FiniNetworkStats (void);
-void SaveNetworkStats (void);
+void AverageNetworkStatistics( void );
+void ResetNetworkStatistics( void );
+void InitNetworkStats( void );
+void FiniNetworkStats( void );
+void SaveNetworkStats( void );
 
 
 #endif /* _NETWORK_H_ */

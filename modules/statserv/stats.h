@@ -42,24 +42,24 @@ typedef struct statistic {
 	statisticentry monthly;
 } statistic;
 
-void AverageStatisticEntry (statisticentry *stat, unsigned int current);
-void AverageStatistic (statistic *stat);
-int AverageStatistics (void *);
-void ResetStatisticEntry (statisticentry *stat, unsigned int current);
-void ResetStatistic (statistic *stat);
-int ResetStatistics (void *);
-int IncStatisticEntry (statisticentry *stat, unsigned int current);
-int IncStatistic (statistic *stat);
-void DecStatisticEntry (statisticentry *stat, unsigned int current);
-void DecStatistic (statistic *stat);
-int SetStatisticEntry (statisticentry *stat, unsigned int current, int diff);
-int SetStatistic (statistic *stat, int current);
-void PreSaveStatistic (statistic *stat);
-void PostLoadStatistic (statistic *stat);
+void AverageStatisticEntry( statisticentry *stat, unsigned int current );
+void AverageStatistic( statistic *stat );
+int AverageStatistics( void *v );
+void ResetStatisticEntry( statisticentry *stat, unsigned int current );
+void ResetStatistic( statistic *stat );
+int ResetStatistics( void *v );
+int IncStatisticEntry( statisticentry *stat, unsigned int current );
+int IncStatistic( statistic *stat );
+void DecStatisticEntry( statisticentry *stat, unsigned int current );
+void DecStatistic( statistic *stat );
+int SetStatisticEntry( statisticentry *stat, unsigned int current, int diff );
+int SetStatistic( statistic *stat, int current );
+void PreSaveStatistic( statistic *stat );
+void PostLoadStatistic( statistic *stat );
 
-int GetAllTimePercent (statistic *stat);
-int GetDailyPercent (statistic *stat);
-int GetWeeklyPercent (statistic *stat);
-int GetMonthlyPercent (statistic *stat);
+int GetAllTimePercent( statistic *stat );
+int GetDailyPercent( statistic *stat );
+int GetWeeklyPercent( statistic *stat );
+int GetMonthlyPercent( statistic *stat );
 
 #endif /* _STATS_H_ */

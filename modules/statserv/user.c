@@ -28,20 +28,69 @@
 #include "server.h"
 #include "tld.h"
 
-int ss_event_mode(CmdParams *cmdparams)
+/** @brief AddUser
+ *
+ *  Add user to statserv
+ *
+ *  @param u pointer to client to add
+ *  @param v not used
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int AddUser( const Client *u, const void *v )
+{
+	SET_SEGV_LOCATION();
+	AddServerUser( u );
+	AddNetworkUser();
+	AddTLDUser( u );
+	return NS_FALSE;
+}
+
+/** @brief DelUser
+ *
+ *  Delete user from statserv
+ *
+ *  @param u pointer to client to delete
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static void DelUser( const Client *u )
+{
+	if( IsOper( u ) )
+	{
+		dlog( DEBUG2, "Decreasing OperCount on %s due to signoff", u->uplink->name );
+		DelServerOper( u );
+	}
+	DelServerUser( u );
+	DelNetworkUser();
+	DelTLDUser( u );
+}
+
+/** @brief ss_event_mode
+ *
+ *  MODE event handler
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_event_mode( const CmdParams *cmdparams )
 {
 	int add = 1;
 	serverstat *ss;
 	char *modes = cmdparams->param;
 
 	SET_SEGV_LOCATION();
-	ss = GetServerModValue (cmdparams->source->uplink);
-	if (!ss) {
-		nlog (LOG_WARNING, "Unable to find stats for %s", cmdparams->source->uplink->name);
+	ss = GetServerModValue( cmdparams->source->uplink );
+	if( !ss ) {
+		nlog( LOG_WARNING, "Unable to find stats for %s", cmdparams->source->uplink->name );
 		return NS_SUCCESS;
 	}
-	while (*modes) {
-		switch (*modes) {
+	while( *modes ) {
+		switch( *modes ) {
 		case '+':
 			add = 1;
 			break;
@@ -50,15 +99,15 @@ int ss_event_mode(CmdParams *cmdparams)
 			break;
 		case 'O':
 		case 'o':
-			if (add) {
-				dlog(DEBUG1, "Increasing OperCount for %s", ss->name);
-				AddNetworkOper ();
-				AddServerOper (cmdparams->source);
+			if( add ) {
+				dlog( DEBUG1, "Increasing OperCount for %s", ss->name );
+				AddNetworkOper();
+				AddServerOper( cmdparams->source );
 			} else {
-				if (IsOper(cmdparams->source)) {
-					dlog(DEBUG1, "Decreasing OperCount for %s", ss->name);
-					DelNetworkOper ();
-					DelServerOper (cmdparams->source);
+				if( IsOper( cmdparams->source ) ) {
+					dlog( DEBUG1, "Decreasing OperCount for %s", ss->name );
+					DelNetworkOper();
+					DelServerOper( cmdparams->source );
 				}
 			}
 			break;
@@ -70,133 +119,201 @@ int ss_event_mode(CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static int AddUser (Client *u, void *v)
-{
-	SET_SEGV_LOCATION();
-	AddServerUser (u);
-	AddNetworkUser ();
-	AddTLDUser (u);
-	return NS_FALSE;
-}
+/** @brief ss_event_globalkill
+ *
+ *  GLOBALKILL event handler
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
 
-static void DelUser (Client *u)
-{
-	if (IsOper(u)) {
-		dlog(DEBUG2, "Decreasing OperCount on %s due to signoff", u->uplink->name);
-		DelServerOper (u);
-	}
-	DelServerUser (u);
-	DelNetworkUser ();
-	DelTLDUser (u);
-}
-
-int ss_event_globalkill(CmdParams *cmdparams)
+int ss_event_globalkill( const CmdParams *cmdparams )
 {
 	serverstat *ss;
 
-	DelUser (cmdparams->target);
-	ss = GetServerModValue (cmdparams->target->uplink);
-	IncStatistic (&ss->operkills);
+	DelUser( cmdparams->target );
+	ss = GetServerModValue( cmdparams->target->uplink );
+	IncStatistic( &ss->operkills );
 	return NS_SUCCESS;
 }
 
-int ss_event_serverkill(CmdParams *cmdparams)
+/** @brief ss_event_serverkill
+ *
+ *  SERVERKILL event handler
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_event_serverkill( const CmdParams *cmdparams )
 {
 	serverstat *ss;
 
-	DelUser (cmdparams->target);
-	ss = GetServerModValue (cmdparams->target->uplink);
-	IncStatistic (&ss->serverkills);
+	DelUser( cmdparams->target );
+	ss = GetServerModValue( cmdparams->target->uplink );
+	IncStatistic( &ss->serverkills );
 	return NS_SUCCESS;
 }
 
-int ss_event_quit(CmdParams *cmdparams)
+/** @brief ss_event_quit
+ *
+ *  QUIT event handler
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_event_quit( const CmdParams *cmdparams )
 {
-	DelUser (cmdparams->source);
+	DelUser( cmdparams->source );
 	return NS_SUCCESS;
 }
 
-int ss_event_signon(CmdParams *cmdparams)
+/** @brief ss_event_signon
+ *
+ *  SIGNON event handler
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_event_signon( const CmdParams *cmdparams )
 {
-	AddUser (cmdparams->source, NULL);
+	AddUser( cmdparams->source, NULL );
 	return NS_SUCCESS;
 }
+
+/** @brief operlist
+ *
+ *  OPERLIST helper function
+ *  Process client information and report to requesting user
+ *
+ *  @param u pointer to client to report on
+ *  @param v pointer to client to report to
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
 
 static int operlistaway = 0;
 static char* operlistserver;
 
-static int operlist(Client *u, void * v)
+static int operlist( Client *u, const void * v )
 {
 	Client *listu;
 
-	listu = (Client *)v;
-	if (!IsOper(u))
+	listu = ( Client * )v;
+	if( !IsOper( u ) )
 		return NS_FALSE;
 	if( operlistaway && IsAway( u ) )
 		return NS_FALSE;
-	if (!operlistserver) {
-		irc_prefmsg (ss_bot, listu, "%-15s %-15s %-10d",
-			u->name, u->uplink->name, UserLevel(u));
+	if( !operlistserver ) {
+		irc_prefmsg( ss_bot, listu, "%-15s %-15s %-10d",
+			u->name, u->uplink->name, UserLevel( u ) );
 	} else {
-		if (ircstrcasecmp(operlistserver, u->uplink->name))
+		if( ircstrcasecmp( operlistserver, u->uplink->name ) )
 			return NS_FALSE;
-		irc_prefmsg (ss_bot, listu, "%-15s %-15s %-10d", 
-			u->name, u->uplink->name, UserLevel(u));
+		irc_prefmsg( ss_bot, listu, "%-15s %-15s %-10d", 
+			u->name, u->uplink->name, UserLevel( u ) );
 	}
 	return NS_FALSE;
 }
 
-int ss_cmd_operlist(CmdParams *cmdparams)
+/** @brief ss_cmd_botlist
+ *
+ *  OPERLIST command handler
+ *  Reports current statistics to requesting user
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_cmd_operlist( const CmdParams *cmdparams )
 {
 	char *flags = NULL;
 
 	SET_SEGV_LOCATION();
 	operlistaway = 0;
 	operlistserver = NULL;
-	if (cmdparams->ac == 0) {
-		irc_prefmsg (ss_bot, cmdparams->source, "Online IRCops:");
-		irc_prefmsg (ss_bot, cmdparams->source, "ID  %-15s %-15s %-10s", 
-			"Nick", "Server", "Level");
+	if( cmdparams->ac == 0 ) {
+		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops:" );
+		irc_prefmsg( ss_bot, cmdparams->source, "ID  %-15s %-15s %-10s", 
+			"Nick", "Server", "Level" );
 	}
-	if (cmdparams->ac != 0) {
+	if( cmdparams->ac != 0 ) {
 		flags = cmdparams->av[0];
 		operlistserver = cmdparams->av[1];
 	}
-	if (flags && !ircstrcasecmp(flags, "NOAWAY")) {
+	if( flags && !ircstrcasecmp( flags, "NOAWAY" ) ) {
 		operlistaway = 1;
 		flags = NULL;
-		irc_prefmsg (ss_bot, cmdparams->source, "Online IRCops (not away):");
+		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops( not away ):" );
 	}
-	if (!operlistaway && flags && strchr(flags, '.')) {
+	if( !operlistaway && flags && strchr( flags, '.' ) ) {
 		operlistserver = flags;
-		irc_prefmsg (ss_bot, cmdparams->source, "Online IRCops on server %s", operlistserver);
+		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops on server %s", operlistserver );
 	}
-	GetUserList (operlist, (void *)cmdparams->source);
-	irc_prefmsg (ss_bot, cmdparams->source, "End of list.");
+	GetUserList( operlist, ( void * )cmdparams->source );
+	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
-static int botlist(Client *u, void * v)
+/** @brief botlist
+ *
+ *  BOTLIST helper function
+ *  Process client information and report to requesting user
+ *
+ *  @param u pointer to client to report on
+ *  @param v pointer to client to report to
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+static int botlist( const Client *u, const void * v )
 {
 	Client *listu;
 
-	listu = (Client *)v;
-	if IsBot(u) { 
-		irc_prefmsg (ss_bot, listu, "%-15s %s", u->name, u->uplink->name);
+	listu = ( Client * )v;
+	if IsBot( u ) { 
+		irc_prefmsg( ss_bot, listu, "%-15s %s", u->name, u->uplink->name );
 	}
 	return NS_FALSE;
 }
 
-int ss_cmd_botlist(CmdParams *cmdparams)
+/** @brief ss_cmd_botlist
+ *
+ *  BOTLIST command handler
+ *  Reports current statistics to requesting user
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+int ss_cmd_botlist( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_prefmsg (ss_bot, cmdparams->source, "Online bots:");
-	GetUserList (botlist, (void *)cmdparams->source);
-	irc_prefmsg (ss_bot, cmdparams->source, "End of list.");
+	irc_prefmsg( ss_bot, cmdparams->source, "Online bots:" );
+	GetUserList( botlist, ( void * )cmdparams->source );
+	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
-void InitUserStats (void)
+/** @brief InitUserStats
+ *
+ *  Init user stats
+ *  Requests current user list from core and adds to StatServ
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS on success, NS_FAILURE on failure
+ */
+
+void InitUserStats( void )
 {
-	GetUserList (AddUser, NULL);
+	GetUserList( AddUser, NULL );
 }

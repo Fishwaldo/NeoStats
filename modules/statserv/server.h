@@ -40,25 +40,23 @@ typedef struct serverstat {
 	time_t ts_highest_ping;
 }serverstat;
 
-extern hash_t *serverstathash;
+typedef void( *ServerStatHandler )( const serverstat *cs, const void *v );
 
-typedef void (*ServerStatHandler) (serverstat *cs, void *v);
+void GetServerStats( const ServerStatHandler handler, const void *v );
 
-void GetServerStats (ServerStatHandler handler, void *v);
-
-int ss_event_server (CmdParams *cmdparams);
-int ss_event_squit (CmdParams *cmdparams);
-int ss_event_pong (CmdParams *cmdparams);
-int ss_cmd_map (CmdParams *cmdparams);
-int ss_cmd_server (CmdParams *cmdparams);
-void InitServerStats (void);
-void FiniServerStats (void);
-void SaveServerStats (void);
-void AddServerUser (Client *u);
-void DelServerUser (Client *u);
-void AddServerOper (Client *u);
-void DelServerOper (Client *u);
-void AverageServerStatistics (void);
-void ResetServerStatistics (void);
+int ss_event_server( const CmdParams *cmdparams );
+int ss_event_squit( const CmdParams *cmdparams );
+int ss_event_pong( const CmdParams *cmdparams );
+int ss_cmd_map( const CmdParams *cmdparams );
+int ss_cmd_server( const CmdParams *cmdparams );
+int InitServerStats( void );
+void FiniServerStats( void );
+void SaveServerStats( void );
+void AddServerUser( const Client *u );
+void DelServerUser( const Client *u );
+void AddServerOper( const Client *u );
+void DelServerOper( const Client *u );
+void AverageServerStatistics( void );
+void ResetServerStatistics( void );
 
 #endif /* _SERVER_H_ */

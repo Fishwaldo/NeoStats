@@ -681,7 +681,7 @@ void FreeUserModPtr (Client* u)
 	}
 }
 
-void* GetUserModPtr (Client* u)
+void* GetUserModPtr (const Client* u)
 {
 	return u->modptr[GET_CUR_MODNUM()];
 }
@@ -709,7 +709,7 @@ void SetUserModValue (Client *u, void *data)
 	}
 }
 
-void *GetUserModValue (Client *u)
+void *GetUserModValue (const Client *u)
 {
 	if (u)
 	{

@@ -46,24 +46,22 @@ typedef struct channelstat
 	statistic joins;
 }channelstat;
 
-extern list_t *channelstatlist;
+typedef void (*ChannelStatHandler)( const channelstat *cs, const void *v );
 
-typedef void (*ChannelStatHandler) (channelstat *cs, void *v );
-
-void GetChannelStats( ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, void *v );
+void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, const void *v );
 int topcurrentchannel( const void *key1, const void *key2 );
 int topjoinrunningtotalchannel( const void *key1, const void *key2 );
 int topkickrunningtotalchannel( const void *key1, const void *key2 );
 int toptopicrunningtotalchannel( const void *key1, const void *key2 );
-int ss_event_newchan( CmdParams *cmdparams );
-int ss_event_delchan( CmdParams *cmdparams );
-int ss_event_join( CmdParams *cmdparams );
-int ss_event_part( CmdParams *cmdparams );
-int ss_event_topic( CmdParams *cmdparams );
-int ss_event_kick( CmdParams *cmdparams );
-int ss_cmd_channel( CmdParams *cmdparams );
-int DelOldChan( void* );
-void InitChannelStats( void );
+int ss_event_newchan( const CmdParams *cmdparams );
+int ss_event_delchan( const CmdParams *cmdparams );
+int ss_event_join( const CmdParams *cmdparams );
+int ss_event_part( const CmdParams *cmdparams );
+int ss_event_topic( const CmdParams *cmdparams );
+int ss_event_kick( const CmdParams *cmdparams );
+int ss_cmd_channel( const CmdParams *cmdparams );
+int DelOldChan( void *v );
+int InitChannelStats( void );
 void FiniChannelStats( void );
 void SaveChanStats( void );
 void ResetChannelStatistics( void );

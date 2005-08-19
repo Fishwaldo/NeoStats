@@ -30,18 +30,16 @@ typedef struct TLD {
 	statistic users;
 }TLD;
 
-typedef void (*TLDStatHandler) (TLD *tld, void *v);
+typedef void (*TLDStatHandler)( const TLD *tld, const void *v );
 
-extern list_t *tldstatlist;
-
-void AddTLDUser (Client * u);
-void DelTLDUser (Client * u);
-int ss_cmd_tldmap (CmdParams *cmdparams);
-int ss_event_nickip (CmdParams *cmdparams);
-void InitTLDStatistics (void);
-void FiniTLDStatistics (void);
-void GetTLDStats (TLDStatHandler handler, void *v);
-void AverageTLDStatistics (void);
-void ResetTLDStatistics (void);
+void AddTLDUser( const Client * u );
+void DelTLDUser( const Client * u );
+int ss_cmd_tldmap(const CmdParams *cmdparams );
+int ss_event_nickip( const CmdParams *cmdparams );
+int InitTLDStatistics( void );
+void FiniTLDStatistics( void );
+void GetTLDStats( const TLDStatHandler handler, const void *v );
+void AverageTLDStatistics( void );
+void ResetTLDStatistics( void );
 
 #endif /* _TLD_H_ */

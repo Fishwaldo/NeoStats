@@ -29,7 +29,16 @@
 
 #define SERVER_TABLE	"Server"
 
-hash_t *serverstathash;
+static hash_t *serverstathash;
+
+/** @brief AverageServerStatistics
+ *
+ *  Average server statistics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 void AverageServerStatistics (void)
 {
@@ -44,6 +53,15 @@ void AverageServerStatistics (void)
 		AverageStatistic (&ss->opers);
 	}
 }
+
+/** @brief ResetServerStatistics
+ *
+ *  Reset server statistics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 void ResetServerStatistics (void)
 {
@@ -75,7 +93,7 @@ static serverstat *new_server_stat (const char *name)
 	return ss;
 }
 
-static serverstat *findserverstats (char *name)
+static serverstat *findserverstats (const char *name)
 {
 	serverstat *stats;
 
@@ -86,7 +104,7 @@ static serverstat *findserverstats (char *name)
 	return stats;
 }
 
-void AddServerUser (Client *u)
+void AddServerUser( const  Client *u )
 {
 	serverstat *ss;
 
@@ -97,7 +115,7 @@ void AddServerUser (Client *u)
 	}
 }
 
-void DelServerUser (Client *u)
+void DelServerUser (const Client *u)
 {
 	serverstat *ss;
 
@@ -105,7 +123,7 @@ void DelServerUser (Client *u)
 	DecStatistic (&ss->users);
 }
 
-void AddServerOper (Client *u)
+void AddServerOper (const Client *u)
 {
 	serverstat *ss;
 
@@ -116,7 +134,7 @@ void AddServerOper (Client *u)
 	}
 }
 
-void DelServerOper (Client *u)
+void DelServerOper (const Client *u)
 {
 	serverstat *ss;
 
@@ -124,7 +142,7 @@ void DelServerOper (Client *u)
 	DecStatistic (&ss->opers);
 }
 
-static int AddServerStat (Client *s, void *v)
+static int AddServerStat (Client *s, const void *v)
 {
 	serverstat *ss;
 
@@ -140,7 +158,7 @@ static int AddServerStat (Client *s, void *v)
 	return NS_FALSE;
 }
 
-int ss_event_server (CmdParams *cmdparams)
+int ss_event_server (const CmdParams *cmdparams)
 {
 	AddServerStat (cmdparams->source, NULL);
 	return NS_SUCCESS;
@@ -157,14 +175,14 @@ static void DelServerStat (Client* s)
 	ss->s = NULL;
 }
 
-int ss_event_squit (CmdParams *cmdparams)
+int ss_event_squit (const CmdParams *cmdparams)
 {
 	DelServerStat (cmdparams->source);
 	DelNetworkServer ();
 	return NS_SUCCESS;
 }
 
-static void UpdatePingStats (Client* s)
+static void UpdatePingStats (const Client* s)
 {
 	serverstat *ss;
 
@@ -185,7 +203,7 @@ static void UpdatePingStats (Client* s)
 	}
 }
 
-int ss_event_pong (CmdParams *cmdparams)
+int ss_event_pong (const CmdParams *cmdparams)
 {
 	/* we don't want negative pings! */
 	if (cmdparams->source->server->ping > 0) {
@@ -194,7 +212,7 @@ int ss_event_pong (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static void makemap(char *uplink, Client * u, int level)
+static void makemap(const char *uplink, const Client * u, int level)
 {
 	static char buf[256];
 	hscan_t hs;
@@ -245,7 +263,7 @@ static void makemap(char *uplink, Client * u, int level)
 	}
 }
 
-int ss_cmd_map (CmdParams *cmdparams)
+int ss_cmd_map (const CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ss_bot, cmdparams->source, "%-40s      %-10s %-10s %-10s",
@@ -255,7 +273,7 @@ int ss_cmd_map (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-int ss_cmd_server_list (CmdParams *cmdparams)
+int ss_cmd_server_list (const CmdParams *cmdparams)
 {
 	serverstat *ss;
 	hscan_t hs;
@@ -272,7 +290,7 @@ int ss_cmd_server_list (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static int ss_server_del (CmdParams *cmdparams)
+static int ss_server_del (const CmdParams *cmdparams)
 {
 	serverstat *ss;
 	hnode_t *node;
@@ -303,7 +321,7 @@ static int ss_server_del (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static int ss_server_copy (CmdParams *cmdparams)
+static int ss_server_copy (const CmdParams *cmdparams)
 {
 	serverstat *dest;
 	serverstat *src;
@@ -338,7 +356,7 @@ static int ss_server_copy (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-static int ss_cmd_server_stats (CmdParams *cmdparams)
+static int ss_cmd_server_stats (const CmdParams *cmdparams)
 {
 	serverstat *ss;
 	Client *s;
@@ -401,7 +419,7 @@ static int ss_cmd_server_stats (CmdParams *cmdparams)
 }
 
 
-int ss_cmd_server (CmdParams *cmdparams)
+int ss_cmd_server (const CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	if (!ircstrcasecmp (cmdparams->av[0], "LIST")) {
@@ -439,7 +457,7 @@ void SaveServerStats(void)
 	}
 }
 
-int LoadServerStats(void *data, int size) 
+int LoadServerStats(const void *data, const int size) 
 {
 	serverstat *ss;
 
@@ -455,11 +473,17 @@ int LoadServerStats(void *data, int size)
 	return NS_FALSE;
 }
 
-void InitServerStats (void)
+int InitServerStats (void)
 {
-	serverstathash = hash_create (-1, 0, 0);
+	serverstathash = hash_create( -1, 0, 0 );
+	if( !serverstathash )
+	{
+		nlog( LOG_CRITICAL, "Unable to create server hash list" );
+		return NS_FAILURE;
+	}
 	DBAFetchRows (SERVER_TABLE, LoadServerStats);
 	GetServerList (AddServerStat, NULL);
+	return NS_SUCCESS;
 }
 
 void FiniServerStats (void)
@@ -480,7 +504,7 @@ void FiniServerStats (void)
 	hash_destroy(serverstathash);
 }
 
-void GetServerStats (ServerStatHandler handler, void *v)
+void GetServerStats (const ServerStatHandler handler, const void *v)
 {
 	serverstat *ss;
 	hnode_t *sn;

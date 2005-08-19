@@ -30,6 +30,15 @@
 
 networkstat networkstats;
 
+/** @brief AverageNetworkStatistics 
+ *
+ *  Average network statistics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
 void AverageNetworkStatistics (void)
 {
 	AverageStatistic (&networkstats.servers);
@@ -38,6 +47,15 @@ void AverageNetworkStatistics (void)
 	AverageStatistic (&networkstats.opers);
 	AverageStatistic (&networkstats.kills);
 }
+
+/** @brief ResetNetworkStatistics
+ *
+ *  Reset network statistics
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 void ResetNetworkStatistics (void)
 {
@@ -107,7 +125,7 @@ void DelNetworkKill (void)
 	DecStatistic (&networkstats.kills);
 }
 
-int ss_cmd_netstats (CmdParams *cmdparams)
+int ss_cmd_netstats (const CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg(ss_bot, cmdparams->source, "Network Statistics:-----");
@@ -130,7 +148,7 @@ int ss_cmd_netstats (CmdParams *cmdparams)
 	return NS_SUCCESS;
 }
 
-int ss_cmd_daily (CmdParams *cmdparams)
+int ss_cmd_daily (const CmdParams *cmdparams)
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg(ss_bot, cmdparams->source, "Daily Network Statistics:");

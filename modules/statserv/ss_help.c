@@ -31,9 +31,9 @@ const char *ss_about[] = {
 	NULL
 };
 
-const char *ss_help_userversion[] = {
+const char *ss_help_ctcpversion[] = {
 	"Display client versions statistics",
-	"Syntax: \2USERVERSION [limit]\2",
+	"Syntax: \2ctcpversion [limit]\2",
 	"",
 	"Display statistics on the client versions used on the network",
 	"optional parameter <limit> specifies how many results to show.",

@@ -102,7 +102,7 @@ void put_copyright( void )
 	os_fprintf( opf, "</center></html>\n" );
 }
 
-static void serverlisthandler( serverstat *ss, void *v )
+static void serverlisthandler( const serverstat *ss, const void *v )
 {
 	os_fprintf( opf, "<tr><td height=\"4\"></td>\n" );
 	os_fprintf( opf, "<td height=\"4\"><a href=#%s> %s( %s )</a></td></tr>\n",
@@ -116,7 +116,7 @@ static void html_srvlist( void )
 	os_fprintf( opf, "</table>" );
 }
 
-static void serverlistdetailhandler( serverstat *ss, void *v )
+static void serverlistdetailhandler( const serverstat *ss, const void *v )
 {
 	os_fprintf( opf, "<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",
 		ss->name, ss->name );
@@ -295,7 +295,7 @@ static void html_monthlystats( void )
 	os_fprintf( opf, "</tr></table>\n" );
 }
 
-static void top10membershandler( channelstat *cs, void *v )
+static void top10membershandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->c->users );
@@ -308,7 +308,7 @@ static void html_channeltop10members( void )
 	os_fprintf( opf, "</table>" );
 }
 
-static void top10joinshandler( channelstat *cs, void *v )
+static void top10joinshandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->users.alltime.runningtotal );
@@ -321,7 +321,7 @@ static void html_channeltop10joins( void )
 	os_fprintf( opf, "</table>" );
 }
 
-static void top10kickshandler( channelstat *cs, void *v )
+static void top10kickshandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->kicks.alltime.runningtotal );
@@ -334,7 +334,7 @@ static void html_channeltop10kicks( void )
 	os_fprintf( opf, "</table>" );
 }
 
-static void top10topicshandler( channelstat *cs, void *v )
+static void top10topicshandler( const channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->topics.alltime.runningtotal );
@@ -347,26 +347,20 @@ static void html_channeltop10topics( void )
 	os_fprintf( opf, "</table>" );
 }
 
+static void HTMLClientVersionReport( const ss_ctcp_version *cv, const void *v )
+{
+	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
+		cv->name, cv->users.current );
+}
+
 static void html_clientstats( void )
 {
-	ctcpversionstat *cv;
-	lnode_t *cn;
-	int i;
-	if( !list_is_sorted( versionstatlist, topcurrentversions ) ) {
-		list_sort( versionstatlist, topcurrentversions );
-	}
-	cn = list_first( versionstatlist );
 	os_fprintf( opf, "<table border = 0><tr><th>Version</th><th align=right>Count</th></tr>" );
-	for( i = 0; i < 10 && cn; i++ ) {
-		cv = lnode_get( cn );
-		os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
-			cv->name, cv->users.current );
-		cn = list_next( versionstatlist, cn );
-	}
+	GetClientStats( HTMLClientVersionReport, 10, NULL );
 	os_fprintf( opf, "</table>" );
 }
 
-void HTMLTLDReport( TLD *tld, void *v )
+static void HTMLTLDReport( const TLD *tld, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td>%s</td><td>%3d</td><td>%3d</td><td>%3d</td><td>%3d</td><td>%3d</td></tr>",
 		tld->tld, tld->country, tld->users.current, tld->users.daily.runningtotal, tld->users.weekly.runningtotal, tld->users.monthly.runningtotal, tld->users.alltime.runningtotal );
@@ -379,7 +373,7 @@ static void html_tldmap( void )
 	os_fprintf( opf, "</table>" );
 }
 
-void get_map( char *uplink, int level )
+static void get_map( char *uplink, int level )
 {
 #define MAPBUFSIZE 512
 	static char buf[MAPBUFSIZE];

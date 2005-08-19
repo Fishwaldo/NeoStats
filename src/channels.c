@@ -774,7 +774,7 @@ void FreeChannelModPtr( Channel *c )
 	}
 }
 
-void* GetChannelModPtr( Channel *c )
+void* GetChannelModPtr( const Channel *c )
 {
 	return c->modptr[GET_CUR_MODNUM()];
 }
@@ -802,7 +802,7 @@ void SetChannelModValue( Channel *c, void *data )
 	}
 }
 
-void *GetChannelModValue( Channel *c )
+void *GetChannelModValue( const Channel *c )
 {
 	if( c )
 	{

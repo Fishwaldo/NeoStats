@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - StatServ: boot time sanity checks for list and hash creation. (M)
  - StatServ: port version stats to DBA API. (M)
  - QuoteServ: add sanity checks to db loads. (M)
  - QuoteServ: fix win32 crash - strdup cannot be used in modules. (M)

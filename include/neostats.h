@@ -1592,36 +1592,36 @@ EXPORTFUNC int ModIsChannelExcluded( const Channel *c );
 /* Module data pointer interface channel */
 EXPORTFUNC void *AllocChannelModPtr( Channel *c, int size );
 EXPORTFUNC void FreeChannelModPtr( Channel *c );
-EXPORTFUNC void *GetChannelModPtr( Channel *c );
+EXPORTFUNC void *GetChannelModPtr( const Channel *c );
 /* Module data pointer interface user */
 EXPORTFUNC void *AllocUserModPtr( Client *u, int size );
 EXPORTFUNC void FreeUserModPtr( Client *u );
-EXPORTFUNC void *GetUserModPtr( Client *u );
+EXPORTFUNC void *GetUserModPtr( const Client *u );
 /* Module data pointer interface server */
 EXPORTFUNC void *AllocServerModPtr( Client *s, int size );
 EXPORTFUNC void FreeServerModPtr( Client *s );
-EXPORTFUNC void *GetServerModPtr( Client *s );
+EXPORTFUNC void *GetServerModPtr( const Client *s );
 /* Module data pointer interface bot */
 EXPORTFUNC void *AllocBotModPtr( Bot *pBot, int size );
 EXPORTFUNC void FreeBotModPtr( Bot *pBot );
-EXPORTFUNC void* GetBotModPtr( Bot *pBot );
+EXPORTFUNC void* GetBotModPtr( const Bot *pBot );
 /* Module data value interface */
 /* Module data value interface channel */
 EXPORTFUNC void ClearChannelModValue( Channel *c );
 EXPORTFUNC void SetChannelModValue( Channel *c, void *data );
-EXPORTFUNC void *GetChannelModValue( Channel *c );
+EXPORTFUNC void *GetChannelModValue( const Channel *c );
 /* Module data value interface user */
 EXPORTFUNC void ClearUserModValue( Client *u );
 EXPORTFUNC void SetUserModValue( Client *u, void *data );
-EXPORTFUNC void *GetUserModValue( Client *u );
+EXPORTFUNC void *GetUserModValue( const Client *u );
 /* Module data value interface server */
 EXPORTFUNC void ClearServerModValue( Client *s );
 EXPORTFUNC void SetServerModValue( Client *s, void *data );
-EXPORTFUNC void *GetServerModValue( Client *s );
+EXPORTFUNC void *GetServerModValue( const Client *s );
 /* Module data value interface bot */
 EXPORTFUNC void ClearBotModValue( Bot *pBot );
 EXPORTFUNC void SetBotModValue( Bot *pBot, void *data );
-EXPORTFUNC void *GetBotModValue( Bot *pBot );
+EXPORTFUNC void *GetBotModValue( const Bot *pBot );
 
 //#define ClearBotModValue( b ) b->moddata = 0
 //#define SetBotModValue( b, data ) b->moddata = data

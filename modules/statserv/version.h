@@ -24,17 +24,17 @@
 #ifndef _VERSION_H_
 #define _VERSION_H_
 
-typedef struct ctcpversionstat {
+typedef struct ss_ctcp_version {
 	char name[BUFSIZE];
 	statistic users;
-}ctcpversionstat;
+} ss_ctcp_version;
 
-extern list_t *versionstatlist;
+typedef void (*CTCPVersionHandler)( const ss_ctcp_version *cv, const void *v );
+void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v );
 
-int topcurrentversions( const void *key1, const void *key2 );
-int ss_cmd_userversion( const CmdParams *cmdparams );
+int ss_cmd_ctcpversion( const CmdParams *cmdparams );
 int ss_event_ctcpversion( const CmdParams *cmdparams );
-void InitVersionStats( void );
+int InitVersionStats( void );
 void FiniVersionStats( void );
 
 #endif /* _VERSION_H_ */
