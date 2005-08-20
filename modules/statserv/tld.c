@@ -303,7 +303,7 @@ void SaveTLDStats( void )
  *  @return
  */
 
-static int new_tld( const void *data, int size )
+static int new_tld( void *data, int size )
 {
 	TLD *t;
 

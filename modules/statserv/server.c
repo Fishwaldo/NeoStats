@@ -212,7 +212,7 @@ void DelServerOper( const Client *u )
  *  @return none
  */
 
-static int AddServerStat( Client *s, const void *v )
+static int AddServerStat( Client *s, void *v )
 {
 	serverstat *ss;
 
@@ -678,7 +678,7 @@ void SaveServerStats( void )
  *  @return none
  */
 
-int LoadServerStats( const void *data, const int size ) 
+int LoadServerStats( void *data, int size ) 
 {
 	serverstat *ss;
 

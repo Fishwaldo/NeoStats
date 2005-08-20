@@ -38,7 +38,7 @@
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int AddUser( const Client *u, void *v )
+static int AddUser( Client *u, void *v )
 {
 	SET_SEGV_LOCATION();
 	AddServerUser( u );
@@ -287,7 +287,7 @@ int ss_cmd_operlist( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int botlist( const Client *u, void * v )
+static int botlist( Client *u, void * v )
 {
 	Client *listu;
 

@@ -415,7 +415,7 @@ int ss_event_kick( CmdParams *cmdparams )
  *  @return none
  */
 
-static void top10membershandler( const channelstat *cs, const void *v )
+static void top10membershandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
@@ -433,7 +433,7 @@ static void top10membershandler( const channelstat *cs, const void *v )
  *  @return none
  */
 
-static void top10joinshandler( const channelstat *cs, const void *v )
+static void top10joinshandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
@@ -451,7 +451,7 @@ static void top10joinshandler( const channelstat *cs, const void *v )
  *  @return none
  */
 
-static void top10kickshandler( const channelstat *cs, const void *v )
+static void top10kickshandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
@@ -469,7 +469,7 @@ static void top10kickshandler( const channelstat *cs, const void *v )
  *  @return none
  */
 
-static void top10topicshandler( const channelstat *cs, const void *v )
+static void top10topicshandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 

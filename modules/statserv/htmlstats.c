@@ -409,7 +409,7 @@ static void html_monthlystats( void )
  *  @return none
  */
 
-static void top10membershandler( const channelstat *cs, const void *v )
+static void top10membershandler( channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->c->users );
@@ -440,7 +440,7 @@ static void html_channeltop10members( void )
  *  @return none
  */
 
-static void top10joinshandler( const channelstat *cs, const void *v )
+static void top10joinshandler( channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->users.alltime.runningtotal );
@@ -471,7 +471,7 @@ static void html_channeltop10joins( void )
  *  @return none
  */
 
-static void top10kickshandler( const channelstat *cs, const void *v )
+static void top10kickshandler( channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->kicks.alltime.runningtotal );
@@ -502,7 +502,7 @@ static void html_channeltop10kicks( void )
  *  @return none
  */
 
-static void top10topicshandler( const channelstat *cs, const void *v )
+static void top10topicshandler( channelstat *cs, const void *v )
 {
 	os_fprintf( opf, "<tr><td>%s</td><td align=right>%d</td></tr>\n",
 		cs->name, cs->topics.alltime.runningtotal );
