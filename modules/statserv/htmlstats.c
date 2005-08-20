@@ -236,7 +236,7 @@ static void html_netstats( void )
 {
 	os_fprintf( opf, "<table border = 0>" );
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b></th><th><b>Current</b></th><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
-	os_fprintf( opf, "<td>Users:</td>\n" );
+	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.users.alltime.runningtotal );
 	os_fprintf( opf, "<td>%d( %d%% )</td>\n", networkstats.users.current,
 		GetAllTimePercent( &networkstats.users ) );
