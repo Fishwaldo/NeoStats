@@ -44,11 +44,11 @@ typedef void( *ServerStatHandler )( const serverstat *cs, const void *v );
 
 void GetServerStats( const ServerStatHandler handler, const void *v );
 
-int ss_event_server( const CmdParams *cmdparams );
-int ss_event_squit( const CmdParams *cmdparams );
-int ss_event_pong( const CmdParams *cmdparams );
-int ss_cmd_map( const CmdParams *cmdparams );
-int ss_cmd_server( const CmdParams *cmdparams );
+int ss_event_server( CmdParams *cmdparams );
+int ss_event_squit( CmdParams *cmdparams );
+int ss_event_pong( CmdParams *cmdparams );
+int ss_cmd_map( CmdParams *cmdparams );
+int ss_cmd_server( CmdParams *cmdparams );
 int InitServerStats( void );
 void FiniServerStats( void );
 void SaveServerStats( void );

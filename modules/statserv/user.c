@@ -38,7 +38,7 @@
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int AddUser( const Client *u, const void *v )
+static int AddUser( const Client *u, void *v )
 {
 	SET_SEGV_LOCATION();
 	AddServerUser( u );
@@ -77,7 +77,7 @@ static void DelUser( const Client *u )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_mode( const CmdParams *cmdparams )
+int ss_event_mode( CmdParams *cmdparams )
 {
 	int add = 1;
 	serverstat *ss;
@@ -135,7 +135,7 @@ int ss_event_mode( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_globalkill( const CmdParams *cmdparams )
+int ss_event_globalkill( CmdParams *cmdparams )
 {
 	serverstat *ss;
 
@@ -154,7 +154,7 @@ int ss_event_globalkill( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_serverkill( const CmdParams *cmdparams )
+int ss_event_serverkill( CmdParams *cmdparams )
 {
 	serverstat *ss;
 
@@ -173,7 +173,7 @@ int ss_event_serverkill( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_quit( const CmdParams *cmdparams )
+int ss_event_quit( CmdParams *cmdparams )
 {
 	DelUser( cmdparams->source );
 	return NS_SUCCESS;
@@ -188,7 +188,7 @@ int ss_event_quit( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_signon( const CmdParams *cmdparams )
+int ss_event_signon( CmdParams *cmdparams )
 {
 	AddUser( cmdparams->source, NULL );
 	return NS_SUCCESS;
@@ -208,7 +208,7 @@ int ss_event_signon( const CmdParams *cmdparams )
 static int operlistaway = 0;
 static char* operlistserver;
 
-static int operlist( Client *u, const void * v )
+static int operlist( Client *u, void * v )
 {
 	Client *listu;
 
@@ -242,7 +242,7 @@ static int operlist( Client *u, const void * v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_operlist( const CmdParams *cmdparams )
+int ss_cmd_operlist( CmdParams *cmdparams )
 {
 	char *flags = NULL;
 
@@ -287,7 +287,7 @@ int ss_cmd_operlist( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int botlist( const Client *u, const void * v )
+static int botlist( const Client *u, void * v )
 {
 	Client *listu;
 
@@ -307,7 +307,7 @@ static int botlist( const Client *u, const void * v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_botlist( const CmdParams *cmdparams )
+int ss_cmd_botlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "Online bots:" );

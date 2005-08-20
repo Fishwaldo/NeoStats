@@ -194,7 +194,7 @@ void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v 
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_ctcpversion( const CmdParams *cmdparams )
+int ss_cmd_ctcpversion( CmdParams *cmdparams )
 {
 	int num;
 
@@ -222,7 +222,7 @@ int ss_cmd_ctcpversion( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_ctcpversion( const CmdParams *cmdparams )
+int ss_event_ctcpversion( CmdParams *cmdparams )
 {
 	static char nocols[BUFSIZE];
 	ss_ctcp_version *cv;

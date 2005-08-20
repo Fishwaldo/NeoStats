@@ -236,7 +236,7 @@ static int AddServerStat( Client *s, const void *v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_server( const CmdParams *cmdparams )
+int ss_event_server( CmdParams *cmdparams )
 {
 	AddServerStat( cmdparams->source, NULL );
 	return NS_SUCCESS;
@@ -271,7 +271,7 @@ static void DelServerStat( Client* s )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_squit( const CmdParams *cmdparams )
+int ss_event_squit( CmdParams *cmdparams )
 {
 	DelServerStat( cmdparams->source );
 	DelNetworkServer();
@@ -318,7 +318,7 @@ static void UpdatePingStats( const Client* s )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_pong( const CmdParams *cmdparams )
+int ss_event_pong( CmdParams *cmdparams )
 {
 	/* we don't want negative pings! */
 	if( cmdparams->source->server->ping > 0 )
@@ -399,7 +399,7 @@ static void makemap( const char *uplink, const Client * u, int level )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_map( const CmdParams *cmdparams )
+int ss_cmd_map( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "%-40s      %-10s %-10s %-10s",
@@ -419,7 +419,7 @@ int ss_cmd_map( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_server_list( const CmdParams *cmdparams )
+int ss_cmd_server_list( CmdParams *cmdparams )
 {
 	serverstat *ss;
 	hscan_t hs;
@@ -535,7 +535,7 @@ static int ss_server_copy( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ss_cmd_server_stats( const CmdParams *cmdparams )
+static int ss_cmd_server_stats( CmdParams *cmdparams )
 {
 	serverstat *ss;
 	Client *s;
@@ -612,7 +612,7 @@ static int ss_cmd_server_stats( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_server( const CmdParams *cmdparams )
+int ss_cmd_server( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )

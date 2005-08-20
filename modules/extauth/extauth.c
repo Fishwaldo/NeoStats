@@ -28,7 +28,7 @@
  *  User authentication based on nick!user@host masking
  */
 
-static int ea_cmd_access( const CmdParams *cmdparams );
+static int ea_cmd_access( CmdParams *cmdparams );
 
 /** Access list struct */
 typedef struct AccessEntry
@@ -244,21 +244,15 @@ static int AccessList( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int ea_cmd_access( const CmdParams *cmdparams )
+static int ea_cmd_access( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) ) 
-	{
 		return AccessAdd( cmdparams );
-	} 
-	else if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) ) 
-	{
+	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) ) 
 		return AccessDel( cmdparams );
-	} 
-	else if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) ) 
-	{
+	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) ) 
 		return AccessList( cmdparams );
-	}
 	return NS_ERR_SYNTAX_ERROR;
 }
 

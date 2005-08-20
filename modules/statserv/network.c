@@ -227,7 +227,7 @@ void DelNetworkKill( void )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_netstats( const CmdParams *cmdparams )
+int ss_cmd_netstats( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "Network Statistics:-----" );
@@ -260,7 +260,7 @@ int ss_cmd_netstats( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_daily( const CmdParams *cmdparams )
+int ss_cmd_daily( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "Daily Network Statistics:" );

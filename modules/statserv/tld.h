@@ -34,8 +34,8 @@ typedef void (*TLDStatHandler)( const TLD *tld, const void *v );
 
 void AddTLDUser( const Client * u );
 void DelTLDUser( const Client * u );
-int ss_cmd_tldmap(const CmdParams *cmdparams );
-int ss_event_nickip( const CmdParams *cmdparams );
+int ss_cmd_tldmap(CmdParams *cmdparams );
+int ss_event_nickip( CmdParams *cmdparams );
 int InitTLDStatistics( void );
 void FiniTLDStatistics( void );
 void GetTLDStats( const TLDStatHandler handler, const void *v );
