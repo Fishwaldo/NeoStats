@@ -105,7 +105,7 @@ static void SaveClientVersions( void )
  *  @param data pointer to table row data
  *  @param size of loaded data
  *
- *  @return
+ *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
 static int new_ctcpversion( void *data, int size )

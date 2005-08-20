@@ -63,7 +63,7 @@ static bot_cmd_set_handler bot_cmd_set_handlers[] =
  *  Process SET LIST command
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -128,7 +128,7 @@ static int bot_cmd_set_list( CmdParams *cmdparams )
  *  Report successful SET command
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *  @new_setting string with new value
  *
@@ -158,7 +158,7 @@ static int bot_cmd_set_report( CmdParams *cmdparams, bot_setting *set_ptr, char 
  *  SET handler for boolean
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -197,7 +197,7 @@ static int bot_cmd_set_boolean( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for int
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -241,7 +241,7 @@ static int bot_cmd_set_int( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for string
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -265,7 +265,7 @@ static int bot_cmd_set_string( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for channel
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -294,7 +294,7 @@ static int bot_cmd_set_channel( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for msg
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -317,7 +317,7 @@ static int bot_cmd_set_msg( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for nick
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -341,7 +341,7 @@ static int bot_cmd_set_nick( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for user
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -365,7 +365,7 @@ static int bot_cmd_set_user( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for host
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -394,7 +394,7 @@ static int bot_cmd_set_host( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for realname
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -417,7 +417,7 @@ static int bot_cmd_set_realname( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for ipv4
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -441,7 +441,7 @@ static int bot_cmd_set_ipv4( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler for boolean
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
@@ -460,7 +460,7 @@ static int bot_cmd_set_custom( CmdParams *cmdparams, bot_setting *set_ptr )
  *  SET handler
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -516,7 +516,7 @@ int bot_cmd_set( CmdParams *cmdparams )
  *  Add a single set option
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -533,7 +533,7 @@ static int add_bot_setting( hash_t *set_hash, bot_setting *set_ptr )
  *  delete a single set option
  *  SET subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *  @set_ptr pointer to setting struct
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 

@@ -599,7 +599,7 @@ static void _send_version( const char *source, const char *target )
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-void send_cmd( char *fmt, ... )
+void send_cmd( const char *fmt, ... )
 {
 	va_list ap;
 	char buf[BUFSIZE];

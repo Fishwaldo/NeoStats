@@ -1176,10 +1176,9 @@ EXPORTFUNC void fatal_error( char *file, int line, const char *func, char *error
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text) ); 
 
 /* nsmemory.c */
-
-EXPORTFUNC void *ns_malloc( const int size );
-EXPORTFUNC void *ns_calloc( const int size );
-EXPORTFUNC void *ns_realloc( void *ptr, const int size );
+EXPORTFUNC void *ns_malloc( int size );
+EXPORTFUNC void *ns_calloc( int size );
+EXPORTFUNC void *ns_realloc( void *ptr, int size );
 EXPORTFUNC void _ns_free( void **ptr );
 #define ns_free( ptr ) _ns_free( ( void **) &( ptr ) );
 
@@ -1311,11 +1310,11 @@ EXPORTFUNC Client *FindServer( const char *name );
 
 /* chans.c */
 EXPORTFUNC Channel *FindChannel( const char *chan );
-EXPORTFUNC int test_cmode( Channel *c, const unsigned int mode );
+EXPORTFUNC int test_cmode( const Channel *c, unsigned int mode );
 EXPORTFUNC int IsChannelMember( const Channel *c, const Client *u );
 EXPORTFUNC int test_cumode( const char *chan, const char *nick, const int flag );
 EXPORTFUNC Channel *GetRandomChannel( void );
-EXPORTFUNC Client *GetRandomChannelMember(int uge, Channel *c);
+EXPORTFUNC Client *GetRandomChannelMember( int uge, Channel *c );
 EXPORTFUNC char *GetRandomChannelKey( int length );
 
 #define IsChanOp( chan, nick ) test_cumode( chan, nick, CUMODE_CHANOP )
@@ -1465,11 +1464,12 @@ typedef int (*ChannelListHandler) ( Channel *c, void *v );
 EXPORTFUNC int GetChannelList( ChannelListHandler handler, void *v );
 typedef int (*ChannelMemberHandler) ( Channel *c, ChannelMember *m, void *v );
 EXPORTFUNC int GetChannelMembers( Channel *c, ChannelMemberHandler handler, void *v );
-
 typedef int (*UserListHandler) ( Client *u, void *v );
 EXPORTFUNC int GetUserList( UserListHandler handler, void *v );
 typedef int (*ServerListHandler) ( Client *s, void *v );
 EXPORTFUNC int GetServerList( ServerListHandler handler, void *v );
+typedef int (*ModuleListHandler) ( Module *module_ptr, void *v );
+EXPORTFUNC int GetModuleList (ModuleListHandler handler, void *v );
 
 EXPORTFUNC hash_t *GetServerHash( void );
 EXPORTFUNC hash_t *GetBanHash( void );

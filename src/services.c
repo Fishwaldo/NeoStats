@@ -57,6 +57,7 @@ static int ns_cmd_unload( CmdParams *cmdparams );
 
 static int services_event_ctcpversion( CmdParams *cmdparams );
 
+config nsconfig;
 tme me;
 
 static char quitmsg[BUFSIZE];

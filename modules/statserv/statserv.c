@@ -247,8 +247,8 @@ int ModFini( void )
  *  Set callback for SET HTML
  *  Enable or disable html output
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -277,8 +277,8 @@ static int ss_set_html_cb( CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for SET HTMLPATH
  *  Change html output path
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -307,8 +307,8 @@ static int ss_set_htmlpath_cb( CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for SET HTMLTIME
  *  Change html output time
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -327,8 +327,8 @@ static int ss_set_htmltime_cb( CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for exclusions
  *  Enable or disable exclude event flag
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */

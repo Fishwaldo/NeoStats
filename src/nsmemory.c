@@ -27,98 +27,107 @@
 #include "main.h"
 #include "services.h"
 
-/** @brief NeoStats wrapper for malloc.
+/** @brief ns_malloc
  *
- * Allocates memory for internal variables. 
- * If enough memory can't be allocated, exit the program 
+ *  NeoStats wrapper for malloc.
+ *  Allocates memory for internal variables. 
+ *  If enough memory can't be allocated, exit the program 
  *
- * @param size The amount of memory to alloc
+ *  @param size of memory to alloc
  *
- * @returns pointer to allocated buffer
+ *  @return pointer to allocated buffer
  */
 
-void *ns_malloc (const int size)
+void *ns_malloc( int size )
 {
-	unsigned int allocsize;
 	void *buf;
-	allocsize = size;
-	if (!allocsize) {
-		dlog( DEBUG2, "ns_malloc: illegal attempt to allocate 0 bytes!");
-		allocsize = 1;
+
+	if( !size )
+	{
+		dlog( DEBUG2, "ns_malloc: illegal attempt to allocate 0 bytes!" );
+		size = 1;
 	}
-	buf = malloc (allocsize);
-	if (!buf) {
-		nlog (LOG_CRITICAL, "ns_malloc: out of memory.");
-		do_exit (NS_EXIT_ERROR, "Out of memory");
+	buf = malloc( size );
+	if( !buf )
+	{
+		nlog( LOG_CRITICAL, "ns_malloc: out of memory." );
+		do_exit( NS_EXIT_ERROR, "Out of memory" );
 	}
 	return buf;
 }
 
-/** @brief NeoStats wrapper for calloc.
+/** @brief ns_calloc
  *
- * Allocates memory for internal variables. 
- * If enough memory can't be allocated, exit the program 
+ *	NeoStats wrapper for calloc.
+ *	Allocates memory for internal variables. 
+ *	If enough memory can't be allocated, exit the program 
  *
- * @param size The amount of memory to alloc
+ *	@param size of memory to alloc
  *
- * @returns pointer to allocated buffer
+ *	@return pointer to allocated buffer
  */
 
-void *ns_calloc (const int size)
+void *ns_calloc( int size )
 {
 	void *buf;
-	unsigned int allocsize;
 
-	allocsize = size;
-	if (!allocsize) {
-		dlog( DEBUG2, "ns_calloc: illegal attempt to allocate 0 bytes!");
-		allocsize = 1;
+	if( !size )
+	{
+		dlog( DEBUG2, "ns_calloc: illegal attempt to allocate 0 bytes!" );
+		size = 1;
 	}
-	buf = calloc (1, allocsize);
-	if (!buf) {
-		nlog (LOG_CRITICAL, "ns_calloc: out of memory.");
-		do_exit (NS_EXIT_ERROR, "Out of memory");
+	buf = calloc( 1, size );
+	if( !buf )
+	{
+		nlog( LOG_CRITICAL, "ns_calloc: out of memory." );
+		do_exit( NS_EXIT_ERROR, "Out of memory" );
 	}
 	return buf;
 }
 
-/** @brief NeoStats wrapper for realloc.
+/** @brief ns_realloc
  *
- * Reallocates memory
- * If enough memory can't be allocated, exit the program 
+ *  NeoStats wrapper for realloc.
+ *  Reallocates memory
+ *  If enough memory can't be allocated, exit the program 
  *
- * @param size The amount of memory to realloc
+ *  @param ptr to existing allocation
+ *  @param size of memory to realloc
  *
- * @returns pointer to allocated buffer
+ *  @return pointer to allocated buffer
  */
 
-void *ns_realloc (void* ptr, const int size)
+void *ns_realloc( void* ptr, int size )
 {
 	void *newptr;
-	newptr = realloc (ptr, size);
-	if (!newptr) {
-		nlog (LOG_CRITICAL, "ns_realloc: out of memory.");
-		do_exit (NS_EXIT_ERROR, "Out of memory");
+
+	newptr = realloc( ptr, size );
+	if( !newptr )
+	{
+		nlog( LOG_CRITICAL, "ns_realloc: out of memory." );
+		do_exit( NS_EXIT_ERROR, "Out of memory" );
 	}
 	return newptr;
 }
 
-/** @brief NeoStats wrapper for free.
+/** @brief _ns_free
  *
- * Free memory associated with pointer.
- * If NULL pointer log error and ignore free
+ *  NeoStats wrapper for free.
+ *  Free memory associated with pointer.
+ *  If NULL pointer log error and ignore free
  *
- * @param size Pointer to buffer to free
+ *  @param ptr to buffer to free
  *
- * @returns none
+ *  @returns none
  */
 
-void _ns_free (void **ptr)
+void _ns_free( void **ptr )
 {
-	if (!*ptr) {
-		dlog( DEBUG2, "ns_free: illegal attempt to free NULL pointer");
+	if( !*ptr )
+	{
+		dlog( DEBUG2, "ns_free: illegal attempt to free NULL pointer" );
 		return;
 	}
-	free (*ptr);
+	free( *ptr );
 	*ptr = 0;
 }

@@ -391,7 +391,7 @@ static int cmd_del( CmdParams *cmdparams )
  *  join event handler
  *  join channels if we need to and manage limit on channels
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -417,7 +417,7 @@ static int event_join( CmdParams *cmdparams )
  *  part event handler
  *  manage limit on channels
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */

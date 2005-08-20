@@ -65,9 +65,8 @@ void _m_numeric351( char *origin, char **argv, int argc, int srv )
 	if( !origin )
 		return;
 	s = FindServer( origin );
-	if( s ) {
+	if( s )
 		strlcpy( s->version, argv[1], MAXHOST );
-	}
 }
 
 /** @brief _m_numeric242

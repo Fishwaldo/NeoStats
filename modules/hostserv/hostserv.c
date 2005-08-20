@@ -150,7 +150,7 @@ ModuleEvent module_events[] = {
  *  @return results of strcmp
  */
 
-int findnick( const void *key1, const void *key2 )
+static int findnick( const void *key1, const void *key2 )
 {
 	const vhostentry *vhost = key1;
 	return( ircstrcasecmp( vhost->nick,( char * )key2 ) );
@@ -203,7 +203,17 @@ int ExpireOldHosts( void *userptr )
 	return NS_SUCCESS;
 }
 
-int new_dbvhost( void *data, int size )
+/** @brief new_dbvhost
+ *
+ *  Table load handler
+ *
+ *  @param data pointer to table row data
+ *  @param size of loaded data
+ *
+ *  @return NS_TRUE to abort load or NS_FALSE to continue loading
+ */
+
+static int new_dbvhost( void *data, int size )
 {
 	vhostentry *vhe;
 
@@ -570,6 +580,8 @@ static int hs_cmd_bans_add( CmdParams *cmdparams )
 	char *buf;
 
 	SET_SEGV_LOCATION();
+	if( cmdparams->ac < 3 )
+		return NS_ERR_NEED_MORE_PARAMS;
 	if( hash_lookup( banhash, cmdparams->av[1] ) != NULL ) {
 		irc_prefmsg( hs_bot, cmdparams->source, 
 			"%s already exists in the banned vhost list", cmdparams->av[1] );
@@ -608,6 +620,8 @@ static int hs_cmd_bans_del( CmdParams *cmdparams )
 	hscan_t hs;
 
 	SET_SEGV_LOCATION();
+	if( cmdparams->ac < 2 )
+		return NS_ERR_NEED_MORE_PARAMS;
 	hash_scan_begin( &hs, banhash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		ban =( banentry * )hnode_get( hn );
@@ -642,19 +656,12 @@ static int hs_cmd_bans_del( CmdParams *cmdparams )
 static int hs_cmd_bans( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) ) {
+	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
 		return hs_cmd_bans_list( cmdparams );
-	} else if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) ) {
-		if( cmdparams->ac < 3 ) {
-			return NS_ERR_NEED_MORE_PARAMS;
-		}
+	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
 		return hs_cmd_bans_add( cmdparams );
-	} else if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) ) {
-		if( cmdparams->ac < 2 ) {
-			return NS_ERR_NEED_MORE_PARAMS;
-		}
+	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
 		return hs_cmd_bans_del( cmdparams );
-	}
 	return NS_ERR_SYNTAX_ERROR;
 }
 
@@ -694,9 +701,9 @@ static int hs_cmd_chpass( CmdParams *cmdparams )
 		return NS_SUCCESS;
 	}
 	irc_prefmsg( hs_bot, cmdparams->source, "Error, hostname mismatch" );
-	irc_chanalert( hs_bot, "%s tried to change the password for %s, but the hosts do not match( %s -> %s )",
+	irc_chanalert( hs_bot, "%s tried to change the password for %s, but the hosts do not match (%s -> %s)",
 			cmdparams->source->name, vhe->nick, cmdparams->source->user->hostname, vhe->host );
-	nlog( LOG_WARNING, "%s tried to change the password for %s but the hosts do not match( %s -> %s )",
+	nlog( LOG_WARNING, "%s tried to change the password for %s but the hosts do not match (%s -> %s)",
 			cmdparams->source->name, vhe->nick, cmdparams->source->user->hostname, vhe->host );
 	return NS_SUCCESS;
 }

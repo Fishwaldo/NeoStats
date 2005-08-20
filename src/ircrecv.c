@@ -1403,7 +1403,7 @@ void do_version( const char *nick, const char *remoteserver )
 {
 	SET_SEGV_LOCATION();
 	irc_numeric( RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time );
-	ModulesVersion( nick, remoteserver );
+	AllModuleVersions( nick, remoteserver );
 }
 
 /** @brief Display our MOTD Message of the Day from the external neostats.motd file 

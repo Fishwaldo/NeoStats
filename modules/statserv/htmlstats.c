@@ -147,7 +147,7 @@ static void put_copyright( void )
 static void serverlisthandler( const serverstat *ss, const void *v )
 {
 	os_fprintf( opf, "<tr><td height=\"4\"></td>\n" );
-	os_fprintf( opf, "<td height=\"4\"><a href=#%s> %s( %s )</a></td></tr>\n",
+	os_fprintf( opf, "<td height=\"4\"><a href=#%s> %s (%s)</a></td></tr>\n",
 		ss->name, ss->name,( ss->s ) ? "ONLINE" : "OFFLINE" );
 }
 
@@ -184,11 +184,11 @@ static void serverlistdetailhandler( const serverstat *ss, const void *v )
 		os_fprintf( opf, "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
 			sftime( ss->ts_lastseen ) );
 	} else {
-		os_fprintf( opf,"<tr><td>Current Users:</td><td>%d( %d%% )</td><td>Max %d at %s</td></tr>\n",
+		os_fprintf( opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
 			ss->users.current,( int )( ( ( float ) ss->users.current /( float ) networkstats.users.current ) * 100 ),
 			ss->users.alltime.max, sftime( ss->users.alltime.ts_max ) );
 		os_fprintf( opf,
-			"<tr><td>Current Opers:</td><td>%d( %d%% )</td><td>Max %d at %s</td></tr>\n",
+			"<tr><td>Current Opers:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
 			ss->opers.current,( int )( ( ( float ) ss->opers.current /( float ) networkstats.opers.current ) * 100 ),
 			ss->opers.alltime.max, sftime( ss->opers.alltime.ts_max ) );
 	}
@@ -238,28 +238,28 @@ static void html_netstats( void )
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b></th><th><b>Current</b></th><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.users.alltime.runningtotal );
-	os_fprintf( opf, "<td>%d( %d%% )</td>\n", networkstats.users.current,
+	os_fprintf( opf, "<td>%d (%d%%)</td>\n", networkstats.users.current,
 		GetAllTimePercent( &networkstats.users ) );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.users.alltime.average );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.users.alltime.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.users.alltime.ts_max ) );
 	os_fprintf( opf, "<tr><td>Channels:</td>\n" );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.channels.alltime.runningtotal );
-	os_fprintf( opf, "<td>%i( %d%% )</td>\n", networkstats.channels.current,
+	os_fprintf( opf, "<td>%i (%d%%)</td>\n", networkstats.channels.current,
 		GetAllTimePercent( &networkstats.channels ) );
 	os_fprintf( opf, "<td>%i</td>\n", networkstats.channels.alltime.average );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.channels.alltime.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.channels.alltime.ts_max ) );
 	os_fprintf( opf, "<tr><td>Opers:</td>\n" );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.opers.alltime.runningtotal );
-	os_fprintf( opf, "<td>%i( %d%% )</td>\n", networkstats.opers.current,
+	os_fprintf( opf, "<td>%i (%d%%)</td>\n", networkstats.opers.current,
 		GetAllTimePercent( &networkstats.opers ) );
 	os_fprintf( opf, "<td>%i</td>\n", networkstats.opers.alltime.average );
 	os_fprintf( opf, "<td>%i</td>\n", networkstats.opers.alltime.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.opers.alltime.ts_max ) );
 	os_fprintf( opf, "<td>Servers:</td>\n" );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.runningtotal );
-	os_fprintf( opf, "<td>%d( %d%% )</td>\n", networkstats.servers.current,
+	os_fprintf( opf, "<td>%d (%d%%)</td>\n", networkstats.servers.current,
 		GetAllTimePercent( &networkstats.servers ) );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.average );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.max );
@@ -283,28 +283,28 @@ static void html_dailystats( void )
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.daily.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.users.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.users.current,
 		GetDailyPercent( &networkstats.users ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.daily.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.daily.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.users.daily.ts_max ) );
 	os_fprintf( opf, "<tr><td>Channels:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.daily.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.channels.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.channels.current,
 		GetDailyPercent( &networkstats.channels ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.daily.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.daily.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.channels.daily.ts_max ) );
 	os_fprintf( opf, "<tr><td>Opers:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.daily.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.opers.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.opers.current,
 		GetDailyPercent( &networkstats.opers ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.daily.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.daily.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.opers.daily.ts_max ) );
 	os_fprintf( opf, "<tr><td>Servers:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.daily.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.servers.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.servers.current,
 		GetDailyPercent( &networkstats.servers ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.daily.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.daily.max );
@@ -327,28 +327,28 @@ static void html_weeklystats( void )
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.weekly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.users.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.users.current,
 		GetWeeklyPercent( &networkstats.users ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.weekly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.weekly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.users.weekly.ts_max ) );
 	os_fprintf( opf, "<tr><td>Channels:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.weekly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.channels.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.channels.current,
 		GetWeeklyPercent( &networkstats.channels ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.weekly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.weekly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.channels.weekly.ts_max ) );
 	os_fprintf( opf, "<tr><td>Opers:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.weekly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.opers.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.opers.current,
 		GetWeeklyPercent( &networkstats.opers ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.weekly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.weekly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.opers.weekly.ts_max ) );
 	os_fprintf( opf, "<tr><td>Servers:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.weekly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.servers.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.servers.current,
 		GetWeeklyPercent( &networkstats.servers ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.weekly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.weekly.max );
@@ -371,28 +371,28 @@ static void html_monthlystats( void )
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.monthly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.users.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.users.current,
 		GetMonthlyPercent( &networkstats.users ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.monthly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.monthly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.users.monthly.ts_max ) );
 	os_fprintf( opf, "<tr><td>Channels:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.monthly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.channels.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.channels.current,
 		GetMonthlyPercent( &networkstats.channels ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.monthly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.channels.monthly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.channels.monthly.ts_max ) );
 	os_fprintf( opf, "<tr><td>Opers:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.monthly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.opers.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.opers.current,
 		GetMonthlyPercent( &networkstats.opers ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.monthly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.opers.monthly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.opers.monthly.ts_max ) );
 	os_fprintf( opf, "<tr><td>Servers:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.monthly.runningtotal );
-	os_fprintf( opf, "<td>%-2d( %d%% )</td>\n", networkstats.servers.current,
+	os_fprintf( opf, "<td>%-2d (%d%%)</td>\n", networkstats.servers.current,
 		GetMonthlyPercent( &networkstats.servers ) );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.monthly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.monthly.max );
@@ -748,7 +748,7 @@ int HTMLOutputTimer( void *userptr )
 int ss_cmd_forcehtml( CmdParams *cmdparams )
 {
 	nlog( LOG_NOTICE, "%s!%s@%s forced an update of the HTML file.",
-		    cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname );
+		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname );
 	HTMLOutput();
 	return NS_SUCCESS;
 }

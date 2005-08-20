@@ -257,7 +257,7 @@ char *joinbuf( char **av, int ac, int from )
 
 	buf = ns_malloc( BUFSIZE );
 	if( from >= ac ) {
-		dlog( DEBUG1, "joinbuf: from( %d ) >= ac( %d )", from, ac );
+		dlog( DEBUG1, "joinbuf: from (%d) >= ac (%d)", from, ac );
 		strlcpy( buf, "( null )", BUFSIZE );
 	}
 	else {

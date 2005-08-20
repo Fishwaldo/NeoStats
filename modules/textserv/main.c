@@ -840,7 +840,7 @@ static int ts_cmd_del( CmdParams *cmdparams )
  *    cmdparams->av[0] = target nick
  *    cmdparams->av[1 - cmdparams->ac] = message
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */

@@ -225,7 +225,7 @@ EXPORTVAR extern char *numeric351;
 EXPORTVAR extern ircd_server ircd_srv;
 
 EXPORTFUNC int ircsplitbuf( char *buf, char ***argv, int colon_special );
-EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av, int ac );
+EXPORTFUNC void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int ac );
 
 /* IRCD protocol module API */
 EXPORTFUNC void _m_private( char *origin, char **argv, int argc, int cmdptr );
@@ -398,9 +398,9 @@ MODULEFUNC void send_chgident( const char *source, const char *nick, const char 
 MODULEFUNC void send_stats( const char *source, const char type, const char *target );
 MODULEFUNC void send_version( const char *source, const char *target );
 
-MODULEFUNC void cloakhost( char *host );
+MODULEFUNC void cloakhost( const char *host );
 
-EXPORTFUNC void send_cmd( char *fmt, ... )__attribute__( ( format( printf, 1, 2 ) ) ); /* 2=format 3=params */
+EXPORTFUNC void send_cmd( const char *fmt, ... )__attribute__( ( format( printf, 1, 2 ) ) ); /* 2=format 3=params */
 
 MODULEFUNC int parse (void *notused, void *rline, size_t len);
 

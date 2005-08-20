@@ -139,7 +139,7 @@ static int sortusers( const void *v, const void *v2 )
 void TLDReport( const TLD *tld, const void *v )
 {
 	irc_prefmsg( ss_bot, ( Client * ) v, 
-		"%3s \2%3d\2( %d%% ) -> %s ---> Daily Total: %d",
+		"%3s \2%3d\2 (%d%%) -> %s ---> Daily Total: %d",
 		tld->tld, tld->users.alltime.max, ( int )( ( float ) tld->users.current / ( float ) networkstats.users.current ) * 100,
 		tld->country, tld->users.current );
 }
@@ -300,7 +300,7 @@ void SaveTLDStats( void )
  *  @param data pointer to table row data
  *  @param size of loaded data
  *
- *  @return
+ *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
 static int new_tld( void *data, int size )

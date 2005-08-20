@@ -51,115 +51,171 @@ int RunLevel = 0;
 /* @brief Module hash list */
 static hash_t *modulehash;
 
-/** @brief Initialise module list hashes
+/** @brief GetModuleList
  *
- * For core use only, initialises module list hashes
+ *  Calls handler for all modules
  *
- * @param none
- * 
- * @return none
-*/
+ *  @params handler to call
+ *  @params v additional data to send to handler
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int GetModuleList( ModuleListHandler handler, void *v )
+{
+	Module *module_ptr;
+	hscan_t ms;
+	hnode_t *mn;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin( &ms, modulehash );
+	while( ( mn = hash_scan_next( &ms ) ) != NULL )
+	{
+		module_ptr = hnode_get( mn );
+		if( handler( module_ptr, v ) == NS_TRUE )
+			break;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief InitModules
+ *
+ *  initialises module list hashes
+ *  For core use only
+ *
+ *  @params none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 int InitModules( void )
 {
 	SET_SEGV_LOCATION();
-	modulehash = hash_create (NUM_MODULES, 0, 0);
-	if(!modulehash) {
-		nlog (LOG_CRITICAL, "Unable to create module hash");
+	modulehash = hash_create( NUM_MODULES, 0, 0 );
+	if( !modulehash ) {
+		nlog( LOG_CRITICAL, "Unable to create module hash" );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
 }
 
-void FiniModules (void) 
+/** @brief FiniModules
+ *
+ *  Fini module subsystem
+ *
+ *  @params none
+ *
+ *  @return none
+ */
+
+void FiniModules( void ) 
 {
-	hash_destroy(modulehash);
+	hash_destroy( modulehash );
 }
 
-/** @brief SynchModule 
+/** @brief SynchModule
  *
- * 
+ *  Synch module
  *
- * @return none
+ *  @params module_ptr pointer to module to synch
+ *
+ *  @return result of ModSynch
  */
-int SynchModule (Module* module_ptr)
+
+int SynchModule( Module* module_ptr )
 {
 	int err = NS_SUCCESS; /*FAILURE;*/
-	int (*ModSynch) (void);
+	int( *ModSynch )( void );
 
 #ifdef USE_PERL	
 	/* only standard modules get a sync */
-	if (IS_STD_MOD(module_ptr)) {
+	if( IS_STD_MOD( module_ptr ) ) {
 #endif
 		module_ptr->insynch = 1;
-		ModSynch = ns_dlsym ((int *) module_ptr->handle, "ModSynch");
-		if (ModSynch) {
-			SET_RUN_LEVEL(module_ptr);
-			err = (*ModSynch)(); 
+		ModSynch = ns_dlsym( ( int * ) module_ptr->handle, "ModSynch" );
+		if( ModSynch ) {
+			SET_RUN_LEVEL( module_ptr );
+			err =( *ModSynch )(); 
 			RESET_RUN_LEVEL();
 		}
 		SET_SEGV_LOCATION();
 		module_ptr->synched = 1;
 #ifdef USE_PERL
 	} else {
-		err = perl_sync_module(module_ptr);
+		err = perl_sync_module( module_ptr );
 	}
 #endif
 	return err;
 }
 	
-/** @brief SynchAllModule 
+/** @brief SynchAllModule
  *
- * 
+ *  Synch all modules
  *
- * @return none
+ *  @params none
+ *
+ *  @return none
  */
-int SynchAllModules (void)
+
+void SynchAllModules( void )
 {
 	Module *module_ptr;
 	hscan_t ms;
 	hnode_t *mn;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, modulehash);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		module_ptr = hnode_get (mn);
-		if (SynchModule (module_ptr) != NS_SUCCESS) {
-			unload_module (module_ptr->info->name, NULL);
+	hash_scan_begin( &ms, modulehash );
+	while( ( mn = hash_scan_next( &ms ) ) != NULL ) {
+		module_ptr = hnode_get( mn );
+		if( SynchModule( module_ptr ) != NS_SUCCESS ) {
+			unload_module( module_ptr->info->name, NULL );
 		}
 	}
-	return NS_SUCCESS;
 }
 
-
-/** @brief 
+/** @brief ModuleVersion
  *
- * 
+ *  report module versions
  *
- * @return none
+ *  @params module_ptr pointer to module to report
+ *  @params v nick to send to
+ *
+ *  @return none
  */
-void
-ModulesVersion (const char* nick, const char *remoteserver)
-{
-	Module *module_ptr;
-	hscan_t ms;
-	hnode_t *mn;
 
-	SET_SEGV_LOCATION();
-	hash_scan_begin (&ms, modulehash);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		module_ptr = hnode_get (mn);
-		irc_numeric (RPL_VERSION, nick,
-			_("Module %s version: %s %s %s"),
-			module_ptr->info->name, module_ptr->info->version, 
-			module_ptr->info->build_date, module_ptr->info->build_time);
-	}
+int ModuleVersion( Module *module_ptr, void *v )
+{
+	irc_numeric( RPL_VERSION, (char *)v, _( "Module %s version: %s %s %s" ),
+		module_ptr->info->name, module_ptr->info->version, 
+		module_ptr->info->build_date, module_ptr->info->build_time );
+	return NS_FALSE;
 }
 
-/** @brief 
+/** @brief AllModuleVersions
  *
- * 
+ *  report module versions
  *
- * @return none
+ *  @params nick
+ *  @params remoteserver
+ *
+ *  @return none
+ */
+
+void AllModuleVersions( const char* nick, const char *remoteserver )
+{
+	GetModuleList( ModuleVersion, (void *)nick );
+}
+
+/** @brief load_module_error
+ *
+ *  report load module error
+ *
+ *  @params target
+ *  @params module_name
+ *  @params fmt
+ *  @params ...
+ *
+ *  @return none
  */
 
 void load_module_error( const Client *target, const char *module_name, const char *fmt, ... )
@@ -167,155 +223,167 @@ void load_module_error( const Client *target, const char *module_name, const cha
 	static char buf[BUFSIZE];
 	va_list ap;
 
-	va_start (ap, fmt);
-	ircvsnprintf (buf, BUFSIZE, fmt, ap);
-	va_end (ap);
-	if (target) {
-		irc_prefmsg (ns_botptr, target, __("Unable to load module %s: %s", u), module_name, buf);
+	va_start( ap, fmt );
+	ircvsnprintf( buf, BUFSIZE, fmt, ap );
+	va_end( ap );
+	if( target ) {
+		irc_prefmsg( ns_botptr, target, __( "Unable to load module %s: %s", u ), module_name, buf );
 	}
-	nlog (LOG_WARNING, buf);
+	nlog( LOG_WARNING, buf );
 }
 
-/** @brief 
+/** @brief ns_load_module
  *
- * @param 
- * 
- * @return
+ *  determine the type of module based on extension
+ *  and then call the relevent procedure to load it
+ *
+ *  @params modfilename name of module to load
+ *  @params u client requesting load
+ *
+ *  @return pointer to loaded module
  */
-Module *load_stdmodule (const char *modfilename, Client * u)
+
+Module *load_stdmodule( const char *modfilename, Client * u )
 {
 	int err;
 	void *handle;
 	ModuleInfo *infoptr = NULL;
 	ModuleEvent *eventlistptr = NULL;
 	Module *mod_ptr = NULL;
-	int (*ModInit) (void);
+	int( *ModInit )( void );
 	CmdParams *cmd;
 
 	SET_SEGV_LOCATION();
-	if (hash_isfull (modulehash)) {
-		load_module_error( u, modfilename, __("module list is full", u) );
+	if( hash_isfull( modulehash ) ) {
+		load_module_error( u, modfilename, __( "module list is full", u ) );
 		return NULL;
 	} 
-	handle = ns_dlopen (modfilename, RTLD_NOW || RTLD_GLOBAL);
-	if (!handle) {
+	handle = ns_dlopen( modfilename, RTLD_NOW || RTLD_GLOBAL );
+	if( !handle ) {
 		load_module_error( u, modfilename, ns_dlerrormsg, modfilename );
 		return NULL;
 	}
-	infoptr = ns_dlsym (handle, "module_info");
-	if(infoptr == NULL) {
-		load_module_error( u, modfilename, __("missing module_info", u) );
-		ns_dlclose (handle);
+	infoptr = ns_dlsym( handle, "module_info" );
+	if( infoptr == NULL ) {
+		load_module_error( u, modfilename, __( "missing module_info", u ) );
+		ns_dlclose( handle );
 		return NULL;
 	}
 	/* Check module was built for this version of NeoStats */
-	if( ircstrncasecmp (NEOSTATS_VERSION, infoptr->neostats_version, VERSIONSIZE) !=0 ) {
-		load_module_error( u, modfilename, __("module built with an old version of NeoStats and must be rebuilt.", u)  );
-		ns_dlclose (handle);
+	if( ircstrncasecmp( NEOSTATS_VERSION, infoptr->neostats_version, VERSIONSIZE ) !=0 ) {
+		load_module_error( u, modfilename, __( "module built with an old version of NeoStats and must be rebuilt.", u ) );
+		ns_dlclose( handle );
 		return NULL;
 	}
-	if( !infoptr->copyright || ircstrcasecmp (infoptr->copyright[0], "Copyright (c) <year>, <your name>") ==0 ) {
-		load_module_error( u, modfilename, __("missing copyright text.", u) );
-		ns_dlclose (handle);
+	if( !infoptr->copyright || ircstrcasecmp( infoptr->copyright[0], "Copyright( c ) <year>, <your name>" ) ==0 ) {
+		load_module_error( u, modfilename, __( "missing copyright text.", u ) );
+		ns_dlclose( handle );
 		return NULL;
 	}	
-	if( !infoptr->about_text || ircstrcasecmp (infoptr->about_text[0], "About your module") ==0 ) {
-		load_module_error( u, modfilename, __("missing about text.", u) );
-		ns_dlclose (handle);
+	if( !infoptr->about_text || ircstrcasecmp( infoptr->about_text[0], "About your module" ) ==0 ) {
+		load_module_error( u, modfilename, __( "missing about text.", u ) );
+		ns_dlclose( handle );
 		return NULL;
 	}	
 	/* Check that the Module hasn't already been loaded */
-	if (hash_lookup (modulehash, infoptr->name)) {
-		ns_dlclose (handle);
-		load_module_error( u, modfilename, __("already loaded", u) );
+	if( hash_lookup( modulehash, infoptr->name ) ) {
+		ns_dlclose( handle );
+		load_module_error( u, modfilename, __( "already loaded", u ) );
 		return NULL;
 	}
 	/* Check we have require PROTOCOL/FEATURE support for module */
-	if((infoptr->features & ircd_srv.features) != infoptr->features) {
-		load_module_error( u, modfilename, __("Required module features not available on this IRCd.", u), modfilename );
-		ns_dlclose (handle);
+	if( ( infoptr->features & ircd_srv.features ) != infoptr->features ) {
+		load_module_error( u, modfilename, __( "Required module features not available on this IRCd.", u ), modfilename );
+		ns_dlclose( handle );
 		return NULL;
 	}
-	/* Lookup ModInit (replacement for library __init() call */
-	ModInit = ns_dlsym ((int *) handle, "ModInit");
-	if (!ModInit) {
-		load_module_error( u, modfilename, __("missing ModInit.", u) );
-		ns_dlclose (handle);
+	/* Lookup ModInit( replacement for library __init() call */
+	ModInit = ns_dlsym( ( int * ) handle, "ModInit" );
+	if( !ModInit ) {
+		load_module_error( u, modfilename, __( "missing ModInit.", u ) );
+		ns_dlclose( handle );
 		return NULL;
 	}
 	/* Allocate module */
-	mod_ptr = (Module *) ns_calloc (sizeof (Module));
-	dlog(DEBUG1, "Module internal name: %s", infoptr->name);
-	dlog(DEBUG1, "Module description: %s", infoptr->description);
+	mod_ptr =( Module * ) ns_calloc( sizeof( Module ) );
+	dlog( DEBUG1, "Module internal name: %s", infoptr->name );
+	dlog( DEBUG1, "Module description: %s", infoptr->description );
 	mod_ptr->info = infoptr;
 	mod_ptr->handle = handle;
-	insert_module(mod_ptr);
+	insert_module( mod_ptr );
 #ifdef USE_PERL
 	mod_ptr->modtype = MOD_STANDARD;
 #endif
 	/* Extract pointer to event list */
-	eventlistptr = ns_dlsym (handle, "module_events");
-	if(eventlistptr) {
-		SET_RUN_LEVEL(mod_ptr);
-		AddEventList (eventlistptr);
+	eventlistptr = ns_dlsym( handle, "module_events" );
+	if( eventlistptr ) {
+		SET_RUN_LEVEL( mod_ptr );
+		AddEventList( eventlistptr );
 		RESET_RUN_LEVEL();
 	}
     /* For Auth modules, register auth function */
-	if (infoptr->flags & MODULE_FLAG_AUTH) {
-		if (AddAuthModule (mod_ptr) != NS_SUCCESS) {
-			load_module_error( u, modfilename, __("Unable to load auth module: %s missing ModAuthUser function",u), infoptr->name );
-			unload_module(mod_ptr->info->name, NULL);
+	if( infoptr->flags & MODULE_FLAG_AUTH ) {
+		if( AddAuthModule( mod_ptr ) != NS_SUCCESS ) {
+			load_module_error( u, modfilename, __( "Unable to load auth module: %s missing ModAuthUser function",u ), infoptr->name );
+			unload_module( mod_ptr->info->name, NULL );
 			return NULL;
 		}
 	}
     /* Module side user authentication for e.g. SecureServ helpers 
      * Not available on auth modules */
-	if (!(infoptr->flags & MODULE_FLAG_AUTH)) {
-		mod_ptr->authcb = ns_dlsym ((int *) handle, "ModAuthUser");
+	if( !( infoptr->flags & MODULE_FLAG_AUTH ) ) {
+		mod_ptr->authcb = ns_dlsym( ( int * ) handle, "ModAuthUser" );
 	}
 	/* assign a module number to this module */
-	assign_mod_number(mod_ptr);
+	assign_mod_number( mod_ptr );
 
 	SET_SEGV_LOCATION();
-	SET_RUN_LEVEL(mod_ptr);
+	SET_RUN_LEVEL( mod_ptr );
 	DBAOpenDatabase();
-	err = (*ModInit)(); 
+	err =( *ModInit )(); 
 	RESET_RUN_LEVEL();
-	if (err < 1 || mod_ptr->error) {
-		load_module_error( u, modfilename, __("See %s.log for further information.",u), mod_ptr->info->name );
-		unload_module(mod_ptr->info->name, NULL);
+	if( err < 1 || mod_ptr->error ) {
+		load_module_error( u, modfilename, __( "See %s.log for further information.",u ), mod_ptr->info->name );
+		unload_module( mod_ptr->info->name, NULL );
 		return NULL;
 	}
-	if (infoptr->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
+	if( infoptr->flags & MODULE_FLAG_LOCAL_EXCLUDES ) 
 	{
-		InitModExcludes(mod_ptr);
+		InitModExcludes( mod_ptr );
 	}
 	SET_SEGV_LOCATION();
 
 	/* Let this module know we are online if we are! */
-	if (IsNeoStatsSynched()) {
-		if (SynchModule (mod_ptr) != NS_SUCCESS || mod_ptr->error)
+	if( IsNeoStatsSynched() ) {
+		if( SynchModule( mod_ptr ) != NS_SUCCESS || mod_ptr->error )
 		{
-			load_module_error( u, modfilename, __("See %s.log for further information.", u), mod_ptr->info->name );
-			unload_module(mod_ptr->info->name, NULL);
+			load_module_error( u, modfilename, __( "See %s.log for further information.", u ), mod_ptr->info->name );
+			unload_module( mod_ptr->info->name, NULL );
 			return NULL;
 		}
 	}
-	cmd = ns_calloc (sizeof(CmdParams));
-	cmd->param = (char*)infoptr->name;
-	SendAllModuleEvent(EVENT_MODULELOAD, cmd);
-	ns_free(cmd);
-	if (u) {
-		irc_prefmsg (ns_botptr, u, __("Module %s loaded, %s",u), infoptr->name, infoptr->description);
-		irc_globops (NULL, _("Module %s loaded"), infoptr->name);
+	cmd = ns_calloc( sizeof( CmdParams ) );
+	cmd->param =( char* )infoptr->name;
+	SendAllModuleEvent( EVENT_MODULELOAD, cmd );
+	ns_free( cmd );
+	if( u ) {
+		irc_prefmsg( ns_botptr, u, __( "Module %s loaded, %s",u ), infoptr->name, infoptr->description );
+		irc_globops( NULL, _( "Module %s loaded" ), infoptr->name );
 	}
 	return mod_ptr;
 }
 
-/** @brief determine the type of module based on extension and then
- * call the relevent procedure to load it
+/** @brief ns_load_module
+ *
+ *  determine the type of module based on extension
+ *  and then call the relevent procedure to load it
+ *
+ *  @params modfilename name of module to load
+ *
+ *  @return pointer to loaded module
  */
-Module *ns_load_module(const char *modfilename, Client * u)
+
+Module *ns_load_module( const char *modfilename, Client * u )
 { 
 	char path[255];
 	char loadmodname[255];
@@ -324,238 +392,258 @@ Module *ns_load_module(const char *modfilename, Client * u)
 	strlcpy( loadmodname, modfilename, 255 );
 	strlwr( loadmodname );
 	ircsnprintf( path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_STDEXT );
-	if (stat(path, &buf) != -1) {
-		return load_stdmodule(path, u);
+	if( stat( path, &buf ) != -1 ) {
+		return load_stdmodule( path, u );
 	}
 #ifdef USE_PERL
-	ircsnprintf (path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT);
-	if (stat(path, &buf) != -1) {
+	ircsnprintf( path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_PERLEXT );
+	if( stat( path, &buf ) != -1 ) {
 		Module *mod;
-		mod = load_perlmodule(path, u);
-		mod->info->build_date = ns_malloc(10);
-		strftime((char *)mod->info->build_date, 9, "%d/%m/%y", gmtime(&buf.st_mtime));
-		mod->info->build_time = ns_malloc(11);
-		strftime((char *)mod->info->build_time, 10, "%H:%M", gmtime(&buf.st_mtime));
+		mod = load_perlmodule( path, u );
+		mod->info->build_date = ns_malloc( 10 );
+		strftime( ( char * )mod->info->build_date, 9, "%d/%m/%y", gmtime( &buf.st_mtime ) );
+		mod->info->build_time = ns_malloc( 11 );
+		strftime( ( char * )mod->info->build_time, 10, "%H:%M", gmtime( &buf.st_mtime ) );
 		return mod;
 	}
 #endif
 	/* if we get here, ehhh, doesn't exist */
-	load_module_error( u, modfilename, __("Module file not found", u));
+	load_module_error( u, modfilename, __( "Module file not found", u ) );
 	return NULL;
 
 }
 
-/** @brief generate module number and assign it
+/** @brief insert_module
  *
- * @param mod_ptr module pointer 
+ *  generate module number and assign it
  *
- * @return Nothing 
+ *  @params mod_ptr module pointer 
+ *
+ *  @return none
  */
 
 void assign_mod_number( Module *mod_ptr )
 {
 	int moduleindex = 0;
 
-	while (ModList[moduleindex] != NULL)
+	while( ModList[moduleindex] != NULL )
 		moduleindex++;
 	ModList[moduleindex] = mod_ptr;
 	mod_ptr->modnum = moduleindex;
-	dlog(DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name);
+	dlog( DEBUG1, "Assigned %d to module %s for modulenum", moduleindex, mod_ptr->info->name );
 }
 
-/** @brief insert module pointer into module hash. 
+/** @brief insert_module
  *
- * @param mod_ptr module pointer 
+ *  insert module pointer into module hash. 
  *
- * @return Nothing 
+ *  @params mod_ptr module pointer 
+ *
+ *  @return none
  */
 
-void insert_module(Module *mod_ptr)
+void insert_module( Module *mod_ptr )
 {
-	hnode_create_insert (modulehash, mod_ptr, mod_ptr->info->name);
+	hnode_create_insert( modulehash, mod_ptr, mod_ptr->info->name );
 }
 
-
-
-/** @brief 
+/** @brief ReportModuleInfo
  *
- * @param 
- * 
- * @return
+ *  MODLIST helper
+ *  report module info
+ *
+ *  @params module_ptr pointer to module to report
+ *  @params v client to send to
+ *
+ *  @return none
  */
-int
-ns_cmd_modlist (CmdParams* cmdparams)
-{
-	Module *mod_ptr = NULL;
-	hnode_t *mn;
-	hscan_t hs;
 
+int ReportModuleInfo( Module *module_ptr, void *v )
+{
+	Client *u = (Client *)v;
+	irc_prefmsg( ns_botptr, u, __( "Module: %d %s (%s)", u ), module_ptr->modnum, module_ptr->info->name, module_ptr->info->version );
+	irc_prefmsg( ns_botptr, u, "      : %s", module_ptr->info->description );
+	return NS_FALSE;
+}
+
+/** @brief ns_cmd_modlist
+ *
+ *  MODLIST command handler
+ *
+ *  @params cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+int ns_cmd_modlist( CmdParams* cmdparams )
+{
 	SET_SEGV_LOCATION();
-	hash_scan_begin (&hs, modulehash);
-	while ((mn = hash_scan_next (&hs)) != NULL) {
-		mod_ptr = hnode_get (mn);
-		irc_prefmsg (ns_botptr, cmdparams->source, __("Module: %d %s (%s)", cmdparams->source), mod_ptr->modnum, mod_ptr->info->name, mod_ptr->info->version);
-		irc_prefmsg (ns_botptr, cmdparams->source, "      : %s", mod_ptr->info->description);
-	}
-	irc_prefmsg (ns_botptr, cmdparams->source, __("End of Module List", cmdparams->source));
+	GetModuleList( ReportModuleInfo, (void *)cmdparams->source );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "End of Module List", cmdparams->source ) );
 	return 0;
 }
 
-/** @brief 
+/** @brief unload_module
  *
- * @param 
+ *  Unloads module
+ *
+ *  @param modname name of module to unload
+ *  @param u pointer to client requesting unload if appropriate
  * 
- * @return
- */
-int
-unload_module (const char *modname, Client * u)
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+*/
+
+int unload_module( const char *modname, Client * u )
 {
 	Module *mod_ptr;
 	hnode_t *modnode;
 	int moduleindex;
-	int (*ModFini) ( void );
+	int( *ModFini )( void );
 	CmdParams *cmdparams;
 
 	SET_SEGV_LOCATION();
 	/* Check to see if module is loaded */
-	modnode = hash_lookup (modulehash, modname);
-	if (!modnode) {
-		if (u) {
-			irc_prefmsg (ns_botptr, u, __("Module %s not loaded, try /msg %s modlist", u), modname, ns_botptr->name);
-			irc_chanalert (ns_botptr, _("%s tried to unload %s but its not loaded"), u->name, modname);
+	modnode = hash_lookup( modulehash, modname );
+	if( !modnode ) {
+		if( u ) {
+			irc_prefmsg( ns_botptr, u, __( "Module %s not loaded, try /msg %s modlist", u ), modname, ns_botptr->name );
+			irc_chanalert( ns_botptr, _( "%s tried to unload %s but its not loaded" ), u->name, modname );
 		}
 		return NS_FAILURE;
 	}
-	mod_ptr = hnode_get (modnode);
-	irc_chanalert (ns_botptr, _("Unloading module %s"), modname);
-	if (mod_ptr->info->flags & MODULE_FLAG_AUTH)
+	mod_ptr = hnode_get( modnode );
+	irc_chanalert( ns_botptr, _( "Unloading module %s" ), modname );
+	if( mod_ptr->info->flags & MODULE_FLAG_AUTH )
 	{
-		DelAuthModule (mod_ptr);
+		DelAuthModule( mod_ptr );
 	}
 	moduleindex = mod_ptr->modnum;
 	/* canx any DNS queries used by this module */
-	canx_dns (mod_ptr);
+	canx_dns( mod_ptr );
 	/* Delete any timers used by this module */
-	del_timers (mod_ptr);
+	del_timers( mod_ptr );
 	/* Delete any sockets used by this module */
-	del_sockets (mod_ptr);
+	del_sockets( mod_ptr );
 	/* Delete any associated event list */
 	FreeEventList( mod_ptr );
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
 	 */
-	dlog(DEBUG1, "Deleting Module %s from Hash", modname);
-	hash_delete (modulehash, modnode);		
-	hnode_destroy (modnode);
+	dlog( DEBUG1, "Deleting Module %s from Hash", modname );
+	hash_delete( modulehash, modnode );		
+	hnode_destroy( modnode );
 
 	/* now determine if its perl, or standard module */
-	if (IS_STD_MOD(mod_ptr)) {
-		/* call ModFini (replacement for library __fini() call */
-		ModFini = ns_dlsym ((int *) mod_ptr->handle, "ModFini");
-		if (ModFini) {
-			SET_RUN_LEVEL(mod_ptr);
-			(*ModFini)();
+	if( IS_STD_MOD( mod_ptr ) ) {
+		/* call ModFini( replacement for library __fini() call */
+		ModFini = ns_dlsym( ( int * ) mod_ptr->handle, "ModFini" );
+		if( ModFini ) {
+			SET_RUN_LEVEL( mod_ptr );
+			( *ModFini )();
 			RESET_RUN_LEVEL();
 			SET_SEGV_LOCATION();
 		}
 #if USE_PERL
 	} else {
-		PerlModFini(mod_ptr);
+		PerlModFini( mod_ptr );
 #endif
 	}
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
 	 */
-	DelModuleBots (mod_ptr);
+	DelModuleBots( mod_ptr );
 	/* Close module */
-	irc_globops (NULL, _("%s Module unloaded"), modname);
-	SET_RUN_LEVEL(mod_ptr);
-	if (mod_ptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES) 
+	irc_globops( NULL, _( "%s Module unloaded" ), modname );
+	SET_RUN_LEVEL( mod_ptr );
+	if( mod_ptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES ) 
 	{
-		FiniModExcludes(mod_ptr);
+		FiniModExcludes( mod_ptr );
 	}
-	cmdparams = ns_calloc (sizeof(CmdParams));
-	cmdparams->param = (char*)modname;
-	SendAllModuleEvent(EVENT_MODULEUNLOAD, cmdparams);
-	ns_free(cmdparams);
+	cmdparams = ns_calloc( sizeof( CmdParams ) );
+	cmdparams->param =( char* )modname;
+	SendAllModuleEvent( EVENT_MODULEUNLOAD, cmdparams );
+	ns_free( cmdparams );
 	RESET_RUN_LEVEL();
 
-	SET_RUN_LEVEL(mod_ptr);
+	SET_RUN_LEVEL( mod_ptr );
 	DBACloseDatabase();
 
 
-	if (IS_STD_MOD(mod_ptr)) {
-		ns_dlclose (mod_ptr->handle);
+	if( IS_STD_MOD( mod_ptr ) ) {
+		ns_dlclose( mod_ptr->handle );
 #ifdef USE_PERL
 	} else {
-		unload_perlmod(mod_ptr);
+		unload_perlmod( mod_ptr );
 #endif
 	}
 	RESET_RUN_LEVEL();
-	ns_free (mod_ptr);
+	ns_free( mod_ptr );
 	/* free the module number */
-	if (moduleindex >= 0) {
-		dlog(DEBUG1, "Free %d from Module Numbers", moduleindex);
+	if( moduleindex >= 0 ) {
+		dlog( DEBUG1, "Free %d from Module Numbers", moduleindex );
 		ModList[moduleindex] = NULL;
 	}
 	/* Cleanup moddata */
-	CleanupUserModdata (moduleindex);
-	CleanupServerModdata (moduleindex);
-	CleanupChannelModdata (moduleindex);
+	CleanupUserModdata( moduleindex );
+	CleanupServerModdata( moduleindex );
+	CleanupChannelModdata( moduleindex );
 	return NS_SUCCESS;
 }
 
-/** @brief unload all loaded modules
+/** @brief unload_modules
  *
- * Unloads all loaded modules
+ *  Unloads all loaded modules
  *
- * @param none
+ *  @param none
  * 
- * @return none
+ *  @return none
 */
-void unload_modules(void)
+
+void unload_modules( void )
 {
 	Module *mod_ptr;
 	hscan_t ms;
 	hnode_t *mn;
 
 	/* Walk through hash list unloading each module */
-	hash_scan_begin (&ms, modulehash);
-	while ((mn = hash_scan_next (&ms)) != NULL) {
-		mod_ptr = hnode_get (mn);
-		unload_module (mod_ptr->info->name, NULL);
+	hash_scan_begin( &ms, modulehash );
+	while( ( mn = hash_scan_next( &ms ) ) != NULL ) {
+		mod_ptr = hnode_get( mn );
+		unload_module( mod_ptr->info->name, NULL );
 	}
 }
 
-/** @brief 
+/** @brief ModuleConfig
  *
- * @param 
- * 
- * @return
+ *  Load module configuration
+ *
+ *  @param set_ptr pointer to module settings
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-ModuleConfig(bot_setting* set_ptr)
+
+int ModuleConfig( bot_setting* set_ptr )
 {
 	SET_SEGV_LOCATION();
-	while(set_ptr->option)
+	while( set_ptr->option )
 	{
-		switch(set_ptr->type) {
+		switch( set_ptr->type ) {
 			case SET_TYPE_BOOLEAN:
-				if (DBAFetchConfigBool (set_ptr->option, set_ptr->varptr) != NS_SUCCESS) {
-					*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-					DBAStoreConfigBool (set_ptr->option, set_ptr->varptr);
+				if( DBAFetchConfigBool( set_ptr->option, set_ptr->varptr ) != NS_SUCCESS ) {
+					*( int * )set_ptr->varptr =( int )set_ptr->defaultval;
+					DBAStoreConfigBool( set_ptr->option, set_ptr->varptr );
 				}
-				if(set_ptr->handler) {
-					set_ptr->handler(NULL, SET_LOAD);
+				if( set_ptr->handler ) {
+					set_ptr->handler( NULL, SET_LOAD );
 				}
 				break;
 			case SET_TYPE_INT:
-				if (DBAFetchConfigInt (set_ptr->option, set_ptr->varptr) != NS_SUCCESS) {
-					*(int *)set_ptr->varptr = (int)set_ptr->defaultval;
-					DBAStoreConfigInt(set_ptr->option, set_ptr->varptr);
+				if( DBAFetchConfigInt( set_ptr->option, set_ptr->varptr ) != NS_SUCCESS ) {
+					*( int * )set_ptr->varptr =( int )set_ptr->defaultval;
+					DBAStoreConfigInt( set_ptr->option, set_ptr->varptr );
 				}
-				if(set_ptr->handler) {
-					set_ptr->handler(NULL, SET_LOAD);
+				if( set_ptr->handler ) {
+					set_ptr->handler( NULL, SET_LOAD );
 				}
 				break;
 			case SET_TYPE_STRING:
@@ -566,24 +654,24 @@ ModuleConfig(bot_setting* set_ptr)
 			case SET_TYPE_HOST:
 			case SET_TYPE_REALNAME:
 			case SET_TYPE_IPV4:
-				if(	DBAFetchConfigStr (set_ptr->option, set_ptr->varptr, set_ptr->max) != NS_SUCCESS) {
+				if( 	DBAFetchConfigStr( set_ptr->option, set_ptr->varptr, set_ptr->max ) != NS_SUCCESS ) {
 					if( set_ptr->defaultval ) {
-						strlcpy(set_ptr->varptr, set_ptr->defaultval, set_ptr->max);
+						strlcpy( set_ptr->varptr, set_ptr->defaultval, set_ptr->max );
 					}
-					DBAStoreConfigStr (set_ptr->option, set_ptr->varptr, set_ptr->max);
+					DBAStoreConfigStr( set_ptr->option, set_ptr->varptr, set_ptr->max );
 				}
-				if(set_ptr->handler) {
-					set_ptr->handler(NULL, SET_LOAD);
+				if( set_ptr->handler ) {
+					set_ptr->handler( NULL, SET_LOAD );
 				}
 				break;			
 			case SET_TYPE_CUSTOM:
-				if(set_ptr->handler) {
-					set_ptr->handler(NULL, SET_LOAD);
+				if( set_ptr->handler ) {
+					set_ptr->handler( NULL, SET_LOAD );
 				}
 				break;
 			default:
-				nlog(LOG_WARNING, "Unsupported SET type %d in ModuleConfig %s", 
-					set_ptr->type, set_ptr->option);
+				nlog( LOG_WARNING, "Unsupported SET type %d in ModuleConfig %s", 
+					set_ptr->type, set_ptr->option );
 				break;
 		}
 		set_ptr++;
@@ -591,7 +679,16 @@ ModuleConfig(bot_setting* set_ptr)
 	return NS_SUCCESS;
 }
 
-hash_t *GetModuleHash (void)
+/** @brief GetModuleHash
+ *
+ *  Get module hash pointer
+ *
+ *  @param none
+ *
+ *  @return module hash pointer
+ */
+
+hash_t *GetModuleHash( void )
 {
 	return modulehash;
 }

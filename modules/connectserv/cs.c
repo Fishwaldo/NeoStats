@@ -299,7 +299,7 @@ static void cs_report( const char *fmt, ... )
  *  signon event handler
  *  report signons
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -319,7 +319,7 @@ static int cs_event_signon( const CmdParams *cmdparams )
  *  quit event handler
  *  report quits
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -340,7 +340,7 @@ static int cs_event_quit( const CmdParams *cmdparams )
  *  local kill event handler
  *  report local kills
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -359,7 +359,7 @@ static int cs_event_localkill( const CmdParams *cmdparams )
  *  global kill event handler
  *  report global kills
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -378,7 +378,7 @@ static int cs_event_globalkill( const CmdParams *cmdparams )
  *  server kill event handler
  *  report server kills
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -396,7 +396,7 @@ static int cs_event_serverkill( const CmdParams *cmdparams )
  *
  *  report mode changes
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -427,7 +427,7 @@ static int cs_report_mode( const char *modedesc, const int serverflag, const Cli
  *  umode event handler
  *  report umode changes
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -478,7 +478,7 @@ static int cs_event_umode( const CmdParams *cmdparams )
  *  smode event handler
  *  report smode changes
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -526,7 +526,7 @@ static int cs_event_smode( const CmdParams *cmdparams )
  *  nick change event handler
  *  report nick changes
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -545,7 +545,7 @@ static int cs_event_nick( const CmdParams *cmdparams )
  *  away event handler
  *  report away
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -564,7 +564,7 @@ static int cs_event_away( const CmdParams *cmdparams )
  *  server connect event handler
  *  report server connects
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -581,7 +581,7 @@ static int cs_event_server( const CmdParams *cmdparams )
  *  server quit event handler
  *  report server quits
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -599,8 +599,8 @@ static int cs_event_squit( const CmdParams *cmdparams )
  *  Set callback for exclusions
  *  Enable or disable exclude event flag
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -619,8 +619,8 @@ static int cs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for sign watch
  *  Enable or disable events associated with sign on/off
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -648,8 +648,8 @@ static int cs_set_sign_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for kill watch
  *  Enable or disable events associated with kills
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -679,8 +679,8 @@ static int cs_set_kill_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for mode watch
  *  Enable or disable events associated with modes
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -708,8 +708,8 @@ static int cs_set_mode_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for nick watch
  *  Enable or disable events associated with nick changes
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -735,8 +735,8 @@ static int cs_set_nick_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for away watch
  *  Enable or disable events associated with away events
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -762,8 +762,8 @@ static int cs_set_away_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for server watch
  *  Enable or disable events associated with server connects/quits
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */

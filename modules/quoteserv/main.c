@@ -483,7 +483,7 @@ static int do_quote( const Client *target, const char *which, int reporterror )
  *
  *  QUOTE command handler
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *    cmdparams->av[0] = target nick
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
@@ -499,7 +499,7 @@ static int qs_cmd_quote( CmdParams* cmdparams )
  *  signon event handler
  *  Send quote on signon if enabled
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -514,8 +514,8 @@ static int event_signon( CmdParams *cmdparams )
  *  Set callback for exclusions
  *  Enable or disable exclude event flag
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -534,8 +534,8 @@ static int qs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
  *  Set callback for signonquote
  *  Enable or disable events associated with signonquote
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */

@@ -90,6 +90,7 @@ static int calc_cmd_ulevel( const bot_cmd *cmd_ptr )
  *	calculate ulevel
  *
  *  @param pointer to command structure
+ *
  *  @return command user level requires
  */
 

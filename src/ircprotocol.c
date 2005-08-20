@@ -52,29 +52,37 @@ ProtocolInfo *protocol_info;
 void *protocol_module_handle;
 irc_cmd *cmd_list;
 
-/** @brief process ircd commands
+/** @brief process_ircd_cmd
  *
- * 
+ *  process ircd commands
  *
- *  @param none
+ *  @param cmdptr source flag
+ *  @param cmd command string
+ *  @param origin of command
+ *  @param av array of arguments
+ *  @param ac count of args in av
  *
  *  @return none
  */
 
-EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av, int ac )
+void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int ac )
 {
 	irc_cmd *ircd_cmd_ptr;
 	irc_cmd *intrinsic_cmd_ptr;
 
 	SET_SEGV_LOCATION();
 	ircd_cmd_ptr = cmd_list;
-	while( ircd_cmd_ptr->name ) {
+	while( ircd_cmd_ptr->name )
+	{
 		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) || 
 		 ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && !ircstrcasecmp( *ircd_cmd_ptr->token, cmd ) ) ) {
-			if( ircd_cmd_ptr->handler ) {
+			if( ircd_cmd_ptr->handler )
+			{
 				dlog( DEBUG3, "process_ircd_cmd: running command %s", *ircd_cmd_ptr->name );
 				ircd_cmd_ptr->handler( origin, av, ac, cmdptr );
-			} else {
+			}
+			else
+			{
 				dlog( DEBUG3, "process_ircd_cmd: ignoring command %s", cmd );
 			}
 			ircd_cmd_ptr->usage++;
@@ -83,7 +91,8 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av
 		ircd_cmd_ptr ++;
 	}
 	intrinsic_cmd_ptr = intrinsic_cmd_list;
-	while( intrinsic_cmd_ptr->handler ) {
+	while( intrinsic_cmd_ptr->handler )
+	{
 		if( *intrinsic_cmd_ptr->name )
 		{
 			if( !ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) || 
@@ -99,12 +108,16 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av
 	}
 	ircd_cmd_ptr = numeric_cmd_list;	
 	/* Process numeric replies */
-	while( ircd_cmd_ptr->name ) {
-		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) ) {
+	while( ircd_cmd_ptr->name )
+	{
+		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) )
+		{
 			if( ircd_cmd_ptr->handler ) {
 				dlog( DEBUG3, "process_ircd_cmd: running command %s", *ircd_cmd_ptr->name );
 				ircd_cmd_ptr->handler( origin, av, ac, cmdptr );
-			} else {
+			}
+			else
+			{
 				dlog( DEBUG3, "process_ircd_cmd: ignoring command %s", cmd );
 			}
 			ircd_cmd_ptr->usage++;
@@ -118,14 +131,16 @@ EXPORTFUNC void process_ircd_cmd( int cmdptr, char *cmd, char *origin, char **av
 
 /** @brief parse
  *
- * 
+ *  parser
  *
- *  @param none
+ *  @param notused
+ *  @param rline
+ *  @param len
  *
- *  @return none
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int parse( void *arg, void *rline, size_t len )
+int parse( void *notused, void *rline, size_t len )
 {
 	char origin[64], cmd[64], *coreLine;
 	char *line = (char *)rline;
@@ -138,7 +153,8 @@ int parse( void *arg, void *rline, size_t len )
 		return NS_FAILURE;
 	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
 	dlog( DEBUGRX, "RX: %s", line );
-	if( *line == ':' ) {
+	if( *line == ':' )
+	{
 		coreLine = strpbrk( line, " " );
 		if( !coreLine )
 			return NS_FAILURE;
@@ -147,17 +163,22 @@ int parse( void *arg, void *rline, size_t len )
 		strlcpy( origin, line + 1, sizeof( origin ) );
 		memmove( line, coreLine, strnlen( coreLine, BUFSIZE ) + 1 );
 		cmdptr = 1;
-	} else {
+	}
+	else
+	{
 		cmdptr = 0;
 		*origin = 0;
 	}
 	if( !*line )
 		return NS_FAILURE;
 	coreLine = strpbrk( line, " " );
-	if( coreLine ) {
+	if( coreLine )
+	{
 		*coreLine = 0;
 		while( isspace( *++coreLine ) );
-	} else {
+	}
+	else
+	{
 		coreLine = line + strlen( line );
 	}
 	strlcpy( cmd, line, sizeof( cmd ) ); 
@@ -171,8 +192,20 @@ int parse( void *arg, void *rline, size_t len )
 	return NS_SUCCESS;
 }
 
-/* :<source> <command> <param1> <paramN> :<last parameter> */
-/* <source> <command> <param1> <paramN> :<last parameter> */
+/** @brief parsep10
+ *
+ *  P10 parser
+ *  formats:
+ *    :<source> <command> <param1> <paramN> :<last parameter>
+ *    <source> <command> <param1> <paramN> :<last parameter>
+ *
+ *  @param notused
+ *  @param rline
+ *  @param len
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 int parsep10( void *notused, void *rline, size_t len )
 {
 	char origin[64], cmd[64], *coreLine;
@@ -187,12 +220,17 @@ int parsep10( void *notused, void *rline, size_t len )
 	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
 	dlog( DEBUGRX, "%s", line );
 	coreLine = strpbrk( line, " " );
-	if( coreLine ) {
+	if( coreLine )
+	{
 		*coreLine = 0;
 		while( isspace( *++coreLine ) );
-	} else
+	}
+	else
+	{
 		coreLine = line + strlen( line );
-	if( ( !ircstrcasecmp( line, "SERVER" ) ) ||( !ircstrcasecmp( line, "PASS" ) ) ) {
+	}
+	if( ( !ircstrcasecmp( line, "SERVER" ) ) ||( !ircstrcasecmp( line, "PASS" ) ) )
+	{
 		strlcpy( cmd, line, sizeof( cmd ) );
 		dlog( DEBUG1, "cmd   : %s", cmd );
 		dlog( DEBUG1, "args  : %s", coreLine );
@@ -203,25 +241,29 @@ int parsep10( void *notused, void *rline, size_t len )
 		 if config uplink name does not match our uplinks server name we can
 		 never find the uplink!
 		*/
-		if( strcmp( cmd, "SERVER" ) == 0 ) {
+		if( strcmp( cmd, "SERVER" ) == 0 )
 			strlcpy( me.uplink, av[0], MAXHOST );
-		}
-	} else {
+	}
+	else
+	{
 		strlcpy( origin, line, sizeof( origin ) );	
 		cmdptr = 0;
 		line = strpbrk( coreLine, " " );
-		if( line ) {
+		if( line )
+		{
 			*line = 0;
 			while( isspace( *++line ) );
-		} /*else
-			coreLine = line + strlen( line );*/
+		} 
+		/*else
+		{
+			coreLine = line + strlen( line );
+		}*/
 		strlcpy( cmd, coreLine, sizeof( cmd ) );
 		dlog( DEBUG1, "origin: %s", origin );
 		dlog( DEBUG1, "cmd   : %s", cmd );
 		dlog( DEBUG1, "args  : %s", line );
-		if( line ) {
+		if( line )
 			ac = ircsplitbuf( line, &av, 1 );
-		}
 		dlog( DEBUG1, "0 %d", ac );
 	}
 	process_ircd_cmd( cmdptr, cmd, origin, av, ac );
@@ -242,27 +284,30 @@ int parsep10( void *notused, void *rline, size_t len )
 static int InitIrcdProtocol( void )
 {
 	protocol_info = ns_dlsym( protocol_module_handle, "protocol_info" );
-	if( !protocol_info ) {
+	if( !protocol_info )
+	{
 		nlog( LOG_CRITICAL, "Unable to find protocol_info in protocol module %s", protocol_path );
 		return NS_FAILURE;	
 	}
-	if( protocol_info->required & PROTOCOL_CLIENTMODE ) {
+	if( protocol_info->required & PROTOCOL_CLIENTMODE )
 		nsconfig.singlebotmode = 1;
-	}
 	strlcpy( me.servicescmode, protocol_info->services_cmode, MODESIZE );
 	strlcpy( me.servicesumode, protocol_info->services_umode, MODESIZE );
 	/* set min protocol */
 	ircd_srv.protocol = protocol_info->required;
 	/* Allow protocol module to "override" the parser */
 	irc_parse = ns_dlsym( protocol_module_handle, "parse" );
-	if( irc_parse == NULL ) {
+	/* Use internal parser */
+	if( irc_parse == NULL )
+	{
 		if( ircd_srv.protocol & PROTOCOL_P10 )
 			irc_parse = parsep10;
 		else
 			irc_parse = parse;
 	}
 	cmd_list = ns_dlsym( protocol_module_handle, "cmd_list" );
-	if( !cmd_list ) {
+	if( !cmd_list )
+	{
 		nlog( LOG_CRITICAL, "Unable to find command list in selected IRCd module" );
 		return NS_FAILURE;	
 	}
@@ -290,9 +335,8 @@ static int InitIrcdModes( void )
 	user_umodes = ns_dlsym( protocol_module_handle, "user_umodes" );
 	/* Not required */
 	user_smodes = ns_dlsym( protocol_module_handle, "user_smodes" );
-	if( user_smodes ) {
+	if( user_smodes )
 		ircd_srv.features |= FEATURE_USERSMODES;
-	}
 	if( InitModeTables( chan_umodes, chan_modes, user_umodes, user_smodes ) != NS_SUCCESS ) 
 		return NS_FAILURE;
 	return NS_SUCCESS;
@@ -315,14 +359,14 @@ int InitIrcd( void )
 	ircsnprintf( protocol_path, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_STDEXT );
 	nlog( LOG_NORMAL, "Using protocol module %s", protocol_path );
 	protocol_module_handle = ns_dlopen( protocol_path, RTLD_NOW || RTLD_GLOBAL );
-	if( !protocol_module_handle ) {
+	if( !protocol_module_handle )
+	{
 		nlog( LOG_CRITICAL, "Unable to load protocol module %s", protocol_path );
 		return NS_FAILURE;	
 	}
 	/* Setup protocol options */
-	if( InitIrcdProtocol() != NS_SUCCESS ) {
+	if( InitIrcdProtocol() != NS_SUCCESS )
 		return NS_FAILURE;	
-	}
 	/* Setup IRCD function calls */
 	if( InitIrcdSymbols() != NS_SUCCESS ) 
 		return NS_FAILURE;
@@ -332,16 +376,30 @@ int InitIrcd( void )
 	return NS_SUCCESS;
 }
 
-int FiniIrcd ( void ) {
-	ns_dlclose(protocol_module_handle);
-	return NS_SUCCESS;
+/** @brief FiniIrcd
+ *
+ *  fini ircd
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+void FiniIrcd( void )
+{
+	ns_dlclose( protocol_module_handle );
 }
 
 /** @brief HaveFeature
  *
+ *  Check to see if a feature is supported
+ *
+ *  @param mask of features to check
+ *
  *  @return 1 if have else 0
  */
+
 int HaveFeature( int mask )
 {
-	return( ircd_srv.features&mask );
+	return( ircd_srv.features & mask );
 }

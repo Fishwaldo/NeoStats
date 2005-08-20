@@ -153,7 +153,7 @@ int ModFini (void)
  *  globops handler
  *  log globops
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -170,7 +170,7 @@ static int operlog_event_globops( CmdParams *cmdparams )
  *  chatops handler
  *  log chatops
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -187,7 +187,7 @@ static int operlog_event_chatops( CmdParams *cmdparams )
  *  wallops handler
  *  log wallops
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -204,7 +204,7 @@ static int operlog_event_wallops( CmdParams *cmdparams )
  *  local kill handler
  *  log local kill
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -221,7 +221,7 @@ static int operlog_event_localkill( CmdParams *cmdparams )
  *  local kill handler
  *  log local kill
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -238,7 +238,7 @@ static int operlog_event_globalkill( CmdParams *cmdparams )
  *  local kill handler
  *  log local kill
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
@@ -255,7 +255,7 @@ static int operlog_event_serverkill( CmdParams *cmdparams )
  *  mode handler
  *  log operator mode
  *
- *  @cmdparams pointer to commands param struct
+ *  @params cmdparams pointer to commands param struct
  *
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */

@@ -33,7 +33,6 @@
 
 #define SERVER_TABLE_SIZE	-1
 
-config nsconfig;
 static hash_t *serverhash;
 /** @brief Module data flags */
 static unsigned int fservermoddata = 0;
@@ -163,8 +162,7 @@ find_server_base64 (const char *num)
 	return NULL;
 }
 
-Client *
-FindServer (const char *name)
+Client *FindServer (const char *name)
 {
 	hnode_t *sn;
 

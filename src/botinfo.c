@@ -46,8 +46,8 @@ static bot_setting bot_info_settings[]=
  *  SET nick callback
  *  Command subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -66,8 +66,8 @@ static int bot_set_nick_cb( CmdParams* cmdparams, SET_REASON reason )
  *  SET user callback
  *  Command subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -86,8 +86,8 @@ static int bot_set_user_cb( CmdParams* cmdparams, SET_REASON reason )
  *  SET host callback
  *  Command subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -106,8 +106,8 @@ static int bot_set_host_cb( CmdParams* cmdparams, SET_REASON reason )
  *  SET realname callback
  *  Command subsystem use only.
  *
- *  @cmdparams pointer to commands param struct
- *  @cmdparams reason for SET
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -130,8 +130,8 @@ static int bot_set_realname_cb( CmdParams* cmdparams, SET_REASON reason )
  *  Add bot info settings to SET command
  *  Command subsystem use only.
  *
- *  @cmdparams pointer to bot
- *  @cmdparams pointer to bot info structure
+ *  @params cmdparams pointer to bot
+ *  @params cmdparams pointer to bot info structure
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -157,7 +157,7 @@ int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
  *  Delete bot info settings from SET command
  *  Command subsystem use only.
  *
- *  @cmdparams pointer to bot
+ *  @params cmdparams pointer to bot
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */

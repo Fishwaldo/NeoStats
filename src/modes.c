@@ -461,11 +461,10 @@ const char *GetSmodeDesc (const unsigned int mask)
  * @param c channel to check
  * @param mode is the mode to check, as a LONG
  *
- * @returns 1 on match, 0 on no match, -1 on error
+ * @return 1 on match, 0 on no match, -1 on error
  *
 */
-int
-test_cmode (Channel *c, const unsigned int mask)
+int test_cmode(const Channel *c, unsigned int mask)
 {
 	ModesParm *m;
 	lnode_t *mn;

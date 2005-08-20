@@ -95,7 +95,7 @@ static serverstat *new_server_stat( const char *name )
 	serverstat *ss;
 
 	SET_SEGV_LOCATION();
-	dlog( DEBUG2, "new_server_stat( %s )", name );
+	dlog( DEBUG2, "new_server_stat (%s)", name );
 	if( hash_isfull( serverstathash ) )
 	{
 		nlog( LOG_CRITICAL, "StatServ Server hash is full!" );
@@ -122,7 +122,7 @@ static serverstat *findserverstats( const char *name )
 
 	stats =( serverstat * )hnode_find( serverstathash, name );
 	if( !stats )
-		dlog( DEBUG2, "findserverstats( %s ) - not found", name );
+		dlog( DEBUG2, "findserverstats (%s) - not found", name );
 	return stats;
 }
 
@@ -216,7 +216,7 @@ static int AddServerStat( Client *s, void *v )
 {
 	serverstat *ss;
 
-	dlog( DEBUG2, "AddServerStat( %s )", s->name );
+	dlog( DEBUG2, "AddServerStat (%s)", s->name );
 	ss = findserverstats( s->name );
 	if( !ss )
 		ss = new_server_stat( s->name );
@@ -350,7 +350,7 @@ static void makemap( const char *uplink, const Client * u, int level )
 	while( ( sn = hash_scan_next( &hs ) ) )
 	{
 		s = hnode_get( sn );
-		printf( "%d %s %s( %s )\n", level, s->name, s->uplink ? s->uplink->name : "", uplink );
+		printf( "%d %s %s (%s)\n", level, s->name, s->uplink ? s->uplink->name : "", uplink );
 		ss =( serverstat * ) GetServerModValue( s );
 		if( ( level == 0 ) &&( s->uplinkname[0] == 0 ) )
 		{
@@ -430,7 +430,7 @@ int ss_cmd_server_list( CmdParams *cmdparams )
 	while( ( sn = hash_scan_next( &hs ) ) )
 	{
 		ss = hnode_get( sn );
-		irc_prefmsg( ss_bot, cmdparams->source, "%s( %s )", ss->name, 
+		irc_prefmsg( ss_bot, cmdparams->source, "%s (%s)", ss->name, 
 			( ss->s ) ? "ONLINE" : "OFFLINE" );
 	}
 	irc_prefmsg( ss_bot,cmdparams->source, "End of list." );
@@ -567,7 +567,7 @@ static int ss_cmd_server_stats( CmdParams *cmdparams )
 		uptime = s->server->uptime +( me.now - me.ts_boot );
 		irc_prefmsg( ss_bot, cmdparams->source, "Version: %s", s->version );
 		irc_prefmsg( ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld",( uptime / TS_ONE_DAY ),( ( uptime / TS_ONE_DAY ) == 1 ) ? "" : "s",( ( uptime / TS_ONE_HOUR ) % 24 ),( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ),( uptime % 60 ) );
-		irc_prefmsg( ss_bot, cmdparams->source, "Current Users: %-3d( %d%% )", 
+		irc_prefmsg( ss_bot, cmdparams->source, "Current Users: %-3d (%d%%)", 
 			s->server->users, 
 			( int )( ( float ) s->server->users /( float ) networkstats.users.current * 100 ) );
 	}
@@ -675,7 +675,7 @@ void SaveServerStats( void )
  *  @param data pointer to table row data
  *  @param size of loaded data
  *
- *  @return none
+ *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
 int LoadServerStats( void *data, int size ) 

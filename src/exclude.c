@@ -104,18 +104,19 @@ static void new_exclude( list_t *exclude_list, const void *data )
 	exclude = ns_calloc( sizeof( Exclude ) );
 	os_memcpy( exclude, data, sizeof( Exclude ) );
 	lnode_create_append( exclude_list, exclude );
-	dlog( DEBUG2, "Added exclusion %s( %d ) by %s on %d", exclude->pattern, exclude->type, exclude->addedby,( int )exclude->addedon );
+	dlog( DEBUG2, "Added exclusion %s (%d) by %s on %d", exclude->pattern, exclude->type, exclude->addedby,( int )exclude->addedon );
 }
 
 /** @brief new_global_exclude
  *
+ *  Table load handler
  *  Database row handler to load global exclude data
  *  Exclusion sub system use only
  *
- *  @param data exclude data
- *  @param size of data
+ *  @param data pointer to table row data
+ *  @param size of loaded data
  *
- *  @return none
+ *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
 static int new_global_exclude( const void *data, int size )
@@ -126,13 +127,14 @@ static int new_global_exclude( const void *data, int size )
 
 /** @brief new_mod_exclude
  *
+ *  Table load handler
  *  Database row handler to load module exclude data
  *  Exclusion sub system use only
  *
- *  @param data exclude data
- *  @param size of data
+ *  @param data pointer to table row data
+ *  @param size of loaded data
  *
- *  @return none
+ *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
 static int new_mod_exclude( const void *data, int size )
@@ -321,9 +323,9 @@ static int do_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 	ns_free( buf );
 	/* if we get here, then exclude is valid */
 	lnode_create_append( exclude_list, exclude );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Added %s( %s ) to exclusion list", cmdparams->source ), exclude->pattern, cmdparams->av[1] );
+	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Added %s (%s) to exclusion list", cmdparams->source ), exclude->pattern, cmdparams->av[1] );
 	if( nsconfig.cmdreport )
-		irc_chanalert( cmdparams->bot, _( "%s added %s( %s ) to the exclusion list" ), cmdparams->source->name, exclude->pattern, cmdparams->av[1] );
+		irc_chanalert( cmdparams->bot, _( "%s added %s (%s) to the exclusion list" ), cmdparams->source->name, exclude->pattern, cmdparams->av[1] );
 	/* now save the exclusion list */
 	DBAStore( "exclusions", exclude->pattern,( void * )exclude, sizeof( Exclude ) );
 	return NS_SUCCESS;
@@ -455,7 +457,7 @@ static int do_exclude_list( list_t *exclude_list, const CmdParams *cmdparams )
 	while( node != NULL )
 	{
 		exclude = lnode_get( node );			
-		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "%s( %s ) Added by %s on %s for %s", cmdparams->source ), exclude->pattern, ExcludeDesc[exclude->type], exclude->addedby, sftime( exclude->addedon ), exclude->reason );
+		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "%s (%s) Added by %s on %s for %s", cmdparams->source ), exclude->pattern, ExcludeDesc[exclude->type], exclude->addedby, sftime( exclude->addedon ), exclude->reason );
 		node = list_next( exclude_list, node );
 	}
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "End of list.", cmdparams->source ) );
@@ -506,7 +508,7 @@ static int mod_cmd_exclude_list( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_exclude( const CmdParams *cmdparams ) 
+int ns_cmd_exclude( CmdParams *cmdparams ) 
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
