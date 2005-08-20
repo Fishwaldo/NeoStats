@@ -532,7 +532,7 @@ int ns_cmd_exclude( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int mod_cmd_exclude( const CmdParams *cmdparams )
+static int mod_cmd_exclude( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
