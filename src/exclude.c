@@ -38,7 +38,7 @@
 #include "helpstrings.h"
 
 /* Prototype for module exclude command handler */
-static int mod_cmd_exclude( const CmdParams *cmdparams );
+static int mod_cmd_exclude( CmdParams *cmdparams );
 
 /* Exclude types */
 typedef enum NS_EXCLUDE
@@ -119,7 +119,7 @@ static void new_exclude( list_t *exclude_list, const void *data )
  *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
-static int new_global_exclude( const void *data, int size )
+static int new_global_exclude( void *data, int size )
 {
 	new_exclude( exclude_list, data );
 	return NS_FALSE;
@@ -137,7 +137,7 @@ static int new_global_exclude( const void *data, int size )
  *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
-static int new_mod_exclude( const void *data, int size )
+static int new_mod_exclude( void *data, int size )
 {
 	new_exclude( excludelists[GET_CUR_MODNUM()], data );
 	return NS_FALSE;
@@ -358,7 +358,7 @@ static int ns_cmd_exclude_add( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int mod_cmd_exclude_add( const CmdParams *cmdparams )
+static int mod_cmd_exclude_add( CmdParams *cmdparams )
 {
 	return do_exclude_add( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
 }
