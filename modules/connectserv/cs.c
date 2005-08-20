@@ -125,26 +125,26 @@ static const msg msg_format[]=
 #define CS_MSG( x ) ( cs_cfg.colour == 1 ? msg_format[x].formatcolour : msg_format[x].format )
 
 /** Bot event function prototypes */
-static int cs_event_signon( const CmdParams *cmdparams );
-static int cs_event_umode( const CmdParams *cmdparams );
-static int cs_event_smode( const CmdParams *cmdparams );
-static int cs_event_quit( const CmdParams *cmdparams );
-static int cs_event_localkill( const CmdParams *cmdparams );
-static int cs_event_globalkill( const CmdParams *cmdparams );
-static int cs_event_serverkill( const CmdParams *cmdparams );
-static int cs_event_nick( const CmdParams *cmdparams );
-static int cs_event_away( const CmdParams *cmdparams );
-static int cs_event_server( const CmdParams *cmdparams );
-static int cs_event_squit( const CmdParams *cmdparams );
+static int cs_event_signon( CmdParams *cmdparams );
+static int cs_event_umode( CmdParams *cmdparams );
+static int cs_event_smode( CmdParams *cmdparams );
+static int cs_event_quit( CmdParams *cmdparams );
+static int cs_event_localkill( CmdParams *cmdparams );
+static int cs_event_globalkill( CmdParams *cmdparams );
+static int cs_event_serverkill( CmdParams *cmdparams );
+static int cs_event_nick( CmdParams *cmdparams );
+static int cs_event_away( CmdParams *cmdparams );
+static int cs_event_server( CmdParams *cmdparams );
+static int cs_event_squit( CmdParams *cmdparams );
 
 /** Set callbacks */
-static int cs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_sign_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_kill_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_mode_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_nick_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_away_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int cs_set_serv_watch_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason );
+static int cs_set_serv_watch_cb( CmdParams *cmdparams, SET_REASON reason );
 
 /** Bot pointer */
 static Bot *cs_bot;
@@ -304,7 +304,7 @@ static void cs_report( const char *fmt, ... )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_signon( const CmdParams *cmdparams )
+static int cs_event_signon( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	/* Print Connection Notice */
@@ -324,7 +324,7 @@ static int cs_event_signon( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_quit( const CmdParams *cmdparams )
+static int cs_event_quit( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	/* Print Disconnection Notice */
@@ -345,7 +345,7 @@ static int cs_event_quit( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_localkill( const CmdParams *cmdparams )
+static int cs_event_localkill( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	cs_report( CS_MSG( MSG_LOCALKILL ), cmdparams->target->name, 
@@ -364,7 +364,7 @@ static int cs_event_localkill( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_globalkill( const CmdParams *cmdparams )
+static int cs_event_globalkill( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	cs_report( CS_MSG( MSG_GLOBALKILL ), cmdparams->target->name, 
@@ -383,7 +383,7 @@ static int cs_event_globalkill( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_serverkill( const CmdParams *cmdparams )
+static int cs_event_serverkill( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	cs_report( CS_MSG( MSG_SERVERKILL ), cmdparams->target->name, 
@@ -432,7 +432,7 @@ static int cs_report_mode( const char *modedesc, const int serverflag, const Cli
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_umode( const CmdParams *cmdparams )
+static int cs_event_umode( CmdParams *cmdparams )
 {
 	/* Mask of modes we will handle */
 	static const unsigned int OperUmodes = 
@@ -483,7 +483,7 @@ static int cs_event_umode( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_smode( const CmdParams *cmdparams )
+static int cs_event_smode( CmdParams *cmdparams )
 {
 	/* Mask of modes we will handle */
 	static const unsigned int OperSmodes =
@@ -531,7 +531,7 @@ static int cs_event_smode( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_nick( const CmdParams *cmdparams )
+static int cs_event_nick( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	cs_report( CS_MSG( MSG_NICKCHANGE ), cmdparams->param, 
@@ -550,7 +550,7 @@ static int cs_event_nick( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_away( const CmdParams *cmdparams )
+static int cs_event_away( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	cs_report( CS_MSG( MSG_AWAY ), cmdparams->source->name, 
@@ -569,7 +569,7 @@ static int cs_event_away( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_server( const CmdParams *cmdparams )
+static int cs_event_server( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	cs_report( CS_MSG( MSG_SERVER ), cmdparams->source->name, cmdparams->source->uplink->name );
@@ -586,7 +586,7 @@ static int cs_event_server( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_event_squit( const CmdParams *cmdparams )
+static int cs_event_squit( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	cs_report( CS_MSG( MSG_SQUIT ), cmdparams->source->name, cmdparams->source->uplink->name, 
@@ -605,7 +605,7 @@ static int cs_event_squit( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -625,7 +625,7 @@ static int cs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_sign_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_sign_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -654,7 +654,7 @@ static int cs_set_sign_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_kill_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_kill_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -685,7 +685,7 @@ static int cs_set_kill_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_mode_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_mode_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -714,7 +714,7 @@ static int cs_set_mode_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_nick_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_nick_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -741,7 +741,7 @@ static int cs_set_nick_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_away_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_away_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -768,7 +768,7 @@ static int cs_set_away_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int cs_set_serv_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
+static int cs_set_serv_watch_cb( CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
