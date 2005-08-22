@@ -72,7 +72,7 @@ static void DelDCCClient( Client *dcc )
 	dccnode = lnode_find( dcclist, dcc->name, comparef );
 	if( dccnode )
 	{
-		lnode_destroy( dccnode );
+		lnode_destroy( list_delete( dcclist, dccnode ) );
 		ns_free( dcc );
 	}
 }

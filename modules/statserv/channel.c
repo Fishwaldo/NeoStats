@@ -304,8 +304,7 @@ int ss_event_delchan( CmdParams *cmdparams )
 	}
 	cs = lnode_get( ln );
 	SaveChannel( cs );
-	list_delete( channelstatlist, ln );
-	lnode_destroy( ln );
+	list_delete_destroy_node( channelstatlist, ln );
 	ns_free( cs );
 	return NS_SUCCESS;
 }
@@ -732,7 +731,7 @@ int InitChannelStats( void )
 		nlog( LOG_CRITICAL, "Unable to create channel stat list" );
 		return NS_FAILURE;
 	}
-	GetChannelList( AddChannel, NULL );
+	ProcessChannelList( AddChannel, NULL );
 	return NS_SUCCESS;
 }
 

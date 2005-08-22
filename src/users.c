@@ -439,7 +439,7 @@ void ListUsers (CmdParams *cmdparams, const char *nick)
 	SET_SEGV_LOCATION();
 	irc_prefmsg (ns_botptr, cmdparams->source, __("================USERLIST================", cmdparams->source));
 	if (!nick) {
-		GetUserList (dumpuser, cmdparams);
+		ProcessUserList (dumpuser, cmdparams);
 	} else {
 		u = FindUser (nick);
 		if (u) {
@@ -590,7 +590,7 @@ void QuitServerUsers (Client *s)
 	}
 }
 
-int GetUserList (UserListHandler handler, void *v)
+int ProcessUserList (UserListHandler handler, void *v)
 {
 	Client *u;
 	hscan_t scan;

@@ -242,7 +242,7 @@ int ss_cmd_netstats( CmdParams *cmdparams )
 	irc_prefmsg( ss_bot, cmdparams->source, "Current Opers: %d", networkstats.opers.current );
 	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Opers: %d [%s]",
 		networkstats.opers.alltime.max, sftime( networkstats.opers.alltime.ts_max ) );
-	irc_prefmsg( ss_bot, cmdparams->source, "Users Set Away: %d", me.awaycount );
+	irc_prefmsg( ss_bot, cmdparams->source, "Users Set Away: %d", NSGetAwayCount() );
 	irc_prefmsg( ss_bot, cmdparams->source, "Current Servers: %d", networkstats.servers.current );
 	irc_prefmsg( ss_bot, cmdparams->source, "Maximum Servers: %d [%s]",
 		networkstats.servers.alltime.max, sftime( networkstats.servers.alltime.ts_max ) );

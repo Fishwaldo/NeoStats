@@ -895,3 +895,12 @@ lnode_find (list_t * list, const void *key, int compare (const void *, const voi
 	}
 	return NULL;
 }
+
+/*
+ * Delete node from list and free it
+ */
+void list_delete_destroy_node( list_t * list, lnode_t * del )
+{
+	list_delete( list, del );
+	lnode_destroy( del );
+}

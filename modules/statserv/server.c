@@ -741,7 +741,7 @@ int InitServerStats( void )
 		return NS_FAILURE;
 	}
 	DBAFetchRows( SERVER_TABLE, LoadServerStats );
-	GetServerList( AddServerStat, NULL );
+	ProcessServerList( AddServerStat, NULL );
 	return NS_SUCCESS;
 }
 

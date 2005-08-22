@@ -633,8 +633,10 @@ typedef struct tme {
 
 EXPORTVAR extern tme me;
 
-
-
+#define NSGetChannelCount() me.channelcount
+#define NSGetServerCount() me.servercount
+#define NSGetUserCount() me.usercount
+#define NSGetAwayCount() me.awaycount
 
 /** @brief Bans structure
  *  
@@ -1327,7 +1329,7 @@ EXPORTFUNC int test_cmode( const Channel *c, unsigned int mode );
 EXPORTFUNC int IsChannelMember( const Channel *c, const Client *u );
 EXPORTFUNC int test_cumode( const char *chan, const char *nick, const int flag );
 EXPORTFUNC Channel *GetRandomChannel( void );
-EXPORTFUNC Client *GetRandomChannelMember( int uge, Channel *c );
+EXPORTFUNC Client *GetRandomChannelMember( Channel *c, int uge );
 EXPORTFUNC char *GetRandomChannelKey( int length );
 
 #define IsChanOp( chan, nick ) test_cumode( chan, nick, CUMODE_CHANOP )
@@ -1482,25 +1484,21 @@ EXPORTFUNC void dlog( DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(p
 
 /* List walk handler type */
 typedef int (*ChannelListHandler) ( Channel *c, void *v );
-EXPORTFUNC int GetChannelList( ChannelListHandler handler, void *v );
+EXPORTFUNC int ProcessChannelList( ChannelListHandler handler, void *v );
 /* List walk handler type */
-typedef int (*ChannelMemberHandler) ( Channel *c, ChannelMember *m, void *v );
-EXPORTFUNC int GetChannelMembers( Channel *c, ChannelMemberHandler handler, void *v );
+typedef int (*ChannelMemberListHandler) ( Channel *c, ChannelMember *m, void *v );
+EXPORTFUNC int ProcessChannelMembers( Channel *c, ChannelMemberListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*UserListHandler) ( Client *u, void *v );
-EXPORTFUNC int GetUserList( UserListHandler handler, void *v );
+EXPORTFUNC int ProcessUserList( UserListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*ServerListHandler) ( Client *s, void *v );
-EXPORTFUNC int GetServerList( ServerListHandler handler, void *v );
+EXPORTFUNC int ProcessServerList( ServerListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*ModuleListHandler) ( Module *module_ptr, void *v );
-EXPORTFUNC int GetModuleList (ModuleListHandler handler, void *v );
+EXPORTFUNC int ProcessModuleList( ModuleListHandler handler, void *v );
 
 EXPORTFUNC hash_t *GetServerHash( void );
-EXPORTFUNC hash_t *GetBanHash( void );
-EXPORTFUNC hash_t *GetChannelHash( void );
-EXPORTFUNC hash_t *GetUserHash( void );
-EXPORTFUNC hash_t *GetModuleHash( void );
 
 EXPORTFUNC int HaveFeature( int mask );
 

@@ -265,7 +265,7 @@ static void html_netstats( void )
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.max );
 	os_fprintf( opf, "<td>%s</td>\n", sftime( networkstats.servers.alltime.ts_max ) );
 	os_fprintf( opf, "<tr><td colspan=\"3\">Users Set Away:</td>\n" );
-	os_fprintf( opf, "<td colspan=\"3\">%d</td></tr></table>\n", me.awaycount );
+	os_fprintf( opf, "<td colspan=\"3\">%d</td></tr></table>\n", NSGetAwayCount() );
 }
 
 /** @brief html_dailystats

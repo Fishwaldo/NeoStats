@@ -30,6 +30,12 @@
 #include "perlmod.h"
 #endif /* USE_PERL */
 
+typedef struct ModuleAllEvent
+{
+	Event event;
+	CmdParams* cmdparams;
+} ModuleAllEvent;
+
 /** String descriptions of events for debug use.
   * must match enum in events.h
   */
@@ -166,6 +172,26 @@ void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr )
 	dlog( DEBUG5, "SendModuleEvent: %s has no event handler for %s", module_ptr->info->name, EventStrings[event] );
 }
 
+/** @brief SendAllModuleEventHandler
+ *
+ *	List walk handler to call event handler for all modules
+ *  NeoStats core use only
+ *
+ *  @param module_ptr pointer to module
+ *  @param v pointer to cmdparams and event
+ *
+ *  @return none
+ */
+
+static int SendAllModuleEventHandler( Module *module_ptr, void *v )
+{
+	ModuleAllEvent *mae = (ModuleAllEvent *)v;
+
+	if( module_ptr->event_list )
+		SendModuleEvent( mae->event, mae->cmdparams, module_ptr );
+	return NS_FALSE;
+}
+
 /** @brief SendAllModuleEvent
  *
  *	Call event handler for all modules
@@ -179,19 +205,13 @@ void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr )
 
 void SendAllModuleEvent( Event event, CmdParams* cmdparams )
 {
-	Module *module_ptr;
-	hscan_t ms;
-	hnode_t *mn;
+	ModuleAllEvent mae;
 
 	SET_SEGV_LOCATION();
 	dlog( DEBUG5, "SendAllModuleEvent: %s to all modules", EventStrings[event] );
-	hash_scan_begin( &ms, GetModuleHash() );
-	while( ( mn = hash_scan_next( &ms ) ) != NULL )
-	{
-		module_ptr = hnode_get( mn );
-		if( module_ptr->event_list )
-			SendModuleEvent( event, cmdparams, module_ptr );
-	}
+	mae.event = event;
+	mae.cmdparams = cmdparams;
+	ProcessModuleList( SendAllModuleEventHandler, (void *)&mae );
 }
 
 /** @brief AddEvent

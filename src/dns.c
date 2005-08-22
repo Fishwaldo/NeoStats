@@ -273,8 +273,7 @@ void canx_dns(Module* modptr)
 			ns_free (dnsdata->a);
 			ns_free (dnsdata);
 			lnode2 = list_next(dnslist, dnsnode);
-			list_delete(dnslist, dnsnode);
-			lnode_destroy(dnsnode);
+			list_delete_destroy_node( dnslist, dnsnode );
 			dnsnode = lnode2;
 		}
 		dnsnode = list_next(dnslist, dnsnode);
@@ -285,8 +284,7 @@ void canx_dns(Module* modptr)
 		if (dnsdata->modptr == modptr) {
 			ns_free(dnsdata);
 			lnode2 = list_next(dnsqueue, dnsnode);
-			list_delete(dnsqueue, dnsnode);
-			lnode_destroy(dnsnode);
+			list_delete_destroy_node( dnsqueue, dnsnode );
 			dnsnode = lnode2;
 		}
 		dnsnode = list_next(dnsqueue, dnsnode);
@@ -342,8 +340,7 @@ void do_dns (int notused, short event, void *arg)
 			dnsnode = list_next (dnslist, dnsnode);
 			ns_free (dnsdata->a);
 			ns_free (dnsdata);
-			list_delete(dnslist, dnsnode1);
-			lnode_destroy (dnsnode1);
+			list_delete_destroy_node( dnslist, dnsnode1 );
 		} else {
 			dlog(DEBUG1, "DNS: Calling callback function for lookup %s", dnsdata->lookupdata);
 			DNSStats.success++;
@@ -356,8 +353,7 @@ void do_dns (int notused, short event, void *arg)
 			dnsnode = list_next (dnslist, dnsnode);
 			ns_free (dnsdata->a);
 			ns_free (dnsdata);
-			list_delete(dnslist, dnsnode1);
-			lnode_destroy (dnsnode1);
+			list_delete_destroy_node( dnslist, dnsnode1 );
 		}
 	}
 	dns_check_queue();
@@ -397,8 +393,7 @@ void dns_check_queue()
 				ns_free (dnsdata);
 				dnsnode2 = dnsnode;
 				dnsnode = list_next(dnsqueue, dnsnode);
-				list_delete(dnsqueue, dnsnode2);
-				lnode_destroy(dnsnode2);
+				list_delete_destroy_node( dnsqueue, dnsnode2 );
 				continue;
 			}
 			/* move from queue to active list */

@@ -395,9 +395,9 @@ static int ns_cmd_status( CmdParams *cmdparams )
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Reconnect time: %d", cmdparams->source ), nsconfig.r_time );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Requests: %d",cmdparams->source ), me.requests );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Max sockets: %d( in use: %d )", cmdparams->source ), me.maxsocks, me.cursocks );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current servers: %d", cmdparams->source ), me.servercount );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current channels: %d", cmdparams->source ), me.channelcount );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current users: %d( Away: %d )", cmdparams->source ), me.usercount, me.awaycount );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current servers: %d", cmdparams->source ), NSGetServerCount() );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current channels: %d", cmdparams->source ), NSGetChannelCount() );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Current users: %d( Away: %d )", cmdparams->source ), NSGetUserCount(), NSGetAwayCount() );
 	if( nsconfig.debug )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode enabled", cmdparams->source ) );
 	else

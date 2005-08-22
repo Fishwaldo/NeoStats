@@ -229,7 +229,7 @@ static void del_user_channel( Channel *c, Client *u )
 	if( !un ) {
 		nlog( LOG_WARNING, "del_user_channel: %s not found in channel %s", u->name, c->name );
 	} else {
-		lnode_destroy( list_delete( u->user->chans, un ) );
+		list_delete_destroy_node( u->user->chans, un );
 	}
 }
 
@@ -255,7 +255,7 @@ static void del_channel_member( Channel *c, Client *u )
 		return;
 	}
 	cm = lnode_get( un );
-	lnode_destroy( list_delete( c->members, un ) );
+	list_delete_destroy_node( c->members, un );
 	ns_free( cm );
 	dlog( DEBUG3, "del_channel_member: cur users %s %d (list %d)", c->name, c->users,( int )list_count( c->members ) );
 	c->users--;
@@ -678,7 +678,7 @@ Channel *GetRandomChannel( void )
  *  @return Client pointer selected or NULL if none
  */
 
-Client *GetRandomChannelMember(int uge, Channel *c) 
+Client *GetRandomChannelMember( Channel *c, int uge )
 {
 	ChannelMember *cm;
 	lnode_t *ln;
@@ -718,7 +718,7 @@ char *GetRandomChannelKey( int length )
 	return key;
 }
 
-int GetChannelList( ChannelListHandler handler, void *v )
+int ProcessChannelList( ChannelListHandler handler, void *v )
 {
 	hnode_t *node;
 	hscan_t scan;
@@ -734,7 +734,7 @@ int GetChannelList( ChannelListHandler handler, void *v )
 	return NS_SUCCESS;
 }
 
-int GetChannelMembers( Channel *c, ChannelMemberHandler handler, void *v )
+int ProcessChannelMembers( Channel *c, ChannelMemberListHandler handler, void *v )
 {
  	ChannelMember *cm;
 	lnode_t *cmn;
@@ -747,11 +747,6 @@ int GetChannelMembers( Channel *c, ChannelMemberHandler handler, void *v )
 		cmn = list_next( c->members, cmn );
 	}
 	return NS_SUCCESS;
-}
-
-hash_t *GetChannelHash( void )
-{
-	return channelhash;
 }
 
 void *AllocChannelModPtr( Channel* c, int size )

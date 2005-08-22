@@ -219,18 +219,3 @@ int InitBans( void )
 	}
 	return NS_SUCCESS;
 }
-
-/** @brief GetBanHash
- *
- *  Get pointer to bans hash table
- *  Use at own risk.
- *
- *  @param none
- *
- *  @return pointer to hash table
- */
-
-hash_t *GetBanHash( void )
-{
-	return banhash;
-}

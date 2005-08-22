@@ -596,8 +596,7 @@ int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac)
 						dlog(DEBUG1, "ChanMode: can't find mode %c for channel %s", *modes, c->name);
 					} else {
 						m = lnode_get (mn);
-						list_delete (c->modeparms, mn);
-						lnode_destroy (mn);
+						list_delete_destroy_node( c->modeparms, mn );
 						ns_free (m);
 					}
 				} else {

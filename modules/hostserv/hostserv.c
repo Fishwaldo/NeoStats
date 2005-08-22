@@ -193,8 +193,7 @@ int ExpireOldHosts( void *userptr )
 			nlog( LOG_NOTICE, "Expiring old vhost: %s for %s", vhe->vhost, vhe->nick );
 			del_vhost( vhe );
 			hn2 = list_next( vhost_list, hn );
-			list_delete( vhost_list, hn );
-			lnode_destroy( hn );
+			list_delete_destroy_node( vhost_list, hn );
 			hn = hn2;
 		} else {
 			hn = list_next( vhost_list, hn );
@@ -966,8 +965,7 @@ static int hs_cmd_del( CmdParams *cmdparams )
 	CommandReport( hs_bot, "%s removed vhost %s for %s",
 			cmdparams->source->name, vhe->vhost, vhe->nick );
 	del_vhost( vhe );
-	list_delete( vhost_list, hn );
-	lnode_destroy( hn );
+	list_delete_destroy_node( vhost_list, hn );
 	return NS_SUCCESS;
 }
 

@@ -51,7 +51,7 @@ int RunLevel = 0;
 /* @brief Module hash list */
 static hash_t *modulehash;
 
-/** @brief GetModuleList
+/** @brief ProcessModuleList
  *
  *  Calls handler for all modules
  *
@@ -61,7 +61,7 @@ static hash_t *modulehash;
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int GetModuleList( ModuleListHandler handler, void *v )
+int ProcessModuleList( ModuleListHandler handler, void *v )
 {
 	Module *module_ptr;
 	hscan_t ms;
@@ -203,7 +203,7 @@ int ModuleVersion( Module *module_ptr, void *v )
 
 void AllModuleVersions( const char* nick, const char *remoteserver )
 {
-	GetModuleList( ModuleVersion, (void *)nick );
+	ProcessModuleList( ModuleVersion, (void *)nick );
 }
 
 /** @brief load_module_error
@@ -478,7 +478,7 @@ int ReportModuleInfo( Module *module_ptr, void *v )
 int ns_cmd_modlist( CmdParams* cmdparams )
 {
 	SET_SEGV_LOCATION();
-	GetModuleList( ReportModuleInfo, (void *)cmdparams->source );
+	ProcessModuleList( ReportModuleInfo, (void *)cmdparams->source );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "End of Module List", cmdparams->source ) );
 	return 0;
 }
@@ -677,18 +677,4 @@ int ModuleConfig( bot_setting* set_ptr )
 		set_ptr++;
 	}
 	return NS_SUCCESS;
-}
-
-/** @brief GetModuleHash
- *
- *  Get module hash pointer
- *
- *  @param none
- *
- *  @return module hash pointer
- */
-
-hash_t *GetModuleHash( void )
-{
-	return modulehash;
 }

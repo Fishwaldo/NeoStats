@@ -274,7 +274,7 @@ FiniServers (void)
 	hash_destroy(serverhash);
 }
 
-int GetServerList (ServerListHandler handler, void *v)
+int ProcessServerList (ServerListHandler handler, void *v)
 {
 	hnode_t *node;
 	hscan_t scan;

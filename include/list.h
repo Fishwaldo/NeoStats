@@ -178,6 +178,7 @@ EXPORTFUNC	void list_destroy_auto (list_t * list);
 EXPORTFUNC	lnode_t *lnode_create_append (list_t *, void *);
 EXPORTFUNC	lnode_t *lnode_create_prepend (list_t *list, void *data);
 EXPORTFUNC	void *lnode_find (list_t * list, const void *key, int compare (const void *, const void *));
+EXPORTFUNC	void list_delete_destroy_node( list_t * list, lnode_t * del );
 
 #ifdef __cplusplus
 }

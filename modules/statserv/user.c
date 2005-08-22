@@ -271,7 +271,7 @@ int ss_cmd_operlist( CmdParams *cmdparams )
 		operlistserver = flags;
 		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops on server %s", operlistserver );
 	}
-	GetUserList( operlist, ( void * )cmdparams->source );
+	ProcessUserList( operlist, ( void * )cmdparams->source );
 	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
@@ -311,7 +311,7 @@ int ss_cmd_botlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "Online bots:" );
-	GetUserList( botlist, ( void * )cmdparams->source );
+	ProcessUserList( botlist, ( void * )cmdparams->source );
 	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
@@ -328,5 +328,5 @@ int ss_cmd_botlist( CmdParams *cmdparams )
 
 void InitUserStats( void )
 {
-	GetUserList( AddUser, NULL );
+	ProcessUserList( AddUser, NULL );
 }

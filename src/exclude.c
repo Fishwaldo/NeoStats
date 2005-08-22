@@ -473,8 +473,7 @@ static int do_exclude_del( list_t *exclude_list, const CmdParams *cmdparams )
 		exclude = lnode_get( node );
 		if( ircstrcasecmp( exclude->pattern, cmdparams->av[1] ) == 0 )
 		{
-			list_delete( exclude_list, node );
-			lnode_destroy( node );
+			list_delete_destroy_node( exclude_list, node );
 			DBADelete( "exclusions", exclude->pattern );
 			irc_prefmsg( cmdparams->bot, cmdparams->source, __( "%s delete from exclusion list",cmdparams->source ), exclude->pattern );
 			ns_free( exclude );

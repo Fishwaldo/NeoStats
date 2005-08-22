@@ -70,8 +70,7 @@ void ResetTLDStatistics( void )
 			{
 				tn2 = list_next( tldstatlist, tn );
 				ns_free( t );
-				list_delete( tldstatlist, tn );
-				lnode_destroy( tn );
+				list_delete_destroy_node( tldstatlist, tn );
 				tn = tn2;
 				continue;
 			}
