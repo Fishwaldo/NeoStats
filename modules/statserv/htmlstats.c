@@ -44,6 +44,8 @@ typedef struct htmlfunc {
 	htmlhandler handler;
 }htmlfunc;
 
+#define TABLE_START( opf ) os_fprintf( ( opf ), "<table border = 0>" );
+#define TABLE_END( opf ) os_fprintf( opf, "</table>" );
 /** HTML handler prototypes */
 static void html_map( void );
 static void html_srvlist( void );
@@ -162,9 +164,10 @@ static void serverlisthandler( const serverstat *ss, const void *v )
 
 static void html_srvlist( void )
 {
-	os_fprintf( opf, "<table border=0><tr><th colspan = 2>Server name</th></tr>" );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th colspan = 2>Server name</th></tr>" );
 	GetServerStats( serverlisthandler, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief serverlistdetailhandler
@@ -218,9 +221,9 @@ static void serverlistdetailhandler( const serverstat *ss, const void *v )
 
 static void html_srvlistdet( void )
 {
-	os_fprintf( opf, "<table border=0>" );
+	TABLE_START( opf );
 	GetServerStats( serverlistdetailhandler, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief html_netstats
@@ -234,7 +237,7 @@ static void html_srvlistdet( void )
 
 static void html_netstats( void )
 {
-	os_fprintf( opf, "<table border = 0>" );
+	TABLE_START( opf );
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b></th><th><b>Current</b></th><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.users.alltime.runningtotal );
@@ -265,7 +268,8 @@ static void html_netstats( void )
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.max );
 	os_fprintf( opf, "<td>%s</td>\n", sftime( networkstats.servers.alltime.ts_max ) );
 	os_fprintf( opf, "<tr><td colspan=\"3\">Users Set Away:</td>\n" );
-	os_fprintf( opf, "<td colspan=\"3\">%d</td></tr></table>\n", NSGetAwayCount() );
+	os_fprintf( opf, "<td colspan=\"3\">%d</td></tr>\n", NSGetAwayCount() );
+	TABLE_END( opf );
 }
 
 /** @brief html_dailystats
@@ -279,7 +283,7 @@ static void html_netstats( void )
 
 static void html_dailystats( void )
 {
-	os_fprintf( opf, "<table border = 0>" );
+	TABLE_START( opf );
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.daily.runningtotal );
@@ -309,7 +313,7 @@ static void html_dailystats( void )
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.daily.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.daily.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.servers.daily.ts_max ) );
-	os_fprintf( opf, "</tr></table>\n" );
+	TABLE_END( opf );
 }
 
 /** @brief html_weeklystats
@@ -323,7 +327,7 @@ static void html_dailystats( void )
 
 static void html_weeklystats( void )
 {
-	os_fprintf( opf, "<table border = 0>" );
+	TABLE_START( opf );
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.weekly.runningtotal );
@@ -353,7 +357,7 @@ static void html_weeklystats( void )
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.weekly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.weekly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.servers.weekly.ts_max ) );
-	os_fprintf( opf, "</tr></table>\n" );
+	TABLE_END( opf );
 }
 
 /** @brief html_monthlystats
@@ -367,7 +371,7 @@ static void html_weeklystats( void )
 
 static void html_monthlystats( void )
 {
-	os_fprintf( opf, "<table border = 0>" );
+	TABLE_START( opf );
 	os_fprintf( opf, "<tr><th><b></b></th><th><b>Total</b><th><b>Current</b><th><b>Average</b></th><th><b>Max</b></th><th><b>Max Time</b></th></tr>\n" );
 	os_fprintf( opf, "<tr><td>Users:</td>\n" );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.users.monthly.runningtotal );
@@ -397,7 +401,7 @@ static void html_monthlystats( void )
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.monthly.average );
 	os_fprintf( opf, "<td>%-2d</td>\n", networkstats.servers.monthly.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.servers.monthly.ts_max ) );
-	os_fprintf( opf, "</tr></table>\n" );
+	TABLE_END( opf );
 }
 
 /** @brief top10membershandler
@@ -426,9 +430,10 @@ static void top10membershandler( channelstat *cs, const void *v )
 
 static void html_channeltop10members( void )
 {
-	os_fprintf( opf, "<table border = 0><tr><th>Channel</th><th align=right>Members</th></tr>" );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th>Channel</th><th align=right>Members</th></tr>" );
 	GetChannelStats( top10membershandler, CHANNEL_SORT_MEMBERS, 10, 1, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief top10joinshandler
@@ -457,9 +462,10 @@ static void top10joinshandler( channelstat *cs, const void *v )
 
 static void html_channeltop10joins( void )
 {
-	os_fprintf( opf, "<table border = 0><tr><th>Channel</th><th align=right>Total Joins</th></tr>" );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th>Channel</th><th align=right>Total Joins</th></tr>" );
 	GetChannelStats( top10joinshandler, CHANNEL_SORT_JOINS, 10, 1, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief top10kickshandler
@@ -488,9 +494,10 @@ static void top10kickshandler( channelstat *cs, const void *v )
 
 static void html_channeltop10kicks( void )
 {
-	os_fprintf( opf, "<table border = 0><tr><th>Channel</th><th>Total Kicks</th></tr>" );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th>Channel</th><th>Total Kicks</th></tr>" );
 	GetChannelStats( top10kickshandler, CHANNEL_SORT_KICKS, 10, 1, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief top10topicshandler
@@ -519,9 +526,10 @@ static void top10topicshandler( channelstat *cs, const void *v )
 
 static void html_channeltop10topics( void )
 {
-	os_fprintf( opf, "<table border = 0><tr><th>Channel</th><th>Total Topics</th></tr>" );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th>Channel</th><th>Total Topics</th></tr>" );
 	GetChannelStats( top10topicshandler, CHANNEL_SORT_TOPICS, 10, 1, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief HTMLClientVersionReport
@@ -550,9 +558,10 @@ static void HTMLClientVersionReport( const ss_ctcp_version *cv, const void *v )
 
 static void html_clientstats( void )
 {
-	os_fprintf( opf, "<table border = 0><tr><th>Version</th><th align=right>Count</th></tr>" );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th>Version</th><th align=right>Count</th></tr>" );
 	GetClientStats( HTMLClientVersionReport, 10, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief HTMLTLDReport
@@ -581,9 +590,10 @@ static void HTMLTLDReport( const TLD *tld, const void *v )
 
 static void html_tldmap( void )
 {
-	os_fprintf( opf, "<table border = 0><tr><th>tld</th><th>Country</th><th>Current</th><th>Day</th><th>Week</th><th>Month</th><th>All Time</th></tr>" );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th>tld</th><th>Country</th><th>Current</th><th>Day</th><th>Week</th><th>Month</th><th>All Time</th></tr>" );
 	GetTLDStats( HTMLTLDReport, NULL );
-	os_fprintf( opf, "</table>" );
+	TABLE_END( opf );
 }
 
 /** @brief get_map
@@ -615,7 +625,8 @@ static void get_map( char *uplink, int level )
 			if( StatServ.exclusions && IsExcluded( s ) ) {
 				get_map( s->name, level );
 			}
-			os_fprintf( opf, "<table border=0><tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>" );
+			TABLE_START( opf );
+			os_fprintf( opf, "<tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>" );
 			os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 				(int)s->server->ping,( int )ss->highest_ping );
@@ -658,7 +669,7 @@ static void get_map( char *uplink, int level )
 static void html_map( void )
 {
 	get_map( "", 0 );
-	os_fputs( "</TABLE>\n", opf );
+	TABLE_END( opf );
 }
 
 /** @brief HTMLOutput
