@@ -79,8 +79,7 @@ HR {height:2px}
 			</tr>
 		</table></td>
 	</tr>
-</table></form>
-
+</table>
 
 <table width="98%" cellspacing="0" cellpadding="4" border="0" align="center">
 	<tr>
