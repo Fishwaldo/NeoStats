@@ -114,11 +114,11 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 	return ret_value;
 }
 
-int
-perl_sync_module(Module *mod) {
-	mod->insynch = 1;
+int perl_sync_module(Module *mod)
+{
+	SetModuleInSynch( mod );
 	execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::sync", 0)),1, mod->pm->filename);
-	mod->synched = 1;
+	SetModuleSynched( mod );
 	return NS_SUCCESS;
 }
 
@@ -1558,7 +1558,6 @@ Module *load_perlmodule (const char *filename, Client *u)
 	   perl_definition array.
 	 */
 	eval_pv (perl_definitions, TRUE);
-	mod->insynch = 0;
 	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
 								1, (char *)filename)) {
 		/* if we are here, check that pm->mod->info has something, otherwise the script didnt register */
@@ -1599,37 +1598,38 @@ Module *load_perlmodule (const char *filename, Client *u)
 	return mod;
 }
 
-void PerlModFini(Module *mod) {
-		SET_RUN_LEVEL(mod);
-		if (mod->synched == 1) {
-			/* only execute unload if synced */
-			execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), 1, mod->pm->filename);
-		}
-		RESET_RUN_LEVEL();
+void PerlModFini(Module *mod)
+{
+	SET_RUN_LEVEL(mod);
+	if( IsModuleSynched( mod ) )
+	{
+		/* only execute unload if synced */
+		execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), 1, mod->pm->filename);
+	}
+	RESET_RUN_LEVEL();
 }
 
-void unload_perlmod(Module *mod) {
-		PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
-		/* because segv handler doesn't handle perl well yet */
+void unload_perlmod(Module *mod)
+{
+	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
+	/* because segv handler doesn't handle perl well yet */
 //		RESET_RUN_LEVEL()
-		PL_perl_destruct_level = 1;
-		perl_destruct ((PMI *)mod->pm->my_perl);
+	PL_perl_destruct_level = 1;
+	perl_destruct ((PMI *)mod->pm->my_perl);
 
-		perl_free ((PMI *)mod->pm->my_perl);
+	perl_free ((PMI *)mod->pm->my_perl);
 
-		free((void *)mod->info->name);
+	free((void *)mod->info->name);
 
-		free((void *)mod->info->description);
+	free((void *)mod->info->description);
 
-		free((void *)mod->info->version);
-		
-		free((void *)mod->info->build_date);
-		
-		free((void *)mod->info->build_time);
+	free((void *)mod->info->version);
+	
+	free((void *)mod->info->build_date);
+	
+	free((void *)mod->info->build_time);
 
-		free(mod->info);
-		
-		free(mod->pm);
-
-
+	free(mod->info);
+	
+	free(mod->pm);
 }

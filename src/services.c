@@ -220,11 +220,11 @@ int init_services_bot( void )
 	ircsnprintf( ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick );
 	if( nsconfig.onlyopers ) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
-	ns_module.insynch = 1;
+	SetModuleInSynch( &ns_module );
 	ns_botptr = AddBot( &ns_botinfo );
 	add_services_set_list (ns_debugsettings);
 	AddEventList( neostats_events );
-	ns_module.synched = 1;
+	SetModuleSynched( &ns_module );
 	me.synched = 1;
 	SynchAllModules();
 	RequestServerUptimes();	

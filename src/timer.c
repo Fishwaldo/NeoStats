@@ -343,7 +343,7 @@ run_mod_timers (int ismidnight)
 		SET_SEGV_LOCATION();
 		timer = hnode_get (tn);
 		/* If a module is not yet synched, reset it's lastrun */
-		if (!timer->moduleptr->synched) {
+		if( !IsModuleSynched( timer->moduleptr ) ) {
 			timer->lastrun = (int) me.now;
 		} else {
 			switch (timer->type) {

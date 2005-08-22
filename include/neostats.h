@@ -439,8 +439,6 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 
 #define IsNeoStatsSynched()		me.synched
 
-#define IsModuleSynched()		GET_CUR_MODULE()->synched
-
 /* Unified return values and error system */
 
 /* NeoStats general success failure return type */
@@ -957,6 +955,10 @@ struct PerlModInfo;
 
 #endif /* USE_PERL */
 
+#define MODULE_STATUS_SYNCHED	0x00000001
+#define MODULE_STATUS_INSYNCH	0x00000002
+#define MODULE_STATUS_ERROR		0x00000004
+
 /** @brief Module structure
  * 
  */
@@ -974,15 +976,24 @@ typedef struct _Module {
 	void *handle;
 	/** index */
 	unsigned int modnum;
-	/** status flags */
-	unsigned int insynch;
-	unsigned int synched;
-	unsigned int error;
+	/** status flag for synch, error, etc */
+	unsigned int status;
 #ifdef USE_PERL
 	MOD_TYPE modtype;
 	struct PerlModInfo *pm;
 #endif /* USE_PERL */
 }_Module;
+
+/* Set module status */
+#define SetModuleSynched( m ) ( ( m )->status |= MODULE_STATUS_SYNCHED )
+#define SetModuleInSynch( m ) ( ( m )->status |= MODULE_STATUS_INSYNCH )
+#define SetModuleError( m ) ( ( m )->status |= MODULE_STATUS_ERROR )
+/* Test module status */
+#define IsModuleSynched( m ) ( ( m )->status & MODULE_STATUS_SYNCHED )
+#define IsModuleInSynch( m ) ( ( m )->status & MODULE_STATUS_INSYNCH )
+#define IsModuleError( m ) ( ( m )->status & MODULE_STATUS_ERROR )
+
+#define ModuleSynched()	( GET_CUR_MODULE()->status & MODULE_STATUS_SYNCHED )
 
 /* Simple stack to manage run level replacing segv_module used in 
  * previous versions. This makes it easier to determine where we are 

@@ -290,7 +290,7 @@ static int check_interval( void )
 	static time_t lasttime;
 	static int count;
 
-	if( !IsModuleSynched() )
+	if( !ModuleSynched() )
 		return NS_FALSE;
 	if( ( me.now - lasttime ) < StatServ.msginterval  )
 	{

@@ -131,7 +131,7 @@ int SynchModule( Module* module_ptr )
 	/* only standard modules get a sync */
 	if( IS_STD_MOD( module_ptr ) ) {
 #endif
-		module_ptr->insynch = 1;
+		SetModuleInSynch( module_ptr );
 		ModSynch = ns_dlsym( ( int * ) module_ptr->handle, "ModSynch" );
 		if( ModSynch ) {
 			SET_RUN_LEVEL( module_ptr );
@@ -139,7 +139,7 @@ int SynchModule( Module* module_ptr )
 			RESET_RUN_LEVEL();
 		}
 		SET_SEGV_LOCATION();
-		module_ptr->synched = 1;
+		SetModuleSynched( module_ptr );
 #ifdef USE_PERL
 	} else {
 		err = perl_sync_module( module_ptr );
@@ -342,7 +342,7 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 	DBAOpenDatabase();
 	err =( *ModInit )(); 
 	RESET_RUN_LEVEL();
-	if( err < 1 || mod_ptr->error ) {
+	if( err < 1 || IsModuleError( mod_ptr ) ) {
 		load_module_error( u, modfilename, __( "See %s.log for further information.",u ), mod_ptr->info->name );
 		unload_module( mod_ptr->info->name, NULL );
 		return NULL;
@@ -355,7 +355,7 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 
 	/* Let this module know we are online if we are! */
 	if( IsNeoStatsSynched() ) {
-		if( SynchModule( mod_ptr ) != NS_SUCCESS || mod_ptr->error )
+		if( SynchModule( mod_ptr ) != NS_SUCCESS || IsModuleError( mod_ptr ) )
 		{
 			load_module_error( u, modfilename, __( "See %s.log for further information.", u ), mod_ptr->info->name );
 			unload_module( mod_ptr->info->name, NULL );

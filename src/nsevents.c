@@ -118,7 +118,7 @@ void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr )
 	{
 		/* If we are not yet synched, check that the module supports 
 			* the event before we are synched. */
-		if( !module_ptr->synched && !( module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH ) )
+		if( !IsModuleSynched( module_ptr ) && !( module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH ) )
 		{
 			dlog( DEBUG5, "Skipping module %s for %s since module is not yet synched", module_ptr->info->name, EventStrings[event] );
 			return;

@@ -679,9 +679,9 @@ Bot *AddBot( BotInfo *botinfo )
 
 	SET_SEGV_LOCATION();
 	modptr = GET_CUR_MODULE();
-	if( !modptr->insynch ) {
+	if( !IsModuleInSynch( modptr ) ) {
 		nlog( LOG_WARNING, "Module %s attempted to init a bot %s but is not yet synched", modptr->info->name, botinfo->nick );
-		modptr->error = 1;
+		SetModuleError( modptr );
 		return NULL;
 	}
 	/* In single bot mode, just add all commands and settings to main bot */

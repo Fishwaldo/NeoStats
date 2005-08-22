@@ -368,9 +368,9 @@ int del_all_bot_cmds( Bot* bot_ptr )
  */
 int add_services_cmd_list( bot_cmd *bot_cmd_list ) 
 {
-	if( !GET_CUR_MODULE()->insynch )
+	if( !IsModuleInSynch( GET_CUR_MODULE() ) )
 	{
-		GET_CUR_MODULE()->error = 1;
+		SetModuleError( GET_CUR_MODULE() );
 		return NS_FAILURE;
 	}	
 	return add_bot_cmd_list( ns_botptr, bot_cmd_list );
