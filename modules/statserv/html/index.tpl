@@ -1,7 +1,8 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="Content-Style-Type" content="text/css">
 
 <title>Network Statistics by NeoStats</title>
 <style type="text/css">
@@ -52,7 +53,7 @@ HR {height:2px}
 				<td class="row2"><table width="100%" cellspacing="0" border="0">
 					<tr>
 						<td><a href="http://www.neostats.net/" target=_NEW>
-                          <img border="0" src="http://www.neostats.net/neostats.gif"></a>
+                          <img border="0" src="http://www.neostats.net/neostats.gif" alt="NeoStats"></a>
                         </td>
 						<td align="right" valign="top" bordercolorlight="#000000" bordercolor="#000000"><span class=title>!TITLE!</span></td>
 					</tr>
@@ -97,7 +98,7 @@ cellspacing="0" border="1">
 	 		<td class="cat" height="30"><span class="cattitle"><b>Network</b>&nbsp;Map</span></td>
 			<tr>
 				<td class="row1" align="center">
-				<a name=map>!MAP!
+				<a name=map></a>!MAP!
 			</td>
 			</tr>
 
@@ -106,7 +107,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=tldmap>!TLDMAP!
+				<a name=tldmap></a>!TLDMAP!
 			</td>
 			</tr>
 	
@@ -115,7 +116,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=netstats>!NETSTATS!
+				<a name=netstats></a>!NETSTATS!
 			</td>
 			</tr>
 	
@@ -124,7 +125,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=daily>!DAILYSTATS!
+				<a name=daily></a>!DAILYSTATS!
 			</td>
 			</tr>
 			<tr>
@@ -132,7 +133,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=weekly>!WEEKLYSTATS!
+				<a name=weekly></a>!WEEKLYSTATS!
 			</td>
 			</tr>
 			<tr>
@@ -140,7 +141,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=monthly>!MONTHLYSTATS!
+				<a name=monthly></a>!MONTHLYSTATS!
 			</td>
 			</tr>
 			<tr>
@@ -148,7 +149,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=clivers>!CLIENTSTATS!
+				<a name=clivers></a>!CLIENTSTATS!
 			</td>
 			</tr>
 			<tr>
@@ -156,7 +157,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=top10chan>!TOP10CHAN!
+				<a name=top10chan></a>!TOP10CHAN!
 			</td>
 			</tr>
 			<tr>
@@ -164,7 +165,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=joinchan>!TOP10JOIN!
+				<a name=joinchan></a>!TOP10JOIN!
 			</td>
 			</tr>
 			<tr>
@@ -172,7 +173,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=kickchan>!TOP10KICKS!
+				<a name=kickchan></a>!TOP10KICKS!
 			</td>
 			</tr>
 			<tr>
@@ -180,7 +181,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=topicchan>!TOP10TOPICS!
+				<a name=topicchan></a>!TOP10TOPICS!
 			</td>
 			</tr>
 			<tr>
@@ -188,7 +189,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=srvlist>!SRVLIST!
+				<a name=srvlist></a>!SRVLIST!
 				(Click on a Server name for more information)
 			</td>
 			</tr>
@@ -197,7 +198,7 @@ cellspacing="0" border="1">
 			</tr>
 			<tr>
 				<td class="row1" align="center">
-				<a name=srvdet>!SRVLISTDET!
+				<a name=srvdet></a>!SRVLISTDET!
 			</td>
 			</tr>
 		</table></td>

@@ -134,7 +134,7 @@ static void put_copyright( void )
 	os_fprintf( opf, "<br> %s compiled on %s at %s\n", module_info.name,
 		module_info.build_date, module_info.build_time );
 	os_fprintf( opf, "<br><a href=\"http://www.neostats.net\">http://www.neostats.net</a>\n" );
-	os_fprintf( opf, "</center></html>\n" );
+	os_fprintf( opf, "</center>\n" );
 }
 
 /** @brief serverlisthandler
@@ -149,7 +149,7 @@ static void put_copyright( void )
 static void serverlisthandler( const serverstat *ss, const void *v )
 {
 	os_fprintf( opf, "<tr><td height=\"4\"></td>\n" );
-	os_fprintf( opf, "<td height=\"4\"><a href=#%s> %s (%s)</a></td></tr>\n",
+	os_fprintf( opf, "<td height=\"4\"><a href=\"#%s\"> %s (%s)</a></td></tr>\n",
 		ss->name, ss->name,( ss->s ) ? "ONLINE" : "OFFLINE" );
 }
 
@@ -181,7 +181,7 @@ static void html_srvlist( void )
 
 static void serverlistdetailhandler( const serverstat *ss, const void *v )
 {
-	os_fprintf( opf, "<tr><th><a name=%s>Server:</th><th colspan = 2><b>%s</b></th></tr>\n",
+	os_fprintf( opf, "<tr><th><a name=\"%s\">Server:</a></th><th colspan = 2><b>%s</b></th></tr>\n",
 		ss->name, ss->name );
 	if( !ss->s ) {
 		os_fprintf( opf, "<tr><td>Last Seen:</td><td colspan = 2>%s</td></tr>\n",
@@ -260,13 +260,13 @@ static void html_netstats( void )
 	os_fprintf( opf, "<td>%i</td>\n", networkstats.opers.alltime.average );
 	os_fprintf( opf, "<td>%i</td>\n", networkstats.opers.alltime.max );
 	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.opers.alltime.ts_max ) );
-	os_fprintf( opf, "<td>Servers:</td>\n" );
+	os_fprintf( opf, "<tr><td>Servers:</td>\n" );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.runningtotal );
 	os_fprintf( opf, "<td>%d (%d%%)</td>\n", networkstats.servers.current,
 		GetAllTimePercent( &networkstats.servers ) );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.average );
 	os_fprintf( opf, "<td>%d</td>\n", networkstats.servers.alltime.max );
-	os_fprintf( opf, "<td>%s</td>\n", sftime( networkstats.servers.alltime.ts_max ) );
+	os_fprintf( opf, "<td>%s</td></tr>\n", sftime( networkstats.servers.alltime.ts_max ) );
 	os_fprintf( opf, "<tr><td colspan=\"3\">Users Set Away:</td>\n" );
 	os_fprintf( opf, "<td colspan=\"3\">%d</td></tr>\n", NSGetAwayCount() );
 	TABLE_END( opf );
