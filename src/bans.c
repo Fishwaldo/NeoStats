@@ -39,6 +39,33 @@
  *  Bans subsystem use only. */
 static hash_t *banhash;
 
+/** @brief ProcessBanList
+ *
+ *  Calls handler for all bans
+ *
+ *  @params handler to call
+ *  @params v additional data to send to handler
+ *
+ *  @return result of handler NS_TRUE or NS_FALSE
+ */
+
+int ProcessBanList( BanListHandler handler, void *v )
+{
+	Ban *ban;
+	hscan_t ss;
+	hnode_t *bansnode;
+
+	SET_SEGV_LOCATION();
+	hash_scan_begin( &ss, banhash );
+	while( ( bansnode = hash_scan_next( &ss ) ) != NULL )
+	{
+		ban = hnode_get( bansnode );
+		if( handler( ban, v ) == NS_TRUE )
+			return NS_TRUE;
+	}
+	return NS_FALSE;
+}
+
 /** @brief new_ban
  *
  *  Create a new ban
@@ -149,6 +176,23 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
 	ns_free( ban );
 }
 
+/** @brief ReportBan
+ *
+ *  BANS LIST helper
+ *  report ban info
+ *
+ *  @params module_ptr pointer to module to report
+ *  @params v client to send to
+ *
+ *  @return none
+ */
+
+static int ReportBan( Ban *ban, void *v )
+{
+	irc_chanalert( ns_botptr, _( "Ban: %s " ), ban->mask );
+	return NS_FALSE;
+}
+
 /** @brief ListBans
  *
  *  List all bans currently set
@@ -161,16 +205,8 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
 
 void ListBans( void )
 {
-	Ban *ban;
-	hscan_t ss;
-	hnode_t *bansnode;
-
 	irc_chanalert( ns_botptr, _( "Ban Listing:" ) );
-	hash_scan_begin( &ss, banhash );
-	while( ( bansnode = hash_scan_next( &ss ) ) != NULL ) {
-		ban = hnode_get( bansnode );
-		irc_chanalert( ns_botptr, _( "Ban: %s " ), ban->mask );
-	}
+	ProcessBanList( ReportBan, NULL );
 	irc_chanalert( ns_botptr, _( "End of list." ) );
 }
 

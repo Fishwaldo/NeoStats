@@ -1497,6 +1497,9 @@ EXPORTFUNC int ProcessServerList( ServerListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*ModuleListHandler) ( Module *module_ptr, void *v );
 EXPORTFUNC int ProcessModuleList( ModuleListHandler handler, void *v );
+/* List walk handler type */
+typedef int (*BanListHandler) ( Ban *ban, void *v );
+EXPORTFUNC int ProcessBanList( BanListHandler handler, void *v );
 
 EXPORTFUNC hash_t *GetServerHash( void );
 
