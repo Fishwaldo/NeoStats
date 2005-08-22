@@ -60,7 +60,7 @@ static Module *AuthModList[NUM_MODULES];
  *  @return NS_TRUE if is, NS_FALSE if not 
  */
 
-static int IsServiceRoot( Client *u )
+static int IsServiceRoot( const Client *u )
 {
 	/* Test client nick!user@host against the configured service root */
 	if( ( match( nsconfig.rootuser.nick, u->name ) ) &&
@@ -81,7 +81,7 @@ static int IsServiceRoot( Client *u )
  *  @return authentication level
  */
 
-int AuthUser( Client *u )
+int AuthUser( const Client *u )
 {
 	int newauthlvl = 0;
 	int authlvl = 0;

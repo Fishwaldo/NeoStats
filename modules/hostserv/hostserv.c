@@ -436,12 +436,12 @@ int ModInit( void )
 	vhost_list = list_create( -1 );
 	if( !vhost_list ) {
 		nlog( LOG_CRITICAL, "Unable to create vhost list" );
-		return -1;
+		return NS_FAILURE;
 	}
 	banhash = hash_create( -1, 0, 0 );
 	if( !banhash ) {
 		nlog( LOG_CRITICAL, "Unable to create ban hash" );
-		return -1;
+		return NS_FAILURE;
 	}
 	ModuleConfig( hs_settings );
 	LoadBans();

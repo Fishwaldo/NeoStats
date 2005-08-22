@@ -922,8 +922,7 @@ typedef struct ModuleInfo {
 	const int padding[5];	
 }ModuleInfo;
 
-typedef int (*mod_auth) ( Client *u );
-typedef int (*userauthfunc) ( Client *u );
+typedef int (*mod_auth) ( const Client *u );
 
 #ifdef USE_PERL	
 
@@ -960,12 +959,20 @@ struct PerlModInfo;
  * 
  */
 typedef struct _Module {
+	/** Pointer to info structure */
 	ModuleInfo *info;
+	/** Pointer to event list */
 	ModuleEvent **event_list;
+	/** Optional module supplied auth callback for modules to authorise
+	 *  module commands not handled by core auth modules (e.g. SecureServ helpers) */
 	mod_auth authcb;
+	/** Auth callback for auth modules */
 	mod_auth userauth;
+	/** Dynamic library handle */
 	void *handle;
+	/** index */
 	unsigned int modnum;
+	/** status flags */
 	unsigned int insynch;
 	unsigned int synched;
 	unsigned int error;
@@ -975,22 +982,28 @@ typedef struct _Module {
 #endif /* USE_PERL */
 }_Module;
 
-
-
-EXPORTVAR extern Module *RunModule[10];
-EXPORTVAR extern int RunLevel;
-
 /* Simple stack to manage run level replacing segv_module used in 
  * previous versions. This makes it easier to determine where we are 
  * running and avoids the need for modules to manage this or the core to
  * have to set/reset when a module calls a core function which triggers
  * other modules to run (e.g. AddBot)
  */
+/* Run level stack */
+EXPORTVAR extern Module *RunModule[10]; 
+/* Run level stack index */
+EXPORTVAR extern int RunLevel;
+/* Macros to manage run level stack */
+/* Set current run level */
 #define SET_RUN_LEVEL( moduleptr ) { if( RunLevel < 10 ) { RunLevel++; RunModule[RunLevel] = moduleptr; } }
+/* Reset run level */
 #define RESET_RUN_LEVEL() { if( RunLevel > 0 ) { RunLevel--; } }
+/* Get current run level module pointer */
 #define GET_CUR_MODULE() RunModule[RunLevel]
+/* Get current run level module index */
 #define GET_CUR_MODNUM() RunModule[RunLevel]->modnum
+/* Get current run level module name */
 #define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
+/* Get current run level module version */
 #define GET_CUR_MODVERSION() RunModule[RunLevel]->info->version
 
 /** @brief Socket function types
@@ -1365,14 +1378,21 @@ EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileorme
 #define IsAway( x ) ( ( x ) && ( x->user->is_away ) )
 
 EXPORTFUNC int ValidateNick( const char *nick );
+EXPORTFUNC int ValidateNickWild( const char *nick );
 EXPORTFUNC int ValidateUser( const char *username );
+EXPORTFUNC int ValidateUserWild( const char *username );
 EXPORTFUNC int ValidateHost( const char *hostname );
+EXPORTFUNC int ValidateHostWild( const char *hostname );
+EXPORTFUNC int ValidateUserHost( const char *userhost );
+EXPORTFUNC int ValidateUserHostWild( const char *userhost );
 EXPORTFUNC int ValidateURL( const char *url );
 EXPORTFUNC int ValidateChannel( const char *channel_name );
+EXPORTFUNC int ValidateChannelWild( const char *channel_name );
 EXPORTFUNC int ValidateChannelKey( const char *key );
 
 #define CONFIG_TABLE_NAME	"config"
 
+/* Row fetch handler type */
 typedef int (*DBRowHandler) ( void *data, int size );
 
 /* DB API */
@@ -1460,14 +1480,19 @@ extern void nassert_fail( const char *expr, const char *file, const int line, co
 EXPORTFUNC void nlog( LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void dlog( DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
+/* List walk handler type */
 typedef int (*ChannelListHandler) ( Channel *c, void *v );
 EXPORTFUNC int GetChannelList( ChannelListHandler handler, void *v );
+/* List walk handler type */
 typedef int (*ChannelMemberHandler) ( Channel *c, ChannelMember *m, void *v );
 EXPORTFUNC int GetChannelMembers( Channel *c, ChannelMemberHandler handler, void *v );
+/* List walk handler type */
 typedef int (*UserListHandler) ( Client *u, void *v );
 EXPORTFUNC int GetUserList( UserListHandler handler, void *v );
+/* List walk handler type */
 typedef int (*ServerListHandler) ( Client *s, void *v );
 EXPORTFUNC int GetServerList( ServerListHandler handler, void *v );
+/* List walk handler type */
 typedef int (*ModuleListHandler) ( Module *module_ptr, void *v );
 EXPORTFUNC int GetModuleList (ModuleListHandler handler, void *v );
 

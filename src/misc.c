@@ -422,6 +422,27 @@ int ValidateNick( const char *nick )
 	return NS_SUCCESS;
 }
 
+/** @brief ValidateNickWild
+ *  
+ *  Check that passed string is a valid nick
+ *  Wild cards allowed
+ *  
+ *  @param nick to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ValidateNickWild( const char *nick )
+{
+	while( *nick )
+	{
+		if( !IsNickChar( *nick ) && !IsWildChar( *nick ) )
+			return NS_FAILURE;
+		nick++;
+	}
+	return NS_SUCCESS;
+}
+
 /** @brief ValidateUser
  *  
  *  Check that passed string is a valid username
@@ -436,6 +457,27 @@ int ValidateUser( const char *username )
 	while( *username )
 	{
 		if( !IsUserChar( *username ) )
+			return NS_FAILURE;
+		username++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ValidateUserWild
+ *  
+ *  Check that passed string is a valid username
+ *  Wild cards allowed
+ *  
+ *  @param username to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ValidateUserWild( const char *username )
+{
+	while( *username )
+	{
+		if( !IsUserChar( *username ) && !IsWildChar( *username ) )
 			return NS_FAILURE;
 		username++;
 	}
@@ -459,6 +501,90 @@ int ValidateHost( const char *hostname )
 			return NS_FAILURE;
 		hostname++;
 	}
+	return NS_SUCCESS;
+}
+
+/** @brief ValidateHostWild
+ *  
+ *  Check that passed string is a valid hostname
+ *  Wild cards allowed
+ *  
+ *  @param hostname to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ValidateHostWild( const char *hostname )
+{
+	while( *hostname )
+	{
+		if( !IsHostChar( *hostname ) && !IsWildChar( *hostname ) )
+			return NS_FAILURE;
+		hostname++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ValidateUserHost
+ *  
+ *  Check that passed string is a valid nick!user@host
+ *  
+ *  @param hostname to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ValidateUserHost( const char *userhost )
+{
+	static char localuserhost[USERHOSTLEN];
+	char *nick, *user , *host;
+
+	if( !index( userhost, '!' ) || !index( userhost, '@' ) )
+		return NS_FAILURE;
+
+	strlcpy( localuserhost, userhost, USERHOSTLEN );
+	nick = strtok( localuserhost, "!" );
+	user = strtok( NULL, "@" );
+	host = strtok( NULL, "" );
+
+	if( ValidateNick( nick ) != NS_SUCCESS )
+		return NS_FAILURE;
+	if( ValidateUser( user ) != NS_SUCCESS )
+		return NS_FAILURE;
+	if( ValidateHost( host ) != NS_SUCCESS )
+		return NS_FAILURE;
+	return NS_SUCCESS;
+}
+
+/** @brief ValidateUserHostWild
+ *  
+ *  Check that passed string is a valid nick!user@host
+ *  Wild cards allowed
+ *  
+ *  @param hostname to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ValidateUserHostWild( const char *userhost )
+{
+	static char localuserhost[USERHOSTLEN];
+	char *nick, *user , *host;
+
+	if( !index( userhost, '!' ) || !index( userhost, '@' ) )
+		return NS_FAILURE;
+
+	strlcpy( localuserhost, userhost, USERHOSTLEN );
+	nick = strtok( localuserhost, "!" );
+	user = strtok( NULL, "@" );
+	host = strtok( NULL, "" );
+
+	if( ValidateNickWild( nick ) != NS_SUCCESS )
+		return NS_FAILURE;
+	if( ValidateUserWild( user ) != NS_SUCCESS )
+		return NS_FAILURE;
+	if( ValidateHostWild( host ) != NS_SUCCESS )
+		return NS_FAILURE;
 	return NS_SUCCESS;
 }
 
@@ -505,6 +631,31 @@ int ValidateChannel( const char *channel_name )
 	while( *channel_name )
 	{
 		if( !IsChanChar( *channel_name ) )
+			return NS_FAILURE;
+		channel_name++;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief ValidateChannelWild
+ *  
+ *  Check that passed string is a valid channel name
+ *  Wild cards allowed
+ *  
+ *  @param channel name to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ValidateChannelWild( const char *channel_name )
+{
+	/* Channel name must start with channel prefix */
+	if( !IsChanPrefix( *channel_name ) )
+		return NS_FAILURE;
+	channel_name ++;
+	while( *channel_name )
+	{
+		if( !IsChanChar( *channel_name ) && !IsWildChar( *channel_name ) )
 			return NS_FAILURE;
 		channel_name++;
 	}

@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Exclude system tidy ups and bug fix for module excludes. (M)
+ - More Validatexxx functions which will allow for wildcards in the string
+   tested. (M)
  - StatServ: boot time sanity checks for list and hash creation. (M)
  - StatServ: port version stats to DBA API. (M)
  - QuoteServ: add sanity checks to db loads. (M)

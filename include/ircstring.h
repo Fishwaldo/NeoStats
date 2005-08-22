@@ -94,5 +94,6 @@ extern const unsigned int CharAttrs[];
 
 #define IsNonEOS(c) (CharAttrs[(unsigned char)(c)] & NONEOS_C)
 #define IsEol(c) (CharAttrs[(unsigned char)(c)] & EOL_C)
+#define IsWildChar(c)( ( c ) == '?' || ( c ) == '*' )
 
 #endif /* _IRCSTRING_H_ */
