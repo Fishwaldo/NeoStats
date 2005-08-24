@@ -4,7 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
- - Creaye core support for map generation accessible to all modules via a 
+ - Create core support for map generation accessible to all modules via a 
    callback handler and tidy up StatServ map code to take advantage of 
    the new function. (M)
  - Exclude system tidy ups and bug fix for module excludes. (M)
