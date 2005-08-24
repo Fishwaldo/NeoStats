@@ -41,7 +41,6 @@ typedef struct serverstat {
 }serverstat;
 
 typedef void( *ServerStatHandler )( const serverstat *cs, const void *v );
-
 void GetServerStats( const ServerStatHandler handler, const void *v );
 
 int ss_event_server( CmdParams *cmdparams );

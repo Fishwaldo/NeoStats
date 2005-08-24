@@ -166,7 +166,7 @@ int ircsplitbuf( char *buf, char ***argv, int colon_special )
 			argvsize += 8;
 			*argv = ns_realloc( *argv, sizeof( char * ) * argvsize );
 		}
-		if( ( *buf == ':' ) &&( colcount < 1 ) ) {
+		if( ( *buf == ':' ) && ( colcount < 1 ) ) {
 			buf++;
 			colcount++;
 			if( colon_special ) {
@@ -218,7 +218,7 @@ int split_buf( char *buf, char ***argv, int colon_special )
 			argvsize += 8;
 			*argv = ns_realloc( *argv, sizeof( char * ) * argvsize );
 		}
-		if( ( *buf == ':' ) &&( colcount < 1 ) ) {
+		if( ( *buf == ':' ) && ( colcount < 1 ) ) {
 			buf++;
 			colcount++;
 		}

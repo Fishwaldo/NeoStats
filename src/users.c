@@ -398,13 +398,13 @@ void UserAway( const char *nick, const char *awaymsg )
 		u->user->awaymsg[0] = 0;
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->source = u;
-	if( IsAway( u ) &&( !awaymsg ) )
+	if( IsAway( u ) && ( !awaymsg ) )
 	{
 		u->user->is_away = 0;
 		me.awaycount--;
 		u->uplink->server->awaycount--;
 	}
-	else if( !IsAway( u ) &&( awaymsg ) )
+	else if( !IsAway( u ) && ( awaymsg ) )
 	{
 		u->user->is_away = 1;
 		me.awaycount++;
@@ -688,7 +688,7 @@ void UserMode( const char *nick, const char *modes )
 	if( ircd_srv.features&FEATURE_UMODECLOAK )
 	{
 		/* Do we have a hidden host any more? */
-		if( ( oldmode & UMODE_HIDE ) &&( !( u->user->Umode & UMODE_HIDE ) ) )
+		if( ( oldmode & UMODE_HIDE ) && ( !( u->user->Umode & UMODE_HIDE ) ) )
 			strlcpy( u->user->vhost, u->user->hostname, MAXHOST );
 	}
 	dlog( DEBUG1, "UserMode: modes for %s now %x", u->name, u->user->Umode );

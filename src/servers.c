@@ -24,7 +24,7 @@
 */
 
 /*  TODO:
- *  - Deprecate GetServerHash()
+ *  - 
  */
 
 #include "neostats.h"
@@ -411,6 +411,66 @@ int ProcessServerList( ServerListHandler handler, void *v )
 	return NS_SUCCESS;
 }
 
+/** @brief TransverseMap
+ *
+ *  Recursively transverse map and send results to handler
+ *
+ *  @param handler to call with map entry
+ *  @param useexclusions whether to observe global exclusions
+ *  @param uplink current point in map
+ *  @param depth in map
+ *  @param v optional handler parameter
+ *
+ *  @return none
+ */
+
+static void TransverseMap( ServerMapHandler handler, int useexclusions, const char *uplink, int depth, void *v )
+{
+	hscan_t hs;
+	hnode_t *sn;
+	Client *s;
+
+	hash_scan_begin( &hs, serverhash );
+	while( ( sn = hash_scan_next( &hs ) ) )
+	{
+		s = hnode_get( sn );
+		/*printf( "%d %s %s (%s)\n", depth, s->name, s->uplink ? s->uplink->name : "", uplink );*/
+		if( ( depth == 0 ) && ( s->uplinkname[0] == 0 ) )
+		{
+			/* its the root server */
+			if( useexclusions && IsExcluded( s ) )
+				TransverseMap( handler, useexclusions, s->name, depth, v );
+			handler( s, 1, depth, v );
+			TransverseMap( handler, useexclusions, s->name, depth + 1, v );
+		}
+		else if( ( depth > 0 ) && ( s->uplink ) &&  !ircstrcasecmp( s->uplink->name, uplink ) )
+		{
+			if( useexclusions && IsExcluded( s ) )
+				TransverseMap( handler, useexclusions, s->name, depth, v );
+			/* its not the root server */
+			handler( s, 0, depth, v );
+			TransverseMap( handler, useexclusions, s->name, depth + 1, v );
+		}
+	}
+}
+
+/** @brief ProcessServerMap
+ *
+ *  Process server map
+ *  Recursively transverse map and send results to handler
+ *
+ *  @param handler to call with map entry
+ *  @param useexclusions whether to observe global exclusions
+ *  @param v optional handler parameter
+ *
+ *  @return none
+ */
+
+void ProcessServerMap( ServerMapHandler handler, int useexclusions, void *v )
+{
+	TransverseMap( handler, useexclusions, "", 0, v );
+}
+
 /** @brief RequestServerUptime
  *
  *  Request uptime of a server
@@ -441,21 +501,6 @@ static int RequestServerUptime( Client *s, void *v )
 void RequestServerUptimes( void )
 {
 	ProcessServerList( RequestServerUptime, NULL );
-}
-
-/** @brief GetServerHash
- *
- *  GetServerHash
- *  NeoStats core use only.
- *
- *  @param none
- *
- *  @return server hash
- */
-
-hash_t *GetServerHash( void )
-{
-	return serverhash;
 }
 
 /** @brief AllocServerModPtr

@@ -596,63 +596,50 @@ static void html_tldmap( void )
 	TABLE_END( opf );
 }
 
-/** @brief get_map
+/** @brief HTMLMapHandler
  *
- *  HTML recursive handler to generate network map
+ *  HTML handler to output network map
  *
- *  @param none
+ *  @param s pointer to server
+ *  @param isroot whether this server is root
+ *  @param depth of server in map
+ *  @param v not used
  *
  *  @return none
  */
 
-static void get_map( char *uplink, int level )
+static void HTMLMapHandler( const Client *s, int isroot, int depth, void *v )
 {
 #define MAPBUFSIZE 512
 	static char buf[MAPBUFSIZE];
-	hscan_t hs;
-	hnode_t *sn;
-	Client *s;
+	Client *u = (Client *)v;
 	serverstat *ss;
-	int i;
 
-	hash_scan_begin( &hs, GetServerHash() );
-	while( ( sn = hash_scan_next( &hs ) ) ) {
-		s = hnode_get( sn );
-		ss = GetServerModValue( s );
-
-		if( ( level == 0 ) &&( s->uplinkname[0] == 0 ) ) {
-			/* its the root server */
-			if( StatServ.exclusions && IsExcluded( s ) ) {
-				get_map( s->name, level );
-			}
-			TABLE_START( opf );
-			os_fprintf( opf, "<tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>" );
+	ss = ( serverstat * ) GetServerModValue( s );
+	if( isroot )
+	{
+		/* its the root server */
+		os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+			ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
+			(int)s->server->ping,( int )ss->highest_ping );
+	}
+	else
+	{
+		/* its not the root server */
+		if( StatServ.flatmap )
+		{
 			os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 				(int)s->server->ping,( int )ss->highest_ping );
-			get_map( s->name, level + 1 );
-		} else if( ( level > 0 ) && !ircstrcasecmp( uplink, s->uplinkname ) ) {
-			if( StatServ.exclusions && IsExcluded( s ) ) {
-				get_map( s->name, level );
-			}
-			/* its not the root server */
-			if( StatServ.flatmap )
-			{
-				os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
-					ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-					(int)s->server->ping,( int )ss->highest_ping );
-			}
-			else
-			{
-				buf[0]='\0';
-				for( i = 1; i < level; i++ ) {
-					ircsnprintf( buf, MAPBUFSIZE, "%s&nbsp&nbsp&nbsp&nbsp&nbsp|", buf );
-				}
-				os_fprintf( opf, "<tr><td>%s\\_%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
-					buf, ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-					(int)s->server->ping,( int )ss->highest_ping );
-			}
-			get_map( s->name, level + 1 );
+		}
+		else
+		{
+			buf[0]='\0';
+			for( ; depth > 1; depth-- )
+				strlcat( buf, "&nbsp&nbsp&nbsp&nbsp&nbsp|", MAPBUFSIZE );
+			os_fprintf( opf, "<tr><td>%s\\_%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
+				buf, ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
+				(int)s->server->ping,( int )ss->highest_ping );
 		}
 	}
 }
@@ -668,7 +655,9 @@ static void get_map( char *uplink, int level )
 
 static void html_map( void )
 {
-	get_map( "", 0 );
+	TABLE_START( opf );
+	os_fprintf( opf, "<tr><th>Server Name</th><th>Users/Max</th><th>Opers/Max</th><th>Ping/Max</th></tr>" );
+	ProcessServerMap( HTMLMapHandler, StatServ.exclusions, NULL );
 	TABLE_END( opf );
 }
 

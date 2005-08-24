@@ -1510,13 +1510,14 @@ EXPORTFUNC int ProcessUserList( UserListHandler handler, void *v );
 typedef int (*ServerListHandler) ( Client *s, void *v );
 EXPORTFUNC int ProcessServerList( ServerListHandler handler, void *v );
 /* List walk handler type */
+typedef void( *ServerMapHandler )( const Client *s, int isroot, int depth, void *v );
+EXPORTFUNC void ProcessServerMap( ServerMapHandler handler, int useexclusions, void *v );
+/* List walk handler type */
 typedef int (*ModuleListHandler) ( Module *module_ptr, void *v );
 EXPORTFUNC int ProcessModuleList( ModuleListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*BanListHandler) ( Ban *ban, void *v );
 EXPORTFUNC int ProcessBanList( BanListHandler handler, void *v );
-
-EXPORTFUNC hash_t *GetServerHash( void );
 
 EXPORTFUNC int HaveFeature( int mask );
 

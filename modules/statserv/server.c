@@ -326,65 +326,51 @@ int ss_event_pong( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** @brief makemap
+/** @brief MapHandler
  *
- *  MAP command handler
- *  Recursively transverse map and report results
+ *  MAP process callback
+ *  report results of map process
  *
- *  @param uplink current point in map
- *  @param u client to report to
- *  @param level in map
+ *  @param s pointer to server
+ *  @param isroot whether this server is root
+ *  @param depth of server in map
+ *  @param v user to report to
  *
- *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ *  @return none
  */
 
-static void makemap( const char *uplink, const Client * u, int level )
+static void MapHandler( const Client *s, int isroot, int depth, void *v )
 {
-	static char buf[256];
-	hscan_t hs;
-	hnode_t *sn;
-	Client *s;
+#define MAPBUFSIZE 512
+	static char buf[MAPBUFSIZE];
+	Client *u = (Client *)v;
 	serverstat *ss;
-	int i;
-	hash_scan_begin( &hs, GetServerHash() );
-	while( ( sn = hash_scan_next( &hs ) ) )
+
+	ss = ( serverstat * ) GetServerModValue( s );
+	if( isroot )
 	{
-		s = hnode_get( sn );
-		printf( "%d %s %s (%s)\n", level, s->name, s->uplink ? s->uplink->name : "", uplink );
-		ss = ( serverstat * ) GetServerModValue( s );
-		if( ( level == 0 ) &&( s->uplinkname[0] == 0 ) )
+		/* its the root server */
+		irc_prefmsg( ss_bot, u, "\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
+			ss->name, s->server->users,( int )ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
+			( int )s->server->ping, ss->highest_ping );
+	}
+	else
+	{
+		/* its not the root server */
+		if( StatServ.flatmap )
 		{
-			/* its the root server */
-			if( StatServ.exclusions && IsExcluded( s ) )
-				makemap( s->name, u, level );
-			irc_prefmsg( ss_bot, u,
-				"\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
+			irc_prefmsg( ss_bot, u, "\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]", 
 				ss->name, s->server->users,( int )ss->users.alltime.max,
 				ss->opers.current, ss->opers.alltime.max,( int )s->server->ping, ss->highest_ping );
-			makemap( s->name, u, level + 1 );
-		} else if( ( level > 0 ) &&( s->uplink ) &&  !ircstrcasecmp( s->uplink->name, uplink ) )
+		}
+		else
 		{
-			if( StatServ.exclusions && IsExcluded( s ) )
-				makemap( s->name, u, level );
-			/* its not the root server */
-			if( StatServ.flatmap )
-			{
-				irc_prefmsg( ss_bot, u,
-					"\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]", 
-					ss->name, s->server->users,( int )ss->users.alltime.max,
-					ss->opers.current, ss->opers.alltime.max,( int )s->server->ping, ss->highest_ping );
-			}
-			else
-			{
-				buf[0]='\0';
-				for( i = 1; i < level; i++ )
-					strlcat( buf, "     |", 256 );
-				irc_prefmsg( ss_bot, u,
-					"%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
-					buf, ss->name, s->server->users,( int )ss->users.alltime.max,
-					ss->opers.current, ss->opers.alltime.max,( int )s->server->ping, ss->highest_ping );
-			}
-			makemap( s->name, u, level + 1 );
+			buf[0]='\0';
+			for( ; depth > 1; depth-- )
+				strlcat( buf, "     |", 256 );
+			irc_prefmsg( ss_bot, u, "%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
+				buf, ss->name, s->server->users,( int )ss->users.alltime.max,
+				ss->opers.current, ss->opers.alltime.max,( int )s->server->ping, ss->highest_ping );
 		}
 	}
 }
@@ -404,7 +390,7 @@ int ss_cmd_map( CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "%-40s      %-10s %-10s %-10s",
 		"\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2", "\2[LAG/MAX]\2" );
-	makemap( "", cmdparams->source, 0 );
+	ProcessServerMap( MapHandler, StatServ.exclusions, (void *)cmdparams->source );
 	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
@@ -563,7 +549,7 @@ static int ss_cmd_server_stats( CmdParams *cmdparams )
 		/* Calculate uptime as uptime from server plus uptime of NeoStats */
 		time_t uptime;
 
-		uptime = s->server->uptime +( me.now - me.ts_boot );
+		uptime = s->server->uptime + ( me.now - me.ts_boot );
 		irc_prefmsg( ss_bot, cmdparams->source, "Version: %s", s->version );
 		irc_prefmsg( ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld",( uptime / TS_ONE_DAY ),( ( uptime / TS_ONE_DAY ) == 1 ) ? "" : "s",( ( uptime / TS_ONE_HOUR ) % 24 ),( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ),( uptime % 60 ) );
 		irc_prefmsg( ss_bot, cmdparams->source, "Current Users: %-3d (%d%%)", 
