@@ -537,8 +537,12 @@
 #define access _access
 #define getpid GetCurrentProcessId
 #include <direct.h>
-//#define S_IWUSR _S_IWRITE
-//#define S_IRUSR _S_IREAD
+#define S_IWUSR _S_IWRITE
+#define S_IRUSR _S_IREAD
+#define S_IWGRP _S_IWRITE
+#define S_IRGRP _S_IREAD
+#define S_IWOTH _S_IWRITE
+#define S_IROTH _S_IREAD
 #define S_ISDIR(mode) ((mode) & _S_IFDIR ? 1 : 0)
 #define S_ISREG(mode) ((mode) & _S_IFREG ? 1 : 0)
 #define R_OK 04

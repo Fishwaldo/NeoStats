@@ -715,10 +715,8 @@ void HTMLOutput( void )
 	}
 	os_fclose( tpl );
 	os_fclose( opf );
-#ifndef WIN32
     /* update the umode so others can read it and owner can overwrite it */
     chmod(StatServ.htmlpath, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
-#endif /* WIN32 */
 }
 
 /** @brief HTMLOutputTimer
