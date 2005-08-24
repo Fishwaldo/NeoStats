@@ -48,16 +48,23 @@ static char quitreason[BUFSIZE];
 /* temp buffer to save kick info for IRCu */
 static char savekicker[MAXHOST];
 static char savekickreason[BUFSIZE];
-/** @brief Module data flags */
-static unsigned int fchannelmoddata = 0;
-static unsigned int moddatacnt[NUM_MODULES];
+
+/** @brief comparechanmember
+ *
+ *  list helper for channel members
+ *  Channel subsystem use only.
+ *
+ *  @param key1
+ *  @param key2
+ *
+ *  @return results of comparison
+ */
 
 int comparechanmember( const void *key1, const void *key2 )
 {
 	ChannelMember *cm = ( ChannelMember * ) key1;
 	return ircstrcasecmp( cm->u->name, key2 );
 }
-
 
 /** @brief ChanPartHandler
  *
@@ -90,7 +97,8 @@ static void ChanPartHandler( list_t * list, lnode_t * node, void *v )
 void PartAllChannels( Client *u, const char *reason )
 {
 	os_memset( quitreason, 0, BUFSIZE );
-	if( reason ) {
+	if( reason )
+	{
 		strlcpy( quitreason, reason, BUFSIZE );
 		strip_mirc_codes( quitreason );
 	}
@@ -116,22 +124,21 @@ void ChannelTopic( const char *chan, const char *owner, const char *ts, const ch
 	Channel *c;
 
 	c = FindChannel( chan );
-	if( !c ) {
+	if( !c )
+	{
 		nlog( LOG_WARNING, "ChannelTopic: can't find channel %s", chan );
 		return;
 	}
-	if( topic ) {
+	if( topic )
 		strlcpy( c->topic, topic, BUFSIZE );
-	} else {
+	else
 		c->topic[0] = 0;
-	}
 	strlcpy( c->topicowner, owner, MAXHOST );
 	c->topictime = ( ts ) ? atoi( ts ) : me.now;
 	cmdparams = (CmdParams *) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->source = FindUser( owner );
-	if( !cmdparams->source ) {
+	if( !cmdparams->source )
 		cmdparams->source = FindServer( owner );
-	}
 	cmdparams->channel = c;
 	SendAllModuleEvent( EVENT_TOPIC, cmdparams );
 	ns_free( cmdparams );
@@ -151,16 +158,15 @@ static Channel *new_chan( const char *chan )
 	CmdParams *cmdparams;
 	Channel *c;
 
-	if( hash_isfull( channelhash ) ) {
+	if( hash_isfull( channelhash ) )
+	{
 		nlog( LOG_CRITICAL, "new_chan: channel hash is full" );
 		return NULL;
 	}
 	c = ns_calloc( sizeof( Channel ) );
 	strlcpy( c->name, chan, MAXCHANLEN );
 	if( ircstrcasecmp( me.serviceschan, chan ) == 0 )
-	{
 		c->flags |= CHANNEL_FLAG_ME;
-	}
 	hnode_create_insert( channelhash, c, c->name );
 	c->members = list_create( CHANNEL_MEM_SIZE );
 	c->modeparms = list_create( CHANNEL_MAXMODES );
@@ -194,7 +200,8 @@ void del_chan( Channel *c )
 	SET_SEGV_LOCATION();
 	dlog( DEBUG2, "del_chan: deleting channel %s", c->name );
 	cn = hash_lookup( channelhash, c->name );
-	if( !cn ) {
+	if( !cn )
+	{
 		nlog( LOG_WARNING, "del_chan: channel %s not found.", c->name );
 		return;
 	}
@@ -205,8 +212,7 @@ void del_chan( Channel *c )
 	ns_free( cmdparams );
 	list_destroy_auto( c->modeparms );
 	list_destroy( c->members );
-	hash_delete( channelhash, cn );
-	hnode_destroy( cn );
+	hash_delete_destroy_node( channelhash, cn );
 	ns_free( c );
 }
 
@@ -226,14 +232,13 @@ static void del_user_channel( Channel *c, Client *u )
 	lnode_t *un;
 
 	un = list_find( u->user->chans, c->name, comparef );
-	if( !un ) {
+	if( !un )
 		nlog( LOG_WARNING, "del_user_channel: %s not found in channel %s", u->name, c->name );
-	} else {
+	else
 		list_delete_destroy_node( u->user->chans, un );
-	}
 }
 
-/** @brief del_user_channel
+/** @brief del_channel_member
  *
  *  Deletes channel member record
  *  Channel subsystem use only.
@@ -250,7 +255,8 @@ static void del_channel_member( Channel *c, Client *u )
 	lnode_t *un;
 	
 	un = list_find( c->members, u->name, comparechanmember );
-	if( !un ) {
+	if( !un )
+	{
 		nlog( LOG_WARNING, "%s isn't a member of channel %s", u->name, c->name );
 		return;
 	}
@@ -273,9 +279,12 @@ static void del_channel_member( Channel *c, Client *u )
 
 static void CheckEmptyChannel( Channel *c )
 {
-	if( c->users <= 0 ) {
+	if( c->users <= 0 )
+	{
 		del_chan( c );
-	} else if( ( c->neousers > 0 ) && ( c->neousers == c->users ) ) {
+	}
+	else if( ( c->neousers > 0 ) && ( c->neousers == c->users ) )
+	{
 		/* all real users have left the channel */
 		handle_dead_channel( c );
 	}
@@ -303,36 +312,41 @@ void KickChannel( const char *kickby, const char *chan, const char *kicked, cons
 	SET_SEGV_LOCATION();
 	dlog( DEBUG2, "KickChannel: %s kicked %s from %s for %s", kickby, kicked, chan, kickreason ? kickreason : "no reason" );
 	u = FindUser( kicked );
-	if( !u ) {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "KickChannel: user %s not found", kicked );
 		return;
 	}
 	c = FindChannel( chan );
-	if( !c ) {
+	if( !c )
+	{
 		nlog( LOG_WARNING, "KickChannel: channel %s not found", chan );
 		return;
 	} 
 	/* If PROTOCOL_KICKPART then we will also get part so DO NOT REMOVE USER or send event yet */
-	if( ircd_srv.protocol & PROTOCOL_KICKPART ) {
+	if( ircd_srv.protocol & PROTOCOL_KICKPART )
+	{
 		u->flags |= CLIENT_FLAG_ZOMBIE;
 		strlcpy( savekicker, kickby, MAXHOST );
 		if( kickreason )
 			strlcpy( savekickreason, kickreason, BUFSIZE );
 		else 
 			savekickreason[0] = 0;
-	} else {
+	}
+	else
+	{
 		del_user_channel( c, u );
 		del_channel_member( c, u );
 		cmdparams = (CmdParams *) ns_calloc( sizeof( CmdParams ) );
 		cmdparams->target = u;
 		cmdparams->channel = c;
 		cmdparams->source = FindUser( kickby );
-		if( !cmdparams->source ) {
+		if( !cmdparams->source )
 			cmdparams->source = FindServer( kickby );
-		}
 		cmdparams->param = (char *)kickreason;
 		SendAllModuleEvent( EVENT_KICK, cmdparams );
-		if( IsMe( u ) ) {
+		if( IsMe( u ) )
+		{
 			/* its one of our bots */
 			cmdparams->bot = u->user->bot;
 			SendModuleEvent( EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr );
@@ -363,12 +377,14 @@ void PartChannel( Client *u, const char *chan, const char *reason )
 
 	SET_SEGV_LOCATION();
 	dlog( DEBUG2, "PartChannel: parting %s from %s", u->name, chan );
-	if( !u ) {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "PartChannel: trying to part NULL user from %s", chan );
 		return;
 	}
 	c = FindChannel( chan );
-	if( !c ) {
+	if( !c )
+	{
 		nlog( LOG_WARNING, "PartChannel: channel %s not found", chan );
 		return;
 	}
@@ -381,12 +397,12 @@ void PartChannel( Client *u, const char *chan, const char *reason )
 		u->flags &= ~CLIENT_FLAG_ZOMBIE;
 		cmdparams->target = u;
 		cmdparams->source = FindUser( savekicker );
-		if( !cmdparams->source ) {
+		if( !cmdparams->source )
 			cmdparams->source = FindServer( savekicker );
-		}
 		cmdparams->param = savekickreason[0] ? savekickreason : NULL;
 		SendAllModuleEvent( EVENT_KICK, cmdparams );
-		if( IsMe( u ) ) {
+		if( IsMe( u ) )
+		{
 			/* its one of our bots */
 			cmdparams->bot = u->user->bot;
 			SendModuleEvent( EVENT_KICKBOT, cmdparams, u->user->bot->moduleptr );
@@ -397,7 +413,8 @@ void PartChannel( Client *u, const char *chan, const char *reason )
 	cmdparams->source = u;
 	cmdparams->param = (char *) reason;
 	SendAllModuleEvent( EVENT_PART, cmdparams );
-	if( IsMe( u ) ) {
+	if( IsMe( u ) )
+	{
 		/* its one of our bots */
 		SendModuleEvent( EVENT_PARTBOT, cmdparams, u->user->bot->moduleptr );
 		c->neousers --;
@@ -406,20 +423,20 @@ void PartChannel( Client *u, const char *chan, const char *reason )
 	ns_free( cmdparams );
 }
 
-/** @brief Process a user joining a channel
+/** @brief JoinChannel
  *
- * joins a user to a channel and raises JOINCHAN event and if required NEWCHAN events
- * if the channel is new, a new channel record is requested and defaults are set
- * if its one of our bots, also update the botchanlist
  *
- * @param u The User structure of the user joining the channel
- * @param chan the channel name
+ *  joins a user to a channel and raises JOINCHAN event and if required NEWCHAN events
+ *  if the channel is new, a new channel record is requested and defaults are set
+ *  if its one of our bots, also update the botchanlist
  *
- * @returns Nothing
+ *  @param nick of user joining
+ *  @param chan name of channel
+ *
+ *  @return none
 */
 
-void
-JoinChannel( const char *nick, const char *chan )
+void JoinChannel( const char *nick, const char *chan )
 {
 	CmdParams *cmdparams;
 	Client *u;
@@ -428,28 +445,33 @@ JoinChannel( const char *nick, const char *chan )
 	
 	SET_SEGV_LOCATION();
 	u = FindUser( nick );
-	if( !u ) {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "JoinChannel: tried to join unknown user %s to channel %s", nick, chan );
 		return;
 	}
-	if( !ircstrcasecmp( "0", chan ) ) {
+	if( !ircstrcasecmp( "0", chan ) )
+	{
 		/* join 0 is actually part all chans */
 		dlog( DEBUG2, "JoinChannel: parting %s from all channels", u->name );
 		PartAllChannels( u, NULL );
 		return;
 	}
 	c = FindChannel( chan );
-	if( !c ) {
+	if( !c )
+	{
 		/* its a new Channel */
 		dlog( DEBUG2, "JoinChannel: new channel %s", chan );
 		c = new_chan( chan );
 	}
 	/* add this users details to the channel members hash */
-	if( list_find( c->members, u->name, comparechanmember ) ) {
+	if( list_find( c->members, u->name, comparechanmember ) )
+	{
 		nlog( LOG_WARNING, "JoinChannel: tried to add %s to channel %s but they are already a member", u->name, chan );
 		return;
 	}
-	if( list_isfull( c->members ) ) {
+	if( list_isfull( c->members ) )
+	{
 		nlog( LOG_CRITICAL, "JoinChannel: channel %s member list is full", c->name );
 		return;
 	}
@@ -460,7 +482,8 @@ JoinChannel( const char *nick, const char *chan )
 	cm->flags = 0;
 	lnode_create_append( c->members, cm );
 	c->users++;
-	if( list_isfull( u->user->chans ) ) {
+	if( list_isfull( u->user->chans ) )
+	{
 		nlog( LOG_CRITICAL, "JoinChannel: user %s member list is full", u->name );
 		return;
 	}
@@ -468,7 +491,8 @@ JoinChannel( const char *nick, const char *chan )
 	cmdparams = (CmdParams *) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->source = u;
 	cmdparams->channel = c;
-	if( IsMe( u ) ) {
+	if( IsMe( u ) )
+	{
 		/* its one of our bots */
 		c->neousers ++;
 	}
@@ -477,14 +501,15 @@ JoinChannel( const char *nick, const char *chan )
 	dlog( DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users,( int )list_count( c->members ) );
 }
 
-/** @brief Dump Channel information
+/** @brief ListChannelMembers
  *
- * dump either the entire channel list, or a single channel detail. Used for debugging
- * sends the output to the services channel
+ *  List channel members
+ *  sends the output to the services channel
  *
- * @param chan the channel name to dump, or NULL for all channels
+ *  @param cmdparams
+ *  @param c pointer to channel
  *
- * @returns Nothing
+ *  @return none
 */
 
 static void ListChannelMembers( CmdParams * cmdparams, Channel *c )
@@ -494,15 +519,29 @@ static void ListChannelMembers( CmdParams * cmdparams, Channel *c )
 
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Members:    %d (List %d)", cmdparams->source ), c->users,( int )list_count( c->members ) );
 	cmn = list_first( c->members );
-	while( cmn ) {
+	while( cmn )
+	{
 		cm = lnode_get( cmn );
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "            %s Modes %s Joined: %ld", cmdparams->source ), cm->u->name, CmodeMaskToString( cm->flags ),( long )cm->tsjoin );
 		cmn = list_next( c->members, cmn );
 	}
 }
 
-static void ListChannel( CmdParams * cmdparams, Channel *c )
+/** @brief ListChannel
+ *
+ *  Report channels
+ *
+ *  @param c pointer to channel
+ *  @param v cmdparams
+ *
+ *  @returns none
+*/
+
+static int ListChannel( Channel *c, void *v )
 {
+	CmdParams *cmdparams;
+
+	cmdparams = ( CmdParams * ) v;
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Channel:    %s", cmdparams->source ), c->name );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Created:    %ld", cmdparams->source ),( long )c->creationtime );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "TopicOwner: %s TopicTime: %ld Topic: %s", cmdparams->source ), c->topicowner,( long )c->topictime, c->topic );
@@ -511,33 +550,38 @@ static void ListChannel( CmdParams * cmdparams, Channel *c )
 	ListChannelModes( cmdparams, c );
 	ListChannelMembers( cmdparams, c );
 	irc_prefmsg( ns_botptr, cmdparams->source, "========================================" );
+	return NS_FALSE;
 }
+
+/** @brief ListChannels
+ *
+ *  Report channels
+ *
+ *  @param cmdparams
+ *  @param chan
+ *
+ *  @returns none
+*/
 
 void ListChannels( CmdParams * cmdparams, const char *chan )
 {
-	hnode_t *cn;
-	hscan_t sc;
 	Channel *c;
 
 	if( !nsconfig.debug )
 		return;
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "================CHANLIST================",cmdparams->source ) );
-	if( !chan ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels %d", cmdparams->source ),( int )hash_count( channelhash ) );
-		hash_scan_begin( &sc, channelhash );
-		while( ( cn = hash_scan_next( &sc ) ) != NULL ) {
-			c = hnode_get( cn );
-			ListChannel( cmdparams, c );
-		}
-	} else {
+	if( chan )
+	{
 		c = FindChannel( chan );
-		if( c ) {
-			ListChannel( cmdparams, c );
-		} else {
+		if( c )
+			ListChannel( c, cmdparams );
+		else
 			irc_prefmsg( ns_botptr, cmdparams->source, __( "ListChannels: can't find channel %s", cmdparams->source ), chan );
-		}
+		return;
 	}
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels %d", cmdparams->source ),( int )hash_count( channelhash ) );
+	ProcessChannelList( ListChannel, cmdparams );
 }
 
 /** @brief FindChannel
@@ -554,9 +598,8 @@ Channel *FindChannel( const char *chan )
 	Channel *c;
 
 	c = ( Channel * )hnode_find( channelhash, chan );
-	if( !c ) {
+	if( !c )
 		dlog( DEBUG3, "FindChannel: %s not found", chan );
-	}
 	return c;
 }
 
@@ -572,12 +615,10 @@ Channel *FindChannel( const char *chan )
 
 int IsChannelMember( const Channel *c, const Client *u ) 
 {
-	if( !u || !c ) {
+	if( !u || !c )
 		return NS_FALSE;
-	}
-	if( list_find( c->members, u->name, comparechanmember ) ) {
+	if( list_find( c->members, u->name, comparechanmember ) )
 		return NS_TRUE;
-	}
 	return NS_FALSE;
 }
 
@@ -599,14 +640,13 @@ int test_cumode( const char *chan, const char *nick, const int flag )
 
 	u = FindUser( nick );
 	c = FindChannel( chan );
-	if( !u || !c ) {
+	if( !u || !c )
 		return NS_FALSE;
-	}
 	cm = lnode_find( c->members, nick, comparechanmember );
-	if( cm ) {
-		if( cm->flags & flag ) {
+	if( cm )
+	{
+		if( cm->flags & flag )
 			return NS_TRUE;
-		}
 	}	
 	return NS_FALSE;
 }
@@ -624,7 +664,8 @@ int test_cumode( const char *chan, const char *nick, const int flag )
 int InitChannels( void )
 {
 	channelhash = hash_create( CHANNEL_TABLE_SIZE, 0, 0 );
-	if( !channelhash )	{
+	if( !channelhash )
+	{
 		nlog( LOG_CRITICAL, "Unable to create channel hash" );
 		return NS_FAILURE;
 	}
@@ -646,6 +687,15 @@ void FiniChannels( void )
 	hash_destroy( channelhash );
 }
 
+/** @brief GetRandomChannel
+ *
+ *  find random channel
+ *
+ *  @params none
+ *
+ *  @return Channel pointer selected or NULL if none
+ */
+
 Channel *GetRandomChannel( void ) 
 {
 	hscan_t cs;
@@ -654,14 +704,13 @@ Channel *GetRandomChannel( void )
 	
 	curno = 0;
 	randno = hrand( hash_count( channelhash ), 1 );	
-	if( randno == -1 ) {
+	if( randno == -1 )
 		return NULL;
-	}
 	hash_scan_begin( &cs, channelhash );
-	while( ( cn = hash_scan_next( &cs ) ) != NULL ) {
-		if( curno == randno ) {
+	while( ( cn = hash_scan_next( &cs ) ) != NULL )
+	{
+		if( curno == randno )
 			return(( Channel * )hnode_get( cn ) );
-		}
 		curno++;
 	}
 	nlog( LOG_WARNING, "GetRandomChannel() ran out of channels?" );
@@ -672,8 +721,8 @@ Channel *GetRandomChannel( void )
  *
  *  find random channel member
  *
- *  @params uge use global exclusions
  *  @params c channel to select member from
+ *  @params uge use global exclusions
  *
  *  @return Client pointer selected or NULL if none
  */
@@ -702,6 +751,16 @@ Client *GetRandomChannelMember( Channel *c, int uge )
 }
 
 
+/** @brief GetRandomChannelKey
+ *
+ *  Generate a random channel key
+ *  NeoStats core use only.
+ *
+ *  @param length to generate
+ *
+ *  @return pointer to allocated key
+ */
+
 char *GetRandomChannelKey( int length ) 
 {
 	int i;
@@ -718,6 +777,17 @@ char *GetRandomChannelKey( int length )
 	return key;
 }
 
+/** @brief ProcessChannelList
+ *
+ *  Walk channel list and call handler for each channel
+ *  NeoStats core use only.
+ *
+ *  @param handler to call
+ *  @param v optional pointer
+ *
+ *  @return NS_SUCCESS
+ */
+
 int ProcessChannelList( ChannelListHandler handler, void *v )
 {
 	hnode_t *node;
@@ -726,7 +796,8 @@ int ProcessChannelList( ChannelListHandler handler, void *v )
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &scan, channelhash );
-	while( ( node = hash_scan_next( &scan ) ) != NULL ) {
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
+	{
 		c = hnode_get( node );
 		if( handler( c, v ) == NS_TRUE )
 			break;
@@ -734,13 +805,26 @@ int ProcessChannelList( ChannelListHandler handler, void *v )
 	return NS_SUCCESS;
 }
 
+/** @brief ProcessChannelMembers
+ *
+ *  Walk channel member list and call handler for each member
+ *  NeoStats core use only.
+ *
+ *  @param c channel to process
+ *  @param handler to call
+ *  @param v optional pointer
+ *
+ *  @return NS_SUCCESS
+ */
+
 int ProcessChannelMembers( Channel *c, ChannelMemberListHandler handler, void *v )
 {
  	ChannelMember *cm;
 	lnode_t *cmn;
 
 	cmn = list_first( c->members );
-	while( cmn ) {
+	while( cmn )
+	{
 		cm = lnode_get( cmn );
 		if( handler( c, cm, v ) == NS_TRUE )
 			break;
@@ -749,83 +833,150 @@ int ProcessChannelMembers( Channel *c, ChannelMemberListHandler handler, void *v
 	return NS_SUCCESS;
 }
 
+/** @brief AllocChannelModPtr
+ *
+ *  Allocate memory for a module pointer for a channel
+ *  NeoStats core use only.
+ *
+ *  @param u pointer to channel to add pointer for
+ *  @param size to allocate
+ *
+ *  @return pointer to allocated memory
+ */
+
 void *AllocChannelModPtr( Channel* c, int size )
 {
 	void *ptr;
 	ptr = ns_calloc( size );
-	c->modptr[GET_CUR_MODNUM()] = ptr;
-	fchannelmoddata |= ( 1 << GET_CUR_MODNUM() );
-	moddatacnt[GET_CUR_MODNUM()]++;
+	c->modptr[GET_CUR_MODULE_INDEX()] = ptr;
+	GET_CUR_MODULE()->channeldatacnt++;
 	return ptr;
 }
 
+/** @brief FreeChannelModPtr
+ *
+ *  Free memory for a module pointer for a channel
+ *  NeoStats core use only.
+ *
+ *  @param u pointer to channel to free pointer for
+ *
+ *  @return none
+ */
+
 void FreeChannelModPtr( Channel *c )
 {
-	ns_free( c->modptr[GET_CUR_MODNUM()] );
-	moddatacnt[GET_CUR_MODNUM()]--;
-	if( moddatacnt[GET_CUR_MODNUM()] == 0 )
-	{
-		fchannelmoddata &= ~( 1 << GET_CUR_MODNUM() );
-	}
+	ns_free( c->modptr[GET_CUR_MODULE_INDEX()] );
+	GET_CUR_MODULE()->channeldatacnt--;
 }
+
+/** @brief GetChannelModPtr
+ *
+ *  Retrieve module pointer for a channel
+ *  NeoStats core use only.
+ *
+ *  @param u pointer to channel to lookup pointer for
+ *
+ *  @return none
+ */
 
 void* GetChannelModPtr( const Channel *c )
 {
-	return c->modptr[GET_CUR_MODNUM()];
+	if( c )
+		return c->modptr[GET_CUR_MODULE_INDEX()];
+	return NULL;
 }
+
+/** @brief ClearChannelModValue
+ *
+ *  Clear module value for a channel
+ *  NeoStats core use only.
+ *
+ *  @param c pointer to channel to clear
+ *
+ *  @return none
+ */
 
 void ClearChannelModValue( Channel *c )
 {
 	if( c )
 	{
-		c->modvalue[GET_CUR_MODNUM()] = NULL;
-		moddatacnt[GET_CUR_MODNUM()]--;
-	}
-	if( moddatacnt[GET_CUR_MODNUM()] == 0 )
-	{
-		fchannelmoddata &= ~( 1 << GET_CUR_MODNUM() );
+		c->modvalue[GET_CUR_MODULE_INDEX()] = NULL;
+		GET_CUR_MODULE()->channeldatacnt--;
 	}
 }
+
+/** @brief SetChannelModValue
+ *
+ *  Set module value for a channel
+ *  NeoStats core use only.
+ *
+ *  @param c pointer to channel to set
+ *  @param data pointer to set
+ *
+ *  @return none
+ */
 
 void SetChannelModValue( Channel *c, void *data )
 {
 	if( c )
 	{
-		c->modvalue[GET_CUR_MODNUM()] = data;
-		fchannelmoddata |= ( 1 << GET_CUR_MODNUM() );
-		moddatacnt[GET_CUR_MODNUM()]++;
+		c->modvalue[GET_CUR_MODULE_INDEX()] = data;
+		GET_CUR_MODULE()->channeldatacnt++;
 	}
 }
+
+/** @brief GetChannelModValue
+ *
+ *  Retrieve module value for a channel
+ *  NeoStats core use only.
+ *
+ *  @param c pointer to channel to lookup pointer for
+ *
+ *  @return none
+ */
 
 void *GetChannelModValue( const Channel *c )
 {
 	if( c )
-	{
-		return c->modvalue[GET_CUR_MODNUM()];
-	}
+		return c->modvalue[GET_CUR_MODULE_INDEX()];
 	return NULL;	
 }
 
+/** @brief CleanupChannelModdataHandler
+ *
+ *  Cleanup channel moddata
+ *
+ *  @param c pointer to channel
+ *  @param v not used
+ *
+ *  @return none
+ */
+
+static int CleanupChannelModdataHandler( Channel *c, void *v )
+{
+	if( c->modptr[GET_CUR_MODULE_INDEX()] )
+		ns_free( c->modptr[GET_CUR_MODULE_INDEX()] );		
+	c->modvalue[GET_CUR_MODULE_INDEX()] = NULL;
+	return NS_FALSE;
+}
+
+/** @brief CleanupChannelModdata
+ *
+ *  Clear module data values and pointer left set by an unloaded module
+ *  NeoStats core use only.
+ *
+ *  @param index of module to clear
+ *
+ *  @return none
+ */
+
 void CleanupChannelModdata( int index )
 {
-	hnode_t *node;
-	hscan_t scan;
-	Channel *c;
-
 	SET_SEGV_LOCATION();
-	if (fchannelmoddata & (1 << index)) {
-		if( moddatacnt[index] > 0 ) {
-			nlog( LOG_WARNING, "Cleaning up channels after dirty module!" );
-			hash_scan_begin( &scan, channelhash );
-			while( ( node = hash_scan_next( &scan ) ) != NULL ) {
-				c = hnode_get( node );
-				if( c->modptr[index] ) {
-					ns_free( c->modptr[index] );		
-				}
-				c->modvalue[index] = NULL;
-			}
-		}
-		fchannelmoddata &= ~( 1 << index );
-		moddatacnt[index] = 0;
+	if( GET_CUR_MODULE()->channeldatacnt > 0 )
+	{
+		nlog( LOG_WARNING, "Cleaning up channels after dirty module!" );
+		ProcessChannelList( CleanupChannelModdataHandler, NULL );
 	}
+	GET_CUR_MODULE()->channeldatacnt = 0;
 }

@@ -261,6 +261,8 @@ EXPORTFUNC 	extern void hnode_destroy (hnode_t *);
 EXPORTFUNC 	void hnode_create_insert (hash_t *, void *, const void *);
 EXPORTFUNC 	hnode_t *hnode_find (hash_t * hash, const void *key);
 
+EXPORTFUNC 	extern void hash_delete_destroy_node( hash_t *, hnode_t * );
+EXPORTFUNC 	extern void hash_scan_delete_destroy_node( hash_t *hash, hnode_t *node );
 
 #ifdef __cplusplus
 }

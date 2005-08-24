@@ -1257,7 +1257,7 @@ void do_globops( const char *origin, const char *message )
 		c = FindUser( origin );
 		if( c )
 		{
-			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+			cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 			cmdparams->source = c;
 			cmdparams->param = ( char * )message;
 			SendAllModuleEvent( EVENT_GLOBOPS, cmdparams );
@@ -1288,7 +1288,7 @@ void do_wallops( const char *origin, const char *message )
 		c = FindUser( origin );
 		if( c )
 		{
-			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+			cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 			cmdparams->source = c;
 			cmdparams->param = ( char * )message;
 			SendAllModuleEvent( EVENT_WALLOPS, cmdparams );
@@ -1319,7 +1319,7 @@ void do_chatops( const char *origin, const char *message )
 		c = FindUser( origin );
 		if( c )
 		{
-			cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+			cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 			cmdparams->source = c;
 			cmdparams->param = ( char * )message;
 			SendAllModuleEvent( EVENT_CHATOPS, cmdparams );
@@ -1381,7 +1381,7 @@ void do_pong( const char *origin, const char *destination )
 			s->server->ping -= me.ulag;
 		if( IsMe( s ) )
 			me.ulag = me.s->server->ping;
-		cmdparams =( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+		cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 		cmdparams->source = s;
 		SendAllModuleEvent( EVENT_PONG, cmdparams );
 		ns_free( cmdparams );
@@ -1702,7 +1702,7 @@ void do_snetinfo( const char *maxglobalcnt, const char *tsendsync, const char *p
 void do_join( const char *nick, const char *chanlist, const char *keys )
 {
 	char *s, *t;
-	t =( char *)chanlist;
+	t = ( char *)chanlist;
 	while( *( s = t ) ) {
 		t = s + strcspn( s, "," );
 		if( *t )
@@ -2145,11 +2145,12 @@ void do_svsnick( const char *oldnick, const char *newnick, const char *ts )
 	do_nickchange( oldnick, newnick, ts );
 }
 
-/** @brief 
+/** @brief do_sethost
  *
- *  
+ *  SETHOST handler
  *
- *  @param 
+ *  @param nick of user to change
+ *  @param host to change to
  *
  *  @return none
  */
@@ -2167,11 +2168,12 @@ void do_sethost( const char *nick, const char *host )
 	}
 }
 
-/** @brief 
+/** @brief do_setident
  *
- *  
+ *  SETIDENT handler
  *
- *  @param 
+ *  @param nick of user to change
+ *  @param ident to change to
  *
  *  @return none
  */
@@ -2189,11 +2191,12 @@ void do_setident( const char *nick, const char *ident )
 	}
 }
 
-/** @brief 
+/** @brief do_chghost
  *
- *  
+ *  CHGHOST handler
  *
- *  @param 
+ *  @param nick of user to change
+ *  @param host to change to
  *
  *  @return none
  */
@@ -2203,19 +2206,21 @@ void do_chghost( const char *nick, const char *host )
 	Client *u;
 
 	u = FindUser( nick );
-	if( u ) {
-		dlog( DEBUG1, "do_chghost: setting host of user %s to %s", nick, host );
-		strlcpy( u->user->hostname,( char *)host, MAXHOST );
-	} else {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "do_chghost: user %s not found", nick );
+		return;
 	}
+	dlog( DEBUG1, "do_chghost: setting host of user %s to %s", nick, host );
+	strlcpy( u->user->hostname,( char *)host, MAXHOST );
 }
 
-/** @brief 
+/** @brief do_chgident
  *
- *  
+ *  CHGIDENT handler
  *
- *  @param 
+ *  @param nick of user to change
+ *  @param ident to change to
  *
  *  @return none
  */
@@ -2225,19 +2230,21 @@ void do_chgident( const char *nick, const char *ident )
 	Client *u;
 
 	u = FindUser( nick );
-	if( u ) {
-		dlog( DEBUG1, "do_chgident: setting ident of user %s to %s", nick, ident );
-		strlcpy( u->user->username,( char *)ident, MAXHOST );
-	} else {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "do_chgident: user %s not found", nick );
+		return;
 	}
+	dlog( DEBUG1, "do_chgident: setting ident of user %s to %s", nick, ident );
+	strlcpy( u->user->username,( char *)ident, MAXHOST );
 }
 
-/** @brief 
+/** @brief do_chgname
  *
- *  
+ *  CHGNAME handler
  *
- *  @param 
+ *  @param nick of user to change
+ *  @param realname to change to
  *
  *  @return none
  */
@@ -2247,28 +2254,11 @@ void do_chgname( const char *nick, const char *realname )
 	Client *u;
 
 	u = FindUser( nick );
-	if( u ) {
-		dlog( DEBUG1, "do_chgname: setting realname of user %s to %s", nick, realname );
-		strlcpy( u->info,( char *)realname, MAXHOST );
-	} else {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "do_chgname: user %s not found", nick );
+		return;
 	}
+	dlog( DEBUG1, "do_chgname: setting realname of user %s to %s", nick, realname );
+	strlcpy( u->info,( char *)realname, MAXHOST );
 }
-
-/** @brief 
- *
- *  
- *
- *  @param 
- *
- *  @return none
- */
-
-MODULEFUNC void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts );
-MODULEFUNC void send_rakill( const char *source, const char *host, const char *ident );
-MODULEFUNC void send_sqline( const char *source, const char *mask, const char *reason );
-MODULEFUNC void send_unsqline( const char *source, const char *mask );
-MODULEFUNC void send_sgline( const char *source, const char *mask, const char *reason );
-MODULEFUNC void send_unsgline( const char *source, const char *mask );
-MODULEFUNC void send_zline( const char *source, const char *mask, const char *reason );
-MODULEFUNC void send_unzline( const char *source, const char *mask );

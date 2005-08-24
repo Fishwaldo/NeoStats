@@ -465,7 +465,7 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 			if( target ) {
 				if( tarindex >= targsize )
 					return( -1 );
-				target[tarindex] =( unsigned char )( pos - Base64 ) << 2;
+				target[tarindex] = ( unsigned char )( pos - Base64 ) << 2;
 			}
 			state = 1;
 			break;
@@ -474,7 +474,7 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 				if( tarindex + 1 >= targsize )
 					return( -1 );
 				target[tarindex]   |= ( pos - Base64 ) >> 4;
-				target[tarindex+1]  =( unsigned char )( ( pos - Base64 ) & 0x0f )
+				target[tarindex+1]  = ( unsigned char )( ( pos - Base64 ) & 0x0f )
 							<< 4 ;
 			}
 			tarindex++;
@@ -485,7 +485,7 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 				if( tarindex + 1 >= targsize )
 					return( -1 );
 				target[tarindex]   |= ( pos - Base64 ) >> 2;
-				target[tarindex+1]  =( unsigned char )( ( pos - Base64 ) & 0x03 )
+				target[tarindex+1]  = ( unsigned char )( ( pos - Base64 ) & 0x03 )
 							<< 6;
 			}
 			tarindex++;
@@ -495,7 +495,7 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 			if( target ) {
 				if( tarindex >= targsize )
 					return( -1 );
-				target[tarindex] |=( pos - Base64 );
+				target[tarindex] |= ( pos - Base64 );
 			}
 			tarindex++;
 			state = 0;

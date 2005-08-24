@@ -194,9 +194,8 @@ static int AccessDel( const CmdParams *cmdparams )
 	node = hash_lookup( accesshash, cmdparams->av[1] );
 	if( node ) 
 	{
-		AccessEntry *access =( AccessEntry * )hnode_get( node );
-		hash_delete( accesshash, node );
-		hnode_destroy( node );
+		AccessEntry *access = ( AccessEntry * )hnode_get( node );
+		hash_delete_destroy_node( accesshash, node );
 		ns_free( access );
 		DBADelete( "AccessList", cmdparams->av[1] );
 		irc_prefmsg( NULL, cmdparams->source, "Deleted %s from access list", cmdparams->av[1] );
@@ -319,7 +318,7 @@ int ModAuthUser( const Client *u )
 	AccessEntry *access;
 
 	dlog( DEBUG2, "ModAuthUser for %s", u->name );
-	access =( AccessEntry *)hnode_find( accesshash, u->name );
+	access = ( AccessEntry *)hnode_find( accesshash, u->name );
 	if( access) 
 	{
 		ircsnprintf( hostmask, USERHOSTLEN, "%s@%s", u->user->username, u->user->hostname );

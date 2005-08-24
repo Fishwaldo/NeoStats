@@ -83,7 +83,7 @@ int ctcp_private( CmdParams *cmdparams )
 			len = strlen( cmd->cmd );
 			if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )
 			{
-				cmdparams->param +=( len + 1 );		
+				cmdparams->param += ( len + 1 );		
 				if( cmd->req_handler ) {
 					cmd->req_handler( cmdparams );
 				}
@@ -107,7 +107,7 @@ int ctcp_notice( CmdParams *cmdparams )
 			len = strlen( cmd->cmd );
 			if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )
 			{
-				cmdparams->param +=( len + 1 );		
+				cmdparams->param += ( len + 1 );		
 				if( cmd->rpl_handler ) {
 					cmd->rpl_handler( cmdparams );
 				}

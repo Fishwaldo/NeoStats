@@ -412,7 +412,7 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 				char *s, *t;
 				char modechar = 0;
 			
-				t =( char *)argv[param];
+				t = ( char *)argv[param];
 				while( *( s = t ) ) {
 					t = s + strcspn( s, "," );
 					if( *t )

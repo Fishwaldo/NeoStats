@@ -110,7 +110,7 @@ static void DCCChatDisconnect( Client *dcc )
 
 static void DCCGotAddr( void *data, adns_answer *a )
 {
-	Client *u =( Client * )data;
+	Client *u = ( Client * )data;
 
 	if( a && a->nrrs > 0 && u && a->status == adns_s_ok )
 	{
@@ -157,7 +157,7 @@ int irc_dccmsgall( const char *fmt, ...)
 
 	dccnode = list_first( dcclist );
 	while( dccnode ) {
-		todcc =( Client * )lnode_get( dccnode );
+		todcc = ( Client * )lnode_get( dccnode );
 		dcc_write( todcc, buf );
 		dccnode = list_next( dcclist, dccnode );
 	}
@@ -168,8 +168,8 @@ static int dcc_parse( void *arg, void *rline, size_t len )
 {
 	static char buf[BUFSIZE];
 	char *cmd;
-	char *line =( char * )rline;
-	Client *dcc =( Client * )arg;
+	char *line = ( char * )rline;
+	Client *dcc = ( Client * )arg;
 	CmdParams *cmdparams;
 
 	strcpy( buf, line );
@@ -183,7 +183,7 @@ static int dcc_parse( void *arg, void *rline, size_t len )
 		}
    		*cmd = 0;
    		cmd++;
-		cmdparams =( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
+		cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 		cmdparams->source = dcc;
 		if( cmdparams->source ) {
 			cmdparams->target = FindUser( buf + 1 );
@@ -236,7 +236,7 @@ void dcc_send_msg( const Client* dcc, char * buf )
 
 static int dcc_error( int sock_no, void *name )
 {
-	Sock *sock =( Sock * )name;
+	Sock *sock = ( Sock * )name;
 	if( sock->data )
 		DelDCCClient( sock->data );
 	else
@@ -256,7 +256,7 @@ int dcc_req( CmdParams* cmdparams )
 		len = strlen( cmd->cmd );
 		if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )
 		{
-			cmdparams->param +=( len + 1 );		
+			cmdparams->param += ( len + 1 );		
 			if( cmd->req_handler )
 				cmd->req_handler( cmdparams );
 			return NS_SUCCESS;
@@ -321,7 +321,7 @@ void FiniDCC( void )
 	dccnode = list_first( dcclist );
 	while( dccnode )
 	{
-		dcc =( Client * )lnode_get( dccnode );
+		dcc = ( Client * )lnode_get( dccnode );
 		DCCChatDisconnect( dcc );
 		ns_free( dcc );
 		dccnode = list_next( dcclist, dccnode );

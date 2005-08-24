@@ -914,8 +914,7 @@ int DelSock( Sock *sock )
 	if( ( sn = hash_lookup( sockethash, sock->name ) ) != NULL ) {
 		sock = hnode_get( sn );
 		dlog( DEBUG2, "DelSock: deleting socket %s from module %s", sock->name, sock->moduleptr->info->name );
-		hash_delete( sockethash, sn );
-		hnode_destroy( sn );
+		hash_delete_destroy_node( sockethash, sn );
 		ns_free( sock );
 		return NS_SUCCESS;
 	}
@@ -945,8 +944,7 @@ del_sockets (Module *mod_ptr)
 		{
 			dlog( DEBUG1, "del_sockets: deleting socket %s from module %s", sock->name, mod_ptr->info->name );
    			CloseSock( sock );
-			hash_scan_delete( sockethash, socknode );
-			hnode_destroy( socknode );
+			hash_scan_delete_destroy_node( sockethash, socknode );
 			ns_free( sock );
 		}
 	}

@@ -151,24 +151,24 @@ static void ManageLimit( char *name, int users, int curlimit, int add )
 
 static void JoinChannels( void )
 {
-       ls_channel *db;
-       hnode_t *hn;
-       hscan_t hs;
+	ls_channel *db;
+	hnode_t *hn;
+	hscan_t hs;
 
-       hash_scan_begin( &hs, qshash );
-       while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
-       {
-               Channel *c;
+	hash_scan_begin( &hs, qshash );
+	while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+	{
+		Channel *c;
 
-               db =( ( ls_channel * )hnode_get( hn ) );
-               c = FindChannel( db->name );
-               if( c )
-               {
-                       if( joinchannels )
-                               irc_join (ls_bot, db->name, "+o");
-                       ManageLimit( db->name, c->users, 0, 1 );
-               }
-       }
+		db = ( ( ls_channel * )hnode_get( hn ) );
+		c = FindChannel( db->name );
+		if( c )
+		{
+			if( joinchannels )
+				irc_join (ls_bot, db->name, "+o");
+			ManageLimit( db->name, c->users, 0, 1 );
+		}
+	}
 }
 
 /** @brief PartChannels
@@ -189,7 +189,7 @@ static void PartChannels( void )
 	hash_scan_begin( &hs, qshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
 	{
-		db =( ( ls_channel * )hnode_get( hn ) );
+		db = ( ( ls_channel * )hnode_get( hn ) );
 		if( FindChannel( db->name ) )
 			irc_part( ls_bot, db->name, NULL);
 	}
@@ -273,9 +273,8 @@ int ModFini( void )
 	hash_scan_begin( &hs, qshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL )
 	{
-		db =( ( ls_channel * )hnode_get( hn ) );
-		hash_delete( qshash, hn );
-		hnode_destroy( hn );
+		db = ( ( ls_channel * )hnode_get( hn ) );
+		hash_delete_destroy_node( qshash, hn );
 		ns_free( db );
 	}
 	hash_destroy( qshash );
@@ -339,7 +338,7 @@ static int cmd_list( CmdParams *cmdparams )
 	irc_prefmsg( ls_bot, cmdparams->source, "channels" );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL )
 	{
-		db =( ( ls_channel * )hnode_get( hn ) );
+		db = ( ( ls_channel * )hnode_get( hn ) );
 		irc_prefmsg( ls_bot, cmdparams->source, "%s", db->name );
 	}
 	irc_prefmsg( ls_bot, cmdparams->source, "End of list." );
@@ -366,17 +365,16 @@ static int cmd_del( CmdParams *cmdparams )
 	hash_scan_begin( &hs, qshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL )
 	{
-		db =( ls_channel * )hnode_get( hn );
+		db = ( ls_channel * )hnode_get( hn );
 		if( ircstrcasecmp( db->name, cmdparams->av[0] ) == 0 )
 		{
-			hash_scan_delete( qshash, hn );
 			irc_prefmsg( ls_bot, cmdparams->source, 
 				"Deleted %s from the channel list", cmdparams->av[0] );
 			CommandReport( ls_bot, "%s deleted %s from the channel list",
 				cmdparams->source->name, cmdparams->av[0] );
 			nlog( LOG_NOTICE, "%s deleted %s from the channel list",
 				cmdparams->source->name, cmdparams->av[0] );
-			hnode_destroy( hn );
+			hash_scan_delete_destroy_node( qshash, hn );
 			DBADelete( "channels", db->name );
 			ns_free( db );
 			return NS_SUCCESS;
@@ -468,7 +466,7 @@ static int set_limitbuffer_cb( CmdParams* cmdparams, SET_REASON reason )
 		while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
 		{
 			Channel *c;
-			db =( ( ls_channel * )hnode_get( hn ) );
+			db = ( ( ls_channel * )hnode_get( hn ) );
 			c = FindChannel( db->name );
 			if( c )
 				ManageLimit( db->name, c->users, cmdparams->channel->limit, 1 );

@@ -135,7 +135,7 @@ int SynchModule( Module* module_ptr )
 		ModSynch = ns_dlsym( ( int * ) module_ptr->handle, "ModSynch" );
 		if( ModSynch ) {
 			SET_RUN_LEVEL( module_ptr );
-			err =( *ModSynch )(); 
+			err = ( *ModSynch )(); 
 			RESET_RUN_LEVEL();
 		}
 		SET_SEGV_LOCATION();
@@ -305,7 +305,7 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 		return NULL;
 	}
 	/* Allocate module */
-	mod_ptr =( Module * ) ns_calloc( sizeof( Module ) );
+	mod_ptr = ( Module * ) ns_calloc( sizeof( Module ) );
 	dlog( DEBUG1, "Module internal name: %s", infoptr->name );
 	dlog( DEBUG1, "Module description: %s", infoptr->description );
 	mod_ptr->info = infoptr;
@@ -340,7 +340,7 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL( mod_ptr );
 	DBAOpenDatabase();
-	err =( *ModInit )(); 
+	err = ( *ModInit )(); 
 	RESET_RUN_LEVEL();
 	if( err < 1 || IsModuleError( mod_ptr ) ) {
 		load_module_error( u, modfilename, __( "See %s.log for further information.",u ), mod_ptr->info->name );
@@ -363,7 +363,7 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 		}
 	}
 	cmd = ns_calloc( sizeof( CmdParams ) );
-	cmd->param =( char* )infoptr->name;
+	cmd->param = ( char* )infoptr->name;
 	SendAllModuleEvent( EVENT_MODULELOAD, cmd );
 	ns_free( cmd );
 	if( u ) {
@@ -530,8 +530,7 @@ int unload_module( const char *modname, Client * u )
 	 * during signoff 
 	 */
 	dlog( DEBUG1, "Deleting Module %s from Hash", modname );
-	hash_delete( modulehash, modnode );		
-	hnode_destroy( modnode );
+	hash_delete_destroy_node( modulehash, modnode );		
 
 	/* now determine if its perl, or standard module */
 	if( IS_STD_MOD( mod_ptr ) ) {
@@ -560,7 +559,7 @@ int unload_module( const char *modname, Client * u )
 		FiniModExcludes( mod_ptr );
 	}
 	cmdparams = ns_calloc( sizeof( CmdParams ) );
-	cmdparams->param =( char* )modname;
+	cmdparams->param = ( char* )modname;
 	SendAllModuleEvent( EVENT_MODULEUNLOAD, cmdparams );
 	ns_free( cmdparams );
 	RESET_RUN_LEVEL();
@@ -576,6 +575,10 @@ int unload_module( const char *modname, Client * u )
 		unload_perlmod( mod_ptr );
 #endif
 	}
+	/* Cleanup moddata */
+	CleanupUserModdata( moduleindex );
+	CleanupServerModdata( moduleindex );
+	CleanupChannelModdata( moduleindex );
 	RESET_RUN_LEVEL();
 	ns_free( mod_ptr );
 	/* free the module number */
@@ -583,10 +586,6 @@ int unload_module( const char *modname, Client * u )
 		dlog( DEBUG1, "Free %d from Module Numbers", moduleindex );
 		ModList[moduleindex] = NULL;
 	}
-	/* Cleanup moddata */
-	CleanupUserModdata( moduleindex );
-	CleanupServerModdata( moduleindex );
-	CleanupChannelModdata( moduleindex );
 	return NS_SUCCESS;
 }
 
@@ -630,7 +629,7 @@ int ModuleConfig( bot_setting* set_ptr )
 		switch( set_ptr->type ) {
 			case SET_TYPE_BOOLEAN:
 				if( DBAFetchConfigBool( set_ptr->option, set_ptr->varptr ) != NS_SUCCESS ) {
-					*( int * )set_ptr->varptr =( int )set_ptr->defaultval;
+					*( int * )set_ptr->varptr = ( int )set_ptr->defaultval;
 					DBAStoreConfigBool( set_ptr->option, set_ptr->varptr );
 				}
 				if( set_ptr->handler ) {
@@ -639,7 +638,7 @@ int ModuleConfig( bot_setting* set_ptr )
 				break;
 			case SET_TYPE_INT:
 				if( DBAFetchConfigInt( set_ptr->option, set_ptr->varptr ) != NS_SUCCESS ) {
-					*( int * )set_ptr->varptr =( int )set_ptr->defaultval;
+					*( int * )set_ptr->varptr = ( int )set_ptr->defaultval;
 					DBAStoreConfigInt( set_ptr->option, set_ptr->varptr );
 				}
 				if( set_ptr->handler ) {

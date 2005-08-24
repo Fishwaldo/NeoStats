@@ -91,7 +91,7 @@ void PostLoadStatistic( statistic *stat )
 
 void AverageStatisticEntry( statisticentry *stat, unsigned int current )
 {
-	stat->average =( stat->max + current ) / 2;
+	stat->average = ( stat->max + current ) / 2;
 }
 
 /** @brief AverageStatistic

@@ -545,8 +545,7 @@ static int del_bot_setting( hash_t *set_hash, bot_setting *set_ptr )
 	
 	setnode = hash_lookup( set_hash, set_ptr->option );
 	if( setnode ) {
-		hash_delete( set_hash, setnode );
-		hnode_destroy( setnode );
+		hash_delete_destroy_node( set_hash, setnode );
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -636,8 +635,7 @@ int del_all_bot_settings( Bot *bot_ptr )
 	/* Cycle through command hash and delete each command */
 	hash_scan_begin( &hs, bot_ptr->botsettings );
 	while( ( setnode = hash_scan_next( &hs ) ) != NULL ) {
-		hash_delete( bot_ptr->botsettings, setnode );
-		hnode_destroy( setnode );
+		hash_scan_delete_destroy_node( bot_ptr->botsettings, setnode );
 	}
 	/* Destroy command */
 	hash_destroy( bot_ptr->botsettings );

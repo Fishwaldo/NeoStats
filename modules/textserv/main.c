@@ -527,8 +527,7 @@ void PartBot( dbbot *db )
 		{
 			channame = ( ( char * )hnode_get( hn ) );
 			irc_part( db->botptr, channame, "" );
-			hash_delete( db->chanhash, hn );
-			hnode_destroy( hn );
+			hash_scan_delete_destroy_node( db->chanhash, hn );
 			ns_free( channame );
 		}
 		irc_quit( db->botptr, "" );
@@ -590,7 +589,7 @@ static int load_botchanentry( void *data, int size )
 	hn = hash_lookup( tshash, bce->name );
 	if( hn != NULL )
 	{
-		db =( ( dbbot * )hnode_get( hn ) );
+		db = ( ( dbbot * )hnode_get( hn ) );
 		if( hash_lookup( db->chanhash, bce->channel) == NULL ) 
 		{
 			channame = ns_calloc( MAXCHANLEN );
@@ -645,7 +644,7 @@ int ModSynch( void )
 	hash_scan_begin( &hs, tshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL )
 	{
-		db =( ( dbbot * )hnode_get( hn ) );
+		db = ( ( dbbot * )hnode_get( hn ) );
 		JoinBot( db );
 	}
 	return NS_SUCCESS;
@@ -669,10 +668,9 @@ int ModFini( void )
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, tshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		db =( ( dbbot * )hnode_get( hn ) );
+		db = ( ( dbbot * )hnode_get( hn ) );
 		PartBot( db );
-		hash_delete( tshash, hn );
-		hnode_destroy( hn );
+		hash_scan_delete_destroy_node( tshash, hn );
 		ns_free( db );
 	}
 	hash_destroy( tshash );
@@ -776,7 +774,7 @@ static int ts_cmd_list( CmdParams *cmdparams )
 	hash_scan_begin( &hs, tshash );
 	irc_prefmsg( ts_bot, cmdparams->source, "Bots" );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		db =( ( dbbot * )hnode_get( hn ) );
+		db = ( ( dbbot * )hnode_get( hn ) );
 		irc_prefmsg( ts_bot, cmdparams->source, "%s (%s@%s), %s, %s, %s", db->tsbot.botname, db->tsbot.botuser, db->tsbot.bothost, db->tsbot.public ? "Public" : "Private", db->tsbot.dbname, db->tsbot.channel );
 	}
 	irc_prefmsg( ts_bot, cmdparams->source, "End of list." );
@@ -804,7 +802,7 @@ static int ts_cmd_del( CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, tshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		db =( dbbot * )hnode_get( hn );
+		db = ( dbbot * )hnode_get( hn );
 		if( ircstrcasecmp( db->tsbot.botname, cmdparams->av[0] ) == 0 ) {
 			hash_scan_begin( &hs2, db->chanhash );
 			while( ( hn2 = hash_scan_next( &hs2 ) ) != NULL )
@@ -817,14 +815,13 @@ static int ts_cmd_del( CmdParams *cmdparams )
 				ns_free( botchan );
 			}
 			PartBot( db );
-			hash_scan_delete( tshash, hn );
 			irc_prefmsg( ts_bot, cmdparams->source, 
 				"Deleted %s from the Bot list", cmdparams->av[0] );
 			CommandReport( ts_bot, "%s deleted %s from the Bot list",
 				cmdparams->source->name, cmdparams->av[0] );
 			nlog( LOG_NOTICE, "%s deleted %s from the Bot list",
 				cmdparams->source->name, cmdparams->av[0] );
-			hnode_destroy( hn );
+			hash_scan_delete_destroy_node( tshash, hn );
 			DBADelete( "Bots", db->tsbot.botname );
 			ns_free( db );
 			return NS_SUCCESS;
@@ -1001,8 +998,7 @@ static int ts_cmd_del_chan( CmdParams *cmdparams )
 	strlcpy( botchan, db->tsbot.botname, MAXNICK+MAXCHANLEN );
 	strlcat( botchan, channame, MAXNICK+MAXCHANLEN );
 	DBADelete( "BotChans", botchan );
-	hash_delete( db->chanhash, hn );
-	hnode_destroy( hn );
+	hash_delete_destroy_node( db->chanhash, hn );
 	ns_free( channame );
 	ns_free( botchan );
 	return NS_SUCCESS;

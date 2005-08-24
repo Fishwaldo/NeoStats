@@ -914,3 +914,21 @@ hnode_t *hnode_find (hash_t * hash, const void *key)
 	}
 	return hnode_get (hn);
 }
+
+/*
+ * Delete node from hash and free it
+ */
+void hash_delete_destroy_node( hash_t *hash, hnode_t *node )
+{
+	hash_delete( hash, node );
+	hnode_destroy( node );
+}
+
+/*
+ * Delete node from hash and free it
+ */
+void hash_scan_delete_destroy_node( hash_t *hash, hnode_t *node )
+{
+	hash_scan_delete( hash, node );
+	hnode_destroy( node );
+}

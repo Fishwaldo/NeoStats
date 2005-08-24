@@ -978,6 +978,10 @@ typedef struct _Module {
 	unsigned int modnum;
 	/** status flag for synch, error, etc */
 	unsigned int status;
+	/** moddata flags */
+	unsigned int userdatacnt;
+	unsigned int serverdatacnt;
+	unsigned int channeldatacnt;
 #ifdef USE_PERL
 	MOD_TYPE modtype;
 	struct PerlModInfo *pm;
@@ -1013,7 +1017,7 @@ EXPORTVAR extern int RunLevel;
 /* Get current run level module pointer */
 #define GET_CUR_MODULE() RunModule[RunLevel]
 /* Get current run level module index */
-#define GET_CUR_MODNUM() RunModule[RunLevel]->modnum
+#define GET_CUR_MODULE_INDEX() RunModule[RunLevel]->modnum
 /* Get current run level module name */
 #define GET_CUR_MODNAME() RunModule[RunLevel]->info->name
 /* Get current run level module version */

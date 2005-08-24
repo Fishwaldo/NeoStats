@@ -35,6 +35,8 @@
 #include "ctcp.h"
 #include "exclude.h"
 
+#define IS_CTCP_MSG( msg ) ( msg[0] == '\1' )
+
 #define BOT_TABLE_SIZE		100		/* Max number of bots */
 #define NICK_TRIES			5		/* Number of attempts for nick generation */
 
@@ -93,12 +95,14 @@ static int flood_test( Client *u )
 	if( UserLevel( u ) >= NS_ULEVEL_OPER )	
 		return NS_FALSE;
 	/* calculate and test flood values */
-	if( ( me.now - u->user->tslastmsg ) > nsconfig.msgsampletime ) {
+	if( ( me.now - u->user->tslastmsg ) > nsconfig.msgsampletime )
+	{
 		u->user->tslastmsg = me.now;
 		u->user->flood = 0;
 		return NS_FALSE;
 	}
-	if( u->user->flood >= nsconfig.msgthreshold ) {
+	if( u->user->flood >= nsconfig.msgthreshold )
+	{
 		nlog( LOG_NORMAL, "FLOODING: %s!%s@%s", u->name, u->user->username, u->user->hostname );
 		irc_svskill( ns_botptr, u, _( "%s!%s (Flooding Services)" ), me.name, ns_botptr->name );
 		return NS_TRUE;
@@ -197,24 +201,30 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 	char *chan;
 
 	SET_SEGV_LOCATION();
-	if( cmdparams->param[0] == nsconfig.cmdchar[0] ) {
+	if( cmdparams->param[0] == nsconfig.cmdchar[0] )
+	{
 		/* skip over command char */
 		cmdparams->param ++;
 		cmdflag = 1;
 	}
 	hash_scan_begin( &bs, bothash );
-	while( ( bn = hash_scan_next( &bs ) ) != NULL ) {
+	while( ( bn = hash_scan_next( &bs ) ) != NULL )
+	{
 		botptr = hnode_get( bn );
 		/* Use an internal flag for handling DEAF so we can fake support
 		 * on IRCd's which do not have the mode natively
 		 */
-		if( !( botptr->flags & BOT_FLAG_DEAF ) ) {
+		if( !( botptr->flags & BOT_FLAG_DEAF ) )
+		{
 			cm = list_first( botptr->u->user->chans );
-			while( cm ) {	
+			while( cm )
+			{	
 				chan = ( char * ) lnode_get( cm );
 				cmdparams->bot = botptr;
-				if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 ) {
-					if( !cmdflag || !( botptr->flags & BOT_FLAG_SERVICEBOT ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS ) {
+				if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 )
+				{
+					if( !cmdflag || !( botptr->flags & BOT_FLAG_SERVICEBOT ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS )
+					{
 						/* Reset message if we have stripped cmdchar */
 						if( cmdflag )
 							cmdparams->param --;
@@ -250,13 +260,18 @@ void bot_notice( char *origin, char **av, int ac )
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 	/* Check origin validity */
-	if( process_origin( cmdparams, origin ) ) {
+	if( process_origin( cmdparams, origin ) )
+	{
 		/* Find target bot */
-		if( process_target_user( cmdparams, av[0] ) ) {
+		if( process_target_user( cmdparams, av[0] ) )
+		{
 			cmdparams->param = av[ac - 1];
-			if( av[ac - 1][0] == '\1' ) {
+			if( IS_CTCP_MSG( cmdparams->param ) )
+			{
 				ctcp_notice( cmdparams );
-			} else {
+			}
+			else
+			{
 				SendModuleEvent( EVENT_NOTICE, cmdparams, cmdparams->bot->moduleptr );
 			}
 		}		
@@ -282,12 +297,17 @@ void bot_chan_notice( char *origin, char **av, int ac )
 
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof(CmdParams ) );
-	if( process_origin( cmdparams, origin ) ) {
-		if( process_target_chan( cmdparams, av[0] ) ) {
+	if( process_origin( cmdparams, origin ) )
+	{
+		if( process_target_chan( cmdparams, av[0] ) )
+		{
 			cmdparams->param = av[ac - 1];
-			if( av[ac - 1][0] == '\1' ) {
+			if( IS_CTCP_MSG( cmdparams->param ) )
+			{
 				ctcp_cnotice( cmdparams );
-			} else {
+			}
+			else
+			{
 				bot_chan_event( EVENT_CNOTICE, cmdparams );
 			}
 		}
@@ -313,16 +333,22 @@ void bot_private( char *origin, char **av, int ac )
 
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof(CmdParams ) );
-	if( process_origin( cmdparams, origin ) ) {
+	if( process_origin( cmdparams, origin ) )
+	{
 		/* Find target bot */
-		if( process_target_user( cmdparams, av[0] ) ) {
+		if( process_target_user( cmdparams, av[0] ) )
+		{
 			cmdparams->param = av[ac - 1];
 			/* Check CTCP first to avoid Unknown command messages later */
-			if( av[ac - 1][0] == '\1' ) {
+			if( IS_CTCP_MSG( cmdparams->param ) )
+			{
 				ctcp_private( cmdparams );
-			} else {
+			}
+			else
+			{
 				if( !( cmdparams->bot->flags & BOT_FLAG_SERVICEBOT ) ||
-					run_bot_cmd( cmdparams, 0 ) == NS_FAILURE ) {
+					run_bot_cmd( cmdparams, 0 ) == NS_FAILURE )
+				{
 					SendModuleEvent( EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr );
 				}
 			}
@@ -349,12 +375,17 @@ void bot_chan_private( char *origin, char **av, int ac )
 
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof(CmdParams ) );
-	if( process_origin( cmdparams, origin ) ) {
-		if( process_target_chan( cmdparams, av[0] ) ) {
+	if( process_origin( cmdparams, origin ) )
+	{
+		if( process_target_chan( cmdparams, av[0] ) )
+		{
 			cmdparams->param = av[ac - 1];
-			if( av[ac - 1][0] == '\1' ) {
+			if( IS_CTCP_MSG( cmdparams->param ) )
+			{
 				ctcp_cprivate( cmdparams );
-			} else {
+			}
+			else
+			{
 				bot_chan_event( EVENT_CPRIVATE, cmdparams );
 			}
 		}
@@ -377,9 +408,8 @@ Bot *FindBot( const char *bot_name )
 
 	SET_SEGV_LOCATION(); 
 	bot = ( Bot * ) hnode_find( bothash, bot_name );
-	if( !bot ) {
+	if( !bot )
 		dlog( DEBUG3, "FindBot: %s not found", bot_name );
-	}
 	return bot;
 }
 
@@ -400,15 +430,16 @@ int DelBot( const char *bot_name )
 
 	SET_SEGV_LOCATION();
 	bn = hash_lookup( bothash, bot_name );
-	if( !bn ) {
+	if( !bn )
+	{
+		nlog( LOG_WARNING, "DelBot: %s not found", bot_name );
 		return NS_FAILURE;
 	}
 	botptr = hnode_get( bn );
 	del_all_bot_cmds( botptr );
 	del_bot_info_settings( botptr );
 	del_all_bot_settings( botptr );
-	hash_delete( bothash, bn );
-	hnode_destroy( bn );
+	hash_delete_destroy_node( bothash, bn );
 	ns_free( botptr );
 	return NS_SUCCESS;
 }
@@ -430,8 +461,9 @@ int BotNickChange( const Bot *botptr, const char *newnick )
 
 	SET_SEGV_LOCATION();
 	bn = hash_lookup( bothash, botptr->name );
-	if( !bn ) {
-		nlog( LOG_NOTICE, "BotNickChange: Couldn't find bot %s in bot list", botptr->name );
+	if( !bn )
+	{
+		nlog( LOG_WARNING, "BotNickChange: %s not found", botptr->name );
 		return NS_FAILURE;
 	}
 	/* remove old hash entry */
@@ -463,17 +495,18 @@ int ns_cmd_botlist( CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Module Bot List:", cmdparams->source ) );
 	hash_scan_begin( &bs, bothash );
-	while( ( bn = hash_scan_next( &bs ) ) != NULL ) {
+	while( ( bn = hash_scan_next( &bs ) ) != NULL )
+	{
 		botptr = hnode_get( bn );
-		if( ( botptr->flags & 0x80000000 ) ) {
+		if( ( botptr->flags & 0x80000000 ) )
 			irc_prefmsg( ns_botptr, cmdparams->source, __( "NeoStats", cmdparams->source ) );
-		} else {
+		else
 			irc_prefmsg( ns_botptr, cmdparams->source, __( "Module: %s", cmdparams->source ), botptr->moduleptr->info->name );
-		}
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Bot: %s", cmdparams->source ), botptr->name );
 		cm = list_first( botptr->u->user->chans );
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels:", cmdparams->source ) );
-		while( cm ) {
+		while( cm )
+		{
 			irc_prefmsg( ns_botptr, cmdparams->source, "    %s", ( char * ) lnode_get( cm ) );
 			cm = list_next( botptr->u->user->chans, cm );
 		}
@@ -499,9 +532,11 @@ void DelModuleBots( Module *mod_ptr )
 	hscan_t hscan;
 
 	hash_scan_begin( &hscan, bothash );
-	while( ( modnode = hash_scan_next( &hscan ) ) != NULL ) {
+	while( ( modnode = hash_scan_next( &hscan ) ) != NULL )
+	{
 		botptr = hnode_get( modnode );
-		if( botptr->moduleptr == mod_ptr ) {
+		if( botptr->moduleptr == mod_ptr )
+		{
 			dlog( DEBUG1, "Deleting module %s bot %s", mod_ptr->info->name, botptr->name );
 			irc_quit( botptr, _( "Module Unloaded" ) );
 		}
@@ -524,7 +559,8 @@ static Bot *new_bot( const char *bot_name )
 	Bot *botptr;
 
 	SET_SEGV_LOCATION();
-	if( hash_isfull( bothash ) ) {
+	if( hash_isfull( bothash ) )
+	{
 		nlog( LOG_CRITICAL, "new_bot: Failed to create bot %s, bot list is full", bot_name );
 		return NULL;
 	}
@@ -679,18 +715,21 @@ Bot *AddBot( BotInfo *botinfo )
 
 	SET_SEGV_LOCATION();
 	modptr = GET_CUR_MODULE();
-	if( !IsModuleInSynch( modptr ) ) {
+	if( !IsModuleInSynch( modptr ) )
+	{
 		nlog( LOG_WARNING, "Module %s attempted to init a bot %s but is not yet synched", modptr->info->name, botinfo->nick );
 		SetModuleError( modptr );
 		return NULL;
 	}
 	/* In single bot mode, just add all commands and settings to main bot */
-	if( nsconfig.singlebotmode && ns_botptr ) {
+	if( nsconfig.singlebotmode && ns_botptr )
+	{
 		add_bot_cmd_list( ns_botptr, botinfo->bot_cmd_list );
 		add_bot_setting_list( ns_botptr, botinfo->bot_setting_list );
 		return(ns_botptr );
 	}
-	if( GetBotNick( botinfo, nick ) == NS_FAILURE ) {
+	if( GetBotNick( botinfo, nick ) == NS_FAILURE )
+	{
 		nlog( LOG_WARNING, "Failed to find free nick for bot %s", botinfo->nick );
 		return NULL;
 	}
@@ -704,7 +743,8 @@ Bot *AddBot( BotInfo *botinfo )
 	botptr->flags = botinfo->flags;
 	ConnectBot( botptr );
 	/* Only add commands and settings for service bots */
-	if( botptr->flags & BOT_FLAG_SERVICEBOT ) {
+	if( botptr->flags & BOT_FLAG_SERVICEBOT )
+	{
 		add_bot_cmd_list( botptr, botinfo->bot_cmd_list );
 		add_bot_setting_list( botptr, botinfo->bot_setting_list );
 		/* Do not add set botinfo options for root bot */
@@ -745,12 +785,15 @@ void handle_dead_channel( Channel *c )
 	hash_scan_begin( &bs, bothash );
 	cmdparams = ns_calloc( sizeof( CmdParams ) );
 	cmdparams->channel = c;
-	while( ( bn = hash_scan_next( &bs ) ) != NULL ) {
+	while( ( bn = hash_scan_next( &bs ) ) != NULL )
+	{
 		cmdparams->bot = hnode_get( bn );
 		cm = list_first( cmdparams->bot->u->user->chans );
-		while( cm ) {
+		while( cm )
+		{
 			chan = ( char * ) lnode_get( cm );
-			if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 ) {
+			if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 )
+			{
 				/* Force the bot to leave the channel */
 				irc_part( cmdparams->bot, cmdparams->channel->name, NULL );
 				/* Tell the module we kicked them out */
@@ -763,6 +806,17 @@ void handle_dead_channel( Channel *c )
 	ns_free( cmdparams );
 }
 
+/** @brief AllocBotModPtr
+ *
+ *  Allocate memory for a module pointer for a bot
+ *  NeoStats core use only.
+ *
+ *  @param pBot pointer to bot to lookup pointer for
+ *  @param size to allocate
+ *
+ *  @return pointer to allocated memory
+ */
+
 void *AllocBotModPtr( Bot *pBot, int size )
 {
 	void *ptr;
@@ -771,37 +825,85 @@ void *AllocBotModPtr( Bot *pBot, int size )
 	return ptr;
 }
 
+/** @brief FreeBotModPtr
+ *
+ *  Free memory for a module pointer for a bot
+ *  NeoStats core use only.
+ *
+ *  @param pBot pointer to bot to lookup pointer for
+ *
+ *  @return none
+ */
+
 void FreeBotModPtr( Bot *pBot )
 {
-	ns_free( pBot->moddata );
+	if( pBot )
+		ns_free( pBot->moddata );
 }
+
+/** @brief GetBotModPtr
+ *
+ *  Retrieve module pointer for a bot
+ *  NeoStats core use only.
+ *
+ *  @param pBot pointer to bot to lookup pointer for
+ *
+ *  @return none
+ */
 
 void* GetBotModPtr( const Bot *pBot )
 {
-	return pBot->moddata;
+	if( pBot )
+		return pBot->moddata;
+	return NULL;
 }
+
+/** @brief ClearBotModValue
+ *
+ *  Clear module value for a bot
+ *  NeoStats core use only.
+ *
+ *  @param pBot pointer to bot to lookup pointer for
+ *
+ *  @return none
+ */
 
 void ClearBotModValue( Bot *pBot )
 {
 	if( pBot )
-	{
 		pBot->moddata = NULL;
-	}
 }
+
+/** @brief SetBotModValue
+ *
+ *  Set module value for a bot
+ *  NeoStats core use only.
+ *
+ *  @param pBot pointer to bot to lookup pointer for
+ *  @param data pointer to set
+ *
+ *  @return none
+ */
 
 void SetBotModValue( Bot *pBot, void *data )
 {
 	if( pBot )
-	{
 		pBot->moddata = data;
-	}
 }
+
+/** @brief GetBotModValue
+ *
+ *  Retrieve module value for a bot
+ *  NeoStats core use only.
+ *
+ *  @param pBot pointer to bot to lookup pointer for
+ *
+ *  @return none
+ */
 
 void *GetBotModValue( const Bot *pBot )
 {
 	if( pBot )
-	{
 		return pBot->moddata;
-	}
 	return NULL;	
 }

@@ -120,7 +120,7 @@ static serverstat *findserverstats( const char *name )
 {
 	serverstat *stats;
 
-	stats =( serverstat * )hnode_find( serverstathash, name );
+	stats = ( serverstat * )hnode_find( serverstathash, name );
 	if( !stats )
 		dlog( DEBUG2, "findserverstats (%s) - not found", name );
 	return stats;
@@ -255,7 +255,7 @@ static void DelServerStat( Client* s )
 {
 	serverstat *ss;
 	
-	ss =( serverstat * ) GetServerModValue( s );
+	ss = ( serverstat * ) GetServerModValue( s );
 	ss->ts_lastseen = me.now;
 	IncStatistic( &ss->splits );
 	ClearServerModValue( s );
@@ -291,7 +291,7 @@ static void UpdatePingStats( const Client* s )
 {
 	serverstat *ss;
 
-	ss =( serverstat * ) GetServerModValue( s );
+	ss = ( serverstat * ) GetServerModValue( s );
 	if( !ss )
 		return;
 	if( s->server->ping > ss->highest_ping )
@@ -351,7 +351,7 @@ static void makemap( const char *uplink, const Client * u, int level )
 	{
 		s = hnode_get( sn );
 		printf( "%d %s %s (%s)\n", level, s->name, s->uplink ? s->uplink->name : "", uplink );
-		ss =( serverstat * ) GetServerModValue( s );
+		ss = ( serverstat * ) GetServerModValue( s );
 		if( ( level == 0 ) &&( s->uplinkname[0] == 0 ) )
 		{
 			/* its the root server */
@@ -469,9 +469,8 @@ static int ss_server_del( const CmdParams *cmdparams )
 	node = hash_lookup( serverstathash, cmdparams->av[1] );
 	if( node )
 	{
-		ss =( serverstat * )hnode_get( node );
-		hash_delete( serverstathash, node );
-		hnode_destroy( node );
+		ss = ( serverstat * )hnode_get( node );
+		hash_delete_destroy_node( serverstathash, node );
 		ns_free( ss );
 		irc_prefmsg( ss_bot, cmdparams->source, "Removed %s from the database.",
 			cmdparams->av[1] );
@@ -766,8 +765,7 @@ void FiniServerStats( void )
 	{
 		ss = hnode_get( sn );
 		ClearServerModValue( ss->s );
-		hash_scan_delete( serverstathash, sn );
-		hnode_destroy( sn );
+		hash_scan_delete_destroy_node( serverstathash, sn );
 		ns_free( ss );
 	}
 	hash_destroy( serverstathash );

@@ -323,7 +323,7 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 		const char *sethost = NULL;
 		int param;
 
-		modes =( argv[5][0] == '+' ) ? argv[5]: NULL;
+		modes = ( argv[5][0] == '+' ) ? argv[5]: NULL;
 		if( modes ) {
 			param = 6;
 			for( modeptr = modes; *modeptr; ++modeptr ) {

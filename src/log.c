@@ -179,8 +179,7 @@ void CloseLogs( void )
 			fclose( logentry->logfile );
 			logentry->logfile = NULL;
 		}
-		hash_scan_delete( logs, hn );
-		hnode_destroy( hn );
+		hash_scan_delete_destroy_node( logs, hn );
 		ns_free( logentry );
 	}
 }

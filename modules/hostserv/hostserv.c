@@ -493,9 +493,8 @@ int ModFini( void )
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, banhash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		ban =( ( banentry * )hnode_get( hn ) );
-		hash_delete( banhash, hn );
-		hnode_destroy( hn );
+		ban = ( ( banentry * )hnode_get( hn ) );
+		hash_scan_delete_destroy_node( banhash, hn );
 		ns_free( ban );
 	}
 	hash_destroy( banhash );
@@ -554,7 +553,7 @@ static int hs_cmd_bans_list( CmdParams *cmdparams )
 	hash_scan_begin( &hs, banhash );
 	irc_prefmsg( hs_bot, cmdparams->source, "Banned vhosts" );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		ban =( ( banentry * )hnode_get( hn ) );
+		ban = ( ( banentry * )hnode_get( hn ) );
 		irc_prefmsg( hs_bot, cmdparams->source, "%d - %s added by %s for %s", i, ban->host, ban->who, ban->reason );
 		i++;
 	}
@@ -623,16 +622,15 @@ static int hs_cmd_bans_del( CmdParams *cmdparams )
 		return NS_ERR_NEED_MORE_PARAMS;
 	hash_scan_begin( &hs, banhash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		ban =( banentry * )hnode_get( hn );
+		ban = ( banentry * )hnode_get( hn );
 		if( ircstrcasecmp( ban->host, cmdparams->av[1] ) == 0 ) {
-			hash_scan_delete( banhash, hn );
 			irc_prefmsg( hs_bot, cmdparams->source, 
 				"Deleted %s from the banned vhost list", cmdparams->av[1] );
 			CommandReport( hs_bot, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1] );
 			nlog( LOG_NOTICE, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1] );
-			hnode_destroy( hn );
+			hash_scan_delete_destroy_node( banhash, hn );
 			DBADelete( "bans", ban->host );
 			ns_free( ban );
 			return NS_SUCCESS;
@@ -734,7 +732,7 @@ static int hs_cmd_add( CmdParams *cmdparams )
 	}
 	hash_scan_begin( &hs, banhash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		ban =( banentry * ) hnode_get( hn );
+		ban = ( banentry * ) hnode_get( hn );
 		if( match( ban->host, cmdparams->av[2] ) ) {
 			irc_prefmsg( hs_bot, cmdparams->source, 
 				"%s has been matched against the vhost ban %s",
@@ -957,7 +955,7 @@ static int hs_cmd_del( CmdParams *cmdparams )
 		irc_prefmsg( hs_bot, cmdparams->source, "No vhost for user %s", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	vhe =( vhostentry * ) lnode_get( hn );
+	vhe = ( vhostentry * ) lnode_get( hn );
 	irc_prefmsg( hs_bot, cmdparams->source, "removed vhost %s for %s",
 		vhe->nick, vhe->vhost );
 	nlog( LOG_NOTICE, "%s removed the vhost %s for %s", 

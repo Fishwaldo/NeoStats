@@ -171,8 +171,7 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
 	cmdparams->param = ( char * )ban;
 	SendAllModuleEvent( EVENT_DELBAN, cmdparams );
 	ns_free( cmdparams );
-	hash_delete( banhash, bansnode );
-	hnode_destroy( bansnode );
+	hash_delete_destroy_node( banhash, bansnode );
 	ns_free( ban );
 }
 
@@ -229,8 +228,7 @@ void FiniBans( void )
 	hash_scan_begin( &hs, banhash );
 	while( ( bansnode = hash_scan_next( &hs ) ) != NULL  ) {
 		ban = hnode_get( bansnode );
-		hash_delete( banhash, bansnode );
-		hnode_destroy( bansnode );
+		hash_scan_delete_destroy_node( banhash, bansnode );
 		ns_free( ban );
 	}
 	hash_destroy( banhash );

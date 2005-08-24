@@ -212,7 +212,7 @@ static int new_global_exclude( void *data, int size )
 
 static int new_mod_exclude( void *data, int size )
 {
-	new_exclude( excludelists[GET_CUR_MODNUM()], data );
+	new_exclude( excludelists[GET_CUR_MODULE_INDEX()], data );
 	return NS_FALSE;
 }
 
@@ -759,7 +759,7 @@ int ModIsUserExcluded( const Client *u )
 		dlog( DEBUG1, "User %s excluded as neostats or module user.", u->name );
 		return NS_TRUE;
 	}
-	return ProcessExcludeList( excludelists[GET_CUR_MODNUM()], ModExcludeUserHandler, ( void * )u );
+	return ProcessExcludeList( excludelists[GET_CUR_MODULE_INDEX()], ModExcludeUserHandler, ( void * )u );
 }
 
 /** @brief ns_do_exclude_server
@@ -828,7 +828,7 @@ int ModIsServerExcluded( const Client *s )
 {
 	Exclude *foundexclude;
 
-	foundexclude = FindExclude( excludelists[GET_CUR_MODNUM()], NS_EXCLUDE_SERVER, s->name );
+	foundexclude = FindExclude( excludelists[GET_CUR_MODULE_INDEX()], NS_EXCLUDE_SERVER, s->name );
 	if( foundexclude )
 	{
 		dlog( DEBUG1, "Excluding server %s against %s", s->name, foundexclude->pattern );
@@ -857,7 +857,7 @@ int ModIsChannelExcluded( const Channel *c )
 		dlog( DEBUG1, "Excluding services channel %s", c->name );
 		return NS_TRUE;
 	}
-	foundexclude = FindExclude( excludelists[GET_CUR_MODNUM()], NS_EXCLUDE_CHANNEL, c->name );
+	foundexclude = FindExclude( excludelists[GET_CUR_MODULE_INDEX()], NS_EXCLUDE_CHANNEL, c->name );
 	if( foundexclude )
 	{
 		dlog( DEBUG1, "Excluding channel %s against %s", c->name, foundexclude->pattern );

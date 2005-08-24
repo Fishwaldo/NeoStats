@@ -155,13 +155,11 @@ void FiniDBA( void )
 			tbe = (tableentry *) hnode_get( tnode );
 			dlog(DEBUG5, "Closing Table %s", tbe->name);
 			DBACloseTable( tbe->table );
-			hash_scan_delete( dbe->tablehash, tnode );
-			hnode_destroy( tnode );
+			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
 		}
 		hash_destroy( dbe->tablehash );
-		hash_scan_delete( dbhash, node );
-		hnode_destroy( node );
+		hash_scan_delete_destroy_node( dbhash, node );
 		ns_free( dbe );
 	}
 	hash_destroy( dbhash );
@@ -228,13 +226,11 @@ int DBACloseDatabase( void )
 			tbe = (tableentry *) hnode_get( tnode );
 			dlog(DEBUG5, "Closing Table %s", tbe->name);
 			DBMCloseTable( tbe->handle );
-			hash_delete( dbe->tablehash, tnode );
-			hnode_destroy( tnode );
+			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
 		}
 		hash_destroy( dbe->tablehash );
-		hash_delete( dbhash, node );
-		hnode_destroy( node );
+		hash_delete_destroy_node( dbhash, node );
 		ns_free( dbe );
 	}
 	return NS_SUCCESS;
@@ -337,8 +333,7 @@ int DBACloseTable( const char *table )
 	{
 		tbe = (tableentry *)hnode_get( node );
 		DBMCloseTable( tbe->handle );
-		hash_delete( dbhash, node );
-		hnode_destroy( node );
+		hash_delete_destroy_node( dbhash, node );
 		ns_free( tbe );
 	}
 	return NS_SUCCESS;

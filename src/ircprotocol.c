@@ -75,7 +75,7 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
 	while( ircd_cmd_ptr->name )
 	{
 		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) || 
-		 ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && !ircstrcasecmp( *ircd_cmd_ptr->token, cmd ) ) ) {
+		  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && !ircstrcasecmp( *ircd_cmd_ptr->token, cmd ) ) ) {
 			if( ircd_cmd_ptr->handler )
 			{
 				dlog( DEBUG3, "process_ircd_cmd: running command %s", *ircd_cmd_ptr->name );
@@ -199,9 +199,9 @@ int parse( void *notused, void *rline, size_t len )
  *    :<source> <command> <param1> <paramN> :<last parameter>
  *    <source> <command> <param1> <paramN> :<last parameter>
  *
- *  @param notused
- *  @param rline
- *  @param len
+ *  @param notused Justin????
+ *  @param rline Justin????
+ *  @param len Justin????
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
@@ -209,7 +209,7 @@ int parse( void *notused, void *rline, size_t len )
 int parsep10( void *notused, void *rline, size_t len )
 {
 	char origin[64], cmd[64], *coreLine;
-	char *line =( char * )rline;
+	char *line = ( char * )rline;
 	int cmdptr = 0;
 	int ac = 0;
 	char **av = NULL;

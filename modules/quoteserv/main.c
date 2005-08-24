@@ -284,8 +284,7 @@ int ModFini( void )
 	hash_scan_begin( &hs, qshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		db = ( ( database * )hnode_get( hn ) );
-		hash_delete( qshash, hn );
-		hnode_destroy( hn );
+		hash_delete_destroy_node( qshash, hn );
 		qs_free_database( db );
 	}
 	hash_destroy( qshash );
@@ -361,7 +360,7 @@ static int qs_cmd_list( CmdParams *cmdparams )
 	hash_scan_begin( &hs, qshash );
 	irc_prefmsg( qs_bot, cmdparams->source, "Databases" );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		db =( ( database * )hnode_get( hn ) );
+		db = ( ( database * )hnode_get( hn ) );
 		irc_prefmsg( qs_bot, cmdparams->source, "%d - %s", i, db->name );
 		i++;
 	}
@@ -388,16 +387,15 @@ static int qs_cmd_del( CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
-		db =( database * )hnode_get( hn );
+		db = ( database * )hnode_get( hn );
 		if( ircstrcasecmp( db->name, cmdparams->av[0] ) == 0 ) {
-			hash_scan_delete( qshash, hn );
 			irc_prefmsg( qs_bot, cmdparams->source, 
 				"Deleted %s from the database list", cmdparams->av[0] );
 			CommandReport( qs_bot, "%s deleted %s from the database list",
 				cmdparams->source->name, cmdparams->av[0] );
 			nlog( LOG_NOTICE, "%s deleted %s from the database list",
 				cmdparams->source->name, cmdparams->av[0] );
-			hnode_destroy( hn );
+			hash_scan_delete_destroy_node( qshash, hn );
 			DBADelete( "databases", db->name );
 			ns_free( db );
 			return NS_SUCCESS;
@@ -444,7 +442,7 @@ static int do_quote( const Client *target, const char *which, int reporterror )
 			while( ( hn = hash_scan_next( &hs ) ) != NULL )
 			{
 				i++;
-				db =( database * )hnode_get( hn );
+				db = ( database * )hnode_get( hn );
 				if( i == randdb )
 					break;
 			}
