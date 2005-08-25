@@ -612,7 +612,6 @@ static void HTMLMapHandler( const Client *s, int isroot, int depth, void *v )
 {
 #define MAPBUFSIZE 512
 	static char buf[MAPBUFSIZE];
-	Client *u = (Client *)v;
 	serverstat *ss;
 
 	ss = ( serverstat * ) GetServerModValue( s );
