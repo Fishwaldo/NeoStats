@@ -118,13 +118,19 @@ static int dbaccesslisthandler( void *data, int size )
  *
  *  @param none
  *
- *  @return none
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
 static void LoadAccessList( void )
 {
 	accesshash = hash_create( -1, 0, 0 );
+	if( !accesshash )
+	{
+		nlog( LOG_CRITICAL, "Unable to create accesslist hash" );
+		return NS_FAILURE;
+	}
 	DBAFetchRows( "AccessList", dbaccesslisthandler );
+	return NS_SUCCESS;
 }
 
 /** @brief AccessAdd

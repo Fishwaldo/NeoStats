@@ -180,7 +180,7 @@ void DelServer( const char *name, const char *reason )
 		cmdparams->param = ( char *)reason;
 	SendAllModuleEvent( EVENT_SQUIT, cmdparams );
 	ns_free( cmdparams );
-	hash_delete_destroy_node( serverhash, sn );
+	hash_scan_delete_destroy_node( serverhash, sn );
 	ns_free( s->server );
 	ns_free( s );
 }

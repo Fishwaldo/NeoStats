@@ -52,12 +52,12 @@ static hash_t *banhash;
 int ProcessBanList( BanListHandler handler, void *v )
 {
 	Ban *ban;
-	hscan_t ss;
+	hscan_t hs;
 	hnode_t *bansnode;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin( &ss, banhash );
-	while( ( bansnode = hash_scan_next( &ss ) ) != NULL )
+	hash_scan_begin( &hs, banhash );
+	while( ( bansnode = hash_scan_next( &hs ) ) != NULL )
 	{
 		ban = hnode_get( bansnode );
 		if( handler( ban, v ) == NS_TRUE )
@@ -80,7 +80,8 @@ static Ban *new_ban( const char *mask )
 {
 	Ban *ban;
 
-	if( hash_isfull( banhash ) ) {
+	if( hash_isfull( banhash ) )
+	{
 		nlog( LOG_CRITICAL, "new_ban: bans hash is full" );
 		return NULL;
 	}
@@ -117,9 +118,8 @@ void AddBan( const char *type, const char *user, const char *host, const char *m
 
 	SET_SEGV_LOCATION();
 	ban = new_ban( mask );
-	if( !ban ) {
+	if( !ban )
 		return;
-	}
 	strlcpy( ban->type, type, 8 );
 	strlcpy( ban->user, user, MAXUSER );
 	strlcpy( ban->host, host, MAXHOST );
@@ -161,7 +161,8 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
 
 	SET_SEGV_LOCATION();
 	bansnode = hash_lookup( banhash, mask );
-	if( !bansnode ) {
+	if( !bansnode )
+	{
 		nlog( LOG_WARNING, "DelBan: unknown ban %s", mask );
 		return;
 	}
@@ -226,7 +227,8 @@ void FiniBans( void )
 	hscan_t hs;
 
 	hash_scan_begin( &hs, banhash );
-	while( ( bansnode = hash_scan_next( &hs ) ) != NULL  ) {
+	while( ( bansnode = hash_scan_next( &hs ) ) != NULL  )
+	{
 		ban = hnode_get( bansnode );
 		hash_scan_delete_destroy_node( banhash, bansnode );
 		ns_free( ban );
@@ -247,7 +249,8 @@ void FiniBans( void )
 int InitBans( void )
 {
 	banhash = hash_create( -1, 0, 0 );
-	if( !banhash ) {
+	if( !banhash )
+	{
 		nlog( LOG_CRITICAL, "Unable to create bans hash" );
 		return NS_FAILURE;
 	}

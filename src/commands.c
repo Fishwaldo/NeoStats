@@ -77,7 +77,8 @@ static bot_cmd intrinsic_commands[]=
  */
 static int calc_cmd_ulevel( const bot_cmd *cmd_ptr )
 {
-	if( cmd_ptr->ulevel > NS_ULEVEL_ROOT ) {
+	if( cmd_ptr->ulevel > NS_ULEVEL_ROOT )
+	{
 		/* int pointer rather than value */
 		return( *( int* )cmd_ptr->ulevel );
 	}
@@ -102,12 +103,13 @@ int getuserlevel( const CmdParams *cmdparams )
 	/* Generally we just want the standard user level */
 	ulevel = UserLevel( cmdparams->source );
 	/* If less than a locop see if the module can give us a user level */
-	if( ulevel < NS_ULEVEL_LOCOPER ) {
-		if( cmdparams->bot->moduleptr->authcb ) {
+	if( ulevel < NS_ULEVEL_LOCOPER )
+	{
+		if( cmdparams->bot->moduleptr->authcb )
+		{
 			modlevel = cmdparams->bot->moduleptr->authcb( cmdparams->source );
-			if( modlevel > ulevel ) {
+			if( modlevel > ulevel )
 				ulevel = modlevel;
-			}
 		}
 	}
 	return ulevel;
@@ -161,10 +163,9 @@ void msg_unknown_command( CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Syntax error: unknown command: \2%s\2", cmdparams->source ), 
 		cmdparams->param );
-	if( nsconfig.cmdreport ) {
+	if( nsconfig.cmdreport )
 		irc_chanalert( cmdparams->bot, _( "%s requested %s, but that is an unknown command" ),
 			cmdparams->source->name, cmdparams->param );
-	}
 }
 
 void msg_only_opers( CmdParams *cmdparams )
@@ -179,7 +180,8 @@ void msg_only_opers( CmdParams *cmdparams )
 
 void check_cmd_result( CmdParams *cmdparams, int cmdret, char *extra )
 {
-	switch( cmdret ) {
+	switch( cmdret )
+	{
 		case NS_ERR_SYNTAX_ERROR:
 			msg_syntax_error( cmdparams );
 			break;
@@ -213,21 +215,25 @@ int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	 * check validity during processing. Only check critical elements.
 	 * For now we verify help during processing since it is not critical. */
 	/* No command, we cannot recover from this */
-	if( !cmd_ptr->cmd ) {
+	if( !cmd_ptr->cmd )
+	{
 		nlog( LOG_ERROR, "add_bot_cmd: missing command" );
 		return NS_FAILURE;
 	}
-	if( hash_lookup( cmd_hash, cmd_ptr->cmd ) ) {
+	if( hash_lookup( cmd_hash, cmd_ptr->cmd ) )
+	{
 		nlog( LOG_ERROR, "add_bot_cmd: attempt to add duplicate command %s", cmd_ptr->cmd );
 		return NS_FAILURE;
 	}
 	/* No handler, we cannot recover from this */
-	if( !cmd_ptr->handler ) {
+	if( !cmd_ptr->handler )
+	{
 		nlog( LOG_ERROR, "add_bot_cmd: missing command handler, command %s not added", 
 			cmd_ptr->cmd );
 		return NS_FAILURE;
 	}
-	if( !cmd_ptr->helptext ) {
+	if( !cmd_ptr->helptext )
+	{
 		nlog( LOG_ERROR, "add_bot_cmd: missing help text, command %s not added", 
 			cmd_ptr->cmd );
 		return NS_FAILURE;
@@ -236,7 +242,8 @@ int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	hnode_create_insert( cmd_hash, cmd_ptr, cmd_ptr->cmd );
 	snprintf( confcmd, 32, "command%s", cmd_ptr->cmd );
 	cmd_ptr->modptr = GET_CUR_MODULE();
-	if( DBAFetchConfigInt( confcmd, &ulevel ) == NS_SUCCESS ) {
+	if( DBAFetchConfigInt( confcmd, &ulevel ) == NS_SUCCESS )
+	{
 		hashentry = ( bot_cmd * ) hnode_find( cmd_hash, cmd_ptr->cmd );
 		hashentry->ulevel = ulevel;
 	}
@@ -255,13 +262,11 @@ bot_cmd *find_bot_cmd( Bot *bot_ptr, char *cmd)
 	hnode_t *cmdnode;
 	
 	/* Find the command */
-	if (!bot_ptr->botcmds) {
+	if (!bot_ptr->botcmds)
 		return NULL;
-	}
 	cmdnode = hash_lookup( bot_ptr->botcmds, cmd );
-	if( cmdnode ) {
+	if( cmdnode )
 		return hnode_get(cmdnode);
-	}
 	return NULL;
 }	
 
@@ -276,11 +281,13 @@ int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	
 	/* Delete the command */
 	cmdnode = hash_lookup( cmd_hash, cmd_ptr->cmd );
-	if( cmdnode ) {
+	if( cmdnode )
+	{
 		dlog( DEBUG3, "deleting command %s from services bot",( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
 		hash_delete_destroy_node( cmd_hash, cmdnode );
 #if USE_PERL
-		if (IS_PERL_MOD(cmd_ptr->modptr)) {
+		if (IS_PERL_MOD(cmd_ptr->modptr))
+		{
 			ns_free(cmd_ptr->cmd);
 			ns_free(cmd_ptr->moddata);
 			/* XXX is this correct on a array of strings? */
@@ -298,15 +305,21 @@ int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
  */
 int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list ) 
 {
-	if( !bot_cmd_list ) {
+	if( !bot_cmd_list )
 		return NS_FAILURE;
-	}
 	/* If no hash create */
-	if( bot_ptr->botcmds == NULL ) {
+	if( bot_ptr->botcmds == NULL )
+	{
 		bot_ptr->botcmds = hash_create( -1, 0, 0 );
+		if( !bot_ptr->botcmds )
+		{
+			nlog( LOG_CRITICAL, "Unable to create botcmds hash" );
+			return NS_FAILURE;
+		}
 	}
 	/* Cycle through command list and add them */
-	while( bot_cmd_list->cmd ) {
+	while( bot_cmd_list->cmd )
+	{
 		add_bot_cmd( bot_ptr->botcmds, bot_cmd_list );
 		bot_cmd_list++;
 	}
@@ -320,15 +333,14 @@ int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list )
 int del_bot_cmd_list( Bot* bot_ptr, bot_cmd *bot_cmd_list ) 
 {
 	/* If no bot pointer return failure */
-	if( !bot_ptr ) {
+	if( !bot_ptr )
 		return NS_FAILURE;
-	}
 	/* If no hash return failure */
-	if( !bot_ptr->botcmds ) {
+	if( !bot_ptr->botcmds )
 		return NS_FAILURE;
-	}
 	/* Cycle through command list and delete them */
-	while( bot_cmd_list->cmd ) {
+	while( bot_cmd_list->cmd )
+	{
 		del_bot_cmd( bot_ptr->botcmds, bot_cmd_list );
 		bot_cmd_list++;
 	}
@@ -345,12 +357,12 @@ int del_all_bot_cmds( Bot* bot_ptr )
 	hscan_t hs;
 
 	/* Check we have a command hash */
-	if( bot_ptr->botcmds == NULL ) {
+	if( bot_ptr->botcmds == NULL )
 		return NS_FAILURE;
-	}
 	/* Cycle through command hash and delete each command */
 	hash_scan_begin( &hs, bot_ptr->botcmds );
-	while( ( cmdnode = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( cmdnode = hash_scan_next( &hs ) ) != NULL )
+	{
 		dlog( DEBUG3, "deleting command %s from services bot",( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
 		hash_scan_delete_destroy_node( bot_ptr->botcmds, cmdnode );
 	}
@@ -409,7 +421,8 @@ run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
 	bot_cmd *cmd_ptr;
 
 	/* Handle SET if we have it */
-	if( cmdparams->bot->botsettings && !ircstrcasecmp( cmd, "SET" ) ) {
+	if( cmdparams->bot->botsettings && !ircstrcasecmp( cmd, "SET" ) )
+	{
 		intrinsic_handler( cmdparams, bot_cmd_set );
 		return NS_SUCCESS;
 	}
@@ -417,8 +430,10 @@ run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
 	cmd_ptr = intrinsic_commands;
 	if( !ircstrcasecmp( cmd, "LEVELS" ) && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS ) 
 		return NS_FAILURE;
-	while( cmd_ptr->cmd ) {
-		if( !ircstrcasecmp( cmd, cmd_ptr->cmd ) ) {
+	while( cmd_ptr->cmd )
+	{
+		if( !ircstrcasecmp( cmd, cmd_ptr->cmd ) )
+		{
 			intrinsic_handler( cmdparams, cmd_ptr->handler );
 			return NS_SUCCESS;
 		}
@@ -464,9 +479,8 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	ac = split_buf( privmsgbuffer, &av, 0 );
 	cmdparams->cmd = av[0];
 	cmdparams->ac = 0;
-	for( i = 1; i < ac; i++ ) {
+	for( i = 1; i < ac; i++ )
 		AddStringToList( &cmdparams->av, av[i], &cmdparams->ac );
-	}
 	userlevel = getuserlevel( cmdparams ); 
 	/* Check user authority to use this command set */
 	if( ( ( cmdparams->bot->flags & BOT_FLAG_RESTRICT_OPERS ) && ( userlevel < NS_ULEVEL_OPER ) ) ||
@@ -559,7 +573,8 @@ static int bot_cmd_help_set( CmdParams *cmdparams, int userlevel )
 	irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_help_set );
 	/* Display option specific text for current user level */
 	hash_scan_begin( &hs, cmdparams->bot->botsettings );
-	while( ( setnode = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( setnode = hash_scan_next( &hs ) ) != NULL )
+	{
 		set_ptr = hnode_get( setnode );
 		if( set_ptr->helptext && userlevel >= set_ptr->ulevel )
 		{
@@ -605,54 +620,65 @@ static int bot_cmd_help( CmdParams *cmdparams )
 	userlevel = getuserlevel( cmdparams );
 
 	/* If no parameter to help, generate main help text */
-	if( cmdparams->ac < 1 ) {
+	if( cmdparams->ac < 1 )
+	{
 		lowlevel = 0;
 		curlevel = 30;
-		if( nsconfig.cmdreport ) {
+		if( nsconfig.cmdreport )
 			irc_chanalert( cmdparams->bot, _( "%s requested %s help" ), cmdparams->source->name, cmdparams->bot->name );
-		}
 		nlog( LOG_NORMAL, "%s requested %s help", cmdparams->source->name, cmdparams->bot->name );
 		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "\2The following commands can be used with %s:\2",cmdparams->source ), cmdparams->bot->name );
 
 		/* Handle intrinsic commands */
 		cmd_ptr = intrinsic_commands;
-		while( cmd_ptr->cmd ) {
+		while( cmd_ptr->cmd )
+		{
 			/* Check for module override */	
 			if( !ircstrcasecmp( cmd_ptr->cmd, "LEVELS" ) && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS )
 			{
 				cmd_ptr++;
 				continue;
 			}
-			if( !cmdparams->bot->botcmds || !hash_lookup( cmdparams->bot->botcmds, cmd_ptr->cmd ) ) {
+			if( !cmdparams->bot->botcmds || !hash_lookup( cmdparams->bot->botcmds, cmd_ptr->cmd ) )
+			{
 				irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->helptext[0] );
 			}
 			cmd_ptr++;
 		}
 		/* Do we have a set command? */
-		if( cmdparams->bot->botsettings && userlevel >= cmdparams->bot->set_ulevel ) {
+		if( cmdparams->bot->botsettings && userlevel >= cmdparams->bot->set_ulevel )
+		{
 			irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s Configure %s", "SET", cmdparams->bot->name );
 		}
-		if( cmdparams->bot->botcmds ) {
-			while( 1 ) {
+		if( cmdparams->bot->botcmds )
+		{
+			while( 1 )
+			{
 				hnode_t* cmdnode;
 
 				hash_scan_begin( &hs, cmdparams->bot->botcmds );
-				while( ( cmdnode = hash_scan_next( &hs ) ) != NULL ) {
+				while( ( cmdnode = hash_scan_next( &hs ) ) != NULL )
+				{
 					cmd_ptr = hnode_get( cmdnode );
 					cmdlevel = calc_cmd_ulevel( cmd_ptr );
-					if( ( cmdlevel < curlevel ) && ( cmdlevel >= lowlevel ) ) {
-						if( curlevelmsg && !donemsg ) {
+					if( ( cmdlevel < curlevel ) && ( cmdlevel >= lowlevel ) )
+					{
+						if( curlevelmsg && !donemsg )
+						{
 							irc_prefmsg( cmdparams->bot, cmdparams->source, __( "\2Additional commands available to %s:\2", cmdparams->source ), curlevelmsg );
 							donemsg = 1;
 						}
 						irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->helptext[0] );
 					}
 				}
-				if( lowlevel >= userlevel ) {
+				if( lowlevel >= userlevel )
+				{
 					break;
 				}
-				if( userlevel >= curlevel ) {
-					switch( curlevel ) {
+				if( userlevel >= curlevel )
+				{
+					switch( curlevel )
+					{
 						case 30:
 							curlevel = NS_ULEVEL_OPER;
 							lowlevel = 30;
@@ -688,17 +714,21 @@ static int bot_cmd_help( CmdParams *cmdparams )
 		bot_cmd_help_on_help( cmdparams );
 		return NS_SUCCESS;
 	}
-	if( nsconfig.cmdreport ) {
+	if( nsconfig.cmdreport )
+	{
 		irc_chanalert( cmdparams->bot, _( "%s requested %s help on %s" ), cmdparams->source->name, cmdparams->bot->name, cmdparams->av[0] );
 	}
 	nlog( LOG_NORMAL, "%s requested %s help on %s", cmdparams->source->name, cmdparams->bot->name, cmdparams->av[0] );
 
 	/* Process command list */
-	if( cmdparams->bot->botcmds ) {
+	if( cmdparams->bot->botcmds )
+	{
 		cmd_ptr = ( bot_cmd* )hnode_find( cmdparams->bot->botcmds, cmdparams->av[0] );
-		if( cmd_ptr ) {
+		if( cmd_ptr )
+		{
 			cmdlevel = calc_cmd_ulevel( cmd_ptr );
-			if( userlevel < cmdlevel ) {
+			if( userlevel < cmdlevel )
+			{
 				msg_permission_denied( cmdparams, NULL );
 				return NS_ERR_NO_PERMISSION;
 			}		
@@ -709,15 +739,18 @@ static int bot_cmd_help( CmdParams *cmdparams )
 
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
-	while( cmd_ptr->cmd ) {
-		if( !ircstrcasecmp( cmdparams->av[0], cmd_ptr->cmd ) ) {
+	while( cmd_ptr->cmd )
+	{
+		if( !ircstrcasecmp( cmdparams->av[0], cmd_ptr->cmd ) )
+		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext + 1 );
 			return NS_SUCCESS;
 		}
 		cmd_ptr++;
 	}
 	/* Handle SET if we have it */	
-	if( cmdparams->bot->botsettings && userlevel >= cmdparams->bot->set_ulevel && !ircstrcasecmp( cmdparams->av[0], "SET" ) ) {
+	if( cmdparams->bot->botsettings && userlevel >= cmdparams->bot->set_ulevel && !ircstrcasecmp( cmdparams->av[0], "SET" ) )
+	{
 		bot_cmd_help_set( cmdparams, userlevel );		
 		return NS_SUCCESS;
 	}
@@ -736,13 +769,15 @@ Client *FindValidUser( const Bot *botptr, const Client *sourceuser, const char *
 	
 	/* Check target user is on IRC */
 	target = FindUser( target_nick );
-	if( !target ) {
+	if( !target )
+	{
 		irc_prefmsg( botptr, sourceuser, 
 			__( "%s cannot be found on IRC, message not sent.", sourceuser ), target_nick );
 		return NULL;
 	}
 	/* Check for message to self */
-	if( IsMe( target ) ) {
+	if( IsMe( target ) )
+	{
 		irc_prefmsg( botptr, sourceuser, __( "Cannot send message to a service bot.", sourceuser ) );
 		return NULL;
 	}
@@ -755,11 +790,15 @@ Client *FindValidUser( const Bot *botptr, const Client *sourceuser, const char *
  */
 static int bot_cmd_about( CmdParams *cmdparams )
 {
-	if( cmdparams->bot->moduleptr ) {
-		if (IS_STD_MOD(cmdparams->bot->moduleptr)) {
+	if( cmdparams->bot->moduleptr )
+	{
+		if (IS_STD_MOD(cmdparams->bot->moduleptr))
+		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text );
 #if USE_PERL
-		} else {
+		}
+		else
+		{
 			irc_prefmsg(cmdparams->bot, cmdparams->source, "Not Available");
 #endif
 		}
@@ -786,12 +825,16 @@ static int bot_cmd_version( CmdParams *cmdparams )
  */
 static int bot_cmd_credits( CmdParams *cmdparams )
 {
-	if( cmdparams->bot->moduleptr ) {
-		if (IS_STD_MOD(cmdparams->bot->moduleptr)) {
+	if( cmdparams->bot->moduleptr )
+	{
+		if (IS_STD_MOD(cmdparams->bot->moduleptr))
+		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, 
 				cmdparams->bot->moduleptr->info->copyright );
 #if USE_PERL
-		} else {
+		}
+		else
+		{
 			irc_prefmsg(cmdparams->bot, cmdparams->source, "Not Available");
 #endif
 		}
@@ -808,40 +851,43 @@ static int bot_cmd_levels( CmdParams *cmdparams )
 	bot_cmd *cmd_ptr;
 	int userlevel;
 
-	if( cmdparams->ac < 1 ) {
+	if( cmdparams->ac < 1 )
 		return NS_ERR_NEED_MORE_PARAMS;
-	}
 	if( !cmdparams->bot->botcmds )
 	{
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "No commands found." );
 		return NS_SUCCESS;
 	}
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) ) {
+	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+	{
 		hnode_t *cmdnode;
 		hscan_t hs;
 
 		/* Cycle through command hash and list each command */
 		hash_scan_begin( &hs, cmdparams->bot->botcmds );
-		while( ( cmdnode = hash_scan_next( &hs ) ) != NULL ) {
+		while( ( cmdnode = hash_scan_next( &hs ) ) != NULL )
+		{
 			cmd_ptr = ( ( bot_cmd* )hnode_get( cmdnode ) );
 			irc_prefmsg( cmdparams->bot, cmdparams->source, "%s %d", cmd_ptr->cmd, cmd_ptr->ulevel );
 		}
 		return NS_SUCCESS;
 	}
-	if( cmdparams->ac < 2 ) {
+	if( cmdparams->ac < 2 )
 		return NS_ERR_NEED_MORE_PARAMS;
-	}
 	userlevel = getuserlevel( cmdparams );
-	if( userlevel < NS_ULEVEL_ROOT ) {
+	if( userlevel < NS_ULEVEL_ROOT )
+	{
 		msg_permission_denied( cmdparams, cmdparams->cmd );
 		return NS_ERR_NO_PERMISSION;
 	}
 	cmd_ptr = ( bot_cmd * )hnode_find( cmdparams->bot->botcmds, cmdparams->av[0] );
-	if( cmd_ptr ) {
+	if( cmd_ptr )
+	{
 		int newlevel = 0;
 
 		newlevel = atoi( cmdparams->av[1] );
-		if( newlevel >= 0 && newlevel <= NS_ULEVEL_ROOT ) {
+		if( newlevel >= 0 && newlevel <= NS_ULEVEL_ROOT )
+		{
 			cmd_ptr->ulevel = newlevel;
 			snprintf( confcmd, 32, "command%s", cmd_ptr->cmd );
 			DBAStoreConfigInt( confcmd, &newlevel );

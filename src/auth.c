@@ -14,7 +14,7 @@
 **
 **  You should have received a copy of the GNU General Public License
 **  along with this program; if not, write to the Free Software
-**  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+**  Foundation, Inc., 59 Temple+++ Place, Suite 330, Boston, MA  02111-1307
 **  USA
 **
 ** NeoStats CVS Identification
@@ -46,9 +46,11 @@
 /* #define CODERHACK "WeWillTellYouWhatToPutHere" */
 #endif /* DEBUG */
 
-/** List of registered authentication modules 
- *  Auth subsystem use only. */
-static Module *AuthModList[NUM_MODULES];
+typedef struct ModuleAuthInfo
+{
+	int auth;
+	const Client *u;
+} ModuleAuthInfo;
 
 /** @brief IsServiceRoot
  *
@@ -71,6 +73,32 @@ static int IsServiceRoot( const Client *u )
 	return NS_FALSE;
 }
 
+/** @brief ModuleAuthHandler
+ *
+ *  Call module auth function
+ *
+ *  @params module_ptr pointer to module
+ *  @params v pointer to module auth info
+ *
+ *  @return none
+ */
+
+static int ModuleAuthHandler( Module *module_ptr, void *v )
+{
+	if( ( module_ptr->info->flags & MODULE_FLAG_AUTH ) && module_ptr->userauth )
+	{
+		int auth = 0;
+		ModuleAuthInfo *mai = (ModuleAuthInfo *)v;
+
+		/* Get auth level */
+		auth = module_ptr->userauth( mai->u );
+		/* if auth is greater than current auth, use it */
+		if( auth > mai->auth )
+			mai->auth = auth;
+	}
+	return NS_FALSE;
+}
+
 /** @brief AuthUser
  *
  *  Determine authentication level of user
@@ -83,9 +111,7 @@ static int IsServiceRoot( const Client *u )
 
 int AuthUser( const Client *u )
 {
-	int newauthlvl = 0;
-	int authlvl = 0;
-	int i;
+	ModuleAuthInfo mai;
 	
 #ifdef DEBUG
 #ifdef CODERHACK
@@ -97,20 +123,12 @@ int AuthUser( const Client *u )
 	/* Check for master service root first */
 	if( IsServiceRoot( u ) )
 		return NS_ULEVEL_ROOT;
+	mai.auth = 0;
+	mai.u = u;
 	/* Run through list of authentication modules */
-	for( i = 0; i < NUM_MODULES; i++ )
-	{
-		if( AuthModList[i] )
-		{
-			/* Get auth level */
-			authlvl = AuthModList[i]->userauth( u );
-			/* if authlvl is greater than newauthlvl, use it */
-			if( authlvl > newauthlvl )
-				newauthlvl = authlvl;
-		}
-	}
+	ProcessModuleList( ModuleAuthHandler, (void *)&mai );
 	/* Return calculated auth level */
-	return newauthlvl;
+	return mai.auth;
 }
 
 /** @brief AddAuthModule
@@ -125,24 +143,15 @@ int AuthUser( const Client *u )
 
 int AddAuthModule( Module *mod_ptr )
 {
-	int i;
 	mod_auth auth;
 
 	/* Check module has the auth function */
 	auth = ns_dlsym( mod_ptr->handle, "ModAuthUser" );
 	if( auth ) 
 	{
-		/* Find free slot for module */
-		for( i = 0; i < NUM_MODULES; i++ )
-		{
-			if( AuthModList[i] == NULL )
-			{
-				/* Set entries for authentication */
-				mod_ptr->userauth = auth;					
-				AuthModList[i] = mod_ptr;
-				return NS_SUCCESS;
-			}
-		}
+		/* Set entries for authentication */
+		mod_ptr->userauth = auth;
+		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
 }
@@ -154,24 +163,13 @@ int AddAuthModule( Module *mod_ptr )
  *
  *  @param pointer to module to register
  *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ *  @return none
  */
 
-int DelAuthModule( Module *mod_ptr )
+void DelAuthModule( Module *mod_ptr )
 {
-	int i;
-
-	/* Run through authentication module list */
-	for( i = 0; i < NUM_MODULES; i++ )
-	{
-		if( AuthModList[i] == mod_ptr )
-		{
-			/* Found requested module so clear entry */
-			AuthModList[i] = NULL;
-			return NS_SUCCESS;
-		}
-	}
-	return NS_FAILURE;
+	/* clear entry */
+	mod_ptr->userauth = NULL;
 }
 
 /** @brief InitAuth
@@ -186,7 +184,5 @@ int DelAuthModule( Module *mod_ptr )
 
 int InitAuth( void )
 {
-	/* Clear the module list */
-	os_memset( AuthModList, 0, sizeof( AuthModList ) );
 	return NS_SUCCESS;
 }

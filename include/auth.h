@@ -26,7 +26,7 @@
 
 int InitAuth( void );
 int AddAuthModule( Module *mod_ptr );
-int DelAuthModule( Module *mod_ptr );
+void DelAuthModule( Module *mod_ptr );
 int AuthUser( const Client *u );
 
 #endif /* _AUTH_H_ */

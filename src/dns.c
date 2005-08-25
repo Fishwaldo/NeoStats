@@ -202,8 +202,11 @@ int InitDns (void)
 	}
 	/* dnsqueue is unlimited. */
 	dnsqueue = list_create(-1);
-	if (!dnsqueue) 
+	if (!dnsqueue)
+	{
+		nlog (LOG_CRITICAL, "Unable to create DNS queue");
 		return NS_FAILURE;
+	}
 #ifndef DEBUG
 	adnsstart = adns_init (&ads, adns_if_noerrprint | adns_if_noautosys, 0, sock_update);
 #else
@@ -413,7 +416,7 @@ void do_dns_stats_Z(Client *u)
 	irc_numeric (RPL_MEMSTATS, u->name, "Active DNS queries: %d", (int) list_count(dnslist));
 	irc_numeric (RPL_MEMSTATS, u->name, "Queued DNS Queries: %d", (int) list_count(dnsqueue));
 	irc_numeric (RPL_MEMSTATS, u->name, "Max Queued Queries: %d", DNSStats.maxqueued);
-	irc_numeric (RPL_MEMSTATS, u->name, "Total DNS Questions: %d", DNSStats.totalq);
+	irc_numeric (RPL_MEMSTATS, u->name, "Total DNS Queries: %d", DNSStats.totalq);
 	irc_numeric (RPL_MEMSTATS, u->name, "Successful Lookups: %d", DNSStats.success);
 	irc_numeric (RPL_MEMSTATS, u->name, "Unsuccessful Lookups: %d", DNSStats.failure);
 }

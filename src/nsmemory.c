@@ -97,7 +97,7 @@ void *ns_calloc( int size )
  *  @return pointer to allocated buffer
  */
 
-void *ns_realloc( void* ptr, int size )
+void *ns_realloc( void *ptr, int size )
 {
 	void *newptr;
 

@@ -105,7 +105,7 @@ static const char *EventStrings[] =
  *  @return none
  */
 
-void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr )
+void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr )
 {
 	SET_SEGV_LOCATION();
 	dlog( DEBUG5, "SendModuleEvent: %s to module %s", EventStrings[event], module_ptr->info->name );
@@ -117,7 +117,7 @@ void SendModuleEvent( Event event, CmdParams* cmdparams, Module* module_ptr )
 	if( module_ptr->event_list[event] )
 	{
 		/* If we are not yet synched, check that the module supports 
-			* the event before we are synched. */
+		 * the event before we are synched. */
 		if( !IsModuleSynched( module_ptr ) && !( module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH ) )
 		{
 			dlog( DEBUG5, "Skipping module %s for %s since module is not yet synched", module_ptr->info->name, EventStrings[event] );
@@ -203,7 +203,7 @@ static int SendAllModuleEventHandler( Module *module_ptr, void *v )
  *  @return none
  */
 
-void SendAllModuleEvent( Event event, CmdParams* cmdparams )
+void SendAllModuleEvent( Event event, CmdParams *cmdparams )
 {
 	ModuleAllEvent mae;
 
@@ -224,9 +224,9 @@ void SendAllModuleEvent( Event event, CmdParams* cmdparams )
  *  @return none
  */
 
-void AddEvent( ModuleEvent* eventptr )
+void AddEvent( ModuleEvent *eventptr )
 {
-	Module* mod_ptr;
+	Module *mod_ptr;
 
 	if( !eventptr )
 	{
@@ -283,7 +283,7 @@ void AddEventList( ModuleEvent *eventlistptr )
 
 void DeleteEvent( Event event )
 {
-	Module* mod_ptr;
+	Module *mod_ptr;
 
 	mod_ptr = GET_CUR_MODULE();
 	if( !mod_ptr->event_list )
@@ -330,7 +330,7 @@ void DeleteEventList( ModuleEvent *eventlistptr )
  *  @return none
  */
 
-void FreeEventList( Module* mod_ptr )
+void FreeEventList( Module *mod_ptr )
 {
 	if( mod_ptr->event_list )
 	{
@@ -353,7 +353,7 @@ void FreeEventList( Module* mod_ptr )
 void SetAllEventFlags( unsigned int flag, unsigned int enable )
 {
 	int i;
-	ModuleEvent** eventlistptr;
+	ModuleEvent **eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
 	if( !eventlistptr )
@@ -387,7 +387,7 @@ void SetAllEventFlags( unsigned int flag, unsigned int enable )
 
 void SetEventFlags( Event event, unsigned int flag, unsigned int enable )
 {
-	ModuleEvent** eventlistptr;
+	ModuleEvent **eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
 	if( !eventlistptr )
@@ -418,7 +418,7 @@ void SetEventFlags( Event event, unsigned int flag, unsigned int enable )
 
 void EnableEvent( Event event )
 {
-	ModuleEvent** eventlistptr;
+	ModuleEvent **eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
 	if( !eventlistptr )
@@ -446,7 +446,7 @@ void EnableEvent( Event event )
 
 void DisableEvent( Event event )
 {
-	ModuleEvent** eventlistptr;
+	ModuleEvent **eventlistptr;
 
 	eventlistptr = GET_CUR_MODULE()->event_list;
 	if( !eventlistptr )

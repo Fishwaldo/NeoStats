@@ -570,6 +570,11 @@ int add_bot_setting_list( Bot* bot_ptr, bot_setting *set_ptr )
 	/* If no hash create */
 	if( bot_ptr->botsettings == NULL ) {
 		bot_ptr->botsettings = hash_create( -1, 0, 0 );
+		if( !bot_ptr->botsettings )
+		{
+			nlog( LOG_CRITICAL, "Unable to create botsettings hash" );
+			return NS_FAILURE;
+		}
 	}
 	/* Default SET to ROOT only */
 	bot_ptr->set_ulevel = NS_ULEVEL_ROOT;
