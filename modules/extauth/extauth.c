@@ -121,7 +121,7 @@ static int dbaccesslisthandler( void *data, int size )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static void LoadAccessList( void )
+static int LoadAccessList( void )
 {
 	accesshash = hash_create( -1, 0, 0 );
 	if( !accesshash )
@@ -272,7 +272,8 @@ static int ea_cmd_access( CmdParams *cmdparams )
 
 int ModInit( void )
 {
-	LoadAccessList();
+	if( LoadAccessList() != NS_SUCCESS )
+		return NS_FAILURE;
 	return NS_SUCCESS;
 }
 

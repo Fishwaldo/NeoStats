@@ -668,6 +668,8 @@ static int ExcludeUserHandler( Exclude *exclude, void *v )
 				return NS_TRUE;
 			}
 			break;
+		default:
+			break;
 	}
 	return NS_FALSE;
 }
@@ -736,6 +738,8 @@ static int ModExcludeUserHandler( Exclude *exclude, void *v )
 				dlog( DEBUG1, "User %s is excluded by userhost entry %s", u->name, exclude->pattern );
 				return NS_TRUE;
 			}
+			break;
+		default:
 			break;
 	}
 	return NS_FALSE;
