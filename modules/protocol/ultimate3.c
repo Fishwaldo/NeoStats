@@ -187,6 +187,7 @@ static void m_sjoin( char *origin, char **argv, int argc, int srv );
 static void m_client( char *origin, char **argv, int argc, int srv );
 static void m_smode( char *origin, char **argv, int argc, int srv );
 static void m_vctrl( char *origin, char **argv, int argc, int srv );
+static void m_netinfo( char *origin, char **argv, int argc, int srv );
 
 ProtocolInfo protocol_info = 
 {
@@ -228,6 +229,7 @@ irc_cmd cmd_list[] =
 	{&MSG_CLIENT,    0, m_client,    0},
 	{&MSG_SMODE,     0, m_smode,     0},
 	{&MSG_VCTRL,     0, m_vctrl,     0},
+	{&MSG_NETINFO,   0, m_netinfo,   0},
 	{0, 0, 0, 0},
 };
 
@@ -349,6 +351,10 @@ void send_burst( int b )
 	}
 }
 
+void send_netinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname ) {
+	dlog(DEBUG3, "Warning, Ultimate3 Protocol Handler was asked to send Netinfo, Not supported");
+}
+
 /* :source SJOIN TS #chan modebuf  :nickbuf */
 /* :source SJOIN TS #chan modebuf parabuf :nickbuf */
 /* :source SJOIN TS #chan */
@@ -409,4 +415,9 @@ static void m_client( char *origin, char **argv, int argc, int srv )
 static void m_smode( char *origin, char **argv, int argc, int srv )
 {
 	do_smode( argv[0], argv[1] );
+}
+
+static void m_netinfo( char *origin, char **argv, int argc, int srv) {
+	/* netinfo is essentially the same as globops */
+	do_globops(origin, argv[0]);
 }
