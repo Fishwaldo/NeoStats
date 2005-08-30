@@ -291,7 +291,7 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 
 int
 perl_command_cb(CmdParams *cmdparams) {
-	return execute_perl(cmdparams->bot->moduleptr, sv_2mortal (newSVpv (cmdparams->cmd_ptr->moddata, 0)), 3, cmdparams->cmd_ptr->cmd, cmdparams->source->name, cmdparams->param);
+	return execute_perl(GET_CUR_MODULE(), sv_2mortal (newSVpv (cmdparams->cmd_ptr->moddata, 0)), 3, cmdparams->cmd_ptr->cmd, cmdparams->source->name, cmdparams->param);
 }
 
 int
