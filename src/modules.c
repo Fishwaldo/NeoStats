@@ -124,29 +124,31 @@ void FiniModules( void )
 
 int SynchModule( Module* module_ptr )
 {
-	int err = NS_SUCCESS; /*FAILURE;*/
+	int err = NS_SUCCESS;
 	int( *ModSynch )( void );
 
-#ifdef USE_PERL	
-	/* only standard modules get a sync */
-	if( IS_STD_MOD( module_ptr ) ) {
-#endif
-		SetModuleInSynch( module_ptr );
+	/* Start sync process */
+	SetModuleInSynch( module_ptr );
+	if( IS_STANDARD_MOD( module_ptr ) )
+	{
 		ModSynch = ns_dlsym( ( int * ) module_ptr->handle, "ModSynch" );
-		if( ModSynch ) {
+		if( ModSynch )
+		{
 			SET_RUN_LEVEL( module_ptr );
 			err = ( *ModSynch )(); 
 			RESET_RUN_LEVEL();
 		}
-		SET_SEGV_LOCATION();
-		SetModuleSynched( module_ptr );
+	}
 #ifdef USE_PERL
-	} else {
+	else
+	{
 		SET_RUN_LEVEL( module_ptr );
 		err = perl_sync_module( module_ptr );
 		RESET_RUN_LEVEL();
 	}
 #endif
+	/* sync complete */
+	SetModuleSynched( module_ptr );
 	return err;
 }
 	
@@ -313,9 +315,7 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 	mod_ptr->info = infoptr;
 	mod_ptr->handle = handle;
 	insert_module( mod_ptr );
-#ifdef USE_PERL
-	mod_ptr->modtype = MOD_STANDARD;
-#endif
+	mod_ptr->type = MOD_TYPE_STANDARD;
 	/* Extract pointer to event list */
 	eventlistptr = ns_dlsym( handle, "module_events" );
 	if( eventlistptr ) {
@@ -535,7 +535,7 @@ int unload_module( const char *modname, Client * u )
 	hash_delete_destroy_node( modulehash, modnode );		
 
 	/* now determine if its perl, or standard module */
-	if( IS_STD_MOD( mod_ptr ) ) {
+	if( IS_STANDARD_MOD( mod_ptr ) ) {
 		/* call ModFini( replacement for library __fini() call */
 		ModFini = ns_dlsym( ( int * ) mod_ptr->handle, "ModFini" );
 		if( ModFini ) {
@@ -573,7 +573,7 @@ int unload_module( const char *modname, Client * u )
 	DBACloseDatabase();
 
 
-	if( IS_STD_MOD( mod_ptr ) ) {
+	if( IS_STANDARD_MOD( mod_ptr ) ) {
 		ns_dlclose( mod_ptr->handle );
 #ifdef USE_PERL
 	} else {

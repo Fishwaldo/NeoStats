@@ -123,9 +123,7 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 
 int perl_sync_module(Module *mod)
 {
-	SetModuleInSynch( mod );
 	execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::sync", 0)),1, mod->pm->filename);
-	SetModuleSynched( mod );
 	return NS_SUCCESS;
 }
 
@@ -1547,7 +1545,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	mod = ns_calloc(sizeof(Module));
 	mod->pm = ns_calloc(sizeof(PerlModInfo));
 	mod->info = ns_calloc(sizeof(ModuleInfo));
-	mod->modtype = MOD_PERL;
+	mod->type = MOD_TYPE_PERL;
 	strlcpy(mod->pm->filename, filename, MAXPATH);
 	/* this is a temp solution till we get fully loaded. Its Bad */
 	mod->info->name = ns_malloc(strlen("NeoStats")+1);

@@ -148,7 +148,7 @@ void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr )
 		}			
 		dlog( DEBUG1, "Running module %s with %s", module_ptr->info->name, EventStrings[event] );
 		SET_SEGV_LOCATION();
-		if( IS_STD_MOD( module_ptr ) )
+		if( IS_STANDARD_MOD( module_ptr ) )
 		{
 			if( setjmp( sigvbuf ) == 0 )
 			{
@@ -240,7 +240,7 @@ void AddEvent( ModuleEvent *eventptr )
 		mod_ptr->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
 	dlog( DEBUG5, "AddEvent: adding %s to %s", EventStrings[eventptr->event], mod_ptr->info->name );
 	/* only standard modules have a handler, perl mods use a custom callback */
-	if(IS_STD_MOD(mod_ptr) && !eventptr->handler )
+	if(IS_STANDARD_MOD(mod_ptr) && !eventptr->handler )
 	{
 		nlog( LOG_ERROR, "AddEvent: missing handler for %s in module %s", EventStrings[eventptr->event], mod_ptr->info->name );
 		return;

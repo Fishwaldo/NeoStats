@@ -90,6 +90,7 @@ ModuleInfo ns_module_info = {
 
 /** Fake Module pointer for run level code */
 Module ns_module = {
+	MOD_TYPE_STANDARD,
 	&ns_module_info
 };
 

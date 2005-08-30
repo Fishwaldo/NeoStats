@@ -870,6 +870,13 @@ typedef int ModuleFlags;
 #define MODULE_FLAG_AUTH			0x00000001
 #define MODULE_FLAG_LOCAL_EXCLUDES	0x00000002
 
+typedef enum MOD_TYPE {
+	/* standard C Modules */
+	MOD_TYPE_STANDARD = 1,
+	/* Perl Modules */
+	MOD_TYPE_PERL
+} MOD_TYPE;
+
 /** @brief Module Info structure
  *	This describes the module to the NeoStats core and provides information
  *  to end users when modules are queried.
@@ -924,34 +931,23 @@ typedef struct ModuleInfo {
 
 typedef int (*mod_auth) ( const Client *u );
 
+/* Module type macros */
+#define IS_STANDARD_MOD( mod ) ( ( mod )->type == MOD_TYPE_STANDARD )
+#ifdef USE_PERL	
+#define IS_PERL_MOD( mod ) ( ( mod )->type == MOD_TYPE_PERL )
+#else /* USE_PERL */
+#define IS_PERL_MOD( mod ) ( 0 )
+#endif /* USE_PERL */
+
 #ifdef USE_PERL	
 
-typedef enum MOD_TYPE {
-	/* standard C Modules */
-	MOD_STANDARD = 1,
-	/* Perl Modules */
-	MOD_PERL
-} MOD_TYPE;
-	
 /* forward decleration (in perlmod.h) for perl module info
  * we don't include any perl includes here because it screws up
  * some of the existing system defines (like readdir) */
 struct PerlModInfo;
 
-
-/* defines to easily detect different modules */
-#define IS_PERL_MOD(mod) ((mod)->modtype == MOD_PERL)
-#define IS_STD_MOD(mod) ((mod)->modtype == MOD_STANDARD)
-
 /* to save some chars while typing */
-
 #define PMI PerlInterpreter
-
-#endif /* USE_PERL */
-
-#ifndef USE_PERL
-#define IS_STD_MOD(mod) (1)
-#define IS_PERL_MOD(mod) (0)
 
 #endif /* USE_PERL */
 
@@ -963,6 +959,8 @@ struct PerlModInfo;
  * 
  */
 typedef struct _Module {
+	/** type of module  */
+	MOD_TYPE type;
 	/** Pointer to info structure */
 	ModuleInfo *info;
 	/** Pointer to event list */
@@ -983,7 +981,6 @@ typedef struct _Module {
 	unsigned int serverdatacnt;
 	unsigned int channeldatacnt;
 #ifdef USE_PERL
-	MOD_TYPE modtype;
 	struct PerlModInfo *pm;
 #endif /* USE_PERL */
 }_Module;
