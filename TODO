@@ -14,3 +14,7 @@ just to check memory allocations
 http://www.neostats.net/boards/viewtopic.php?t=1672&highlight=
 
 http://www.neostats.net/boards/viewtopic.php?p=7094#7094
+
+=rollergirl.sg.as.irc-chat.net= *** Global -- from FloodServ: Warning,
+possible flood on #services. Closing channel. AJPP: 6/1 Sec, SampleTime 5
+<-- should exclude our services channel from floodserv checking 
