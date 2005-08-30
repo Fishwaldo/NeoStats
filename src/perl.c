@@ -79,8 +79,13 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 	SAVETMPS;
 	PUSHMARK (SP);
 
-	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
+#if 0
 	SET_RUN_LEVEL(mod);
+	dlog(DEBUG1, "Current Runlevel: %s", GET_CUR_MODNAME());
+#endif
+	dlog(DEBUG1, "Current Runlevel in call: %s: %s", GET_CUR_MODNAME(), mod->info->description);
+		
+	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
 
 
 
@@ -110,7 +115,9 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
+#if 0
 	RESET_RUN_LEVEL();
+#endif
 	return ret_value;
 }
 
@@ -1558,6 +1565,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	   perl_definition array.
 	 */
 	eval_pv (perl_definitions, TRUE);
+	SET_RUN_LEVEL(mod);
 	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::load", 0)),
 								1, (char *)filename)) {
 		/* if we are here, check that pm->mod->info has something, otherwise the script didnt register */
@@ -1575,9 +1583,10 @@ Module *load_perlmodule (const char *filename, Client *u)
 		return NULL;	
 	}
 	assign_mod_number(mod);
-	SET_RUN_LEVEL(mod);
+
 	DBAOpenDatabase();
 	RESET_RUN_LEVEL();
+
 	insert_module(mod);
 
 
@@ -1600,13 +1609,11 @@ Module *load_perlmodule (const char *filename, Client *u)
 
 void PerlModFini(Module *mod)
 {
-	SET_RUN_LEVEL(mod);
 	if( IsModuleSynched( mod ) )
 	{
 		/* only execute unload if synced */
 		execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), 1, mod->pm->filename);
 	}
-	RESET_RUN_LEVEL();
 }
 
 void unload_perlmod(Module *mod)

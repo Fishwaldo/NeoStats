@@ -164,7 +164,9 @@ void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr )
 #if USE_PERL
 		else if( IS_PERL_MOD( module_ptr ) )
 		{
+			SET_RUN_LEVEL( module_ptr );
 			perl_event_cb( event, cmdparams, module_ptr );
+			RESET_RUN_LEVEL();
 		}			
 #endif
 		return;
@@ -237,7 +239,8 @@ void AddEvent( ModuleEvent *eventptr )
 	if( !mod_ptr->event_list )
 		mod_ptr->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
 	dlog( DEBUG5, "AddEvent: adding %s to %s", EventStrings[eventptr->event], mod_ptr->info->name );
-	if( !eventptr->handler )
+	/* only standard modules have a handler, perl mods use a custom callback */
+	if(IS_STD_MOD(mod_ptr) && !eventptr->handler )
 	{
 		nlog( LOG_ERROR, "AddEvent: missing handler for %s in module %s", EventStrings[eventptr->event], mod_ptr->info->name );
 		return;

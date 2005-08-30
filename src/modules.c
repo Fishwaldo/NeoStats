@@ -142,7 +142,9 @@ int SynchModule( Module* module_ptr )
 		SetModuleSynched( module_ptr );
 #ifdef USE_PERL
 	} else {
+		SET_RUN_LEVEL( module_ptr );
 		err = perl_sync_module( module_ptr );
+		RESET_RUN_LEVEL();
 	}
 #endif
 	return err;
@@ -544,7 +546,10 @@ int unload_module( const char *modname, Client * u )
 		}
 #if USE_PERL
 	} else {
+		SET_RUN_LEVEL( mod_ptr );
 		PerlModFini( mod_ptr );
+		RESET_RUN_LEVEL();
+		SET_SEGV_LOCATION();
 #endif
 	}
 	/* Delete any bots used by this module. Done after ModFini, so the bot 

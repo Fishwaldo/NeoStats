@@ -354,7 +354,7 @@ sub setupbot {
 		flags => '0',
 	};
 	$cmd->{helptext} = \@helptext;
-	NeoStats::AddCmd($bot, $cmd, 'cmd_cb_test');
+	NeoStats::AddCmd("SecureServ", $cmd, 'cmd_cb_test');
 	NeoStats::debug(NeoStats::DelCmd($bot, $cmd->{cmd}));
 	NeoStats::ChanAlert($bot, "Loaded up and ready to rock and role");
 

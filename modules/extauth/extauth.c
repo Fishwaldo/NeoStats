@@ -148,6 +148,7 @@ static int AccessAdd( const CmdParams *cmdparams )
 	AccessEntry *access;
 	
 	SET_SEGV_LOCATION();
+	dlog(DEBUG1, "Current Run Level %s", GET_CUR_MODNAME());
 	if( cmdparams->ac < 3 ) 
 	{
 		return NS_ERR_NEED_MORE_PARAMS;
