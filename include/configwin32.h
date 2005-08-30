@@ -524,17 +524,10 @@
 /* #undef HAVE___VA_COPY */
 
 /* Additional Win32 specifics */
-#define strcasecmp stricmp 
-#define strncasecmp strnicmp 
-#define index strchr
-#define rindex strrchr
 #define __PRETTY_FUNCTION__ __FUNCTION__
 #define inline __inline
 #define sleep(n)
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
 #include <io.h>
-#define access _access
 #define getpid GetCurrentProcessId
 #include <direct.h>
 #define S_IWUSR _S_IWRITE

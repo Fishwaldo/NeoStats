@@ -118,7 +118,11 @@ int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args )
 					break;
 				default:
 					/* in the event of an unknown type call lib version of vs[n]printf */
+#ifdef WIN32
+					return _vsnprintf( buf, size, fmt, saveargs );
+#else /* WIN32 */
 					return vsnprintf( buf, size, fmt, saveargs );
+#endif /* WIN32 */
 					/* avoid compiler warning by having a superfluous break */
 					break;
 			}

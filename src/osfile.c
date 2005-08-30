@@ -259,7 +259,11 @@ int os_access( const char *path, int mode )
 {
 	int retval;
 
+#ifdef WIN32
+	retval = _access( path, mode );
+#else /* WIN32 */
 	retval = access( path, mode );
+#endif /* WIN32 */
 	os_file_errno = errno;
 	return retval;
 }

@@ -539,7 +539,7 @@ int ValidateUserHost( const char *userhost )
 	static char localuserhost[USERHOSTLEN];
 	char *nick, *user , *host;
 
-	if( !index( userhost, '!' ) || !index( userhost, '@' ) )
+	if( !strchr( userhost, '!' ) || !strchr( userhost, '@' ) )
 		return NS_FAILURE;
 
 	strlcpy( localuserhost, userhost, USERHOSTLEN );
@@ -571,7 +571,7 @@ int ValidateUserHostWild( const char *userhost )
 	static char localuserhost[USERHOSTLEN];
 	char *nick, *user , *host;
 
-	if( !index( userhost, '!' ) || !index( userhost, '@' ) )
+	if( !strchr( userhost, '!' ) || !strchr( userhost, '@' ) )
 		return NS_FAILURE;
 
 	strlcpy( localuserhost, userhost, USERHOSTLEN );

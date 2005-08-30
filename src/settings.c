@@ -373,7 +373,7 @@ static int bot_cmd_set_user( CmdParams *cmdparams, bot_setting *set_ptr )
 
 static int bot_cmd_set_host( CmdParams *cmdparams, bot_setting *set_ptr )
 {
-	if( !index( cmdparams->av[1], '.' ) ) {
+	if( !strchr( cmdparams->av[1], '.' ) ) {
 		irc_prefmsg( cmdparams->bot, cmdparams->source, 
 			__( "%s is an invalid hostname", cmdparams->source ), cmdparams->av[1] );
 		return NS_ERR_SYNTAX_ERROR;

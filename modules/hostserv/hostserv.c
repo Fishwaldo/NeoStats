@@ -742,7 +742,7 @@ static int hs_cmd_add( CmdParams *cmdparams )
 			return NS_SUCCESS;
 		}
 	}
-	if( ValidateHost( cmdparams->av[2] ) == NS_FAILURE || !index( cmdparams->av[2], '.' ) ) {
+	if( ValidateHost( cmdparams->av[2] ) == NS_FAILURE || !strchr( cmdparams->av[2], '.' ) ) {
 		irc_prefmsg( hs_bot, cmdparams->source, 
 			"%s is an invalid host", cmdparams->av[2] );
 		return NS_SUCCESS;

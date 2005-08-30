@@ -1665,10 +1665,6 @@ EXPORTFUNC void ClearBotModValue( Bot *pBot );
 EXPORTFUNC void SetBotModValue( Bot *pBot, void *data );
 EXPORTFUNC void *GetBotModValue( const Bot *pBot );
 
-//#define ClearBotModValue( b ) b->moddata = 0
-//#define SetBotModValue( b, data ) b->moddata = data
-//#define GetBotModValue( b ) b->moddata
-
 /* MQ Server update sending functions */
 typedef enum MQ_MSG_TYPE {
 	UPDATE_SSREPORT=1,
