@@ -307,7 +307,22 @@ int ModSynch( void )
 
 int ModFini( void )
 {
+	hscan_t accessscan;
+	hnode_t *node;
+	AccessEntry *access;
+
 	del_services_cmd_list( extauth_commands );
+
+
+	hash_scan_begin( &accessscan, accesshash );
+	while( ( node = hash_scan_next( &accessscan ) )!= NULL) 
+	{
+		access = hnode_get( node );
+		ns_free (access);
+		hash_scan_delete_destroy_node(accesshash, node);
+	}
+	hash_destroy(accesshash);
+
 	return NS_SUCCESS;
 }
 

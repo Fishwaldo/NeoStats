@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Fix a memleak in ExtAuth (F)
  - Netinfo on Ultimate3 is like Globops, not a burst function (F)
  - Create core support for map generation accessible to all modules via a 
    callback handler and tidy up StatServ map code to take advantage of 
