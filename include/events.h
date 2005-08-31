@@ -387,6 +387,20 @@ typedef enum Event {
  */
 	EVENT_CTCPPINGREQ,
 
+/*  EVENT_CTCPUNHANDLEDRPL 
+ *    parameters:
+ *      user in cmdparams->source
+ *      ???
+ */
+	EVENT_CTCPUNHANDLEDRPL,
+
+/*  EVENT_CTCPUNHANDLEDREQ
+ *    parameters:
+ *      user in cmdparams->source
+ *      ???
+ */
+	EVENT_CTCPUNHANDLEDREQ,
+
 /*  DCC events 
  *    Generated in response to ctcp dcc events
  */

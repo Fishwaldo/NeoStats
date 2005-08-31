@@ -45,6 +45,8 @@ static int ctcp_req_time( CmdParams* cmdparams );
 static int ctcp_rpl_time( CmdParams* cmdparams );
 static int ctcp_req_ping( CmdParams* cmdparams );
 static int ctcp_rpl_ping( CmdParams* cmdparams );
+static int ctcp_req_unhandled( CmdParams* cmdparams );
+static int ctcp_rpl_unhandled( CmdParams* cmdparams );
 
 static ctcp_cmd ctcp_cmds[]= {
 	{"VERSION",	ctcp_req_version,	ctcp_rpl_version },
@@ -92,6 +94,7 @@ int ctcp_private( CmdParams *cmdparams )
 			cmd++;
 		}
 	}
+	ctcp_req_unhandled( cmdparams );
 	return NS_SUCCESS;
 }
 
@@ -116,6 +119,7 @@ int ctcp_notice( CmdParams *cmdparams )
 			cmd++;
 		}
 	}
+	ctcp_rpl_unhandled( cmdparams );
 	return NS_SUCCESS;
 }
 
@@ -253,3 +257,32 @@ int irc_ctcp_ping_req( const Bot* botptr, const Client* target )
 	irc_privmsg( botptr, target, "\1PING\1" );
 	return NS_SUCCESS;
 }
+
+static int ctcp_req_unhandled( CmdParams* cmdparams )
+{
+	dlog( DEBUG5, "RX: CTCP UNHANDLED request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPUNHANDLEDREQ, cmdparams, cmdparams->bot->moduleptr );
+	return NS_SUCCESS;
+}
+
+static int ctcp_rpl_unhandled( CmdParams* cmdparams )
+{
+	dlog( DEBUG5, "RX: CTCP UNHANDLED reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
+	SendModuleEvent( EVENT_CTCPUNHANDLEDRPL, cmdparams, cmdparams->bot->moduleptr );
+	return NS_SUCCESS;
+}
+
+int irc_ctcp_unhandled_req( const Bot *botptr, const Client *target, const char *ctcp_command )
+{
+	dlog( DEBUG5, "TX: CTCP UNHANDLED request from %s to %s: %s %s", botptr->name, target->name, ctcp_command );
+	irc_privmsg( botptr, target, "\1%s\1", ctcp_command );
+	return NS_SUCCESS;
+}
+
+int irc_ctcp_unhandled_rpl( const Bot *botptr, const Client *target, const char *ctcp_command, const char *ctcp_parameters )
+{
+	dlog( DEBUG5, "TX: CTCP UNHANDLED request from %s to %s: %s %s", botptr->name, target->name, ctcp_command, ctcp_parameters );
+	irc_privmsg( botptr, target, "\1%s %s\1", ctcp_command, ctcp_parameters );
+	return NS_SUCCESS;
+}
+

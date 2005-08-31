@@ -1321,9 +1321,13 @@ EXPORTFUNC int irc_ctcp_ping_req( const Bot *botptr, const Client *target );
 EXPORTFUNC int irc_ctcp_finger_req( const Bot *botptr, const Client *target );
 
 EXPORTFUNC int irc_ctcp_action_req( const Bot *botptr, const Client *target, const char *action );
-EXPORTFUNC int irc_ctcp_action_req_channel( const Bot* botptr, const Channel* channel, const char *action );
+EXPORTFUNC int irc_ctcp_action_req_channel( const Bot *botptr, const Channel *channel, const char *action );
 
 EXPORTFUNC int irc_ctcp_time_req( const Bot* botptr, const Client* target );
+
+EXPORTFUNC int irc_ctcp_unhandled_req( const Bot *botptr, const Client *target, const char *ctcp_command );
+EXPORTFUNC int irc_ctcp_unhandled_rpl( const Bot *botptr, const Client *target, const char *ctcp_command, const char *ctcp_parameters );
+
 
 /* bots.c */
 EXPORTFUNC int GenerateBotNick( char *nickbuf, int stublen, int alphacount, int numcount);
