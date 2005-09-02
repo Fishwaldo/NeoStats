@@ -249,9 +249,12 @@ Client *FindServer( const char *name )
 
 static int dumpserver( Client *s, void *v )
 {
-	/* Calculate uptime as uptime from server plus uptime of NeoStats */
-	time_t uptime = s->server->uptime  + ( me.now - me.ts_boot );
+	CmdParams *cmdparams;
+	time_t uptime;
 
+	/* Calculate uptime as uptime from server plus uptime of NeoStats */
+	uptime = s->server->uptime  + ( me.now - me.ts_boot );
+	cmdparams = ( CmdParams * ) v;
 	if( ircd_srv.protocol & PROTOCOL_B64SERVER )
 		irc_prefmsg( ns_botptr, cmdparams->source, _( "Server: %s (%s)" ), s->name, s->name64 );
 	else
