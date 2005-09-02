@@ -869,6 +869,7 @@ typedef int ModuleFlags;
 #define MODULE_FLAG_NONE			0x00000000
 #define MODULE_FLAG_AUTH			0x00000001
 #define MODULE_FLAG_LOCAL_EXCLUDES	0x00000002
+#define MODULE_FLAG_CTCP_VERSION	0x00000004
 
 typedef enum MOD_TYPE {
 	/* standard C Modules */

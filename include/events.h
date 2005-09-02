@@ -335,12 +335,14 @@ typedef enum Event {
  *      version in cmdparams->param
  */
 	EVENT_CTCPVERSIONRPL,
+	EVENT_CTCPVERSIONRPLBC,
 
 /*  EVENT_CTCPVERSIONREQ
  *    parameters:
  *      user in cmdparams->source
  */
 	EVENT_CTCPVERSIONREQ,
+	EVENT_CTCPVERSIONREQBC,
 
 /*  EVENT_CTCPFINGERRPL 
  *    parameters:
@@ -348,18 +350,21 @@ typedef enum Event {
  *      finger in cmdparams->param
  */
 	EVENT_CTCPFINGERRPL,
+	EVENT_CTCPFINGERRPLBC,
 
 /*  EVENT_CTCPFINGERREQ
  *    parameters:
  *      user in cmdparams->source
  */
 	EVENT_CTCPFINGERREQ,
+	EVENT_CTCPFINGERREQBC,
 
 /*  EVENT_CTCPACTIONREQ
  *    parameters:
  *      user in cmdparams->source
  */
 	EVENT_CTCPACTIONREQ,
+	EVENT_CTCPACTIONREQBC,
 
 /*  EVENT_CTCPTIMERPL 
  *    parameters:
@@ -367,12 +372,14 @@ typedef enum Event {
  *      time in cmdparams->param
  */
 	EVENT_CTCPTIMERPL,
+	EVENT_CTCPTIMERPLBC,
 
 /*  EVENT_CTCPTIMEREQ
  *    parameters:
  *      user in cmdparams->source
  */
 	EVENT_CTCPTIMEREQ,
+	EVENT_CTCPTIMEREQBC,
 
 /*  EVENT_CTCPPINGRPL 
  *    parameters:
@@ -380,12 +387,14 @@ typedef enum Event {
  *      ping in cmdparams->param
  */
 	EVENT_CTCPPINGRPL,
+	EVENT_CTCPPINGRPLBC,
 
 /*  EVENT_CTCPPINGREQ
  *    parameters:
  *      user in cmdparams->source
  */
 	EVENT_CTCPPINGREQ,
+	EVENT_CTCPPINGREQBC,
 
 /*  EVENT_CTCPUNHANDLEDRPL 
  *    parameters:
@@ -393,6 +402,7 @@ typedef enum Event {
  *      ???
  */
 	EVENT_CTCPUNHANDLEDRPL,
+	EVENT_CTCPUNHANDLEDRPLBC,
 
 /*  EVENT_CTCPUNHANDLEDREQ
  *    parameters:
@@ -400,6 +410,7 @@ typedef enum Event {
  *      ???
  */
 	EVENT_CTCPUNHANDLEDREQ,
+	EVENT_CTCPUNHANDLEDREQBC,
 
 /*  DCC events 
  *    Generated in response to ctcp dcc events

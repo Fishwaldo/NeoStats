@@ -65,7 +65,7 @@ ModuleEvent module_events[] = {
 	{EVENT_PART,			ss_event_part,			EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_KICK,			ss_event_kick,			EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_TOPIC,			ss_event_topic,			EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_CTCPVERSIONRPL,	ss_event_ctcpversion,	EVENT_FLAG_IGNORE_SYNCH},
+	{EVENT_CTCPVERSIONRPLBC,ss_event_ctcpversionbc,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_NULL,			NULL,					0}
 };
 

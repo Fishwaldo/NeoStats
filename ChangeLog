@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add broadcast forms of CTCP events so that modules can watch just their own 
+   CTCP transactions or all CTCP transactions on the network. (M)
  - Introduce framework for unknown ctcp messages. (M)
  - Fix a memleak in ExtAuth (F)
  - Netinfo on Ultimate3 is like Globops, not a burst function (F)

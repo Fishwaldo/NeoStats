@@ -40,6 +40,7 @@
 #include "services.h"
 #include "bans.h"
 
+/* Command function prototypes */
 static int ns_cmd_shutdown( CmdParams *cmdparams );
 static int ns_cmd_reload( CmdParams *cmdparams );
 static int ns_cmd_jupe( CmdParams *cmdparams );
@@ -95,7 +96,7 @@ Module ns_module = {
 };
 
 /** Bot comand table */
-static bot_cmd ns_commands[]=
+static bot_cmd ns_commands[] =
 {
 	{"LEVEL",		ns_cmd_level,		0, 	0,					ns_help_level},
 	{"STATUS",		ns_cmd_status,		0, 	0,					ns_help_status},
@@ -122,14 +123,14 @@ static bot_cmd ns_commands[]=
 };
 
 /** Bot setting table */
-static bot_setting ns_settings[]=
+static bot_setting ns_settings[] =
 {
 	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgsampletime, NULL,( void * )10 },
 	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,		SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgthreshold, NULL,( void * )5 },
 	{"SPLITTIME",		&nsconfig.splittime,		SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_splittime, NULL,( void * )300 },
 	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_joinserviceschan, NULL,( void* )1 },
 	{"PINGTIME",		&nsconfig.pingtime,			SET_TYPE_INT,		0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_pingtime, NULL,( void* )120 },
-	{"VERSIONSCAN",		&me.versionscan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_versionscan, NULL,( void* )1 },
+	{"VERSIONSCAN",		&me.versionscan,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_versionscan, NULL,( void* )1 },
 	{"SERVICECMODE",	me.servicescmode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_servicecmode, NULL, NULL },
 	{"SERVICEUMODE",	me.servicesumode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_serviceumode, NULL, NULL },
 	{"CMDCHAR",			nsconfig.cmdchar,			SET_TYPE_STRING,	0, 2, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdchar, NULL,( void* )"!" },
@@ -140,7 +141,8 @@ static bot_setting ns_settings[]=
 	NS_SETTING_END()
 };
 
-static bot_setting ns_debugsettings[]=
+/** Bot debug setting table */
+static bot_setting ns_debugsettings[] =
 {
 #ifndef DEBUG
 	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, NULL,( void* )0 },
@@ -154,19 +156,23 @@ static bot_setting ns_debugsettings[]=
 /** Bot pointer */
 Bot* ns_botptr = NULL;
 
-BotInfo ns_botinfo = {
+/** Core bot info */
+BotInfo ns_botinfo =
+{
 	"NeoStats",
 	"NeoStats1",
 	"Neo",
 	BOT_COMMON_HOST,
-	"",
+	"/msg NeoStats \2HELP\2",
 	/* 0x80000000 is a "hidden" flag to identify the core bot */
 	0x80000000|BOT_FLAG_ONLY_OPERS|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF,
 	ns_commands, 
 	ns_settings,
 };
 
-ModuleEvent neostats_events[] = {
+/** Core event table */
+ModuleEvent neostats_events[] =
+{
 	{EVENT_CTCPVERSIONRPL,	services_event_ctcpversion,	EVENT_FLAG_IGNORE_SYNCH},
 	{EVENT_NULL,		NULL}
 };
@@ -175,13 +181,16 @@ ModuleEvent neostats_events[] = {
  *
  *  NeoStats CTCP VERSION reply event handler
  *
- * @return none
+ *  @param cmdparams structure with command information
+ *
+ *  @return none
  */
+
 static int services_event_ctcpversion( CmdParams *cmdparams )
 {
 	dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
 	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
-	SendAllModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams );
+	SendAllModuleEvent( EVENT_CTCPVERSIONRPLBC, cmdparams );
 	return NS_SUCCESS;
 }
 
@@ -189,8 +198,11 @@ static int services_event_ctcpversion( CmdParams *cmdparams )
  *
  *  init NeoStats core
  *
+ *  @param none
+ *
  *  @return none
  */
+
 void InitServices( void )
 {
 	ModuleConfig( ns_settings );
@@ -200,8 +212,11 @@ void InitServices( void )
  *
  *  fini NeoStats core
  *
+ *  @param none
+ *
  *  @return none
  */
+
 void FiniServices( void )
 {
 	FreeEventList( &ns_module );
@@ -211,8 +226,11 @@ void FiniServices( void )
  *
  *  init NeoStats bot
  *
- * @return none
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 int init_services_bot( void )
 {
 	SET_SEGV_LOCATION();
@@ -232,13 +250,16 @@ int init_services_bot( void )
 	return NS_SUCCESS;
 }
 
-/** @brief SHUTDOWN command handler
+/** @brief ns_cmd_shutdown
  *
+ *  SHUTDOWN command handler
  *  Shutdown NeoStats
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_shutdown( CmdParams *cmdparams )
 {
 	char *message;
@@ -255,13 +276,16 @@ static int ns_cmd_shutdown( CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 
-/** @brief RELOAD command handler
+/** @brief ns_cmd_reload
  *
+ *  RELOAD command handler
  *  Reload NeoStats
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_reload( CmdParams *cmdparams )
 {
 	char *message;
@@ -278,13 +302,16 @@ static int ns_cmd_reload( CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 
-/** @brief JUPE command handler
+/** @brief ns_cmd_jupe
  *
+ *  JUPE command handler
  *  Jupiter a server
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_jupe( CmdParams *cmdparams )
 {
 	static char infoline[255];
@@ -298,13 +325,16 @@ static int ns_cmd_jupe( CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 
-/** @brief USERLIST command handler
+/** @brief ns_cmd_userlist
  *
+ *  USERLIST command handler
  *  Dump user list
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_userlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
@@ -312,17 +342,20 @@ static int ns_cmd_userlist( CmdParams *cmdparams )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
-	ListUsers( cmdparams,( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
+	ListUsers( cmdparams, ( cmdparams->ac < 1 ) ? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
 
-/** @brief SERVERLIST command handler
+/** @brief ns_cmd_serverlist
  *
+ *  SERVERLIST command handler
  *  Dump server list
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_serverlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
@@ -330,17 +363,20 @@ static int ns_cmd_serverlist( CmdParams *cmdparams )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
-	ListServers(( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
+	ListServers( cmdparams, ( cmdparams->ac < 1 ) ? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
 
-/** @brief CHANNELLIST command handler
+/** @brief ns_cmd_channellist
  *
+ *  CHANNELLIST command handler
  *  Dump channel list
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_channellist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
@@ -348,17 +384,20 @@ static int ns_cmd_channellist( CmdParams *cmdparams )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
 	   	return NS_FAILURE;
 	}
-	ListChannels( cmdparams,( cmdparams->ac < 1 )? NULL : cmdparams->av[0] );
+	ListChannels( cmdparams, ( cmdparams->ac < 1 ) ? NULL : cmdparams->av[0] );
    	return NS_SUCCESS;
 }
 
-/** @brief USERLIST command handler
+/** @brief ns_cmd_banlist
  *
- *  Dump user list
+ *  BANLIST command handler
+ *  Dump ban list
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_banlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
@@ -370,13 +409,16 @@ static int ns_cmd_banlist( CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 
-/** @brief STATUS command handler
+/** @brief ns_cmd_status
  *
+ *  STATUS command handler
  *  Display NeoStats status
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_status( CmdParams *cmdparams )
 {
 	time_t uptime = me.now - me.ts_boot;
@@ -406,13 +448,16 @@ static int ns_cmd_status( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** @brief LEVEL command handler
+/** @brief ns_cmd_level
  *
+ *  LEVEL command handler
  *  Display user level
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_level( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
@@ -434,13 +479,16 @@ static int ns_cmd_level( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** @brief LOAD command handler
+/** @brief ns_cmd_load
  *
+ *  LOAD command handler
  *  Load module
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_load( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
@@ -451,13 +499,16 @@ static int ns_cmd_load( CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 
-/** @brief UNLOAD command handler
+/** @brief ns_cmd_unload
  *
+ *  UNLOAD command handler
  *  Unload module
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_unload( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
@@ -467,13 +518,15 @@ static int ns_cmd_unload( CmdParams *cmdparams )
 }
 
 #ifdef USE_RAW
-/** @brief RAW command handler
+/** @brief ns_cmd_raw
  *
- *  issue a RAW command
+ *  RAW command handler
  *   
  *  @param cmdparams structure with command information
- *  @returns none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+
 static int ns_cmd_raw( CmdParams *cmdparams )
 {
 	char *message;

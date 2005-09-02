@@ -213,7 +213,7 @@ int ss_cmd_ctcpversion( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** @brief ss_event_ctcpversion
+/** @brief ss_event_ctcpversionbc
  *
  *  CTCP VERSION event handler
  *
@@ -222,7 +222,7 @@ int ss_cmd_ctcpversion( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_ctcpversion( CmdParams *cmdparams )
+int ss_event_ctcpversionbc( CmdParams *cmdparams )
 {
 	static char nocols[BUFSIZE];
 	ss_ctcp_version *cv;
@@ -230,16 +230,14 @@ int ss_event_ctcpversion( CmdParams *cmdparams )
     strlcpy( nocols, cmdparams->param, BUFSIZE );
 	strip_mirc_codes( nocols );
 	cv = findctcpversion( nocols );
-	if( cv )
+	if( !cv )
 	{
-		IncStatistic( &cv->users );
-		return NS_SUCCESS;
+		cv = ns_calloc( sizeof( ss_ctcp_version ) );
+		strlcpy( cv->name, nocols, BUFSIZE );
+		lnode_create_append( ctcp_version_list, cv );
+		dlog( DEBUG2, "Added version: %s", cv->name );
 	}
-	cv = ns_calloc( sizeof( ss_ctcp_version ) );
-	strlcpy( cv->name, nocols, BUFSIZE );
 	IncStatistic( &cv->users );
-	lnode_create_append( ctcp_version_list, cv );
-	dlog( DEBUG2, "Added version: %s", cv->name );
 	return NS_SUCCESS;
 }
 

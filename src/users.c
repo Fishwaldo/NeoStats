@@ -647,10 +647,7 @@ void SetUserVhost( const char *nick, const char *vhost )
 	{
 		strlcpy( u->user->vhost, vhost, MAXHOST );
 		ircsnprintf( u->user->uservhostmask, USERHOSTLEN, "%s!%s@%s", nick, u->user->username, vhost );
-		/* sethost on Unreal doesn't send +xt, but /umode +x sends +x 
-		 * so, we will never be 100% sure about +t 
-		 */
-		if( ircd_srv.features&FEATURE_UMODECLOAK )
+		if( ircd_srv.features & FEATURE_UMODECLOAK )
 			u->user->Umode |= UMODE_HIDE;
 	}
 }

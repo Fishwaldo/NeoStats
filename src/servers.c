@@ -253,14 +253,14 @@ static int dumpserver( Client *s, void *v )
 	time_t uptime = s->server->uptime  + ( me.now - me.ts_boot );
 
 	if( ircd_srv.protocol & PROTOCOL_B64SERVER )
-		irc_chanalert( ns_botptr, _( "Server: %s (%s)" ), s->name, s->name64 );
+		irc_prefmsg( ns_botptr, cmdparams->source, _( "Server: %s (%s)" ), s->name, s->name64 );
 	else
-		irc_chanalert( ns_botptr, _( "Server: %s" ), s->name );
-	irc_chanalert( ns_botptr, _( "Version: %s" ), s->version );
-	irc_chanalert( ns_botptr, _( "Uptime:  %ld day%s, %02ld:%02ld:%02ld" ),( uptime / TS_ONE_DAY ),( uptime / TS_ONE_DAY == 1 ) ? "" : "s",( ( uptime / TS_ONE_HOUR ) % 24 ),( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ),( uptime % 60 ) );
-	irc_chanalert( ns_botptr, _( "Flags:   %x" ), s->flags );
-	irc_chanalert( ns_botptr, _( "Uplink:  %s" ), s->uplink ? s->uplink->name : "" );
-	irc_chanalert( ns_botptr, "========================================" );
+		irc_prefmsg( ns_botptr, cmdparams->source, _( "Server: %s" ), s->name );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "Version: %s" ), s->version );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "Uptime:  %ld day%s, %02ld:%02ld:%02ld" ),( uptime / TS_ONE_DAY ),( uptime / TS_ONE_DAY == 1 ) ? "" : "s",( ( uptime / TS_ONE_HOUR ) % 24 ),( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ),( uptime % 60 ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "Flags:   %x" ), s->flags );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "Uplink:  %s" ), s->uplink ? s->uplink->name : "" );
+	irc_prefmsg( ns_botptr, cmdparams->source, "========================================" );
 	return NS_FALSE;
 }
 
@@ -274,9 +274,9 @@ static int dumpserver( Client *s, void *v )
  *  @return none
  */
 
-void ListServers( const char *name )
+void ListServers( CmdParams *cmdparams, const char *name )
 {
-	irc_chanalert( ns_botptr, _( "===============SERVERLIST===============" ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "===============SERVERLIST===============" ) );
 	if( name )
 	{
 		Client *s;
@@ -285,7 +285,7 @@ void ListServers( const char *name )
 		if( s )
 			dumpserver( s, NULL );
 		else
-			irc_chanalert( ns_botptr, _( "ListServers: can't find server %s" ), name );
+			irc_prefmsg( ns_botptr, cmdparams->source, _( "ListServers: can't find server %s" ), name );
 		return;
 	}
 	ProcessServerList( dumpserver, NULL );
