@@ -209,7 +209,7 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 	ns_free( cmdparams );
 	/* Send CTCP VERSION request if we are configured to do so */
 	if( IsNeoStatsSynched() && me.versionscan && !IsExcluded( u ) && !IsMe( u ) )
-		irc_ctcp_version_req( ns_botptr, u );
+		master_ctcp_version_req( u );
 	return u;
 }
 
@@ -529,7 +529,7 @@ int InitUsers( void )
 	return NS_SUCCESS;
 }
 
-/** @brief dumpuser
+/** @brief ListUser
  *
  *  Report user information
  *  NeoStats core use only.
@@ -540,7 +540,7 @@ int InitUsers( void )
  *  @return NS_FALSE
  */
 
-static int dumpuser( Client *u, void* v )
+static int ListUser( Client *u, void* v )
 {
 	CmdParams *cmdparams;
 	lnode_t *cm;
@@ -574,56 +574,38 @@ static int dumpuser( Client *u, void* v )
 	return NS_FALSE;
 }
 
-/** @brief ListUsers
+/** @brief ns_cmd_userlist
  *
- *  Report current user list
- *  NeoStats core use only.
+ *  USERLIST command handler
+ *  Dump user list
+ *   
+ *  @param cmdparams structure with command information
  *
- *  @param cmdparams
- *  @param nick
- *
- *  @return none
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-void ListUsers( CmdParams *cmdparams, const char *nick )
+int ns_cmd_userlist( CmdParams *cmdparams )
 {
 	Client *u;
 
-	if( !nsconfig.debug )
-		return;
 	SET_SEGV_LOCATION();
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "================USERLIST================", cmdparams->source ) );
-	if( !nick )
+	if( !nsconfig.debug )
 	{
-		ProcessUserList( dumpuser, cmdparams );
-		return;
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
+	   	return NS_FAILURE;
 	}
-	u = FindUser( nick );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "================USERLIST================", cmdparams->source ) );
+	if( cmdparams->ac < 1 )
+	{
+		ProcessUserList( ListUser, cmdparams );
+		return NS_SUCCESS;
+	}
+	u = FindUser( cmdparams->av[0] );
 	if( u )
-		dumpuser( u,( void * )cmdparams );
+		ListUser( u,( void * )cmdparams );
 	else
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "ListUsers: can't find user %s", cmdparams->source ), nick );
-}
-
-/** @brief UserLevel
- *
- *  Calculate user authentication level
- *  NeoStats core use only.
- *
- *  @param u pointer to client to authenticate
- *
- *  @return user level
- */
-
-int UserLevel( Client *u )
-{
-	/* Have we already calculated the user level? */
-	if( u->user->ulevel != -1 )
-		return u->user->ulevel;
-	u->user->ulevel = AuthUser( u );
-	/* Set user level so we no longer need to calculate */
-	dlog( DEBUG1, "UserLevel for %s set to %d", u->name, u->user->ulevel );
-	return u->user->ulevel;
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "can't find user %s", cmdparams->source ), cmdparams->av[0] );
+	return NS_SUCCESS;
 }
 
 /** @brief SetUserVhost

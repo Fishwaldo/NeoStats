@@ -436,6 +436,8 @@ int DelBot( const char *bot_name )
 		return NS_FAILURE;
 	}
 	botptr = hnode_get( bn );
+	if( botptr->flags & BOT_FLAG_CTCPVERSIONMASTER )
+		SetCTCPVersionMaster( NULL );
 	del_all_bot_cmds( botptr );
 	del_bot_info_settings( botptr );
 	del_all_bot_settings( botptr );
@@ -754,6 +756,8 @@ Bot *AddBot( BotInfo *botinfo )
 		if( botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES )
 			AddBotExcludeCommands( botptr );
 	}
+	if( botptr->flags & BOT_FLAG_CTCPVERSIONMASTER )
+		SetCTCPVersionMaster( botptr );
 	return botptr;
 }
 

@@ -32,6 +32,8 @@ Module *ns_load_module( const char *path, Client * u );
 int unload_module( const char *module_name, Client * u );
 void unload_modules( void );
 int ns_cmd_modlist( CmdParams* cmdparams );
+int ns_cmd_load( CmdParams *cmdparams );
+int ns_cmd_unload( CmdParams *cmdparams );
 void AllModuleVersions( const char* nick, const char *remoteserver );
 int SynchModule( Module* module_ptr );
 void SynchAllModules( void );

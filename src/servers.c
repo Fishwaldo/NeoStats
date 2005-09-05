@@ -49,7 +49,7 @@ static hash_t *serverhash;
  *  @return pointer to Client or NULL if fails
  */
 
-static Client * new_server( const char *name )
+static Client *new_server( const char *name )
 {
 	Client *s;
 
@@ -236,7 +236,7 @@ Client *FindServer( const char *name )
 	return NULL;
 }
 
-/** @brief dumpserver
+/** @brief ListServer
  *
  *  Report server information
  *  NeoStats core use only.
@@ -247,7 +247,7 @@ Client *FindServer( const char *name )
  *  @return none
  */
 
-static int dumpserver( Client *s, void *v )
+static int ListServer( Client *s, void *v )
 {
 	CmdParams *cmdparams;
 	time_t uptime;
@@ -267,31 +267,38 @@ static int dumpserver( Client *s, void *v )
 	return NS_FALSE;
 }
 
-/** @brief ListServers
+/** @brief ns_cmd_serverlist
  *
- *  Report current server list
- *  NeoStats core use only.
+ *  SERVERLIST command handler
+ *  Dump server list
+ *   
+ *  @param cmdparams structure with command information
  *
- *  @param name
- *
- *  @return none
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-void ListServers( CmdParams *cmdparams, const char *name )
+int ns_cmd_serverlist( CmdParams *cmdparams )
 {
-	irc_prefmsg( ns_botptr, cmdparams->source, _( "===============SERVERLIST===============" ) );
-	if( name )
-	{
-		Client *s;
+	Client *s;
 
-		s = FindServer( name );
-		if( s )
-			dumpserver( s, NULL );
-		else
-			irc_prefmsg( ns_botptr, cmdparams->source, _( "ListServers: can't find server %s" ), name );
-		return;
+	SET_SEGV_LOCATION();
+	if( !nsconfig.debug )
+	{
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
+	   	return NS_FAILURE;
 	}
-	ProcessServerList( dumpserver, NULL );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "===============SERVERLIST===============" ) );
+	if( cmdparams->ac < 1 )
+	{
+		ProcessServerList( ListServer, NULL );
+   		return NS_SUCCESS;
+	}
+	s = FindServer( cmdparams->av[0] );
+	if( s )
+		ListServer( s, NULL );
+	else
+		irc_prefmsg( ns_botptr, cmdparams->source, _( "can't find server %s" ), cmdparams->av[0] );
+   	return NS_SUCCESS;
 }
 
 /** @brief InitServers

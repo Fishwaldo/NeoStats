@@ -26,7 +26,7 @@
 
 Client *AddServer( const char *name, const char *uplink, const char *hops, const char *numeric, const char *infoline );
 void DelServer( const char *name, const char* reason );
-void ListServers( CmdParams *cmdparams, const char *name );
+int ns_cmd_serverlist( CmdParams *cmdparams );
 int InitServers( void );
 void PingServers( void );
 void FiniServers( void );

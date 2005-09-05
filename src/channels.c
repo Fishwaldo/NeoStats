@@ -553,35 +553,38 @@ static int ListChannel( Channel *c, void *v )
 	return NS_FALSE;
 }
 
-/** @brief ListChannels
+/** @brief ns_cmd_channellist
  *
- *  Report channels
+ *  CHANNELLIST command handler
+ *  Dump channel list
+ *   
+ *  @param cmdparams structure with command information
  *
- *  @param cmdparams
- *  @param chan
- *
- *  @returns none
-*/
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
-void ListChannels( CmdParams * cmdparams, const char *chan )
+int ns_cmd_channellist( CmdParams *cmdparams )
 {
 	Channel *c;
 
-	if( !nsconfig.debug )
-		return;
 	SET_SEGV_LOCATION();
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "================CHANLIST================",cmdparams->source ) );
-	if( chan )
+	if( !nsconfig.debug )
 	{
-		c = FindChannel( chan );
-		if( c )
-			ListChannel( c, cmdparams );
-		else
-			irc_prefmsg( ns_botptr, cmdparams->source, __( "ListChannels: can't find channel %s", cmdparams->source ), chan );
-		return;
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
+	   	return NS_FAILURE;
 	}
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels %d", cmdparams->source ),( int )hash_count( channelhash ) );
-	ProcessChannelList( ListChannel, cmdparams );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "================CHANLIST================",cmdparams->source ) );
+	if( cmdparams->ac < 1 )
+	{
+		ProcessChannelList( ListChannel, cmdparams );
+   		return NS_SUCCESS;
+	}
+	c = FindChannel( cmdparams->av[0] );
+	if( c )
+		ListChannel( c, cmdparams );
+	else
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "can't find channel %s", cmdparams->source ), cmdparams->av[0] );
+   	return NS_SUCCESS;
 }
 
 /** @brief FindChannel

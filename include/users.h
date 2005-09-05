@@ -36,7 +36,7 @@ void UserMode( const char *nick, const char *modes );
 void UserSMode( const char *nick, const char *modes );
 void UserAway( const char *nick, const char *awaymsg );
 Client *find_user_base64( const char *num );
-void ListUsers( CmdParams* cmdparams, const char *nick );
+int ns_cmd_userlist( CmdParams *cmdparams );
 void QuitServerUsers( Client *s );
 EXPORTFUNC void AddFakeUser( const char *mask );
 EXPORTFUNC void DelFakeUser( const char *mask );

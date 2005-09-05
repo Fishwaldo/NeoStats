@@ -39,6 +39,7 @@
 #include "exclude.h"
 #include "services.h"
 #include "bans.h"
+#include "auth.h"
 
 /* Command function prototypes */
 static int ns_cmd_shutdown( CmdParams *cmdparams );
@@ -47,14 +48,7 @@ static int ns_cmd_jupe( CmdParams *cmdparams );
 #ifdef USE_RAW
 static int ns_cmd_raw( CmdParams *cmdparams );
 #endif
-static int ns_cmd_userlist( CmdParams *cmdparams );
-static int ns_cmd_serverlist( CmdParams *cmdparams );
-static int ns_cmd_channellist( CmdParams *cmdparams );
-static int ns_cmd_banlist( CmdParams *cmdparams );
 static int ns_cmd_status( CmdParams *cmdparams );
-static int ns_cmd_level( CmdParams *cmdparams );
-static int ns_cmd_load( CmdParams *cmdparams );
-static int ns_cmd_unload( CmdParams *cmdparams );
 
 static int services_event_ctcpversion( CmdParams *cmdparams );
 
@@ -241,7 +235,7 @@ int init_services_bot( void )
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	SetModuleInSynch( &ns_module );
 	ns_botptr = AddBot( &ns_botinfo );
-	add_services_set_list (ns_debugsettings);
+	add_services_set_list( ns_debugsettings );
 	AddEventList( neostats_events );
 	SetModuleSynched( &ns_module );
 	me.synched = 1;
@@ -325,90 +319,6 @@ static int ns_cmd_jupe( CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 
-/** @brief ns_cmd_userlist
- *
- *  USERLIST command handler
- *  Dump user list
- *   
- *  @param cmdparams structure with command information
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_userlist( CmdParams *cmdparams )
-{
-	SET_SEGV_LOCATION();
-	if( !nsconfig.debug ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
-	ListUsers( cmdparams, ( cmdparams->ac < 1 ) ? NULL : cmdparams->av[0] );
-   	return NS_SUCCESS;
-}
-
-/** @brief ns_cmd_serverlist
- *
- *  SERVERLIST command handler
- *  Dump server list
- *   
- *  @param cmdparams structure with command information
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_serverlist( CmdParams *cmdparams )
-{
-	SET_SEGV_LOCATION();
-	if( !nsconfig.debug ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
-	ListServers( cmdparams, ( cmdparams->ac < 1 ) ? NULL : cmdparams->av[0] );
-   	return NS_SUCCESS;
-}
-
-/** @brief ns_cmd_channellist
- *
- *  CHANNELLIST command handler
- *  Dump channel list
- *   
- *  @param cmdparams structure with command information
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_channellist( CmdParams *cmdparams )
-{
-	SET_SEGV_LOCATION();
-	if( !nsconfig.debug ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
-	ListChannels( cmdparams, ( cmdparams->ac < 1 ) ? NULL : cmdparams->av[0] );
-   	return NS_SUCCESS;
-}
-
-/** @brief ns_cmd_banlist
- *
- *  BANLIST command handler
- *  Dump ban list
- *   
- *  @param cmdparams structure with command information
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_banlist( CmdParams *cmdparams )
-{
-	SET_SEGV_LOCATION();
-	if( !nsconfig.debug ) {
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
-	ListBans();
-   	return NS_SUCCESS;
-}
-
 /** @brief ns_cmd_status
  *
  *  STATUS command handler
@@ -446,75 +356,6 @@ static int ns_cmd_status( CmdParams *cmdparams )
 	else
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode disabled", cmdparams->source ) );
 	return NS_SUCCESS;
-}
-
-/** @brief ns_cmd_level
- *
- *  LEVEL command handler
- *  Display user level
- *   
- *  @param cmdparams structure with command information
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_level( CmdParams *cmdparams )
-{
-	SET_SEGV_LOCATION();
-	if( cmdparams->ac < 1 ) {
-		/* Force recalc user level */
-		cmdparams->source->user->ulevel = -1;
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "Your level is %d", cmdparams->source ), UserLevel( cmdparams->source ) );
-	} else {
-		Client * otheruser;
-		otheruser = FindUser( cmdparams->av[0] );
-		/* Force recalc user level */
-		otheruser->user->ulevel = -1;
-		if( !otheruser ) {
-			irc_prefmsg( ns_botptr, cmdparams->source, __( "User %s not found", cmdparams->source ), cmdparams->av[0] );
-			return NS_FAILURE;
-		}
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "User level for %s is %d", cmdparams->source ), otheruser->name, UserLevel( otheruser ) );
-	}
-	return NS_SUCCESS;
-}
-
-/** @brief ns_cmd_load
- *
- *  LOAD command handler
- *  Load module
- *   
- *  @param cmdparams structure with command information
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_load( CmdParams *cmdparams )
-{
-	SET_SEGV_LOCATION();
-	if( ns_load_module( cmdparams->av[0], cmdparams->source ) )
-		irc_chanalert( ns_botptr, _( "%s loaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
-	else
-		irc_chanalert( ns_botptr, _( "%s tried to load module %s, but load failed" ), cmdparams->source->name, cmdparams->av[0] );
-   	return NS_SUCCESS;
-}
-
-/** @brief ns_cmd_unload
- *
- *  UNLOAD command handler
- *  Unload module
- *   
- *  @param cmdparams structure with command information
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_unload( CmdParams *cmdparams )
-{
-	SET_SEGV_LOCATION();
-	if( unload_module( cmdparams->av[0], cmdparams->source ) > 0 )
-		irc_chanalert( ns_botptr, _( "%s unloaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
-   	return NS_SUCCESS;
 }
 
 #ifdef USE_RAW

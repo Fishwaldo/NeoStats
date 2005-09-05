@@ -28,5 +28,7 @@ int ctcp_private( CmdParams *cmdparams );
 int ctcp_notice( CmdParams *cmdparams );
 int ctcp_cprivate( CmdParams *cmdparams );
 int ctcp_cnotice( CmdParams *cmdparams );
+int master_ctcp_version_req( const Client *target );
+void SetCTCPVersionMaster( const Bot *bot );
 
 #endif /* _CTCP_H_ */

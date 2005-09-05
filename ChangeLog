@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Introduce module override to allow a module bot to become the primary source
+   of signon CTCP version requests. (M)
  - Add broadcast forms of CTCP events so that modules can watch just their own 
    CTCP transactions or all CTCP transactions on the network. (M)
  - Introduce framework for unknown ctcp messages. (M)

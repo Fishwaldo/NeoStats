@@ -785,6 +785,10 @@ typedef struct _bot_cmd {
  * E.g. TextServ db bots
  */
 #define BOT_FLAG_NOINTRINSICLEVELS	0x00000020
+/* Bot becomes CTCP master for version requests and replies
+ * E.g. SecureServ issuing CTCP VERSION rather than NeoStats
+ */
+#define BOT_FLAG_CTCPVERSIONMASTER	0x00000040
 
 /* This defines a "NULL" string for the purpose of BotInfo structures that 
  * want to inherit the main host used by NeoStats and still make the info

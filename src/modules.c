@@ -485,6 +485,44 @@ int ns_cmd_modlist( CmdParams* cmdparams )
 	return 0;
 }
 
+/** @brief ns_cmd_load
+ *
+ *  LOAD command handler
+ *  Load module
+ *   
+ *  @param cmdparams structure with command information
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ns_cmd_load( CmdParams *cmdparams )
+{
+	SET_SEGV_LOCATION();
+	if( ns_load_module( cmdparams->av[0], cmdparams->source ) )
+		irc_chanalert( ns_botptr, _( "%s loaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
+	else
+		irc_chanalert( ns_botptr, _( "%s tried to load module %s, but load failed" ), cmdparams->source->name, cmdparams->av[0] );
+   	return NS_SUCCESS;
+}
+
+/** @brief ns_cmd_unload
+ *
+ *  UNLOAD command handler
+ *  Unload module
+ *   
+ *  @param cmdparams structure with command information
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ns_cmd_unload( CmdParams *cmdparams )
+{
+	SET_SEGV_LOCATION();
+	if( unload_module( cmdparams->av[0], cmdparams->source ) > 0 )
+		irc_chanalert( ns_botptr, _( "%s unloaded module %s" ), cmdparams->source->name, cmdparams->av[0] );
+   	return NS_SUCCESS;
+}
+
 /** @brief unload_module
  *
  *  Unloads module
@@ -571,7 +609,10 @@ int unload_module( const char *modname, Client * u )
 
 	SET_RUN_LEVEL( mod_ptr );
 	DBACloseDatabase();
-
+	/* Cleanup moddata */
+	CleanupUserModdata( moduleindex );
+	CleanupServerModdata( moduleindex );
+	CleanupChannelModdata( moduleindex );
 
 	if( IS_STANDARD_MOD( mod_ptr ) ) {
 		ns_dlclose( mod_ptr->handle );
@@ -580,10 +621,6 @@ int unload_module( const char *modname, Client * u )
 		unload_perlmod( mod_ptr );
 #endif
 	}
-	/* Cleanup moddata */
-	CleanupUserModdata( moduleindex );
-	CleanupServerModdata( moduleindex );
-	CleanupChannelModdata( moduleindex );
 	RESET_RUN_LEVEL();
 	ns_free( mod_ptr );
 	/* free the module number */

@@ -25,11 +25,15 @@
 #include "nsevents.h"
 #include "ctcp.h"
 #include "dcc.h"
+#include "services.h"
 
 /** CTCP subsystem
  *
  *  Handle incoming and outgoing CTCP messages
  */
+
+/* CTCP master version request bot pointer */
+static const Bot *CTCPVersionMasterBot = NULL;
 
 /* CTCP command handler type */
 typedef int( *ctcp_cmd_handler )( CmdParams *cmdparams );
@@ -248,6 +252,43 @@ int irc_ctcp_version_req( const Bot *botptr, const Client *target )
 	dlog( DEBUG5, "TX: CTCP VERSION request from %s to %s", botptr->name, target->name );
 	irc_privmsg( botptr, target, "\1VERSION\1" );
 	return NS_SUCCESS;
+}
+
+/** @brief master_ctcp_version_req
+ *
+ *  Send a correctly formatted CTCP VERSION request
+ *  Module call.
+ *
+ *  @param target, pointer to client to send to
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int master_ctcp_version_req( const Client *target ) 
+{
+	const Bot *botptr;
+
+	botptr = CTCPVersionMasterBot;
+	if( !botptr )
+		botptr = ns_botptr;
+	dlog( DEBUG5, "TX: CTCP VERSION request from %s to %s", botptr->name, target->name );
+	irc_privmsg( botptr, target, "\1VERSION\1" );
+	return NS_SUCCESS;
+}
+
+/** @brief SetCTCPVersionMaster
+ *
+ *  Set CTCP version master
+ *  Module call.
+ *
+ *  @param botptr, pointer to bot sending request
+ *
+ *  @return none
+ */
+
+void SetCTCPVersionMaster( const Bot *bot )
+{
+	CTCPVersionMasterBot = bot;
 }
 
 /** @brief ctcp_req_finger

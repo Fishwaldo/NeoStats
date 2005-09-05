@@ -680,7 +680,7 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 	}
 }
 
-void ListChannelModes (CmdParams* cmdparams, Channel* c)
+void ListChannelModes(CmdParams* cmdparams, Channel* c)
 {
 	lnode_t *cmn;
 	ModesParm *m;

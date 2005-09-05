@@ -76,6 +76,7 @@ static int IsServiceRoot( const Client *u )
 /** @brief ModuleAuthHandler
  *
  *  Call module auth function
+ *  Auth subsystem use only.
  *
  *  @params module_ptr pointer to module
  *  @params v pointer to module auth info
@@ -102,14 +103,14 @@ static int ModuleAuthHandler( Module *module_ptr, void *v )
 /** @brief AuthUser
  *
  *  Determine authentication level of user
- *  NeoStats core use only.
+ *  Auth subsystem use only.
  *
  *  @param u pointer to client to test
  *
  *  @return authentication level
  */
 
-int AuthUser( const Client *u )
+static int AuthUser( const Client *u )
 {
 	ModuleAuthInfo mai;
 	
@@ -129,6 +130,58 @@ int AuthUser( const Client *u )
 	ProcessModuleList( ModuleAuthHandler, (void *)&mai );
 	/* Return calculated auth level */
 	return mai.auth;
+}
+
+/** @brief UserLevel
+ *
+ *  Calculate user authentication level
+ *  NeoStats core use only.
+ *
+ *  @param u pointer to client to authenticate
+ *
+ *  @return user level
+ */
+
+int UserLevel( Client *u )
+{
+	/* Have we already calculated the user level? */
+	if( u->user->ulevel != -1 )
+		return u->user->ulevel;
+	u->user->ulevel = AuthUser( u );
+	/* Set user level so we no longer need to calculate */
+	dlog( DEBUG1, "UserLevel for %s set to %d", u->name, u->user->ulevel );
+	return u->user->ulevel;
+}
+
+/** @brief ns_cmd_level
+ *
+ *  LEVEL command handler
+ *  Display user level
+ *   
+ *  @param cmdparams structure with command information
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ns_cmd_level( CmdParams *cmdparams )
+{
+	SET_SEGV_LOCATION();
+	if( cmdparams->ac < 1 ) {
+		/* Force recalc user level */
+		cmdparams->source->user->ulevel = -1;
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "Your level is %d", cmdparams->source ), UserLevel( cmdparams->source ) );
+	} else {
+		Client * otheruser;
+		otheruser = FindUser( cmdparams->av[0] );
+		/* Force recalc user level */
+		otheruser->user->ulevel = -1;
+		if( !otheruser ) {
+			irc_prefmsg( ns_botptr, cmdparams->source, __( "User %s not found", cmdparams->source ), cmdparams->av[0] );
+			return NS_FAILURE;
+		}
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "User level for %s is %d", cmdparams->source ), otheruser->name, UserLevel( otheruser ) );
+	}
+	return NS_SUCCESS;
 }
 
 /** @brief AddAuthModule

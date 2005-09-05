@@ -27,6 +27,6 @@
 int InitAuth( void );
 int AddAuthModule( Module *mod_ptr );
 void DelAuthModule( Module *mod_ptr );
-int AuthUser( const Client *u );
+int ns_cmd_level( CmdParams *cmdparams );
 
 #endif /* _AUTH_H_ */

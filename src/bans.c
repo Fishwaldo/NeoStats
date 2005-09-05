@@ -176,7 +176,7 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
 	ns_free( ban );
 }
 
-/** @brief ReportBan
+/** @brief ListBan
  *
  *  BANS LIST helper
  *  report ban info
@@ -187,27 +187,37 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
  *  @return none
  */
 
-static int ReportBan( Ban *ban, void *v )
+static int ListBan( Ban *ban, void *v )
 {
-	irc_chanalert( ns_botptr, _( "Ban: %s " ), ban->mask );
+	CmdParams *cmdparams;
+
+	cmdparams = ( CmdParams * ) v;
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "Ban: %s " ), ban->mask );
 	return NS_FALSE;
 }
 
-/** @brief ListBans
+/** @brief ns_cmd_banlist
  *
- *  List all bans currently set
- *  NeoStats core use only.
+ *  BANLIST command handler
+ *  Dump ban list
+ *   
+ *  @param cmdparams structure with command information
  *
- *  @param none
- *
- *  @return nothing
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-void ListBans( void )
+int ns_cmd_banlist( CmdParams *cmdparams )
 {
-	irc_chanalert( ns_botptr, _( "Ban Listing:" ) );
-	ProcessBanList( ReportBan, NULL );
-	irc_chanalert( ns_botptr, _( "End of list." ) );
+	SET_SEGV_LOCATION();
+	if( !nsconfig.debug )
+	{
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
+	   	return NS_FAILURE;
+	}
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "Ban Listing:" ) );
+	ProcessBanList( ListBan, (void *)cmdparams );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "End of list." ) );
+   	return NS_SUCCESS;
 }
 
 /** @brief FiniBans

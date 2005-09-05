@@ -24,7 +24,7 @@
 #ifndef _CHANNELS_H_
 #define _CHANNELS_H_
 
-void ListChannels( CmdParams* cmdparams, const char *chan );
+int ns_cmd_channellist( CmdParams *cmdparams );
 void PartChannel( Client *u, const char *chan, const char *reason );
 void PartAllChannels( Client *u, const char *reason );
 void JoinChannel( const char *nick, const char *chan );
