@@ -64,7 +64,7 @@ extern "C" {
 # define __export
 #endif /* __BORLANDC__ */
 
-FILE *cfg_yyin;
+extern FILE *cfg_yyin;
 
 
 

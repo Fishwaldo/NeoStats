@@ -54,7 +54,7 @@ struct langdump_struct {
 
 typedef struct langdump_struct langdump;
 
-struct lang_stats {
+extern struct lang_stats {
 	char *lang_list[MAXLANG];
 	int noofloadedlanguages;
 	int dbhits[MAXLANG];

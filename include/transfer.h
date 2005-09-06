@@ -32,7 +32,7 @@
 
 
 /* this is the curl multi handle we use */
-CURLM *curlmultihandle;
+extern CURLM *curlmultihandle;
 
 
 
@@ -66,7 +66,7 @@ typedef struct neo_transfer {
 	transfer_callback *callback;
 } neo_transfer;
 
-list_t *activetransfers;
+extern list_t *activetransfers;
 
 
 int InitCurl( void );

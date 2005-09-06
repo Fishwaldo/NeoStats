@@ -51,6 +51,8 @@ extern char *cfg_qstring;
 
 char *cfg_yylval = 0;
 
+FILE *cfg_yyin;
+
 const char confuse_version[] = "2.5";
 const char confuse_copyright[] = "LibConfuse by Martin Hedenfalk <mhe@home.se>";
 const char confuse_author[] = "Martin Hedenfalk <mhe@home.se>";

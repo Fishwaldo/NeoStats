@@ -30,6 +30,9 @@
 
 #define MAX_TRANSFERS	10	/* number of curl transfers */
 
+CURLM *curlmultihandle;
+list_t *activetransfers;
+
 int InitCurl(void) 
 {
 	/* global curl init */

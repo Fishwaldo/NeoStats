@@ -171,7 +171,7 @@ typedef struct allocnode {
 	struct allocnode *next, *back;
 } allocnode;
 
-union maxalign {
+extern union maxalign {
 	byte d[1];
 	struct in_addr ia;
 	long l;

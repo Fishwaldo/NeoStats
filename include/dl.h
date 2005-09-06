@@ -67,6 +67,6 @@ void *ns_dlopen( const char *file, int mode );
 int ns_dlclose( void *handle );
 char *ns_dlerror( void );
 
-char *ns_dlerrormsg;
+extern char *ns_dlerrormsg;
 
 #endif /* _DL_H_ */

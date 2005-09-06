@@ -51,7 +51,8 @@ static char protocol_path[MAXPATH];
 ProtocolInfo *protocol_info;
 void *protocol_module_handle;
 irc_cmd *cmd_list;
-
+int (*irc_parse) (void *notused, void *rline, size_t len);
+ 
 /** @brief process_ircd_cmd
  *
  *  process ircd commands
