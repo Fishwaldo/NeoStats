@@ -1360,7 +1360,7 @@ EXPORTFUNC char *GetRandomChannelKey( int length );
 #define IsChanProt( chan, nick ) test_cumode( chan, nick, CUMODE_CHANPROT )
 #define IsChanAdmin( chan, nick ) test_cumode( chan, nick, CUMODE_CHANADMIN )
 
-EXPORTVAR unsigned char UmodeChRegNick;
+EXPORTVAR extern unsigned char UmodeChRegNick;
 
 /* dns.c */
 EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void *data, adns_answer * a), void *data );
@@ -1574,7 +1574,7 @@ EXPORTFUNC int os_close( int fd );
 EXPORTFUNC int os_mkstemp( char *ftemplate );
 EXPORTFUNC int os_write_temp_file( char *ftemplate, const void *buffer, unsigned int count );
 EXPORTFUNC int os_file_get_size( const char *filename );
-EXPORTVAR int os_file_errno;
+EXPORTVAR extern int os_file_errno;
 
 EXPORTFUNC char *os_strerror( void );
 EXPORTFUNC size_t os_strftime( char *strDest, size_t maxsize, const char *format, const struct tm *timeptr );
@@ -1592,7 +1592,7 @@ EXPORTFUNC int os_sock_bind( OS_SOCKET s, const struct sockaddr* name, int namel
 EXPORTFUNC int os_sock_listen( OS_SOCKET s, int backlog );
 EXPORTFUNC int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char *optval, int optlen );
 EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void *argp );
-EXPORTVAR int os_sock_errno;
+EXPORTVAR extern int os_sock_errno;
 EXPORTFUNC char *os_sock_getlasterrorstring( void );
 EXPORTFUNC char *os_sock_strerror( const int sockerrno );
 EXPORTFUNC int os_sock_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout );
