@@ -464,7 +464,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED LIBOBJS POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE unamepath sedpath perlpath PERL_CFLAGS PERL_LDFLAGS DO_PERL_TRUE DO_PERL_FALSE wi_PWD USECCDV PROTOCOL LIBTOOL_DEPS MODULES LIBDB CCDV EVNTLIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL YACC LEX LEXLIB LEX_OUTPUT_ROOT SED unamepath LIBOBJS POW_LIB PCRE_LIBS PCRE_CFLAGS BUILD_PCRE_TRUE BUILD_PCRE_FALSE CURL_LIBS CURL_CFLAGS BUILD_CURL_TRUE BUILD_CURL_FALSE sedpath perlpath PERL_CFLAGS PERL_LDFLAGS DO_PERL_TRUE DO_PERL_FALSE wi_PWD USECCDV PROTOCOL LIBTOOL_DEPS MODULES LIBDB CCDV EVNTLIBOBJS RDYNAMIC_FLAG LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -19705,6 +19705,63 @@ echo "${ECHO_T}no" >&6
 fi
 
 
+# Extract the first word of "uname", so it can be a program name with args.
+set dummy uname; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_unamepath+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $unamepath in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_unamepath="$unamepath" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_unamepath="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+unamepath=$ac_cv_path_unamepath
+
+if test -n "$unamepath"; then
+  echo "$as_me:$LINENO: result: $unamepath" >&5
+echo "${ECHO_T}$unamepath" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test "_$unamepath" = _; then
+	system="unknown"
+else
+	echo "$as_me:$LINENO: checking system type" >&5
+echo $ECHO_N "checking system type... $ECHO_C" >&6
+	system=`$unamepath -s`
+	echo "$as_me:$LINENO: result: $system" >&5
+echo "${ECHO_T}$system" >&6
+fi
+
+case "$system" in
+	"Darwin")
+		RDYNAMIC_FLAG=
+		;;
+	*)
+		RDYNAMIC_FLAG="-rdynamic"
+		;;
+esac
 # Checks for libraries.
 # AC_LIB_LTDL
 
@@ -26912,54 +26969,6 @@ fi
 
 
 
-	# Extract the first word of "uname", so it can be a program name with args.
-set dummy uname; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_unamepath+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $unamepath in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_unamepath="$unamepath" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_unamepath="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  ;;
-esac
-fi
-unamepath=$ac_cv_path_unamepath
-
-if test -n "$unamepath"; then
-  echo "$as_me:$LINENO: result: $unamepath" >&5
-echo "${ECHO_T}$unamepath" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-	if test "_$unamepath" = _; then
-		system="unknown"
-	else
-		echo "$as_me:$LINENO: checking system type" >&5
-echo $ECHO_N "checking system type... $ECHO_C" >&6
-		system=`$unamepath -s`
-		echo "$as_me:$LINENO: result: $system" >&5
-echo "${ECHO_T}$system" >&6
-	fi
 
 
 	# Check whether --enable-perl or --disable-perl was given.
@@ -28540,6 +28549,7 @@ CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 
 
+
                                                                                                                                                                                                                                       ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile modules/protocol/Makefile modules/dbm/Makefile modules/dbm/bdb/Makefile modules/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/quoteserv/Makefile modules/limitserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile neostats"
 
 
@@ -29364,6 +29374,7 @@ s,@LEX@,$LEX,;t t
 s,@LEXLIB@,$LEXLIB,;t t
 s,@LEX_OUTPUT_ROOT@,$LEX_OUTPUT_ROOT,;t t
 s,@SED@,$SED,;t t
+s,@unamepath@,$unamepath,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@POW_LIB@,$POW_LIB,;t t
 s,@PCRE_LIBS@,$PCRE_LIBS,;t t
@@ -29374,7 +29385,6 @@ s,@CURL_LIBS@,$CURL_LIBS,;t t
 s,@CURL_CFLAGS@,$CURL_CFLAGS,;t t
 s,@BUILD_CURL_TRUE@,$BUILD_CURL_TRUE,;t t
 s,@BUILD_CURL_FALSE@,$BUILD_CURL_FALSE,;t t
-s,@unamepath@,$unamepath,;t t
 s,@sedpath@,$sedpath,;t t
 s,@perlpath@,$perlpath,;t t
 s,@PERL_CFLAGS@,$PERL_CFLAGS,;t t
@@ -29389,6 +29399,7 @@ s,@MODULES@,$MODULES,;t t
 s,@LIBDB@,$LIBDB,;t t
 s,@CCDV@,$CCDV,;t t
 s,@EVNTLIBOBJS@,$EVNTLIBOBJS,;t t
+s,@RDYNAMIC_FLAG@,$RDYNAMIC_FLAG,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 

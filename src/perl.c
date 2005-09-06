@@ -676,58 +676,62 @@ XS (XS_NeoStats_AddCommand)
 	if (items < 3) {
 		nlog(LOG_WARNING, "Usage: NeoStats:Internal:AddCommand(bot, botcmd, callback)");
 	} else {
-		ret = ST(1);
-		if(SvTYPE(SvRV(ret))!=SVt_PVHV) {
-			 dlog(DEBUG1, "XS_NeoStats_AddCommand: unsuported input %lu, must %i", SvTYPE(SvRV(ret)), SVt_PVHV);
-			 XSRETURN_EMPTY;
-		}
-		rethash = (HV*)SvRV(ret);
-#ifdef DEBUG
-		dump_hash(rethash);
-#endif
-		bc = ns_malloc(sizeof(bot_cmd));
-		value = *hv_fetch(rethash, "cmd", strlen("cmd"), FALSE);
-		bc->cmd = ns_malloc(SvLEN(value)+1);
-		strlcpy((char *)bc->cmd, SvPV_nolen(value), SvLEN(value)+1);
-		value = *hv_fetch(rethash, "minparams", strlen("minparams"), FALSE);
-		bc->minparams = SvIV(value);
-		value = *hv_fetch(rethash, "ulevel", strlen("ulevel"), FALSE);
-		bc->ulevel = SvIV(value);
-
-		value = *hv_fetch(rethash, "helptext", strlen("helptext"), FALSE);
-		/* make sure its a array */
-		if (SvTYPE(SvRV(value)) != SVt_PVAV) {
-			dlog(DEBUG1, "XS_NeoStats_AddCommand: Helptext field is not a array");
-			ns_free(bc->cmd);
-			ns_free(bc);
-			XSRETURN_EMPTY;
-		}
-		/* ok, lets setup the array */
-		helptext = (AV*)SvRV(value);
-		j = 0;
-		for (i =0; i <= av_len(helptext); i++) {
-			/* ok, try to follow me here:
-			 * we extract each member of the array (av_fetch)
-			 * and convert it to a string (SvPV_nolen)
-			 * then make a copy (malloc'ed) of it (strdup)
-			 * and put it on the end of the array of helptext strings (AddStringToList)!
-			 */
-			AddStringToList(&bc->helptext, strdup(SvPV_nolen(*av_fetch(helptext, i, FALSE))), &j);
-		}
-		value = *hv_fetch(rethash, "flags", strlen("flags"), FALSE);
-		bc->flags = SvIV(value);
-
-		bc->moddata = malloc(SvLEN(ST(2))+1);
-		strlcpy(bc->moddata, SvPV_nolen(ST(2)), SvLEN(ST(2))+1);
-		bc->modptr = mod;
-		bc->handler = perl_command_cb;
 		bot = FindBot(SvPV_nolen(ST(0)));
 		if (bot) {
 			if (bot->botcmds == NULL) {
 				bot->botcmds = hash_create(-1, 0, 0);
 			}
+			ret = ST(1);
+			if(SvTYPE(SvRV(ret))!=SVt_PVHV) {
+				 dlog(DEBUG1, "XS_NeoStats_AddCommand: unsuported input %lu, must %i", SvTYPE(SvRV(ret)), SVt_PVHV);
+				 XSRETURN_EMPTY;
+			}
+			rethash = (HV*)SvRV(ret);
+#ifdef DEBUG
+			dump_hash(rethash);
+#endif
+			bc = ns_malloc(sizeof(bot_cmd));
+			value = *hv_fetch(rethash, "cmd", strlen("cmd"), FALSE);
+			bc->cmd = ns_malloc(SvLEN(value)+1);
+			strlcpy((char *)bc->cmd, SvPV_nolen(value), SvLEN(value)+1);
+			value = *hv_fetch(rethash, "minparams", strlen("minparams"), FALSE);
+			bc->minparams = SvIV(value);
+			value = *hv_fetch(rethash, "ulevel", strlen("ulevel"), FALSE);
+			bc->ulevel = SvIV(value);
+
+			value = *hv_fetch(rethash, "helptext", strlen("helptext"), FALSE);
+			/* make sure its a array */
+			if (SvTYPE(SvRV(value)) != SVt_PVAV) {
+				dlog(DEBUG1, "XS_NeoStats_AddCommand: Helptext field is not a array");
+				ns_free(bc->cmd);
+				ns_free(bc);
+				XSRETURN_EMPTY;
+			}
+			/* ok, lets setup the array */
+			helptext = (AV*)SvRV(value);
+			j = 0;
+			for (i =0; i <= av_len(helptext); i++) {
+				/* ok, try to follow me here:
+				 * we extract each member of the array (av_fetch)
+				 * and convert it to a string (SvPV_nolen)
+				 * then make a copy (malloc'ed) of it (strdup)
+				 * and put it on the end of the array of helptext strings (AddStringToList)!
+				 */
+				 AddStringToList(&bc->helptext, strdup(SvPV_nolen(*av_fetch(helptext, i, FALSE))), &j);
+			}
+			value = *hv_fetch(rethash, "flags", strlen("flags"), FALSE);
+			bc->flags = SvIV(value);
+
+			bc->moddata = malloc(SvLEN(ST(2))+1);
+			strlcpy(bc->moddata, SvPV_nolen(ST(2)), SvLEN(ST(2))+1);
+			bc->modptr = mod;
+			bc->handler = perl_command_cb;
+	
 			XSRETURN_UV(add_bot_cmd(bot->botcmds, bc));
+		} else {
+			nlog(LOG_WARNING, "XS_NeoStats_AddBot: Bot %s is not valid", ST(0));
 		}
+			
 	}
 	XSRETURN_UV(NS_FAILURE);
 }
