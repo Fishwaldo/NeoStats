@@ -289,6 +289,10 @@ static void cs_report( const char *fmt, ... )
 	va_start( ap, fmt );
 	ircvsnprintf( buf, BUFSIZE, fmt, ap );
 	va_end( ap );
+
+	/* make sure the user can't use format specifers to crash/buffer overflow */
+	clean_string(buf, BUFSIZE);
+	
 	irc_chanalert( cs_bot, buf );
 	if( cs_cfg.logging ) 
 		nlog( LOG_NORMAL, buf );

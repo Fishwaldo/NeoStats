@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Fix a potential security vulnerbility with user supplied strings (F)
+ - NeoStats now compiles and runs on Mac OSX (Tiger) (F)
  - Introduce module override to allow a module bot to become the primary source
    of signon CTCP version requests. (M)
  - Add broadcast forms of CTCP events so that modules can watch just their own 

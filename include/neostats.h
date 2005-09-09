@@ -1221,6 +1221,7 @@ EXPORTFUNC char *sstrdup( const char *s );
 char *strlwr( char *s );
 EXPORTFUNC void AddStringToList( char ***List, char S[], int *C );
 EXPORTFUNC void strip_mirc_codes( char *text );
+EXPORTFUNC void clean_string(char *text, size_t len);
 EXPORTFUNC char *sctime( time_t t );
 EXPORTFUNC char *sftime( time_t t );
 EXPORTFUNC char *make_safe_filename( char *name );

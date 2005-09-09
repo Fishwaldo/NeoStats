@@ -363,6 +363,44 @@ void strip_mirc_codes( char *text )
 	*dd = 0;
 }
 
+/** @brief clean_string
+ * 
+ *  cleans up a string, escaping some vars that could be used to
+ *  crash neostats (like format strings, %s %d etc)
+ * 
+ *  @param text to clean
+ *
+ *  @returns none
+ */
+
+void clean_string( char *text, size_t len )
+{
+	char *dd, *start, *orig; 
+	int i = 0;
+	dd = malloc(len);	
+	start = dd;
+	orig = text;
+	
+	while( *text ) {
+		i++;
+		switch( *text ) {
+			case '%':
+				/* if our final length is bigger than the buffer, then we just 
+				 * drop the char */
+				if ( (i+1) <= len) {
+					*dd++ = '%';
+				} else {
+					*text++;
+				}
+				break;
+		}
+		*dd++ = *text++;		/* Move on to the next char */
+	}
+	*dd = 0;
+	strncpy(orig,start,len);
+	free(start);	
+}
+
 /** @brief sctime
  * 
  *  
