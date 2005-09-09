@@ -18,6 +18,6 @@ ultimate2_la_SOURCES = ultimate2.c
 ultimate3_la_SOURCES = ultimate3.c
 unreal31_la_SOURCES = unreal31.c
 unreal32_la_SOURCES = unreal32.c
-AM_LDFLAGS	= -module -avoid-version -no-undefined
+AM_LDFLAGS	= -module -avoid-version
 AM_CFLAGS		= -I$(top_srcdir)/lib/adns/ -I$(top_srcdir)/lib/keeper @PCRE_CFLAGS@ @CURL_CFLAGS@
 include $(top_srcdir)/autotools/rules.mk

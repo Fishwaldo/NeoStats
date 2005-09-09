@@ -224,7 +224,7 @@ statserv_la_SOURCES = ss_help.c \
 			geoip/GeoIPBitReader.c geoip/GeoIPBitReader.h \
 			geoip/GeoIP.c geoip/GeoIP.h
 
-statserv_la_LDFLAGS = -module -avoid-version -no-undefined
+statserv_la_LDFLAGS = -module -avoid-version
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -Igeoip -DGEOIPDATADIR=\"$(datadir)\" \
 			-DSYSCONFDIR=\"$(sysconfdir)\"
 

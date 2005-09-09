@@ -219,7 +219,7 @@ gdbm_la_SOURCES = gdbm.c \
 	gdbmfetch.c gdbmopen.c gdbmreorg.c gdbmseq.c gdbmsetopt.c \
 	gdbmstore.c gdbmsync.c global.c hash.c update.c version.c
 
-AM_LDFLAGS = -module -avoid-version -no-undefined
+AM_LDFLAGS = -module -avoid-version
 AM_CFLAGS = -I$(top_srcdir)/lib/adns/ @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@

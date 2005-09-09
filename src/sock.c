@@ -996,7 +996,7 @@ int ns_cmd_socklist (CmdParams* cmdparams)
 				break;
 			case SOCK_LINEMODE:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("LineMode Socket - fd: %d", cmdparams->source), sock->sock_no);
-				irc_prefmsg (ns_botptr, cmdparams->source, __("ReceiveQ Set: %d Current: %d", cmdparams->source), sock->sfunc.linemode.recvq, sock->sfunc.linemode.readbufsize);	
+				irc_prefmsg (ns_botptr, cmdparams->source, __("ReceiveQ Set: %d Current: %d", cmdparams->source), (int)sock->sfunc.linemode.recvq, (int)sock->sfunc.linemode.readbufsize);	
 				break;
 			case SOCK_LISTEN:
 				irc_prefmsg (ns_botptr, cmdparams->source, __("Listen Socket - fd %d Port %d", cmdparams->source), sock->sock_no, sock->sfunc.listenmode.port);

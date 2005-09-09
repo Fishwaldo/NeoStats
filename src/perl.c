@@ -240,30 +240,39 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_CTCPVERSIONRPL:
+		case EVENT_CTCPVERSIONRPLBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_CTCPVERSIONREQ:
+		case EVENT_CTCPVERSIONREQBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
 			break;
 		case EVENT_CTCPFINGERRPL:
+		case EVENT_CTCPFINGERRPLBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_CTCPFINGERREQ:
+		case EVENT_CTCPFINGERREQBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
 			break;
 		case EVENT_CTCPACTIONREQ:
+		case EVENT_CTCPACTIONREQBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
 			break;
 		case EVENT_CTCPTIMERPL:
+		case EVENT_CTCPTIMERPLBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_CTCPTIMEREQ:
+		case EVENT_CTCPTIMEREQBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
 			break;
 		case EVENT_CTCPPINGRPL:
+		case EVENT_CTCPPINGRPLBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
 			break;
 		case EVENT_CTCPPINGREQ:
+		case EVENT_CTCPPINGREQBC:
 			ret = execute_perl(mod_ptr, mod_ptr->event_list[evt]->pe->callback, 1, cmdparams->source->name);
 			break;
 		case EVENT_DCCSEND:

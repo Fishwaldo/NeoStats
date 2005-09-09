@@ -586,7 +586,7 @@ static int ctcp_rpl_unhandled( CmdParams *cmdparams )
 
 int irc_ctcp_unhandled_req( const Bot *botptr, const Client *target, const char *ctcp_command )
 {
-	dlog( DEBUG5, "TX: CTCP UNHANDLED request from %s to %s: %s %s", botptr->name, target->name, ctcp_command );
+	dlog( DEBUG5, "TX: CTCP UNHANDLED request from %s to %s: %s", botptr->name, target->name, ctcp_command );
 	irc_privmsg( botptr, target, "\1%s\1", ctcp_command );
 	return NS_SUCCESS;
 }

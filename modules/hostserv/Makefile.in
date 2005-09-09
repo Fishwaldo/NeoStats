@@ -210,7 +210,7 @@ unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = hostserv.la
 hostserv_la_SOURCES = hostserv.c hostserv.h hs_help.c
-hostserv_la_LDFLAGS = -module -avoid-version -no-undefined
+hostserv_la_LDFLAGS = -module -avoid-version
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@

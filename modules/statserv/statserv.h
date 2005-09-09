@@ -36,7 +36,7 @@
 
 extern Bot *ss_bot;
 
-struct StatServ { 
+extern struct StatServ { 
 	int lagtime; 
 	int lagalert; 
 	int recordalert; 

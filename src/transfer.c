@@ -78,7 +78,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 		case NS_FILE:
 			/* we are saving to a file... :) */
 			writesize = fwrite(transferptr, size, nmemb, neotrans->savefile);
-			dlog(DEBUG1, "Write %d to file from transfer from URL %s", (int)size*nmemb, neotrans->url);
+			dlog(DEBUG1, "Write %d to file from transfer from URL %s", (int)size*(int)nmemb, neotrans->url);
 			break;
 		case NS_MEMORY:
 			size *= nmemb;
