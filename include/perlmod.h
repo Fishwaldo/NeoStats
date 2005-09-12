@@ -24,6 +24,9 @@
 #ifndef _PERLMOD_H_
 #define _PERLMOD_H_
 
+
+typedef int (*perl_xs_init) (void);
+
 #ifdef PERLDEFINES
 #ifdef WIN32
 /* I have no idea why... */
@@ -47,12 +50,14 @@
 typedef struct PerlEvent {
 	SV *callback;
 	SV *userdata;
-	int options;
 } PerlEvent;
 
 typedef struct PerlModInfo {
 	char filename[MAXPATH];
 	PerlInterpreter *my_perl;
+	struct ModuleEvent **event_list;
+	int registered;
+	perl_xs_init extninit;
 } PerlModInfo;
 
 #endif /* PERLDEFINES */
@@ -62,6 +67,7 @@ typedef struct PerlModInfo {
 int Init_Perl( void );
 void PerlModFini(Module *mod);
 void unload_perlmod(Module *mod);
+void unload_perlextension(Module *mod);
 void ns_cmd_modperlist(CmdParams *cmd);
 Module *load_perlmodule(const char *filename, Client *u);
 int perl_sync_module(Module *mod);
