@@ -553,6 +553,11 @@ int unload_module( const char *modname, Client * u )
 	}
 	mod_ptr = hnode_get( modnode );
 	irc_chanalert( ns_botptr, _( "Unloading module %s" ), modname );
+#ifdef USE_PERL
+	/* unload any extensions first */
+	unload_perlextension(mod_ptr);
+#endif
+	
 	if( mod_ptr->info->flags & MODULE_FLAG_AUTH )
 	{
 		DelAuthModule( mod_ptr );
