@@ -628,7 +628,6 @@
 				D0068E1F08D1FB4A00131B40,
 				D0068E2008D1FB4A00131B40,
 				D0068E2108D1FB4A00131B40,
-				D0068E2208D1FB4A00131B40,
 				D0068E2308D1FB4A00131B40,
 				D0068E2508D1FB4A00131B40,
 				D0068E2608D1FB4A00131B40,
@@ -666,7 +665,6 @@
 				D0068E4A08D1FB4A00131B40,
 				D0068E4B08D1FB4A00131B40,
 				D0068E4C08D1FB4A00131B40,
-				D0068E4D08D1FB4A00131B40,
 				D0068E4E08D1FB4A00131B40,
 			);
 			isa = PBXGroup;
@@ -767,14 +765,6 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			path = conf.h;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		D0068E2208D1FB4A00131B40 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			path = config.h;
 			refType = 4;
 			sourceTree = "<group>";
 		};
@@ -1074,14 +1064,6 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
-		D0068E4D08D1FB4A00131B40 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			path = version.h;
-			refType = 4;
-			sourceTree = "<group>";
-		};
 		D0068E4E08D1FB4A00131B40 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -1106,7 +1088,6 @@
 				D0E060B208D1FD6F00DBA28C,
 				D0E060B308D1FD6F00DBA28C,
 				D0E060B408D1FD6F00DBA28C,
-				D0E060B508D1FD6F00DBA28C,
 				D0E060B608D1FD6F00DBA28C,
 				D0E060B708D1FD6F00DBA28C,
 				D0E060B808D1FD6F00DBA28C,
@@ -1224,14 +1205,6 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.h;
 			path = base64.h;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		D0E060B508D1FD6F00DBA28C = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.h;
-			path = "ca-bundle.h";
 			refType = 4;
 			sourceTree = "<group>";
 		};
@@ -2163,7 +2136,6 @@
 		};
 		D0E0616108D1FD6F00DBA28C = {
 			children = (
-				D0E0616208D1FD6F00DBA28C,
 				D0E0616508D1FD6F00DBA28C,
 				D0E0616608D1FD6F00DBA28C,
 				D0E0616708D1FD6F00DBA28C,
@@ -2174,14 +2146,6 @@
 			);
 			isa = PBXGroup;
 			path = pcre;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		D0E0616208D1FD6F00DBA28C = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			lastKnownFileType = sourcecode.c.c;
-			path = chartables.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};

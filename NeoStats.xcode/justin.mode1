@@ -209,6 +209,46 @@
 			<key>Content</key>
 			<dict>
 				<key>PBXProjectModuleGUID</key>
+				<string>D0A7D86008D5B73100DC5576</string>
+				<key>PBXProjectModuleLabel</key>
+				<string>perl.c</string>
+				<key>PBXSplitModuleInNavigatorKey</key>
+				<dict>
+					<key>Split0</key>
+					<dict>
+						<key>PBXProjectModuleGUID</key>
+						<string>D0A7D86108D5B73100DC5576</string>
+						<key>PBXProjectModuleLabel</key>
+						<string>perl.c</string>
+						<key>_historyCapacity</key>
+						<integer>0</integer>
+						<key>bookmark</key>
+						<string>D0A7D86208D5B73100DC5576</string>
+						<key>history</key>
+						<array>
+							<string>D0A7D85D08D5B72400DC5576</string>
+						</array>
+					</dict>
+					<key>SplitCount</key>
+					<string>1</string>
+				</dict>
+				<key>StatusBarVisibility</key>
+				<true/>
+			</dict>
+			<key>Geometry</key>
+			<dict>
+				<key>Frame</key>
+				<string>{{0, 20}, {750, 461}}</string>
+				<key>PBXModuleWindowStatusBarHidden2</key>
+				<false/>
+				<key>RubberWindowFrame</key>
+				<string>65 197 750 502 0 0 1024 746 </string>
+			</dict>
+		</dict>
+		<dict>
+			<key>Content</key>
+			<dict>
+				<key>PBXProjectModuleGUID</key>
 				<string>D0A7D6F108D5931100DC5576</string>
 				<key>PBXProjectModuleLabel</key>
 				<string>neostats.h</string>
@@ -223,7 +263,7 @@
 						<key>_historyCapacity</key>
 						<integer>0</integer>
 						<key>bookmark</key>
-						<string>D0A7D85108D5B4EC00DC5576</string>
+						<string>D0A7D86308D5B73100DC5576</string>
 						<key>history</key>
 						<array>
 							<string>D0A7D71F08D594A700DC5576</string>
@@ -356,13 +396,13 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>37</integer>
-									<integer>3</integer>
+									<integer>105</integer>
+									<integer>56</integer>
 									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
-							<string>{{0, 440}, {300, 632}}</string>
+							<string>{{0, 1380}, {300, 632}}</string>
 						</dict>
 						<key>PBXTopSmartGroupGIDs</key>
 						<array/>
@@ -383,7 +423,7 @@
 							<real>278</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>4 55 1020 691 0 0 1024 746 </string>
+						<string>4 54 1020 691 0 0 1024 746 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -420,7 +460,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {698, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>4 55 1020 691 0 0 1024 746 </string>
+								<string>4 54 1020 691 0 0 1024 746 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -440,7 +480,7 @@
 								<key>Frame</key>
 								<string>{{0, 5}, {698, 645}}</string>
 								<key>RubberWindowFrame</key>
-								<string>4 55 1020 691 0 0 1024 746 </string>
+								<string>4 54 1020 691 0 0 1024 746 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -585,7 +625,7 @@
 	<key>StatusbarIsVisible</key>
 	<true/>
 	<key>TimeStamp</key>
-	<real>148223212.402585</real>
+	<real>148223793.15716401</real>
 	<key>ToolbarDisplayMode</key>
 	<integer>1</integer>
 	<key>ToolbarIsVisible</key>
@@ -602,11 +642,12 @@
 	<array>
 		<string>D080B52F08D1EFA70071778A</string>
 		<string>D0A7D6EC08D592CE00DC5576</string>
-		<string>/Users/justin/Documents/Dev/Neo30/NeoStats.xcode</string>
 		<string>D0A7D6F108D5931100DC5576</string>
+		<string>/Users/justin/Documents/Dev/Neo30/NeoStats.xcode</string>
+		<string>D0A7D86008D5B73100DC5576</string>
 	</array>
 	<key>WindowString</key>
-	<string>4 55 1020 691 0 0 1024 746 </string>
+	<string>4 54 1020 691 0 0 1024 746 </string>
 	<key>WindowTools</key>
 	<array>
 		<dict>
