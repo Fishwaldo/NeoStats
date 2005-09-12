@@ -288,6 +288,15 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 		case EVENT_DELBAN:
 			dlog(DEBUG1, "EVENT_*BAN Todo!");
 			break;
+		case EVENT_CTCPUNHANDLEDRPL:
+		case EVENT_CTCPUNHANDLEDRPLBC:
+			ret = execute_perl(mod_ptr, mod_ptr->pm->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+		case EVENT_CTCPUNHANDLEDREQ:
+		case EVENT_CTCPUNHANDLEDREQBC:
+			ret = execute_perl(mod_ptr, mod_ptr->pm->event_list[evt]->pe->callback, 2, cmdparams->source->name, cmdparams->param);
+			break;
+
 		case EVENT_COUNT:
 			/* nothing */
 			break;
