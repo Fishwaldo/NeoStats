@@ -13,6 +13,9 @@
 /Makefile.am -text
 /Makefile.in -text
 /NEWS -text
+NeoStats.xcode/justin.mode1 -text
+NeoStats.xcode/justin.pbxuser -text
+NeoStats.xcode/project.pbxproj -text
 /README -text
 /README.win32 -text
 /RELNOTES -text
