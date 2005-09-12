@@ -295,7 +295,7 @@ void AddEvent( ModuleEvent *eventptr )
 	dlog( DEBUG5, "AddEvent: adding %s to %s", EventStrings[eventptr->event], mod_ptr->info->name );
 
 	/* only standard modules have a handler, perl mods use a custom callback */
-	if (!eventptr->flags & EVENT_FLAG_PERLCALL) {
+	if (!(eventptr->flags & EVENT_FLAG_PERLCALL)) {
 		if(!eventptr->handler )
 		{
 			nlog( LOG_ERROR, "AddEvent: missing handler for %s in module %s", EventStrings[eventptr->event], mod_ptr->info->name );
@@ -305,7 +305,7 @@ void AddEvent( ModuleEvent *eventptr )
 			mod_ptr->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
 		mod_ptr->event_list[eventptr->event] = eventptr;
 	} else {
-		if( !(mod_ptr->pm && mod_ptr->pm->event_list) )
+		if( (mod_ptr->pm && !mod_ptr->pm->event_list) )
 			mod_ptr->pm->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
 		mod_ptr->pm->event_list[eventptr->event] = eventptr;
 	}

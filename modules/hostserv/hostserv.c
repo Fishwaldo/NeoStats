@@ -402,8 +402,8 @@ static int hs_event_umode( CmdParams *cmdparams )
 						return -1;
 					}
 #endif
-					dlog( DEBUG2, "Regnick Mode on %s", cmdparams->av[0] );
-					ircsnprintf( vhost, MAXHOST, "%s.%s", cmdparams->av[0], hs_cfg.vhostdom );
+					dlog( DEBUG2, "Regnick Mode on %s", cmdparams->source->name );
+					ircsnprintf( vhost, MAXHOST, "%s.%s", cmdparams->source->name, hs_cfg.vhostdom );
 					irc_svshost( hs_bot, cmdparams->source, vhost );
 					irc_prefmsg( hs_bot, cmdparams->source, "Setting your host to %s", vhost );
 					if( hs_cfg.verbose ) {
