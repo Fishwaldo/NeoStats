@@ -461,6 +461,8 @@ XS (XS_NeoStats_hook_event)
 		evt->pe = ns_calloc(sizeof(PerlEvent));
 		evt->event = (int) SvIV (ST (0));
 		evt->flags = (int) SvIV (ST (1));
+		/* its a perl callback */
+		evt->flags |= EVENT_FLAG_PERLCALL; 
 		/* null, because its a perl event, which will execute via dedicated perl event handler */
 		evt->handler = NULL; 
 		evt->pe->callback = sv_mortalcopy(ST (2));
