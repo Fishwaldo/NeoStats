@@ -841,6 +841,7 @@ typedef int (*timer_handler) ( void* );
 #define	EVENT_FLAG_USE_EXCLUDE		0x00000004  /* Event observes global exclusions */
 #define	EVENT_FLAG_EXCLUDE_ME		0x00000008	/* Event excludes neostats bots and servers */
 #define	EVENT_FLAG_EXCLUDE_MODME	0x00000010	/* Event excludes module bots */
+#define EVENT_FLAG_PERLCALL			0x00000020	/* Event is for a perl Module/Extension */
 
 #ifdef USE_PERL
 /** @brief Forward declaration of perl events 
