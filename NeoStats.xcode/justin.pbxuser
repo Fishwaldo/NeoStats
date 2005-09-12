@@ -324,6 +324,25 @@
 			D0A7D82208D5ADEF00DC5576 = D0A7D82208D5ADEF00DC5576;
 			D0A7D82508D5AE0900DC5576 = D0A7D82508D5AE0900DC5576;
 			D0A7D82608D5AE0900DC5576 = D0A7D82608D5AE0900DC5576;
+			D0A7D82F08D5B2E200DC5576 = D0A7D82F08D5B2E200DC5576;
+			D0A7D83008D5B2E200DC5576 = D0A7D83008D5B2E200DC5576;
+			D0A7D83108D5B2E200DC5576 = D0A7D83108D5B2E200DC5576;
+			D0A7D83C08D5B45800DC5576 = D0A7D83C08D5B45800DC5576;
+			D0A7D83D08D5B45800DC5576 = D0A7D83D08D5B45800DC5576;
+			D0A7D83E08D5B45800DC5576 = D0A7D83E08D5B45800DC5576;
+			D0A7D83F08D5B45800DC5576 = D0A7D83F08D5B45800DC5576;
+			D0A7D84008D5B45800DC5576 = D0A7D84008D5B45800DC5576;
+			D0A7D84108D5B45800DC5576 = D0A7D84108D5B45800DC5576;
+			D0A7D84208D5B45800DC5576 = D0A7D84208D5B45800DC5576;
+			D0A7D84308D5B45800DC5576 = D0A7D84308D5B45800DC5576;
+			D0A7D84408D5B45800DC5576 = D0A7D84408D5B45800DC5576;
+			D0A7D84508D5B45800DC5576 = D0A7D84508D5B45800DC5576;
+			D0A7D84608D5B45800DC5576 = D0A7D84608D5B45800DC5576;
+			D0A7D84908D5B4C800DC5576 = D0A7D84908D5B4C800DC5576;
+			D0A7D84A08D5B4C800DC5576 = D0A7D84A08D5B4C800DC5576;
+			D0A7D84B08D5B4C800DC5576 = D0A7D84B08D5B4C800DC5576;
+			D0A7D84E08D5B4E200DC5576 = D0A7D84E08D5B4E200DC5576;
+			D0A7D85108D5B4EC00DC5576 = D0A7D85108D5B4EC00DC5576;
 		};
 		sourceControlManager = D0068D2D08D1F96200131B40;
 		userBuildSettings = {
@@ -429,7 +448,7 @@
 	D0068DE408D1FA6B00131B40 = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {824, 10178}}";
-			sepNavSelRange = "{14832, 0}";
+			sepNavSelRange = "{18776, 0}";
 			sepNavVisRect = "{{0, 7621}, {705, 429}}";
 			sepNavWindowFrame = "{{111, 99}, {750, 558}}";
 		};
@@ -437,8 +456,8 @@
 	D0068DED08D1FA6B00131B40 = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1064, 7532}}";
-			sepNavSelRange = "{10275, 0}";
-			sepNavVisRect = "{{0, 5584}, {705, 429}}";
+			sepNavSelRange = "{7990, 0}";
+			sepNavVisRect = "{{0, 5873}, {705, 429}}";
 			sepNavWindowFrame = "{{225, 127}, {750, 558}}";
 		};
 	};
@@ -451,24 +470,24 @@
 	};
 	D0068DF908D1FA6B00131B40 = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1154, 24178}}";
-			sepNavSelRange = "{47948, 0}";
-			sepNavVisRect = "{{0, 23749}, {705, 429}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1154, 24206}}";
+			sepNavSelRange = "{15526, 0}";
+			sepNavVisRect = "{{0, 1790}, {705, 429}}";
 			sepNavWindowFrame = "{{65, 141}, {750, 558}}";
 		};
 	};
 	D0068E3B08D1FB4A00131B40 = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1196, 23590}}";
-			sepNavSelRange = "{26254, 54}";
-			sepNavVisRect = "{{0, 11923}, {705, 429}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1196, 23604}}";
+			sepNavSelRange = "{26572, 0}";
+			sepNavVisRect = "{{0, 12019}, {705, 429}}";
 		};
 	};
 	D0068E3E08D1FB4A00131B40 = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {705, 448}}";
 			sepNavSelRange = "{0, 0}";
-			sepNavVisRect = "{{0, 0}, {705, 429}}";
+			sepNavVisRect = "{{0, 19}, {705, 429}}";
 			sepNavWindowFrame = "{{88, 120}, {750, 558}}";
 		};
 	};
@@ -477,7 +496,7 @@
 			sepNavIntBoundsRect = "{{0, 0}, {705, 1092}}";
 			sepNavSelRange = "{1842, 0}";
 			sepNavVisRect = "{{0, 649}, {705, 429}}";
-			sepNavWindowFrame = "{{178, 58}, {750, 558}}";
+			sepNavWindowFrame = "{{65, 141}, {750, 558}}";
 		};
 	};
 	D0A7D6C308D591C800DC5576 = {
@@ -603,7 +622,7 @@
 		isa = PBXTextBookmark;
 		name = "neostats.h: 865";
 		rLen = 0;
-		rLoc = 26488;
+		rLoc = 26595;
 		rType = 0;
 		vrLen = 643;
 		vrLoc = 26254;
@@ -633,7 +652,7 @@
 		isa = PBXTextBookmark;
 		name = "neostats.h: 865";
 		rLen = 0;
-		rLoc = 26488;
+		rLoc = 26595;
 		rType = 0;
 		vrLen = 643;
 		vrLoc = 26254;
@@ -653,7 +672,7 @@
 		isa = PBXTextBookmark;
 		name = "neostats.h: 865";
 		rLen = 0;
-		rLoc = 26488;
+		rLoc = 26595;
 		rType = 0;
 		vrLen = 643;
 		vrLoc = 26254;
@@ -841,7 +860,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 287";
 		rLen = 0;
-		rLoc = 7999;
+		rLoc = 8024;
 		rType = 0;
 		vrLen = 839;
 		vrLoc = 6911;
@@ -901,7 +920,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 287";
 		rLen = 0;
-		rLoc = 7999;
+		rLoc = 8024;
 		rType = 0;
 		vrLen = 612;
 		vrLoc = 8237;
@@ -911,7 +930,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 495";
 		rLen = 0;
-		rLoc = 16367;
+		rLoc = 16433;
 		rType = 0;
 		vrLen = 660;
 		vrLoc = 15717;
@@ -921,7 +940,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 742";
 		rLen = 0;
-		rLoc = 22321;
+		rLoc = 22387;
 		rType = 0;
 		vrLen = 1061;
 		vrLoc = 21249;
@@ -931,7 +950,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 287";
 		rLen = 0;
-		rLoc = 7999;
+		rLoc = 8024;
 		rType = 0;
 		vrLen = 612;
 		vrLoc = 8237;
@@ -941,7 +960,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 742";
 		rLen = 0;
-		rLoc = 22321;
+		rLoc = 22387;
 		rType = 0;
 		vrLen = 1061;
 		vrLoc = 21249;
@@ -951,7 +970,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 742";
 		rLen = 0;
-		rLoc = 22321;
+		rLoc = 22387;
 		rType = 0;
 		vrLen = 1061;
 		vrLoc = 21249;
@@ -961,7 +980,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 293";
 		rLen = 0;
-		rLoc = 8353;
+		rLoc = 8378;
 		rType = 0;
 		vrLen = 916;
 		vrLoc = 7019;
@@ -971,7 +990,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 285";
 		rLen = 0;
-		rLoc = 7999;
+		rLoc = 8024;
 		rType = 0;
 		vrLen = 574;
 		vrLoc = 8331;
@@ -991,7 +1010,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 285";
 		rLen = 0;
-		rLoc = 7999;
+		rLoc = 8024;
 		rType = 0;
 		vrLen = 574;
 		vrLoc = 8352;
@@ -1011,7 +1030,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 285";
 		rLen = 0;
-		rLoc = 7999;
+		rLoc = 8024;
 		rType = 0;
 		vrLen = 574;
 		vrLoc = 8401;
@@ -1035,7 +1054,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 285";
 		rLen = 0;
-		rLoc = 7999;
+		rLoc = 8024;
 		rType = 0;
 		vrLen = 574;
 		vrLoc = 8401;
@@ -1085,7 +1104,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 742";
 		rLen = 0;
-		rLoc = 22321;
+		rLoc = 22387;
 		rType = 0;
 		vrLen = 816;
 		vrLoc = 15020;
@@ -1115,7 +1134,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 742";
 		rLen = 0;
-		rLoc = 22321;
+		rLoc = 22387;
 		rType = 0;
 		vrLen = 816;
 		vrLoc = 15020;
@@ -1145,7 +1164,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 742";
 		rLen = 0;
-		rLoc = 22321;
+		rLoc = 22387;
 		rType = 0;
 		vrLen = 816;
 		vrLoc = 15020;
@@ -1175,7 +1194,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 742";
 		rLen = 0;
-		rLoc = 22321;
+		rLoc = 22387;
 		rType = 0;
 		vrLen = 816;
 		vrLoc = 15020;
@@ -1209,7 +1228,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1560";
 		rLen = 0;
-		rLoc = 45595;
+		rLoc = 45661;
 		rType = 0;
 		vrLen = 978;
 		vrLoc = 43358;
@@ -1249,7 +1268,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: load_perlfiles";
 		rLen = 0;
-		rLoc = 43278;
+		rLoc = 43344;
 		rType = 0;
 		vrLen = 980;
 		vrLoc = 42312;
@@ -1269,7 +1288,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1577";
 		rLen = 0;
-		rLoc = 45184;
+		rLoc = 45250;
 		rType = 0;
 		vrLen = 1132;
 		vrLoc = 43574;
@@ -1289,7 +1308,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1581";
 		rLen = 0;
-		rLoc = 45524;
+		rLoc = 45590;
 		rType = 0;
 		vrLen = 1146;
 		vrLoc = 43574;
@@ -1309,7 +1328,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: load_perlfiles";
 		rLen = 0;
-		rLoc = 43227;
+		rLoc = 43293;
 		rType = 0;
 		vrLen = 1174;
 		vrLoc = 43650;
@@ -1329,7 +1348,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1581";
 		rLen = 0;
-		rLoc = 45545;
+		rLoc = 45611;
 		rType = 0;
 		vrLen = 1046;
 		vrLoc = 43815;
@@ -1349,7 +1368,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1575";
 		rLen = 0;
-		rLoc = 44215;
+		rLoc = 44281;
 		rType = 0;
 		vrLen = 972;
 		vrLoc = 43502;
@@ -1369,7 +1388,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1597";
 		rLen = 0;
-		rLoc = 44534;
+		rLoc = 44600;
 		rType = 0;
 		vrLen = 900;
 		vrLoc = 44008;
@@ -1409,7 +1428,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1526";
 		rLen = 0;
-		rLoc = 43146;
+		rLoc = 43212;
 		rType = 0;
 		vrLen = 1154;
 		vrLoc = 41991;
@@ -1429,7 +1448,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: load_perlextension";
 		rLen = 0;
-		rLoc = 44223;
+		rLoc = 44289;
 		rType = 0;
 		vrLen = 899;
 		vrLoc = 44009;
@@ -1449,7 +1468,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: load_perlextension";
 		rLen = 0;
-		rLoc = 44297;
+		rLoc = 44363;
 		rType = 0;
 		vrLen = 885;
 		vrLoc = 44091;
@@ -1469,7 +1488,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1613";
 		rLen = 0;
-		rLoc = 45093;
+		rLoc = 45159;
 		rType = 0;
 		vrLen = 925;
 		vrLoc = 44194;
@@ -1489,7 +1508,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1582";
 		rLen = 0;
-		rLoc = 44315;
+		rLoc = 44381;
 		rType = 0;
 		vrLen = 875;
 		vrLoc = 44076;
@@ -1549,7 +1568,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: xs_init";
 		rLen = 0;
-		rLoc = 43148;
+		rLoc = 43214;
 		rType = 0;
 		vrLen = 1078;
 		vrLoc = 42161;
@@ -1569,7 +1588,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1616";
 		rLen = 0;
-		rLoc = 45118;
+		rLoc = 45184;
 		rType = 0;
 		vrLen = 859;
 		vrLoc = 44416;
@@ -1599,7 +1618,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1528";
 		rLen = 0;
-		rLoc = 43143;
+		rLoc = 43209;
 		rType = 0;
 		vrLen = 1006;
 		vrLoc = 42200;
@@ -1619,7 +1638,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1528";
 		rLen = 0;
-		rLoc = 43143;
+		rLoc = 43209;
 		rType = 0;
 		vrLen = 1006;
 		vrLoc = 42200;
@@ -1629,7 +1648,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1628";
 		rLen = 0;
-		rLoc = 45487;
+		rLoc = 45553;
 		rType = 0;
 		vrLen = 1004;
 		vrLoc = 45121;
@@ -1649,7 +1668,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1527";
 		rLen = 0;
-		rLoc = 43141;
+		rLoc = 43207;
 		rType = 0;
 		vrLen = 1443;
 		vrLoc = 41730;
@@ -1679,7 +1698,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1527";
 		rLen = 0;
-		rLoc = 43141;
+		rLoc = 43207;
 		rType = 0;
 		vrLen = 1443;
 		vrLoc = 41730;
@@ -1699,7 +1718,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1527";
 		rLen = 0;
-		rLoc = 43141;
+		rLoc = 43207;
 		rType = 0;
 		vrLen = 1443;
 		vrLoc = 41730;
@@ -1719,7 +1738,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1527";
 		rLen = 0;
-		rLoc = 43141;
+		rLoc = 43207;
 		rType = 0;
 		vrLen = 1443;
 		vrLoc = 41730;
@@ -1729,7 +1748,7 @@
 		isa = PBXTextBookmark;
 		name = "typedef int (*event_handler) ( CmdParams *cmdparams );";
 		rLen = 54;
-		rLoc = 26254;
+		rLoc = 26338;
 		rType = 0;
 		vrLen = 650;
 		vrLoc = 26246;
@@ -1739,7 +1758,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1527";
 		rLen = 0;
-		rLoc = 43141;
+		rLoc = 43207;
 		rType = 0;
 		vrLen = 1379;
 		vrLoc = 41794;
@@ -1749,7 +1768,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1527";
 		rLen = 0;
-		rLoc = 43141;
+		rLoc = 43207;
 		rType = 0;
 		vrLen = 1443;
 		vrLoc = 41730;
@@ -1759,7 +1778,7 @@
 		isa = PBXTextBookmark;
 		name = "typedef int (*event_handler) ( CmdParams *cmdparams );";
 		rLen = 54;
-		rLoc = 26254;
+		rLoc = 26338;
 		rType = 0;
 		vrLen = 615;
 		vrLoc = 26184;
@@ -1769,7 +1788,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1527";
 		rLen = 0;
-		rLoc = 43141;
+		rLoc = 43207;
 		rType = 0;
 		vrLen = 1379;
 		vrLoc = 41794;
@@ -1779,7 +1798,7 @@
 		isa = PBXTextBookmark;
 		name = "typedef int (*event_handler) ( CmdParams *cmdparams );";
 		rLen = 54;
-		rLoc = 26254;
+		rLoc = 26338;
 		rType = 0;
 		vrLen = 650;
 		vrLoc = 26246;
@@ -1789,7 +1808,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1526";
 		rLen = 0;
-		rLoc = 43117;
+		rLoc = 43183;
 		rType = 0;
 		vrLen = 1801;
 		vrLoc = 41320;
@@ -1819,7 +1838,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1526";
 		rLen = 0;
-		rLoc = 43117;
+		rLoc = 43183;
 		rType = 0;
 		vrLen = 1801;
 		vrLoc = 41320;
@@ -1839,7 +1858,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1526";
 		rLen = 0;
-		rLoc = 43117;
+		rLoc = 43183;
 		rType = 0;
 		vrLen = 1801;
 		vrLoc = 41320;
@@ -1849,7 +1868,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1539";
 		rLen = 0;
-		rLoc = 43282;
+		rLoc = 43348;
 		rType = 0;
 		vrLen = 569;
 		vrLoc = 43150;
@@ -1869,7 +1888,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1629";
 		rLen = 0;
-		rLoc = 45543;
+		rLoc = 45609;
 		rType = 0;
 		vrLen = 987;
 		vrLoc = 45133;
@@ -1889,7 +1908,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1608";
 		rLen = 0;
-		rLoc = 45037;
+		rLoc = 45103;
 		rType = 0;
 		vrLen = 577;
 		vrLoc = 47386;
@@ -1919,7 +1938,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: unload_perlextension";
 		rLen = 0;
-		rLoc = 47615;
+		rLoc = 47681;
 		rType = 0;
 		vrLen = 577;
 		vrLoc = 47386;
@@ -1929,7 +1948,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: unload_perlextension";
 		rLen = 0;
-		rLoc = 47984;
+		rLoc = 48050;
 		rType = 0;
 		vrLen = 611;
 		vrLoc = 47386;
@@ -1949,7 +1968,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: unload_perlextension";
 		rLen = 0;
-		rLoc = 47984;
+		rLoc = 48050;
 		rType = 0;
 		vrLen = 611;
 		vrLoc = 47386;
@@ -1959,7 +1978,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: unload_perlextension";
 		rLen = 0;
-		rLoc = 47984;
+		rLoc = 48050;
 		rType = 0;
 		vrLen = 611;
 		vrLoc = 47386;
@@ -1969,7 +1988,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 409";
 		rLen = 0;
-		rLoc = 10310;
+		rLoc = 10335;
 		rType = 0;
 		vrLen = 600;
 		vrLoc = 10073;
@@ -1989,7 +2008,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 409";
 		rLen = 0;
-		rLoc = 10275;
+		rLoc = 10300;
 		rType = 0;
 		vrLen = 602;
 		vrLoc = 10073;
@@ -2009,7 +2028,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 409";
 		rLen = 0;
-		rLoc = 10275;
+		rLoc = 10300;
 		rType = 0;
 		vrLen = 602;
 		vrLoc = 10073;
@@ -2019,7 +2038,7 @@
 		isa = PBXTextBookmark;
 		name = "nsevents.c: 409";
 		rLen = 0;
-		rLoc = 10275;
+		rLoc = 10300;
 		rType = 0;
 		vrLen = 602;
 		vrLoc = 10073;
@@ -2029,7 +2048,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1683";
 		rLen = 0;
-		rLoc = 47006;
+		rLoc = 47072;
 		rType = 0;
 		vrLen = 878;
 		vrLoc = 46511;
@@ -2049,7 +2068,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1681";
 		rLen = 0;
-		rLoc = 46965;
+		rLoc = 47031;
 		rType = 0;
 		vrLen = 878;
 		vrLoc = 46511;
@@ -2069,7 +2088,7 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1723";
 		rLen = 0;
-		rLoc = 47948;
+		rLoc = 48014;
 		rType = 0;
 		vrLen = 611;
 		vrLoc = 47389;
@@ -2099,10 +2118,200 @@
 		isa = PBXTextBookmark;
 		name = "perl.c: 1723";
 		rLen = 0;
-		rLoc = 47948;
+		rLoc = 48014;
 		rType = 0;
 		vrLen = 611;
 		vrLoc = 47389;
+	};
+	D0A7D82F08D5B2E200DC5576 = {
+		fRef = D0068DF908D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "perl.c: 1727";
+		rLen = 0;
+		rLoc = 48065;
+		rType = 0;
+		vrLen = 611;
+		vrLoc = 47388;
+	};
+	D0A7D83008D5B2E200DC5576 = {
+		fRef = D0068DF908D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "perl.c: 1727";
+		rLen = 0;
+		rLoc = 48065;
+		rType = 0;
+		vrLen = 611;
+		vrLoc = 47388;
+	};
+	D0A7D83108D5B2E200DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 864";
+		rLen = 0;
+		rLoc = 26595;
+		rType = 0;
+		vrLen = 622;
+		vrLoc = 26214;
+	};
+	D0A7D83C08D5B45800DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 844";
+		rLen = 0;
+		rLoc = 26203;
+		rType = 0;
+		vrLen = 939;
+		vrLoc = 25536;
+	};
+	D0A7D83D08D5B45800DC5576 = {
+		fRef = D0068DED08D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "nsevents.c: 298";
+		rLen = 0;
+		rLoc = 7990;
+		rType = 0;
+		vrLen = 584;
+		vrLoc = 10494;
+	};
+	D0A7D83E08D5B45800DC5576 = {
+		fRef = D0068DF908D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "perl.c: 450";
+		rLen = 0;
+		rLoc = 15143;
+		rType = 0;
+		vrLen = 810;
+		vrLoc = 15137;
+	};
+	D0A7D83F08D5B45800DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 864";
+		rLen = 0;
+		rLoc = 26595;
+		rType = 0;
+		vrLen = 622;
+		vrLoc = 26214;
+	};
+	D0A7D84008D5B45800DC5576 = {
+		fRef = D0068DED08D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "nsevents.c: 298";
+		rLen = 0;
+		rLoc = 7990;
+		rType = 0;
+		vrLen = 859;
+		vrLoc = 7470;
+	};
+	D0A7D84108D5B45800DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 844";
+		rLen = 0;
+		rLoc = 26203;
+		rType = 0;
+		vrLen = 889;
+		vrLoc = 25536;
+	};
+	D0A7D84208D5B45800DC5576 = {
+		fRef = D0068DED08D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "nsevents.c: 298";
+		rLen = 0;
+		rLoc = 7990;
+		rType = 0;
+		vrLen = 838;
+		vrLoc = 7491;
+	};
+	D0A7D84308D5B45800DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 844";
+		rLen = 0;
+		rLoc = 26203;
+		rType = 0;
+		vrLen = 939;
+		vrLoc = 25536;
+	};
+	D0A7D84408D5B45800DC5576 = {
+		fRef = D0068DF908D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "perl.c: 450";
+		rLen = 0;
+		rLoc = 15143;
+		rType = 0;
+		vrLen = 810;
+		vrLoc = 15137;
+	};
+	D0A7D84508D5B45800DC5576 = {
+		fRef = D0068DED08D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "nsevents.c: 298";
+		rLen = 0;
+		rLoc = 7990;
+		rType = 0;
+		vrLen = 584;
+		vrLoc = 10494;
+	};
+	D0A7D84608D5B45800DC5576 = {
+		fRef = D0068DF908D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "perl.c: 465";
+		rLen = 0;
+		rLoc = 15526;
+		rType = 0;
+		vrLen = 808;
+		vrLoc = 15137;
+	};
+	D0A7D84908D5B4C800DC5576 = {
+		fRef = D0068DF908D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "perl.c: 465";
+		rLen = 0;
+		rLoc = 15526;
+		rType = 0;
+		vrLen = 1307;
+		vrLoc = 2987;
+	};
+	D0A7D84A08D5B4C800DC5576 = {
+		fRef = D0068DF908D1FA6B00131B40;
+		isa = PBXTextBookmark;
+		name = "perl.c: 465";
+		rLen = 0;
+		rLoc = 15526;
+		rType = 0;
+		vrLen = 1307;
+		vrLoc = 2987;
+	};
+	D0A7D84B08D5B4C800DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 867";
+		rLen = 0;
+		rLoc = 26594;
+		rType = 0;
+		vrLen = 756;
+		vrLoc = 26441;
+	};
+	D0A7D84E08D5B4E200DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 867";
+		rLen = 0;
+		rLoc = 26594;
+		rType = 0;
+		vrLen = 771;
+		vrLoc = 26441;
+	};
+	D0A7D85108D5B4EC00DC5576 = {
+		fRef = D0068E3B08D1FB4A00131B40;
+		isa = PBXTextBookmark;
+		name = "neostats.h: 866";
+		rLen = 0;
+		rLoc = 26572;
+		rType = 0;
+		vrLen = 772;
+		vrLoc = 26441;
 	};
 	D0E0612008D1FD6F00DBA28C = {
 		uiCtxt = {
