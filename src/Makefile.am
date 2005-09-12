@@ -9,7 +9,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		base64.c numerics.c settings.c botinfo.c \
 		adnscheck.c adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c \
 		adnsreply.c adnssetup.c adnstransmit.c adnstypes.c \
-		oscalls.c ossocket.c osfile.c updates.c
+		oscalls.c ossocket.c osfile.c updates.c MiniMessage.c MiniMessageGateway.c
 if DO_PERL
 neostats_SOURCES += perl.c neostats.pm.h
 else

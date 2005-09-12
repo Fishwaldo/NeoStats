@@ -77,6 +77,8 @@
 //D04
 		D0068D3408D1FA6A00131B40 = {
 			children = (
+				D0A7D86808D5B8DE00DC5576,
+				D0A7D86908D5B8DE00DC5576,
 				D0068D7108D1FA6B00131B40,
 				D0068D7308D1FA6B00131B40,
 				D0068D7508D1FA6B00131B40,
@@ -616,6 +618,8 @@
 		};
 		D0068E1508D1FB4A00131B40 = {
 			children = (
+				D0A7D86A08D5B91500DC5576,
+				D0A7D86B08D5B91500DC5576,
 				D0068E1608D1FB4A00131B40,
 				D0068E1708D1FB4A00131B40,
 				D0068E1808D1FB4A00131B40,
@@ -1069,6 +1073,38 @@
 			isa = PBXFileReference;
 			lastKnownFileType = text.script.sh;
 			path = version.sh;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D0A7D86808D5B8DE00DC5576 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = MiniMessage.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D0A7D86908D5B8DE00DC5576 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = MiniMessageGateway.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D0A7D86A08D5B91500DC5576 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = MiniMessage.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D0A7D86B08D5B91500DC5576 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = MiniMessageGateway.h;
 			refType = 4;
 			sourceTree = "<group>";
 		};
