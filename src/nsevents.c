@@ -120,69 +120,111 @@ static const char *EventStrings[] =
 
 void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr )
 {
+	ModuleEvent **evt;
+#ifdef USE_PERL
+	int inperl = 0;
+#endif
 	SET_SEGV_LOCATION();
 	dlog( DEBUG5, "SendModuleEvent: %s to module %s", EventStrings[event], module_ptr->info->name );
-	if( !module_ptr->event_list )
-	{
-		dlog( DEBUG5, "SendModuleEvent: module %s has no events associated with it", module_ptr->info->name );
-		return;
+
+	/* if the C event list isn't populated */
+	if( !module_ptr->event_list) {
+#ifdef USE_PERL
+		/* and the Perl event list isn't populated either */
+		if (!(module_ptr->pm && module_ptr->pm->event_list))
+#endif
+		{
+			/* then bail out */
+			dlog( DEBUG5, "SendModuleEvent: module %s has no events associated with it", module_ptr->info->name );
+			return;
+		} else {
+			/* otherwise, we have a perl event, but not a C Event */
+			evt = module_ptr->pm->event_list;
+			inperl = 1;
+		}
+	} else {
+		/* we have a C event, so process this first, and at the bottom, switch to perl events */
+		evt = module_ptr->event_list;
 	}
-	if( module_ptr->event_list[event] )
-	{
-		/* If we are not yet synched, check that the module supports 
-		 * the event before we are synched. */
-		if( !IsModuleSynched( module_ptr ) && !( module_ptr->event_list[event]->flags & EVENT_FLAG_IGNORE_SYNCH ) )
+	while (1) {
+		if( evt[event] )
 		{
-			dlog( DEBUG5, "Skipping module %s for %s since module is not yet synched", module_ptr->info->name, EventStrings[event] );
-			return;
-		}
-		if( ( module_ptr->event_list[event]->flags & EVENT_FLAG_DISABLED ) )
-		{
-			dlog( DEBUG5, "Skipping module %s for %s since it is disabled", module_ptr->info->name, EventStrings[event] );
-			return;
-		}
-		if( ( module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_ME ) && IsMe( cmdparams->source ) )
-		{
-			dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a NeoStats client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
-			return;
-		}
-		if( module_ptr->event_list[event]->flags & EVENT_FLAG_EXCLUDE_MODME )
-		{
-			if( cmdparams->source && cmdparams->source->user && cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr )
+			/* If we are not yet synched, check that the module supports 
+			* the event before we are synched. */
+			if( !IsModuleSynched( module_ptr ) && !( evt[event]->flags & EVENT_FLAG_IGNORE_SYNCH ) )
 			{
-				dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a Module client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
+				dlog( DEBUG5, "Skipping module %s for %s since module is not yet synched", module_ptr->info->name, EventStrings[event] );
 				return;
 			}
-		}			
-		if( ( module_ptr->event_list[event]->flags & EVENT_FLAG_USE_EXCLUDE ) && IsExcluded( cmdparams->source ) )
-		{
-			dlog( DEBUG5, "Skipping module %s for %s since %s is excluded", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
-			return;
-		}			
-		dlog( DEBUG1, "Running module %s with %s", module_ptr->info->name, EventStrings[event] );
-		SET_SEGV_LOCATION();
-		if( IS_STANDARD_MOD( module_ptr ) )
-		{
-			if( setjmp( sigvbuf ) == 0 )
+			if( ( evt[event]->flags & EVENT_FLAG_DISABLED ) )
+			{
+				dlog( DEBUG5, "Skipping module %s for %s since it is disabled", module_ptr->info->name, EventStrings[event] );
+				return;
+			}
+			if( ( evt[event]->flags & EVENT_FLAG_EXCLUDE_ME ) && IsMe( cmdparams->source ) )
+			{
+				dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a NeoStats client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
+				return;
+			}
+			if( evt[event]->flags & EVENT_FLAG_EXCLUDE_MODME )
+			{
+				if( cmdparams->source && cmdparams->source->user && cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr )
+				{
+					dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a Module client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
+					return;
+				}
+			}			
+			if( ( evt[event]->flags & EVENT_FLAG_USE_EXCLUDE ) && IsExcluded( cmdparams->source ) )
+			{
+				dlog( DEBUG5, "Skipping module %s for %s since %s is excluded", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
+				return;
+			}			
+			dlog( DEBUG1, "Running module %s with %s", module_ptr->info->name, EventStrings[event] );
+			SET_SEGV_LOCATION();
+#ifdef USE_PERL
+			/* is this a C event */
+			if( inperl == 0 )
+#endif
+			{
+				if( setjmp( sigvbuf ) == 0 )
+				{
+					SET_RUN_LEVEL( module_ptr );
+					module_ptr->event_list[event]->handler( cmdparams );
+					RESET_RUN_LEVEL();
+				}
+				else
+				{
+					nlog( LOG_CRITICAL, "SendModuleEvent: setjmp() failed, not calling module %s", module_ptr->info->name );
+				}
+			}
+#if USE_PERL
+			/* no, it must be a perl event */
+			else if( inperl == 1)
 			{
 				SET_RUN_LEVEL( module_ptr );
-				module_ptr->event_list[event]->handler( cmdparams );
+				perl_event_cb( event, cmdparams, module_ptr );
 				RESET_RUN_LEVEL();
-			}
-			else
-			{
-				nlog( LOG_CRITICAL, "SendModuleEvent: setjmp() failed, not calling module %s", module_ptr->info->name );
-			}
-		}
-#if USE_PERL
-		else if( IS_PERL_MOD( module_ptr ) )
-		{
-			SET_RUN_LEVEL( module_ptr );
-			perl_event_cb( event, cmdparams, module_ptr );
-			RESET_RUN_LEVEL();
-		}			
+			}			
 #endif
-		return;
+		}
+#ifdef USE_PERL
+		if (inperl == 0) {
+			/* if we just ran a C event list then check if the perl has a event list */
+			if (module_ptr->pm && module_ptr->pm->event_list) {
+				/* and if it does, process it */
+				evt = module_ptr->pm->event_list;
+				inperl = 1;
+			} else {
+				/* otherwise return, nothing else to do */
+				return;
+			}
+		} else {
+			/* if we are here, it means perl events have already run */
+			return;
+		}
+#else
+	return;
+#endif
 	}
 	dlog( DEBUG5, "SendModuleEvent: %s has no event handler for %s", module_ptr->info->name, EventStrings[event] );
 }
@@ -202,7 +244,7 @@ static int SendAllModuleEventHandler( Module *module_ptr, void *v )
 {
 	ModuleAllEvent *mae = (ModuleAllEvent *)v;
 
-	if( module_ptr->event_list )
+	if( module_ptr->event_list || (module_ptr->pm && module_ptr->pm->event_list))
 		SendModuleEvent( mae->event, mae->cmdparams, module_ptr );
 	return NS_FALSE;
 }
@@ -249,16 +291,25 @@ void AddEvent( ModuleEvent *eventptr )
 		return;
 	}
 	mod_ptr = GET_CUR_MODULE();
-	if( !mod_ptr->event_list )
-		mod_ptr->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
+
 	dlog( DEBUG5, "AddEvent: adding %s to %s", EventStrings[eventptr->event], mod_ptr->info->name );
+
 	/* only standard modules have a handler, perl mods use a custom callback */
-	if(IS_STANDARD_MOD(mod_ptr) && !eventptr->handler )
-	{
-		nlog( LOG_ERROR, "AddEvent: missing handler for %s in module %s", EventStrings[eventptr->event], mod_ptr->info->name );
-		return;
+	if (!eventptr->pe) {
+		if(!eventptr->handler )
+		{
+			nlog( LOG_ERROR, "AddEvent: missing handler for %s in module %s", EventStrings[eventptr->event], mod_ptr->info->name );
+			return;
+		}
+		if( !mod_ptr->event_list )
+			mod_ptr->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
+		mod_ptr->event_list[eventptr->event] = eventptr;
+	} else {
+		if( !mod_ptr->pm->event_list )
+			mod_ptr->pm->event_list = ns_calloc( sizeof( ModuleEvent * ) * EVENT_COUNT );
+		mod_ptr->pm->event_list[eventptr->event] = eventptr;
 	}
-	mod_ptr->event_list[eventptr->event] = eventptr;
+	
 	if( eventptr->event == EVENT_NICKIP )
 		me.want_nickip = 1; 		
 }
@@ -353,6 +404,13 @@ void FreeEventList( Module *mod_ptr )
 		ns_free( mod_ptr->event_list );
 		mod_ptr->event_list = NULL;
 	}
+#ifdef USE_PERL
+	if ( mod_ptr->pm && mod_ptr->pm->event_list)
+	{
+		ns_free(mod_ptr->pm->event_list);
+		mod_ptr->pm->event_list = NULL;
+	}
+#endif
 }
 
 /** @brief SetAllEventFlags
