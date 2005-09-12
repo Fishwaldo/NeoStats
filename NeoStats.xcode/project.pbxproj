@@ -618,6 +618,7 @@
 		};
 		D0068E1508D1FB4A00131B40 = {
 			children = (
+				D05E38E508D5BF4D00225737,
 				D0A7D86A08D5B91500DC5576,
 				D0A7D86B08D5B91500DC5576,
 				D0068E1608D1FB4A00131B40,
@@ -1073,6 +1074,14 @@
 			isa = PBXFileReference;
 			lastKnownFileType = text.script.sh;
 			path = version.sh;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		D05E38E508D5BF4D00225737 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = MuscleSupport.h;
 			refType = 4;
 			sourceTree = "<group>";
 		};
