@@ -146,7 +146,7 @@ int SynchModule( Module* module_ptr )
 		err = perl_sync_module( module_ptr );
 		RESET_RUN_LEVEL();
 	}
-#endif
+#endif /* USE_PERL */
 	/* sync complete */
 	SetModuleSynched( module_ptr );
 	return err;
@@ -408,7 +408,7 @@ Module *ns_load_module( const char *modfilename, Client * u )
 		strftime( ( char * )mod->info->build_time, 10, "%H:%M", gmtime( &buf.st_mtime ) );
 		return mod;
 	}
-#endif
+#endif /* USE_PERL */
 	/* if we get here, ehhh, doesn't exist */
 	load_module_error( u, modfilename, __( "Module file not found", u ) );
 	return NULL;
@@ -556,7 +556,7 @@ int unload_module( const char *modname, Client * u )
 #ifdef USE_PERL
 	/* unload any extensions first */
 	unload_perlextension(mod_ptr);
-#endif
+#endif /* USE_PERL */
 	
 	if( mod_ptr->info->flags & MODULE_FLAG_AUTH )
 	{
@@ -593,7 +593,7 @@ int unload_module( const char *modname, Client * u )
 		PerlModFini( mod_ptr );
 		RESET_RUN_LEVEL();
 		SET_SEGV_LOCATION();
-#endif
+#endif /* USE_PERL */
 	}
 	/* Delete any bots used by this module. Done after ModFini, so the bot 
 	 * can still send messages during ModFini 
@@ -619,13 +619,12 @@ int unload_module( const char *modname, Client * u )
 	CleanupServerModdata( moduleindex );
 	CleanupChannelModdata( moduleindex );
 
-	if( IS_STANDARD_MOD( mod_ptr ) ) {
+	if( IS_STANDARD_MOD( mod_ptr ) )
 		ns_dlclose( mod_ptr->handle );
 #ifdef USE_PERL
-	} else {
+	else
 		unload_perlmod( mod_ptr );
-#endif
-	}
+#endif /* USE_PERL */
 	RESET_RUN_LEVEL();
 	ns_free( mod_ptr );
 	/* free the module number */

@@ -165,7 +165,7 @@ static void SendEvent( ModuleEvent *eventptr, Event event, CmdParams *cmdparams,
 		RESET_RUN_LEVEL();
 		return;
 	}			
-#endif
+#endif /* USE_PERL */
 	if( setjmp( sigvbuf ) == 0 )
 	{
 		SET_RUN_LEVEL( module_ptr );
@@ -200,7 +200,7 @@ void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr )
 #ifdef USE_PERL
 	if( ( module_ptr->pm && module_ptr->pm->event_list ) )
 		SendEvent( module_ptr->pm->event_list[event], event, cmdparams, module_ptr );
-#endif
+#endif /* USE_PERL */
 }
 
 /** @brief SendAllModuleEventHandler
@@ -273,7 +273,7 @@ void AddEvent( ModuleEvent *eventptr )
 		mod_ptr->pm->event_list[eventptr->event] = eventptr;
 	}
 	else
-#endif
+#endif /* USE_PERL */
 	{
 		if( !eventptr->handler )
 		{
@@ -384,7 +384,7 @@ void FreeEventList( Module *mod_ptr )
 		ns_free( mod_ptr->pm->event_list );
 		mod_ptr->pm->event_list = NULL;
 	}
-#endif
+#endif /* USE_PERL */
 }
 
 /** @brief SetAllEventFlags

@@ -445,12 +445,12 @@ static int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt )
 		ircsnprintf( buf, MAXPATH, "%s/%s%s", MOD_PATH, file, MOD_PERLEXT );
 		if( stat( buf, &fileinfo ) == -1 )
 		{
-#endif
+#endif /* USE_PERL */
 			cfg_error( cfg, "Unable to find file %s specified in option %s: %s", buf, opt->name, strerror( errno ) );
 			return CFG_PARSE_ERROR;
 #ifdef USE_PERL
 		}
-#endif
+#endif /* USE_PERL */
 	}
 	if( !S_ISREG( fileinfo.st_mode ) )
 	{

@@ -847,7 +847,7 @@ typedef int (*timer_handler) ( void* );
 /** @brief Forward declaration of perl events 
  */
 struct PerlEvent;
-#endif
+#endif /* USE_PERL */
 
 /** @brief Event function types
  * 

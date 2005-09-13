@@ -294,7 +294,7 @@ int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 			/* Mark: depends on how the array is allocated */
 			ns_free(cmd_ptr->helptext);
 		}
-#endif
+#endif /* USE_PERL */
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
@@ -793,7 +793,7 @@ static int bot_cmd_about( CmdParams *cmdparams )
 {
 	if( cmdparams->bot->moduleptr )
 	{
-		if (IS_STANDARD_MOD(cmdparams->bot->moduleptr))
+		if( IS_STANDARD_MOD( cmdparams->bot->moduleptr ) )
 		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text );
 #if USE_PERL
@@ -801,7 +801,7 @@ static int bot_cmd_about( CmdParams *cmdparams )
 		else
 		{
 			irc_prefmsg(cmdparams->bot, cmdparams->source, "Not Available");
-#endif
+#endif /* USE_PERL */
 		}
 	}
 	return NS_SUCCESS;
@@ -828,7 +828,7 @@ static int bot_cmd_credits( CmdParams *cmdparams )
 {
 	if( cmdparams->bot->moduleptr )
 	{
-		if (IS_STANDARD_MOD(cmdparams->bot->moduleptr))
+		if( IS_STANDARD_MOD( cmdparams->bot->moduleptr ) )
 		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, 
 				cmdparams->bot->moduleptr->info->copyright );
@@ -837,7 +837,7 @@ static int bot_cmd_credits( CmdParams *cmdparams )
 		else
 		{
 			irc_prefmsg(cmdparams->bot, cmdparams->source, "Not Available");
-#endif
+#endif /* USE_PERL */
 		}
 	}
 	return NS_SUCCESS;

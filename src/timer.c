@@ -283,7 +283,7 @@ int DelTimer( const char *name )
 #ifdef USE_PERL
 		if( IS_PERL_MOD( timer->moduleptr ) )
 			ns_free( timer->userptr );
-#endif
+#endif /* USE_PERL */
 		ns_free( timer );
 		return NS_SUCCESS;
 	}

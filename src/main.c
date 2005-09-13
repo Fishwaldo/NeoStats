@@ -275,7 +275,7 @@ static int InitCore( void )
 #ifdef USE_PERL
 	if( Init_Perl() != NS_SUCCESS )
 		return NS_FAILURE;
-#endif
+#endif /* USE_PERL */
 	InitServices();
 	dlog( DEBUG1, "Core init successful" );
 	return NS_SUCCESS;
