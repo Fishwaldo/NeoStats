@@ -56,21 +56,21 @@ fi
 
 # If Settings exist, load the info, otherwise tell them to run configure.
 
-if [ -r config.h ]; then
-	echo "Starting configuration.. "
-else if [ -r include/config.h ]; then
-	echo "Starting configuration.. "
-else
-	echo "Configuration failed!"
-	echo "You have not run configure yet!"
-	echo "You probably should read the README file too"
-	echo ""
-	echo "Type ./configure"
-	echo "(If you need help read the README before asking us)"
-	echo ""
-	exit 1
-fi
-fi
+#if [ -r config.h ]; then
+#	echo "Starting configuration.. "
+#else if [ -r include/config.h ]; then
+#	echo "Starting configuration.. "
+#else
+#	echo "Configuration failed!"
+#	echo "You have not run configure yet!"
+#	echo "You probably should read the README file too"
+#	echo ""
+#	echo "Type ./configure"
+#	echo "(If you need help read the README before asking us)"
+#	echo ""
+#	exit 1
+#fi
+#fi
 CONF=$NEOSTATSCONF
 
 if [ -r "$CONF" ]; then
