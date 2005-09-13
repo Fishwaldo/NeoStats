@@ -247,7 +247,7 @@ void load_module_error( const Client *target, const char *module_name, const cha
  *  @return pointer to loaded module
  */
 
-Module *load_stdmodule( const char *modfilename, Client * u )
+static Module *load_stdmodule( const char *modfilename, Client * u )
 {
 	int err;
 	void *handle;
@@ -279,7 +279,7 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 		ns_dlclose( handle );
 		return NULL;
 	}
-	if( !infoptr->copyright || ircstrcasecmp( infoptr->copyright[0], "Copyright( c ) <year>, <your name>" ) ==0 ) {
+	if( !infoptr->copyright || ircstrcasecmp( infoptr->copyright[0], "Copyright (c) <year>, <your name>" ) ==0 ) {
 		load_module_error( u, modfilename, __( "missing copyright text.", u ) );
 		ns_dlclose( handle );
 		return NULL;
@@ -387,8 +387,8 @@ Module *load_stdmodule( const char *modfilename, Client * u )
 
 Module *ns_load_module( const char *modfilename, Client * u )
 { 
-	char path[255];
-	char loadmodname[255];
+	static char path[255];
+	static char loadmodname[255];
 	struct stat buf;
 
 	strlcpy( loadmodname, modfilename, 255 );
