@@ -36,7 +36,7 @@
 
 extern Bot *ss_bot;
 
-extern struct StatServ { 
+typedef struct tStatServ { 
 	int lagtime; 
 	int lagalert; 
 	int recordalert; 
@@ -48,7 +48,9 @@ extern struct StatServ {
 	int msglimit; 
 	int exclusions; 
 	int flatmap; 
-} StatServ;
+} tStatServ;
+
+extern tStatServ StatServ;
 
 /* ss_help.c */
 extern const char *ss_about[];

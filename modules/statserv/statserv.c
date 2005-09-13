@@ -39,6 +39,8 @@
 #include "tld.h"
 #include "htmlstats.h"
 
+tStatServ StatServ;
+
 /** SET callback prototypes */
 static int ss_set_htmltime_cb( CmdParams *cmdparams, SET_REASON reason );
 static int ss_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason );
