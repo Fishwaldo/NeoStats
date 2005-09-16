@@ -968,14 +968,17 @@ int cfg_parse_fp(cfg_t *cfg, FILE *fp)
 
 int cfg_parse(cfg_t *cfg, const char *filename)
 {
-    int ret;
+    char pszDir[255];
+	int ret;
     FILE *fp;
 
     nassert(cfg && filename);
 
     free(cfg->filename);
     cfg->filename = cfg_tilde_expand(filename);
-    fp = fopen(cfg->filename, "rt");
+	getcwd( pszDir, 255 );
+	
+	fp = fopen(cfg->filename, "rt");
     if(fp == 0)
         return CFG_FILE_ERROR;
     ret = cfg_parse_fp(cfg, fp);

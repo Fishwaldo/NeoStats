@@ -88,7 +88,7 @@ ModuleInfo module_info = {
 	CORE_MODULE_VERSION,
 	__DATE__,
 	__TIME__,
-	0,
+	MODULE_FLAG_CTCP_VERSION,
 	0,
 };
 

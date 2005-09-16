@@ -333,9 +333,10 @@ static Module *load_stdmodule( const char *modfilename, Client * u )
 	}
     /* Module side user authentication for e.g. SecureServ helpers 
      * Not available on auth modules */
-	if( !( infoptr->flags & MODULE_FLAG_AUTH ) ) {
+	if( !( infoptr->flags & MODULE_FLAG_AUTH ) )
 		mod_ptr->authcb = ns_dlsym( ( int * ) handle, "ModAuthUser" );
-	}
+	if( infoptr->flags & MODULE_FLAG_CTCP_VERSION )
+		me.versionscan ++;		
 	/* assign a module number to this module */
 	assign_mod_number( mod_ptr );
 
@@ -559,9 +560,9 @@ int unload_module( const char *modname, Client * u )
 #endif /* USE_PERL */
 	
 	if( mod_ptr->info->flags & MODULE_FLAG_AUTH )
-	{
 		DelAuthModule( mod_ptr );
-	}
+	if( mod_ptr->info->flags & MODULE_FLAG_CTCP_VERSION )
+		me.versionscan --;
 	moduleindex = mod_ptr->modnum;
 	/* canx any DNS queries used by this module */
 	canx_dns( mod_ptr );

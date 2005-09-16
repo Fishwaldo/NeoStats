@@ -124,7 +124,6 @@ static bot_setting ns_settings[] =
 	{"SPLITTIME",		&nsconfig.splittime,		SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_splittime, NULL,( void * )300 },
 	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_joinserviceschan, NULL,( void* )1 },
 	{"PINGTIME",		&nsconfig.pingtime,			SET_TYPE_INT,		0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_pingtime, NULL,( void* )120 },
-	{"VERSIONSCAN",		&me.versionscan,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_versionscan, NULL,( void* )1 },
 	{"SERVICECMODE",	me.servicescmode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_servicecmode, NULL, NULL },
 	{"SERVICEUMODE",	me.servicesumode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_serviceumode, NULL, NULL },
 	{"CMDCHAR",			nsconfig.cmdchar,			SET_TYPE_STRING,	0, 2, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdchar, NULL,( void* )"!" },
@@ -183,8 +182,8 @@ ModuleEvent neostats_events[] =
 static int services_event_ctcpversion( CmdParams *cmdparams )
 {
 	dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
-	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
-	SendAllModuleEvent( EVENT_CTCPVERSIONRPLBC, cmdparams );
+	/*strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );*/
+	/*SendAllModuleEvent( EVENT_CTCPVERSIONRPLBC, cmdparams );*/
 	return NS_SUCCESS;
 }
 

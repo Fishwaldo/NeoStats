@@ -341,12 +341,6 @@ const char *ns_help_set_realname[] = {
 	NULL
 };
 
-const char *ns_help_set_versionscan[] = {
-	"\2VERSIONSCAN <ON|OFF>\2",
-	"CTCP version users on connection to the network.",
-	NULL
-};
-
 const char *ns_help_set_servicecmode[] = {
 	"\2SERVICECMODE <mode>\2",
 	"Channel modes assigned to service bots when they join",
