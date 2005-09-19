@@ -97,7 +97,10 @@ Client *AddServer( const char *name, const char *uplink, const char *hops, const
 		s->uplink = FindServer( uplink );
 	} 
 	if( infoline )
-		strlcpy( s->info, infoline, MAXINFO );
+	{
+		strlcpy( s->info, infoline, MAXREALNAME );
+		clean_string( s->info, MAXREALNAME );
+	}
 	if( numeric )
 		s->server->numeric =  atoi( numeric );
 	s->tsconnect = me.now;

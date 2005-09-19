@@ -394,7 +394,7 @@ EXPORTFUNC char CmodeCharToPrefix( const char mode );
 
 #define MODESIZE		53
 #define PARAMSIZE		MAXNICK+MAXUSER+MAXHOST+10
-#define MAXINFO			128
+#define MAXINFO			MAXREALNAME
 #define B64SIZE			16
 
 #define KEYLEN			(32 + 1)
