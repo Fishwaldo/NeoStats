@@ -28,6 +28,7 @@ extern const char *hs_help_add[];
 extern const char *hs_help_del[];
 extern const char *hs_help_view[];
 extern const char *hs_help_list[];
+extern const char *hs_help_listwild[];
 extern const char *hs_help_login[];
 extern const char *hs_help_chpass[];
 extern const char *hs_help_bans[];

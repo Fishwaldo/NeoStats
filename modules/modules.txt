@@ -114,6 +114,7 @@ This is optional.
  */
 ModuleEvent module_events[] = {
 	{EVENT_NULL,	NULL, 0}
+	NS_EVENT_END()
 };
 
 The table contains the event we want to process (e.g. SIGNON), the 
@@ -121,8 +122,8 @@ function to call when it happens (e.g. MySignonHandler) and optional
 flags related to event (e.g. EVENT_FLAG_USE_EXCLUDE). Events are 
 raised for both server and user actions.
 
-The table must be NULL terminated with the event field set to EVENT_NULL,
-the function field set to NULL and the flags field set to 0.
+The table must be NULL terminated with a correctly formed NULL entry.
+A macro NS_EVENT_END() is provided for this purpose.
 
 Descriptions of all available events and their parameters are listed in
 "events.h". The header file is automatically included by "neostats.h" 

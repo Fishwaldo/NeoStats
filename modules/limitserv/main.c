@@ -107,7 +107,7 @@ ModuleEvent module_events[] =
 {
 	{EVENT_JOIN,	event_join},
 	{EVENT_PART,	event_part},
-	{EVENT_NULL,	NULL}
+	NS_EVENT_END()
 };
 
 /** @brief ManageLimit

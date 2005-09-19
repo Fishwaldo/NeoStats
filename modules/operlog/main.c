@@ -89,7 +89,7 @@ ModuleEvent module_events[] =
 	{EVENT_GLOBALKILL,	operlog_event_globalkill },
 	{EVENT_SERVERKILL,	operlog_event_serverkill },
 	{EVENT_UMODE,		operlog_event_umode },	
-	{EVENT_NULL,		NULL}
+	NS_EVENT_END()
 };
 
 /** @brief ModInit

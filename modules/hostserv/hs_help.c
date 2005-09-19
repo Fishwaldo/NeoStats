@@ -68,13 +68,20 @@ const char *hs_help_list[] = {
 	"List vhosts",
 	"Syntax: \2LIST\2",
 	"        \2LIST <startpos>\2",
-	"        \2LIST <NICK|HOST|VHOST> <limit>\2",
 	"",
 	"Lists the vhosts stored in the database.",
 	"For detailed information on a vhost see \2HELP VIEW\2",
 	"20 vhosts are displayed at a time. To view other vhosts the",
 	"<startpos> parameter allows listing from that position.",
-	"<NICK|HOST|VHOST> display only those matching the wildcard <limit>.",
+	NULL
+};
+
+const char *hs_help_listwild[] = {
+	"List vhosts",
+	"Syntax: \2LISTWILD <NICK|HOST|VHOST> <limit>\2",
+	"",
+	"Lists the vhosts stored in the database of the requested.",
+	"type matching the wildcard <limit>.",
 	NULL
 };
 

@@ -215,7 +215,7 @@ ModuleEvent module_events[] =
 	{EVENT_AWAY,		cs_event_away,		EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_SERVER,		cs_event_server,	EVENT_FLAG_EXCLUDE_ME},
 	{EVENT_SQUIT,		cs_event_squit,		EVENT_FLAG_EXCLUDE_ME},
-	{EVENT_NULL,		NULL}
+	NS_EVENT_END()
 };
 
 /** @brief ModInit

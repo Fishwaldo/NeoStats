@@ -525,6 +525,7 @@ int ValidateUserWild( const char *username )
 /** @brief ValidateHost
  *  
  *  Check that passed string is a valid hostname
+ *  Valid host is considered to be at least x.y
  *  
  *  @param hostname to check
  *  
@@ -533,6 +534,8 @@ int ValidateUserWild( const char *username )
 
 int ValidateHost( const char *hostname )
 {
+	if( !strchr( hostname, '.' ) )
+		return NS_FAILURE;
 	while( *hostname )
 	{
 		if( !IsHostChar( *hostname ) )
@@ -719,3 +722,33 @@ int ValidateChannelKey( const char *key )
 	}
 	return NS_SUCCESS;
 }
+
+/** @brief IsJustWildcard
+ *
+ *  Check the wildcard mask to ensure we are not using
+ *  an extremely broad one such as *, *.*, *.*.* etc
+ *
+ *  @param mask to check
+ *
+ *  @return NS_TRUE if OK else NS_FALSE
+ */
+
+int IsJustWildcard( const char *mask, int ishostmask )
+{
+	static const char stringset[] = "?*";
+	static const char stringsethost[] = "?*.@";
+	int len;
+	int spanlen;
+
+	if( !ircstrcasecmp( mask, "*" ) )
+		return NS_TRUE;
+	len = strlen( mask );
+	if( ishostmask )
+		spanlen = strspn( mask, stringsethost );
+	else
+		spanlen = strspn( mask, stringset );
+	if( spanlen == len )
+		return NS_FALSE;
+	return ;
+}
+

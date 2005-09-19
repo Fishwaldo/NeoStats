@@ -242,7 +242,7 @@ BotInfo template_bot_info =
  */
 ModuleEvent module_events[] = 
 {
-	{EVENT_NULL,	NULL}
+	NS_EVENT_END()
 };
 
 /** @brief ModInit

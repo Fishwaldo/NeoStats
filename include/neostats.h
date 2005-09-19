@@ -867,6 +867,8 @@ typedef struct ModuleEvent {
 #endif /* USE_PERL */
 }ModuleEvent;
 
+#define NS_EVENT_END() { EVENT_NULL,	NULL ,0 }
+
 typedef int ModuleProtocol;
 typedef int ModuleFeatures;
 typedef int ModuleFlags;
@@ -1414,6 +1416,7 @@ EXPORTFUNC int ValidateURL( const char *url );
 EXPORTFUNC int ValidateChannel( const char *channel_name );
 EXPORTFUNC int ValidateChannelWild( const char *channel_name );
 EXPORTFUNC int ValidateChannelKey( const char *key );
+EXPORTFUNC int IsJustWildcard( const char *mask, int ishostmask );
 
 #define CONFIG_TABLE_NAME	"config"
 

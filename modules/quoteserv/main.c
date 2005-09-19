@@ -115,7 +115,7 @@ static BotInfo qs_botinfo =
 ModuleEvent module_events[] = 
 {
 	{EVENT_SIGNON,	event_signon},
-	{EVENT_NULL,	NULL}
+	NS_EVENT_END()
 };
 
 /** @brief qs_read_database

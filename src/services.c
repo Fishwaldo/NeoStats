@@ -167,7 +167,7 @@ BotInfo ns_botinfo =
 ModuleEvent neostats_events[] =
 {
 	{EVENT_CTCPVERSIONRPL,	services_event_ctcpversion,	EVENT_FLAG_IGNORE_SYNCH},
-	{EVENT_NULL,		NULL}
+	NS_EVENT_END()
 };
 
 /** @brief services_event_ctcpversion
