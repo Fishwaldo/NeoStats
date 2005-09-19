@@ -28,7 +28,6 @@
  *  - nothing at present
  *  TOCONSIDER:
  *  - Real time exclusions??? possibly optional.
- *  - move excludelists and bot_cmd_lists arrays into Module struct???
  */
 
 #include "neostats.h"
@@ -74,10 +73,6 @@ typedef int (*ExcludeHandler) ( Exclude *exclude, void *v );
 
 /* Global exclusion list */
 static list_t *exclude_list;
-/* Module exclusion list array */
-static list_t *excludelists[NUM_MODULES];
-/* Module exclusion command array */
-static bot_cmd *bot_cmd_lists[NUM_MODULES];
 
 /* String descriptions of exclude types */
 const char* ExcludeDesc[NS_EXCLUDE_MAX] =
@@ -212,7 +207,7 @@ static int new_global_exclude( void *data, int size )
 
 static int new_mod_exclude( void *data, int size )
 {
-	new_exclude( excludelists[GET_CUR_MODULE_INDEX()], data );
+	new_exclude( GET_CUR_MODULE()->exclude_list, data );
 	return NS_FALSE;
 }
 
@@ -251,9 +246,10 @@ int InitModExcludes( Module *mod_ptr )
 {
 	SET_SEGV_LOCATION();
 	SET_RUN_LEVEL( mod_ptr );
-	excludelists[mod_ptr->modnum] = list_create( MAX_MOD_EXCLUDES );
-	bot_cmd_lists[mod_ptr->modnum] = ns_malloc( sizeof( mod_exclude_commands ) );
-	os_memcpy( bot_cmd_lists[mod_ptr->modnum], mod_exclude_commands, sizeof( mod_exclude_commands ) );
+	
+	mod_ptr->exclude_list = list_create( MAX_MOD_EXCLUDES );
+	mod_ptr->bot_cmd_list = ns_malloc( sizeof( mod_exclude_commands ) );
+	os_memcpy( mod_ptr->bot_cmd_list, mod_exclude_commands, sizeof( mod_exclude_commands ) );
 	DBAFetchRows( "exclusions", new_mod_exclude );
 	RESET_RUN_LEVEL();
 	return NS_SUCCESS;
@@ -286,8 +282,8 @@ void FiniExcludes( void )
 
 void FiniModExcludes( Module *mod_ptr )
 {
-	ns_free( bot_cmd_lists[mod_ptr->modnum] );
-	list_destroy_auto( excludelists[mod_ptr->modnum] );
+	ns_free( mod_ptr->bot_cmd_list );
+	list_destroy_auto( mod_ptr->exclude_list );
 }
 
 /** @brief AddBotExcludeCommands
@@ -302,7 +298,7 @@ void FiniModExcludes( Module *mod_ptr )
 
 void AddBotExcludeCommands( Bot *botptr )
 {
-	add_bot_cmd_list( botptr, bot_cmd_lists[botptr->moduleptr->modnum] );
+	add_bot_cmd_list( botptr, GET_CUR_MODULE()->bot_cmd_list );
 }
 
 /** @brief AddExclude
@@ -443,7 +439,7 @@ static int ns_cmd_exclude_add( const CmdParams *cmdparams )
 
 static int mod_cmd_exclude_add( CmdParams *cmdparams )
 {
-	return do_exclude_add( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
+	return do_exclude_add( GET_CUR_MODULE()->exclude_list, cmdparams );
 }
 
 /** @brief do_exclude_del
@@ -514,7 +510,7 @@ static int ns_cmd_exclude_del( const CmdParams *cmdparams )
 
 static int mod_cmd_exclude_del( const CmdParams *cmdparams )
 {
-	return do_exclude_del( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
+	return do_exclude_del( GET_CUR_MODULE()->exclude_list, cmdparams );
 }
 
 /** @brief ReportExcludeHandler
@@ -585,7 +581,7 @@ static int ns_cmd_exclude_list( const CmdParams *cmdparams )
 
 static int mod_cmd_exclude_list( const CmdParams *cmdparams )
 {
-	return do_exclude_list( excludelists[cmdparams->bot->moduleptr->modnum], cmdparams );
+	return do_exclude_list( GET_CUR_MODULE()->exclude_list, cmdparams );
 }
 
 /** @brief ns_cmd_exclude
@@ -762,7 +758,7 @@ int ModIsUserExcluded( const Client *u )
 		dlog( DEBUG1, "User %s excluded as neostats or module user.", u->name );
 		return NS_TRUE;
 	}
-	return ProcessExcludeList( excludelists[GET_CUR_MODULE_INDEX()], ModExcludeUserHandler, ( void * )u );
+	return ProcessExcludeList( GET_CUR_MODULE()->exclude_list, ModExcludeUserHandler, ( void * )u );
 }
 
 /** @brief ns_do_exclude_server
@@ -831,7 +827,7 @@ int ModIsServerExcluded( const Client *s )
 {
 	Exclude *foundexclude;
 
-	foundexclude = FindExclude( excludelists[GET_CUR_MODULE_INDEX()], NS_EXCLUDE_SERVER, s->name );
+	foundexclude = FindExclude( GET_CUR_MODULE()->exclude_list, NS_EXCLUDE_SERVER, s->name );
 	if( foundexclude )
 	{
 		dlog( DEBUG1, "Excluding server %s against %s", s->name, foundexclude->pattern );
@@ -860,7 +856,7 @@ int ModIsChannelExcluded( const Channel *c )
 		dlog( DEBUG1, "Excluding services channel %s", c->name );
 		return NS_TRUE;
 	}
-	foundexclude = FindExclude( excludelists[GET_CUR_MODULE_INDEX()], NS_EXCLUDE_CHANNEL, c->name );
+	foundexclude = FindExclude( GET_CUR_MODULE()->exclude_list, NS_EXCLUDE_CHANNEL, c->name );
 	if( foundexclude )
 	{
 		dlog( DEBUG1, "Excluding channel %s against %s", c->name, foundexclude->pattern );

@@ -978,6 +978,10 @@ typedef struct _Module {
 	mod_auth authcb;
 	/** Auth callback for auth modules */
 	mod_auth userauth;
+	/** Exclude list */
+	list_t *exclude_list;
+	/** Exclude command list */
+	bot_cmd *bot_cmd_list;
 	/** Dynamic library handle */
 	void *handle;
 	/** index */
