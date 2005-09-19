@@ -40,6 +40,6 @@ int ns_cmd_userlist( CmdParams *cmdparams );
 void QuitServerUsers( Client *s );
 EXPORTFUNC void AddFakeUser( const char *mask );
 EXPORTFUNC void DelFakeUser( const char *mask );
-void CleanupUserModdata( int index );
+void CleanupUserModdata( void );
 
 #endif /* _USERS_H_ */

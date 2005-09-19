@@ -1029,7 +1029,7 @@ static int CleanupUserModdataHandler( Client *u, void *v )
  *  @return none
  */
 
-void CleanupUserModdata( int index )
+void CleanupUserModdata( void )
 {
 	SET_SEGV_LOCATION();
 	if( GET_CUR_MODULE()->userdatacnt > 0 )

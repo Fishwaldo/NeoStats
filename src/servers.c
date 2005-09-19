@@ -656,7 +656,7 @@ static int CleanupServerModdataHandler( Client *s, void *v )
  *  @return none
  */
 
-void CleanupServerModdata( int index )
+void CleanupServerModdata( void )
 {
 	SET_SEGV_LOCATION();
 	if( GET_CUR_MODULE()->serverdatacnt > 0 )

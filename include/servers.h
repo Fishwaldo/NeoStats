@@ -32,6 +32,6 @@ void PingServers( void );
 void FiniServers( void );
 Client *find_server_base64( const char *num );
 void RequestServerUptimes( void );
-void CleanupServerModdata( int index );
+void CleanupServerModdata( void );
 
 #endif /* _SERVER_H_ */

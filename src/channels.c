@@ -973,7 +973,7 @@ static int CleanupChannelModdataHandler( Channel *c, void *v )
  *  @return none
  */
 
-void CleanupChannelModdata( int index )
+void CleanupChannelModdata( void )
 {
 	SET_SEGV_LOCATION();
 	if( GET_CUR_MODULE()->channeldatacnt > 0 )

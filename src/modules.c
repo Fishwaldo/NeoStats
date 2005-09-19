@@ -616,9 +616,9 @@ int unload_module( const char *modname, Client * u )
 	SET_RUN_LEVEL( mod_ptr );
 	DBACloseDatabase();
 	/* Cleanup moddata */
-	CleanupUserModdata( moduleindex );
-	CleanupServerModdata( moduleindex );
-	CleanupChannelModdata( moduleindex );
+	CleanupUserModdata();
+	CleanupServerModdata();
+	CleanupChannelModdata();
 
 	if( IS_STANDARD_MOD( mod_ptr ) )
 		ns_dlclose( mod_ptr->handle );
