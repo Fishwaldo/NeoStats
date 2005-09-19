@@ -260,6 +260,11 @@ int DBAOpenTable( const char *table )
 	tbe = ns_calloc( sizeof( tableentry ) );
 	strlcpy( tbe->table, table, MAX_MOD_NAME );
 	ircsnprintf( tbe->name, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
+	if( hnode_find( dbe->tablehash, tbe->name ) )
+	{
+		dlog( DEBUG5, "DBAOpenTable %s already open", table );
+		return NS_SUCCESS;
+	}
 	tbe->handle = DBMOpenTable( tbe->name );
 	if( !tbe->handle )
 	{
@@ -281,7 +286,7 @@ int DBAOpenTable( const char *table )
  *  @return table entry or NULL for none
  */
 
-static tableentry *DBAFetchTableEntry( const char *table )
+static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 {
 	dbentry *dbe;
 	tableentry *tbe;
@@ -301,6 +306,7 @@ static tableentry *DBAFetchTableEntry( const char *table )
 		tbe = (tableentry *)hnode_find( dbe->tablehash, dbname );
 		if( !tbe )
 			nlog( LOG_WARNING, "Open table failed for %s %s", dbname, table );
+		*islocalopen = 1;
 	}
 	return tbe;
 }
@@ -353,13 +359,18 @@ int DBACloseTable( const char *table )
 
 int DBAFetch( const char *table, const char *key, void *data, int size )
 {
+	int islocalopen = 0;
+	int ret = 0;
 	tableentry *tbe;
 
 	dlog( DEBUG5, "DBAFetch %s %s", table, key );
-	tbe = DBAFetchTableEntry( table );
+	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	return DBMGetData( tbe->handle, key, data, size );
+	ret = DBMGetData( tbe->handle, key, data, size );
+	if( islocalopen )
+		DBACloseTable( table );
+	return ret;
 }
 
 /** @brief DBAStore
@@ -376,13 +387,18 @@ int DBAFetch( const char *table, const char *key, void *data, int size )
 
 int DBAStore( const char *table, const char *key, void *data, int size )
 {
+	int islocalopen = 0;
+	int ret = 0;
 	tableentry *tbe;
 
 	dlog( DEBUG5, "DBAStore %s %s", table, key );
-	tbe = DBAFetchTableEntry( table );
+	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	return DBMSetData( tbe->handle, key, data, size );
+	ret = DBMSetData( tbe->handle, key, data, size );
+	if( islocalopen )
+		DBACloseTable( table );
+	return ret;
 }
 
 /** @brief DBAFetchRows
@@ -397,13 +413,18 @@ int DBAStore( const char *table, const char *key, void *data, int size )
 
 int DBAFetchRows( const char *table, DBRowHandler handler )
 {
+	int islocalopen = 0;
+	int ret = 0;
 	tableentry *tbe;
 
 	dlog( DEBUG5, "DBAFetchRows %s", table );
-	tbe = DBAFetchTableEntry( table );
+	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return 0;
-	return DBMGetTableRows( tbe->handle, handler );	
+	ret = DBMGetTableRows( tbe->handle, handler );	
+	if( islocalopen )
+		DBACloseTable( table );
+	return ret;
 }
 
 /** @brief DBADelete
@@ -418,11 +439,16 @@ int DBAFetchRows( const char *table, DBRowHandler handler )
 
 int DBADelete( const char *table, const char *key )
 {
+	int islocalopen = 0;
+	int ret = 0;
 	tableentry *tbe;
 
 	dlog( DEBUG5, "DBADelete %s %s", table, key );
-	tbe = DBAFetchTableEntry( table );
+	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	return DBMDelData( tbe->handle, key );
+	ret = DBMDelData( tbe->handle, key );
+	if( islocalopen )
+		DBACloseTable( table );
+	return ret;
 }

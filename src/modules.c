@@ -671,6 +671,7 @@ void unload_modules( void )
 int ModuleConfig( bot_setting* set_ptr )
 {
 	SET_SEGV_LOCATION();
+	DBAOpenTable( CONFIG_TABLE_NAME );
 	while( set_ptr->option )
 	{
 		switch( set_ptr->type ) {
@@ -722,5 +723,6 @@ int ModuleConfig( bot_setting* set_ptr )
 		}
 		set_ptr++;
 	}
+	DBACloseTable( CONFIG_TABLE_NAME );
 	return NS_SUCCESS;
 }
