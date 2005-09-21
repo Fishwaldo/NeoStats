@@ -187,7 +187,6 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 	strlcpy( u->user->uservhostmask, u->user->userhostmask, USERHOSTLEN );
 	strlcpy( u->user->username, user, MAXUSER );
 	strlcpy( u->info, realname, MAXREALNAME );
-	clean_string( u->info, MAXREALNAME );
 	u->user->ulevel = -1;
 	u->uplink = FindServer( server );
 	u->uplink->server->users++;

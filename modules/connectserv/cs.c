@@ -289,9 +289,9 @@ static void cs_report( const char *fmt, ... )
 	va_start( ap, fmt );
 	ircvsnprintf( buf, BUFSIZE, fmt, ap );
 	va_end( ap );
-	irc_chanalert( cs_bot, buf );
+	irc_chanalert( cs_bot, "%s", buf );
 	if( cs_cfg.logging ) 
-		nlog( LOG_NORMAL, buf );
+		nlog( LOG_NORMAL, "%s", buf );
 }
 
 /** @brief cs_event_signon

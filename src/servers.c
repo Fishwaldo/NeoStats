@@ -99,7 +99,6 @@ Client *AddServer( const char *name, const char *uplink, const char *hops, const
 	if( infoline )
 	{
 		strlcpy( s->info, infoline, MAXREALNAME );
-		clean_string( s->info, MAXREALNAME );
 	}
 	if( numeric )
 		s->server->numeric =  atoi( numeric );
