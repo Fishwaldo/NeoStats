@@ -1117,6 +1117,14 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
+		D0B9857208EAB4210064EE17 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = main.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
 		D0E060AE08D1FD6F00DBA28C = {
 			children = (
 				D0E060AF08D1FD6F00DBA28C,
@@ -2798,6 +2806,7 @@
 		};
 		D0E061D408D1FD8B00DBA28C = {
 			children = (
+				D0B9857208EAB4210064EE17,
 				D0E061D508D1FD8B00DBA28C,
 			);
 			isa = PBXGroup;
