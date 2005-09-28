@@ -50,6 +50,11 @@ use Symbol();
     my ($package) = caller;
     my $pkg_info = NeoStats::Embed::pkg_info( $package );
     my $filename = $pkg_info->{filename};
+	
+	if ($pkg_info->{type} != 0) {
+		NeoStats::debug("Extension tried to register as a module");
+		return NeoStats::NS_FAILURE;
+	}
 
     my ($name, $version, $description, $startupcb, $shutdowncb) = @_;
     $description = "" unless defined $description;
@@ -69,6 +74,33 @@ use Symbol();
     return NeoStats::NS_SUCCESS;
   }
 
+  sub registerextension {
+    if (@_ != 4) {
+      NeoStats::debug("Invalid Number of arguments to registerextension");
+      return NeoStats::NS_FAILURE;
+    }
+    my ($package) = caller;
+    my $pkg_info = NeoStats::Embed::pkg_info( $package );
+    my $filename = $pkg_info->{filename};
+	
+	if ($pkg_info->{type} != 1) {
+		NeoStats::debug("Perl Module tried to register as a extension");
+		return NeoStats::NS_FAILURE;
+	}
+
+    my ($name, $version, $startupcb, $shutdowncb) = @_;
+    $pkg_info->{name} = $name;
+    $pkg_info->{version} = $version;
+    $pkg_info->{gui_entry} =
+      NeoStats::Internal::registerextension( $pkg_info->{name}, $pkg_info->{version});
+    $startupcb = NeoStats::Embed::fix_callback( $package, $startupcb );
+    $shutdowncb = NeoStats::Embed::fix_callback( $package, $shutdowncb );
+    $pkg_info->{shutdown} = $shutdowncb;
+    $pkg_info->{startup} = $startupcb;
+
+    # keep with old behavior
+    return NeoStats::NS_SUCCESS;
+  }
 
 
   sub hook_event {
@@ -719,6 +751,7 @@ $SIG{__WARN__} = sub {
       # this must come before the eval or the filename will not be found in
       # NeoStats::register
       $scripts{$package}{filename} = $file;
+	  $scripts{$package}{type} = 0;
 
       {
 #        no strict; no warnings;
@@ -741,7 +774,57 @@ $SIG{__WARN__} = sub {
     
     return 0;
   }
+ 
+  
+    sub loadextension {
+    my $file = expand_homedir( shift @_ );
 
+    my $package = file2pkg( $file );
+
+    if ( open FH, $file ) {
+      my $source = do {local $/; <FH>};
+      close FH;
+
+      if ( my $replacements = $source =~ s/^\s*package ([\w:]+).*?;//mg ) {
+        my $original_package = $1;
+
+        if ( $replacements > 1 ) {
+          NeoStats::debug( "Too many package defintions, only 1 is allowed\n" );
+          return 1;
+        }
+
+        # fixes things up for code calling subs with fully qualified names
+        $source =~ s/${original_package}:://g;
+
+      }
+
+      # this must come before the eval or the filename will not be found in
+      # NeoStats::registerextension
+      $scripts{$package}{filename} = $file;
+	  $scripts{$package}{type} = 1;
+	  
+      {
+#        no strict; no warnings;
+        eval "package $package; $source;";
+      }
+
+      if ( $@ ) {
+        # something went wrong
+        NeoStats::debug( "Error loading extension '$file':\n$@\n" );
+
+        # make sure the script list doesn't contain false information
+        unload( $scripts{$package}{filename} );
+        return 1;
+      }
+
+    } else {
+      NeoStats::debug( "Error opening '$file': $!\n" );
+      return 2;
+    }
+    
+    return 0;
+  }
+  
   sub unload {
     my $file = shift @_;
     my $package = file2pkg( $file );

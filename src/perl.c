@@ -433,8 +433,30 @@ XS (XS_NeoStats_register)
 		mod->info->version = strndup(SvPV_nolen (ST (1)), sv_len(ST (1)));
 		mod->info->description = strndup(SvPV_nolen (ST (2)), sv_len(ST(2)));
 		mod->pm->registered = 1;
+		mod->pm->type = TYPE_MODULE;
 		XSRETURN_UV (PTR2UV (mod));
 
+	}
+}
+
+static
+XS (XS_NeoStats_registerextension)
+{
+	Module *mod;
+	dXSARGS;
+	if (items != 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats::Internal::registerextension(scriptname, version)");
+	} else {
+		mod = GET_CUR_MODULE();
+		if (!mod) {
+			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
+			XSRETURN_EMPTY;
+		}
+		mod->pm->extname = strndup(SvPV_nolen(ST(0)), sv_len(ST (0)));
+		mod->pm->extversion = strndup(SvPV_nolen (ST (1)), sv_len(ST (1)));
+		mod->pm->registered = 1;
+		mod->pm->type = TYPE_EXTENSION;
+		XSRETURN_UV (PTR2UV (mod));
 	}
 }
 
@@ -1535,6 +1557,7 @@ xs_init (pTHX)
 	newCONSTSUB (stash, "NS_FAILURE", newSViv (NS_FAILURE));
 
 	if (mod->pm->extninit) {
+		newXS ("NeoStats::Internal::registerextension", XS_NeoStats_registerextension, __FILE__);
 		mod->pm->extninit();
 	}
 }
@@ -1595,27 +1618,29 @@ Module *load_perlfiles (const char *filename, Module *mod, perl_xs_init init_fun
 int load_perlextension(const char *filename, perl_xs_init init_func, Client *u)
 {
 	Module *mod;
+	char filebuf[BUFSIZE];
 	
 	mod = GET_CUR_MODULE();
 	if (!mod) {
 		nlog(LOG_WARNING, "Trying to laod a Perl Extension %s in the core? No No", filename);
 		return NS_FAILURE;
 	}	
-	
-	mod = load_perlfiles((const char *)filename, mod, init_func);
+	ircsnprintf(filebuf, BUFSIZE, "modules/%s.ple", filename);
+printf("%s\n",filebuf);
+	mod = load_perlfiles((const char *)filebuf, mod, init_func);
 	
 	SET_RUN_LEVEL(mod);
 	if (!execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::loadextension", 0)),
-								1, (char *)filename)) {
+								1, (char *)filebuf)) {
 		/* if we are here, check that pm->mod->description has something, otherwise the script didnt register */
 		if (!mod->pm->registered) {
-			load_module_error(u, filename, __("Perl extension didn't register.", u));
+			load_module_error(u, filebuf, __("Perl extension didn't register.", u));
 			unload_perlextension(mod);
 			return NS_FAILURE;
 		}		
 		/* it loaded ok */
 	} else {
-		load_module_error(u, filename, __("Errors in Perl extension", u));
+		load_module_error(u, filebuf, __("Errors in Perl extension", u));
 		unload_perlextension(mod);
 		return NS_FAILURE;	
 	}
