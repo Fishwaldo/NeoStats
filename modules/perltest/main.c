@@ -95,6 +95,12 @@ ModuleInfo module_info =
 	0,
 };
 
+static void 
+perl_ext_init() {
+printf("called extension init");
+}
+
+
 /** 
  *  example command
  *  Just sends "Hello World!" to the services channel
@@ -102,8 +108,14 @@ ModuleInfo module_info =
 static int load_extension( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_chanalert( perl_bot, "%s says \"Hello World!\"",
-		cmdparams->source->name );
+	irc_chanalert( perl_bot, "%s is trying to load perl extension %s",
+		cmdparams->source->name, cmdparams->av[0] );
+	if (load_perlextension(cmdparams->av[0], perl_ext_init, cmdparams->source)) {
+		perl_sync_module(GET_CUR_MODULE());
+	} else {
+		return NS_FAILURE;
+	}
+	
 	return NS_SUCCESS;
 }
 
@@ -154,7 +166,7 @@ BotInfo perl_bot_info =
 	"Perl Extensions Test",
 	/* OPTIONAL: 
 	 * flags */
-	0, 
+	BOT_FLAG_SERVICEBOT, 
 	/* OPTIONAL: 
 	 * bot command list pointer, use NULL if not needed */
 	perl_commands, 
