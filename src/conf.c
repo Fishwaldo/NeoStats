@@ -53,6 +53,7 @@ static int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_noload( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_neohost( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt );
 
 /** @brief Core Configuration Items
@@ -115,7 +116,7 @@ cfg_opt_t fileconfig[] = {
 };
 
 validate_args arg_validate[] = {
-	{"ServerConfig|Name", &cb_verify_host},
+	{"ServerConfig|Name", &cb_verify_neohost},
 	{"ServerConfig|ServiceChannel", &cb_verify_chan},
 	{"ServerConfig|ServerNumeric", &cb_verify_numeric},
 	{"ServerConfig|BindTo", &cb_verify_bind},
@@ -534,6 +535,31 @@ static int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt )
 	if( ValidateHost( opt->values[0]->string ) == NS_FAILURE )
 	{
 		cfg_error( cfg, "Invalid hostname %s for option %s", opt->values[0]->string, opt->name );
+		return CFG_PARSE_ERROR;
+	}
+	return CFG_SUCCESS;
+}
+
+/** @brief cb_verify_neohost
+ *
+ *  Verify hostname/ip address configuration value
+ *  Config subsystem use only
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+static int cb_verify_neohost( cfg_t *cfg, cfg_opt_t *opt )
+{
+	if( ValidateHost( opt->values[0]->string ) == NS_FAILURE )
+	{
+		cfg_error( cfg, "Invalid hostname %s for option %s", opt->values[0]->string, opt->name );
+		return CFG_PARSE_ERROR;
+	}
+	if ((!strcasecmp(opt->values[0]->string, "stats.neostats.net")) || (!strcasecmp(opt->values[0]->string, "stats.somennet.net"))) {
+		cfg_error( cfg, "You must use a hostname other than %s", opt->values[0]->string);
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;
