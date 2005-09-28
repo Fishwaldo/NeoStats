@@ -52,12 +52,20 @@ typedef struct PerlEvent {
 	SV *userdata;
 } PerlEvent;
 
+typedef enum PerlType {
+	TYPE_MODULE,
+	TYPE_EXTENSION,
+}PerlType;
+
 typedef struct PerlModInfo {
 	char filename[MAXPATH];
 	PerlInterpreter *my_perl;
 	struct ModuleEvent **event_list;
 	int registered;
+	PerlType type;
 	perl_xs_init extninit;
+	const char *extversion;
+	const char *extname;
 } PerlModInfo;
 
 #endif /* PERLDEFINES */
