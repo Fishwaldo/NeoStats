@@ -455,7 +455,7 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am
 	uninstall-info-am
 
 
-version.h:
+version.h:	stamp-h1
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
 
 .c.o:
