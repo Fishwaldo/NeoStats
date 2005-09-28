@@ -463,6 +463,7 @@ modules/operlog/help.c -text
 modules/operlog/main.c -text
 modules/operlog/operlog.h -text
 modules/operlog/operlog.vcproj -text
+modules/perltest/Makefile.am -text
 modules/perltest/main.c -text
 modules/perltest/test.pl -text
 modules/protocol/Makefile.am -text
