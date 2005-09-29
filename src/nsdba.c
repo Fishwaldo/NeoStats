@@ -334,12 +334,12 @@ int DBACloseTable( const char *table )
 		return NS_FAILURE;
 	}
 	ircsnprintf( dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
-	node = hash_lookup( dbhash, dbname );
+	node = hash_lookup( dbe->tablehash, dbname );
 	if( node )
 	{
 		tbe = (tableentry *)hnode_get( node );
 		DBMCloseTable( tbe->handle );
-		hash_delete_destroy_node( dbhash, node );
+		hash_delete_destroy_node( dbe->tablehash, node );
 		ns_free( tbe );
 	}
 	return NS_SUCCESS;
