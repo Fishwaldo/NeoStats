@@ -25,19 +25,33 @@
  */
 
 #include "neostats.h"
+#include "event.h"
+#include "MiniMessage.h"
+#include "MiniMessageGateway.h"
+
 
 void GotUpdateAddress(void *data, adns_answer *a);
+static int mqswrite(int fd, void *data);
+static int mqsread(void *data, void *notused, size_t len);
+int mqs_login();
 
-struct updateserver {
-	int ok;
-	struct sockaddr_in sendtomq;
-	OS_SOCKET sock;
-} mqs;
+updateserver mqs;
+MMessageGateway *mqsgw;
+
+int MQSSendSock(const char * buf, uint32 numBytes, void * arg) {
+	return os_sock_write(mqs.sock, buf, numBytes); 
+}
+
 
 int InitUpdate(void) 
 {
-	mqs.ok = 0;
-	dns_lookup( "mqpool.neostats.net",  adns_r_a, GotUpdateAddress, NULL );
+	mqs.state = MQS_DISCONNECTED;
+	mqsgw = MGAllocMessageGateway();
+	if (!mqsgw) {
+		nlog(LOG_WARNING, "Couldn't allocate MiniMessageGateway Object");
+		return NS_FAILURE;
+	}
+	dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
 	dlog(DEBUG1, "Updates Initialized successfully");
 	return NS_SUCCESS;
 }
@@ -48,34 +62,75 @@ void FiniUpdate(void)
 
 void GotUpdateAddress(void *data, adns_answer *a) 
 {
-	char *url;
-	int i, len, ri;
-
+	struct timeval tv;
 	SET_SEGV_LOCATION();
-	adns_rr_info(a->type, 0, 0, &len, 0, 0);
-	for(i = 0; i < a->nrrs;  i++) {
-		ri = adns_rr_info(a->type, 0, 0, 0, a->rrs.bytes +i*len, &url);
-		if (!ri) {
-			/* ok, we got a valid answer, lets maybe kick of the update check.*/
-			mqs.sendtomq.sin_addr.s_addr = inet_addr(url);
-			mqs.sendtomq.sin_port = htons(2335);
-			mqs.sendtomq.sin_family = AF_INET;
-			mqs.sock = socket(AF_INET, SOCK_DGRAM, 0);
-			mqs.ok = 1;
-			nlog (LOG_NORMAL, "Got DNS for MQ Pool Server: %s", url);
-		} else {
-			nlog(LOG_WARNING, "DNS error Checking for MQ Server Pool: %s", adns_strerror(ri));
-		}
-		ns_free (url);
+	if( a && a->nrrs > 0 && a->status == adns_s_ok ) {
+			mqs.sock = sock_connect(SOCK_STREAM, a->rrs.addr->addr.inet.sin_addr, mqs.port);
+			if (mqs.sock > 0) {
+				tv.tv_sec = 30;
+				AddSock(SOCK_NATIVE, "MQS", mqs.sock, mqsread, mqswrite, EV_WRITE|EV_TIMEOUT, NULL, &tv);
+				mqs.state = MQS_CONNECTING;
+			}
+			nlog (LOG_NORMAL, "Got DNS for MQ Pool Server: %s", inet_ntoa(a->rrs.addr->addr.inet.sin_addr));
+	} else {
+		nlog(LOG_WARNING, "DNS error Checking for MQ Server Pool: %s", adns_strerror(a->status));
 	}
-	if (a->nrrs < 1) {
-		nlog(LOG_WARNING, "DNS Error checking for MQ Server Pool");
+}
+
+int mqswrite(int fd, void *data) {
+	switch (mqs.state) {
+		case MQS_DISCONNECTED:
+			break;
+		/* we are connected */
+		case MQS_CONNECTING:
+			return mqs_login();
+			break;
+		case MQS_SENTAUTH:
+		case MQS_OK:
+			/* ask MiniMessageGateway to write any buffer out */
+			break;
 	}
+	return NS_FAILURE;
+}
+
+int mqsread(void *data, void *notused, size_t len) {
+
+	return NS_SUCCESS;
+}
+
+int mqs_login() 
+{
+	MMessage *msg = MMAllocMessage(0);
+	MByteBuffer **username;
+	MByteBuffer **password;
+	MByteBuffer **version;
+	if (!msg) {
+		nlog(LOG_WARNING, "Warning, Couldn't create MiniMessage");
+		return NS_FAILURE;
+	}
+	username = MMPutStringField(msg, false, "username", 1);
+	username[0] = MBStrdupByteBuffer(mqs.username);
+	password = MMPutStringField(msg, false, "password", 1);
+	password[0] = MBStrdupByteBuffer(mqs.password);
+	version = MMPutStringField(msg, false, "version", 1);
+	version[0] = MBStrdupByteBuffer(me.version);
+	MMSetWhat(msg, MAKETYPE("login\0"));
+#ifdef DEBUG
+	MMPrintToStream(msg);
+#endif
+	MGAddOutgoingMessage(mqsgw, msg);
+	MMFreeMessage(msg);
+
+	MGDoOutput(mqsgw, ~0, MQSSendSock, NULL);
+	
+	mqs.state = MQS_SENTAUTH;
+	
+	return NS_SUCCESS;
 }
 void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len) {
 	char *buf;
 	
-	if (mqs.ok == 1) {
+	if (mqs.state == MQS_OK) {
 		/* for now, we know that data is always a char string */
 		buf = malloc(sizeof(int) + len);
 		ircsnprintf(buf, (sizeof(int)+len+1), "%d\n%s", type, (char *)data);

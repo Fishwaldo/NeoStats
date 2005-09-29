@@ -101,6 +101,14 @@ cfg_opt_t modules[] = {
 	CFG_END()
 };
 
+cfg_opt_t neonet[] = {
+	CFG_STR ("HostName", "mqpool.neostats.net", CFGF_NONE),
+	CFG_INT ("Port", 2960, CFGF_NONE),
+	CFG_STR ("UserName", 0, CFGF_NONE),
+	CFG_STR ("Password", 0, CFGF_NONE),
+	CFG_END()
+};
+
 cfg_opt_t fileconfig[] = {
 	CFG_SEC ("ServerConfig", server_details, CFGF_NONE),
 	CFG_SEC ("Options", options, CFGF_NONE),
@@ -112,6 +120,7 @@ cfg_opt_t fileconfig[] = {
 #endif /* 0 */
 	CFG_SEC ("ServiceRoot", serviceroot, CFGF_NONE),
 	CFG_SEC ("Modules", modules, CFGF_NONE),
+	CFG_SEC ("NeoNet", neonet, CFGF_NONE),
 	CFG_END()
 };
 
@@ -128,7 +137,8 @@ validate_args arg_validate[] = {
 	{"Options|NOLOAD", &cb_noload},
 	{"Servers|IpAddress", &cb_verify_host},
 	{"ServiceRoot|Mask", &cb_verify_mask},
-	{"Modules|ModuleName", &cb_verify_file}
+	{"Modules|ModuleName", &cb_verify_file},
+	{"NeoNet|HostName", &cb_verify_host}
 };
 
 /** @brief ConfParseError
@@ -260,6 +270,13 @@ static int set_config_values( cfg_t *cfg )
 		dlog( DEBUG6, "                     %s", cfg_getnstr( cfg, "Modules|ModuleName", i ));
 	}	
 	dlog( DEBUG6, "-----------------------------------------------" );
+printf("%d\n", cfg_size(cfg, "NeoNet|UserName"));
+	if (cfg_size(cfg, "NeoNet|UserName") > 1) 
+		strlcpy(mqs.username, cfg_getstr(cfg, "NeoNet|UserName"), MAXUSER);
+	if (cfg_size(cfg, "NeoNet|Password") > 1)
+	strlcpy(mqs.password, cfg_getstr(cfg, "NeoNet|Password"), MAXUSER);
+	strlcpy(mqs.hostname, cfg_getstr(cfg, "NeoNet|HostName"), MAXHOST);
+	mqs.port = cfg_getint(cfg, "NeoNet|Port");
 	return NS_SUCCESS;
 }
 
