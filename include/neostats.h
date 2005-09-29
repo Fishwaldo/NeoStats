@@ -1184,6 +1184,33 @@ typedef struct _Bot {
 	void *moddata;
 }_Bot;
 
+typedef enum MQS_STATE {
+	MQS_DISCONNECTED,
+	MQS_CONNECTING,
+	MQS_SENTAUTH,
+	MQS_OK,
+} MQS_STATE;
+
+/* this is the NeoNet details */
+typedef struct updateserver {
+	MQS_STATE state;
+	struct sockaddr_in sendtomq;
+	OS_SOCKET sock;
+	char username[MAXUSER];
+	char password [MAXUSER];
+	char hostname[MAXHOST];
+	int port;
+}updateserver;
+
+extern updateserver mqs;
+
+/* MQ Server update sending functions */
+typedef enum MQ_MSG_TYPE {
+	UPDATE_SSREPORT=1,
+	UPDATE_OPSBREPORT,
+} MQ_MSG_TYPE;
+
+
 /* load configuration associated with this bot_setting list */
 EXPORTFUNC int ModuleConfig( bot_setting *bot_settings );
 
@@ -1680,11 +1707,6 @@ EXPORTFUNC void ClearBotModValue( Bot *pBot );
 EXPORTFUNC void SetBotModValue( Bot *pBot, void *data );
 EXPORTFUNC void *GetBotModValue( const Bot *pBot );
 
-/* MQ Server update sending functions */
-typedef enum MQ_MSG_TYPE {
-	UPDATE_SSREPORT=1,
-	UPDATE_OPSBREPORT,
-} MQ_MSG_TYPE;
 
 EXPORTFUNC void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len);
 int InitUpdate();
