@@ -608,6 +608,7 @@
 "my $callback = shift;\n"
 "my ($package) = caller;\n"
 "$callback = NeoStats::Embed::fix_callback( $package, $callback );\n"
+"NeoStats::debug(\"Callback is $callback\");\n"
 "return NeoStats::Internal::AddTimer($type, $name, $interval, $callback);\n"
 "}\n"
 "\n"

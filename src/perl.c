@@ -65,7 +65,7 @@ dump_hash(HV *rethash) {
 /*
   this is used for autoload and shutdown callbacks
 */
-static int
+int
 execute_perl (Module *mod, SV * function, int numargs, ...)
 {
 
@@ -73,6 +73,11 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 	SV *sv;
 	va_list args;
 	char *tmpstr[10];
+
+	if (!mod->pm) {
+		nlog(LOG_WARNING, "Tried to execute a perl call when perl isn't loaded!");
+		return NS_FAILURE;
+	}
 
 	dSP;
 	ENTER;
@@ -1625,8 +1630,8 @@ int load_perlextension(const char *filename, perl_xs_init init_func, Client *u)
 		nlog(LOG_WARNING, "Trying to laod a Perl Extension %s in the core? No No", filename);
 		return NS_FAILURE;
 	}	
-	ircsnprintf(filebuf, BUFSIZE, "modules/%s.ple", filename);
-printf("%s\n",filebuf);
+	ircsnprintf(filebuf, BUFSIZE, "modules/%s%s", filename, MOD_EXTEXT);
+
 	mod = load_perlfiles((const char *)filebuf, mod, init_func);
 	
 	SET_RUN_LEVEL(mod);
@@ -1706,7 +1711,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 
 void PerlModFini(Module *mod)
 {
-	if( IsModuleSynched( mod ) )
+	if( IsModuleSynched( mod ) && mod->pm->type == TYPE_MODULE )
 	{
 		/* only execute unload if synced */
 		execute_perl (mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), 1, mod->pm->filename);
@@ -1715,8 +1720,8 @@ void PerlModFini(Module *mod)
 
 void PerlExtensionFini(Module *mod)
 {
-	if (IsModuleSynched(mod) ) {
-		execute_perl(mod, sv_2mortal (newSVpv ("NeoStats::Embed::unloadextension", 0)), 1, mod->pm->filename);
+	if (IsModuleSynched(mod) && mod->pm->type == TYPE_EXTENSION) {
+		execute_perl(mod, sv_2mortal (newSVpv ("NeoStats::Embed::unload", 0)), 1, mod->pm->filename);
 	}
 }
 

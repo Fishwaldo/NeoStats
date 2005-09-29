@@ -554,11 +554,6 @@ int unload_module( const char *modname, Client * u )
 	}
 	mod_ptr = hnode_get( modnode );
 	irc_chanalert( ns_botptr, _( "Unloading module %s" ), modname );
-#ifdef USE_PERL
-	/* unload any extensions first */
-	if ((mod_ptr->pm) && (mod_ptr->pm->type = TYPE_EXTENSION)) 
-		unload_perlextension(mod_ptr);
-#endif /* USE_PERL */
 	
 	if( mod_ptr->info->flags & MODULE_FLAG_AUTH )
 		DelAuthModule( mod_ptr );
@@ -573,6 +568,15 @@ int unload_module( const char *modname, Client * u )
 	del_sockets( mod_ptr );
 	/* Delete any associated event list */
 	FreeEventList( mod_ptr );
+
+#ifdef USE_PERL
+	/* unload any extensions first */
+	if ((mod_ptr->pm) && (mod_ptr->pm->type = TYPE_EXTENSION)) {
+		PerlExtensionFini(mod_ptr);
+		unload_perlextension(mod_ptr);
+	}
+#endif /* USE_PERL */
+
 	/* Remove from the module hash so we dont call events for this module 
 	 * during signoff 
 	 */
