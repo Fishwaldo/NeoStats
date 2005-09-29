@@ -145,14 +145,14 @@ void FiniDBA( void )
 	hash_scan_begin( &ds, dbhash );
 	while( ( node = hash_scan_next( &ds ) ) != NULL )
 	{
-		dbe = (dbentry *) hnode_get( node );
+		dbe = ( dbentry * ) hnode_get( node );
 		dlog( DEBUG5, "Closing Database %s", dbe->name );
 		hash_scan_begin( &ts, dbe->tablehash );
 		while( ( tnode = hash_scan_next( &ts ) ) != NULL )
 		{
 			tbe = (tableentry *) hnode_get( tnode );
 			dlog( DEBUG5, "Closing Table %s", tbe->name );
-			DBACloseTable( tbe->table );
+			DBMCloseTable( tbe->handle );
 			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
 		}
@@ -216,7 +216,7 @@ int DBACloseDatabase( void )
 	node = hash_lookup( dbhash, GET_CUR_MODNAME() );
 	if (node)
 	{
-		dbe = ( dbentry* )hnode_get( node );
+		dbe = ( dbentry * ) hnode_get( node );
 		dlog( DEBUG5, "Closing Database %s", dbe->name );
 		hash_scan_begin( &ts, dbe->tablehash );
 		while( ( tnode = hash_scan_next( &ts ) ) != NULL )
@@ -228,7 +228,7 @@ int DBACloseDatabase( void )
 			ns_free( tbe );
 		}
 		hash_destroy( dbe->tablehash );
-		hash_delete_destroy_node( dbhash, node );
+		hash_scan_delete_destroy_node( dbhash, node );
 		ns_free( dbe );
 	}
 	return NS_SUCCESS;
