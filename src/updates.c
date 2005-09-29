@@ -29,7 +29,6 @@
 #include "MiniMessage.h"
 #include "MiniMessageGateway.h"
 
-
 void GotUpdateAddress(void *data, adns_answer *a);
 static int mqswrite(int fd, void *data);
 static int mqsread(void *data, void *notused, size_t len);
@@ -45,6 +44,7 @@ int MQSSendSock(const char * buf, uint32 numBytes, void * arg) {
 
 int InitUpdate(void) 
 {
+#ifndef WIN32 /* DOES NOT WORK */
 	mqs.state = MQS_DISCONNECTED;
 	mqsgw = MGAllocMessageGateway();
 	if (!mqsgw) {
@@ -53,6 +53,7 @@ int InitUpdate(void)
 	}
 	dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
 	dlog(DEBUG1, "Updates Initialized successfully");
+#endif /* WIN32 */
 	return NS_SUCCESS;
 }
 
@@ -88,9 +89,11 @@ int mqswrite(int fd, void *data) {
 		case MQS_SENTAUTH:
 		case MQS_OK:
 			/* ask MiniMessageGateway to write any buffer out */
+#ifndef WIN32 /*DOES NOT COMPILE, where is MQHasBytesToOutPut supposed to come from??? */
 			if (MQHasBytesToOutPut(mqsgw)) {
 				MGDoOutput(mqsgw, ~0, MQSSendSock, NULL);
 			}
+#endif /* WIN32 */
 			break;
 	}
 	return NS_FAILURE;

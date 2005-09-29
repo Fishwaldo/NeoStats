@@ -198,6 +198,7 @@ static int services_event_ctcpversion( CmdParams *cmdparams )
 
 void InitServices( void )
 {
+	DBAOpenDatabase();
 	ModuleConfig( ns_settings );
 }
 

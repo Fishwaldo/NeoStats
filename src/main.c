@@ -446,8 +446,8 @@ int main( int argc, char *argv[] )
 	/* Load modules after we fork. This fixes the load->fork-exit->call 
 	   _fini problems when we fork */
 	ConfLoadModules();
-	/* Connect to server */
 	InitUpdate();
+	/* Connect to server */
 	Connect();
 #ifdef WIN32
 	return EXIT_SUCCESS;

@@ -349,6 +349,12 @@
 				RelativePath=".\match.c">
 			</File>
 			<File
+				RelativePath=".\MiniMessage.c">
+			</File>
+			<File
+				RelativePath=".\MiniMessageGateway.c">
+			</File>
+			<File
 				RelativePath=".\misc.c">
 			</File>
 			<File
@@ -525,10 +531,19 @@
 				RelativePath="..\include\main.h">
 			</File>
 			<File
+				RelativePath="..\include\MiniMessage.h">
+			</File>
+			<File
+				RelativePath="..\include\MiniMessageGateway.h">
+			</File>
+			<File
 				RelativePath="..\include\modes.h">
 			</File>
 			<File
 				RelativePath="..\include\modules.h">
+			</File>
+			<File
+				RelativePath="..\include\MuscleSupport.h">
 			</File>
 			<File
 				RelativePath="..\include\neostats.h">

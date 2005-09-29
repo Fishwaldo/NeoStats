@@ -751,4 +751,3 @@ int IsJustWildcard( const char *mask, int ishostmask )
 		return NS_FALSE;
 	return NS_TRUE;
 }
-

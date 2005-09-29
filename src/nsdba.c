@@ -64,7 +64,6 @@ static dbm_sym dbm_sym_table[] =
 };
 
 static hash_t *dbhash;
-static char dbname[MAXPATH];
 static void *dbm_module_handle;
 
 /** @brief InitDBAMSymbols
@@ -122,7 +121,6 @@ int InitDBA( void )
 		nlog( LOG_CRITICAL, "Unable to create db hash" );
 		return NS_FAILURE;
 	}
-	DBAOpenDatabase();
 	return NS_SUCCESS;
 }
 
@@ -145,15 +143,15 @@ void FiniDBA( void )
 	hscan_t ts;
 
 	hash_scan_begin( &ds, dbhash );
-	while( ( node = hash_scan_next( &ds ) ) != NULL  )
+	while( ( node = hash_scan_next( &ds ) ) != NULL )
 	{
 		dbe = (dbentry *) hnode_get( node );
-		dlog(DEBUG5, "Closing Database %s", dbe->name);
+		dlog( DEBUG5, "Closing Database %s", dbe->name );
 		hash_scan_begin( &ts, dbe->tablehash );
-		while(( tnode = hash_scan_next( &ts ) ) != NULL  )
+		while( ( tnode = hash_scan_next( &ts ) ) != NULL )
 		{
 			tbe = (tableentry *) hnode_get( tnode );
-			dlog(DEBUG5, "Closing Table %s", tbe->name);
+			dlog( DEBUG5, "Closing Table %s", tbe->name );
 			DBACloseTable( tbe->table );
 			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
@@ -193,7 +191,7 @@ int DBAOpenDatabase( void )
 		nlog( LOG_CRITICAL, "DBAOpenDatabase: Unable to create table hash" );
 		return NS_FAILURE;
 	}
-	hnode_create_insert( dbhash, dbe, dbe->name);
+	hnode_create_insert( dbhash, dbe, dbe->name );
 	return NS_SUCCESS;
 }
 
@@ -219,12 +217,12 @@ int DBACloseDatabase( void )
 	if (node)
 	{
 		dbe = ( dbentry* )hnode_get( node );
-		dlog(DEBUG5, "Closing Database %s", dbe->name);
+		dlog( DEBUG5, "Closing Database %s", dbe->name );
 		hash_scan_begin( &ts, dbe->tablehash );
-		while(( tnode = hash_scan_next( &ts ) ) != NULL  )
+		while( ( tnode = hash_scan_next( &ts ) ) != NULL )
 		{
 			tbe = (tableentry *) hnode_get( tnode );
-			dlog(DEBUG5, "Closing Table %s", tbe->name);
+			dlog( DEBUG5, "Closing Table %s", tbe->name );
 			DBMCloseTable( tbe->handle );
 			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
@@ -288,6 +286,7 @@ int DBAOpenTable( const char *table )
 
 static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 {
+	static char dbname[MAXPATH];
 	dbentry *dbe;
 	tableentry *tbe;
 
@@ -322,6 +321,7 @@ static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 
 int DBACloseTable( const char *table )
 {
+	static char dbname[MAXPATH];
 	dbentry *dbe;
 	tableentry *tbe;
 	hnode_t *node;
