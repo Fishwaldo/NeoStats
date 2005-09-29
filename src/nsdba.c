@@ -36,7 +36,6 @@ typedef struct dbentry {
 
 typedef struct tableentry {
 	char name[MAXPATH];
-	char table[MAXPATH];
 	void *handle;
 } tableentry;
 
@@ -256,7 +255,6 @@ int DBAOpenTable( const char *table )
 		return NS_FAILURE;
 	}
 	tbe = ns_calloc( sizeof( tableentry ) );
-	strlcpy( tbe->table, table, MAX_MOD_NAME );
 	ircsnprintf( tbe->name, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
 	if( hnode_find( dbe->tablehash, tbe->name ) )
 	{

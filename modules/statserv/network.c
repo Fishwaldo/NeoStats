@@ -329,6 +329,7 @@ void SaveNetworkStats( void )
 
 void InitNetworkStats( void )
 {
+	DBAOpenTable( NETWORK_TABLE );
 	LoadNetworkStats();
 }
 
@@ -343,5 +344,6 @@ void InitNetworkStats( void )
 
 void FiniNetworkStats( void )
 {
+	DBACloseTable( NETWORK_TABLE );
 	SaveNetworkStats();
 }

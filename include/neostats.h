@@ -1464,12 +1464,12 @@ EXPORTFUNC int DBAFetch( const char *table, const char *key, void *data, int siz
 EXPORTFUNC int DBADelete( const char *table, const char * key );
 EXPORTFUNC int DBAFetchRows( const char *table, DBRowHandler handler );
 /* DB API Macros to wrap common types */
-#define DBAStoreBool( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )
-#define DBAStoreInt( table, key, data ) DBAStore( table, key, ( void* )data, sizeof ( int ) )
-#define DBAStoreStr( table, key, data, size ) DBAStore( table, key, ( void* )data, size)
-#define DBAFetchBool( table, key, data ) DBAFetch( table, key, ( void* )data, sizeof ( int ) )
-#define DBAFetchInt( table, key, data ) DBAFetch( table, key, ( void* )data, sizeof ( int ) )
-#define DBAFetchStr( table, key, data, size ) DBAFetch( table, key, ( void* )data, size)
+#define DBAStoreBool( table, key, data ) DBAStore( table, key, ( void * )data, sizeof ( int ) )
+#define DBAStoreInt( table, key, data ) DBAStore( table, key, ( void * )data, sizeof ( int ) )
+#define DBAStoreStr( table, key, data, size ) DBAStore( table, key, ( void * )data, size)
+#define DBAFetchBool( table, key, data ) DBAFetch( table, key, ( void * )data, sizeof ( int ) )
+#define DBAFetchInt( table, key, data ) DBAFetch( table, key, ( void * )data, sizeof ( int ) )
+#define DBAFetchStr( table, key, data, size ) DBAFetch( table, key, ( void * )data, size)
 /* DB API Macros to wrap common config types */
 #define DBAStoreConfigBool( key, data ) DBAStoreBool(CONFIG_TABLE_NAME, key, data)
 #define DBAStoreConfigInt( key, data ) DBAStoreInt(CONFIG_TABLE_NAME, key, data)

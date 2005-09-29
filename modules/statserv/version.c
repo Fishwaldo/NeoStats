@@ -258,6 +258,7 @@ int InitVersionStats( void )
 		nlog( LOG_CRITICAL, "Unable to create version stat list" );
 		return NS_FAILURE;
 	}
+	DBAOpenTable( CTCPVERSION_TABLE );
 	LoadVersionStats();
 	return NS_SUCCESS;
 }
@@ -274,5 +275,6 @@ int InitVersionStats( void )
 void FiniVersionStats( void )
 {
 	SaveClientVersions();
+	DBACloseTable( CTCPVERSION_TABLE );
 	list_destroy_auto( ctcp_version_list );
 }

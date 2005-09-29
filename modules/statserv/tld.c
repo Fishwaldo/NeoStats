@@ -370,6 +370,7 @@ int InitTLDStatistics( void )
 	ircsnprintf( t->tld, 5, UNKNOWN_COUNTRY_CODE );
 	strlcpy( t->country, "Unknown", 8 );
 	lnode_create_append( tldstatlist, t );
+	DBAOpenTable( TLD_TABLE );
 	LoadTLDStats();
 	return NS_SUCCESS;
 }
@@ -386,6 +387,7 @@ int InitTLDStatistics( void )
 void FiniTLDStatistics( void ) 
 {
 	SaveTLDStats();
+	DBACloseTable( TLD_TABLE );
 	if( gi )
 	{
 		GeoIP_delete( gi );

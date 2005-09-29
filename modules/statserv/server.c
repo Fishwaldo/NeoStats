@@ -725,6 +725,7 @@ int InitServerStats( void )
 		nlog( LOG_CRITICAL, "Unable to create server hash list" );
 		return NS_FAILURE;
 	}
+	DBAOpenTable( SERVER_TABLE );
 	DBAFetchRows( SERVER_TABLE, LoadServerStats );
 	ProcessServerList( AddServerStat, NULL );
 	return NS_SUCCESS;
@@ -746,6 +747,7 @@ void FiniServerStats( void )
 	hscan_t hs;
 
 	SaveServerStats();
+	DBACloseTable( SERVER_TABLE );
 	hash_scan_begin( &hs, serverstathash );
 	while( ( sn = hash_scan_next( &hs ) ) )
 	{

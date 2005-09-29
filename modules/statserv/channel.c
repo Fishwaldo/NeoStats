@@ -731,6 +731,7 @@ int InitChannelStats( void )
 		nlog( LOG_CRITICAL, "Unable to create channel stat list" );
 		return NS_FAILURE;
 	}
+	DBAOpenTable( CHANNEL_TABLE );
 	ProcessChannelList( AddChannel, NULL );
 	return NS_SUCCESS;
 }
@@ -750,6 +751,7 @@ void FiniChannelStats( void )
 	channelstat *cs;
 
 	SaveChanStats();
+	DBACloseTable( CHANNEL_TABLE );
 	ln = list_first( channelstatlist );
 	while( ln )
 	{

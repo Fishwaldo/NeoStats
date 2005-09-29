@@ -200,8 +200,6 @@ int ModInit( void )
 int ModSynch( void )
 {
 	SET_SEGV_LOCATION();
-	/* RTA init must be in synch since core does not start 
-	   RTA during the init cycle when NeoStats first boots */
 	ss_bot = AddBot( &ss_botinfo );
 	if( !ss_bot )
 		return NS_FAILURE;

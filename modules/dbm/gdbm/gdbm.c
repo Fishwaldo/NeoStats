@@ -35,7 +35,7 @@ void *DBMOpenTable( const char *name )
 	gdbm_file_info *gdbm_file;
 	int cache_size = DEFAULT_CACHESIZE;
 
-	dlog( DEBUG4, "DBMOpenTable" );
+	dlog( DEBUG4, "DBMOpenTable %s", name );
 	ircsprintf( filename, "%s.gdbm", name );
 	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00664, NULL );
 	if( gdbm_file == NULL )
@@ -75,7 +75,7 @@ int DBMGetData( void *handle, char *key, void *data, int size )
 		free( dbdata.dptr );
 		return NS_SUCCESS;
 	}
-	dlog( DEBUG1, "gdbm_fetch fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
+	dlog( DEBUG1, "DBMGetData: gdbm_fetch fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 	return NS_FAILURE;
 }
 
@@ -90,7 +90,7 @@ int DBMSetData( void *handle, char *key, void *data, int size )
 	dbdata.dsize = size;
 	if( gdbm_store( ( gdbm_file_info * )handle, dbkey, dbdata, GDBM_REPLACE ) != 0 )
 	{
-		dlog( DEBUG1, "gdbm_store fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
+		dlog( DEBUG1, "DBMSetData: gdbm_store fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
