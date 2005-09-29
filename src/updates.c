@@ -88,6 +88,9 @@ int mqswrite(int fd, void *data) {
 		case MQS_SENTAUTH:
 		case MQS_OK:
 			/* ask MiniMessageGateway to write any buffer out */
+			if (MQHasBytesToOutPut(mqsgw)) {
+				MGDoOutput(mqsgw, ~0, MQSSendSock, NULL);
+			}
 			break;
 	}
 	return NS_FAILURE;
@@ -108,6 +111,8 @@ int mqs_login()
 		nlog(LOG_WARNING, "Warning, Couldn't create MiniMessage");
 		return NS_FAILURE;
 	}
+	nlog(LOG_INFO, "Connnected to MQ Server, Logging in");
+
 	username = MMPutStringField(msg, false, "username", 1);
 	username[0] = MBStrdupByteBuffer(mqs.username);
 	password = MMPutStringField(msg, false, "password", 1);

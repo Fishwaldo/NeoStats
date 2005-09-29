@@ -1230,32 +1230,31 @@ static void PrintMMessageFieldToStream(const MMessageField * field, int indent)
    if (ni > 10) ni = 10;  /* truncate to avoid too much spam */
 
    MakePrettyTypeCodeString(field->typeCode, pbuf);
-   DoIndent(indent); printf("Entry: Name=[%s] GetNumItems()=%lu, TypeCode=%s (%li) flatSize=%lu\n", field->name, field->numItems, pbuf, field->typeCode, GetMMessageFieldFlattenedSize(field, MFalse));
+   dlog(DEBUG1,"Entry: Name=[%s] GetNumItems()=%lu, TypeCode=%s (%li) flatSize=%lu", field->name, field->numItems, pbuf, field->typeCode, GetMMessageFieldFlattenedSize(field, MFalse));
    for (i=0; i<ni; i++)
    {
-      DoIndent(indent); printf("  %i. ", i);
       switch(field->typeCode)
       {
-         case B_BOOL_TYPE:    printf("%i\n",   (((const MBool *)data)[i])); break;
-         case B_DOUBLE_TYPE:  printf("%f\n",   ((const double *)data)[i]); break;
-         case B_FLOAT_TYPE:   printf("%f\n",   ((const float *)data)[i]);  break;
-         case B_INT64_TYPE:   printf("%lli\n", ((const int64 *)data)[i]);  break;
-         case B_INT32_TYPE:   printf("%li\n",  ((const int32 *)data)[i]);  break;
-         case B_POINTER_TYPE: printf("%p\n",   ((const void **)data)[i]);  break;
-         case B_INT16_TYPE:   printf("%i\n",   ((const int16 *)data)[i]);  break;
-         case B_INT8_TYPE:    printf("%i\n",   ((const int8 *)data)[i]);   break;
+         case B_BOOL_TYPE:    dlog(DEBUG1,"%i) %i",i,   (((const MBool *)data)[i])); break;
+         case B_DOUBLE_TYPE:  dlog(DEBUG1,"%i) %f", i,  ((const double *)data)[i]); break;
+         case B_FLOAT_TYPE:   dlog(DEBUG1,"%i) %f", i,  ((const float *)data)[i]);  break;
+         case B_INT64_TYPE:   dlog(DEBUG1,"%i) %lli", i, ((const int64 *)data)[i]);  break;
+         case B_INT32_TYPE:   dlog(DEBUG1,"%i) %li", i, ((const int32 *)data)[i]);  break;
+         case B_POINTER_TYPE: dlog(DEBUG1,"%i) %p", i,  ((const void **)data)[i]);  break;
+         case B_INT16_TYPE:   dlog(DEBUG1,"%i) %i", i,  ((const int16 *)data)[i]);  break;
+         case B_INT8_TYPE:    dlog(DEBUG1,"%i) %i", i,  ((const int8 *)data)[i]);   break;
 
          case B_POINT_TYPE:
          {
             const MPoint * pt = &((const MPoint *)data)[i];
-            printf("x=%f y=%f\n", pt->x, pt->y);
+            dlog(DEBUG1,"%i) x=%f y=%f", i, pt->x, pt->y);
          }
          break;
 
          case B_RECT_TYPE:
          {
             const MRect * rc = &((const MRect *)data)[i];
-            printf("l=%f t=%f r=%f b=%f\n", rc->left, rc->top, rc->right, rc->bottom);
+            dlog(DEBUG1,"%i) l=%f t=%f r=%f b=%f", i, rc->left, rc->top, rc->right, rc->bottom);
          }
          break;
 
@@ -1263,15 +1262,15 @@ static void PrintMMessageFieldToStream(const MMessageField * field, int indent)
          {
             MMessage * subMsg = ((MMessage **)field->data)[i];
             if (subMsg) PrintMMessageToStreamAux(subMsg, indent+3);
-                   else printf("(NULL Message)\n");
+                   else dlog(DEBUG1,"%i) (NULL Message)", i);
          }
          break;
 
          case B_STRING_TYPE:
          {
             MByteBuffer * subBuf = ((MByteBuffer **)field->data)[i];
-            if (subBuf) printf("[%s]\n", (const char *) (&subBuf->bytes));
-                   else printf("(NULL String)\n");
+            if (subBuf) dlog(DEBUG1,"%i) [%s]", i,(const char *) (&subBuf->bytes));
+                   else dlog(DEBUG1,"%i) (NULL String)", i);
          }
          break;
 
@@ -1289,18 +1288,18 @@ static void PrintMMessageFieldToStream(const MMessageField * field, int indent)
 
                   if (nb > 10)
                   { 
-                     printf("(%i bytes, starting with", nb);
+                     dlog(DEBUG1,"%i) (%i bytes, starting with", i, nb);
                      nb = 10;
                   }
-                  else printf("(%i bytes, equal to",nb);
+                  else dlog(DEBUG1,"%i) (%i bytes, equal to", i, nb);
 
-                  for (j=0; j<nb; j++) printf(" %02x", b[j]);
-                  if (nb < subBuf->numBytes) printf("...)\n");
-                                        else printf(")\n");
+                  for (j=0; j<nb; j++) dlog(DEBUG1," %02x", b[j]);
+                  if (nb < subBuf->numBytes) dlog(DEBUG1,"...)");
+                                        else dlog(DEBUG1,")");
                }
-               else printf("(zero-length buffer)\n");
+               else dlog(DEBUG1,"%i) (zero-length buffer)", i);
             }
-            else printf("(NULL Buffer)\n");
+            else dlog(DEBUG1,"%i) (NULL Buffer)", i);
          }
          break;
       }
@@ -1313,7 +1312,7 @@ static void PrintMMessageToStreamAux(const MMessage * msg, int indent)
    char buf[5];
    MakePrettyTypeCodeString(msg->what, buf);
 
-   printf("MMessage:  msg=%p, what='%s' (%li/0x%lx), entryCount=%li, flatSize=%lu\n", msg, buf, msg->what, msg->what, msg->numFields, MMGetFlattenedSize(msg));
+   dlog(DEBUG1, "MMessage:  msg=%p, what='%s' (%li/0x%lx), entryCount=%li, flatSize=%lu", msg, buf, msg->what, msg->what, msg->numFields, MMGetFlattenedSize(msg));
 
    indent += 2;
    {

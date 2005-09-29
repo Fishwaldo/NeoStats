@@ -270,12 +270,12 @@ static int set_config_values( cfg_t *cfg )
 		dlog( DEBUG6, "                     %s", cfg_getnstr( cfg, "Modules|ModuleName", i ));
 	}	
 	dlog( DEBUG6, "-----------------------------------------------" );
-printf("%d\n", cfg_size(cfg, "NeoNet|UserName"));
-	if (cfg_size(cfg, "NeoNet|UserName") > 1) 
+	if (cfg_size(cfg, "NeoNet|UserName") >= 1) 
 		strlcpy(mqs.username, cfg_getstr(cfg, "NeoNet|UserName"), MAXUSER);
-	if (cfg_size(cfg, "NeoNet|Password") > 1)
-	strlcpy(mqs.password, cfg_getstr(cfg, "NeoNet|Password"), MAXUSER);
+	if (cfg_size(cfg, "NeoNet|Password") >= 1)
+		strlcpy(mqs.password, cfg_getstr(cfg, "NeoNet|Password"), MAXUSER);
 	strlcpy(mqs.hostname, cfg_getstr(cfg, "NeoNet|HostName"), MAXHOST);
+
 	mqs.port = cfg_getint(cfg, "NeoNet|Port");
 	return NS_SUCCESS;
 }
