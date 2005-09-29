@@ -89,7 +89,7 @@ int mqswrite(int fd, void *data) {
 		case MQS_SENTAUTH:
 		case MQS_OK:
 			/* ask MiniMessageGateway to write any buffer out */
-#ifndef WIN32 /*DOES NOT COMPILE, where is MQHasBytesToOutPut supposed to come from??? */
+#if 0 /*DOES NOT COMPILE, where is MQHasBytesToOutPut supposed to come from??? */
 			if (MQHasBytesToOutPut(mqsgw)) {
 				MGDoOutput(mqsgw, ~0, MQSSendSock, NULL);
 			}
