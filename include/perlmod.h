@@ -28,6 +28,7 @@
 typedef int (*perl_xs_init) (void);
 
 #ifdef PERLDEFINES
+#undef _
 #ifdef WIN32
 /* I have no idea why... */
 #define _POSIX_
@@ -68,18 +69,24 @@ typedef struct PerlModInfo {
 	const char *extname;
 } PerlModInfo;
 
+int execute_perl(Module *mod, SV *function, int numargs, ...);
+
 #endif /* PERLDEFINES */
 
 #define MOD_PERLEXT	".pl"
+#define MOD_EXTEXT ".ple"
 
 int Init_Perl( void );
 void PerlModFini(Module *mod);
+void PerlExtensionFini(Module *mod);
 void unload_perlmod(Module *mod);
 void unload_perlextension(Module *mod);
 void ns_cmd_modperlist(CmdParams *cmd);
 Module *load_perlmodule(const char *filename, Client *u);
+int load_perlextension(const char *filename, perl_xs_init init_func, Client *u);
 int perl_sync_module(Module *mod);
 int perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr);
+
 
 
 #endif /* _PERLMOD_H_ */
