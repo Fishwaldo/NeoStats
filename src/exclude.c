@@ -25,7 +25,8 @@
  */
 
 /*  TODO:
- *  - nothing at present
+ *  - use core fake module for exclude hash so we can remove the
+ *    seperate code paths for core and module exclusions
  *  TOCONSIDER:
  *  - Real time exclusions??? possibly optional.
  */
@@ -246,8 +247,8 @@ int InitModExcludes( Module *mod_ptr )
 {
 	SET_SEGV_LOCATION();
 	mod_ptr->exclude_list = list_create( MAX_MOD_EXCLUDES );
-	mod_ptr->bot_cmd_list = ns_malloc( sizeof( mod_exclude_commands ) );
-	os_memcpy( mod_ptr->bot_cmd_list, mod_exclude_commands, sizeof( mod_exclude_commands ) );
+	mod_ptr->exclude_cmd_list = ns_malloc( sizeof( mod_exclude_commands ) );
+	os_memcpy( mod_ptr->exclude_cmd_list, mod_exclude_commands, sizeof( mod_exclude_commands ) );
 	SET_RUN_LEVEL( mod_ptr );	
 	DBAFetchRows( "exclusions", new_mod_exclude );
 	RESET_RUN_LEVEL();
@@ -281,7 +282,7 @@ void FiniExcludes( void )
 
 void FiniModExcludes( Module *mod_ptr )
 {
-	ns_free( mod_ptr->bot_cmd_list );
+	ns_free( mod_ptr->exclude_cmd_list );
 	list_destroy_auto( mod_ptr->exclude_list );
 }
 
@@ -297,7 +298,7 @@ void FiniModExcludes( Module *mod_ptr )
 
 void AddBotExcludeCommands( Bot *botptr )
 {
-	add_bot_cmd_list( botptr, GET_CUR_MODULE()->bot_cmd_list );
+	add_bot_cmd_list( botptr, GET_CUR_MODULE()->exclude_cmd_list );
 }
 
 /** @brief AddExclude
@@ -314,7 +315,7 @@ void AddBotExcludeCommands( Bot *botptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int AddExclude( list_t *exclude_list, NS_EXCLUDE type, const CmdParams *cmdparams )
+static int AddExclude( list_t *exclude_list, NS_EXCLUDE type, const CmdParams *cmdparams )
 {
 	char *buf;
 	Exclude *exclude;
@@ -326,7 +327,6 @@ int AddExclude( list_t *exclude_list, NS_EXCLUDE type, const CmdParams *cmdparam
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s already added as %s", cmdparams->av[2], foundexclude->pattern );
 		return NS_SUCCESS;
 	}
-
 	exclude = ns_calloc( sizeof( Exclude ) );
 	exclude->type = type;
 	exclude->addedon = me.now;

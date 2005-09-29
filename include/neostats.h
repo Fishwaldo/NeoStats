@@ -981,7 +981,7 @@ typedef struct _Module {
 	/** Exclude list */
 	list_t *exclude_list;
 	/** Exclude command list */
-	bot_cmd *bot_cmd_list;
+	bot_cmd *exclude_cmd_list;
 	/** Dynamic library handle */
 	void *handle;
 	/** index */

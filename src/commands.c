@@ -22,6 +22,7 @@
 */
 
 /*  TODO:
+ *  - Sub command processing, e.g. "EXCLUDE ADD" ???
  *  - More error processing
  *  - Fix LEVELS command for SET and other intrinsics
  */
