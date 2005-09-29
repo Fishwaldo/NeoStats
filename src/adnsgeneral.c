@@ -177,7 +177,8 @@ int adns__vbuf_appendstr(vbuf * vb, const char *data)
 
 void adns__vbuf_free(vbuf * vb)
 {
-	ns_free(vb->buf);
+	if( vb->buf )
+		ns_free(vb->buf);
 	adns__vbuf_init(vb);
 }
 

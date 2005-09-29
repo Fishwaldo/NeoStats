@@ -72,7 +72,8 @@ static void freesearchlist(adns_state ads)
 {
 	if (ads->nsearchlist)
 		ns_free(*ads->searchlist);
-	ns_free(ads->searchlist);
+	if( ads->searchlist )
+		ns_free(ads->searchlist);
 }
 
 static void saveerr(adns_state ads, int en)
