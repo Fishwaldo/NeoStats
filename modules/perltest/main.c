@@ -26,8 +26,11 @@
   */
 
 #include "neostats.h"	/* NeoStats API */
+#define PERLDEFINES
+#include "perlmod.h"
 
 static Bot *perl_bot;
+static int perlext_pong (CmdParams *cmds);
 
 const char* perl_copyright[] = 
 {
@@ -95,9 +98,20 @@ ModuleInfo module_info =
 	0,
 };
 
+XS (XS_NeoStats_Test_PerlExt) 
+{
+	dXSARGS;
+	if(items != 1) {
+		nlog(LOG_WARNING, "Didn't get required no of params for TestPerlExt Call");
+	} else {
+		irc_chanalert(perl_bot, "TestPerlExt Got this: %s", SvPV_nolen(ST(0)));
+	}
+}
+
 static void 
 perl_ext_init() {
-printf("called extension init");
+	newXS("NeoStats::PerlExt::TestPerlExt", XS_NeoStats_Test_PerlExt, __FILE__);
+	nlog(LOG_INFO, "Loaded Perl Extensions Hooks");
 }
 
 
@@ -115,7 +129,7 @@ static int load_extension( const CmdParams *cmdparams )
 	} else {
 		return NS_FAILURE;
 	}
-	
+	execute_perl(GET_CUR_MODULE(), sv_2mortal (newSVpv ("NeoStats::Module::extension_2eple::TestCall", 0)), 1, "Hello World");
 	return NS_SUCCESS;
 }
 
@@ -182,6 +196,7 @@ BotInfo perl_bot_info =
  */
 ModuleEvent module_events[] = 
 {
+	{EVENT_PONG, perlext_pong },
 	NS_EVENT_END()
 };
 
@@ -233,3 +248,10 @@ int ModFini( void )
 {
 	return NS_SUCCESS;
 }
+
+static int
+perlext_pong (CmdParams *cmds) {
+	irc_chanalert(perl_bot, "Got Pong fromm %s", cmds->source->name);
+
+}
+
