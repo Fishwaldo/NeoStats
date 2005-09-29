@@ -44,7 +44,7 @@ int MQSSendSock(const char * buf, uint32 numBytes, void * arg) {
 
 int InitUpdate(void) 
 {
-#ifndef WIN32 /* DOES NOT WORK */
+#if 0 /* DOES NOT WORK */
 	mqs.state = MQS_DISCONNECTED;
 	mqsgw = MGAllocMessageGateway();
 	if (!mqsgw) {
