@@ -246,6 +246,8 @@ static int InitCore( void )
 		return NS_FAILURE;
 	if( InitDBA() != NS_SUCCESS )
 		return NS_FAILURE;
+	/* Open core database */
+	DBAOpenDatabase();
 	if( InitModules() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitAuth() != NS_SUCCESS )

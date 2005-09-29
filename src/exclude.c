@@ -245,11 +245,10 @@ int InitExcludes( void )
 int InitModExcludes( Module *mod_ptr )
 {
 	SET_SEGV_LOCATION();
-	SET_RUN_LEVEL( mod_ptr );
-	
 	mod_ptr->exclude_list = list_create( MAX_MOD_EXCLUDES );
 	mod_ptr->bot_cmd_list = ns_malloc( sizeof( mod_exclude_commands ) );
 	os_memcpy( mod_ptr->bot_cmd_list, mod_exclude_commands, sizeof( mod_exclude_commands ) );
+	SET_RUN_LEVEL( mod_ptr );	
 	DBAFetchRows( "exclusions", new_mod_exclude );
 	RESET_RUN_LEVEL();
 	return NS_SUCCESS;
