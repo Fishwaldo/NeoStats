@@ -749,6 +749,6 @@ int IsJustWildcard( const char *mask, int ishostmask )
 		spanlen = strspn( mask, stringset );
 	if( spanlen == len )
 		return NS_FALSE;
-	return ;
+	return NS_TRUE;
 }
 

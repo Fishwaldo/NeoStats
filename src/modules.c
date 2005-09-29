@@ -556,7 +556,8 @@ int unload_module( const char *modname, Client * u )
 	irc_chanalert( ns_botptr, _( "Unloading module %s" ), modname );
 #ifdef USE_PERL
 	/* unload any extensions first */
-	unload_perlextension(mod_ptr);
+	if ((mod_ptr->pm) && (mod_ptr->pm->type = TYPE_EXTENSION)) 
+		unload_perlextension(mod_ptr);
 #endif /* USE_PERL */
 	
 	if( mod_ptr->info->flags & MODULE_FLAG_AUTH )
