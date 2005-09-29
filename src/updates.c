@@ -53,7 +53,7 @@ int InitUpdate(void)
 	}
 	dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
 	dlog(DEBUG1, "Updates Initialized successfully");
-#endif /* WIN32 */
+#endif
 	return NS_SUCCESS;
 }
 
@@ -93,7 +93,7 @@ int mqswrite(int fd, void *data) {
 			if (MQHasBytesToOutPut(mqsgw)) {
 				MGDoOutput(mqsgw, ~0, MQSSendSock, NULL);
 			}
-#endif /* WIN32 */
+#endif
 			break;
 	}
 	return NS_FAILURE;
