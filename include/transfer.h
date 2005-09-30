@@ -23,51 +23,8 @@
 
 #ifndef _TRANSFER_H_
 #define _TRANSFER_H_
-#include "neostats.h"
-#include "curl.h"
 
-/* max URL size */
-#define MAXURL 64
-
-
-
-/* this is the curl multi handle we use */
-extern CURLM *curlmultihandle;
-
-
-
-/* this struct contains info for each transfer in progress */
-typedef struct neo_transfer {
-	/* the curl handle used to track downloads by curl */
-	CURL *curleasyhandle;
-	/* should we save to a file or a memory space */
-	int savefileormem;
-	/* if saving to memory, save here, */
-	char *savemem;
-	/* the allocated amount size of the savemem area */
-	int savememsize;
-	/* the current position of hte savemem area */
-	int savemempos; 
-	/* the file to save to */
-	char filename[MAXPATH];
-	/* if saving to a file, the file handle */
-	FILE *savefile;
-	/* the error, if any */
-	char curlerror[CURL_ERROR_SIZE];
-	/* user data, passed by modules, other functions to help reference this download */
-	void *data;
-	/* the url to retrive/upload/download etc etc etc */
-	char url[MAXURL];
-	/* the useragent */
-	char useragent[MAXURL];
-	/* the params, if any */
-	char params[512];
-	/* the callback function */
-	transfer_callback *callback;
-} neo_transfer;
-
-extern list_t *activetransfers;
-
+#define CURLHACK 1
 
 int InitCurl( void );
 void FiniCurl( void );

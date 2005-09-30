@@ -1414,7 +1414,6 @@ EXPORTFUNC Client *FindValidUser( const Bot *botptr, const Client *u, const char
 
 /* transfer.c stuff */
 typedef void (transfer_callback) ( void *data, int returncode, char *body, int bodysize );
-EXPORTFUNC void transfer_status( void );
 EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileormemory, char *filename, void *data, transfer_callback *callback );
 
 /* Is the client excluded */

@@ -28,10 +28,42 @@
 #include "transfer.h"
 #include "curl.h"
 
+#define MAXURL 64	/* max URL size */
 #define MAX_TRANSFERS	10	/* number of curl transfers */
 
-CURLM *curlmultihandle;
-list_t *activetransfers;
+/* this struct contains info for each transfer in progress */
+typedef struct neo_transfer {
+	/* the curl handle used to track downloads by curl */
+	CURL *curleasyhandle;
+	/* should we save to a file or a memory space */
+	int savefileormem;
+	/* if saving to memory, save here, */
+	char *savemem;
+	/* the allocated amount size of the savemem area */
+	int savememsize;
+	/* the current position of hte savemem area */
+	int savemempos; 
+	/* the file to save to */
+	char filename[MAXPATH];
+	/* if saving to a file, the file handle */
+	FILE *savefile;
+	/* the error, if any */
+	char curlerror[CURL_ERROR_SIZE];
+	/* user data, passed by modules, other functions to help reference this download */
+	void *data;
+	/* the url to retrive/upload/download etc etc etc */
+	char url[MAXURL];
+	/* the useragent */
+	char useragent[MAXURL];
+	/* the params, if any */
+	char params[512];
+	/* the callback function */
+	transfer_callback *callback;
+} neo_transfer;
+
+/* this is the curl multi handle we use */
+static CURLM *curlmultihandle;
+static list_t *activetransfers;
 
 int InitCurl(void) 
 {
@@ -271,7 +303,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	return NS_SUCCESS;
 }
 
-void transfer_status(void) 
+static void transfer_status( void ) 
 {
 	CURLMsg *msg;
 	int msg_left;
@@ -313,3 +345,32 @@ void transfer_status(void)
 		}
 	}
 }
+
+#ifdef CURLHACK
+void CurlHackReadLoop( void )
+{
+	struct timeval TimeOut;
+	int SelectResult;
+	fd_set readfds, writefds, errfds;
+	int maxfdsunused;
+
+    /* don't wait */
+	TimeOut.tv_sec = 0;
+	TimeOut.tv_usec = 0;
+	FD_ZERO (&readfds);
+	FD_ZERO (&writefds);
+	FD_ZERO (&errfds);
+	curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
+	SelectResult = select (maxfdsunused+1, &readfds, &writefds, &errfds, &TimeOut);
+	if (SelectResult > 0)
+	{
+		/* check CURL fds */
+		while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &maxfdsunused))
+		{
+		}
+    	SET_SEGV_LOCATION();
+		transfer_status();
+    }
+}
+#endif /* CURLHACK */
+

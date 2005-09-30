@@ -33,7 +33,6 @@
 #include "timer.h"
 #include "dns.h"
 #include "transfer.h"
-#include "curl.h"
 #include "services.h"
 #include "ircprotocol.h"
 #include "dcc.h"
@@ -123,7 +122,6 @@ static OS_SOCKET ConnectTo (char *host, int port)
 	return s;
 }
 
-#define CURLHACK 1
 /** @brief main recv loop
  *
  * @param none
@@ -131,48 +129,22 @@ static OS_SOCKET ConnectTo (char *host, int port)
  * @return none
  */
 #ifndef WIN32
-static void
-#else
-void
+static
 #endif
-read_loop ()
+void read_loop( void )
 {
-#if CURLHACK
-	struct timeval TimeOut;
-	int SelectResult;
-	fd_set readfds, writefds, errfds;
-	int maxfdsunused;
-#endif
-
 	me.lastmsg = me.now;
 	while (1) { /* loop till we get a error */
 		SET_SEGV_LOCATION();
 		update_time_now();
-#if CURLHACK
+#ifdef CURLHACK
         event_loop(EVLOOP_ONCE);
-#else
-		event_dispatch();
-#endif
 		SET_SEGV_LOCATION();
-/* this is a hack till CURL gets the new socket code */
-#if CURLHACK
-        /* don't wait */
-		TimeOut.tv_sec = 0;
-		TimeOut.tv_usec = 0;
-		FD_ZERO (&readfds);
-		FD_ZERO (&writefds);
-		FD_ZERO (&errfds);
-		curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
-		SelectResult = select (maxfdsunused+1, &readfds, &writefds, &errfds, &TimeOut);
-		if (SelectResult > 0) {
-			/* check CURL fds */
-			while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &maxfdsunused)) {
-			}
-    		SET_SEGV_LOCATION();
-			transfer_status();
-        }
+		/* this is a hack till CURL gets the new socket code */
+#else /* CURLHACK */
+		event_dispatch();
+#endif /* CURLHACK */
 	}
-#endif
 }
 
 /** @brief Connects to IRC and starts the main loop
