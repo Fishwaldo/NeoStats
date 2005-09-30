@@ -132,20 +132,20 @@ irc_cmd intrinsic_cmd_list[] =
  *
  *  process GLOBOPS command
  *  RX: :Mark GLOBOPS :test globops
- *  GLOBOPS :message
+ *  :origin GLOBOPS :message
  *	argv[0] = message
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
 
-void _m_globops( char *origin, char **av, int ac, int cmdptr )
+void _m_globops( char *origin, char **argv, int argc, int srv )
 {
-	do_globops( origin, av[0] );	
+	do_globops( origin, argv[0] );	
 }
 
 /** @brief _m_wallops
@@ -156,16 +156,16 @@ void _m_globops( char *origin, char **av, int ac, int cmdptr )
  *	argv[0] = message
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
 
-void _m_wallops( char *origin, char **av, int ac, int cmdptr )
+void _m_wallops( char *origin, char **argv, int argc, int srv )
 {
-	do_wallops( origin, av[0] );	
+	do_wallops( origin, argv[0] );	
 }
 
 /** @brief _m_chatops
@@ -176,16 +176,16 @@ void _m_wallops( char *origin, char **av, int ac, int cmdptr )
  *	argv[0] = message
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
 
-void _m_chatops( char *origin, char **av, int ac, int cmdptr )
+void _m_chatops( char *origin, char **argv, int argc, int srv )
 {
-	do_chatops( origin, av[0] );	
+	do_chatops( origin, argv[0] );	
 }
 
 /** @brief _m_error
@@ -196,18 +196,18 @@ void _m_chatops( char *origin, char **av, int ac, int cmdptr )
  *	argv[0] = message
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
 
-void _m_error( char *origin, char **av, int ac, int cmdptr )
+void _m_error( char *origin, char **argv, int argc, int srv )
 {
-	fprintf(stderr, "IRCD reported error: %s", av[0] );
-	nlog (LOG_ERROR, "IRCD reported error: %s", av[0] );
-	do_exit (NS_EXIT_ERROR, av[0] );
+	fprintf(stderr, "IRCD reported error: %s", argv[0] );
+	nlog (LOG_ERROR, "IRCD reported error: %s", argv[0] );
+	do_exit (NS_EXIT_ERROR, argv[0] );
 }
 
 /** @brief _m_ignorecommand
@@ -217,9 +217,9 @@ void _m_error( char *origin, char **av, int ac, int cmdptr )
  *  cmd anything else
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -231,19 +231,19 @@ void _m_ignorecommand( char *origin, char **argv, int argc, int srv )
 /** @brief _m_pass
  *
  *  process PASS command
- *  RX: 
+ *  RX: PASS :password
  *  PASS :password
  *	argv[0] = password
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
 
-void _m_pass( char *origin, char **av, int ac, int cmdptr )
+void _m_pass( char *origin, char **argv, int argc, int srv )
 {
 	
 }
@@ -255,14 +255,14 @@ void _m_pass( char *origin, char **av, int ac, int cmdptr )
  *  PROTOCTL <token list>
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
 
-void _m_protoctl( char *origin, char **argv, int argc, int cmdptr )
+void _m_protoctl( char *origin, char **argv, int argc, int srv )
 {
 	do_protocol( origin, argv, argc );
 }
@@ -274,9 +274,9 @@ void _m_protoctl( char *origin, char **argv, int argc, int cmdptr )
  *	argv[0] = remote server
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -303,9 +303,9 @@ void _m_version( char *origin, char **argv, int argc, int srv )
  *  origin MOTD :stats.neostats.net
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -325,9 +325,9 @@ void _m_motd( char *origin, char **argv, int argc, int srv )
  *	argv[0] = servername
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -347,9 +347,9 @@ void _m_admin( char *origin, char **argv, int argc, int srv )
  *	argv[0] = servername
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -366,9 +366,9 @@ void _m_credits( char *origin, char **argv, int argc, int srv )
  *	argv[0] = servername
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -388,9 +388,9 @@ void _m_info( char *origin, char **argv, int argc, int srv )
  *	argv[1] = destination
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -420,9 +420,9 @@ void _m_stats( char *origin, char **argv, int argc, int srv )
  *  P10: R: AB G !1076065765.431368 stats.mark.net 1076065765.431368
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -444,9 +444,9 @@ void _m_ping( char *origin, char **argv, int argc, int srv )
  *  P10: R: AB Z AB :stats.mark.net
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -466,9 +466,9 @@ void _m_pong( char *origin, char **argv, int argc, int srv )
  *  argv[0] = comment
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -488,9 +488,9 @@ void _m_quit( char *origin, char **argv, int argc, int srv )
  *	argv[1] = channel password( key )
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -510,9 +510,9 @@ void _m_join( char *origin, char **argv, int argc, int srv )
  *	argv[1] = comment
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -533,9 +533,9 @@ void _m_part( char *origin, char **argv, int argc, int srv )
  *	argv[2] = kick comment
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -568,9 +568,9 @@ void _m_kick( char *origin, char **argv, int argc, int srv )
  *
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -596,9 +596,9 @@ void _m_topic( char *origin, char **argv, int argc, int srv )
  *	argv[0] = away message
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -628,9 +628,9 @@ void _m_away( char *origin, char **argv, int argc, int srv )
  *	argv[1] = kill path
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -659,9 +659,9 @@ void _m_kill( char *origin, char **argv, int argc, int srv )
  *  P10: R: ABAAV SQ york.gose.org 1076280461 :relink
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -695,9 +695,9 @@ void _m_squit( char *origin, char **argv, int argc, int srv )
  *  argv[7] = ircnet
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -720,9 +720,9 @@ void _m_netinfo( char *origin, char **argv, int argc, int srv )
  *  argv[7] = ircnet
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -742,9 +742,9 @@ void _m_snetinfo( char *origin, char **argv, int argc, int srv )
  *   argv[1] - modes to change
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -769,9 +769,9 @@ void _m_mode( char *origin, char **argv, int argc, int srv )
  *  argv[2] = timestamp
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -787,9 +787,9 @@ void _m_svsnick( char *origin, char **argv, int argc, int srv )
  *	argv[0] = name
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -806,9 +806,9 @@ void _m_setname( char *origin, char **argv, int argc, int srv )
  *	argv[1] = name
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -824,9 +824,9 @@ void _m_chgname( char *origin, char **argv, int argc, int srv )
  *	argv[0] = host
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -843,9 +843,9 @@ void _m_sethost( char *origin, char **argv, int argc, int srv )
  *	argv[1] = host
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -861,9 +861,9 @@ void _m_chghost( char *origin, char **argv, int argc, int srv )
  *	argv[0] = ident
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -880,9 +880,9 @@ void _m_setident( char *origin, char **argv, int argc, int srv )
  *	argv[1] = ident
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -900,9 +900,9 @@ void _m_chgident( char *origin, char **argv, int argc, int srv )
  *	argv[2] = key
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -920,9 +920,9 @@ void _m_svsjoin( char *origin, char **argv, int argc, int srv )
  *	argv[2] = reason
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -940,9 +940,9 @@ void _m_svspart( char *origin, char **argv, int argc, int srv )
  *	argv[0]
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -959,9 +959,9 @@ void _m_svinfo( char *origin, char **argv, int argc, int srv )
  *  EOB
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -981,9 +981,9 @@ void _m_eob( char *origin, char **argv, int argc, int srv )
  *  argv[1] - reason
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1000,9 +1000,9 @@ void _m_sqline( char *origin, char **argv, int argc, int srv )
  *  argv[0] - mask
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1020,9 +1020,9 @@ void _m_unsqline( char *origin, char **argv, int argc, int srv )
  *  argv[1] - reason
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1039,9 +1039,9 @@ void _m_zline( char *origin, char **argv, int argc, int srv )
  *  argv[0] - mask
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1057,9 +1057,9 @@ void _m_unzline( char *origin, char **argv, int argc, int srv )
  *  AKILL
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1075,9 +1075,9 @@ void _m_akill( char *origin, char **argv, int argc, int srv )
  *  RAKILL
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1095,9 +1095,9 @@ void _m_rakill( char *origin, char **argv, int argc, int srv )
  *  argv[1] - reason
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1114,9 +1114,9 @@ void _m_kline( char *origin, char **argv, int argc, int srv )
  *  argv[0] - mask
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1134,9 +1134,9 @@ void _m_unkline( char *origin, char **argv, int argc, int srv )
  *  argv[1] - reason
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1153,9 +1153,9 @@ void _m_gline( char *origin, char **argv, int argc, int srv )
  *  argv[0] - mask
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -1169,14 +1169,14 @@ void _m_remgline( char *origin, char **argv, int argc, int srv )
  *  process NOTICE command
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
 
-void _m_notice( char *origin, char **argv, int argc, int cmdptr )
+void _m_notice( char *origin, char **argv, int argc, int srv )
 {
 	SET_SEGV_LOCATION();
 	if( argv[0] == NULL ) {
@@ -1203,9 +1203,9 @@ void _m_notice( char *origin, char **argv, int argc, int cmdptr )
  *  process PRIVATE command
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */

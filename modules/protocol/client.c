@@ -173,7 +173,7 @@ char *MSG_SENDSNO = "SENDSNO";
 #define CMODE_ONLYSECURE	0x40000000
 #define CMODE_NONICKCHANGE	0x80000000
 
-static void m_private( char* origin, char **av, int ac, int cmdptr );
+static void m_private( char* origin, char **av, int ac, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
 static void m_topic( char *origin, char **argv, int argc, int srv );
 static void m_kick( char *origin, char **argv, int argc, int srv );
@@ -369,7 +369,7 @@ static void m_part( char *origin, char **argv, int argc, int srv )
  * @return none
  */
 
-static void m_private( char* origin, char **av, int ac, int cmdptr )
+static void m_private( char* origin, char **av, int ac, int srv )
 {
 	char *p;
 	char nick[MAXNICK];
@@ -378,7 +378,7 @@ static void m_private( char* origin, char **av, int ac, int cmdptr )
 	p = strchr( nick, '!' );
 	*p = 0;
 	AddFakeUser( origin );
-	_m_private( nick, av, ac, cmdptr );
+	_m_private( nick, av, ac, srv );
 	DelFakeUser( origin );
 }
 

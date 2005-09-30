@@ -49,9 +49,9 @@ irc_cmd numeric_cmd_list[] = {
  *  RX: :irc.foo.com 351 stats.neostats.net Unreal3.2. irc.foo.com :FinWXOoZ [*=2303]
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -75,9 +75,9 @@ void _m_numeric351( char *origin, char **argv, int argc, int srv )
  *  RX: :irc.foo.com 242 NeoStats :Server Up 6 days, 23:52:55
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -129,9 +129,9 @@ void _m_numeric242( char *origin, char **argv, int argc, int srv )
  *  RX: :irc.foo.com nnn to :message
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */

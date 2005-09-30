@@ -628,9 +628,9 @@ void send_svstime( const char *source, const unsigned long ts )
  *  on old protocols, serverinfo is argv[2], and numeric is left out
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -664,9 +664,9 @@ static void m_server( char *origin, char **argv, int argc, int srv )
  *  argv[2] - Service Stamp( if mode == d )
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -687,9 +687,9 @@ static void m_svsmode( char *origin, char **argv, int argc, int srv )
  *  argv[0] - modes to change
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -726,9 +726,9 @@ static void m_umode2( char *origin, char **argv, int argc, int srv )
  *  argv[10] = info
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -768,9 +768,9 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
  *  RX: :servername EOS
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -804,9 +804,9 @@ static void m_eos( char *origin, char **argv, int argc, int srv )
  *  "ts parabuf :parv[parc - 1]"	OPT_SJOIN | OPT_SJ3 
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -824,9 +824,9 @@ static void m_sjoin( char *origin, char **argv, int argc, int srv )
  *  argv[1] = new swhois
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -842,9 +842,9 @@ static void m_swhois( char *origin, char **argv, int argc, int srv )
  *  RX:
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */
@@ -869,9 +869,9 @@ static void m_smo( char *origin, char **argv, int argc, int srv )
  *  argv[7]  reason 
  *
  *  @param origin source of message (user/server)
- *  @param av list of message parameters
- *  @param ac parameter count
- *  @param cmdptr command flag
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
  *
  *  @return none
  */

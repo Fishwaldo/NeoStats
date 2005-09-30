@@ -228,10 +228,10 @@ EXPORTFUNC int ircsplitbuf( char *buf, char ***argv, int colon_special );
 EXPORTFUNC void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int ac );
 
 /* IRCD protocol module API */
-EXPORTFUNC void _m_private( char *origin, char **argv, int argc, int cmdptr );
-EXPORTFUNC void _m_notice( char *origin, char **argv, int argc, int cmdptr );
-EXPORTFUNC void _m_pass( char *origin, char **argv, int argc, int cmdptr );
-EXPORTFUNC void _m_protoctl( char *origin, char **argv, int argc, int cmdptr );
+EXPORTFUNC void _m_private( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_notice( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_pass( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_protoctl( char *origin, char **argv, int argc, int srv );
 #define _m_capab _m_protoctl
 EXPORTFUNC void _m_version( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_motd( char *origin, char **argv, int argc, int srv );
