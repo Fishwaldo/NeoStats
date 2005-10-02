@@ -284,19 +284,14 @@ char *TOK_POST = "BN";
 char *MSG_INFOSERV = "INFOSERV";
 char *MSG_IS = "IS";
 char *TOK_INFOSERV = "BO";
-
 char *MSG_BOTSERV = "BOTSERV";
 char *TOK_BOTSERV = "BS";
-
 char *MSG_CYCLE = "CYCLE";
 char *TOK_CYCLE = "BP";
-
 char *MSG_MODULE = "MODULE";
 char *TOK_MODULE = "BQ";
-
 char *MSG_SENDSNO = "SENDSNO";
 char *TOK_SENDSNO = "Ss";
-
 char *MSG_EOS = "EOS";
 char *TOK_EOS = "ES";
 
@@ -619,16 +614,18 @@ void send_svstime( const char *source, const unsigned long ts )
 /** m_server
  *
  *  process SERVER command
- *  RX: SERVER irc.foonet.com 1 :U2305-FinWXOoZE-1 FooNet Server
- *  SERVER servername hopcount numeric :U<protocol>-flags-numeric serverdesc
- *	argv[0] = servername
- *  argv[1] = hopcount
- *  argv[2] = numeric
- *  argv[3] = serverinfo
- *  on old protocols, serverinfo is argv[2], and numeric is left out
+ *  RX:
+ *    SERVER irc.foonet.com 1 :U2305-FinWXOoZE-1 FooNet Server
+ *  Format:
+ *    SERVER servername hopcount numeric :U<protocol>-flags-numeric serverdesc
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = servername
+ *    argv[1] = hopcount
+ *    argv[2] = numeric
+ *    argv[3] = serverinfo
+ *  on old protocols, serverinfo is argv[2], and numeric is left out
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -659,12 +656,15 @@ static void m_server( char *origin, char **argv, int argc, int srv )
  *
  *  process SVSMODE command
  *  RX:
- *  argv[0] - username to change mode for
- *  argv[1] - modes to change
- *  argv[2] - Service Stamp( if mode == d )
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - username to change mode for
+ *    argv[1] - modes to change
+ *    argv[2] - Service Stamp( if mode == d )
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -684,10 +684,13 @@ static void m_svsmode( char *origin, char **argv, int argc, int srv )
  *
  *  process UMODE2 command
  *  RX:
- *  argv[0] - modes to change
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - modes to change
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -702,31 +705,34 @@ static void m_umode2( char *origin, char **argv, int argc, int srv )
 /** m_nick
  *
  *  process NICK command
- *  RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP fwAAAQ== :Mark
- *  RX: & Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP :Mark
- *  argv[0] = nickname
- * if from new client
- *  argv[1] = nick password
- * if from server:
- *  argv[1] = hopcount
- *  argv[2] = timestamp
- *  argv[3] = username
- *  argv[4] = hostname
- *  argv[5] = servername
- * if NICK version 1:
- *  argv[6] = servicestamp
- *  argv[7] = info
- * if NICK version 2:
- *  argv[6] = servicestamp
- *  argv[7] = umodes
- *  argv[8] = virthost, * if none
- *  argv[9] = info
- * if NICKIP:
- *  argv[9] = ip
- *  argv[10] = info
+ *  RX:
+ *    NICK Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP fwAAAQ== :Mark
+ *    NICK Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP :Mark
+ *  Format:
+ *    NICK nick hop TS user host uplink servicestamp umode vhost [base64 IP] :realname
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = nickname
+ *  if from new client
+ *    argv[1] = nick password
+ *  if from server:
+ *    argv[1] = hopcount
+ *    argv[2] = timestamp
+ *    argv[3] = username
+ *    argv[4] = hostname
+ *    argv[5] = servername
+ *  if NICK version 1:
+ *    argv[6] = servicestamp
+ *    argv[7] = info
+ *  if NICK version 2:
+ *    argv[6] = servicestamp
+ *    argv[7] = umodes
+ *    argv[8] = virthost, * if none
+ *    argv[9] = info
+ *  if NICKIP:
+ *    argv[9] = ip
+ *    argv[10] = info
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -765,7 +771,10 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 /** m_eos
  *
  *  process EOS command
- *  RX: :servername EOS
+ *  RX:
+ *    :irc.foonet.com EOS
+ *  Format:
+ *    :origin EOS
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -783,28 +792,30 @@ static void m_eos( char *origin, char **argv, int argc, int srv )
 /** m_sjoin
  *
  *  process SJOIN command
- *  RX: ~ 1073861298 #services + <none> :Mark
- *  MSG_SJOIN creationtime chname    modebuf parabuf :member list
- *  argv[0] = channel timestamp
- *    char *argv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
- *  argv[1] = channel name
- *  "ts chname :"
- * if( argc == 3 ) 
- *  argv[2] = nick names + modes - all in one parameter
- *  "ts chname modebuf :"
- *  "ts chname :"@/"""name"	OPT_SJ3
- * if( argc == 4 )
- *  argv[2] = channel modes
- *  argv[3] = nick names + modes - all in one parameter
- *  "ts chname modebuf parabuf :"
- * if( argc > 4 )
- *  argv[2] = channel modes
- *  argv[3 to argc - 2] = mode parameters
- *  argv[argc - 1] = nick names + modes
- *  "ts parabuf :parv[parc - 1]"	OPT_SJOIN | OPT_SJ3 
+ *  RX:
+ *    SJOIN 1073861298 #services + <none> :Mark
+ *  Format:
+ *    SJOIN creationtime chname modebuf parabuf :member list
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = channel timestamp
+ *      char *argv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
+ *    argv[1] = channel name
+ *      "ts chname :"
+ *  if( argc == 3 ) 
+ *    argv[2] = nick names + modes - all in one parameter
+ *      "ts chname modebuf :"
+ *      "ts chname :"@/"""name"	OPT_SJ3
+ *  if( argc == 4 )
+ *    argv[2] = channel modes
+ *    argv[3] = nick names + modes - all in one parameter
+ *      "ts chname modebuf parabuf :"
+ *  if( argc > 4 )
+ *    argv[2] = channel modes
+ *    argv[3 to argc - 2] = mode parameters
+ *    argv[argc - 1] = nick names + modes
+ *      "ts parabuf :parv[parc - 1]"	OPT_SJOIN | OPT_SJ3 
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -820,11 +831,14 @@ static void m_sjoin( char *origin, char **argv, int argc, int srv )
  *
  *  process SWHOIS command
  *  RX:
- *  argv[0] = nickname
- *  argv[1] = new swhois
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = nickname
+ *    argv[1] = new swhois
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -840,6 +854,11 @@ static void m_swhois( char *origin, char **argv, int argc, int srv )
  *
  *  process SMO command
  *  RX:
+ *    :irc.foonet.com SMO o :(\1link\1) Link irc.foonet.com -> stats.neostats.net[@127.0.0.1.2722] established
+ *    :irc.foonet.com SMO o :\1(sync)\1 Possible negative TS split at link stats.neostats.net (1128112841 - 1128112842 = -1)
+ *    :irc.foonet.com SMO o :\1(sync)\1 Link stats.neostats.net -> irc.foonet.com is now synced [secs: 2 recv: 0.825 sent: 0.657]
+ *  Format:
+ *    :origin SMO ? :message
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -857,19 +876,22 @@ static void m_smo( char *origin, char **argv, int argc, int srv )
 /** m_tkl
  *
  *  process TKL command
- *  RX: :server BD + G * mask setter 1074811259 1074206459 :reason
- *  RX: :server BD + Z * mask setter 0 1070062390 :reason
- *  argv[0]  +|- 
- *  argv[1]  G   
- *  argv[2]  user 
- *  argv[3]  host 
- *  argv[4]  setby 
- *  argv[5]  expire_at 
- *  argv[6]  set_at 
- *  argv[7]  reason 
+ *  RX:
+ *    TODO
+ *  Format:
+ *    :server BD + G * mask setter 1074811259 1074206459 :reason
+ *    :server BD + Z * mask setter 0 1070062390 :reason
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0]  +|- 
+ *    argv[1]  G   
+ *    argv[2]  user 
+ *    argv[3]  host 
+ *    argv[4]  setby 
+ *    argv[5]  expire_at 
+ *    argv[6]  set_at 
+ *    argv[7]  reason 
  *  @param argc parameter count
  *  @param srv command flag
  *

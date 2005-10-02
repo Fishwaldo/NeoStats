@@ -131,12 +131,14 @@ irc_cmd intrinsic_cmd_list[] =
 /** @brief _m_glopops
  *
  *  process GLOBOPS command
- *  RX: :Mark GLOBOPS :test globops
- *  :origin GLOBOPS :message
- *	argv[0] = message
+ *  RX:
+ *    :Mark GLOBOPS :test globops
+ *  Format:
+ *    :origin GLOBOPS :message
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = message
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -151,12 +153,14 @@ void _m_globops( char *origin, char **argv, int argc, int srv )
 /** @brief _m_wallops
  *
  *  process WALLOPS command
- *  RX: :Mark WALLOPS :test wallops
- *  WALLOPS :message
- *	argv[0] = message
+ *  RX:
+ *    :Mark WALLOPS :test wallops
+ *  Format:
+ *    :origin WALLOPS :message
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = message
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -171,12 +175,14 @@ void _m_wallops( char *origin, char **argv, int argc, int srv )
 /** @brief _m_chatops
  *
  *  process CHATOPS command
- *  RX: :Mark CHATOPS :test chatops
- *  CHATOPS :message
- *	argv[0] = message
+ *  RX:
+ *    :Mark CHATOPS :test chatops
+ *  Format:
+ *    :origin CHATOPS :message
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = message
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -191,12 +197,14 @@ void _m_chatops( char *origin, char **argv, int argc, int srv )
 /** @brief _m_error
  *
  *  process ERROR command
- *  RX: :Mark ERROR :message
- *  ERROR :message
- *	argv[0] = message
+ *  RX:
+ *    :Mark ERROR :message
+ *  Format:
+ *    :origin ERROR :message
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = message
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -213,8 +221,10 @@ void _m_error( char *origin, char **argv, int argc, int srv )
 /** @brief _m_ignorecommand
  *
  *  silently drop command
- *  RX: 
- *  cmd anything else
+ *  RX:
+ *    N/A
+ *  Format:
+ *    :origin COMMAND parameters :parameters
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -231,12 +241,14 @@ void _m_ignorecommand( char *origin, char **argv, int argc, int srv )
 /** @brief _m_pass
  *
  *  process PASS command
- *  RX: PASS :password
- *  PASS :password
- *	argv[0] = password
+ *  RX:
+ *    PASS :password
+ *  Format:
+ *    PASS :password
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = password
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -251,11 +263,14 @@ void _m_pass( char *origin, char **argv, int argc, int srv )
 /** @brief _m_protoctl
  *
  *  process PROTOCTL command
- *  RX: 
- *  PROTOCTL <token list>
+ *  RX:
+ *    PROTOCTL NOQUIT TOKEN 
+ *  Format:
+ *    PROTOCTL <token list>
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0 - argc] = tokens
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -270,11 +285,14 @@ void _m_protoctl( char *origin, char **argv, int argc, int srv )
 /** @brief _m_version
  *
  *  process VERSION command
- *  origin VERSION :stats.neostats.net
- *	argv[0] = remote server
+ *  RX:
+ *    :Mark VERSION :stats.neostats.net
+ *  Format:
+ *    :origin VERSION :servername
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = servername
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -300,10 +318,14 @@ void _m_version( char *origin, char **argv, int argc, int srv )
 /** @brief _m_motd
  *
  *  process MOTD command
- *  origin MOTD :stats.neostats.net
+ *  RX:
+ *    :Mark MOTD :stats.neostats.net
+ *  Format:
+ *    :origin MOTD :servername
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = servername
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -321,11 +343,14 @@ void _m_motd( char *origin, char **argv, int argc, int srv )
 /** @brief _m_admin
  *
  *  process ADMIN command
- *  origin ADMIN :stats.neostats.net
- *	argv[0] = servername
+ *  RX:
+ *    :Mark ADMIN :servername
+ *  Format:
+ *    :origin ADMIN :stats.neostats.net
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = servername
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -343,11 +368,14 @@ void _m_admin( char *origin, char **argv, int argc, int srv )
 /** @brief _m_credits
  *
  *  process CREDITS command
- *  origin CREDITS :stats.neostats.net
- *	argv[0] = servername
+ *  RX:
+ *    :Mark CREDITS u :stats.neostats.net
+ *  Format:
+ *    :origin CREDITS :servername
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = servername
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -362,11 +390,14 @@ void _m_credits( char *origin, char **argv, int argc, int srv )
 /** @brief _m_info
  *
  *  process INFO command
- *  origin INFO :stats.neostats.net
- *	argv[0] = servername
+ *  RX:
+ *    :Mark INFO u :stats.neostats.net
+ *  Format:
+ *    :origin INFO :servername
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = servername
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -382,13 +413,15 @@ void _m_info( char *origin, char **argv, int argc, int srv )
 /** @brief _m_stats
  *
  *  process STATS command
- *  RX: 
- *  :origin STATS u :stats.neostats.net
- *	argv[0] = stats type
- *	argv[1] = destination
+ *  RX:
+ *    :Mark STATS u :stats.neostats.net
+ *  Format:
+ *    :origin STATS u :servername
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = stats type
+ *	  argv[1] = servername
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -413,14 +446,17 @@ void _m_stats( char *origin, char **argv, int argc, int srv )
 /** @brief _m_ping
  *
  *  process PING command
- *  RX: 
- *  PING :irc.foonet.com
- *	argv[0] = origin
- *	argv[1] = destination
- *  P10: R: AB G !1076065765.431368 stats.mark.net 1076065765.431368
- *
+ *  RX:
+ *    PING :irc.foonet.com
+ *  P10:
+ *    AB G !1076065765.431368 stats.mark.net 1076065765.431368
+ *  Format:
+ *    TODO
+ *  
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = origin
+ *	  argv[1] = destination
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -438,13 +474,17 @@ void _m_ping( char *origin, char **argv, int argc, int srv )
 /** @brief _m_pong
  *
  *  process PONG command
- *  irc.foonet.com PONG irc.foonet.com :stats.neostats.net
- *  argv[0] = origin
- *  argv[1] = destination
- *  P10: R: AB Z AB :stats.mark.net
+ *  RX:
+ *    irc.foonet.com PONG irc.foonet.com :stats.neostats.net
+ *  P10: 
+ *    AB Z AB :stats.neostats.net
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = origin
+ *    argv[1] = destination
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -462,11 +502,14 @@ void _m_pong( char *origin, char **argv, int argc, int srv )
 /** @brief _m_quit
  *
  *  process QUIT command
- *  origin QUIT :comment
- *  argv[0] = comment
+ *  RX:
+ *    :Mark QUIT :Quit: Client exited
+ *  Format:
+ *    :origin QUIT :comment
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = comment
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -484,11 +527,15 @@ void _m_quit( char *origin, char **argv, int argc, int srv )
 /** @brief m_join
  *
  *  process JOIN command
- *	argv[0] = channel
- *	argv[1] = channel password( key )
+ *  RX:
+ *    TODO
+ *  Format:
+ *    :origin JOIN #channel key
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = channel
+ *	  argv[1] = channel password( key )
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -506,11 +553,15 @@ void _m_join( char *origin, char **argv, int argc, int srv )
 /** @brief m_part
  *
  *  process PART command
- *	argv[0] = channel
- *	argv[1] = comment
+ *  RX:
+ *    :Mark PART #test :leaving this place
+ *  Format:
+ *    :origin PART #channel :reason
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = channel
+ *	  argv[1] = comment
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -528,12 +579,16 @@ void _m_part( char *origin, char **argv, int argc, int srv )
 /** @brief _m_kick
  *
  *  process KICK command
- *	argv[0] = channel
- *	argv[1] = client to kick
- *	argv[2] = kick comment
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = channel
+ *	  argv[1] = client to kick
+ *	  argv[2] = kick comment
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -558,17 +613,20 @@ void _m_kick( char *origin, char **argv, int argc, int srv )
 /** @brief _m_topic
  *
  *  process TOPIC command
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *  origin TOPIC #channel owner TS :topic
- *  argv[0] = topic text
- * For servers using TS:
- *  argv[0] = channel name
- *  argv[1] = topic nickname
- *  argv[2] = topic time
- *  argv[3] = topic text
- *
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = topic text
+ *  For servers using TS:
+ *    argv[0] = channel name
+ *    argv[1] = topic nickname
+ *    argv[2] = topic time
+ *    argv[3] = topic text
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -593,10 +651,14 @@ void _m_topic( char *origin, char **argv, int argc, int srv )
 /** @brief _m_away
  *
  *  process AWAY command
- *	argv[0] = away message
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = away message
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -624,11 +686,15 @@ void _m_away( char *origin, char **argv, int argc, int srv )
 /** @brief _m_kill
  *
  *  process KILL command
- *	argv[0] = kill victim(s) - comma separated list
- *	argv[1] = kill path
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = kill victim(s) - comma separated list
+ *	  argv[1] = kill path
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -653,13 +719,17 @@ void _m_kill( char *origin, char **argv, int argc, int srv )
 /** @brief _m_squit
  *
  *  process SQUIT command
- *	argv[0] = server name
- *	argv[argc-1] = comment
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *  P10: R: AB SQ mark.local.org 0 :Ping timeout 
  *  P10: R: ABAAV SQ york.gose.org 1076280461 :relink
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = server name
+ *	  argv[argc-1] = comment
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -685,17 +755,21 @@ void _m_squit( char *origin, char **argv, int argc, int srv )
 /** @brief _m_netinfo
  *
  *  process NETINFO command
- *  argv[0] = max global count
- *  argv[1] = time of end sync
- *  argv[2] = protocol
- *  argv[3] = cloak
- *  argv[4] = free( ** )
- *  argv[5] = free( ** )
- *  argv[6] = free( ** )
- *  argv[7] = ircnet
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = max global count
+ *    argv[1] = time of end sync
+ *    argv[2] = protocol
+ *    argv[3] = cloak
+ *    argv[4] = free( ** )
+ *    argv[5] = free( ** )
+ *    argv[6] = free( ** )
+ *    argv[7] = ircnet
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -710,17 +784,21 @@ void _m_netinfo( char *origin, char **argv, int argc, int srv )
 /** @brief _m_snetinfo
  *
  *  process NETINFO command
- *  argv[0] = max global count
- *  argv[1] = time of end sync
- *  argv[2] = protocol
- *  argv[3] = cloak
- *  argv[4] = free( ** )
- *  argv[5] = free( ** )
- *  argv[6] = free( ** )
- *  argv[7] = ircnet
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = max global count
+ *    argv[1] = time of end sync
+ *    argv[2] = protocol
+ *    argv[3] = cloak
+ *    argv[4] = free( ** )
+ *    argv[5] = free( ** )
+ *    argv[6] = free( ** )
+ *    argv[7] = ircnet
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -735,14 +813,17 @@ void _m_snetinfo( char *origin, char **argv, int argc, int srv )
 /** @brief _m_mode
  *
  *  process MODE command
- *	 argv[0] - channel
- *
- *  m_umode
- *   argv[0] - username to change mode for
- *   argv[1] - modes to change
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	 argv[0] - channel
+ *  m_umode
+ *   argv[0] - username to change mode for
+ *   argv[1] - modes to change
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -764,12 +845,16 @@ void _m_mode( char *origin, char **argv, int argc, int srv )
 /** @brief _m_svsnick
  *
  *  process SVSNICK command
- *  argv[0] = old nickname
- *  argv[1] = new nickname
- *  argv[2] = timestamp
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] = old nickname
+ *    argv[1] = new nickname
+ *    argv[2] = timestamp
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -784,10 +869,14 @@ void _m_svsnick( char *origin, char **argv, int argc, int srv )
 /** @brief _m_setname
  *
  *  process SETNAME command
- *	argv[0] = name
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = name
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -802,11 +891,15 @@ void _m_setname( char *origin, char **argv, int argc, int srv )
 /** @brief _m_chgname
  *
  *  process CHGNAME command
- *	argv[0] = nick
- *	argv[1] = name
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = nick
+ *	  argv[1] = name
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -821,10 +914,14 @@ void _m_chgname( char *origin, char **argv, int argc, int srv )
 /** @brief _m_sethost
  *
  *  process SETHOST command
- *	argv[0] = host
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = host
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -839,11 +936,15 @@ void _m_sethost( char *origin, char **argv, int argc, int srv )
 /** @brief _m_chghost
  *
  *  process CHGHOST command
- *	argv[0] = nick
- *	argv[1] = host
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = nick
+ *	  argv[1] = host
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -858,10 +959,14 @@ void _m_chghost( char *origin, char **argv, int argc, int srv )
 /** @brief _m_setident
  *
  *  process SETIDENT command
- *	argv[0] = ident
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = ident
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -876,11 +981,15 @@ void _m_setident( char *origin, char **argv, int argc, int srv )
 /** @brief _m_chgident
  *
  *  process CHGIDENT command
- *	argv[0] = nick
- *	argv[1] = ident
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = nick
+ *	  argv[1] = ident
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -895,12 +1004,16 @@ void _m_chgident( char *origin, char **argv, int argc, int srv )
 /** @brief _m_svsjoin
  *
  *  process SVSJOIN command
- *	argv[0] = nick
- *	argv[1] = channel
- *	argv[2] = key
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = nick
+ *	  argv[1] = channel
+ *	  argv[2] = key
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -915,12 +1028,16 @@ void _m_svsjoin( char *origin, char **argv, int argc, int srv )
 /** @brief _m_svspart
  *
  *  process SVSPART command
- *	argv[0] = nick
- *	argv[1] = channel
- *	argv[2] = reason
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0] = nick
+ *	  argv[1] = channel
+ *	  argv[2] = reason
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -935,12 +1052,14 @@ void _m_svspart( char *origin, char **argv, int argc, int srv )
 /** @brief _m_svinfo
  *
  *  process SVINFO command
- *  RX: 
- *  SVINFO
- *	argv[0]
+ *  RX:
+ *    SVINFO
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *	  argv[0]
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -955,8 +1074,10 @@ void _m_svinfo( char *origin, char **argv, int argc, int srv )
 /** @brief _m_eob
  *
  *  process EOB command
- *  RX: 
- *  EOB
+ *  RX:
+ *    EOB
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -975,13 +1096,15 @@ void _m_eob( char *origin, char **argv, int argc, int srv )
 /** @brief _m_sqline
  *
  *  process SQLINE command
- *  RX: :server c dos_bot* :Reserved nickname: Dosbot
- *  SQLINE
- *  argv[0] - mask
- *  argv[1] - reason
+ *  RX:
+ *    SQLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
+ *    argv[1] - reason
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -995,12 +1118,14 @@ void _m_sqline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_unsqline
  *
  *  process UNSQLINE command
- *  RX: 
- *  UNSQLINE
- *  argv[0] - mask
+ *  RX:
+ *    UNSQLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -1014,13 +1139,15 @@ void _m_unsqline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_zline
  *
  *  process ZLINE command
- *  RX: 
- *  ZLINE
- *  argv[0] - mask
- *  argv[1] - reason
+ *  RX:
+ *    ZLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
+ *    argv[1] - reason
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -1034,12 +1161,14 @@ void _m_zline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_unzline
  *
  *  process UNZLINE command
- *  RX: 
- *  UNZLINE
- *  argv[0] - mask
+ *  RX:
+ *    UNZLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -1053,8 +1182,10 @@ void _m_unzline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_akill
  *
  *  process AKILL command
- *  RX: 
- *  AKILL
+ *  RX:
+ *    AKILL
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -1071,8 +1202,10 @@ void _m_akill( char *origin, char **argv, int argc, int srv )
 /** @brief _m_rakill
  *
  *  process RAKILL command
- *  RX: 
- *  RAKILL
+ *  RX:
+ *    RAKILL
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -1089,13 +1222,15 @@ void _m_rakill( char *origin, char **argv, int argc, int srv )
 /** @brief _m_kline
  *
  *  process KLINE command
- *  RX: 
- *  KLINE
- *  argv[0] - mask
- *  argv[1] - reason
+ *  RX:
+ *    KLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
+ *    argv[1] - reason
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -1109,12 +1244,14 @@ void _m_kline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_unkline
  *
  *  process UNKLINE command
- *  RX: 
- *  UNKLINE
- *  argv[0] - mask
+ *  RX:
+ *    UNKLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -1128,13 +1265,15 @@ void _m_unkline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_gline
  *
  *  process GLINE command
- *  RX: 
- *  GLINE
- *  argv[0] - mask
- *  argv[1] - reason
+ *  RX:
+ *    GLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
+ *    argv[1] - reason
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -1148,12 +1287,14 @@ void _m_gline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_remgline
  *
  *  process REMGLINE command
- *  RX: 
- *  REMGLINE
- *  argv[0] - mask
+ *  RX:
+ *    REMGLINE
+ *  Format:
+ *    TODO
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
+ *    argv[0] - mask
  *  @param argc parameter count
  *  @param srv command flag
  *
@@ -1167,6 +1308,10 @@ void _m_remgline( char *origin, char **argv, int argc, int srv )
 /** @brief _m_notice
  *
  *  process NOTICE command
+ *  RX:
+ *    :Mark NOTICE NeoStats :this is a notice
+ *  Format:
+ *    :origin NOTICE target :message
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -1201,6 +1346,10 @@ void _m_notice( char *origin, char **argv, int argc, int srv )
 /** @brief _m_private
  *
  *  process PRIVATE command
+ *  RX:
+ *    :Mark PRIVATE NeoStats :this is a private message
+ *  Format:
+ *    :origin PRIVATE target :message
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
