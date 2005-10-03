@@ -315,16 +315,14 @@ int ns_cmd_serverlist( CmdParams *cmdparams )
 
 int InitServers( void )
 {
-	Client* s;
-	
 	serverhash = hash_create( SERVER_TABLE_SIZE, 0, 0 );
 	if( !serverhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create server hash" );
 		return NS_FAILURE;
 	}
-	s = AddServer( me.name, NULL, 0, NULL, me.infoline );
-	strlcpy( s->version, me.version, VERSIONSIZE );
+	me.s = AddServer( me.name, NULL, 0, NULL, me.infoline );
+	strlcpy( me.s->version, me.version, VERSIONSIZE );
 	return NS_SUCCESS;
 }
 
