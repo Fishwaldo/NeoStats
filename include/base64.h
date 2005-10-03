@@ -34,4 +34,6 @@ EXPORTFUNC int set_nick_base64( const char *nick, const char *base64name );
 EXPORTFUNC char *nick_to_base64( const char *nick );
 EXPORTFUNC char *base64_to_nick( const char *base64name );
 
+EXPORTFUNC char *base64_to_name( const char *base64name );
+
 #endif /* _BASE64_H_ */

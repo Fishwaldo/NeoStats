@@ -289,6 +289,9 @@ void _m_protoctl( char *origin, char **argv, int argc, int srv )
  *    :Mark VERSION :stats.neostats.net
  *  Format:
  *    :origin VERSION :servername
+ *  P10:
+ *    ABAAB V :Bj
+ *    originnum V :servernum
  *
  *  @param origin source of message (user/server)
  *  @param argv list of message parameters
@@ -301,16 +304,8 @@ void _m_protoctl( char *origin, char **argv, int argc, int srv )
 
 void _m_version( char *origin, char **argv, int argc, int srv )
 {
-	if( ircd_srv.protocol & PROTOCOL_P10 )
-	{
-		/* ABAAB V :Bj */
-		char *b64origin;
-
-		b64origin = base64_to_nick( origin );
-		if( !b64origin )
-			b64origin = base64_to_server( origin );
-		do_version( b64origin, base64_to_server( argv[0] ) );
-	}
+	if( ircd_srv.protocol & PROTOCOL_P10 )		
+		do_version( base64_to_name( origin ), base64_to_server( argv[0] ) );
 	else
 		do_version( origin, argv[0] );
 }
@@ -431,14 +426,7 @@ void _m_info( char *origin, char **argv, int argc, int srv )
 void _m_stats( char *origin, char **argv, int argc, int srv )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
-	{
-		char *b64origin;
-
-		b64origin = base64_to_nick( origin );
-		if( !b64origin )
-			b64origin = base64_to_server( origin );
-		do_stats( b64origin, argv[0] );
-	}
+		do_stats( base64_to_name( origin ), argv[0] );
 	else
 		do_stats( origin, argv[0] );
 }
@@ -598,14 +586,7 @@ void _m_part( char *origin, char **argv, int argc, int srv )
 void _m_kick( char *origin, char **argv, int argc, int srv )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
-	{
-		char *b64origin;
-
-		if( !( b64origin = base64_to_nick( origin ) ) ) {
-			b64origin = base64_to_server( origin );
-		}
-		do_kick( b64origin, argv[0], base64_to_nick( argv[1] ), argv[2] );
-	}
+		do_kick( base64_to_name( origin ), argv[0], base64_to_nick( argv[1] ), argv[2] );
 	else
 		do_kick( origin, argv[0], argv[1], argv[2] );
 }
@@ -636,14 +617,7 @@ void _m_kick( char *origin, char **argv, int argc, int srv )
 void _m_topic( char *origin, char **argv, int argc, int srv )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
-	{
-		char *b64origin;
-
-		b64origin = base64_to_nick( origin );
-		if( !b64origin )
-			b64origin = base64_to_server( origin );
-		do_topic( argv[0], b64origin, NULL, argv[argc-1] );
-	}
+		do_topic( argv[0], base64_to_name( origin ), NULL, argv[argc-1] );
 	else
 		do_topic( argv[0], argv[1], argv[2], argv[3] );
 }
@@ -704,14 +678,7 @@ void _m_away( char *origin, char **argv, int argc, int srv )
 void _m_kill( char *origin, char **argv, int argc, int srv )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
-	{
-		char *b64origin;
-
-		b64origin = base64_to_nick( origin );
-		if( !b64origin )
-			b64origin = base64_to_server( origin );
-		do_kill( b64origin, base64_to_nick( argv[0] ), argv[1] );
-	}
+		do_kill( base64_to_name( origin ), base64_to_nick( argv[0] ), argv[1] );
 	else
 		do_kill( origin, argv[0], argv[1] );
 }

@@ -179,3 +179,28 @@ char *base64_to_nick( const char* base64name )
 	dlog( DEBUG1, "base64_to_nick: cannot find %s", base64name );
 	return NULL;
 }
+
+/** @brief base64_to_name
+ *
+ *  Get client name (server or user) from base64 name
+ *  NeoStats core use and protocol use only.
+ *
+ *  @param base64name to find
+ *
+ *  @return name or NULL if not found
+ */
+
+char *base64_to_name( const char* base64name )
+{
+	Client *c;
+
+	dlog( DEBUG1, "base64_to_name: scanning for %s", base64name );
+	c = find_user_base64( base64name );
+	if( c )
+		return c->name;
+	c = find_server_base64( base64name );
+	if( c )
+		return c->name;
+	dlog( DEBUG1, "base64_to_name: cannot find %s", base64name );
+	return NULL;
+}

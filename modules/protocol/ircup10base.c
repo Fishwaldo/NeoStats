@@ -187,7 +187,7 @@ void send_nick( const char *nick, const unsigned long ts, const char *newmode, c
 			break;
 		}
 	}
-	ircsnprintf( nicknumbuf, 6, "%sAA%c", neostatsbase64,( i+'A' ) );
+	ircsnprintf( nicknumbuf, 6, "%sAA%c", neostatsbase64,( i + 'A' ) );
 	send_cmd( "%s %s %s 1 %lu %s %s %s AAAAAA %s :%s", neostatsbase64, TOK_NICK, nick, ts, ident, host, newmode, nicknumbuf, realname );
 	set_nick_base64( nick, nicknumbuf );
 }
@@ -274,11 +274,6 @@ static void m_server( char *origin, char **argv, int argc, int srv )
 /* R: ABAAG M #chan1 +v ABAAH */
 static void m_mode( char *origin, char **argv, int argc, int srv )
 {
-	char *b64origin;
-
-	b64origin = base64_to_nick( origin );
-	if( !b64origin )
-		b64origin = base64_to_server( origin );
 	if( argv[0][0] == '#' ) {
 		char **av;
 		int ac = 0;
@@ -329,7 +324,7 @@ static void m_mode( char *origin, char **argv, int argc, int srv )
 			modes++;
 		}
 
-		do_mode_channel( b64origin, av, ac );
+		do_mode_channel( base64_to_name( origin ), av, ac );
 		ns_free( av );
 	} else {
 		do_mode_user( argv[0], argv[1] );
@@ -489,22 +484,12 @@ static void m_end_of_burst( char *origin, char **argv, int argc, int srv )
 
 static void m_wallusers( char *origin, char **argv, int argc, int srv )
 {
-	char *b64origin;
-
-	b64origin = base64_to_nick( origin );
-	if( !b64origin )
-		b64origin = base64_to_server( origin );
-	do_wallops( b64origin, argv[0] );	
+	do_wallops( base64_to_name( origin ), argv[0] );	
 }
 
 static void m_wallops( char *origin, char **argv, int argc, int srv )
 {
-	char *b64origin;
-
-	b64origin = base64_to_nick( origin );
-	if( !b64origin )
-		b64origin = base64_to_server( origin );
-	do_globops( b64origin, argv[0] );
+	do_globops( base64_to_name( origin ), argv[0] );
 }
 
 static void m_private( char *origin, char **argv, int argc, int srv )
