@@ -165,7 +165,7 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 
 void send_quit( const char *source, const char *quitmsg )
 {
-	char *num;
+	const char *num;
 
 	/* Clear numeric */
 	num = nick_to_base64( source );
@@ -194,7 +194,7 @@ void send_nick( const char *nick, const unsigned long ts, const char *newmode, c
 
 void send_wallops( const char *source, const char *buf )
 {
-	char *b64source;
+	const char *b64source;
 	
 	b64source = server_to_base64( source );
 	if( !b64source )
@@ -228,7 +228,7 @@ void send_rakill( const char *source, const char *host, const char *ident )
 
 void send_globops( const char *source, const char *buf )
 {
-	char *b64source;
+	const char *b64source;
 	
 	b64source = server_to_base64( source );
 	if( !b64source )
@@ -497,7 +497,7 @@ static void m_private( char *origin, char **argv, int argc, int srv )
 	char **av;
 	int ac = 0;
 	int i;
-	char *av0;
+	const char *av0;
 	
 	if( argv[0][0] == '#' ) {
 		av0 = argv[0];
@@ -521,7 +521,7 @@ static void m_notice( char *origin, char **argv, int argc, int srv )
 	char **av;
 	int ac = 0;
 	int i;
-	char *av0;
+	const char *av0;
 	
 	if( argv[0][0] == '#' ) {
 		av0 = argv[0];

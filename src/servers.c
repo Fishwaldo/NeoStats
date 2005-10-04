@@ -70,7 +70,7 @@ static Client *new_server( const char *name )
 
 /** @brief AddServer
  *
- *  Add a user to NeoStats
+ *  Add a server to NeoStats
  *  NeoStats core use only.
  *
  *  @param name

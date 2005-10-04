@@ -707,7 +707,7 @@ void _m_squit( char *origin, char **argv, int argc, int srv )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
 	{
-		char *b64argv0;
+		const char *b64argv0;
 
 		b64argv0 = base64_to_server( argv[0] );
 		if( b64argv0 )
@@ -2173,13 +2173,12 @@ void do_burst( char *origin, char **argv, int argc )
  *  @return none
  */
 
-void do_swhois( char *who, char *swhois )
+void do_swhois( const char *who, const char *swhois )
 {
-	Client * u;
+	Client *u;
 	u = FindUser( who );
-	if( u ) {
+	if( u )
 		strlcpy( u->user->swhois, swhois, MAXHOST );
-	}
 }
 
 /** @brief 

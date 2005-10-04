@@ -52,6 +52,8 @@ static int ns_cmd_status( CmdParams *cmdparams );
 
 static int services_event_ctcpversion( CmdParams *cmdparams );
 
+static int ns_set_debug_cb( CmdParams *cmdparams, SET_REASON reason );
+
 config nsconfig;
 tme me;
 
@@ -109,6 +111,12 @@ static bot_cmd ns_commands[] =
 	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist},
 	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist},
 	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist},
+	NS_CMD_END()
+};
+
+/** Bot comand table */
+static bot_cmd ns_debug_commands[] =
+{
 	{"USERLIST",	ns_cmd_userlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_userlist},
 	{"CHANNELLIST",	ns_cmd_channellist,	0, 	NS_ULEVEL_ROOT,  	ns_help_channellist},
 	{"SERVERLIST",	ns_cmd_serverlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverlist},
@@ -138,7 +146,7 @@ static bot_setting ns_settings[] =
 static bot_setting ns_debugsettings[] =
 {
 #ifndef DEBUG
-	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, NULL,( void* )0 },
+	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, ns_set_debug_cb,( void* )0 },
 #endif
 	{"DEBUGMODULE",		nsconfig.debugmodule,		SET_TYPE_STRING,	0, MAX_MOD_NAME,NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugmodule, NULL,( void* )"all" },
 	{"DEBUGLEVEL",		&nsconfig.debuglevel,		SET_TYPE_INT,		1, 10, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debuglevel, NULL,( void* )0 },
@@ -380,3 +388,30 @@ static int ns_cmd_raw( CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 #endif
+
+/** @brief ns_set_debug_cb
+ *
+ *  Set callback for debug
+ *  Enable or disable debug commands
+ *
+ *  @params cmdparams pointer to commands param struct
+ *  @params reason for SET
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int ns_set_debug_cb( CmdParams *cmdparams, SET_REASON reason )
+{
+	if( reason == SET_LOAD || reason == SET_CHANGE )
+	{
+		if( nsconfig.debug )
+		{
+			add_bot_cmd_list( ns_botptr, ns_debug_commands );
+		} 
+		else 
+		{
+			del_bot_cmd_list( ns_botptr, ns_debug_commands );
+		}
+	}
+	return NS_SUCCESS;
+}

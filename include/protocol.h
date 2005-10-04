@@ -325,7 +325,7 @@ EXPORTFUNC void do_nickchange( const char *oldnick, const char *newnick, const c
 EXPORTFUNC void do_topic( const char *chan, const char *owner, const char *ts, const char *topic );
 EXPORTFUNC void do_server( const char *name, const char *uplink, const char *hops, const char *numeric, const char *infoline, int srv );
 EXPORTFUNC void do_burst( char *origin, char **argv, int argc );
-EXPORTFUNC void do_swhois( char *who, char *swhois );
+EXPORTFUNC void do_swhois( const char *who, const char *swhois );
 EXPORTFUNC void do_tkl( const char *add, const char *type, const char *user, const char *host, const char *setby, const char *tsexpire, const char *tsset, const char *reason );
 EXPORTFUNC void do_eos( const char *name );
 EXPORTFUNC void do_setname( const char *nick, const char *realname );

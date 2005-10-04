@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Win32: add right click menu to system tray icon. (M)
+ - Win32: minimise to system tray instead of task bar. (M)
  - First pass DBA redundancy reduction. (M)
  - HostServ: additional wildcard checks to fix security loophole. (M)
  - Replace SET VERSIONSCAN option with automatic support based on module

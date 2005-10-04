@@ -61,10 +61,9 @@ void _m_numeric351( char *origin, char **argv, int argc, int srv )
 	Client *s;
 
 	if( ircd_srv.protocol & PROTOCOL_B64SERVER )
-		origin = base64_to_server( origin );
-	if( !origin )
-		return;
-	s = FindServer( origin );
+		s = FindServer( base64_to_server( origin ) );
+	else
+		s = FindServer( origin );
 	if( s )
 		strlcpy( s->version, argv[1], MAXHOST );
 }
@@ -87,10 +86,9 @@ void _m_numeric242( char *origin, char **argv, int argc, int srv )
 	Client *s;
 
 	if( ircd_srv.protocol & PROTOCOL_B64SERVER )
-		origin = base64_to_server( origin );
-	if( !origin )
-		return;
-	s = FindServer( origin );
+		s = FindServer( base64_to_server( origin ) );
+	else
+		s = FindServer( origin );
 	if( s ) {
 		/* Convert "Server Up d days, hh:mm:ss" to seconds*/
 		char *ptr;
