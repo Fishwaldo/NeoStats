@@ -165,8 +165,7 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 				case IDM_CLOSE:
 					Shell_NotifyIcon( NIM_DELETE, &nsNotifyIconData );
-					DestroyWindow( hDialog );
-					PostQuitMessage( 0 );
+					DestroyWindow( hwnd );
 					break;
 			}
 
@@ -174,6 +173,8 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		case WM_DESTROY:
 			PostQuitMessage( 0 );
+			TerminateThread( hNeoStatsThread, 0 );
+			do_exit( 0, "Terminated" );
 			return TRUE;
 
 		case WM_CLOSE:
@@ -181,16 +182,11 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 			{
 				return 0;
 			}
-			else 
-			{
-				Shell_NotifyIcon( NIM_DELETE, &nsNotifyIconData );
+			Shell_NotifyIcon( NIM_DELETE, &nsNotifyIconData );
 #ifndef NDEBUG
-				FiniDebugConsole();
+			FiniDebugConsole();
 #endif
-				DestroyWindow( hwnd );				
-				TerminateThread( hNeoStatsThread, 0 );
-				do_exit( 0, "Terminated" );
-			}
+			DestroyWindow( hwnd );				
 			return TRUE;
 
 		case WM_SYSCOMMAND:		
