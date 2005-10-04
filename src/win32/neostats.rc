@@ -80,6 +80,15 @@ BEGIN
     CONTROL         102,IDB_P1CTURE1,"Static",SS_BITMAP,19,7,149,24
 END
 
+IDD_DIALOG2 DIALOGEX 0, 0, 186, 90
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,68,69,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -95,6 +104,14 @@ BEGIN
         RIGHTMARGIN, 179
         TOPMARGIN, 7
         BOTTOMMARGIN, 88
+    END
+
+    IDD_DIALOG2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -117,6 +134,13 @@ IDI_ICON1               ICON                    "icon1.ico"
 IDR_MENU1 MENU 
 BEGIN
     MENUITEM "Open NeoStats",               40001
+    MENUITEM SEPARATOR
+    MENUITEM "Edit Config File",            40003
+    MENUITEM SEPARATOR
+    MENUITEM "About...",                    40004
+    MENUITEM "NeoStats website",            40007
+    MENUITEM "NeoStats forums",             40008
+    MENUITEM SEPARATOR
     MENUITEM "Exit NeoStats",               40002
 END
 

@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Win32: system tray menu options for NeoStats web site and forums. (M)
  - Win32: add right click menu to system tray icon. (M)
  - Win32: minimise to system tray instead of task bar. (M)
  - First pass DBA redundancy reduction. (M)

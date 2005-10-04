@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <io.h>
+#include <shlwapi.h>
 
 #include "resource.h"
 
@@ -45,6 +46,8 @@ HICON hIcon;
 NOTIFYICONDATA nsNotifyIconData;
 HMENU hTrayPopMenu;
 POINT TrayPoint;
+
+char szConfigFileName[ MAX_PATH ];
 
 #ifndef NDEBUG
 void InitDebugConsole( void )
@@ -78,14 +81,38 @@ void ErrorMessageBox( char* error )
 	MessageBox( NULL, error, szNeoStatsErrorTitle, MB_ICONEXCLAMATION | MB_OK );
 }
 
+INT_PTR CALLBACK AboutDialogProc(HWND hwndDlg, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	switch (msg)
+	{
+		case WM_INITDIALOG:
+			break;
+
+		case WM_COMMAND:
+			switch (LOWORD(wparam))
+			{
+				case IDOK:
+					EndDialog(hwndDlg, TRUE);
+					return TRUE;
+			}
+			break;
+
+			case WM_DESTROY:
+			break;
+	}
+
+	return FALSE;
+}
+
 INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
+	int error;
     switch( message )
     {
 		case WM_INITDIALOG:
 			return TRUE;
 
-		case WM_USER_SHELLICON: 	
+		case WM_USER_SHELLICON:
 			switch( LOWORD( lParam ) ) 
 			{ 
 				case WM_LBUTTONDBLCLK:
@@ -95,8 +122,16 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 				case WM_RBUTTONDOWN: 
 					GetCursorPos( &TrayPoint );			
 					hTrayPopMenu = CreatePopupMenu();
-					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, ID_OPEN, "&Open NeoStats");
-					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, ID_CLOSE, "&Exit NeoStats");										
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_OPEN, "&Open NeoStats");
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_EDITCONFIG, "&Edit Config File");
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_ABOUT, "&About...");
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_WEBHOME, "&NeoStats website");
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_WEBFORUMS, "&NeoStats forums");
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_CLOSE, "E&xit NeoStats");
+					
 					SetForegroundWindow( hDialog );
 					TrackPopupMenu( hTrayPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_BOTTOMALIGN, TrayPoint.x, TrayPoint.y, 0, hDialog, NULL);
 					SendMessage( hDialog, WM_NULL, 0, 0 );			
@@ -107,11 +142,28 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		case WM_COMMAND:
 			switch( LOWORD( wParam ) )
 			{
-				case ID_OPEN:
+				case IDM_OPEN:
 					ShowWindow( hDialog, SW_NORMAL ); 
 					break;
+				
+				case IDM_ABOUT:
+					DialogBox( hInstance, MAKEINTRESOURCE( IDD_DIALOG2 ), hDialog, AboutDialogProc );
+					break;
 
-				case ID_CLOSE:
+				case IDM_EDITCONFIG:
+					error = ( int )ShellExecute( hDialog, "edit", szConfigFileName, NULL, NULL, SW_SHOWNORMAL );
+					ShellAbout( hDialog, "szapp", "szOtherStuff", hIcon);
+					break;
+
+				case IDM_WEBHOME:
+					error = ( int )ShellExecute( hDialog, "open", "http://www.neostats.net", NULL, NULL, SW_SHOWNORMAL );
+					break;
+
+				case IDM_WEBFORUMS:
+					error = ( int )ShellExecute( hDialog, "open", "http://www.neostats.net/boards", NULL, NULL, SW_SHOWNORMAL );
+					break;
+
+				case IDM_CLOSE:
 					Shell_NotifyIcon( NIM_DELETE, &nsNotifyIconData );
 					DestroyWindow( hDialog );
 					PostQuitMessage( 0 );
@@ -141,8 +193,7 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 			}
 			return TRUE;
 
-		case WM_SYSCOMMAND: 
-			
+		case WM_SYSCOMMAND:		
 			if(SC_MINIMIZE == wParam) 
 			{ 
 				ShowWindow( hDialog, SW_HIDE );
@@ -163,6 +214,9 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
 	_fmode = _O_BINARY;
 	hInstance = hInst;
 
+	GetCurrentDirectory( MAX_PATH, szConfigFileName );
+	strncat( szConfigFileName, "\\neostats.conf", MAX_PATH );
+
 	if( WSAStartup( MAKEWORD( 2, 0 ), &WSAData ) != 0 )
    	{
         ErrorMessageBox( "Unable to initialize WinSock" );
@@ -179,7 +233,8 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
 	InitDebugConsole();
 #endif
 	hDialog = CreateDialog( hInst, MAKEINTRESOURCE( IDD_DIALOG1 ), 0, DialogProc );
-    if( !hDialog )
+	ShowWindow( hDialog, SW_HIDE );
+	if( !hDialog )
     {
         wsprintf( szMsg, "Error x%x", GetLastError() );
         ErrorMessageBox( szMsg );
