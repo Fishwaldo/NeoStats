@@ -1200,6 +1200,7 @@ typedef struct updateserver {
 	char password [MAXUSER];
 	char hostname[MAXHOST];
 	int port;
+	Sock *Sockinfo;
 }updateserver;
 
 extern updateserver mqs;
