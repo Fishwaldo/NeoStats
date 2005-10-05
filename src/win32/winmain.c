@@ -124,8 +124,10 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 					hTrayPopMenu = CreatePopupMenu();
 					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_OPEN, "&Open NeoStats");
 					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+					/*
 					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_EDITCONFIG, "&Edit Config File");
 					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
+					*/
 					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_ABOUT, "&About...");
 					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_WEBHOME, "&NeoStats website");
 					InsertMenu( hTrayPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_WEBFORUMS, "&NeoStats forums");
@@ -151,8 +153,8 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 					break;
 
 				case IDM_EDITCONFIG:
-					error = ( int )ShellExecute( hDialog, "edit", szConfigFileName, NULL, NULL, SW_SHOWNORMAL );
-					ShellAbout( hDialog, "szapp", "szOtherStuff", hIcon);
+					//error = ( int )ShellExecute( hDialog, "edit", szConfigFileName, NULL, NULL, SW_SHOWNORMAL );
+					MessageBox( NULL, "TODO", "TODO", MB_ICONEXCLAMATION | MB_OK );
 					break;
 
 				case IDM_WEBHOME:
