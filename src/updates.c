@@ -105,6 +105,22 @@ void CheckMQOut() {
 	}
 }
 
+void ProcessMessage(MMessage *msg) {
+	unsigned long what;
+	
+	what = MMGetWhat(msg);
+	printf("%ld\n", MAKETYPE("lgok"));
+	switch (what) {
+		case 1818718059:
+			dlog(DEBUG1, "Login Ok");
+			break;
+		default:
+			dlog(DEBUG1, "Got message type %d", what);
+			break;
+	}
+
+}
+
 int mqswrite(int fd, void *data) {
 	switch (mqs.state) {
 		case MQS_DISCONNECTED:
@@ -148,22 +164,6 @@ int mqsread(void *data, void *notused, size_t len) {
 		MMFreeMessage(msg);
 	}
 	return NS_SUCCESS;
-}
-
-void ProcessMessage(MMessage *msg) {
-	unsigned long what;
-	
-	what = MMGetWhat(msg);
-	printf("%ld\n", MAKETYPE("lgok"));
-	switch (what) {
-		case 1818718059:
-			dlog(DEBUG1, "Login Ok");
-			break;
-		default:
-			dlog(DEBUG1, "Got message type %d", what);
-			break;
-	}
-
 }
 
 int mqs_login() 
