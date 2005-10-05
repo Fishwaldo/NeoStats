@@ -508,7 +508,7 @@ static void m_private( char *origin, char **argv, int argc, int srv )
 			av0 = argv[0];
 		}
 	}	
-	AddStringToList( &av, av0, &ac );
+	AddStringToList( &av, (char *)av0, &ac );
 	for( i = 1; i < argc; i++ ) {
 		AddStringToList( &av, argv[i], &ac );
 	}
@@ -532,7 +532,7 @@ static void m_notice( char *origin, char **argv, int argc, int srv )
 			av0 = argv[0];
 		}
 	}
-	AddStringToList( &av, av0, &ac );
+	AddStringToList( &av, (char *)av0, &ac );
 	for( i = 1; i < argc; i++ ) {
 		AddStringToList( &av, argv[i], &ac );
 	}
