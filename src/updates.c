@@ -42,7 +42,7 @@ int32 MQSSendSock(const uint8 * buf, uint32 numBytes, void * arg) {
 }
 
 int32 MQSRecvSock(uint8 * buf, uint32 numBytes, void * arg) {
-	return read(mqs.sock, (char *)buf, numBytes);
+	return os_sock_read( mqs.sock, (char *)buf, numBytes );
 }
 
 int InitUpdate(void) 
@@ -205,7 +205,7 @@ void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len) {
 		buf = malloc(sizeof(int) + len);
 		ircsnprintf(buf, (sizeof(int)+len+1), "%d\n%s", type, (char *)data);
 		dlog(DEBUG1, "Send Update: %s", buf);
-		sendto(mqs.sock, buf, strlen(buf), 0,  (struct sockaddr *) &mqs.sendtomq, sizeof(mqs.sendtomq));
+		os_sock_sendto(mqs.sock, buf, strlen(buf), 0,  (struct sockaddr *) &mqs.sendtomq, sizeof(mqs.sendtomq));
 		free(buf);
 	}
 }
