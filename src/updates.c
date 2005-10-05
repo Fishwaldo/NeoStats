@@ -47,9 +47,11 @@ int32 MQSRecvSock(uint8 * buf, uint32 numBytes, void * arg) {
 
 int InitUpdate(void) 
 {
+#ifndef WIN32
 	dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
 	dlog(DEBUG1, "Updates Initialized successfully");
 	mqs.state = MQS_DISCONNECTED;
+#endif
 	return NS_SUCCESS;
 }
 
