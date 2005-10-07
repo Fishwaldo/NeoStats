@@ -292,7 +292,7 @@ int ns_cmd_serverlist( CmdParams *cmdparams )
 	}
 	s = FindServer( cmdparams->av[0] );
 	if( s )
-		ListServer( s, NULL );
+		ListServer( s, cmdparams );
 	else
 		irc_prefmsg( ns_botptr, cmdparams->source, _( "can't find server %s" ), cmdparams->av[0] );
    	return NS_SUCCESS;
