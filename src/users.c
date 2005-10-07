@@ -589,11 +589,6 @@ int ns_cmd_userlist( CmdParams *cmdparams )
 	Client *u;
 
 	SET_SEGV_LOCATION();
-	if( !nsconfig.debug )
-	{
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "================USERLIST================", cmdparams->source ) );
 	if( cmdparams->ac < 1 )
 	{
@@ -806,21 +801,23 @@ void QuitServerUsers( Client *s )
  *  @return NS_SUCCESS
  */
 
-int ProcessUserList( UserListHandler handler, void *v )
+int ProcessUserList( const UserListHandler handler, void *v )
 {
 	Client *u;
 	hscan_t scan;
 	hnode_t *node;
+	int ret = 0;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &scan, userhash );
 	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		u = hnode_get( node );
-		if( handler( u, v ) == NS_TRUE )
+		ret = handler( u, v );
+		if( ret != 0 )
 			break;
 	}
-	return NS_SUCCESS;
+	return ret;
 }
 
 /** @brief AddFakeUser

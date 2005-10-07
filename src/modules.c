@@ -61,21 +61,23 @@ static hash_t *modulehash;
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ProcessModuleList( ModuleListHandler handler, void *v )
+int ProcessModuleList( const ModuleListHandler handler, void *v )
 {
 	Module *module_ptr;
 	hscan_t ms;
-	hnode_t *mn;
+	hnode_t *node;
+	int ret = 0;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &ms, modulehash );
-	while( ( mn = hash_scan_next( &ms ) ) != NULL )
+	while( ( node = hash_scan_next( &ms ) ) != NULL )
 	{
-		module_ptr = hnode_get( mn );
-		if( handler( module_ptr, v ) == NS_TRUE )
+		module_ptr = hnode_get( node );
+		ret = handler( module_ptr, v );
+		if( ret != 0 )
 			break;
 	}
-	return NS_SUCCESS;
+	return ret;
 }
 
 /** @brief InitModules
@@ -165,12 +167,12 @@ void SynchAllModules( void )
 {
 	Module *module_ptr;
 	hscan_t ms;
-	hnode_t *mn;
+	hnode_t *node;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &ms, modulehash );
-	while( ( mn = hash_scan_next( &ms ) ) != NULL ) {
-		module_ptr = hnode_get( mn );
+	while( ( node = hash_scan_next( &ms ) ) != NULL ) {
+		module_ptr = hnode_get( node );
 		if( SynchModule( module_ptr ) != NS_SUCCESS ) {
 			unload_module( module_ptr->info->name, NULL );
 		}
@@ -352,7 +354,9 @@ static Module *load_stdmodule( const char *modfilename, Client * u )
 	}
 	if( infoptr->flags & MODULE_FLAG_LOCAL_EXCLUDES ) 
 	{
-		InitModExcludes( mod_ptr );
+		SET_RUN_LEVEL( mod_ptr );	
+		InitExcludes( mod_ptr );
+		RESET_RUN_LEVEL();
 	}
 	SET_SEGV_LOCATION();
 
@@ -654,12 +658,12 @@ void unload_modules( void )
 {
 	Module *mod_ptr;
 	hscan_t ms;
-	hnode_t *mn;
+	hnode_t *node;
 
 	/* Walk through hash list unloading each module */
 	hash_scan_begin( &ms, modulehash );
-	while( ( mn = hash_scan_next( &ms ) ) != NULL ) {
-		mod_ptr = hnode_get( mn );
+	while( ( node = hash_scan_next( &ms ) ) != NULL ) {
+		mod_ptr = hnode_get( node );
 		unload_module( mod_ptr->info->name, NULL );
 	}
 }

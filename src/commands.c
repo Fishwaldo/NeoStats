@@ -81,7 +81,7 @@ static int calc_cmd_ulevel( const bot_cmd *cmd_ptr )
 	if( cmd_ptr->ulevel > NS_ULEVEL_ROOT )
 	{
 		/* int pointer rather than value */
-		return( *( int* )cmd_ptr->ulevel );
+		return( *( ( int * )cmd_ptr->ulevel ) );
 	}
 	/* use cmd entry directly */
 	return( cmd_ptr->ulevel );

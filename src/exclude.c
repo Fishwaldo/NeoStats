@@ -38,7 +38,7 @@
 #include "helpstrings.h"
 
 /* Prototype for module exclude command handler */
-static int mod_cmd_exclude( CmdParams *cmdparams );
+static int cmd_exclude( CmdParams *cmdparams );
 
 /* Exclude type bit mask */
 #define EXCLUDE_HOST		0x00000001
@@ -56,8 +56,8 @@ typedef enum NS_EXCLUDE
 	NS_EXCLUDE_MAX,
 } NS_EXCLUDE;
 
-/* Maximum size of module exclude lists */
-#define MAX_MOD_EXCLUDES		100
+/* Maximum size of exclude lists */
+#define MAX_EXCLUDES		100
 
 /* Exclude struct */
 typedef struct Exclude
@@ -72,9 +72,6 @@ typedef struct Exclude
 /* List walk handler type */
 typedef int (*ExcludeHandler) ( Exclude *exclude, void *v );
 
-/* Global exclusion list */
-static list_t *exclude_list;
-
 /* String descriptions of exclude types */
 const char* ExcludeDesc[NS_EXCLUDE_MAX] =
 {
@@ -85,9 +82,9 @@ const char* ExcludeDesc[NS_EXCLUDE_MAX] =
 };
 
 /* Template bot exclude command struture */
-bot_cmd mod_exclude_commands[] =
+bot_cmd exclude_commands[] =
 {
-	{"EXCLUDE",	mod_cmd_exclude,1,	NS_ULEVEL_ADMIN,ns_help_exclude},
+	{"EXCLUDE",		cmd_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude},
 	NS_CMD_END()
 };
 
@@ -142,17 +139,19 @@ static int ProcessExcludeList( list_t *exclude_list, ExcludeHandler handler, voi
 {
 	lnode_t *node;
 	Exclude *exclude;
+	int ret = 0;
 
 	SET_SEGV_LOCATION();
 	node = list_first( exclude_list );
 	while( node )
 	{
 		exclude = lnode_get( node );
-		if( handler( exclude, v ) == NS_TRUE )
-			return NS_TRUE;
+		ret = handler( exclude, v );
+		if( ret != 0 )
+			break;
 		node = list_next( exclude_list, node );
 	}
-	return NS_FALSE;
+	return ret;
 }
 
 /** @brief new_exclude
@@ -176,7 +175,7 @@ static void new_exclude( list_t *exclude_list, const void *data )
 	dlog( DEBUG2, "Added exclusion %s (%d) by %s on %d", exclude->pattern, exclude->type, exclude->addedby,( int )exclude->addedon );
 }
 
-/** @brief new_global_exclude
+/** @brief load_exclude
  *
  *  Table load handler
  *  Database row handler to load global exclude data
@@ -188,27 +187,11 @@ static void new_exclude( list_t *exclude_list, const void *data )
  *  @return NS_TRUE to abort load or NS_FALSE to continue loading
  */
 
-static int new_global_exclude( void *data, int size )
+static int load_exclude( void *data, int size )
 {
-	new_exclude( exclude_list, data );
-	return NS_FALSE;
-}
-
-/** @brief new_mod_exclude
- *
- *  Table load handler
- *  Database row handler to load module exclude data
- *  Exclusion sub system use only
- *
- *  @param data pointer to table row data
- *  @param size of loaded data
- *
- *  @return NS_TRUE to abort load or NS_FALSE to continue loading
- */
-
-static int new_mod_exclude( void *data, int size )
-{
-	new_exclude( GET_CUR_MODULE()->exclude_list, data );
+	/* Only add exclude data of the correct struct size */
+	if( size == sizeof( Exclude ) )
+		new_exclude( GET_CUR_MODULE()->exclude_list, data );
 	return NS_FALSE;
 }
 
@@ -222,38 +205,20 @@ static int new_mod_exclude( void *data, int size )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int InitExcludes( void ) 
+int InitExcludes( Module *mod_ptr )
 {
-	exclude_list = list_create( -1 );
-	if( !exclude_list ) {
+	SET_SEGV_LOCATION();
+	mod_ptr->exclude_list = list_create( MAX_EXCLUDES );
+	if( !mod_ptr->exclude_list )
+	{
 		nlog( LOG_CRITICAL, "Unable to create exclude list" );
 		return NS_FAILURE;
 	}
-	DBAFetchRows( "exclusions", new_global_exclude );
+	mod_ptr->exclude_cmd_list = ns_malloc( sizeof( exclude_commands ) );
+	os_memcpy( mod_ptr->exclude_cmd_list, exclude_commands, sizeof( exclude_commands ) );
+	DBAFetchRows( "exclusions", load_exclude );
 	return NS_SUCCESS;
 } 
-
-/** @brief InitModExcludes
- *
- *  Initialise module exclusion system and load existing exclusions
- *  NeoStats core use only
- *
- *  @param mod_ptr pointer to module to initialise
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-int InitModExcludes( Module *mod_ptr )
-{
-	SET_SEGV_LOCATION();
-	mod_ptr->exclude_list = list_create( MAX_MOD_EXCLUDES );
-	mod_ptr->exclude_cmd_list = ns_malloc( sizeof( mod_exclude_commands ) );
-	os_memcpy( mod_ptr->exclude_cmd_list, mod_exclude_commands, sizeof( mod_exclude_commands ) );
-	SET_RUN_LEVEL( mod_ptr );	
-	DBAFetchRows( "exclusions", new_mod_exclude );
-	RESET_RUN_LEVEL();
-	return NS_SUCCESS;
-}
 
 /** @brief FiniExcludes
  *
@@ -267,7 +232,7 @@ int InitModExcludes( Module *mod_ptr )
 
 void FiniExcludes( void )
 {
-	list_destroy_auto( exclude_list );
+	list_destroy_auto( GET_CUR_MODULE()->exclude_list );
 }
 
 /** @brief FiniModExcludes
@@ -345,7 +310,7 @@ static int AddExclude( list_t *exclude_list, NS_EXCLUDE type, const CmdParams *c
 	return NS_SUCCESS;
 }
 
-/** @brief do_exclude_add
+/** @brief cmd_exclude_add
  *
  *  EXCLUDE ADD command handler
  *  Adds exclude to exclusion list
@@ -360,7 +325,7 @@ static int AddExclude( list_t *exclude_list, NS_EXCLUDE type, const CmdParams *c
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int do_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
+static int cmd_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 {
 	if( cmdparams->ac < 4 )
 		return NS_ERR_NEED_MORE_PARAMS;
@@ -409,39 +374,7 @@ static int do_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 	return NS_SUCCESS;
 } 
 
-/** @brief ns_cmd_exclude_add
- *
- *  EXCLUDE ADD command handler for global exclusions
- *  Adds exclude to global exclusion list
- *  Exclusion sub system use only
- *
- *  @param cmdparams
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_exclude_add( const CmdParams *cmdparams ) 
-{
-	return do_exclude_add( exclude_list, cmdparams );
-} 
-
-/** @brief mod_cmd_exclude_add
- *
- *  EXCLUDE ADD command handler for module exclusions
- *  Adds exclude to module exclusion list
- *  Exclusion sub system use only
- *
- *  @param cmdparams
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int mod_cmd_exclude_add( CmdParams *cmdparams )
-{
-	return do_exclude_add( GET_CUR_MODULE()->exclude_list, cmdparams );
-}
-
-/** @brief do_exclude_del
+/** @brief cmd_exclude_del
  *
  *  EXCLUDE DEL command handler
  *  Deletes exclusion from exclusion list
@@ -454,7 +387,7 @@ static int mod_cmd_exclude_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int do_exclude_del( list_t *exclude_list, const CmdParams *cmdparams ) 
+static int cmd_exclude_del( list_t *exclude_list, const CmdParams *cmdparams ) 
 {
 	lnode_t *node;
 	Exclude *exclude;
@@ -480,38 +413,6 @@ static int do_exclude_del( list_t *exclude_list, const CmdParams *cmdparams )
 	return NS_SUCCESS;
 } 
 
-/** @brief ns_cmd_exclude_del
- *
- *  EXCLUDE DEL global command handler
- *  Deletes exclusion from global exclusion list
- *  Exclusion sub system use only
- *
- *  @param cmdparams
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_exclude_del( const CmdParams *cmdparams ) 
-{
-	return do_exclude_del( exclude_list, cmdparams );
-} 
-
-/** @brief mod_cmd_exclude_del
- *
- *  EXCLUDE DEL module command handler
- *  Deletes exclusion from module exclusion list
- *  Exclusion sub system use only
- *
- *  @param cmdparams
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int mod_cmd_exclude_del( const CmdParams *cmdparams )
-{
-	return do_exclude_del( GET_CUR_MODULE()->exclude_list, cmdparams );
-}
-
 /** @brief ReportExcludeHandler
  *
  *  Report exclusions to user
@@ -531,7 +432,7 @@ static int ReportExcludeHandler( Exclude *exclude, void *v )
 	return NS_FALSE;
 }
 
-/** @brief do_exclude_list
+/** @brief cmd_exclude_list
  *
  *  EXCLUDE LIST command handler
  *  List exclusions
@@ -543,7 +444,7 @@ static int ReportExcludeHandler( Exclude *exclude, void *v )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int do_exclude_list( list_t *exclude_list, const CmdParams *cmdparams ) 
+static int cmd_exclude_list( list_t *exclude_list, const CmdParams *cmdparams ) 
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Exclusion list:", cmdparams->source ) );
 	ProcessExcludeList( exclude_list, ReportExcludeHandler, ( void * )cmdparams );
@@ -551,63 +452,7 @@ static int do_exclude_list( list_t *exclude_list, const CmdParams *cmdparams )
 	return NS_SUCCESS;
 } 
 
-/** @brief ns_cmd_exclude_list
- *
- *  EXCLUDE LIST command handler
- *  List global exclusions
- *  Exclusion sub system use only
- *
- *  @param cmdparams
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int ns_cmd_exclude_list( const CmdParams *cmdparams ) 
-{
-	return do_exclude_list( exclude_list, cmdparams );
-} 
-
-/** @brief mod_cmd_exclude_list
- *
- *  EXCLUDE LIST command handler
- *  List module exclusions
- *  Exclusion sub system use only
- *
- *  @param cmdparams
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int mod_cmd_exclude_list( const CmdParams *cmdparams )
-{
-	return do_exclude_list( GET_CUR_MODULE()->exclude_list, cmdparams );
-}
-
-/** @brief ns_cmd_exclude
- *
- *  EXCLUDE command handler
- *  Manage global exclusions
- *  Exclusion sub system use only
- *
- *  @param cmdparams
- *    cmdparams->av[0] = subcommand( one of ADD, DEL, LIST )
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-int ns_cmd_exclude( CmdParams *cmdparams ) 
-{
-	SET_SEGV_LOCATION();
-	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
-		return ns_cmd_exclude_add( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
-		return ns_cmd_exclude_del( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
-		return ns_cmd_exclude_list( cmdparams );
-	return NS_ERR_SYNTAX_ERROR;
-}
-
-/** @brief mod_cmd_exclude
+/** @brief cmd_exclude
  *
  *  EXCLUDE command handler
  *  Manage module exclusions
@@ -619,15 +464,15 @@ int ns_cmd_exclude( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int mod_cmd_exclude( CmdParams *cmdparams )
+static int cmd_exclude( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
-		return mod_cmd_exclude_add( cmdparams );
+		return cmd_exclude_add( GET_CUR_MODULE()->exclude_list, cmdparams );
 	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
-		return mod_cmd_exclude_del( cmdparams );
+		return cmd_exclude_del( GET_CUR_MODULE()->exclude_list, cmdparams );
 	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
-		return mod_cmd_exclude_list( cmdparams );
+		return cmd_exclude_list( GET_CUR_MODULE()->exclude_list, cmdparams );
 	return NS_ERR_SYNTAX_ERROR;
 }
 
@@ -689,7 +534,7 @@ void ns_do_exclude_user( Client *u )
 	 	u->flags |= NS_FLAG_EXCLUDED;
 		return;
 	}	
-	ProcessExcludeList( exclude_list, ExcludeUserHandler, ( void * )u );
+	ProcessExcludeList( ns_module.exclude_list, ExcludeUserHandler, ( void * )u );
 }
 
 /** @brief ModExcludeUserHandler
@@ -775,7 +620,7 @@ void ns_do_exclude_server( Client *s )
 {
 	Exclude *foundexclude;
 
-	foundexclude = FindExclude( exclude_list, NS_EXCLUDE_SERVER, s->name );
+	foundexclude = FindExclude( ns_module.exclude_list, NS_EXCLUDE_SERVER, s->name );
 	if( foundexclude )
 	{
 		dlog( DEBUG1, "Excluding server %s against %s", s->name, foundexclude->pattern );
@@ -801,7 +646,7 @@ void ns_do_exclude_chan( Channel *c )
 {
 	Exclude *foundexclude;
 
-	foundexclude = FindExclude( exclude_list, NS_EXCLUDE_CHANNEL, c->name );
+	foundexclude = FindExclude( ns_module.exclude_list, NS_EXCLUDE_CHANNEL, c->name );
 	if( foundexclude )
 	{
 		dlog( DEBUG1, "Excluding channel %s against %s", c->name, foundexclude->pattern );

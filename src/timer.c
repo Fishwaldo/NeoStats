@@ -36,14 +36,10 @@
 
 /* @brief Module Timer hash list */
 static hash_t *timerhash;
+static struct event *timers;
 
 static int midnight = 0;
 static time_t lastservertimesync = 0;
-
-static int is_midnight( void );
-static void run_mod_timers( int ismidnight );
-
-static struct event *timers;
 
 /** @brief InitTimers
  *
@@ -91,6 +87,116 @@ void FiniTimers( void )
 	event_del( timers );
 	os_free( timers );
 	hash_destroy( timerhash );
+}
+
+/** @brief is_midnight
+ *
+ *  Determine midnight
+ *  Timer subsystem use only.
+ *
+ *  @param none
+ *
+ *  @return 1 if midnight else 0
+ */
+
+static int is_midnight( void )
+{
+	struct tm *ltm = localtime( &me.now );
+
+	if( ltm->tm_hour == 0 && ltm->tm_min == 0 )
+		return 1;
+	return 0;
+}
+
+/** @brief run_mod_timers
+ *
+ *  NeoStats command to run pending timer functions
+ *
+ *  @param ismidnight whether we are at midnight
+ * 
+ *  @return none
+ */
+
+static void run_mod_timers( int ismidnight )
+{
+	struct tm *ts;
+	Timer *timer = NULL;
+	hscan_t tscan;
+	hnode_t *tn;
+
+	ts = gmtime( &me.now );
+	/* First, lets see if any modules have a function that is due to run..... */
+	hash_scan_begin( &tscan, timerhash );
+	while( ( tn = hash_scan_next( &tscan ) ) != NULL )
+	{
+		SET_SEGV_LOCATION();
+		timer = hnode_get( tn );
+		/* If a module is not yet synched, reset it's lastrun */
+		if( !IsModuleSynched( timer->moduleptr ) )
+		{
+			timer->lastrun = ( int ) me.now;
+		}
+		else
+		{
+			switch( timer->type )
+			{
+				/* TIMER_TYPE_DAILY */
+				case TIMER_TYPE_MIDNIGHT:
+					if( !ismidnight )
+						continue;
+					break;
+				case TIMER_TYPE_WEEKLY:
+					if( !ismidnight )
+						continue;
+					if( ts->tm_wday != 0 )
+						continue;
+					break;
+				case TIMER_TYPE_MONTHLY:
+					if( !ismidnight )
+						continue;
+					if( ts->tm_mday != 1 )
+						continue;
+					break;
+				case TIMER_TYPE_INTERVAL:
+					if( me.now - timer->lastrun < timer->interval ) 
+						continue;
+					break;
+				case TIMER_TYPE_COUNTDOWN:
+					if( me.now - timer->lastrun < timer->interval )
+					{
+						timer->interval -= ( me.now - timer->lastrun );
+						timer->lastrun = me.now;
+ 						continue;
+					}
+					break;
+			}
+			if( setjmp( sigvbuf ) == 0 )
+			{
+				dlog( DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name );
+				SET_RUN_LEVEL( timer->moduleptr );
+				if( timer->handler( timer->userptr ) < 0 )
+				{
+					dlog( DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name );
+					hash_scan_delete_destroy_node( timerhash, tn );
+					ns_free( timer );
+				}
+				else
+				{
+					timer->lastrun = ( int ) me.now;
+				}
+				RESET_RUN_LEVEL();
+				if( timer->type == TIMER_TYPE_COUNTDOWN )
+				{
+					hash_scan_delete_destroy_node( timerhash, tn );
+					ns_free( timer );
+				}
+			}
+			else
+			{
+				nlog( LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s", timer->moduleptr->info->name );
+			}
+		}
+	}
 }
 
 /** @brief CheckTimers_cb
@@ -147,25 +253,6 @@ void CheckTimers_cb( int notused, short event, void *arg )
 	
 	/* re-add this timeout */
 	event_add( timers, &tv );
-}
-
-/** @brief is_midnight
- *
- *  Determine midnight
- *  Timer subsystem use only.
- *
- *  @param none
- *
- *  @return 1 if midnight else 0
- */
-
-static int is_midnight( void )
-{
-	struct tm *ltm = localtime( &me.now );
-
-	if( ltm->tm_hour == 0 && ltm->tm_min == 0 )
-		return 1;
-	return 0;
 }
 
 /** @brief create new new_timer
@@ -373,95 +460,4 @@ int ns_cmd_timerlist( CmdParams* cmdparams )
 	}
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "End of list.", cmdparams->source ) );
 	return 0;
-}
-
-/** @brief run_mod_timers
- *
- *  NeoStats command to run pending timer functions
- *
- *  @param ismidnight whether we are at midnight
- * 
- *  @return none
- */
-
-static void run_mod_timers( int ismidnight )
-{
-	struct tm *ts;
-	Timer *timer = NULL;
-	hscan_t tscan;
-	hnode_t *tn;
-
-	ts = gmtime( &me.now );
-	/* First, lets see if any modules have a function that is due to run..... */
-	hash_scan_begin( &tscan, timerhash );
-	while( ( tn = hash_scan_next( &tscan ) ) != NULL )
-	{
-		SET_SEGV_LOCATION();
-		timer = hnode_get( tn );
-		/* If a module is not yet synched, reset it's lastrun */
-		if( !IsModuleSynched( timer->moduleptr ) )
-		{
-			timer->lastrun = ( int ) me.now;
-		}
-		else
-		{
-			switch( timer->type )
-			{
-				/* TIMER_TYPE_DAILY */
-				case TIMER_TYPE_MIDNIGHT:
-					if( !ismidnight )
-						continue;
-					break;
-				case TIMER_TYPE_WEEKLY:
-					if( !ismidnight )
-						continue;
-					if( ts->tm_wday != 0 )
-						continue;
-					break;
-				case TIMER_TYPE_MONTHLY:
-					if( !ismidnight )
-						continue;
-					if( ts->tm_mday != 1 )
-						continue;
-					break;
-				case TIMER_TYPE_INTERVAL:
-					if( me.now - timer->lastrun < timer->interval ) 
-						continue;
-					break;
-				case TIMER_TYPE_COUNTDOWN:
-					if( me.now - timer->lastrun < timer->interval )
-					{
-						timer->interval -= ( me.now - timer->lastrun );
-						timer->lastrun = me.now;
- 						continue;
-					}
-					break;
-			}
-			if( setjmp( sigvbuf ) == 0 )
-			{
-				dlog( DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name );
-				SET_RUN_LEVEL( timer->moduleptr );
-				if( timer->handler( timer->userptr ) < 0 )
-				{
-					dlog( DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name );
-					hash_scan_delete_destroy_node( timerhash, tn );
-					ns_free( timer );
-				}
-				else
-				{
-					timer->lastrun = ( int ) me.now;
-				}
-				RESET_RUN_LEVEL();
-				if( timer->type == TIMER_TYPE_COUNTDOWN )
-				{
-					hash_scan_delete_destroy_node( timerhash, tn );
-					ns_free( timer );
-				}
-			}
-			else
-			{
-				nlog( LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s", timer->moduleptr->info->name );
-			}
-		}
-	}
 }

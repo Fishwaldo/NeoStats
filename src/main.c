@@ -258,7 +258,7 @@ static int InitCore( void )
 		return NS_FAILURE;
 	if( InitDns() != NS_SUCCESS )
 		return NS_FAILURE;
-	if( InitExcludes() != NS_SUCCESS )
+	if( InitExcludes( &ns_module ) != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitServers() != NS_SUCCESS )
 		return NS_FAILURE;

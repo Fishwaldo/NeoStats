@@ -166,12 +166,16 @@ int UserLevel( Client *u )
 int ns_cmd_level( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( cmdparams->ac < 1 ) {
+	if( cmdparams->ac < 1 )
+	{
 		/* Force recalc user level */
 		cmdparams->source->user->ulevel = -1;
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Your level is %d", cmdparams->source ), UserLevel( cmdparams->source ) );
-	} else {
+	}
+	else
+	{
 		Client * otheruser;
+
 		otheruser = FindUser( cmdparams->av[0] );
 		/* Force recalc user level */
 		otheruser->user->ulevel = -1;

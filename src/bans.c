@@ -49,21 +49,23 @@ static hash_t *banhash;
  *  @return result of handler NS_TRUE or NS_FALSE
  */
 
-int ProcessBanList( BanListHandler handler, void *v )
+int ProcessBanList( const BanListHandler handler, void *v )
 {
 	Ban *ban;
 	hscan_t hs;
 	hnode_t *bansnode;
+	int ret = 0;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, banhash );
 	while( ( bansnode = hash_scan_next( &hs ) ) != NULL )
 	{
 		ban = hnode_get( bansnode );
-		if( handler( ban, v ) == NS_TRUE )
-			return NS_TRUE;
+		ret = handler( ban, v );
+		if( ret != 0 )
+			break;
 	}
-	return NS_FALSE;
+	return ret;
 }
 
 /** @brief new_ban
@@ -209,11 +211,6 @@ static int ListBan( Ban *ban, void *v )
 int ns_cmd_banlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( !nsconfig.debug )
-	{
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "Ban Listing:" ) );
 	ProcessBanList( ListBan, (void *)cmdparams );
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "End of list." ) );

@@ -104,19 +104,18 @@ static bot_cmd ns_commands[] =
 	{"LOAD",		ns_cmd_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load},
 	{"UNLOAD",		ns_cmd_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload},
 	{"JUPE",		ns_cmd_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe},
-	{"EXCLUDE",		ns_cmd_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude},
 #ifdef USE_RAW																
 	{"RAW",			ns_cmd_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw},
 #endif																	
-	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist},
-	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist},
-	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist},
 	NS_CMD_END()
 };
 
 /** Bot comand table */
 static bot_cmd ns_debug_commands[] =
 {
+	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist},
+	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist},
+	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist},
 	{"USERLIST",	ns_cmd_userlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_userlist},
 	{"CHANNELLIST",	ns_cmd_channellist,	0, 	NS_ULEVEL_ROOT,  	ns_help_channellist},
 	{"SERVERLIST",	ns_cmd_serverlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverlist},
@@ -243,6 +242,7 @@ int init_services_bot( void )
 	SetModuleInSynch( &ns_module );
 	ns_botptr = AddBot( &ns_botinfo );
 	add_services_set_list( ns_debugsettings );
+	add_services_cmd_list( ns_module.exclude_cmd_list );
 	AddEventList( neostats_events );
 	SetModuleSynched( &ns_module );
 	me.synched = 1;

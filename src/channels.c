@@ -568,11 +568,6 @@ int ns_cmd_channellist( CmdParams *cmdparams )
 	Channel *c;
 
 	SET_SEGV_LOCATION();
-	if( !nsconfig.debug )
-	{
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "================CHANLIST================",cmdparams->source ) );
 	if( cmdparams->ac < 1 )
 	{
@@ -791,21 +786,23 @@ char *GetRandomChannelKey( int length )
  *  @return NS_SUCCESS
  */
 
-int ProcessChannelList( ChannelListHandler handler, void *v )
+int ProcessChannelList( const ChannelListHandler handler, void *v )
 {
 	hnode_t *node;
 	hscan_t scan;
 	Channel *c;
+	int ret = 0;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &scan, channelhash );
 	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		c = hnode_get( node );
-		if( handler( c, v ) == NS_TRUE )
+		ret = handler( c, v );
+		if( ret != 0 )
 			break;
 	}
-	return NS_SUCCESS;
+	return ret;
 }
 
 /** @brief ProcessChannelMembers
@@ -820,20 +817,22 @@ int ProcessChannelList( ChannelListHandler handler, void *v )
  *  @return NS_SUCCESS
  */
 
-int ProcessChannelMembers( Channel *c, ChannelMemberListHandler handler, void *v )
+int ProcessChannelMembers( Channel *c, const ChannelMemberListHandler handler, void *v )
 {
  	ChannelMember *cm;
 	lnode_t *cmn;
+	int ret = 0;
 
 	cmn = list_first( c->members );
 	while( cmn )
 	{
 		cm = lnode_get( cmn );
-		if( handler( c, cm, v ) == NS_TRUE )
+		ret = handler( c, cm, v );
+		if( ret != 0 )
 			break;
 		cmn = list_next( c->members, cmn );
 	}
-	return NS_SUCCESS;
+	return ret;
 }
 
 /** @brief AllocChannelModPtr

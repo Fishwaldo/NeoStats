@@ -129,13 +129,13 @@ static void del_server_leaves( Client * hub )
 {
 	Client *s;
 	hscan_t ss;
-	hnode_t *sn;
+	hnode_t *node;
 
 	dlog( DEBUG1, "del_server_leaves: %s", hub->name );
 	hash_scan_begin( &ss, serverhash );
-	while( ( sn = hash_scan_next( &ss ) ) != NULL )
+	while( ( node = hash_scan_next( &ss ) ) != NULL )
 	{
-		s = hnode_get( sn );
+		s = hnode_get( node );
 		if( ircstrcasecmp( hub->name, s->uplinkname ) == 0 )
 		{
 			dlog( DEBUG1, "del_server_leaves: server %s had uplink %s", s->name, hub->name );
@@ -159,16 +159,16 @@ void DelServer( const char *name, const char *reason )
 {
 	CmdParams *cmdparams;
 	Client *s;
-	hnode_t *sn;
+	hnode_t *node;
 
 	dlog( DEBUG1, "DelServer: %s", name );
-	sn = hash_lookup( serverhash, name );
-	if( !sn )
+	node = hash_lookup( serverhash, name );
+	if( !node )
 	{
 		nlog( LOG_WARNING, "DelServer: squit from unknown server %s", name );
 		return;
 	}
-	s = hnode_get( sn );
+	s = hnode_get( node );
 	if( ircd_srv.protocol & PROTOCOL_NOQUIT )
 	{
 		del_server_leaves( s );
@@ -182,7 +182,7 @@ void DelServer( const char *name, const char *reason )
 		cmdparams->param = ( char *)reason;
 	SendAllModuleEvent( EVENT_SQUIT, cmdparams );
 	ns_free( cmdparams );
-	hash_scan_delete_destroy_node( serverhash, sn );
+	hash_scan_delete_destroy_node( serverhash, node );
 	ns_free( s->server );
 	ns_free( s );
 }
@@ -201,12 +201,12 @@ Client *find_server_base64( const char *num )
 {
 	Client *s;
 	hscan_t ss;
-	hnode_t *sn;
+	hnode_t *node;
 
 	hash_scan_begin( &ss, serverhash );
-	while( ( sn = hash_scan_next( &ss ) ) != NULL )
+	while( ( node = hash_scan_next( &ss ) ) != NULL )
 	{
-		s = hnode_get( sn );
+		s = hnode_get( node );
 		if( strncmp( s->name64, num, BASE64SERVERSIZE ) == 0 )
 		{
 			dlog( DEBUG1, "find_server_base64: %s -> %s", num, s->name );
@@ -229,11 +229,11 @@ Client *find_server_base64( const char *num )
 
 Client *FindServer( const char *name )
 {
-	hnode_t *sn;
+	hnode_t *node;
 
-	sn = hash_lookup( serverhash, name );
-	if( sn )
-		return( Client * ) hnode_get( sn );
+	node = hash_lookup( serverhash, name );
+	if( node )
+		return( Client * ) hnode_get( node );
 	dlog( DEBUG3, "FindServer: %s not found!", name );
 	return NULL;
 }
@@ -284,11 +284,6 @@ int ns_cmd_serverlist( CmdParams *cmdparams )
 	Client *s;
 
 	SET_SEGV_LOCATION();
-	if( !nsconfig.debug )
-	{
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "\2Error:\2 debug mode disabled", cmdparams->source ) );
-	   	return NS_FAILURE;
-	}
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "===============SERVERLIST===============" ) );
 	if( cmdparams->ac < 1 )
 	{
@@ -379,14 +374,14 @@ void PingServers( void )
 void FiniServers( void )
 {
 	Client *s;
-	hnode_t *sn;
+	hnode_t *node;
 	hscan_t hs;
 
 	hash_scan_begin( &hs, serverhash );
-	while( ( sn = hash_scan_next( &hs ) ) != NULL )
+	while( ( node = hash_scan_next( &hs ) ) != NULL )
 	{
-		s = hnode_get( sn );
-		hash_scan_delete_destroy_node( serverhash, sn );
+		s = hnode_get( node );
+		hash_scan_delete_destroy_node( serverhash, node );
 		ns_free( s->server );
 		ns_free( s );
 	}
@@ -404,21 +399,23 @@ void FiniServers( void )
  *  @return NS_SUCCESS
  */
 
-int ProcessServerList( ServerListHandler handler, void *v )
+int ProcessServerList( const ServerListHandler handler, void *v )
 {
 	hnode_t *node;
 	hscan_t scan;
-	Client *ss;
+	Client *s;
+	int ret = 0;
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &scan, serverhash );
 	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
-		ss = hnode_get( node );
-		if( handler( ss, v ) == NS_TRUE )
+		s = hnode_get( node );
+		ret = handler( s, v );
+		if( ret != 0 )
 			break;
 	}
-	return NS_SUCCESS;
+	return ret;
 }
 
 /** @brief TransverseMap
@@ -434,16 +431,16 @@ int ProcessServerList( ServerListHandler handler, void *v )
  *  @return none
  */
 
-static void TransverseMap( ServerMapHandler handler, int useexclusions, const char *uplink, int depth, void *v )
+static void TransverseMap( const ServerMapHandler handler, int useexclusions, const char *uplink, int depth, void *v )
 {
 	hscan_t hs;
-	hnode_t *sn;
+	hnode_t *node;
 	Client *s;
 
 	hash_scan_begin( &hs, serverhash );
-	while( ( sn = hash_scan_next( &hs ) ) )
+	while( ( node = hash_scan_next( &hs ) ) )
 	{
-		s = hnode_get( sn );
+		s = hnode_get( node );
 		/*printf( "%d %s %s (%s)\n", depth, s->name, s->uplink ? s->uplink->name : "", uplink );*/
 		if( ( depth == 0 ) && ( s->uplinkname[0] == 0 ) )
 		{
@@ -476,7 +473,7 @@ static void TransverseMap( ServerMapHandler handler, int useexclusions, const ch
  *  @return none
  */
 
-void ProcessServerMap( ServerMapHandler handler, int useexclusions, void *v )
+void ProcessServerMap( const ServerMapHandler handler, int useexclusions, void *v )
 {
 	TransverseMap( handler, useexclusions, "", 0, v );
 }

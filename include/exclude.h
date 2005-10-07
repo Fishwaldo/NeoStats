@@ -24,15 +24,13 @@
 #ifndef _EXCLUDE_H_
 #define _EXCLUDE_H_
 
-int InitExcludes( void );
+int InitExcludes( Module *mod_ptr );
 void FiniExcludes( void );
-int InitModExcludes( Module *mod_ptr );
 void AddBotExcludeCommands( Bot *botptr );
 void FiniModExcludes( Module *mod_ptr );
 
 void ns_do_exclude_chan( Channel *c );
 void ns_do_exclude_server( Client *s );
 void ns_do_exclude_user( Client *u );
-int ns_cmd_exclude( CmdParams *cmdparams );
 
 #endif /* _EXCLUDE_H_ */

@@ -1541,25 +1541,25 @@ EXPORTFUNC void dlog( DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(p
 
 /* List walk handler type */
 typedef int (*ChannelListHandler) ( Channel *c, void *v );
-EXPORTFUNC int ProcessChannelList( ChannelListHandler handler, void *v );
+EXPORTFUNC int ProcessChannelList( const ChannelListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*ChannelMemberListHandler) ( Channel *c, ChannelMember *m, void *v );
-EXPORTFUNC int ProcessChannelMembers( Channel *c, ChannelMemberListHandler handler, void *v );
+EXPORTFUNC int ProcessChannelMembers( Channel *c, const ChannelMemberListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*UserListHandler) ( Client *u, void *v );
-EXPORTFUNC int ProcessUserList( UserListHandler handler, void *v );
+EXPORTFUNC int ProcessUserList( const UserListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*ServerListHandler) ( Client *s, void *v );
-EXPORTFUNC int ProcessServerList( ServerListHandler handler, void *v );
+EXPORTFUNC int ProcessServerList( const ServerListHandler handler, void *v );
 /* List walk handler type */
 typedef void( *ServerMapHandler )( const Client *s, int isroot, int depth, void *v );
-EXPORTFUNC void ProcessServerMap( ServerMapHandler handler, int useexclusions, void *v );
+EXPORTFUNC void ProcessServerMap( const ServerMapHandler handler, int useexclusions, void *v );
 /* List walk handler type */
 typedef int (*ModuleListHandler) ( Module *module_ptr, void *v );
-EXPORTFUNC int ProcessModuleList( ModuleListHandler handler, void *v );
+EXPORTFUNC int ProcessModuleList( const ModuleListHandler handler, void *v );
 /* List walk handler type */
 typedef int (*BanListHandler) ( Ban *ban, void *v );
-EXPORTFUNC int ProcessBanList( BanListHandler handler, void *v );
+EXPORTFUNC int ProcessBanList( const BanListHandler handler, void *v );
 
 EXPORTFUNC int HaveFeature( int mask );
 
