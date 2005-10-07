@@ -38,12 +38,16 @@ typedef struct irc_cmd {
 	unsigned int usage;
 }irc_cmd;
 
+#define IRC_CMD_END() { NULL, NULL, NULL, 0 }
+
 typedef struct mode_init {
 	unsigned char mode;
 	unsigned int mask;
 	unsigned int flags;
 	unsigned char sjoin;
 } mode_init;
+
+#define MODE_INIT_END() {0, 0, 0, 0}
 
 typedef struct ircd_server {
 	int burst;

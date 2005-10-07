@@ -230,14 +230,14 @@ irc_cmd cmd_list[] =
 	{&MSG_SMODE,     0, m_smode,     0},
 	{&MSG_VCTRL,     0, m_vctrl,     0},
 	{&MSG_NETINFO,   0, m_netinfo,   0},
-	{0, 0, 0, 0},
+	IRC_CMD_END()
 };
 
 mode_init chan_umodes[] = 
 {
 	{'h', CUMODE_HALFOP, 0, '%'},
 	{'a', CUMODE_CHANADMIN, 0, '!'},
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init chan_modes[] = 
@@ -253,7 +253,7 @@ mode_init chan_modes[] =
 	{'O', CMODE_OPERONLY, 0},
 	{'R', CMODE_RGSTRONLY, 0},
 	{'S', CMODE_STRIP, 0},	
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
@@ -284,7 +284,7 @@ mode_init user_umodes[] =
 	/* {'d', UMODE_DEBUG}, */
 	{'e', UMODE_DCCWARN},
 	{'W', UMODE_WHOIS},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 mode_init user_smodes[] = 
@@ -297,7 +297,7 @@ mode_init user_smodes[] =
 	{'G', SMODE_GUESTADMIN},
 	{'a', SMODE_COADMIN},
 	{'s', SMODE_SSL},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )

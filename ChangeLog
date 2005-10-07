@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add MODE_INIT_END and IRC_CMD_END macros for protocol table NULL 
+   terminators. (M)
  - Win32: system tray menu options for NeoStats web site and forums. (M)
  - Win32: add right click menu to system tray icon. (M)
  - Win32: minimise to system tray instead of task bar. (M)
@@ -11,7 +13,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
  - HostServ: additional wildcard checks to fix security loophole. (M)
  - Replace SET VERSIONSCAN option with automatic support based on module
    flags. (M)
- - Fix OSX changes which prevent NeoStats running any any platform. (M)
+ - Fix OSX changes which prevent NeoStats running on any platform. (M)
  - Fix a potential security vulnerbility with user supplied strings (F)
  - NeoStats now compiles and runs on Mac OSX (Tiger) (F)
  - Introduce module override to allow a module bot to become the primary source

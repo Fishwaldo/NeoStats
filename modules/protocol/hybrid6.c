@@ -156,22 +156,22 @@ irc_cmd cmd_list[] =
 	/* Command Token Function usage */
 	{&MSG_SERVER, 0, m_server, 0},
 	{&MSG_NICK, 0, m_nick, 0},
-	{0, 0, 0, 0},
+	IRC_CMD_END()
 };
 
 mode_init chan_umodes[] = 
 {
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init chan_modes[] = 
 {
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
 {
-	{0, 0},
+	MODE_INIT_END()
 };
 
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )

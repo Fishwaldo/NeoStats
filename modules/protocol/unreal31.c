@@ -369,7 +369,7 @@ irc_cmd cmd_list[] =
 	{&MSG_SWHOIS, &TOK_SWHOIS, m_swhois, 0},
 	{&MSG_SMO, &TOK_SMO, m_smo, 0},
 	{&MSG_TKL, &TOK_TKL, m_tkl, 0},
-	{0, 0, 0, 0},
+	IRC_CMD_END()
 };
 
 mode_init chan_umodes[] = 
@@ -377,7 +377,7 @@ mode_init chan_umodes[] =
 	{'h', CUMODE_HALFOP, 0, '%'},
 	{'a', CUMODE_CHANPROT, 0, '*'},
 	{'q', CUMODE_CHANOWNER, 0, '~'},
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init chan_modes[] = 
@@ -400,7 +400,7 @@ mode_init chan_modes[] =
 	{'u', CMODE_AUDITORIUM, 0},
 	{'z', CMODE_ONLYSECURE, 0},
 	{'N', CMODE_NONICKCHANGE, 0},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
@@ -432,7 +432,7 @@ mode_init user_umodes[] =
 	{'W', UMODE_WHOIS},
 	{'z', UMODE_SECURE},
 	{'v', UMODE_VICTIM},	
-	{0, 0},
+	MODE_INIT_END()
 };
 
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )

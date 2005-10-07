@@ -58,7 +58,7 @@ static char ircd_smode_char_map[32];
 static mode_init chan_umodes_default[] = {
 	{'v', CUMODE_VOICE, 0, '+'},
 	{'o', CUMODE_CHANOP, 0, '@'},
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 static mode_init chan_modes_default[] = {
@@ -71,13 +71,13 @@ static mode_init chan_modes_default[] = {
 	{'t', CMODE_TOPICLIMIT, 0},
 	{'n', CMODE_NOPRIVMSGS, 0},
 	{'i', CMODE_INVITEONLY, 0},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 static mode_init user_umodes_default[] = {
 	{'o', UMODE_OPER},
 	{'i', UMODE_INVISIBLE},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 typedef struct ModeDesc {

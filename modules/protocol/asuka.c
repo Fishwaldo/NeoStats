@@ -256,12 +256,12 @@ irc_cmd cmd_list[] =
 	{&MSG_END_OF_BURST_ACK, &TOK_END_OF_BURST_ACK, _m_ignorecommand, 0},
 	{&MSG_WALLOPS, &TOK_WALLOPS, m_wallops, 0},
 	{&MSG_WALLUSERS, &TOK_WALLUSERS, m_wallusers, 0},
-	{0, 0, 0, 0},
+	IRC_CMD_END()
 };
 
 mode_init chan_umodes[] = 
 {
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init chan_modes[] = 
@@ -272,7 +272,7 @@ mode_init chan_modes[] =
 	{'D', CMODE_DELJOINS, 0},
 	{'u', CMODE_NOQUITPARTS, 0},
 	{'r', CMODE_RGSTRONLY, 0},
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
@@ -290,7 +290,7 @@ mode_init user_umodes[] =
 	{'I', UMODE_NOIDLE},
 	{'R', UMODE_RGSTRONLY},
 	{'X', UMODE_XTRAOP},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 /*

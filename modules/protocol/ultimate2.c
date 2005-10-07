@@ -372,14 +372,14 @@ irc_cmd cmd_list[] =
 	{&MSG_SVSMODE,   0,   m_svsmode,   0},
 	{&MSG_NICK,      &TOK_NICK,      m_nick,      0},
 	{&MSG_VCTRL,     0,     m_vctrl,     0},
-	{0, 0, 0, 0},
+	IRC_CMD_END()
 };
 
 mode_init chan_umodes[] = 
 {
 	{'h', CUMODE_HALFOP, 0, '%'},
 	{'a', CUMODE_CHANADMIN, 0, '!'},
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init chan_modes[] = 
@@ -395,7 +395,7 @@ mode_init chan_modes[] =
 	{'O', CMODE_OPERONLY, 0},
 	{'R', CMODE_RGSTRONLY, 0},
 	{'S', CMODE_STRIP, 0},	
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
@@ -422,7 +422,7 @@ mode_init user_umodes[] =
 	{'f', UMODE_FLOOD},
 	{'x', UMODE_HIDE},
 	{'W', UMODE_WATCHER},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )

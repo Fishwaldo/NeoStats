@@ -304,12 +304,12 @@ irc_cmd cmd_list[] =
 	{&MSG_SVSPART, &TOK_SVSPART, m_svspart, 0},
 	{&MSG_SWHOIS, &TOK_SWHOIS, m_swhois, 0},
 	{&MSG_FAKEHOST, &TOK_FAKEHOST, m_vhost, 0},
-	{0, 0, 0, 0},
+	IRC_CMD_END()
 };
 
 mode_init chan_umodes[] = 
 {
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init chan_modes[] = 
@@ -328,7 +328,7 @@ mode_init chan_modes[] =
 	{'T', CMODE_NOAMSG, 0},
 	{'Z', CMODE_ONLYSECURE, 0},
 	{'r', CMODE_RGSTRONLY, 0},
-	{0, 0, 0},
+	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
@@ -350,7 +350,7 @@ mode_init user_umodes[] =
 	{'I', UMODE_NOIDLE},
 	{'R', UMODE_RGSTRONLY},
 	{'X', UMODE_XTRAOP},
-	{0, 0},
+	MODE_INIT_END()
 };
 
 void send_swhois( const char *source, const char *target, const char *swhois )
