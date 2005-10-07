@@ -203,6 +203,7 @@ static int services_event_ctcpversion( CmdParams *cmdparams )
 
 void InitServices( void )
 {
+	InitExcludes( &ns_module );
 	ModuleConfig( ns_settings );
 }
 

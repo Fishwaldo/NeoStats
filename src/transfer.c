@@ -88,6 +88,11 @@ int InitCurl(void)
 	}
 	/* init the internal list to track downloads */
 	activetransfers = list_create(MAX_TRANSFERS);
+	if( !activetransfers )
+	{
+		nlog( LOG_CRITICAL, "Unable to create transfer list" );
+		return NS_FAILURE;
+	}
 	dlog(DEBUG1, "LibCurl Initialized successfully");
 	return NS_SUCCESS;
 }

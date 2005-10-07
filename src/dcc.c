@@ -26,29 +26,48 @@
 #include "commands.h"
 #include "services.h"
 
+/** DCC subsystem
+ *
+ *  Handle incoming and outgoing CTCP DCC messages
+ */
+
+/* DCC command handler type */
 typedef int( *dcc_cmd_handler )( CmdParams* cmdparams );
 
+/* DCC command lookup table */
 typedef struct dcc_cmd
 {
 	const char* cmd;
 	dcc_cmd_handler req_handler;
 } dcc_cmd;
 
+/* DCC list pointer */
 static list_t *dcclist;
-static int dccoutput = 0;
 
+/* DCC command type prototypes */
 static int dcc_req_send( CmdParams* cmdparams );
 static int dcc_req_chat( CmdParams* cmdparams );
 static int dcc_parse( void *arg, void *line, size_t );
 static int dcc_error( int what, void *arg );
 static int dcc_write( Client *dcc, char *buf );
 
+/* DCC command lookup table */
 static dcc_cmd dcc_cmds[]= 
 {
 	{"SEND", dcc_req_send},
 	{"CHAT", dcc_req_chat},
 	{NULL},
 };
+
+/** @brief AddDCCClient
+ *
+ *  Add DCC client
+ *  DCC subsystem use only.
+ *
+ *  @param cmdparams
+ *
+ *  @return pointer to client structure
+ */
 
 static Client *AddDCCClient( CmdParams *cmdparams )
 {
@@ -65,6 +84,16 @@ static Client *AddDCCClient( CmdParams *cmdparams )
 	return NULL;
 }
 
+/** @brief DelDCCClient
+ *
+ *  Remove DCC client
+ *  DCC subsystem use only.
+ *
+ *  @param pointer to client structure
+ *
+ *  @return none
+ */
+
 static void DelDCCClient( Client *dcc )
 {
 	lnode_t *dccnode;
@@ -76,6 +105,17 @@ static void DelDCCClient( Client *dcc )
 		ns_free( dcc );
 	}
 }
+
+/** @brief DCCChatConnect
+ *
+ *  Initiate DCC connect
+ *  DCC subsystem use only.
+ *
+ *  @param dcc pointer to client structure
+ *  @param port to connect
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
 static int DCCChatConnect( Client *dcc, int port ) 
 {
@@ -103,10 +143,31 @@ static int DCCChatConnect( Client *dcc, int port )
 	return NS_SUCCESS;
 }
 
+/** @brief DCCChatDisconnect
+ *
+ *  End DCC connect
+ *  DCC subsystem use only.
+ *
+ *  @param dcc pointer to client structure
+ *
+ *  @return none
+ */
+
 static void DCCChatDisconnect( Client *dcc )
 {
 	DelSock( dcc->sock );
 }
+
+/** @brief DCCGotAddr
+ *
+ *  DCCGotAddr
+ *  DCC subsystem use only.
+ *
+ *  @param data
+ *  @param a
+ *
+ *  @return none
+ */
 
 static void DCCGotAddr( void *data, adns_answer *a )
 {
@@ -128,6 +189,17 @@ static void DCCGotAddr( void *data, adns_answer *a )
 	return;
 }
 
+/** @brief DCCChatStart
+ *
+ *  DCCChatStart
+ *  DCC subsystem use only.
+ *
+ *  @param dcc
+ *  @param port
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 static int DCCChatStart( Client *dcc, int port )
 {
 	dcc->port = port;
@@ -143,6 +215,17 @@ static int DCCChatStart( Client *dcc, int port )
 	}
 	return NS_SUCCESS;
 }
+
+/** @brief irc_dccmsgall
+ *
+ *  Send message to all DCC clients
+ *  DCC subsystem use only.
+ *
+ *  @param fmt format of message to send
+ *  @param ... parameters to format string
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
 int irc_dccmsgall( const char *fmt, ...)
 {
@@ -163,6 +246,18 @@ int irc_dccmsgall( const char *fmt, ...)
 	}
 	return NS_SUCCESS;
 }
+
+/** @brief dcc_parse
+ *
+ *  dcc_parse
+ *  DCC subsystem use only.
+ *
+ *  @param arg Justin????
+ *  @param rline Justin????
+ *  @param len Justin????
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
 static int dcc_parse( void *arg, void *rline, size_t len )
 {
@@ -212,11 +307,21 @@ static int dcc_parse( void *arg, void *rline, size_t len )
 	return NS_SUCCESS;
 }
 
+/** @brief dcc_write
+ *
+ *  Send message to a DCC client
+ *  DCC subsystem use only.
+ *
+ *  @param dcc client to send to
+ *  @param buf to send
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 static int dcc_write( Client *dcc, char *buf )
 {
 	static char dcc_buf[BUFSIZE];
 
-	dccoutput = 0;
 	dlog( DEBUG1, "DCCTX: %s", buf );
 	strlcpy( dcc_buf, buf, BUFSIZE );
 	strlcat( dcc_buf, "\n", BUFSIZE );
@@ -229,10 +334,32 @@ static int dcc_write( Client *dcc, char *buf )
 	return NS_SUCCESS;
 }
 
+/** @brief dcc_send_msg
+ *
+ *  Send message to a DCC client
+ *  DCC subsystem use only.
+ *
+ *  @param dcc client to send to
+ *  @param buf to send
+ *
+ *  @return none
+ */
+
 void dcc_send_msg( const Client* dcc, char * buf )
 {
 	dcc_write( ( Client * )dcc, buf );
 }
+
+/** @brief dcc_error
+ *
+ *  Justin???
+ *  DCC subsystem use only.
+ *
+ *  @param sock_no Justin???
+ *  @param name Justin???
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
 static int dcc_error( int sock_no, void *name )
 {
@@ -244,6 +371,16 @@ static int dcc_error( int sock_no, void *name )
 	DelSock( sock );
 	return NS_SUCCESS;
 }
+
+/** @brief dcc_req
+ *
+ *  Handle DCC requests
+ *  DCC subsystem use only.
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
 
 int dcc_req( CmdParams* cmdparams )
 {
@@ -266,6 +403,16 @@ int dcc_req( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
+/** @brief dcc_req_send
+ *
+ *  Send DCC CHAT request
+ *  DCC subsystem use only.
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 static int dcc_req_send( CmdParams* cmdparams )
 {
 	dlog( DEBUG5, "DCC SEND request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
@@ -273,7 +420,18 @@ static int dcc_req_send( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-/* RX: :Mark ! neostats :\1DCC CHAT chat 2130706433 1028\1 */
+/** @brief dcc_req_chat
+ *
+ *  Handle DCC CHAT request
+ *  RX: 
+ *    :Mark ! neostats :\1DCC CHAT chat 2130706433 1028\1
+ *  DCC subsystem use only.
+ *
+ *  @param cmdparams
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 static int dcc_req_chat( CmdParams* cmdparams )
 {
 	int userlevel;
@@ -307,11 +465,34 @@ static int dcc_req_chat( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
+/** @brief InitDCC
+ *
+ *  Init DCC subsystem
+ *
+ *  @param none
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
 int InitDCC( void )
 {
 	dcclist = list_create( -1 );
+	if( !dcclist )
+	{
+		nlog( LOG_CRITICAL, "Unable to create DCC list" );
+		return NS_FAILURE;
+	}
 	return NS_SUCCESS;
 }
+
+/** @brief FiniDCC
+ *
+ *  Fini DCC subsystem
+ *
+ *  @param none
+ *
+ *  @return none
+ */
 
 void FiniDCC( void )
 {

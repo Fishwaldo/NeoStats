@@ -41,7 +41,6 @@
 #include "bans.h"
 #include "services.h"
 #include "modules.h"
-#include "auth.h"
 #include "bots.h"
 #include "timer.h"
 #include "signals.h"
@@ -255,8 +254,6 @@ static int InitCore( void )
 	if( InitBots() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitDns() != NS_SUCCESS )
-		return NS_FAILURE;
-	if( InitExcludes( &ns_module ) != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitServers() != NS_SUCCESS )
 		return NS_FAILURE;
