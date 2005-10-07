@@ -575,7 +575,7 @@ static int cb_verify_neohost( cfg_t *cfg, cfg_opt_t *opt )
 		cfg_error( cfg, "Invalid hostname %s for option %s", opt->values[0]->string, opt->name );
 		return CFG_PARSE_ERROR;
 	}
-	if ((!ircstrcasecmp(opt->values[0]->string, "stats.neostats.net")) || (!ircstrcasecmp(opt->values[0]->string, "stats.somennet.net"))) {
+	if ((!ircstrcasecmp(opt->values[0]->string, "stats.neostats.net")) || (!ircstrcasecmp(opt->values[0]->string, "stats.somenet.net"))) {
 		cfg_error( cfg, "You must use a hostname other than %s", opt->values[0]->string);
 		return CFG_PARSE_ERROR;
 	}
