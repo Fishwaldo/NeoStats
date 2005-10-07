@@ -105,7 +105,7 @@ static int bot_cmd_set_list( CmdParams *cmdparams )
 				case SET_TYPE_IPV4:	
 				case SET_TYPE_CHANNEL:							
 					irc_prefmsg( cmdparams->bot, cmdparams->source, "%s: %s",
-						set_ptr->option,( char* )set_ptr->varptr );
+						set_ptr->option, ( char* )set_ptr->varptr );
 					break;
 				case SET_TYPE_CUSTOM:
 					if( set_ptr->handler ) {

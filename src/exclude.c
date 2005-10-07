@@ -169,7 +169,7 @@ static void new_exclude( list_t *exclude_list, const void *data )
 	exclude = ns_calloc( sizeof( Exclude ) );
 	os_memcpy( exclude, data, sizeof( Exclude ) );
 	lnode_create_append( exclude_list, exclude );
-	dlog( DEBUG2, "Added exclusion %s (%d) by %s on %d", exclude->pattern, exclude->type, exclude->addedby,( int )exclude->addedon );
+	dlog( DEBUG2, "Added exclusion %s (%d) by %s on %d", exclude->pattern, exclude->type, exclude->addedby, ( int )exclude->addedon );
 }
 
 /** @brief load_exclude
@@ -303,7 +303,7 @@ static int AddExclude( list_t *exclude_list, NS_EXCLUDE type, const CmdParams *c
 	if( nsconfig.cmdreport )
 		irc_chanalert( cmdparams->bot, _( "%s added %s (%s) to the exclusion list" ), cmdparams->source->name, exclude->pattern, cmdparams->av[1] );
 	/* now save the exclusion list */
-	DBAStore( "exclusions", exclude->pattern,( void * )exclude, sizeof( Exclude ) );
+	DBAStore( "exclusions", exclude->pattern, ( void * )exclude, sizeof( Exclude ) );
 	return NS_SUCCESS;
 }
 

@@ -150,7 +150,7 @@ static void serverlisthandler( const serverstat *ss, const void *v )
 {
 	os_fprintf( opf, "<tr><td height=\"4\"></td>\n" );
 	os_fprintf( opf, "<td height=\"4\"><a href=\"#%s\"> %s (%s)</a></td></tr>\n",
-		ss->name, ss->name,( ss->s ) ? "ONLINE" : "OFFLINE" );
+		ss->name, ss->name, ( ss->s ) ? "ONLINE" : "OFFLINE" );
 }
 
 /** @brief html_srvlist
@@ -188,11 +188,11 @@ static void serverlistdetailhandler( const serverstat *ss, const void *v )
 			sftime( ss->ts_lastseen ) );
 	} else {
 		os_fprintf( opf,"<tr><td>Current Users:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
-			ss->users.current,( int )( ( ( float ) ss->users.current /( float ) networkstats.users.current ) * 100 ),
+			ss->users.current, ( int )( ( ( float ) ss->users.current /( float ) networkstats.users.current ) * 100 ),
 			ss->users.alltime.max, sftime( ss->users.alltime.ts_max ) );
 		os_fprintf( opf,
 			"<tr><td>Current Opers:</td><td>%d (%d%%)</td><td>Max %d at %s</td></tr>\n",
-			ss->opers.current,( int )( ( ( float ) ss->opers.current /( float ) networkstats.opers.current ) * 100 ),
+			ss->opers.current, ( int )( ( ( float ) ss->opers.current /( float ) networkstats.opers.current ) * 100 ),
 			ss->opers.alltime.max, sftime( ss->opers.alltime.ts_max ) );
 	}
 	os_fprintf( opf, "<tr><td>Total Users Connected:</td><td colspan = 2>%d</td></tr>",
@@ -620,7 +620,7 @@ static void HTMLMapHandler( const Client *s, int isroot, int depth, void *v )
 		/* its the root server */
 		os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 			ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-			(int)s->server->ping,( int )ss->highest_ping );
+			(int)s->server->ping, ( int )ss->highest_ping );
 	}
 	else
 	{
@@ -629,7 +629,7 @@ static void HTMLMapHandler( const Client *s, int isroot, int depth, void *v )
 		{
 			os_fprintf( opf, "<tr><td>%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-				(int)s->server->ping,( int )ss->highest_ping );
+				(int)s->server->ping, ( int )ss->highest_ping );
 		}
 		else
 		{
@@ -638,7 +638,7 @@ static void HTMLMapHandler( const Client *s, int isroot, int depth, void *v )
 				strlcat( buf, "&nbsp&nbsp&nbsp&nbsp&nbsp|", MAPBUFSIZE );
 			os_fprintf( opf, "<tr><td>%s\\_%s</td><td>%d/%d</td><td>%d/%d</td><td>%d/%d</td></tr>\n",
 				buf, ss->name, s->server->users, ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
-				(int)s->server->ping,( int )ss->highest_ping );
+				(int)s->server->ping, ( int )ss->highest_ping );
 		}
 	}
 }
@@ -696,7 +696,7 @@ void HTMLOutput( void )
 		while( htmlfuncptr->directive ) {
 			buftemp = strstr( bufptr, htmlfuncptr->directive );
 			if( buftemp ) {
-				os_fwrite( bufptr,( int )buftemp -( int )bufptr, 1, opf );
+				os_fwrite( bufptr, ( int )buftemp -( int )bufptr, 1, opf );
 				htmlfuncptr->handler();
 				bufptr = buftemp + strlen( htmlfuncptr->directive );
 			}		
@@ -704,7 +704,7 @@ void HTMLOutput( void )
 		}
 		buftemp = strcasestr( bufptr, "</html>" );
 		if( buftemp ) {
-			os_fwrite( bufptr,( int )buftemp -( int )bufptr, 1, opf );
+			os_fwrite( bufptr, ( int )buftemp -( int )bufptr, 1, opf );
 			put_copyright();
 			bufptr = buftemp;
 			os_fputs( bufptr, opf );

@@ -171,7 +171,7 @@ void CloseLogs( void )
 		logentry = hnode_get( hn );
 		logentry->flush = 0;
 #ifdef DEBUG
-		printf( "Closing Logfile %s (%s)\n", logentry->name,( char * ) hnode_getkey( hn ) );
+		printf( "Closing Logfile %s (%s)\n", logentry->name, ( char * ) hnode_getkey( hn ) );
 #endif
 		if( logentry->logfile )
 		{
@@ -214,7 +214,7 @@ void ResetLogs( void )
 		}
 		logentry->flush = 0;
 #ifdef DEBUG
-		printf( "Closing Logfile %s (%s)\n", logentry->name,( char * ) hnode_getkey( hn ) );
+		printf( "Closing Logfile %s (%s)\n", logentry->name, ( char * ) hnode_getkey( hn ) );
 #endif
 		/* make new file name but do not open until needed to avoid 0 length files*/
 		make_log_filename( logentry->name, logentry->logname );

@@ -290,7 +290,7 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 {
 	send_cmd( "%s %s", MSG_PASS, pass );
 	send_cmd( "%s %s", MSG_NICK, "NeoStats" );
-	send_cmd( "%s %s %d %d :%s", MSG_USER, "user",( int ) me.now,( int ) me.now, "real name" );
+	send_cmd( "%s %s %d %d :%s", MSG_USER, "user", ( int ) me.now, ( int ) me.now, "real name" );
 }
 
 void send_cmode( const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, const unsigned long ts )
@@ -311,7 +311,7 @@ void send_swhois( const char *source, const char *target, const char *swhois )
 /* akill is gone in the latest Unreals, so we set Glines instead */
 void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
-	send_cmd( ":%s %s + G %s %s %s %lu %lu :%s", source, MSG_TKL, ident, host, setby,( ts + length ), ts, reason );
+	send_cmd( ":%s %s + G %s %s %s %lu %lu :%s", source, MSG_TKL, ident, host, setby, ( ts + length ), ts, reason );
 }
 
 void send_rakill( const char *source, const char *host, const char *ident )

@@ -80,7 +80,7 @@ static ss_ctcp_version *findctcpversion( const char *name )
  */
 static void SaveClientVersion( const ss_ctcp_version *cv, const void *v )
 {
-	DBAStore( CTCPVERSION_TABLE, cv->name,( void *)cv, sizeof( ss_ctcp_version));
+	DBAStore( CTCPVERSION_TABLE, cv->name, ( void *)cv, sizeof( ss_ctcp_version));
 	dlog( DEBUG2, "Save version %s", cv->name );
 }
 

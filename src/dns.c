@@ -328,7 +328,7 @@ void do_dns (int notused, short event, void *arg)
 		status = adns_check (ads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
-			dlog(DEBUG2, "DNS: Lookup hasn't completed for %s",(char *) &dnsdata->lookupdata);
+			dlog(DEBUG2, "DNS: Lookup hasn't completed for %s", (char *) &dnsdata->lookupdata);
 			dnsnode = list_next (dnslist, dnsnode);
 		} else if (status) {
 			nlog (LOG_CRITICAL, "DNS: Bad error on adns_check: %s. Please report to NeoStats", strerror (status));

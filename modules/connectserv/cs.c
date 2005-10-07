@@ -176,15 +176,15 @@ ModuleInfo module_info =
 /** Bot setting table */
 static bot_setting cs_settings[] =
 {
-	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_signwatch, cs_set_sign_watch_cb,( void* )1 },
-	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_killwatch, cs_set_kill_watch_cb,( void* )1 },
-	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_modewatch, cs_set_mode_watch_cb,( void* )1 },
-	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_nickwatch, cs_set_nick_watch_cb,( void* )1 },
-	{"AWAYWATCH",	&cs_cfg.away_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_awaywatch, cs_set_away_watch_cb,( void* )1 },
-	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_servwatch, cs_set_serv_watch_cb,( void* )1 },
-	{"EXCLUSIONS",	&cs_cfg.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_exclusions, cs_set_exclusions_cb,( void* )1 },
-	{"LOGGING",	&cs_cfg.logging,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_logging, NULL,( void* )1 },
-	{"COLOUR",	&cs_cfg.colour,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_colour, NULL,( void* )0 },
+	{"SIGNWATCH",	&cs_cfg.sign_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_signwatch, cs_set_sign_watch_cb, ( void* )1 },
+	{"KILLWATCH",	&cs_cfg.kill_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_killwatch, cs_set_kill_watch_cb, ( void* )1 },
+	{"MODEWATCH",	&cs_cfg.mode_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_modewatch, cs_set_mode_watch_cb, ( void* )1 },
+	{"NICKWATCH",	&cs_cfg.nick_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_nickwatch, cs_set_nick_watch_cb, ( void* )1 },
+	{"AWAYWATCH",	&cs_cfg.away_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_awaywatch, cs_set_away_watch_cb, ( void* )1 },
+	{"SERVWATCH",	&cs_cfg.serv_watch,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_servwatch, cs_set_serv_watch_cb, ( void* )1 },
+	{"EXCLUSIONS",	&cs_cfg.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_exclusions, cs_set_exclusions_cb, ( void* )1 },
+	{"LOGGING",	&cs_cfg.logging,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_logging, NULL, ( void* )1 },
+	{"COLOUR",	&cs_cfg.colour,		SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	cs_help_set_colour, NULL, ( void* )0 },
 	NS_SETTING_END()
 };
 

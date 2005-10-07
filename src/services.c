@@ -125,18 +125,18 @@ static bot_cmd ns_debug_commands[] =
 /** Bot setting table */
 static bot_setting ns_settings[] =
 {
-	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgsampletime, NULL,( void * )10 },
-	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,		SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgthreshold, NULL,( void * )5 },
-	{"SPLITTIME",		&nsconfig.splittime,		SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_splittime, NULL,( void * )300 },
-	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_joinserviceschan, NULL,( void* )1 },
-	{"PINGTIME",		&nsconfig.pingtime,			SET_TYPE_INT,		0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_pingtime, NULL,( void* )120 },
+	{"MSGSAMPLETIME",	&nsconfig.msgsampletime,	SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgsampletime, NULL, ( void * )10 },
+	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,		SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgthreshold, NULL, ( void * )5 },
+	{"SPLITTIME",		&nsconfig.splittime,		SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_splittime, NULL, ( void * )300 },
+	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_joinserviceschan, NULL, ( void* )1 },
+	{"PINGTIME",		&nsconfig.pingtime,			SET_TYPE_INT,		0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_pingtime, NULL, ( void* )120 },
 	{"SERVICECMODE",	me.servicescmode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_servicecmode, NULL, NULL },
 	{"SERVICEUMODE",	me.servicesumode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_serviceumode, NULL, NULL },
-	{"CMDCHAR",			nsconfig.cmdchar,			SET_TYPE_STRING,	0, 2, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdchar, NULL,( void* )"!" },
-	{"CMDREPORT",		&nsconfig.cmdreport,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdreport, NULL,( void* )1 },
-	{"LOGLEVEL",		&nsconfig.loglevel,			SET_TYPE_INT,		1, 6, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_loglevel, NULL,( void* )5 },
+	{"CMDCHAR",			nsconfig.cmdchar,			SET_TYPE_STRING,	0, 2, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdchar, NULL, ( void* )"!" },
+	{"CMDREPORT",		&nsconfig.cmdreport,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdreport, NULL, ( void* )1 },
+	{"LOGLEVEL",		&nsconfig.loglevel,			SET_TYPE_INT,		1, 6, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_loglevel, NULL, ( void* )5 },
 	{"RECVQ",			&nsconfig.recvq,			SET_TYPE_INT,		1024,10240000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_recvq, NULL, ( void*)2048}, 
-	{"DEBUGCHAN",		nsconfig.debugchan,			SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugchan, NULL,( void* )"#debug" },
+	{"DEBUGCHAN",		nsconfig.debugchan,			SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugchan, NULL, ( void* )"#debug" },
 	NS_SETTING_END()
 };
 
@@ -144,11 +144,11 @@ static bot_setting ns_settings[] =
 static bot_setting ns_debugsettings[] =
 {
 #ifndef DEBUG
-	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, ns_set_debug_cb,( void* )0 },
+	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, ns_set_debug_cb, ( void* )0 },
 #endif
-	{"DEBUGMODULE",		nsconfig.debugmodule,		SET_TYPE_STRING,	0, MAX_MOD_NAME,NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugmodule, NULL,( void* )"all" },
-	{"DEBUGLEVEL",		&nsconfig.debuglevel,		SET_TYPE_INT,		1, 10, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debuglevel, NULL,( void* )0 },
-	{"DEBUGTOCHAN",		&nsconfig.debugtochan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugtochan, NULL,( void* )0 },
+	{"DEBUGMODULE",		nsconfig.debugmodule,		SET_TYPE_STRING,	0, MAX_MOD_NAME,NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugmodule, NULL, ( void* )"all" },
+	{"DEBUGLEVEL",		&nsconfig.debuglevel,		SET_TYPE_INT,		1, 10, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debuglevel, NULL, ( void* )0 },
+	{"DEBUGTOCHAN",		&nsconfig.debugtochan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugtochan, NULL, ( void* )0 },
 	NS_SETTING_END()
 };
 
@@ -344,13 +344,13 @@ static int ns_cmd_status( CmdParams *cmdparams )
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "%s status:", cmdparams->source ), ns_botptr->name );
 	if( uptime > TS_ONE_DAY )
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_DAY,( uptime / TS_ONE_DAY == 1 ) ? "" : "s",( uptime / TS_ONE_HOUR ) % 24,( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE );
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld\2 day%s, \2%02ld:%02ld\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_DAY, ( uptime / TS_ONE_DAY == 1 ) ? "" : "s", ( uptime / TS_ONE_HOUR ) % 24, ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE );
 	else if( uptime > TS_ONE_HOUR )
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_HOUR, uptime / TS_ONE_HOUR == 1 ? "" : "s",( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE,( uptime / 60 ) % TS_ONE_MINUTE == 1 ? "" : "s" );
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld hour%s, %ld minute%s\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_HOUR, uptime / TS_ONE_HOUR == 1 ? "" : "s", ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, ( uptime / 60 ) % TS_ONE_MINUTE == 1 ? "" : "s" );
 	else if( uptime > TS_ONE_MINUTE )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%ld minute%s, %ld second%s\2", cmdparams->source ), ns_botptr->name, uptime / TS_ONE_MINUTE, uptime / TS_ONE_MINUTE == 1 ? "" : "s", uptime % TS_ONE_MINUTE, uptime % TS_ONE_MINUTE == 1 ? "" : "s" );
 	else
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%d second%s\2", cmdparams->source ), ns_botptr->name,( int )uptime, uptime == 1 ? "" : "s" );
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "%s up \2%d second%s\2", cmdparams->source ), ns_botptr->name, ( int )uptime, uptime == 1 ? "" : "s" );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Sent %ld messages, %ld bytes", cmdparams->source ), me.SendM, me.SendBytes );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Received %ld messages, %ld bytes", cmdparams->source ), me.RcveM, me.RcveBytes );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Reconnect time: %d", cmdparams->source ), nsconfig.r_time );

@@ -178,7 +178,7 @@ static int AccessAdd( const CmdParams *cmdparams )
 	access->level = level;
  	hnode_create_insert( accesshash, access, access->nick );
 	/* save the entry */
-	DBAStore( "AccessList", access->nick,( void *)access, sizeof( AccessEntry) );
+	DBAStore( "AccessList", access->nick, ( void *)access, sizeof( AccessEntry) );
 	irc_prefmsg( NULL, cmdparams->source, "Successfully added %s for host %s with level %d to access list", access->nick, access->mask, access->level );
 	return NS_SUCCESS;
 }
@@ -233,7 +233,7 @@ static int AccessList( const CmdParams *cmdparams )
 	AccessEntry *access;
 
 	SET_SEGV_LOCATION();	
-	irc_prefmsg( NULL, cmdparams->source, "Access List (%d):",( int )hash_count( accesshash ) );
+	irc_prefmsg( NULL, cmdparams->source, "Access List (%d):", ( int )hash_count( accesshash ) );
 	hash_scan_begin( &accessscan, accesshash );
 	while( ( node = hash_scan_next( &accessscan ) )!= NULL) 
 	{

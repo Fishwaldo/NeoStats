@@ -305,7 +305,7 @@ static int cmd_add( CmdParams *cmdparams )
 	db = ns_calloc( sizeof( ls_channel ) );
 	strlcpy( db->name, cmdparams->av[0], MAXCHANLEN );
 	hnode_create_insert( qshash, db, db->name );
-	DBAStore( "channels", db->name,( void * )db->name, MAXCHANLEN );
+	DBAStore( "channels", db->name, ( void * )db->name, MAXCHANLEN );
 	CommandReport( ls_bot, "%s added %s to the channel list",
 		cmdparams->source->name, cmdparams->av[0] );
 	nlog( LOG_NOTICE, "%s added %s to the channel list",

@@ -197,7 +197,7 @@ void send_rakill( const char *source, const char *host, const char *ident )
 /* source SJOIN unsigned long chan modes param:" */
 static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
-	do_sjoin( argv[0], argv[1],( ( argc <= 2 ) ? argv[1] : argv[2] ), argv[4], argv, argc );
+	do_sjoin( argv[0], argv[1], ( ( argc <= 2 ) ? argv[1] : argv[2] ), argv[4], argv, argc );
 }
 
 static void m_server( char *origin, char **argv, int argc, int srv )

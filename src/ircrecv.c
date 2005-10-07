@@ -654,7 +654,7 @@ void _m_away( char *origin, char **argv, int argc, int srv )
 		}
 	}
 	else
-		do_away( origin,( argc > 0 ) ? argv[0] : NULL );
+		do_away( origin, ( argc > 0 ) ? argv[0] : NULL );
 }
 
 /** @brief _m_kill
@@ -1650,7 +1650,7 @@ void do_stats( const char *nick, const char *what )
 	if( !ircstrcasecmp( what, "u" ) ) {
 		/* server uptime - Shmad */
 		time_t uptime = me.now - me.ts_boot;
-		irc_numeric( RPL_STATSUPTIME, u->name, __( "Statistical Server up %ld days, %ld:%02ld:%02ld", u ), ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_HOUR ) % 24,( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, uptime % 60 );
+		irc_numeric( RPL_STATSUPTIME, u->name, __( "Statistical Server up %ld days, %ld:%02ld:%02ld", u ), ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_HOUR ) % 24, ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, uptime % 60 );
 	} else if( !ircstrcasecmp( what, "c" ) ) {
 		/* Connections */
 		irc_numeric( RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, me.port );
@@ -1662,7 +1662,7 @@ void do_stats( const char *nick, const char *what )
 		tmp = me.now - me.lastmsg;
 		tmp2 = me.now - me.ts_boot;
 		irc_numeric( RPL_STATSLINKINFO, u->name, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE" );
-		irc_numeric( RPL_STATSLLINE, u->name, "%s 0 %d %d %d %d %d 0 :%d", me.uplink,( int )me.SendM,( int )me.SendBytes,( int )me.RcveM,( int )me.RcveBytes,( int )tmp2,( int )tmp );
+		irc_numeric( RPL_STATSLLINE, u->name, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, ( int )me.SendM, ( int )me.SendBytes, ( int )me.RcveM, ( int )me.RcveBytes, ( int )tmp2, ( int )tmp );
         } else if( !ircstrcasecmp( what, "Z" ) ) {
                 if( UserLevel( u ) >= NS_ULEVEL_ADMIN ) {
                         do_dns_stats_Z( u );
@@ -1958,7 +1958,7 @@ void do_kick( const char *kickby, const char *chan, const char *kicked, const ch
 
 void do_svinfo( void )
 {
-	irc_svinfo( TS_CURRENT, TS_MIN,( unsigned long )me.now );
+	irc_svinfo( TS_CURRENT, TS_MIN, ( unsigned long )me.now );
 }
 
 /** @brief 
@@ -2240,7 +2240,7 @@ void do_setname( const char *nick, const char *realname )
 	u = FindUser( nick );
 	if( u ) {
 		dlog( DEBUG1, "do_setname: setting realname of user %s to %s", nick, realname );
-		strlcpy( u->info,( char *)realname, MAXHOST );
+		strlcpy( u->info, ( char *)realname, MAXHOST );
 	} else {
 		nlog( LOG_WARNING, "do_setname: user %s not found", nick );
 	}
@@ -2277,7 +2277,7 @@ void do_sethost( const char *nick, const char *host )
 	u = FindUser( nick );
 	if( u ) {
 		dlog( DEBUG1, "do_sethost: setting host of user %s to %s", nick, host );
-		strlcpy( u->user->hostname,( char *)host, MAXHOST );
+		strlcpy( u->user->hostname, ( char *)host, MAXHOST );
 	} else {
 		nlog( LOG_WARNING, "do_sethost: user %s not found", nick );
 	}
@@ -2300,7 +2300,7 @@ void do_setident( const char *nick, const char *ident )
 	u = FindUser( nick );
 	if( u ) {
 		dlog( DEBUG1, "do_setident: setting ident of user %s to %s", nick, ident );
-		strlcpy( u->user->username,( char *)ident, MAXHOST );
+		strlcpy( u->user->username, ( char *)ident, MAXHOST );
 	} else {
 		nlog( LOG_WARNING, "do_setident: user %s not found", nick );
 	}
@@ -2327,7 +2327,7 @@ void do_chghost( const char *nick, const char *host )
 		return;
 	}
 	dlog( DEBUG1, "do_chghost: setting host of user %s to %s", nick, host );
-	strlcpy( u->user->hostname,( char *)host, MAXHOST );
+	strlcpy( u->user->hostname, ( char *)host, MAXHOST );
 }
 
 /** @brief do_chgident
@@ -2351,7 +2351,7 @@ void do_chgident( const char *nick, const char *ident )
 		return;
 	}
 	dlog( DEBUG1, "do_chgident: setting ident of user %s to %s", nick, ident );
-	strlcpy( u->user->username,( char *)ident, MAXHOST );
+	strlcpy( u->user->username, ( char *)ident, MAXHOST );
 }
 
 /** @brief do_chgname
@@ -2375,5 +2375,5 @@ void do_chgname( const char *nick, const char *realname )
 		return;
 	}
 	dlog( DEBUG1, "do_chgname: setting realname of user %s to %s", nick, realname );
-	strlcpy( u->info,( char *)realname, MAXHOST );
+	strlcpy( u->info, ( char *)realname, MAXHOST );
 }

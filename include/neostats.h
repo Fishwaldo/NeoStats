@@ -1240,7 +1240,7 @@ EXPORTFUNC Bot *FindBot( const char *bot_name );
 
 /* main.c */
 EXPORTFUNC void fatal_error( char *file, int line, const char *func, char *error_text) __attribute__((noreturn));;
-#define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__,(error_text) ); 
+#define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__, (error_text) ); 
 
 /* nsmemory.c */
 EXPORTFUNC void *ns_malloc( int size );

@@ -263,7 +263,7 @@ static void del_channel_member( Channel *c, Client *u )
 	cm = lnode_get( un );
 	list_delete_destroy_node( c->members, un );
 	ns_free( cm );
-	dlog( DEBUG3, "del_channel_member: cur users %s %d (list %d)", c->name, c->users,( int )list_count( c->members ) );
+	dlog( DEBUG3, "del_channel_member: cur users %s %d (list %d)", c->name, c->users, ( int )list_count( c->members ) );
 	c->users--;
 }
 
@@ -498,7 +498,7 @@ void JoinChannel( const char *nick, const char *chan )
 	}
 	SendAllModuleEvent( EVENT_JOIN, cmdparams );
 	ns_free( cmdparams );
-	dlog( DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users,( int )list_count( c->members ) );
+	dlog( DEBUG3, "JoinChannel: cur users %s %d (list %d)", c->name, c->users, ( int )list_count( c->members ) );
 }
 
 /** @brief ListChannelMembers
@@ -517,12 +517,12 @@ static void ListChannelMembers( CmdParams * cmdparams, Channel *c )
  	ChannelMember *cm;
 	lnode_t *cmn;
 
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Members:    %d (List %d)", cmdparams->source ), c->users,( int )list_count( c->members ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Members:    %d (List %d)", cmdparams->source ), c->users, ( int )list_count( c->members ) );
 	cmn = list_first( c->members );
 	while( cmn )
 	{
 		cm = lnode_get( cmn );
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "            %s Modes %s Joined: %ld", cmdparams->source ), cm->u->name, CmodeMaskToString( cm->flags ),( long )cm->tsjoin );
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "            %s Modes %s Joined: %ld", cmdparams->source ), cm->u->name, CmodeMaskToString( cm->flags ), ( long )cm->tsjoin );
 		cmn = list_next( c->members, cmn );
 	}
 }
@@ -543,8 +543,8 @@ static int ListChannel( Channel *c, void *v )
 
 	cmdparams = ( CmdParams * ) v;
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Channel:    %s", cmdparams->source ), c->name );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Created:    %ld", cmdparams->source ),( long )c->creationtime );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "TopicOwner: %s TopicTime: %ld Topic: %s", cmdparams->source ), c->topicowner,( long )c->topictime, c->topic );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Created:    %ld", cmdparams->source ), ( long )c->creationtime );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "TopicOwner: %s TopicTime: %ld Topic: %s", cmdparams->source ), c->topicowner, ( long )c->topictime, c->topic );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "PubChan?:   %d", cmdparams->source ), is_pub_chan( c ) );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Flags:      %x", cmdparams->source ), c->flags );
 	ListChannelModes( cmdparams, c );

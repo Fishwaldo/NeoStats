@@ -111,17 +111,17 @@ static bot_cmd ss_commands[]=
 /** Bot setting table */
 static bot_setting ss_settings[]=
 {
-	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_html, ss_set_html_cb,( void * )0},
-	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN, NULL,		ss_help_set_htmlpath, ss_set_htmlpath_cb,( void * )""},
-	{"HTMLTIME",	&StatServ.htmltime,		SET_TYPE_INT,		600, TS_ONE_HOUR,		NS_ULEVEL_ADMIN, "seconds",	ss_help_set_htmltime, ss_set_htmltime_cb,( void* )TS_ONE_HOUR},
-	{"CHANNELTIME",	&StatServ.channeltime,	SET_TYPE_INT,		TS_ONE_DAY, 18144000,NS_ULEVEL_ADMIN, "seconds",	ss_help_set_channeltime, NULL,( void* )604800},
-	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_msginterval, NULL,( void * )TS_ONE_MINUTE},
-	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_msglimit, NULL,( void * )5},
-	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_lagtime, NULL,( void * )30},
-	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_lagalert, NULL,( void * )1},
-	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_recordalert, NULL,( void * )1},
-	{"EXCLUSIONS",	&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_exclusions, ss_set_exclusions_cb,( void * )0},
-	{"FLATMAP",		&StatServ.flatmap,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_flatmap, NULL,( void * )0},
+	{"HTML",		&StatServ.html,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_html, ss_set_html_cb, ( void * )0},
+	{"HTMLPATH",	&StatServ.htmlpath,		SET_TYPE_STRING,	0, MAXPATH,		NS_ULEVEL_ADMIN, NULL,		ss_help_set_htmlpath, ss_set_htmlpath_cb, ( void * )""},
+	{"HTMLTIME",	&StatServ.htmltime,		SET_TYPE_INT,		600, TS_ONE_HOUR,		NS_ULEVEL_ADMIN, "seconds",	ss_help_set_htmltime, ss_set_htmltime_cb, ( void* )TS_ONE_HOUR},
+	{"CHANNELTIME",	&StatServ.channeltime,	SET_TYPE_INT,		TS_ONE_DAY, 18144000,NS_ULEVEL_ADMIN, "seconds",	ss_help_set_channeltime, NULL, ( void* )604800},
+	{"MSGINTERVAL",	&StatServ.msginterval,	SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_msginterval, NULL, ( void * )TS_ONE_MINUTE},
+	{"MSGLIMIT",	&StatServ.msglimit,		SET_TYPE_INT,		1, 99, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_msglimit, NULL, ( void * )5},
+	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_lagtime, NULL, ( void * )30},
+	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_lagalert, NULL, ( void * )1},
+	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_recordalert, NULL, ( void * )1},
+	{"EXCLUSIONS",	&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_exclusions, ss_set_exclusions_cb, ( void * )0},
+	{"FLATMAP",		&StatServ.flatmap,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_flatmap, NULL, ( void * )0},
 	NS_SETTING_END()
 };
 

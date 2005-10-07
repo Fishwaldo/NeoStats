@@ -952,7 +952,7 @@ int ns_cmd_socklist (CmdParams* cmdparams)
 		}
 		size = sizeof(struct sockaddr_in);
 		/* this will not print anything if the socket is not connected */
-		if (getpeername(sock->sock_no,(struct sockaddr *)&add, (socklen_t *)&size) > -1) {
+		if (getpeername(sock->sock_no, (struct sockaddr *)&add, (socklen_t *)&size) > -1) {
 			irc_prefmsg (ns_botptr, cmdparams->source, "Remote Socket: %s:%hu", inet_ntoa(add.sin_addr), ntohs(add.sin_port));
 		}
 

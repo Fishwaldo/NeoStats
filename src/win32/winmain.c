@@ -246,7 +246,7 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
 		return FALSE;
 	}
 
-	hIcon = LoadIcon( hInstance,( LPCTSTR )MAKEINTRESOURCE( IDI_ICON1 ) );
+	hIcon = LoadIcon( hInstance, ( LPCTSTR )MAKEINTRESOURCE( IDI_ICON1 ) );
 	nsNotifyIconData.cbSize = sizeof( NOTIFYICONDATA );
 	nsNotifyIconData.hWnd = hDialog;
 	nsNotifyIconData.uID = IDI_ICON1;

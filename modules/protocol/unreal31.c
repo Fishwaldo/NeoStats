@@ -485,7 +485,7 @@ void send_swhois( const char *source, const char *target, const char *swhois )
 /* akill is gone in the latest Unreals, so we set Glines instead */
 void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
-	send_cmd( ":%s %s + G %s %s %s %lu %lu :%s", source, MSGTOK( TKL ), ident, host, setby,( ts + length ), ts, reason );
+	send_cmd( ":%s %s + G %s %s %s %lu %lu :%s", source, MSGTOK( TKL ), ident, host, setby, ( ts + length ), ts, reason );
 }
 
 void send_rakill( const char *source, const char *host, const char *ident )
@@ -605,7 +605,7 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 /* R: ~         1073861298   #services +       <none>  :Mark */
 static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
-	do_sjoin( argv[0], argv[1],( ( argc >= 4 ) ? argv[2] : "" ), origin, argv, argc );
+	do_sjoin( argv[0], argv[1], ( ( argc >= 4 ) ? argv[2] : "" ), origin, argv, argc );
 }
 
 /* m_swhois

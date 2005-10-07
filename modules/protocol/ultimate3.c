@@ -360,7 +360,7 @@ void send_netinfo( const char *source, const char *maxglobalcnt, const unsigned 
 /* :source SJOIN TS #chan */
 static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
-	do_sjoin( argv[0], argv[1],( ( argc <= 2 ) ? argv[1] : argv[2] ), origin, argv, argc );
+	do_sjoin( argv[0], argv[1], ( ( argc <= 2 ) ? argv[1] : argv[2] ), origin, argv, argc );
 }
 
 static void m_burst( char *origin, char **argv, int argc, int srv )

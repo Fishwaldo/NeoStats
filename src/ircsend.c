@@ -357,7 +357,7 @@ static void _send_part( const char *source, const char *chan, const char *reason
 static void _send_kick( const char *source, const char *chan, const char *target, const char *reason )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
-		send_cmd( "%s %s %s %s :%s", nick_to_base64( source ), TOK_KICK, chan, nick_to_base64( target ),( reason ? reason : "No reason given" ) );
+		send_cmd( "%s %s %s %s :%s", nick_to_base64( source ), TOK_KICK, chan, nick_to_base64( target ), ( reason ? reason : "No reason given" ) );
 	else
 		send_cmd( ":%s %s %s %s :%s", source, MSGTOK( KICK ), chan, target, ( reason ? reason : "No reason given" ) );
 }
@@ -659,7 +659,7 @@ int irc_prefmsg_list( const Bot *botptr, const Client * target, const char **tex
 	}
 	while( *text ) {
 		if( **text ) {
-			irc_prefmsg( botptr, target,( char *)*text );
+			irc_prefmsg( botptr, target, ( char *)*text );
 		} else {
 			irc_prefmsg( botptr, target, " " );
 		}
@@ -681,7 +681,7 @@ int irc_privmsg_list( const Bot *botptr, const Client * target, const char **tex
 	}
 	while( *text ) {
 		if( **text ) {
-			irc_privmsg( botptr, target,( char *)*text );
+			irc_privmsg( botptr, target, ( char *)*text );
 		} else {
 			irc_privmsg( botptr, target, " " );
 		}
@@ -879,7 +879,7 @@ int irc_numeric( const int numeric, const char *target, const char *data, ... )
 
 int irc_nick( const char *nick, const char *user, const char *host, const char *realname, const char *modes )
 {
-	irc_send_nick( nick,( unsigned long )me.now, modes, user, host, me.name, realname );
+	irc_send_nick( nick, ( unsigned long )me.now, modes, user, host, me.name, realname );
 	return NS_SUCCESS;
 }
 
@@ -938,13 +938,13 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 	{
 		if( mode == NULL ) 
 		{
-			irc_send_sjoin( me.name, botptr->u->name, chan,( unsigned long )ts );
+			irc_send_sjoin( me.name, botptr->u->name, chan, ( unsigned long )ts );
 			JoinChannel( botptr->u->name, chan );
 		} 
 		else 
 		{
 			ircsnprintf( ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix( mode[1] ), botptr->u->name );
-			irc_send_sjoin( me.name, ircd_buf, chan,( unsigned long )ts );
+			irc_send_sjoin( me.name, ircd_buf, chan, ( unsigned long )ts );
 			JoinChannel( botptr->u->name, chan );
 			ChanUserMode( chan, botptr->u->name, 1, CmodeStringToMask( mode ) );
 		}
@@ -1026,7 +1026,7 @@ int irc_setname( const Bot *botptr, const char *realname )
 		return NS_FAILURE;
 	}
 	irc_send_setname( botptr->name, realname );
-	strlcpy( botptr->u->info,( char *)realname, MAXHOST );
+	strlcpy( botptr->u->info, ( char *)realname, MAXHOST );
 	return NS_SUCCESS;
 }
 
@@ -1042,7 +1042,7 @@ int irc_sethost( const Bot *botptr, const char *host )
 		return NS_FAILURE;
 	}
 	irc_send_sethost( botptr->name, host );
-	strlcpy( botptr->u->user->hostname,( char *)host, MAXHOST );
+	strlcpy( botptr->u->user->hostname, ( char *)host, MAXHOST );
 	return NS_SUCCESS;
 }
  
@@ -1058,7 +1058,7 @@ int irc_setident( const Bot *botptr, const char *ident )
 		return NS_FAILURE;
 	}
 	irc_send_setident( botptr->name, ident );
-	strlcpy( botptr->u->user->username,( char *)ident, MAXHOST );
+	strlcpy( botptr->u->user->username, ( char *)ident, MAXHOST );
 	return NS_SUCCESS;
 }
 
@@ -1196,7 +1196,7 @@ int irc_svstime( const Bot *botptr, const Client *target, const time_t ts )
 		unsupported_cmd( "SVSTIME" );
 		return NS_FAILURE;
 	}
-	irc_send_svstime( me.name,( unsigned long )ts );
+	irc_send_svstime( me.name, ( unsigned long )ts );
 	nlog( LOG_NOTICE, "irc_svstime: synching server times to %lu", ts );
 	return NS_SUCCESS;
 }

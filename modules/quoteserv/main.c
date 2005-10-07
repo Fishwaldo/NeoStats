@@ -332,7 +332,7 @@ static int qs_cmd_add( CmdParams *cmdparams )
 		return NS_SUCCESS;
 	}
 	hnode_create_insert( qshash, db, db->name );
-	DBAStore( "databases", db->name,( void * )db->name, MAXNICK );
+	DBAStore( "databases", db->name, ( void * )db->name, MAXNICK );
 	return NS_SUCCESS;
 }
 

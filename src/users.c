@@ -132,7 +132,7 @@ static int process_ip( const char *nick, const char *host )
 	else
 	{		
 		/* kick of a dns reverse lookup for this host */
-		dns_lookup( ( char * )host, adns_r_addr, lookupnickip,( void * )nick );
+		dns_lookup( ( char * )host, adns_r_addr, lookupnickip, ( void * )nick );
 		ipaddress = 0;
 	}		
 	return ipaddress;
@@ -170,7 +170,7 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 		nlog( LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick );
 		return NULL;
 	}
-	dlog( DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname,( int )htonl( ipaddress ), server, TS );
+	dlog( DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, ( int )htonl( ipaddress ), server, TS );
 	u = new_user( nick );
 	if( !u )
 		return NULL;
@@ -554,8 +554,8 @@ static int ListUser( Client *u, void* v )
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "IP:       %s", cmdparams->source ), u->hostip );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Vhost:    %s", cmdparams->source ), u->user->vhost );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Flags:    0x%x", cmdparams->source ), u->flags );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Modes:    %s( 0x%x )", cmdparams->source ), UmodeMaskToString( u->user->Umode ), u->user->Umode );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Smodes:   %s( 0x%x )", cmdparams->source ), SmodeMaskToString( u->user->Smode ), u->user->Smode );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Modes:    %s (0x%x)", cmdparams->source ), UmodeMaskToString( u->user->Umode ), u->user->Umode );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Smodes:   %s (0x%x)", cmdparams->source ), SmodeMaskToString( u->user->Smode ), u->user->Smode );
 	if( IsAway( u ) )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Away:     %s", cmdparams->source ), u->user->awaymsg );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Version:  %s", cmdparams->source ), u->version );
@@ -564,9 +564,9 @@ static int ListUser( Client *u, void* v )
 	while( cm )
 	{
 		if( i==0 )
-			irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels: %s", cmdparams->source ),( char * ) lnode_get( cm ) );
+			irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels: %s", cmdparams->source ), ( char * ) lnode_get( cm ) );
 		else
-			irc_prefmsg( ns_botptr, cmdparams->source, "          %s",( char * ) lnode_get( cm ) );
+			irc_prefmsg( ns_botptr, cmdparams->source, "          %s", ( char * ) lnode_get( cm ) );
 		cm = list_next( u->user->chans, cm );
 		i++;
 	}
@@ -592,12 +592,12 @@ int ns_cmd_userlist( CmdParams *cmdparams )
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "================USERLIST================", cmdparams->source ) );
 	if( cmdparams->ac < 1 )
 	{
-		ProcessUserList( ListUser, cmdparams );
+		ProcessUserList( ListUser, ( void * )cmdparams );
 		return NS_SUCCESS;
 	}
 	u = FindUser( cmdparams->av[0] );
 	if( u )
-		ListUser( u,( void * )cmdparams );
+		ListUser( u, ( void * )cmdparams );
 	else
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "can't find user %s", cmdparams->source ), cmdparams->av[0] );
 	return NS_SUCCESS;

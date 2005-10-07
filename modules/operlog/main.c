@@ -127,9 +127,7 @@ int ModSynch( void )
 	operlog_bot = AddBot( &operlog_botinfo );
 	/* If failed to create bot, module will terminate */
 	if( !operlog_bot ) 
-	{
 		return NS_FAILURE;
-	}
 	return NS_SUCCESS;
 }
 
@@ -142,7 +140,7 @@ int ModSynch( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ModFini (void)
+int ModFini( void )
 {
 	SET_SEGV_LOCATION();
 	return NS_SUCCESS;
@@ -260,28 +258,31 @@ static int operlog_event_serverkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_umode(CmdParams *cmdparams)
+static int operlog_event_umode( CmdParams *cmdparams )
 {
 	int add = 1;
 	char *modes = cmdparams->param;
 
 	SET_SEGV_LOCATION();
-	while (*modes) {
-		switch (*modes) {
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		case 'O':
-		case 'o':
-			if (add) {
-				nlog( LOG_NOTICE, "OPER: %s is now an IRC Operator", cmdparams->source->name );
-			}
-			break;
-		default:
-			break;
+	while( *modes )
+	{
+		switch( *modes )
+		{
+			case '+':
+				add = 1;
+				break;
+			case '-':
+				add = 0;
+				break;
+			case 'O':
+			case 'o':
+				if( add )
+				{
+					nlog( LOG_NOTICE, "OPER: %s is now an IRC Operator", cmdparams->source->name );
+				}
+				break;
+			default:
+				break;
 		}
 		modes++;
 	}

@@ -450,7 +450,7 @@ void send_vctrl( const int uprot, const int nicklen, const int modex, const int 
 
 void send_akill( const char *source, const char *host, const char *ident, const char *setby, const unsigned long length, const char *reason, const unsigned long ts )
 {
-	send_cmd( ":%s %s %s@%s %lu %lu %s :%s", source, MSG_GLINE, ident, host,( ts + length ), ts, setby, reason );
+	send_cmd( ":%s %s %s@%s %lu %lu %s :%s", source, MSG_GLINE, ident, host, ( ts + length ), ts, setby, reason );
 }
 
 void send_rakill( const char *source, const char *host, const char *ident )

@@ -284,7 +284,7 @@ int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	cmdnode = hash_lookup( cmd_hash, cmd_ptr->cmd );
 	if( cmdnode )
 	{
-		dlog( DEBUG3, "deleting command %s from services bot",( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
+		dlog( DEBUG3, "deleting command %s from services bot", ( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
 		hash_delete_destroy_node( cmd_hash, cmdnode );
 #if USE_PERL
 		if (IS_PERL_MOD(cmd_ptr->modptr))
@@ -365,7 +365,7 @@ int del_all_bot_cmds( Bot* bot_ptr )
 	hash_scan_begin( &hs, bot_ptr->botcmds );
 	while( ( cmdnode = hash_scan_next( &hs ) ) != NULL )
 	{
-		dlog( DEBUG3, "deleting command %s from services bot",( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
+		dlog( DEBUG3, "deleting command %s from services bot", ( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
 		hash_scan_delete_destroy_node( bot_ptr->botcmds, cmdnode );
 	}
 	/* Destroy command */

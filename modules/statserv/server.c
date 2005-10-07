@@ -222,7 +222,7 @@ static int AddServerStat( Client *s, void *v )
 		ss = new_server_stat( s->name );
 	ss->ts_start = ss->ts_lastseen = me.now;
 	AddNetworkServer();
-	SetServerModValue( s,( void * )ss );
+	SetServerModValue( s, ( void * )ss );
 	ss->s = s;
 	return NS_FALSE;
 }
@@ -351,7 +351,7 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
 	{
 		/* its the root server */
 		irc_prefmsg( ss_bot, u, "\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
-			ss->name, s->server->users,( int )ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
+			ss->name, s->server->users, ( int )ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 			( int )s->server->ping, ss->highest_ping );
 	}
 	else
@@ -360,8 +360,8 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
 		if( StatServ.flatmap )
 		{
 			irc_prefmsg( ss_bot, u, "\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]", 
-				ss->name, s->server->users,( int )ss->users.alltime.max,
-				ss->opers.current, ss->opers.alltime.max,( int )s->server->ping, ss->highest_ping );
+				ss->name, s->server->users, ( int )ss->users.alltime.max,
+				ss->opers.current, ss->opers.alltime.max, ( int )s->server->ping, ss->highest_ping );
 		}
 		else
 		{
@@ -369,8 +369,8 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
 			for( ; depth > 1; depth-- )
 				strlcat( buf, "     |", 256 );
 			irc_prefmsg( ss_bot, u, "%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
-				buf, ss->name, s->server->users,( int )ss->users.alltime.max,
-				ss->opers.current, ss->opers.alltime.max,( int )s->server->ping, ss->highest_ping );
+				buf, ss->name, s->server->users, ( int )ss->users.alltime.max,
+				ss->opers.current, ss->opers.alltime.max, ( int )s->server->ping, ss->highest_ping );
 		}
 	}
 }
@@ -551,7 +551,7 @@ static int ss_cmd_server_stats( CmdParams *cmdparams )
 
 		uptime = s->server->uptime + ( me.now - me.ts_boot );
 		irc_prefmsg( ss_bot, cmdparams->source, "Version: %s", s->version );
-		irc_prefmsg( ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld",( uptime / TS_ONE_DAY ),( ( uptime / TS_ONE_DAY ) == 1 ) ? "" : "s",( ( uptime / TS_ONE_HOUR ) % 24 ),( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ),( uptime % 60 ) );
+		irc_prefmsg( ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld", ( uptime / TS_ONE_DAY ), ( ( uptime / TS_ONE_DAY ) == 1 ) ? "" : "s", ( ( uptime / TS_ONE_HOUR ) % 24 ), ( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ), ( uptime % 60 ) );
 		irc_prefmsg( ss_bot, cmdparams->source, "Current Users: %-3d (%d%%)", 
 			s->server->users, 
 			( int )( ( float ) s->server->users /( float ) networkstats.users.current * 100 ) );
@@ -570,12 +570,12 @@ static int ss_cmd_server_stats( CmdParams *cmdparams )
 	irc_prefmsg( ss_bot, cmdparams->source, "Higest ping: %-3d at %s",
 		( int )ss->highest_ping, sftime( ss->ts_highest_ping ) );
 	if( s )
-		irc_prefmsg( ss_bot, cmdparams->source, "Current Ping: %-3d",( int )s->server->ping );
+		irc_prefmsg( ss_bot, cmdparams->source, "Current Ping: %-3d", ( int )s->server->ping );
 	if( ss->splits.alltime.runningtotal >= 1 )
 	{
 		irc_prefmsg( ss_bot, cmdparams->source, 
 			"%s has split from the network %d time %s",
-			ss->name, ss->splits.alltime.runningtotal,( ss->splits.alltime.runningtotal == 1 ) ? "" : "s" );
+			ss->name, ss->splits.alltime.runningtotal, ( ss->splits.alltime.runningtotal == 1 ) ? "" : "s" );
 	}
 	else
 	{
@@ -626,7 +626,7 @@ static void SaveServer( serverstat *ss )
 	PreSaveStatistic( &ss->operkills );
 	PreSaveStatistic( &ss->serverkills );
 	PreSaveStatistic( &ss->splits );
-	DBAStore( SERVER_TABLE, ss->name,( void * )ss, sizeof( serverstat ) );
+	DBAStore( SERVER_TABLE, ss->name, ( void * )ss, sizeof( serverstat ) );
 }
 
 /** @brief SaveServerStats

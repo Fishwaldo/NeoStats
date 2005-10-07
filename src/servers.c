@@ -262,7 +262,7 @@ static int ListServer( Client *s, void *v )
 	else
 		irc_prefmsg( ns_botptr, cmdparams->source, _( "Server: %s" ), s->name );
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "Version: %s" ), s->version );
-	irc_prefmsg( ns_botptr, cmdparams->source, _( "Uptime:  %ld day%s, %02ld:%02ld:%02ld" ),( uptime / TS_ONE_DAY ),( uptime / TS_ONE_DAY == 1 ) ? "" : "s",( ( uptime / TS_ONE_HOUR ) % 24 ),( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ),( uptime % 60 ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, _( "Uptime:  %ld day%s, %02ld:%02ld:%02ld" ), ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_DAY == 1 ) ? "" : "s", ( ( uptime / TS_ONE_HOUR ) % 24 ), ( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ), ( uptime % 60 ) );
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "Flags:   %x" ), s->flags );
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "Uplink:  %s" ), s->uplink ? s->uplink->name : "" );
 	irc_prefmsg( ns_botptr, cmdparams->source, "========================================" );
@@ -287,12 +287,12 @@ int ns_cmd_serverlist( CmdParams *cmdparams )
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "===============SERVERLIST===============" ) );
 	if( cmdparams->ac < 1 )
 	{
-		ProcessServerList( ListServer, cmdparams );
+		ProcessServerList( ListServer, ( void * )cmdparams );
    		return NS_SUCCESS;
 	}
 	s = FindServer( cmdparams->av[0] );
 	if( s )
-		ListServer( s, cmdparams );
+		ListServer( s, ( void * )cmdparams );
 	else
 		irc_prefmsg( ns_botptr, cmdparams->source, _( "can't find server %s" ), cmdparams->av[0] );
    	return NS_SUCCESS;

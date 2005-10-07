@@ -139,7 +139,7 @@ static int DCCChatStart( Client *dcc, int port )
 	else
 	{
 		/* we don't have a valid IP address, kick off a DNS lookup */
-		dns_lookup( dcc->user->hostname, adns_r_addr, DCCGotAddr,( void * )dcc );
+		dns_lookup( dcc->user->hostname, adns_r_addr, DCCGotAddr, ( void * )dcc );
 	}
 	return NS_SUCCESS;
 }
