@@ -92,7 +92,7 @@ ModuleInfo module_info = {
 	0,
 };
 
-/** Bot comand table */
+/** Bot command table */
 static bot_cmd ss_commands[]=
 {
 	{"SERVER",		ss_cmd_server,		1, 	0,		ss_help_server},

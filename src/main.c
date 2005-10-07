@@ -250,8 +250,6 @@ static int InitCore( void )
 	DBAOpenDatabase();
 	if( InitModules() != NS_SUCCESS )
 		return NS_FAILURE;
-	if( InitAuth() != NS_SUCCESS )
-		return NS_FAILURE;
 	if( InitTimers() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitBots() != NS_SUCCESS )

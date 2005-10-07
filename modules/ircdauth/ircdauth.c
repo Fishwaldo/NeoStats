@@ -135,8 +135,8 @@ static int auth_cmd_authmodelist( CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** Bot comand table */
-bot_cmd ircdauth_commands[] =
+/** Bot command table */
+static bot_cmd ircdauth_commands[] =
 {
 	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist},
 	NS_CMD_END()

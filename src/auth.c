@@ -24,6 +24,7 @@
 #include "neostats.h"
 #include "services.h"
 #include "dl.h"
+#include "helpstrings.h"
 
 /** Auth subsystem
  *
@@ -46,11 +47,22 @@
 /* #define CODERHACK "WeWillTellYouWhatToPutHere" */
 #endif /* DEBUG */
 
+/** Struct for auth list walk */
 typedef struct ModuleAuthInfo
 {
 	int auth;
 	const Client *u;
 } ModuleAuthInfo;
+
+/** Command prototypes */
+static int cmd_level( CmdParams *cmdparams );
+
+/** Auth command table */
+static bot_cmd auth_command_list[] =
+{
+	{"LEVEL", cmd_level, 0, 0, ns_help_level},
+	NS_CMD_END()
+};
 
 /** @brief IsServiceRoot
  *
@@ -153,7 +165,7 @@ int UserLevel( Client *u )
 	return u->user->ulevel;
 }
 
-/** @brief ns_cmd_level
+/** @brief cmd_level
  *
  *  LEVEL command handler
  *  Display user level
@@ -163,7 +175,7 @@ int UserLevel( Client *u )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_level( CmdParams *cmdparams )
+static int cmd_level( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( cmdparams->ac < 1 )
@@ -200,16 +212,10 @@ int ns_cmd_level( CmdParams *cmdparams )
 
 int AddAuthModule( Module *mod_ptr )
 {
-	mod_auth auth;
-
-	/* Check module has the auth function */
-	auth = ns_dlsym( mod_ptr->handle, "ModAuthUser" );
-	if( auth ) 
-	{
-		/* Set entries for authentication */
-		mod_ptr->userauth = auth;
+	/* Set entry for authentication if module has auth function */
+	mod_ptr->userauth = ns_dlsym( mod_ptr->handle, "ModAuthUser" );
+	if( mod_ptr->userauth )
 		return NS_SUCCESS;
-	}
 	return NS_FAILURE;
 }
 
@@ -229,9 +235,9 @@ void DelAuthModule( Module *mod_ptr )
 	mod_ptr->userauth = NULL;
 }
 
-/** @brief InitAuth
+/** @brief InitAuthCommands
  *
- *  Init authentication subsystem
+ *  Init authentication subsystem commands
  *  NeoStats core use only.
  *
  *  @param none
@@ -239,7 +245,8 @@ void DelAuthModule( Module *mod_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int InitAuth( void )
+int InitAuthCommands( void )
 {
+	add_services_cmd_list( auth_command_list );
 	return NS_SUCCESS;
 }

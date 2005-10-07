@@ -106,7 +106,7 @@ ModuleInfo module_info =
 	FEATURE_SVSHOST,
 };
 
-/** Bot comand table */
+/** Bot command table */
 static bot_cmd hs_commands[] =
 {
 	{"ADD",		hs_cmd_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add},

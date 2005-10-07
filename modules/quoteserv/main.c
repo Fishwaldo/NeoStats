@@ -80,7 +80,7 @@ ModuleInfo module_info = {
 	0,
 };
 
-/** Bot comand table */
+/** Bot command table */
 static bot_cmd qs_commands[]=
 {
 	{"ADD",		qs_cmd_add,		1,	NS_ULEVEL_ADMIN,	qs_help_add},

@@ -91,10 +91,9 @@ Module ns_module = {
 	&ns_module_info
 };
 
-/** Bot comand table */
+/** Bot command table */
 static bot_cmd ns_commands[] =
 {
-	{"LEVEL",		ns_cmd_level,		0, 	0,					ns_help_level},
 	{"STATUS",		ns_cmd_status,		0, 	0,					ns_help_status},
 	{"SHUTDOWN",	ns_cmd_shutdown,	1, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown},
 #ifndef WIN32
@@ -110,7 +109,7 @@ static bot_cmd ns_commands[] =
 	NS_CMD_END()
 };
 
-/** Bot comand table */
+/** Bot command table */
 static bot_cmd ns_debug_commands[] =
 {
 	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist},
@@ -189,8 +188,7 @@ ModuleEvent neostats_events[] =
 static int services_event_ctcpversion( CmdParams *cmdparams )
 {
 	dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
-	/*strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );*/
-	/*SendAllModuleEvent( EVENT_CTCPVERSIONRPLBC, cmdparams );*/
+	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
 	return NS_SUCCESS;
 }
 
@@ -243,6 +241,9 @@ int init_services_bot( void )
 	ns_botptr = AddBot( &ns_botinfo );
 	add_services_set_list( ns_debugsettings );
 	add_services_cmd_list( ns_module.exclude_cmd_list );
+	if( nsconfig.debug )
+		add_services_cmd_list( ns_debug_commands );
+	InitAuthCommands();
 	AddEventList( neostats_events );
 	SetModuleSynched( &ns_module );
 	me.synched = 1;
@@ -405,13 +406,9 @@ static int ns_set_debug_cb( CmdParams *cmdparams, SET_REASON reason )
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
 		if( nsconfig.debug )
-		{
-			add_bot_cmd_list( ns_botptr, ns_debug_commands );
-		} 
+			add_services_cmd_list( ns_debug_commands );
 		else 
-		{
-			del_bot_cmd_list( ns_botptr, ns_debug_commands );
-		}
+			add_services_cmd_list( ns_debug_commands );
 	}
 	return NS_SUCCESS;
 }

@@ -86,8 +86,8 @@ ModuleInfo module_info =
 /** hash for storing access list */
 static hash_t *accesshash;
 
-/** Bot comand table */
-bot_cmd extauth_commands[] =
+/** Bot command table */
+static bot_cmd extauth_commands[] =
 {
 	{"ACCESS",	ea_cmd_access,	1,	NS_ULEVEL_ROOT, ea_help_access},
 	NS_CMD_END()

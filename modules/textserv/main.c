@@ -100,7 +100,7 @@ ModuleInfo module_info = {
 	0,
 };
 
-/** Bot comand table */
+/** Bot command table */
 static bot_cmd ts_commands[]=
 {
 	{"ADD",		ts_cmd_add,	3,	NS_ULEVEL_ADMIN,	ts_help_add},
@@ -115,7 +115,7 @@ static bot_setting ts_settings[]=
 	NS_SETTING_END()
 };
 
-/** Sub bot comand table template */
+/** Sub bot command table template */
 const char *ts_help_about[] = {
 	"Display about text",
 	"Syntax: \2ABOUT\2",

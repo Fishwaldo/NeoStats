@@ -72,7 +72,7 @@ ModuleInfo module_info = {
 	0,
 };
 
-/** Bot comand table */
+/** Bot command table */
 static bot_cmd ls_commands[]=
 {
 	{"ADD",		cmd_add,	1,	NS_ULEVEL_ADMIN,	help_add},

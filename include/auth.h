@@ -24,9 +24,8 @@
 #ifndef _AUTH_H_
 #define _AUTH_H_
 
-int InitAuth( void );
+int InitAuthCommands( void );
 int AddAuthModule( Module *mod_ptr );
 void DelAuthModule( Module *mod_ptr );
-int ns_cmd_level( CmdParams *cmdparams );
 
 #endif /* _AUTH_H_ */
