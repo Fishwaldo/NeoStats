@@ -93,19 +93,22 @@ bot_cmd extauth_commands[] =
 	NS_CMD_END()
 };
 
-/** @brief dbaccesslisthandler
+/** @brief LoadAccessListEntry
  *
  *  Table load handler
  *
  *  @param pointer to table row data
+ *  @param size of loaded data
  *
  *  @return none
  */
 
-static int dbaccesslisthandler( void *data, int size )
+static int LoadAccessListEntry( void *data, int size )
 {
 	AccessEntry *access;
 	
+	if( size != sizeof( AccessEntry ) )
+		return NS_FALSE;
 	access = ns_calloc( sizeof( AccessEntry ) );
 	os_memcpy( access, data, sizeof( AccessEntry ) );
 	hnode_create_insert( accesshash, access, access->nick );
@@ -129,7 +132,7 @@ static int LoadAccessList( void )
 		nlog( LOG_CRITICAL, "Unable to create accesslist hash" );
 		return NS_FAILURE;
 	}
-	DBAFetchRows( "AccessList", dbaccesslisthandler );
+	DBAFetchRows( "AccessList", LoadAccessListEntry );
 	return NS_SUCCESS;
 }
 

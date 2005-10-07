@@ -591,12 +591,12 @@ void SaveChanStatsProgressive( void )
     int count = 0;
 
 	/* we want to only do 25% each progressive save */
-	limit = ( list_count( channelstatlist ) /4 );
+	limit = ( list_count( channelstatlist ) / 4 );
 	cn = list_first( channelstatlist );
 	while( cn )
 	{
 		cs = lnode_get( cn );
-		/* we are not shutting down, so do progressive save if we have more than 100 channels */
+		/* do progressive save if we have more than 100 channels */
 		if( limit > 25 )
 		{
 			if( count > limit )
@@ -618,7 +618,8 @@ void SaveChanStatsProgressive( void )
  *
  *  Delete old channel stats table row handler
  *
- *  @param none
+ *  @param data pointer to table row data
+ *  @param size of loaded data
  *
  *  @return NS_TRUE if deleted else NS_FALSE
  */
@@ -627,6 +628,8 @@ static int del_chan( void *data, int size )
 {
 	channelstat *cs;
 	
+	if( size != sizeof( channelstat ) )
+		return NS_FALSE;
 	cs = ( channelstat * )data;
 	if( ( ( me.now - cs->ts_lastseen ) > StatServ.channeltime ) && ( !cs->c ) )
 	{

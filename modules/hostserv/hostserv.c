@@ -229,6 +229,8 @@ static int LoadVhost( void *data, int size )
 {
 	vhostentry *vhe;
 
+	if( size != sizeof( vhostentry ) )
+		return NS_FALSE;
 	vhe = ns_calloc( sizeof( vhostentry ) );
 	os_memcpy( vhe, data, sizeof( vhostentry ) );
 	lnode_create_append( vhost_list, vhe );
@@ -294,6 +296,8 @@ static int LoadBan( void *data, int size )
 {
 	banentry *ban;
 
+	if( size != sizeof( banentry ) )
+		return NS_FALSE;
 	ban = ns_calloc( sizeof( banentry ) );
 	os_memcpy( ban, data, sizeof( banentry ) );
 	hnode_create_insert( banhash, ban, ban->host );
