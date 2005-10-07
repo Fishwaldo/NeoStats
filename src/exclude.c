@@ -25,10 +25,7 @@
  */
 
 /*  TODO:
- *  - use core fake module for exclude hash so we can remove the
- *    seperate code paths for core and module exclusions
- *  TOCONSIDER:
- *  - Real time exclusions??? possibly optional.
+ *  - (MAYBE) Real time exclusions??? possibly optional.
  */
 
 #include "neostats.h"

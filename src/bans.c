@@ -24,6 +24,7 @@
 /*  TODO:
  *  - Other ban types beside Unreal TKL
  *  - Channel bans?
+ *  - Bans exclusions?
  */
 
 #include "neostats.h"

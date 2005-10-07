@@ -287,7 +287,7 @@ int ns_cmd_serverlist( CmdParams *cmdparams )
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "===============SERVERLIST===============" ) );
 	if( cmdparams->ac < 1 )
 	{
-		ProcessServerList( ListServer, NULL );
+		ProcessServerList( ListServer, cmdparams );
    		return NS_SUCCESS;
 	}
 	s = FindServer( cmdparams->av[0] );
