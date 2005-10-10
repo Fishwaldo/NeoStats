@@ -552,7 +552,11 @@ int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
  *  Wrapper function for select
  */
 
+#ifdef WIN32
 int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const struct timeval* timeout )
+#else /* WIN32 */
+int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, struct timeval* timeout )
+#endif /* WIN32 */
 {
 	int ret;
 
