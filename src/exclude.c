@@ -103,6 +103,8 @@ static Exclude *FindExclude( list_t *exclude_list, NS_EXCLUDE type, const char *
 	Exclude *exclude;
 
 	SET_SEGV_LOCATION();
+	if( !exclude_list )
+		return NULL;
 	node = list_first( exclude_list );
 	while( node )
 	{
