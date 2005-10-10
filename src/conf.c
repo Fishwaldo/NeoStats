@@ -66,7 +66,7 @@ cfg_opt_t server_details[] = {
 	CFG_STR ("Info", "NeoStats 3.0 Services", CFGF_NONE),
 	CFG_STR ("ServiceChannel", "#services", CFGF_NONE),
 	CFG_INT ("ServerNumeric", 123, CFGF_NONE),
-	CFG_STR ("BindTo", 0, CFGF_NONE),
+	CFG_STR ("BindTo", 0, CFGF_NODEFAULT),
 	CFG_STR ("Protocol", "unreal32", CFGF_NONE),
 	CFG_END()
 };
@@ -92,20 +92,20 @@ cfg_opt_t servers[] = {
 };
 
 cfg_opt_t serviceroot[] = {
-	CFG_STR ("Mask", 0, CFGF_NONE),
+	CFG_STR ("Mask", 0, CFGF_NODEFAULT),
 	CFG_END()
 };
 
 cfg_opt_t modules[] = {
-	CFG_STR_LIST ("ModuleName", 0, CFGF_NONE),
+	CFG_STR_LIST ("ModuleName", 0, CFGF_NODEFAULT),
 	CFG_END()
 };
 
 cfg_opt_t neonet[] = {
 	CFG_STR ("HostName", "mqpool.neostats.net", CFGF_NONE),
 	CFG_INT ("Port", 2960, CFGF_NONE),
-	CFG_STR ("UserName", 0, CFGF_NONE),
-	CFG_STR ("Password", 0, CFGF_NONE),
+	CFG_STR ("UserName", NULL, CFGF_NODEFAULT),
+	CFG_STR ("Password", NULL,CFGF_NODEFAULT ),
 	CFG_END()
 };
 
@@ -226,7 +226,7 @@ static int set_config_values( cfg_t *cfg )
 	/* only opers has a default */
 	nsconfig.onlyopers = cfg_getbool (cfg, "Options|OperOnly");
 	/* vhost has no default, nor is it required */
-	if (cfg_size (cfg, "ServerConfig|BindTo") > 1) {
+	if (cfg_size (cfg, "ServerConfig|BindTo") > 0) {
 		strlcpy (me.local, cfg_getstr (cfg, "ServerConfig|BindTo"), sizeof (me.local));
 		dlog( DEBUG6, "Source IP:          %s\n", me.local );
 	}
@@ -270,12 +270,13 @@ static int set_config_values( cfg_t *cfg )
 		dlog( DEBUG6, "                     %s", cfg_getnstr( cfg, "Modules|ModuleName", i ));
 	}	
 	dlog( DEBUG6, "-----------------------------------------------" );
-	if (cfg_size(cfg, "NeoNet|UserName") >= 1) 
+	if (cfg_size(cfg, "NeoNet|UserName") > 0) 
 		strlcpy(mqs.username, cfg_getstr(cfg, "NeoNet|UserName"), MAXUSER);
-	if (cfg_size(cfg, "NeoNet|Password") >= 1)
+	if (cfg_size(cfg, "NeoNet|Password") > 0)
 		strlcpy(mqs.password, cfg_getstr(cfg, "NeoNet|Password"), MAXUSER);
+	/* has a default */
 	strlcpy(mqs.hostname, cfg_getstr(cfg, "NeoNet|HostName"), MAXHOST);
-
+	/* has a default */
 	mqs.port = cfg_getint(cfg, "NeoNet|Port");
 	return NS_SUCCESS;
 }
