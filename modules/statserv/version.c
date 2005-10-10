@@ -252,7 +252,7 @@ int ss_event_ctcpversionbc( CmdParams *cmdparams )
 
 int InitVersionStats( void )
 {
-	ctcp_version_list = list_create( -1 );
+	ctcp_version_list = list_create( LISTCOUNT_T_MAX );
 	if( !ctcp_version_list )
 	{
 		nlog( LOG_CRITICAL, "Unable to create version stat list" );

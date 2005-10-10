@@ -719,7 +719,7 @@ void GetServerStats( const ServerStatHandler handler, const void *v )
 
 int InitServerStats( void )
 {
-	serverstathash = hash_create( -1, 0, 0 );
+	serverstathash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !serverstathash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create server hash list" );

@@ -30,12 +30,9 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h> 
 #endif /* HAVE_FCNTL_H */
-#include "timer.h"
-#include "dns.h"
 #include "transfer.h"
 #include "services.h"
 #include "ircprotocol.h"
-#include "dcc.h"
 #include "sock.h"
 
 

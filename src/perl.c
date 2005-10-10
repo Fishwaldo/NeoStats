@@ -726,7 +726,7 @@ XS (XS_NeoStats_AddCommand)
 		bot = FindBot(SvPV_nolen(ST(0)));
 		if (bot) {
 			if (bot->botcmds == NULL) {
-				bot->botcmds = hash_create(-1, 0, 0);
+				bot->botcmds = hash_create(HASHCOUNT_T_MAX, 0, 0);
 			}
 			ret = ST(1);
 			if(SvTYPE(SvRV(ret))!=SVt_PVHV) {

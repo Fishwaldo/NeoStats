@@ -728,7 +728,7 @@ void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, 
 
 int InitChannelStats( void )
 {
-	channelstatlist = list_create( -1 );
+	channelstatlist = list_create( LISTCOUNT_T_MAX );
 	if( !channelstatlist )
 	{
 		nlog( LOG_CRITICAL, "Unable to create channel stat list" );

@@ -256,7 +256,7 @@ void FiniBans( void )
 
 int InitBans( void )
 {
-	banhash = hash_create( -1, 0, 0 );
+	banhash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !banhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create bans hash" );

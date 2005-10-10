@@ -201,7 +201,7 @@ int InitDns (void)
 		return NS_FAILURE;
 	}
 	/* dnsqueue is unlimited. */
-	dnsqueue = list_create(-1);
+	dnsqueue = list_create(LISTCOUNT_T_MAX);
 	if (!dnsqueue)
 	{
 		nlog (LOG_CRITICAL, "Unable to create DNS queue");

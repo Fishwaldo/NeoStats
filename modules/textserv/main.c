@@ -563,7 +563,7 @@ static int load_botentry( void *data, int size )
 
 	db = ns_calloc( sizeof( dbbot ) );
 	os_memcpy( &db->tsbot, data, sizeof( botentry ) );
-	db->chanhash = hash_create( -1, 0, 0 );
+	db->chanhash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	hnode_create_insert( tshash, db, db->tsbot.botname );
 	BuildBot( db );
 	return NS_FALSE;
@@ -611,7 +611,7 @@ static int load_botchanentry( void *data, int size )
 
 int ModInit( void )
 {
-	tshash = hash_create( -1, 0, 0 );
+	tshash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !tshash ) {
 		nlog( LOG_CRITICAL, "Unable to create database hash" );
 		return NS_FAILURE;
@@ -737,7 +737,7 @@ static int ts_cmd_add( CmdParams *cmdparams )
 	if( cmdparams->ac > 5 )
 		if( ValidateHost( cmdparams->av[5] ) == NS_SUCCESS )
 			strlcpy( db->tsbot.bothost, cmdparams->av[5], MAXHOST );
-	db->chanhash = hash_create( -1, 0, 0 );
+	db->chanhash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !db->chanhash ) {
 		nlog( LOG_CRITICAL, "Unable to create bots channel hash" );
 		irc_prefmsg( ts_bot, cmdparams->source, "Error creating channel list, %s not added as a bot", cmdparams->av[0] );

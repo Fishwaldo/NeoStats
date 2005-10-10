@@ -22,11 +22,8 @@
 */
 
 #include "neostats.h"
-#include "helpstrings.h"
 #include "services.h"
-#include "ircstring.h"
 #include "commands.h"
-#include "botinfo.h"
 #include "settings.h"
 
 typedef int( *bot_cmd_set_handler )( CmdParams *cmdparams, bot_setting *set_ptr );
@@ -569,7 +566,7 @@ int add_bot_setting_list( Bot* bot_ptr, bot_setting *set_ptr )
 	}
 	/* If no hash create */
 	if( bot_ptr->botsettings == NULL ) {
-		bot_ptr->botsettings = hash_create( -1, 0, 0 );
+		bot_ptr->botsettings = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 		if( !bot_ptr->botsettings )
 		{
 			nlog( LOG_CRITICAL, "Unable to create botsettings hash" );

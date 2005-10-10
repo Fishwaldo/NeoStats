@@ -29,7 +29,6 @@
 #include "nsevents.h"
 #include "bots.h"
 #include "timer.h"
-#include "commands.h"
 #include "sock.h"
 #include "helpstrings.h"
 #include "users.h"

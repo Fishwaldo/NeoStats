@@ -471,13 +471,13 @@ static int hs_event_umode( CmdParams *cmdparams )
 int ModInit( void )
 {
 	SET_SEGV_LOCATION();
-	vhost_list = list_create( -1 );
+	vhost_list = list_create( LISTCOUNT_T_MAX );
 	if( !vhost_list )
 	{
 		nlog( LOG_CRITICAL, "Unable to create vhost list" );
 		return NS_FAILURE;
 	}
-	banhash = hash_create( -1, 0, 0 );
+	banhash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !banhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create ban hash" );

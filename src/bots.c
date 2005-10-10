@@ -23,9 +23,7 @@
 
 #include "neostats.h"
 #include "nsevents.h"
-#include "protocol.h"
 #include "ircprotocol.h"
-#include "modes.h"
 #include "services.h"
 #include "commands.h"
 #include "botinfo.h"
@@ -253,7 +251,7 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
  *  @return none
  */
 
-void bot_notice( char *origin, char **av, int ac )
+void bot_notice( const char *origin, char *const *av, int ac )
 {
 	CmdParams *cmdparams;
 
@@ -291,7 +289,7 @@ void bot_notice( char *origin, char **av, int ac )
  *  @return none
  */
 
-void bot_chan_notice( char *origin, char **av, int ac )
+void bot_chan_notice( const char *origin, char *const *av, int ac )
 {
 	CmdParams *cmdparams;
 
@@ -327,7 +325,7 @@ void bot_chan_notice( char *origin, char **av, int ac )
  *  @return none
  */
 
-void bot_private( char *origin, char **av, int ac )
+void bot_private( const char *origin, char *const *av, int ac )
 {
 	CmdParams *cmdparams;
 
@@ -369,7 +367,7 @@ void bot_private( char *origin, char **av, int ac )
  *  @return none
  */
 
-void bot_chan_private( char *origin, char **av, int ac )
+void bot_chan_private( const char *origin, char *const *av, int ac )
 {
 	CmdParams *cmdparams;
 
@@ -527,7 +525,7 @@ int ns_cmd_botlist( CmdParams *cmdparams )
  *  @return none
  */
 
-void DelModuleBots( Module *mod_ptr )
+void DelModuleBots( const Module *mod_ptr )
 {
 	Bot *botptr;
 	hnode_t *modnode;
@@ -587,7 +585,7 @@ static Bot *new_bot( const char *bot_name )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int GenerateBotNick( char *nickbuf, int stublen, int alphacount, int numcount)
+int GenerateBotNick( char *nickbuf, size_t stublen, int alphacount, int numcount)
 {
 	int i;
 	
@@ -628,9 +626,10 @@ int GenerateBotNick( char *nickbuf, int stublen, int alphacount, int numcount)
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int GetBotNick( BotInfo *botinfo, char *nickbuf )
+static int GetBotNick( const BotInfo *botinfo, char *nickbuf )
 {
-	int i, stublen;
+	size_t stublen;
+	int i;
 
 	/* Check primary nick */
 	strlcpy( nickbuf, botinfo->nick, MAXNICK );
@@ -638,7 +637,7 @@ static int GetBotNick( BotInfo *botinfo, char *nickbuf )
 		return NS_SUCCESS;
 	nlog( LOG_WARNING, "Bot nick %s already in use", nickbuf );
 	/* Check alternate nick */
-	if( botinfo->altnick )
+	if( botinfo->altnick[0] )
 	{
 		strlcpy( nickbuf, botinfo->altnick, MAXNICK );
 		if( FindUser( nickbuf ) == NULL )
@@ -654,7 +653,7 @@ static int GetBotNick( BotInfo *botinfo, char *nickbuf )
 			return NS_SUCCESS;
 	}
 	/* Try to auto generate a nick from bot alt nick */
-	if( botinfo->altnick )
+	if( botinfo->altnick[0] )
 	{
 		strlcpy(nickbuf, botinfo->altnick, MAXNICK);
 		stublen = strlen( nickbuf );
@@ -678,7 +677,7 @@ static int GetBotNick( BotInfo *botinfo, char *nickbuf )
  *  @return none
  */
 
-static void ConnectBot( Bot *botptr )
+static void ConnectBot( const Bot *botptr )
 {
 	if( botptr->flags & BOT_FLAG_SERVICEBOT )
 	{

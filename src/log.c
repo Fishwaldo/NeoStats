@@ -84,7 +84,7 @@ static hash_t *logs;
 int InitLogs( void )
 {
 	SET_SEGV_LOCATION();
-	logs = hash_create( -1, 0, 0 );
+	logs = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !logs ) {
 #ifndef WIN32
 		printf( "ERROR: Can't initialize log subsystem." );

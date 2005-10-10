@@ -346,7 +346,7 @@ int InitTLDStatistics( void )
 	TLD *t;
 
 	SET_SEGV_LOCATION();
-	tldstatlist = list_create( -1 );
+	tldstatlist = list_create( LISTCOUNT_T_MAX );
 	if( !tldstatlist )
 	{
 		nlog( LOG_CRITICAL, "Unable to create TLD list" );

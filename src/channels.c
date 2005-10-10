@@ -30,16 +30,15 @@
 #include "protocol.h"
 #include "modes.h"
 #include "bots.h"
-#include "users.h"
 #include "channels.h"
 #include "exclude.h"
 #include "services.h"
 #include "nsevents.h"
 
 /* @brief hash and list sizes */
-#define CHANNEL_TABLE_SIZE	-1
-#define CHANNEL_MEM_SIZE	-1
-#define CHANNEL_MAXMODES	-1
+#define CHANNEL_TABLE_SIZE	HASHCOUNT_T_MAX
+#define CHANNEL_MEM_SIZE	LISTCOUNT_T_MAX
+#define CHANNEL_MAXMODES	LISTCOUNT_T_MAX
 
 /* @brief Module channel hash list */
 static hash_t *channelhash;
@@ -78,7 +77,7 @@ int comparechanmember( const void *key1, const void *key2 )
  *  @return none
  */
 
-static void ChanPartHandler( list_t * list, lnode_t * node, void *v )
+static void ChanPartHandler( list_t *list, lnode_t *node, void *v )
 {
 	PartChannel( ( Client * )v, lnode_get( node ), quitreason[0] != 0 ? quitreason : NULL );
 }
@@ -264,7 +263,8 @@ static void del_channel_member( Channel *c, Client *u )
 	list_delete_destroy_node( c->members, un );
 	ns_free( cm );
 	dlog( DEBUG3, "del_channel_member: cur users %s %d (list %d)", c->name, c->users, ( int )list_count( c->members ) );
-	c->users--;
+	if( c->users > 0 )
+		c->users--;
 }
 
 /** @brief CheckEmptyChannel
@@ -279,7 +279,7 @@ static void del_channel_member( Channel *c, Client *u )
 
 static void CheckEmptyChannel( Channel *c )
 {
-	if( c->users <= 0 )
+	if( c->users == 0 )
 	{
 		del_chan( c );
 	}
@@ -545,7 +545,7 @@ static int ListChannel( Channel *c, void *v )
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Channel:    %s", cmdparams->source ), c->name );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Created:    %ld", cmdparams->source ), ( long )c->creationtime );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "TopicOwner: %s TopicTime: %ld Topic: %s", cmdparams->source ), c->topicowner, ( long )c->topictime, c->topic );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "PubChan?:   %d", cmdparams->source ), is_pub_chan( c ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Public:     %s", cmdparams->source ), is_pub_chan( c ) ? "Yes" : "No" );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Flags:      %x", cmdparams->source ), c->flags );
 	ListChannelModes( cmdparams, c );
 	ListChannelMembers( cmdparams, c );
@@ -630,7 +630,7 @@ int IsChannelMember( const Channel *c, const Client *u )
  *  @return NS_TRUE if has, else NS_FALSE
  */
 
-int test_cumode( const char *chan, const char *nick, const int flag )
+int test_cumode( const char *chan, const char *nick, unsigned int flag )
 {
 	Client *u;
 	Channel *c;
@@ -732,7 +732,7 @@ Client *GetRandomChannelMember( Channel *c, int uge )
 	int randno;
 	int curno = 0;
 	
-	randno = hrand( ( ( int )list_count( c->members ) ), 1 );	
+	randno = hrand( list_count( c->members ), 1 );	
 	ln = list_first( c->members );
 	while( ln ) 
 	{

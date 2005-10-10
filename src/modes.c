@@ -24,20 +24,28 @@
 #include "neostats.h"
 #include "main.h"
 #include "protocol.h"
-#include "ircprotocol.h"
 #include "modes.h"
 #include "services.h"
-#include "users.h"
 #include "channels.h"
 #include "nsevents.h"
 
+/* */
 #define MODE_TABLE_SIZE	256
 
-typedef struct mode_data {
+/* */
+typedef struct mode_data
+{
 	unsigned int mask;
 	unsigned int flags;
 	unsigned char sjoin;
 } mode_data;
+
+/* */
+typedef struct ModeDesc
+{
+	unsigned int mask;
+	const char *desc;
+} ModeDesc;
 
 unsigned char UmodeChRegNick = 'r';
 static char ModeStringBuf[64];
@@ -55,37 +63,36 @@ static char ircd_cmode_char_map[32];
 static char ircd_umode_char_map[32];
 static char ircd_smode_char_map[32];
 
-static mode_init chan_umodes_default[] = {
+static mode_init chan_umodes_default[] =
+{
 	{'v', CUMODE_VOICE, 0, '+'},
 	{'o', CUMODE_CHANOP, 0, '@'},
 	MODE_INIT_END()
 };
 
-static mode_init chan_modes_default[] = {
-	{'l', CMODE_LIMIT, MODEPARAM},
-	{'k', CMODE_KEY, MODEPARAM},
-	{'b', CMODE_BAN, MODEPARAM},
- 	{'p', CMODE_PRIVATE, 0},
-	{'s', CMODE_SECRET, 0},
-	{'m', CMODE_MODERATED, 0},
-	{'t', CMODE_TOPICLIMIT, 0},
-	{'n', CMODE_NOPRIVMSGS, 0},
-	{'i', CMODE_INVITEONLY, 0},
+static mode_init chan_modes_default[] =
+{
+	{'l', CMODE_LIMIT, MODEPARAM, 0},
+	{'k', CMODE_KEY, MODEPARAM, 0},
+	{'b', CMODE_BAN, MODEPARAM, 0},
+ 	{'p', CMODE_PRIVATE, 0, 0},
+	{'s', CMODE_SECRET, 0, 0},
+	{'m', CMODE_MODERATED, 0, 0},
+	{'t', CMODE_TOPICLIMIT, 0, 0},
+	{'n', CMODE_NOPRIVMSGS, 0, 0},
+	{'i', CMODE_INVITEONLY, 0, 0},
 	MODE_INIT_END()
 };
 
-static mode_init user_umodes_default[] = {
-	{'o', UMODE_OPER},
-	{'i', UMODE_INVISIBLE},
+static mode_init user_umodes_default[] =
+{
+	{'o', UMODE_OPER, 0, 0},
+	{'i', UMODE_INVISIBLE, 0, 0},
 	MODE_INIT_END()
 };
 
-typedef struct ModeDesc {
-	unsigned int mask;
-	const char *desc;
-} ModeDesc;
-
-static ModeDesc UmodeDesc[] = {
+static ModeDesc UmodeDesc[] =
+{
 #ifdef UMODE_DEBUG
 	{UMODE_DEBUG,		"Debug"},
 #endif
@@ -130,9 +137,14 @@ static ModeDesc SmodeDesc[] = {
  *  Build internal mode tables by translating the protocol information
  *  into a faster indexed lookup table
  *
+ *	@param mode_char_map
+ *	@param mode
+ *	@param mask
+ *
  *  @return 
  */
-void BuildModeCharMap( char *mode_char_map, char mode, unsigned int mask )
+
+static void BuildModeCharMap( char *mode_char_map, char mode, unsigned int mask )
 {
     int bitcount = 0;
 	
@@ -150,8 +162,7 @@ void BuildModeCharMap( char *mode_char_map, char mode, unsigned int mask )
  * @return 
  */
 
-
-unsigned int BuildModeTable( char *mode_char_map, mode_data * dest, const mode_init * src, unsigned int flagall )
+unsigned int BuildModeTable( char *mode_char_map, mode_data *dest, const mode_init *src, unsigned int flagall )
 {
 	unsigned int maskall = 0;
 
@@ -177,8 +188,7 @@ unsigned int BuildModeTable( char *mode_char_map, mode_data * dest, const mode_i
  *
  * @return 
  */
-int
-InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const mode_init* user_umodes, const mode_init* user_smodes)
+int InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const mode_init* user_umodes, const mode_init* user_smodes)
 {
 	/* build cmode lookup table */
 	os_memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
@@ -218,7 +228,7 @@ InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const
  *
  *  @return 
  */
-static char *ModeMaskToString( mode_data* mode_table, const long mask ) 
+static char *ModeMaskToString( const mode_data* mode_table, const long mask ) 
 {
 	int i, j;
 

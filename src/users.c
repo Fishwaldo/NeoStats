@@ -25,19 +25,16 @@
 
 #include "neostats.h"
 #include "protocol.h"
-#include "ircprotocol.h"
-#include "modes.h"
 #include "users.h"
 #include "channels.h"
 #include "exclude.h"
 #include "nsevents.h"
 #include "bots.h"
-#include "auth.h"
 #include "services.h"
 #include "ctcp.h"
 #include "base64.h"
 
-#define USER_TABLE_SIZE	-1
+#define USER_TABLE_SIZE	HASHCOUNT_T_MAX
 #define MAXJOINCHANS	-1
 
 /** List of online users */

@@ -78,6 +78,7 @@ void *ns_dlopen (const char *file, int mode)
 #ifdef WIN32
 	void* ret;
 
+	mode = mode; /* supress warning */
 	/* reset error */
 	ns_dlerrormsg = 0;
 	ret = (void*)LoadLibrary(file);

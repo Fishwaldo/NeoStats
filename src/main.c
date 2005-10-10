@@ -44,7 +44,9 @@
 #include "bots.h"
 #include "timer.h"
 #include "signals.h"
+#ifndef WIN32
 #include "lang.h"
+#endif /* !WIN32 */
 #include "nsdba.h"
 #include "dcc.h"
 #ifdef USE_PERL

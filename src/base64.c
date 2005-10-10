@@ -22,7 +22,6 @@
 */
 
 #include "neostats.h"
-#include "ircprotocol.h"
 #include "servers.h"
 #include "users.h"
 #include "base64.h"

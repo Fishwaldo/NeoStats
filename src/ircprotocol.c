@@ -30,21 +30,8 @@
 #include "ircrecv.h"
 #include "numerics.h"
 #include "modes.h"
-#include "nsevents.h"
 #include "dl.h"
-#include "bots.h"
-#include "commands.h"
-#include "sock.h"
-#include "users.h"
-#include "channels.h"
 #include "services.h"
-#include "servers.h"
-#include "bans.h"
-#include "auth.h"
-#include "dns.h"
-#include "base64.h"
-#include "dcc.h"
-#include "main.h"
 
 ircd_server ircd_srv;
 static char protocol_path[MAXPATH];

@@ -24,7 +24,6 @@
 #include "neostats.h"
 #include "nsevents.h"
 #include "commands.h"
-#include "services.h"
 
 /** DCC subsystem
  *
@@ -476,7 +475,7 @@ static int dcc_req_chat( CmdParams* cmdparams )
 
 int InitDCC( void )
 {
-	dcclist = list_create( -1 );
+	dcclist = list_create( LISTCOUNT_T_MAX );
 	if( !dcclist )
 	{
 		nlog( LOG_CRITICAL, "Unable to create DCC list" );

@@ -32,7 +32,6 @@
 #include "modules.h"
 #include "services.h"
 #include "commands.h"
-#include "botinfo.h"
 #include "settings.h"
 
 static int bot_cmd_help( CmdParams *cmdparams );
@@ -179,7 +178,7 @@ void msg_only_opers( CmdParams *cmdparams )
 		cmdparams->source->name, cmdparams->cmd );
 }
 
-void check_cmd_result( CmdParams *cmdparams, int cmdret, char *extra )
+void check_cmd_result( CmdParams *cmdparams, int cmdret )
 {
 	switch( cmdret )
 	{
@@ -312,7 +311,7 @@ int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list )
 	/* If no hash create */
 	if( bot_ptr->botcmds == NULL )
 	{
-		bot_ptr->botcmds = hash_create( -1, 0, 0 );
+		bot_ptr->botcmds = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 		if( !bot_ptr->botcmds )
 		{
 			nlog( LOG_CRITICAL, "Unable to create botcmds hash" );
@@ -409,7 +408,7 @@ intrinsic_handler( CmdParams *cmdparams, bot_cmd_handler handler )
 	SET_RUN_LEVEL( cmdparams->bot->moduleptr );
 	cmdret = handler( cmdparams );
 	RESET_RUN_LEVEL();
-	check_cmd_result( cmdparams, cmdret, NULL );
+	check_cmd_result( cmdparams, cmdret );
 	return NS_SUCCESS;
 }
 
@@ -532,7 +531,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 					nlog( LOG_NORMAL, "%s used %s", cmdparams->source->name, cmdparams->param );
 					/* call handler */
 					cmdret = run_cmd( cmdparams, cmd_ptr );
-					check_cmd_result( cmdparams, cmdret, NULL );
+					check_cmd_result( cmdparams, cmdret );
 					RESET_RUN_LEVEL();
 				}
 				cmdret = NS_SUCCESS;

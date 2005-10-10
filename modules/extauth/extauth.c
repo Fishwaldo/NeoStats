@@ -126,7 +126,7 @@ static int LoadAccessListEntry( void *data, int size )
 
 static int LoadAccessList( void )
 {
-	accesshash = hash_create( -1, 0, 0 );
+	accesshash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !accesshash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create accesslist hash" );

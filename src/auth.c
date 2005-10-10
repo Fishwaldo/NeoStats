@@ -60,7 +60,7 @@ static int cmd_level( CmdParams *cmdparams );
 /** Auth command table */
 static bot_cmd auth_command_list[] =
 {
-	{"LEVEL", cmd_level, 0, 0, ns_help_level},
+	{"LEVEL", cmd_level, 0, 0, ns_help_level, 0, NULL, NULL},
 	NS_CMD_END()
 };
 

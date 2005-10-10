@@ -35,7 +35,7 @@
 #include "services.h"
 #include "users.h"
 
-#define SERVER_TABLE_SIZE	-1
+#define SERVER_TABLE_SIZE	HASHCOUNT_T_MAX
 
 static hash_t *serverhash;
 

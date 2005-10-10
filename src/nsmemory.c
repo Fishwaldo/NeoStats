@@ -25,7 +25,6 @@
 
 #include "neostats.h"
 #include "main.h"
-#include "services.h"
 
 /** @brief ns_malloc
  *

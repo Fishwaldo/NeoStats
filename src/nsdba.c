@@ -114,7 +114,7 @@ int InitDBA( void )
 {
 	if( InitDBAMSymbols() != NS_SUCCESS )
 		return NS_FAILURE;
-	dbhash = hash_create( -1, 0, 0 );
+	dbhash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !dbhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create db hash" );
@@ -184,7 +184,7 @@ int DBAOpenDatabase( void )
 	}
 	dbe = ns_calloc( sizeof( dbentry ) );
 	strlcpy( dbe->name, GET_CUR_MODNAME(), MAX_MOD_NAME );
-	dbe->tablehash = hash_create( -1, 0, 0 );
+	dbe->tablehash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !dbe->tablehash )
 	{
 		nlog( LOG_CRITICAL, "DBAOpenDatabase: Unable to create table hash" );

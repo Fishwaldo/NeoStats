@@ -799,6 +799,7 @@ typedef struct _bot_cmd {
 /* SET Comand handling */
 
 typedef enum SET_TYPE {
+	SET_TYPE_NONE = -1,	/* ON or OFF */
 	SET_TYPE_BOOLEAN = 0,	/* ON or OFF */
 	SET_TYPE_INT,		/* valid integer */
 	SET_TYPE_STRING,	/* single string */
@@ -828,7 +829,7 @@ typedef struct bot_setting {
 	void			*defaultval;/* default value for setting */
 }bot_setting;
 
-#define NS_SETTING_END() { NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL, NULL }
+#define NS_SETTING_END() { NULL, NULL, SET_TYPE_NONE, 0, 0, 0, NULL, NULL, NULL, NULL }
 
 /** @brief Message function types
  * 
@@ -1371,7 +1372,7 @@ EXPORTFUNC int irc_ctcp_unhandled_rpl( const Bot *botptr, const Client *target, 
 
 
 /* bots.c */
-EXPORTFUNC int GenerateBotNick( char *nickbuf, int stublen, int alphacount, int numcount);
+EXPORTFUNC int GenerateBotNick( char *nickbuf, size_t stublen, int alphacount, int numcount);
 
 /* users.c */
 EXPORTFUNC Client *FindUser( const char *nick );
@@ -1384,7 +1385,7 @@ EXPORTFUNC Client *FindServer( const char *name );
 EXPORTFUNC Channel *FindChannel( const char *chan );
 EXPORTFUNC int test_cmode( const Channel *c, unsigned int mode );
 EXPORTFUNC int IsChannelMember( const Channel *c, const Client *u );
-EXPORTFUNC int test_cumode( const char *chan, const char *nick, const int flag );
+EXPORTFUNC int test_cumode( const char *chan, const char *nick, unsigned int flag );
 EXPORTFUNC Channel *GetRandomChannel( void );
 EXPORTFUNC Client *GetRandomChannelMember( Channel *c, int uge );
 EXPORTFUNC char *GetRandomChannelKey( int length );
@@ -1631,7 +1632,7 @@ EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void *argp );
 EXPORTVAR extern int os_sock_errno;
 EXPORTFUNC char *os_sock_getlasterrorstring( void );
 EXPORTFUNC char *os_sock_strerror( const int sockerrno );
-EXPORTFUNC int os_sock_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout );
+EXPORTFUNC int os_sock_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout );
 
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );

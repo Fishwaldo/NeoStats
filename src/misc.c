@@ -25,7 +25,6 @@
 
 #include "neostats.h"
 #include "main.h"
-#include "services.h"
 #include "ircstring.h"
 
 /** @brief hrand
@@ -312,14 +311,12 @@ void strip_mirc_codes( char *text )
 
 	while( *text ) {
 		switch( *text ) {
-			case 1:
-				text++;			/* ctcp stuff */
+			case 1:			/* CTCP */
+				text++;	
 				continue;
-				break;
 			case 2:			/* Bold text */
 				text++;
 				continue;
-				break;
 			case 3:			/* mIRC colors? */
 				if( isdigit( text[1] ) ) {	/* Is the first char a number? */
 					text += 2;		/* Skip over the ^C and the first digit */
@@ -337,15 +334,12 @@ void strip_mirc_codes( char *text )
 			case 7:
 				text++;
 				continue;
-				break;
 			case 0x16:			/* Reverse video */
 				text++;
 				continue;
-				break;
 			case 0x1f:			/* Underlined text */
 				text++;
 				continue;
-				break;
 			case 033:
 				text++;
 				if( *text == '[' ) {
@@ -356,7 +350,6 @@ void strip_mirc_codes( char *text )
 						text++;		/* also kill the following char */
 				}
 				continue;
-				break;
 		}
 		*dd++ = *text++;		/* Move on to the next char */
 	}

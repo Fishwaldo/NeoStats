@@ -34,7 +34,6 @@
 #include "base64.h"
 #include "ircsend.h"
 #include "dl.h"
-#include "main.h"
 
 extern void *protocol_module_handle;
 

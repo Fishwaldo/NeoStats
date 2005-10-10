@@ -25,9 +25,11 @@
  */
 
 #include "neostats.h"
+#ifndef WIN32
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h> 
-#endif
+#endif /* HAVE_FCNTL_H */
+#endif /* WIN32 */
 
 /* local errno implementation */
 int os_sock_errno = 0;
@@ -122,7 +124,8 @@ char *os_sock_strerror( const int sockerrno )
 		case WSAEADDRINUSE:
 			/* 10048 */
 			return "Address already in use.";
-			/* Typically, only one usage of each socket address (protocol/IP address/port) is permitted. This error occurs if an application attempts to bind a socket to an IP address/port that has already been used for an existing socket, or a socket that was not closed properly, or one that is still in the process of closing. For server applications that need to bind multiple sockets to the same port number, consider using setsockopt (SO_REUSEADDR). Client applications usually need not call bind at all—connect chooses an unused port automatically. When bind is called with a wildcard address (involving ADDR_ANY), a WSAEADDRINUSE error could be delayed until the specific address is committed. This could happen with a call to another function later, including connect, listen, WSAConnect, or WSAJoinLeaf.  */
+			/* Typically, only one usage of each socket address (protocol/IP address/port) is permitted. This error occurs if an application attempts to bind a socket to an IP address/port that has already been used for an existing socket, or a socket that was not closed properly, or one that is still in the process of closing. For server applications that need to bind multiple sockets to the same port number, consider using setsockopt (SO_REUSEADDR). 
+			   Client applications usually need not call bind at all—connect chooses an unused port automatically. When bind is called with a wildcard address (involving ADDR_ANY), a WSAEADDRINUSE error could be delayed until the specific address is committed. This could happen with a call to another function later, including connect, listen, WSAConnect, or WSAJoinLeaf.  */
 		case WSAEADDRNOTAVAIL:
 			/* 10049 */
 			return "Cannot assign requested address.";
@@ -146,7 +149,8 @@ char *os_sock_strerror( const int sockerrno )
 		case WSAECONNRESET:
 			/* 10054 */
 			return "Connection reset by peer.";
-			/* An existing connection was forcibly closed by the remote host. This normally results if the peer application on the remote host is suddenly stopped, the host is rebooted, the host or remote network interface is disabled, or the remote host uses a hard close (see setsockopt for more information on the SO_LINGER option on the remote socket). This error may also result if a connection was broken due to keep-alive activity detecting a failure while one or more operations are in progress. Operations that were in progress fail with WSAENETRESET. Subsequent operations fail with WSAECONNRESET.  */
+			/* An existing connection was forcibly closed by the remote host. This normally results if the peer application on the remote host is suddenly stopped, the host is rebooted, the host or remote network interface is disabled, or the remote host uses a hard close (see setsockopt for more information on the SO_LINGER option on the remote socket). 
+			  This error may also result if a connection was broken due to keep-alive activity detecting a failure while one or more operations are in progress. Operations that were in progress fail with WSAENETRESET. Subsequent operations fail with WSAECONNRESET.  */
 		case WSAENOBUFS:
 			/* 10055 */
 			return "No buffer space available.";
@@ -402,15 +406,20 @@ int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockadd
 
 int os_sock_set_nonblocking( OS_SOCKET s )
 {
+#ifdef WIN32
+	int ret;
+	unsigned int flags;
+
+	/* reset local errno implementation */
+	os_sock_errno = 0;
+	flags = 1;
+	ret = ioctlsocket( s, FIONBIO, &flags );
+#else
 	int ret;
 	int flags;
 
 	/* reset local errno implementation */
 	os_sock_errno = 0;
-#ifdef WIN32
-	flags = 1;
-	ret = ioctlsocket( s, FIONBIO, &flags );
-#else
 	flags = fcntl( s, F_GETFL, 0 );
 	flags |= O_NONBLOCK;
 	ret = fcntl( s, F_SETFL, flags );
@@ -543,7 +552,7 @@ int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
  *  Wrapper function for select
  */
 
-int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, struct timeval* timeout )
+int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const struct timeval* timeout )
 {
 	int ret;
 

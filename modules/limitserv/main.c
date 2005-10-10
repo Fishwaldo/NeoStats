@@ -225,7 +225,7 @@ static int LoadChannel( void *data, int size )
 
 int ModInit( void )
 {
-	qshash = hash_create( -1, 0, 0 );
+	qshash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !qshash ) {
 		nlog( LOG_CRITICAL, "Unable to create ls_channel hash" );
 		return -1;

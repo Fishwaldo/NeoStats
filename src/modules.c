@@ -31,7 +31,6 @@
 #include "bots.h"
 #include "dns.h"
 #include "protocol.h"
-#include "ircprotocol.h"
 #include "auth.h"
 #include "users.h"
 #include "channels.h"
