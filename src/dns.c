@@ -51,7 +51,7 @@ typedef struct DnsLookup {
 	Module* modptr;
 } DnsLookup;
 
-adns_state ads;
+adns_state nsads;
 struct event *dnstimeout;
 
 struct DNSStats {
@@ -119,9 +119,9 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (void *data, adns_
 	if (type == adns_r_ptr) {
 		sa.sin_family = AF_INET;
 		sa.sin_addr.s_addr = inet_addr (str);
-		status = adns_submit_reverse (ads, (const struct sockaddr *) &sa, type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+		status = adns_submit_reverse (nsads, (const struct sockaddr *) &sa, type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
 	} else {
-		status = adns_submit (ads, str, type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+		status = adns_submit (nsads, str, type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
 	}
 	if (status) {
 		nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
@@ -141,9 +141,9 @@ adns_read(void *data, void *notused, size_t len) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     if (len > 0) {
-        adns_processreadable(ads, sock->sock_no, &tv);
+        adns_processreadable(nsads, sock->sock_no, &tv);
     } else {
-        adns_processexceptional(ads, sock->sock_no, &tv);
+        adns_processexceptional(nsads, sock->sock_no, &tv);
     }
     do_dns(0,0,NULL);
     return NS_SUCCESS;
@@ -152,7 +152,7 @@ int
 adns_write(int fd, void *data) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    adns_processwriteable(ads, fd, &tv);
+    adns_processwriteable(nsads, fd, &tv);
     do_dns(0,0,NULL);
     return NS_SUCCESS;
 }
@@ -208,9 +208,9 @@ int InitDns (void)
 		return NS_FAILURE;
 	}
 #ifndef DEBUG
-	adnsstart = adns_init (&ads, adns_if_noerrprint | adns_if_noautosys, 0, sock_update);
+	adnsstart = adns_init (&nsads, adns_if_noerrprint | adns_if_noautosys, 0, sock_update);
 #else
-	adnsstart = adns_init (&ads, adns_if_debug | adns_if_noautosys, 0, sock_update);
+	adnsstart = adns_init (&nsads, adns_if_debug | adns_if_noautosys, 0, sock_update);
 #endif
 	if (adnsstart) {
 		nlog (LOG_CRITICAL, "ADNS init failed: %s", strerror (adnsstart));
@@ -255,7 +255,7 @@ void FiniDns (void)
 	list_destroy (dnsqueue);
 	event_del(dnstimeout);
 	free(dnstimeout);
-	adns_finish(ads);
+	adns_finish(nsads);
 }
 /** @brief Canx any DNS queries for modules we might be unloading
  * 
@@ -314,7 +314,7 @@ void do_dns (int notused, short event, void *arg)
 
 	/* process timeouts for ADNS */
 	gettimeofday(&tv,NULL);
-	adns_processtimeouts(ads, &tv);
+	adns_processtimeouts(nsads, &tv);
     
 	/* if the list is empty, no use doing anything */
 	if (list_isempty (dnslist)) {
@@ -325,7 +325,7 @@ void do_dns (int notused, short event, void *arg)
 	while (dnsnode) {
 		/* loop through the list */
 		dnsdata = lnode_get (dnsnode);
-		status = adns_check (ads, &dnsdata->q, &dnsdata->a, NULL);
+		status = adns_check (nsads, &dnsdata->q, &dnsdata->a, NULL);
 		/* if status == eagain, the lookup hasn't completed yet */
 		if (status == EAGAIN) {
 			dlog(DEBUG2, "DNS: Lookup hasn't completed for %s", (char *) &dnsdata->lookupdata);
@@ -386,9 +386,9 @@ void dns_check_queue()
 			if (dnsdata->type == adns_r_ptr) {
 				sa.sin_family = AF_INET;
 				sa.sin_addr.s_addr = inet_addr (dnsdata->lookupdata);
-				status = adns_submit_reverse (ads, (const struct sockaddr *) &sa, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+				status = adns_submit_reverse (nsads, (const struct sockaddr *) &sa, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
 			} else {
-				status = adns_submit (ads, dnsdata->lookupdata, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+				status = adns_submit (nsads, dnsdata->lookupdata, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
 			}
 			if (status) {
 				/* delete from queue and delete node */

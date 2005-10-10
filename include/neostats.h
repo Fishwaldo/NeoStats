@@ -504,7 +504,7 @@ typedef enum NS_TRANSFER {
 EXPORTVAR extern char segv_location[SEGV_LOCATION_BUFSIZE];
 
 /* this is the dns structure */
-extern adns_state ads;
+extern adns_state nsads;
 
 /* version info */
 EXPORTVAR extern const char version_date[];
@@ -1536,8 +1536,8 @@ extern void nassert_fail( const char *expr, const char *file, const int line, co
 #define nassert(expr) (__ASSERT_VOID_CAST (0))
 #endif /* NDEBUG */
 
-EXPORTFUNC void nlog( LOG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void dlog( DEBUG_LEVEL level, char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void nlog( LOG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void dlog( DEBUG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
 /* List walk handler type */
 typedef int (*ChannelListHandler) ( Channel *c, void *v );
