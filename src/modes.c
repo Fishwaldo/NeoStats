@@ -356,17 +356,17 @@ char *CmodeMaskToPrefixString (const unsigned int mask)
 	return PrefixStringBuf;
 }
 
-int UmodeCharToMask (const char mode)
+unsigned int UmodeCharToMask (const char mode)
 {
 	return ircd_umodes[(int)mode].mask;
 }
 
-int SmodeCharToMask (const char mode)
+unsigned int SmodeCharToMask (const char mode)
 {
 	return ircd_smodes[(int)mode].mask;
 }
 
-int CmodeCharToMask (const char mode)
+unsigned int CmodeCharToMask (const char mode)
 {
 	return ircd_cmodes[(int)mode].mask;
 }

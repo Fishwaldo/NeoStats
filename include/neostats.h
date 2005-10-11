@@ -317,9 +317,9 @@ EXPORTVAR extern unsigned int ircd_supported_cumodes;
 #define IsServerOperMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
 #define IsServerOperSMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
 
-EXPORTFUNC int UmodeCharToMask( const char mode );
+EXPORTFUNC unsigned int UmodeCharToMask( const char mode );
 EXPORTFUNC const char *GetUmodeDesc( const unsigned int mask );
-EXPORTFUNC int SmodeCharToMask( const char mode );
+EXPORTFUNC unsigned int SmodeCharToMask( const char mode );
 EXPORTFUNC const char *GetSmodeDesc( const unsigned int mask );
 EXPORTFUNC unsigned int UmodeStringToMask( const char *UmodeString );
 EXPORTFUNC char *UmodeMaskToString( const unsigned int mask );
@@ -330,7 +330,7 @@ EXPORTFUNC char SmodeMaskToChar( const unsigned int mask );
 EXPORTFUNC unsigned int CmodeStringToMask( const char *UmodeString );
 EXPORTFUNC char *CmodeMaskToString( const unsigned int mask );
 EXPORTFUNC char *CmodeMaskToPrefixString( const unsigned int mask );
-EXPORTFUNC int CmodeCharToMask( const char mode );
+EXPORTFUNC unsigned int CmodeCharToMask( const char mode );
 EXPORTFUNC char CmodeMaskToChar( const unsigned int mask );
 EXPORTFUNC int CmodeCharToFlags( const char mode );
 EXPORTFUNC unsigned int CmodePrefixToMask( const char prefix );

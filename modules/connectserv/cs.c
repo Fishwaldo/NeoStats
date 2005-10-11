@@ -398,10 +398,10 @@ static int cs_event_serverkill( CmdParams *cmdparams )
  *
  *  @params cmdparams pointer to commands param struct
  *
- *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ *  @return none
  */
 
-static int cs_report_mode( const char *modedesc, const int serverflag, const Client *u, const int mask, const int add, const char mode )
+static void cs_report_mode( const char *modedesc, const int serverflag, const Client *u, const int add, const char mode )
 {
 	if( serverflag ) 
 	{
@@ -419,7 +419,6 @@ static int cs_report_mode( const char *modedesc, const int serverflag, const Cli
 			add ? '+' : '-',
 			mode );
 	}
-	return NS_SUCCESS;
 }
 
 /** @brief cs_event_umode
@@ -444,7 +443,7 @@ static int cs_event_umode( CmdParams *cmdparams )
 		UMODE_OPER |
 		UMODE_LOCOP |
 		UMODE_SERVICES;
-	int mask;
+	unsigned int mask;
 	int add = 1;
 	const char *modes;
 
@@ -465,7 +464,7 @@ static int cs_event_umode( CmdParams *cmdparams )
 				if( mask & UMODE_BOT )
 					cs_report( CS_MSG( MSG_BOT ), cmdparams->source->name, add ? "now" : "no longer", add ? '+' : '-', *modes );
 				else if( OperUmodes & mask )
-					cs_report_mode( GetUmodeDesc( mask ), IsServerOperMode( mask ), cmdparams->source, mask, add, *modes );
+					cs_report_mode( GetUmodeDesc( mask ), IsServerOperMode( mask ), cmdparams->source, add, *modes );
 				break;
 		}
 		modes++;
@@ -494,7 +493,7 @@ static int cs_event_smode( CmdParams *cmdparams )
 		SMODE_ADMIN |
 		SMODE_COADMIN |
 		SMODE_GUESTADMIN;
-	int mask;
+	unsigned int mask;
 	int add = 1;
 	const char *modes;
 
@@ -513,7 +512,7 @@ static int cs_event_smode( CmdParams *cmdparams )
 			default:
 				mask = SmodeCharToMask( *modes );
 				if( OperSmodes & mask )
-					cs_report_mode( GetSmodeDesc( mask ), IsServerOperSMode( mask ), cmdparams->source, mask, add, *modes );
+					cs_report_mode( GetSmodeDesc( mask ), IsServerOperSMode( mask ), cmdparams->source, add, *modes );
 				break;
 		}
 		modes++;
