@@ -774,13 +774,13 @@ hash_isempty (const hash_t * hash)
 }
 
 static hnode_t *
-hnode_alloc (const void *context)
+hnode_alloc (void *context)
 {
 	return ns_malloc (sizeof *hnode_alloc (NULL));
 }
 
 static void
-hnode_free (hnode_t * node, const void *context)
+hnode_free (hnode_t * node, void *context)
 {
 	ns_free (node);
 }
