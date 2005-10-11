@@ -218,26 +218,26 @@ EXPORTFUNC 	extern void hash_destroy (hash_t *);
 	extern void hash_free (hash_t *);
 	extern hash_t *hash_init (hash_t *, hashcount_t, hash_comp_t, hash_fun_t, hnode_t **, hashcount_t);
 EXPORTFUNC 	extern void hash_insert (hash_t *, hnode_t *, const void *);
-EXPORTFUNC 	extern hnode_t *hash_lookup (hash_t *, const void *);
+EXPORTFUNC 	extern hnode_t *hash_lookup (const hash_t *, const void *);
 EXPORTFUNC 	extern hnode_t *hash_delete (hash_t *, hnode_t *);
 	extern int hash_alloc_insert (hash_t *, const void *, void *);
 	extern void hash_delete_free (hash_t *, hnode_t *);
 
 	extern void hnode_put (hnode_t *, void *);
-	extern void *hnode_get (hnode_t *);
-	extern const void *hnode_getkey (hnode_t *);
-	extern hashcount_t hash_count (hash_t *);
-	extern hashcount_t hash_size (hash_t *);
+	extern void *hnode_get (const hnode_t *);
+	extern const void *hnode_getkey (const hnode_t *);
+	extern hashcount_t hash_count (const hash_t *);
+	extern hashcount_t hash_size (const hash_t *);
 
-	extern int hash_isfull (hash_t *);
-	extern int hash_isempty (hash_t *);
+	extern int hash_isfull (const hash_t *);
+	extern int hash_isempty (const hash_t *);
 
 EXPORTFUNC 	extern void hash_scan_begin (hscan_t *, hash_t *);
 EXPORTFUNC 	extern hnode_t *hash_scan_next (hscan_t *);
 EXPORTFUNC	extern hnode_t *hash_scan_delete (hash_t *, hnode_t *);
 	extern void hash_scan_delfree (hash_t *, hnode_t *);
 
-	extern int hash_verify (hash_t *);
+	extern int hash_verify (const hash_t *);
 	extern hash_val_t hash_fun_default (const void *key);
 
 EXPORTFUNC 	extern hnode_t *hnode_create (void *);
@@ -259,7 +259,7 @@ EXPORTFUNC 	extern void hnode_destroy (hnode_t *);
 #endif /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 
 EXPORTFUNC 	void hnode_create_insert (hash_t *, void *, const void *);
-EXPORTFUNC 	hnode_t *hnode_find (hash_t * hash, const void *key);
+EXPORTFUNC 	hnode_t *hnode_find (const hash_t * hash, const void *key);
 
 EXPORTFUNC 	extern void hash_delete_destroy_node( hash_t *, hnode_t * );
 EXPORTFUNC 	extern void hash_scan_delete_destroy_node( hash_t *hash, hnode_t *node );

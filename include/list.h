@@ -99,8 +99,8 @@ EXPORTFUNC	lnode_t *lnode_create (void *);
 	lnode_t *lnode_init (lnode_t *, void *);
 EXPORTFUNC	void lnode_destroy (lnode_t *);
 	void lnode_put (lnode_t *, void *);
-	void *lnode_get (lnode_t *);
-	int lnode_is_in_a_list (lnode_t *);
+	void *lnode_get (const lnode_t *);
+	int lnode_is_in_a_list (const lnode_t *);
 
 #if defined(LIST_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG)
 #define lnode_put(N, D)		((N)->list_data = (D))
@@ -112,8 +112,8 @@ EXPORTFUNC	void lnode_destroy (lnode_t *);
 	void lnode_pool_destroy (lnodepool_t *);
 	lnode_t *lnode_borrow (lnodepool_t *, void *);
 	void lnode_return (lnodepool_t *, lnode_t *);
-	int lnode_pool_isempty (lnodepool_t *);
-	int lnode_pool_isfrom (lnodepool_t *, lnode_t *);
+	int lnode_pool_isempty (const lnodepool_t *);
+	int lnode_pool_isfrom (const lnodepool_t *, const lnode_t *);
 
 EXPORTFUNC	int comparef (const void *, const void *);
 
@@ -124,20 +124,20 @@ EXPORTFUNC	void list_destroy (list_t *);
 EXPORTFUNC	void list_destroy_nodes (list_t *);
 	void list_return_nodes (list_t *, lnodepool_t *);
 
-	listcount_t list_count (list_t *);
-	int list_isempty (list_t *);
-	int list_isfull (list_t *);
-	int list_contains (list_t *, lnode_t *);
+	listcount_t list_count (const list_t *);
+	int list_isempty (const list_t *);
+	int list_isfull (const list_t *);
+	int list_contains (list_t *, const lnode_t *);
 
 	void list_append (list_t *, lnode_t *);
 	void list_prepend (list_t *, lnode_t *);
 EXPORTFUNC	void list_ins_before (list_t *, lnode_t *, lnode_t *);
 EXPORTFUNC	void list_ins_after (list_t *, lnode_t *, lnode_t *);
 
-	lnode_t *list_first (list_t *);
-	lnode_t *list_last (list_t *);
-	lnode_t *list_next (list_t *, lnode_t *);
-	lnode_t *list_prev (list_t *, lnode_t *);
+	lnode_t *list_first (const list_t *);
+	lnode_t *list_last (const list_t *);
+	lnode_t *list_next (list_t *, const lnode_t *);
+	lnode_t *list_prev (list_t *, const lnode_t *);
 
 	lnode_t *list_del_first (list_t *);
 	lnode_t *list_del_last (list_t *);
@@ -171,13 +171,13 @@ EXPORTFUNC	void list_process (list_t *, void *, void (*)(list_t *, lnode_t *, vo
 	void list_transfer (list_t *, list_t *, lnode_t * first);
 	void list_merge (list_t *, list_t *, int (const void *, const void *));
 EXPORTFUNC	void list_sort (list_t *, int (const void *, const void *));
-EXPORTFUNC	lnode_t *list_find (list_t *, const void *, int (const void *, const void *));
+EXPORTFUNC	lnode_t *list_find (const list_t *, const void *, int (const void *, const void *));
 EXPORTFUNC	int list_is_sorted (list_t *, int (const void *, const void *));
 
 EXPORTFUNC	void list_destroy_auto (list_t * list);
 EXPORTFUNC	lnode_t *lnode_create_append (list_t *, void *);
 EXPORTFUNC	lnode_t *lnode_create_prepend (list_t *list, void *data);
-EXPORTFUNC	void *lnode_find (list_t * list, const void *key, int compare (const void *, const void *));
+EXPORTFUNC	void *lnode_find (const list_t * list, const void *key, int compare (const void *, const void *));
 EXPORTFUNC	void list_delete_destroy_node( list_t * list, lnode_t * del );
 
 #ifdef __cplusplus

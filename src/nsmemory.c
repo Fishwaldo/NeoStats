@@ -37,7 +37,7 @@
  *  @return pointer to allocated buffer
  */
 
-void *ns_malloc( int size )
+void *ns_malloc( size_t size )
 {
 	void *buf;
 
@@ -66,7 +66,7 @@ void *ns_malloc( int size )
  *	@return pointer to allocated buffer
  */
 
-void *ns_calloc( int size )
+void *ns_calloc( size_t size )
 {
 	void *buf;
 
@@ -96,7 +96,7 @@ void *ns_calloc( int size )
  *  @return pointer to allocated buffer
  */
 
-void *ns_realloc( void *ptr, int size )
+void *ns_realloc( void *ptr, size_t size )
 {
 	void *newptr;
 

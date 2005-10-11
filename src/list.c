@@ -94,15 +94,15 @@ list_init (list_t * list, listcount_t maxcount)
 list_t *
 list_create (listcount_t maxcount)
 {
-	list_t *new = ns_malloc (sizeof *new);
-	if (new) {
+	list_t *newlist = ns_malloc (sizeof *newlist);
+	if (newlist) {
 		nassert (maxcount != 0);
-		new->nilnode.next = &new->nilnode;
-		new->nilnode.prev = &new->nilnode;
-		new->nodecount = 0;
-		new->maxcount = maxcount;
+		newlist->nilnode.next = &newlist->nilnode;
+		newlist->nilnode.prev = &newlist->nilnode;
+		newlist->nodecount = 0;
+		newlist->maxcount = maxcount;
 	}
-	return new;
+	return newlist;
 }
 
 /*
@@ -161,48 +161,48 @@ list_return_nodes (list_t * list, lnodepool_t * pool)
 }
 
 /*
- * Insert the node ``new'' into the list immediately after ``this'' node.
+ * Insert the node ``newnode'' into the list immediately after ``thisnode'' node.
  */
 
 void
-list_ins_after (list_t * list, lnode_t * new, lnode_t * this)
+list_ins_after (list_t * list, lnode_t * newnode, lnode_t * thisnode)
 {
-	lnode_t *that = this->next;
+	lnode_t *that = thisnode->next;
 
-	nassert (new != NULL);
-	nassert (!list_contains (list, new));
-	nassert (!lnode_is_in_a_list (new));
-	nassert (this == list_nil (list) || list_contains (list, this));
+	nassert (newnode != NULL);
+	nassert (!list_contains (list, newnode));
+	nassert (!lnode_is_in_a_list (newnode));
+	nassert (thisnode == list_nil (list) || list_contains (list, thisnode));
 	nassert (list->nodecount + 1 > list->nodecount);
 
-	new->prev = this;
-	new->next = that;
-	that->prev = new;
-	this->next = new;
+	newnode->prev = thisnode;
+	newnode->next = that;
+	that->prev = newnode;
+	thisnode->next = newnode;
 	list->nodecount++;
 
 	nassert (list->nodecount <= list->maxcount);
 }
 
 /*
- * Insert the node ``new'' into the list immediately before ``this'' node.
+ * Insert the node ``newnode'' into the list immediately before ``thisnode'' node.
  */
 
 void
-list_ins_before (list_t * list, lnode_t * new, lnode_t * this)
+list_ins_before (list_t * list, lnode_t * newnode, lnode_t * thisnode)
 {
-	lnode_t *that = this->prev;
+	lnode_t *that = thisnode->prev;
 
-	nassert (new != NULL);
-	nassert (!list_contains (list, new));
-	nassert (!lnode_is_in_a_list (new));
-	nassert (this == list_nil (list) || list_contains (list, this));
+	nassert (newnode != NULL);
+	nassert (!list_contains (list, newnode));
+	nassert (!lnode_is_in_a_list (newnode));
+	nassert (thisnode == list_nil (list) || list_contains (list, thisnode));
 	nassert (list->nodecount + 1 > list->nodecount);
 
-	new->next = this;
-	new->prev = that;
-	that->next = new;
-	this->prev = new;
+	newnode->next = thisnode;
+	newnode->prev = that;
+	that->next = newnode;
+	thisnode->prev = newnode;
 	list->nodecount++;
 
 	nassert (list->nodecount <= list->maxcount);
@@ -257,13 +257,13 @@ list_process (list_t * list, void *context, void (*function) (list_t * list, lno
 lnode_t *
 lnode_create (void *data)
 {
-	lnode_t *new = ns_malloc (sizeof *new);
-	if (new) {
-		new->data = data;
-		new->next = NULL;
-		new->prev = NULL;
+	lnode_t *newnode = ns_malloc (sizeof *newnode);
+	if (newnode) {
+		newnode->data = data;
+		newnode->next = NULL;
+		newnode->prev = NULL;
 	}
-	return new;
+	return newnode;
 }
 
 /*
@@ -343,7 +343,7 @@ lnode_pool_create (listcount_t n)
  */
 
 int
-lnode_pool_isfrom (lnodepool_t * pool, lnode_t * node)
+lnode_pool_isfrom (const lnodepool_t * pool, const lnode_t * node)
 {
 	listcount_t i;
 
@@ -377,14 +377,14 @@ lnode_pool_destroy (lnodepool_t * p)
 lnode_t *
 lnode_borrow (lnodepool_t * pool, void *data)
 {
-	lnode_t *new = pool->fre;
-	if (new) {
-		pool->fre = new->next;
-		new->data = data;
-		new->next = NULL;
-		new->prev = NULL;
+	lnode_t *newnode = pool->fre;
+	if (newnode) {
+		pool->fre = newnode->next;
+		newnode->data = data;
+		newnode->next = NULL;
+		newnode->prev = NULL;
 	}
-	return new;
+	return newnode;
 }
 
 /*
@@ -409,7 +409,7 @@ lnode_return (lnodepool_t * pool, lnode_t * node)
  */
 
 int
-list_contains (list_t * list, lnode_t * node)
+list_contains (list_t * list, const lnode_t * node)
 {
 	lnode_t *n, *nil = list_nil (list);
 
@@ -584,7 +584,7 @@ list_sort (list_t * list, int compare (const void *, const void *))
 }
 
 lnode_t *
-list_find (list_t * list, const void *key, int compare (const void *, const void *))
+list_find (const list_t * list, const void *key, int compare (const void *, const void *))
 {
 	lnode_t *node;
 
@@ -645,7 +645,7 @@ list_is_sorted (list_t * list, int compare (const void *, const void *))
  */
 
 int
-list_isempty (list_t * list)
+list_isempty (const list_t * list)
 {
 	return list->nodecount == 0;
 }
@@ -656,7 +656,7 @@ list_isempty (list_t * list)
  */
 
 int
-list_isfull (list_t * list)
+list_isfull (const list_t * list)
 {
 	return list->nodecount == list->maxcount;
 }
@@ -666,7 +666,7 @@ list_isfull (list_t * list)
  */
 
 int
-lnode_pool_isempty (lnodepool_t * pool)
+lnode_pool_isempty (const lnodepool_t * pool)
 {
 	return (pool->fre == NULL);
 }
@@ -696,7 +696,7 @@ list_prepend (list_t * list, lnode_t * node)
  */
 
 lnode_t *
-list_first (list_t * list)
+list_first (const list_t * list)
 {
 	if (list->nilnode.next == &list->nilnode)
 		return NULL;
@@ -708,7 +708,7 @@ list_first (list_t * list)
  */
 
 lnode_t *
-list_last (list_t * list)
+list_last (const list_t * list)
 {
 	if (list->nilnode.prev == &list->nilnode)
 		return NULL;
@@ -720,7 +720,7 @@ list_last (list_t * list)
  */
 
 listcount_t
-list_count (list_t * list)
+list_count (const list_t * list)
 {
 	return list->nodecount;
 }
@@ -761,7 +761,7 @@ lnode_put (lnode_t * lnode, void *data)
  */
 
 void *
-lnode_get (lnode_t * lnode)
+lnode_get (const lnode_t * lnode)
 {
 	return lnode->data;
 }
@@ -772,7 +772,7 @@ lnode_get (lnode_t * lnode)
  */
 
 lnode_t *
-list_next (list_t * list, lnode_t * lnode)
+list_next (list_t * list, const lnode_t * lnode)
 {
 	nassert (list_contains (list, lnode));
 
@@ -786,7 +786,7 @@ list_next (list_t * list, lnode_t * lnode)
  */
 
 lnode_t *
-list_prev (list_t * list, lnode_t * lnode)
+list_prev (list_t * list, const lnode_t * lnode)
 {
 	nassert (list_contains (list, lnode));
 
@@ -800,7 +800,7 @@ list_prev (list_t * list, lnode_t * lnode)
  */
 
 int
-lnode_is_in_a_list (lnode_t * lnode)
+lnode_is_in_a_list (const lnode_t * lnode)
 {
 	return (lnode->next != NULL || lnode->prev != NULL);
 }
@@ -885,7 +885,7 @@ lnode_t *lnode_create_prepend (list_t *list, void *data)
  * Find list entry and return data pointer
  */
 void *
-lnode_find (list_t * list, const void *key, int compare (const void *, const void *))
+lnode_find (const list_t * list, const void *key, int compare (const void *, const void *))
 {
 	lnode_t * ln;
 

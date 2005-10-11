@@ -1244,9 +1244,9 @@ EXPORTFUNC void fatal_error( char *file, int line, const char *func, char *error
 #define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__, (error_text) ); 
 
 /* nsmemory.c */
-EXPORTFUNC void *ns_malloc( int size );
-EXPORTFUNC void *ns_calloc( int size );
-EXPORTFUNC void *ns_realloc( void *ptr, int size );
+EXPORTFUNC void *ns_malloc( size_t size );
+EXPORTFUNC void *ns_calloc( size_t size );
+EXPORTFUNC void *ns_realloc( void *ptr, size_t size );
 EXPORTFUNC void _ns_free( void **ptr );
 #define ns_free( ptr ) _ns_free( ( void **) &( ptr ) );
 
@@ -1532,7 +1532,7 @@ extern void nassert_fail( const char *expr, const char *file, const int line, co
 #ifndef NDEBUG
 #define nassert(expr) \
   (__ASSERT_VOID_CAST ((expr) ? 0 :                                           \
-	(nassert_fail(__STRING(expr), __FILE__, __LINE__, __NASSERT_FUNCTION), 0)))
+	(nassert_fail((__STRING((expr))), __FILE__, __LINE__, __NASSERT_FUNCTION), 0)))
 #else /* NDEBUG */
 #define nassert(expr) (__ASSERT_VOID_CAST (0))
 #endif /* NDEBUG */

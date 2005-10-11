@@ -74,11 +74,10 @@ static const char rcsid[] = "$Id$";
 #define mask hash_mask
 #define dynamic hash_dynamic
 
-#define table hash_table
 #define chain hash_chain
 
-static hnode_t *hnode_alloc (void *context);
-static void hnode_free (hnode_t * node, void *context);
+static hnode_t *hnode_alloc (const void *context);
+static void hnode_free (hnode_t * node, const void *context);
 static int hash_comp_default (const void *key1, const void *key2);
 
 int hash_val_t_bit;
@@ -141,8 +140,7 @@ compute_mask (hashcount_t size)
  * Initialize the table of pointers to null.
  */
 
-static void
-clear_table (hash_t * hash)
+static void clear_table (const hash_t * hash)
 {
 	hash_val_t i;
 
@@ -264,10 +262,11 @@ shrink_table (hash_t * hash)
 	for (chain = 0; chain < nchains; chain++) {
 		low_chain = hash->table[chain];	/* 2 */
 		high_chain = hash->table[chain + nchains];
-		for (low_tail = low_chain; low_tail && low_tail->next; low_tail = low_tail->next);	/* 3 */
-		if (low_chain != 0)	/* 4 */
+		for (low_tail = low_chain; low_tail && low_tail->next; low_tail = low_tail->next)
+			/* VOID */;	/* 3 */
+		if (low_chain != NULL)	/* 4 */
 			low_tail->next = high_chain;
-		else if (high_chain != 0)	/* 5 */
+		else if (high_chain != NULL)	/* 5 */
 			hash->table[chain] = high_chain;
 		else
 			nassert (hash->table[chain] == NULL);	/* 6 */
@@ -466,7 +465,8 @@ hash_scan_begin (hscan_t * scan, hash_t * hash)
 
 	/* 1 */
 
-	for (chain = 0; chain < nchains && hash->table[chain] == 0; chain++);
+	for (chain = 0; chain < nchains && hash->table[chain] == 0; chain++)
+		/* VOID */;
 
 	if (chain < nchains) {	/* 2 */
 		scan->chain = chain;
@@ -581,8 +581,7 @@ hash_insert (hash_t * hash, hnode_t * node, const void *key)
  *    entry.
  */
 
-hnode_t *
-hash_lookup (hash_t * hash, const void *key)
+hnode_t *hash_lookup (const hash_t * hash, const void *key)
 {
 	hash_val_t hkey, chain;
 	hnode_t *nptr;
@@ -721,8 +720,7 @@ hash_scan_delfree (hash_t * hash, hnode_t * node)
  *    to see whether it is correct for the node's chain.
  */
 
-int
-hash_verify (hash_t * hash)
+int hash_verify (const hash_t * hash)
 {
 	hashcount_t count = 0;
 	hash_val_t chain;
@@ -758,7 +756,7 @@ hash_verify (hash_t * hash)
 
 #undef hash_isfull
 int
-hash_isfull (hash_t * hash)
+hash_isfull (const hash_t * hash)
 {
 	return hash->nodecount == hash->maxcount;
 }
@@ -770,19 +768,19 @@ hash_isfull (hash_t * hash)
 
 #undef hash_isempty
 int
-hash_isempty (hash_t * hash)
+hash_isempty (const hash_t * hash)
 {
 	return hash->nodecount == 0;
 }
 
 static hnode_t *
-hnode_alloc (void *context)
+hnode_alloc (const void *context)
 {
 	return ns_malloc (sizeof *hnode_alloc (NULL));
 }
 
 static void
-hnode_free (hnode_t * node, void *context)
+hnode_free (hnode_t * node, const void *context)
 {
 	ns_free (node);
 }
@@ -834,33 +832,33 @@ hnode_put (hnode_t * node, void *data)
 
 #undef hnode_get
 void *
-hnode_get (hnode_t * node)
+hnode_get (const hnode_t * node)
 {
 	return node->data;
 }
 
 #undef hnode_getkey
 const void *
-hnode_getkey (hnode_t * node)
+hnode_getkey (const hnode_t * node)
 {
 	return node->key;
 }
 
 #undef hash_count
 hashcount_t
-hash_count (hash_t * hash)
+hash_count (const hash_t * hash)
 {
 	return hash->nodecount;
 }
 
 #undef hash_size
 hashcount_t
-hash_size (hash_t * hash)
+hash_size (const hash_t * hash)
 {
 	return hash->nchains;
 }
 
-extern hash_val_t
+hash_val_t
 hash_fun_default (const void *key)
 {
 	static unsigned long randbox[] = {
@@ -904,7 +902,7 @@ void hnode_create_insert (hash_t *hash, void *data, const void *key)
 /*
  * Find hash entry and return data pointer
  */
-hnode_t *hnode_find (hash_t * hash, const void *key)
+hnode_t *hnode_find (const hash_t * hash, const void *key)
 {
 	hnode_t *hn;
 
