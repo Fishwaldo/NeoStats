@@ -125,20 +125,20 @@ cfg_opt_t fileconfig[] = {
 };
 
 validate_args arg_validate[] = {
-	{"ServerConfig|Name", &cb_verify_neohost},
-	{"ServerConfig|ServiceChannel", &cb_verify_chan},
-	{"ServerConfig|ServerNumeric", &cb_verify_numeric},
-	{"ServerConfig|BindTo", &cb_verify_bind},
-	{"ServerConfig|Protocol", &cb_verify_file},
-	{"Options|ServerSettime", &cb_verify_settime},
-	{"Options|DataBaseType", &cb_verify_file},
-	{"Options|LogFileNameFormat", &cb_verify_log},
-	{"Options|RootNick", &cb_verify_mask},
-	{"Options|NOLOAD", &cb_noload},
-	{"Servers|IpAddress", &cb_verify_host},
-	{"ServiceRoot|Mask", &cb_verify_mask},
-	{"Modules|ModuleName", &cb_verify_file},
-	{"NeoNet|HostName", &cb_verify_host}
+	{"ServerConfig|Name", cb_verify_neohost},
+	{"ServerConfig|ServiceChannel", cb_verify_chan},
+	{"ServerConfig|ServerNumeric", cb_verify_numeric},
+	{"ServerConfig|BindTo", cb_verify_bind},
+	{"ServerConfig|Protocol", cb_verify_file},
+	{"Options|ServerSettime", cb_verify_settime},
+	{"Options|DataBaseType", cb_verify_file},
+	{"Options|LogFileNameFormat", cb_verify_log},
+	{"Options|RootNick", cb_verify_mask},
+	{"Options|NOLOAD", cb_noload},
+	{"Servers|IpAddress", cb_verify_host},
+	{"ServiceRoot|Mask", cb_verify_mask},
+	{"Modules|ModuleName", cb_verify_file},
+	{"NeoNet|HostName", cb_verify_host}
 };
 
 /** @brief ConfParseError
