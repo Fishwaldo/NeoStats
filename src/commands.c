@@ -41,7 +41,7 @@ static int bot_cmd_credits( CmdParams *cmdparams );
 static int bot_cmd_levels( CmdParams *cmdparams );
 
 /* help title strings for different user levels */
-char *help_level_title[]=
+static char *help_level_title[]=
 {
 	"Operators",
 	"Service Admins",
@@ -60,11 +60,11 @@ char *help_level_title[]=
  */
 static bot_cmd intrinsic_commands[]=
 {
-	{"HELP",	bot_cmd_help,	0, 	0,	cmd_help_help},	
-	{"VERSION",	bot_cmd_version,0, 	0,	cmd_help_version},
-	{"ABOUT",	bot_cmd_about,	0, 	0,	cmd_help_about},
-	{"CREDITS",	bot_cmd_credits,0, 	0,	cmd_help_credits},
-	{"LEVELS",	bot_cmd_levels,	0, 	0,	cmd_help_levels},
+	{"HELP",	bot_cmd_help,	0, 	0,	cmd_help_help,		0, NULL, NULL},	
+	{"VERSION",	bot_cmd_version,0, 	0,	cmd_help_version,	0, NULL, NULL},
+	{"ABOUT",	bot_cmd_about,	0, 	0,	cmd_help_about,		0, NULL, NULL},
+	{"CREDITS",	bot_cmd_credits,0, 	0,	cmd_help_credits,	0, NULL, NULL},
+	{"LEVELS",	bot_cmd_levels,	0, 	0,	cmd_help_levels,	0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -129,7 +129,7 @@ void CommandReport( const Bot *botptr, const char *fmt, ... )
 	irc_chanalert( botptr, buf );
 }
 
-void msg_permission_denied( CmdParams *cmdparams, char *subcommand )
+void msg_permission_denied( const CmdParams *cmdparams, const char *subcommand )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Permission Denied", cmdparams->source ) );
 	irc_chanalert( cmdparams->bot, _( "%s tried to use %s %s, but is not authorised" ), 
@@ -138,28 +138,28 @@ void msg_permission_denied( CmdParams *cmdparams, char *subcommand )
 		cmdparams->source->name, cmdparams->param, subcommand );
 }
 
-void msg_error_need_more_params( CmdParams *cmdparams )
+void msg_error_need_more_params( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Insufficient parameters", cmdparams->source ) );
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
 		cmdparams->bot->name, cmdparams->cmd );
 }
 
-void msg_error_param_out_of_range( CmdParams *cmdparams )
+void msg_error_param_out_of_range( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Parameter out of range.", cmdparams->source ) );
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
 		cmdparams->bot->name, cmdparams->cmd );
 }
 
-void msg_syntax_error( CmdParams *cmdparams )
+void msg_syntax_error( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Syntax error", cmdparams->source ) );
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
 		cmdparams->bot->name, cmdparams->cmd );
 }
 
-void msg_unknown_command( CmdParams *cmdparams )
+void msg_unknown_command( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Syntax error: unknown command: \2%s\2", cmdparams->source ), 
 		cmdparams->param );
@@ -168,7 +168,7 @@ void msg_unknown_command( CmdParams *cmdparams )
 			cmdparams->source->name, cmdparams->param );
 }
 
-void msg_only_opers( CmdParams *cmdparams )
+void msg_only_opers( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, 
 		__( "This service is only available to IRC operators.", cmdparams->source ) );
@@ -178,7 +178,7 @@ void msg_only_opers( CmdParams *cmdparams )
 		cmdparams->source->name, cmdparams->cmd );
 }
 
-void check_cmd_result( CmdParams *cmdparams, int cmdret )
+static void check_cmd_result( const CmdParams *cmdparams, int cmdret )
 {
 	switch( cmdret )
 	{
@@ -257,12 +257,12 @@ int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
  */
  
 
-bot_cmd *find_bot_cmd( Bot *bot_ptr, char *cmd) 
+bot_cmd *find_bot_cmd( const Bot *bot_ptr, const char *cmd) 
 {
 	hnode_t *cmdnode;
 	
 	/* Find the command */
-	if (!bot_ptr->botcmds)
+	if( !bot_ptr->botcmds )
 		return NULL;
 	cmdnode = hash_lookup( bot_ptr->botcmds, cmd );
 	if( cmdnode )
@@ -275,7 +275,7 @@ bot_cmd *find_bot_cmd( Bot *bot_ptr, char *cmd)
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr ) 
+int del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr ) 
 {
 	hnode_t *cmdnode;
 	
@@ -331,7 +331,7 @@ int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int del_bot_cmd_list( Bot* bot_ptr, bot_cmd *bot_cmd_list ) 
+int del_bot_cmd_list( const Bot* bot_ptr, const bot_cmd *bot_cmd_list ) 
 {
 	/* If no bot pointer return failure */
 	if( !bot_ptr )
@@ -391,7 +391,7 @@ int add_services_cmd_list( bot_cmd *bot_cmd_list )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int del_services_cmd_list( bot_cmd *bot_cmd_list ) 
+int del_services_cmd_list( const bot_cmd *bot_cmd_list ) 
 {
 	return del_bot_cmd_list( ns_botptr, bot_cmd_list );
 }
@@ -400,8 +400,7 @@ int del_services_cmd_list( bot_cmd *bot_cmd_list )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-intrinsic_handler( CmdParams *cmdparams, bot_cmd_handler handler )
+static int intrinsic_handler( CmdParams *cmdparams, bot_cmd_handler handler )
 {
 	int cmdret;
 
@@ -416,8 +415,7 @@ intrinsic_handler( CmdParams *cmdparams, bot_cmd_handler handler )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int
-run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
+static int run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
 {
 	bot_cmd *cmd_ptr;
 
@@ -450,7 +448,7 @@ run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int run_cmd( CmdParams *cmdparams, bot_cmd *cmd_ptr )
+static int run_cmd( CmdParams *cmdparams, const bot_cmd *cmd_ptr )
 {
 	if( setjmp( sigvbuf ) == 0 )
 		return cmd_ptr->handler( cmdparams );

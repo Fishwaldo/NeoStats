@@ -258,9 +258,9 @@ char *LANGgettext( const char *string, int mylang );
  */
 
 /* Cmode macros */
-#define is_hidden_chan( x ) ( ( x ) && ( x->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_ADMONLY | CMODE_OPERONLY ) ) )
-#define is_pub_chan( x )  ( ( x ) && !( x->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_RGSTRONLY | CMODE_ADMONLY | CMODE_OPERONLY | CMODE_INVITEONLY | CMODE_KEY ) ) )
-#define is_priv_chan( x ) ( ( x ) && ( x->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_RGSTRONLY | CMODE_ADMONLY | CMODE_OPERONLY | CMODE_INVITEONLY | CMODE_KEY ) ) )
+#define is_hidden_chan( x ) ( ( x ) && ( ( x )->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_ADMONLY | CMODE_OPERONLY ) ) )
+#define is_pub_chan( x )  ( ( x ) && !( ( x )->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_RGSTRONLY | CMODE_ADMONLY | CMODE_OPERONLY | CMODE_INVITEONLY | CMODE_KEY ) ) )
+#define is_priv_chan( x ) ( ( x ) && ( ( x )->modes & ( CMODE_PRIVATE | CMODE_SECRET | CMODE_RGSTRONLY | CMODE_ADMONLY | CMODE_OPERONLY | CMODE_INVITEONLY | CMODE_KEY ) ) )
 
 /* User modes available on all IRCds */
 #define UMODE_INVISIBLE		0x00000001	/* makes user invisible */
@@ -1387,7 +1387,7 @@ EXPORTFUNC int test_cmode( const Channel *c, unsigned int mode );
 EXPORTFUNC int IsChannelMember( const Channel *c, const Client *u );
 EXPORTFUNC int test_cumode( const char *chan, const char *nick, unsigned int flag );
 EXPORTFUNC Channel *GetRandomChannel( void );
-EXPORTFUNC Client *GetRandomChannelMember( Channel *c, int uge );
+EXPORTFUNC Client *GetRandomChannelMember( const Channel *c, int uge );
 EXPORTFUNC char *GetRandomChannelKey( int length );
 
 #define IsChanOp( chan, nick ) test_cumode( chan, nick, CUMODE_CHANOP )
@@ -1405,10 +1405,10 @@ EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void 
 /* services.c */
 EXPORTFUNC int add_services_cmd_list( bot_cmd *bot_cmd_list );
 EXPORTFUNC int add_services_set_list( bot_setting *bot_setting_list );
-EXPORTFUNC int del_services_cmd_list( bot_cmd *bot_cmd_list );
+EXPORTFUNC int del_services_cmd_list( const bot_cmd *bot_cmd_list );
 EXPORTFUNC int del_services_set_list( bot_setting *bot_setting_list );
 EXPORTFUNC int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
-EXPORTFUNC int del_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
+EXPORTFUNC int del_bot_cmd_list( const Bot *bot_ptr, const bot_cmd *bot_cmd_list );
 EXPORTFUNC int add_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
 EXPORTFUNC int del_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
 

@@ -39,7 +39,8 @@
 
 unsigned int hrand( const unsigned int upperbound, const unsigned int lowerbound ) 
 {
-	if( ( upperbound < 1 ) ) {
+	if( ( upperbound < 1 ) )
+	{
 		nlog( LOG_WARNING, "hrand() invalid value for upperbound" );
 		return -1;
 	}

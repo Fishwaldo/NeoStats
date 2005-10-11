@@ -402,7 +402,7 @@ void bot_chan_private( const char *origin, char *const *av, int ac )
 
 Bot *FindBot( const char *bot_name )
 {
-	Bot* bot;
+	Bot *bot;
 
 	SET_SEGV_LOCATION(); 
 	bot = ( Bot * ) hnode_find( bothash, bot_name );

@@ -26,15 +26,15 @@
 
 int del_all_bot_cmds( Bot* bot_ptr );
 int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr );
-bot_cmd *find_bot_cmd( Bot *bot_ptr, char *cmd);
-int del_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr );
+bot_cmd *find_bot_cmd( const Bot *bot_ptr, const char *cmd);
+int del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr );
 int run_bot_cmd( CmdParams * cmdparams, int ischancmd );
 int getuserlevel( const CmdParams *cmdparams );
-void msg_permission_denied( CmdParams *cmdparams, char *subcommand );
-void msg_error_need_more_params( CmdParams *cmdparams );
-void msg_error_param_out_of_range( CmdParams *cmdparams );
-void msg_syntax_error( CmdParams *cmdparams );
-void msg_unknown_command( CmdParams *cmdparams );
-void msg_only_opers( CmdParams *cmdparams );
+void msg_permission_denied( const CmdParams *cmdparams, const char *subcommand );
+void msg_error_need_more_params( const CmdParams *cmdparams );
+void msg_error_param_out_of_range( const CmdParams *cmdparams );
+void msg_syntax_error( const CmdParams *cmdparams );
+void msg_unknown_command( const CmdParams *cmdparams );
+void msg_only_opers( const CmdParams *cmdparams );
 
 #endif /* _COMMANDS_H_ */

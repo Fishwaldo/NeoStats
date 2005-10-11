@@ -191,7 +191,7 @@ static Channel *new_chan( const char *chan )
  *  @return none
  */
 
-void del_chan( Channel *c )
+static void del_chan( Channel *c )
 {
 	CmdParams *cmdparams;
 	hnode_t *cn;
@@ -512,7 +512,7 @@ void JoinChannel( const char *nick, const char *chan )
  *  @return none
 */
 
-static void ListChannelMembers( CmdParams * cmdparams, Channel *c )
+static void ListChannelMembers( const CmdParams *cmdparams, const Channel *c )
 {
  	ChannelMember *cm;
 	lnode_t *cmn;
@@ -545,7 +545,7 @@ static int ListChannel( Channel *c, void *v )
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Channel:    %s", cmdparams->source ), c->name );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Created:    %ld", cmdparams->source ), ( long )c->creationtime );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "TopicOwner: %s TopicTime: %ld Topic: %s", cmdparams->source ), c->topicowner, ( long )c->topictime, c->topic );
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Public:     %s", cmdparams->source ), is_pub_chan( c ) ? "Yes" : "No" );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Public:     %s", cmdparams->source ), ( is_pub_chan( c ) ? "Yes" : "No" ) );
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Flags:      %x", cmdparams->source ), c->flags );
 	ListChannelModes( cmdparams, c );
 	ListChannelMembers( cmdparams, c );
@@ -698,9 +698,9 @@ Channel *GetRandomChannel( void )
 {
 	hscan_t cs;
 	hnode_t *cn;
-	int randno, curno;
+	unsigned int randno;
+	unsigned int curno = 0;
 	
-	curno = 0;
 	randno = hrand( hash_count( channelhash ), 1 );	
 	if( randno == -1 )
 		return NULL;
@@ -725,12 +725,12 @@ Channel *GetRandomChannel( void )
  *  @return Client pointer selected or NULL if none
  */
 
-Client *GetRandomChannelMember( Channel *c, int uge )
+Client *GetRandomChannelMember( const Channel *c, int uge )
 {
 	ChannelMember *cm;
 	lnode_t *ln;
-	int randno;
-	int curno = 0;
+	unsigned int randno;
+	unsigned int curno = 0;
 	
 	randno = hrand( list_count( c->members ), 1 );	
 	ln = list_first( c->members );

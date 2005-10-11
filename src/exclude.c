@@ -70,7 +70,7 @@ typedef struct Exclude
 typedef int (*ExcludeHandler) ( Exclude *exclude, void *v );
 
 /* String descriptions of exclude types */
-const char* ExcludeDesc[NS_EXCLUDE_MAX] =
+static const char* ExcludeDesc[NS_EXCLUDE_MAX] =
 {
 	"Host",
 	"Server",
@@ -79,7 +79,7 @@ const char* ExcludeDesc[NS_EXCLUDE_MAX] =
 };
 
 /* Template bot exclude command struture */
-bot_cmd exclude_commands[] =
+static bot_cmd exclude_commands[] =
 {
 	{"EXCLUDE",		cmd_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude},
 	NS_CMD_END()
