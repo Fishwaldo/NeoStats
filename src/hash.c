@@ -76,8 +76,8 @@ static const char rcsid[] = "$Id$";
 
 #define chain hash_chain
 
-static hnode_t *hnode_alloc (const void *context);
-static void hnode_free (hnode_t * node, const void *context);
+static hnode_t *hnode_alloc (void *context);
+static void hnode_free (hnode_t * node, void *context);
 static int hash_comp_default (const void *key1, const void *key2);
 
 int hash_val_t_bit;
