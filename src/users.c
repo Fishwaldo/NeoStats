@@ -355,7 +355,6 @@ void QuitUser( const char *nick, const char *reason )
 		killbuf = sstrdup( cmdparams->param );
 		ac = split_buf( killbuf, &av, 0 );
 		killreason = joinbuf( av, ac, 5 );
-		cmdparams->source = NULL;
 		cmdparams->source = FindUser( av[4] );
 		cmdparams->target = u;
 		cmdparams->param = killreason;
