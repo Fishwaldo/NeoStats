@@ -355,10 +355,14 @@ void QuitUser( const char *nick, const char *reason )
 		killbuf = sstrdup( cmdparams->param );
 		ac = split_buf( killbuf, &av, 0 );
 		killreason = joinbuf( av, ac, 5 );
+		cmdparams->source = NULL;
 		cmdparams->source = FindUser( av[4] );
 		cmdparams->target = u;
 		cmdparams->param = killreason;
-		SendAllModuleEvent( EVENT_LOCALKILL, cmdparams );
+		if (cmdparams->source) {
+			/* it could be a faked kill... */
+			SendAllModuleEvent( EVENT_LOCALKILL, cmdparams );
+		}
 		ns_free( killbuf );
 		ns_free( killreason );
 		ns_free( av );
