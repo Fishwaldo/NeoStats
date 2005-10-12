@@ -255,7 +255,7 @@ unsigned int split_buf( char *buf, char ***argv )
  *  @returns buffer containing combined arguments
  */
 
-char *joinbuf( const char *const *av, int ac, int from )
+char *joinbuf( char **av, int ac, int from )
 {
 	int i;
 	char *buf;

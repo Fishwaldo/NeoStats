@@ -1264,7 +1264,7 @@ EXPORTFUNC void clean_string(char *text, size_t len);
 EXPORTFUNC char *sctime( time_t t );
 EXPORTFUNC char *sftime( time_t t );
 EXPORTFUNC char *make_safe_filename( char *name );
-EXPORTFUNC char *joinbuf( const char *const *av, int ac, int from );
+EXPORTFUNC char *joinbuf( char **av, int ac, int from );
 EXPORTFUNC unsigned int split_buf( char *buf, char ***argv );
 
 /*  For use by modules to report command information channel which 
@@ -1492,7 +1492,7 @@ typedef enum LOG_LEVEL {
 	LOG_NOTICE,		/* did you know messages */
 	LOG_NORMAL,		/* our normal logging level? */
 	LOG_INFO,		/* lots of info about what we are doing */
-	LOG_LEVELMAX,		
+	LOG_LEVELMAX = LOG_INFO,
 } LOG_LEVEL;
 
 /* define debug levels */
@@ -1510,7 +1510,7 @@ typedef enum DEBUG_LEVEL {
 	DEBUG8,
 	DEBUG9,
 	DEBUG10,
-	DEBUGMAX,
+	DEBUGMAX = DEBUG10,
 } DEBUG_LEVEL;
 
 /* this is for the neostats assert replacement. */
@@ -1717,6 +1717,6 @@ EXPORTFUNC void *GetBotModValue( const Bot *pBot );
 
 
 EXPORTFUNC void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len);
-int InitUpdate();
+int InitUpdate(void);
 
 #endif /* NEOSTATS_H */

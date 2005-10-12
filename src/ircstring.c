@@ -98,8 +98,8 @@ int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args )
 					break;
 				/* handle %d( int ) */
 				case 'd':
-					i=va_arg( args, int );
-					/* treat as unsigned in then convert to +ve after we output the - */
+					i = ( unsigned ) va_arg( args, int );
+					/* treat as unsigned int then convert to +ve after we output the - */
 					if( i & 0x80000000 ) {
 						buf[len++] = '-'; 
 						i = 0x80000000 - ( i & ~0x80000000 );
@@ -123,8 +123,6 @@ int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args )
 #else /* WIN32 */
 					return vsnprintf( buf, size, fmt, saveargs );
 #endif /* WIN32 */
-					/* avoid compiler warning by having a superfluous break */
-					break;
 			}
 		}
 		/* just copy char from src */
@@ -139,7 +137,7 @@ int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args )
 	else
 		buf[size -1] = 0;
 	/* return count chars written */
-	return len;
+	return ( int )len;
 }
 
 /** @brief ircvsprintf

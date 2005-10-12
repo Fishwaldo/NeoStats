@@ -53,7 +53,9 @@
 #include "perlmod.h"
 #endif /* USE_PERL */
 
+#ifndef WIN32
 #define PID_FILENAME	"neostats.pid"
+#endif /* !WIN32 */
 
 static void do_reconnect( void );
 static int in_do_exit = 0;
@@ -165,7 +167,7 @@ static int get_options( int argc, char **argv )
 			return NS_FAILURE;
 		case 'd':
 			level = atoi( optarg );
-			if( ( level >= DEBUGMAX ) ||( level < 1 ) ) {
+			if( ( level > DEBUGMAX ) ||( level < 1 ) ) {
 				printf( "Invalid debug level %d\n", level );
 				return NS_FAILURE;
 			}
@@ -327,7 +329,9 @@ int neostats( void )
 int main( int argc, char *argv[] )
 #endif /* WIN32 */
 {
+#ifndef WIN32
    	char dbpath[MAXPATH];
+#endif /* WIN32 */
 
 	if( InitMe() != NS_SUCCESS )
 		return EXIT_FAILURE;
@@ -459,6 +463,7 @@ int main( int argc, char *argv[] )
 #endif /* WIN32 */
 }
 
+#ifndef WIN32
 /** @brief do_reconnect
  *
  *  Reconnect routine. Cleans up systems and flushes data files
@@ -477,6 +482,7 @@ static void do_reconnect( void )
 		nlog( LOG_NOTICE, "Reconnect time is zero, shutting down" );
 	do_exit( NS_EXIT_RECONNECT, NULL );
 }
+#endif /* !WIN32 */
 
 /** @brief do_exit
  *
@@ -490,7 +496,7 @@ static void do_reconnect( void )
  *  @return none
  */
 
-void do_exit( NS_EXIT_TYPE exitcode, char *quitmsg )
+void do_exit( NS_EXIT_TYPE exitcode, const char *quitmsg )
 {
 	int return_code;
 
