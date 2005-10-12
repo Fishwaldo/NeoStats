@@ -35,7 +35,7 @@
 #include "base64.h"
 
 #define USER_TABLE_SIZE	HASHCOUNT_T_MAX
-#define MAXJOINCHANS	-1
+#define MAXJOINCHANS	LISTCOUNT_T_MAX
 
 /** List of online users */
 static hash_t *userhash;
@@ -111,7 +111,7 @@ static void lookupnickip( void *data, adns_answer *a )
  *  @return IP address
  */
 
-static int process_ip( const char *nick, const char *host )
+static unsigned long process_ip( const char *nick, const char *host )
 {
 	unsigned long ipaddress = 0;
 	struct in_addr *ipad;
