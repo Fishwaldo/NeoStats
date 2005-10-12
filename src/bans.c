@@ -155,8 +155,11 @@ void AddBan( const char *type, const char *user, const char *host, const char *m
  *  @return nothing
  */
 
+/* Temp
 void DelBan( const char *type, const char *user, const char *host, const char *mask,
 			 const char *reason, const char *setby, const char *tsset, const char *tsexpires )
+*/
+void DelBan( const char *mask )
 {
 	CmdParams * cmdparams;
 	Ban *ban;

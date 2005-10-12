@@ -110,7 +110,7 @@ static void strip_ctcp_codes( char *line )
 int ctcp_private( CmdParams *cmdparams )
 {
 	ctcp_cmd* cmd;
-	int len;
+	size_t len;
     
 	if( cmdparams->param[0] == '\1' )
 	{
@@ -123,7 +123,11 @@ int ctcp_private( CmdParams *cmdparams )
 			{
 				cmdparams->param += ( len + 1 );		
 				if( cmd->req_handler )
-					cmd->req_handler( cmdparams );
+				{
+					/* Note ( void ) prefix to indicate 
+					 * we do not care about return value */
+					( void )cmd->req_handler( cmdparams );
+				}
 				return NS_SUCCESS;
 			}
 			cmd++;
@@ -146,7 +150,7 @@ int ctcp_private( CmdParams *cmdparams )
 int ctcp_notice( CmdParams *cmdparams )
 {
 	ctcp_cmd* cmd;
-	int len;
+	size_t len;
     
 	if( cmdparams->param[0] == '\1' )
 	{
@@ -159,7 +163,11 @@ int ctcp_notice( CmdParams *cmdparams )
 			{
 				cmdparams->param += ( len + 1 );		
 				if( cmd->rpl_handler )
-					cmd->rpl_handler( cmdparams );
+				{
+					/* Note ( void ) prefix to indicate 
+					 * we do not care about return value */
+					( void )cmd->rpl_handler( cmdparams );
+				}
 				return NS_SUCCESS;
 			}
 			cmd++;

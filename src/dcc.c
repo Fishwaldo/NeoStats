@@ -68,7 +68,7 @@ static dcc_cmd dcc_cmds[]=
  *  @return pointer to client structure
  */
 
-static Client *AddDCCClient( CmdParams *cmdparams )
+static Client *AddDCCClient( const CmdParams *cmdparams )
 {
 	Client *dcc;
 
@@ -121,7 +121,7 @@ static int DCCChatConnect( Client *dcc, int port )
 	static char tmpname[BUFSIZE];
 	OS_SOCKET socketfd;
 
-	if( ( socketfd = sock_connect( SOCK_STREAM, dcc->ip, port ) ) == NS_FAILURE )
+	if( ( socketfd = sock_connect( SOCK_STREAM, dcc->ip, port ) ) == -1 )
 	{
 		nlog( LOG_WARNING, "Error Connecting to DCC Host %s (%s:%d)", dcc->user->hostname, inet_ntoa( dcc->ip ), port );
 		DelDCCClient( dcc );
@@ -152,7 +152,7 @@ static int DCCChatConnect( Client *dcc, int port )
  *  @return none
  */
 
-static void DCCChatDisconnect( Client *dcc )
+static void DCCChatDisconnect( const Client *dcc )
 {
 	DelSock( dcc->sock );
 }
@@ -384,7 +384,7 @@ static int dcc_error( int sock_no, void *name )
 int dcc_req( CmdParams* cmdparams )
 {
 	dcc_cmd* cmd;
-	int len;
+	size_t len;
     
 	cmd = dcc_cmds;
 	while( cmd->cmd ) 
@@ -394,7 +394,11 @@ int dcc_req( CmdParams* cmdparams )
 		{
 			cmdparams->param += ( len + 1 );		
 			if( cmd->req_handler )
-				cmd->req_handler( cmdparams );
+			{
+				/* Note ( void ) prefix to indicate 
+				 * we do not care about return value */
+				( void )cmd->req_handler( cmdparams );
+			}
 			return NS_SUCCESS;
 		}
 		cmd++;

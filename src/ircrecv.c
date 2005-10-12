@@ -2197,7 +2197,8 @@ void do_tkl( const char *add, const char *type, const char *user, const char *ho
 	if( add[0] == '+' ) {
 		AddBan( type, user, host, mask, reason, setby, tsset, tsexpire );
 	} else {
-		DelBan( type, user, host, mask, reason, setby, tsset, tsexpire );
+		/*TEMPDelBan( type, user, host, mask, reason, setby, tsset, tsexpire );*/
+		DelBan( mask );
 	}
 }
 

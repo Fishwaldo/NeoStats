@@ -205,7 +205,7 @@ getmaxsock (void)
  * @param port to connect to
  * 
  * @return socket number if connect successful
- *         NS_FAILURE if unsuccessful
+ *         -1 if unsuccessful
  */
 OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port )
 {
@@ -231,7 +231,7 @@ OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port )
 		if( os_sock_errno != OS_SOCK_EWOULDBLOCK && os_sock_errno != OS_SOCK_EINPROGRESS )
 		{
 			os_sock_close (s);
-			return NS_FAILURE;
+			return -1;
 		}
 	}
 	return s;

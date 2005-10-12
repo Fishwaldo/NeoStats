@@ -37,12 +37,6 @@
 /* Prototype for module exclude command handler */
 static int cmd_exclude( CmdParams *cmdparams );
 
-/* Exclude type bit mask */
-#define EXCLUDE_HOST		0x00000001
-#define EXCLUDE_USERHOST	0x00000002
-#define EXCLUDE_SERVER		0x00000004
-#define EXCLUDE_CHANNEL		0x00000008
-
 /* Exclude types */
 typedef enum NS_EXCLUDE
 {
@@ -50,7 +44,8 @@ typedef enum NS_EXCLUDE
 	NS_EXCLUDE_SERVER,
 	NS_EXCLUDE_CHANNEL,
 	NS_EXCLUDE_USERHOST,
-	NS_EXCLUDE_MAX,
+	NS_EXCLUDE_LIMIT,
+	/* NS_EXCLUDE_MAX = ( NS_EXCLUDE_LIMIT - 1 ) */
 } NS_EXCLUDE;
 
 /* Maximum size of exclude lists */
@@ -70,7 +65,7 @@ typedef struct Exclude
 typedef int (*ExcludeHandler) ( Exclude *exclude, void *v );
 
 /* String descriptions of exclude types */
-static const char* ExcludeDesc[NS_EXCLUDE_MAX] =
+static const char* ExcludeDesc[ NS_EXCLUDE_LIMIT ] =
 {
 	"Host",
 	"Server",
@@ -81,7 +76,7 @@ static const char* ExcludeDesc[NS_EXCLUDE_MAX] =
 /* Template bot exclude command struture */
 static bot_cmd exclude_commands[] =
 {
-	{"EXCLUDE",		cmd_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude},
+	{"EXCLUDE",		cmd_exclude,		1,	NS_ULEVEL_ADMIN,	ns_help_exclude, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -97,7 +92,7 @@ static bot_cmd exclude_commands[] =
  *  @return exclude structure found or NULL if not found
  */
 
-static Exclude *FindExclude( list_t *exclude_list, NS_EXCLUDE type, const char *pattern )
+static Exclude *FindExclude( const list_t *exclude_list, NS_EXCLUDE type, const char *pattern )
 {
 	lnode_t *node;
 	Exclude *exclude;
@@ -134,7 +129,7 @@ static Exclude *FindExclude( list_t *exclude_list, NS_EXCLUDE type, const char *
  *  @return result of list walk passed from handler
  */
 
-static int ProcessExcludeList( list_t *exclude_list, ExcludeHandler handler, void *v )
+static int ProcessExcludeList( const list_t *exclude_list, ExcludeHandler handler, void *v )
 {
 	lnode_t *node;
 	Exclude *exclude;

@@ -187,14 +187,14 @@ static void ConfParseError( int err )
 
 static int set_config_values( cfg_t *cfg )
 {
-	int i;
+	unsigned int i;
 	/* Server name has a default */
 	strlcpy (me.name, cfg_getstr (cfg, "ServerConfig|Name"), sizeof (me.name));
 	
 	/* Server Port has a default */
 	me.port = cfg_getint (cfg, "Servers|Port");
 	/* Connect To */
-	if (cfg_size (cfg, "Servers|IpAddress") <= 0)
+	if (cfg_size (cfg, "Servers|IpAddress") == 0)
 	{
 #ifndef WIN32
 		printf ("ERROR: No Server was configured for Linking. Please fix this\n");
@@ -203,7 +203,7 @@ static int set_config_values( cfg_t *cfg )
 	}
 	strlcpy (me.uplink, cfg_getstr (cfg, "Servers|IpAddress"), sizeof (me.uplink));
 	/* Connect Pass */
-	if (cfg_size (cfg, "Servers|Password") <= 0)
+	if (cfg_size (cfg, "Servers|Password") == 0)
 	{
 #ifndef WIN32
 		printf ("ERROR: No Password was specified for Linking. Please fix this\n");
@@ -293,7 +293,8 @@ static int set_config_values( cfg_t *cfg )
 int ConfLoad( void )
 {
 	cfg_t *cfg;
-	int i, ret;
+	unsigned int i;
+	int ret;
 
 #ifndef WIN32
 	printf( "Reading the Config File. Please wait ...\n" );
@@ -628,6 +629,7 @@ static void cb_module( char *name )
 			if( !ircstrcasecmp( load_mods[i], name ) )
 				return;
 		}
-		load_mods[i] = sstrdup( name );
+		if( i < NUM_MODULES )
+			load_mods[i] = sstrdup( name );
 	}
 }

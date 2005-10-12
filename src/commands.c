@@ -469,7 +469,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	int cmdret = 0;
 	int cmdlevel;
 	char **av;
-	int ac = 0;
+	unsigned int ac = 0;
 	int i;
 	int processed = 0;
 
@@ -651,7 +651,7 @@ static int bot_cmd_help( CmdParams *cmdparams )
 		}
 		if( cmdparams->bot->botcmds )
 		{
-			while( 1 )
+			for(;;)
 			{
 				hnode_t* cmdnode;
 

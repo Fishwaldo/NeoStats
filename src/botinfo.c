@@ -139,11 +139,11 @@ int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
 	bot_ptr->bot_info_settings = ns_calloc( sizeof( bot_info_settings ) );
 	if( bot_ptr->bot_info_settings ) {
 		os_memcpy( bot_ptr->bot_info_settings, bot_info_settings, sizeof( bot_info_settings ) );
-		bot_ptr->bot_info_settings[0].varptr = (void *)&botinfo->nick;
-		bot_ptr->bot_info_settings[1].varptr = (void *)&botinfo->altnick;
-		bot_ptr->bot_info_settings[2].varptr = (void *)&botinfo->user;
-		bot_ptr->bot_info_settings[3].varptr = (void *)&botinfo->host;
-		bot_ptr->bot_info_settings[4].varptr = (void *)&botinfo->realname;
+		bot_ptr->bot_info_settings[0].varptr = botinfo->nick;
+		bot_ptr->bot_info_settings[1].varptr = botinfo->altnick;
+		bot_ptr->bot_info_settings[2].varptr = botinfo->user;
+		bot_ptr->bot_info_settings[3].varptr = botinfo->host;
+		bot_ptr->bot_info_settings[4].varptr = botinfo->realname;
 		ModuleConfig( bot_ptr->bot_info_settings );
 		add_bot_setting_list( bot_ptr, bot_ptr->bot_info_settings );
 	}
