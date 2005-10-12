@@ -39,12 +39,12 @@
 
 unsigned int hrand( const unsigned int upperbound, const unsigned int lowerbound ) 
 {
-	if( ( upperbound < 1 ) )
+	if( upperbound < 1 )
 	{
 		nlog( LOG_WARNING, "hrand() invalid value for upperbound" );
-		return -1;
+		return 0;
 	}
-	return( ( unsigned )( rand()%( ( int )( upperbound - lowerbound + 1 ) )-( ( int )( lowerbound - 1 ) ) ) );
+	return( ( unsigned )( rand()%( ( int )( ( upperbound - lowerbound ) + 1 ) )-( ( int )( lowerbound - 1 ) ) ) );
 }
 
 /** @brief make_safe_filename
@@ -61,20 +61,21 @@ char *make_safe_filename( char *name )
 	char *ptr;
 
 	ptr = name;
-	while( *ptr ) {
-		switch( *ptr ) {
+	while( *ptr )
+	{
+		switch( *ptr )
+		{
 #ifdef WIN32
-			case '#':
-			*ptr = '_';
-			break;
-#endif
 			case '/':
-#ifdef WIN32
-			*ptr = '.';
-#else
-			*ptr = ':';
-#endif
-			break;
+			case '#':
+				*ptr = '_';
+#else /* WIN32 */
+			case '/':
+				*ptr = ':';
+#endif /* WIN32 */
+				break;
+			default:
+				break;
 		}
 		ptr++;
 	}
@@ -93,6 +94,7 @@ char *make_safe_filename( char *name )
 void strip( char *line )
 {
 	char *c;
+
 	if( ( c = strchr( line, '\n' ) ) )
 		*c = '\0';
 	if( ( c = strchr( line, '\r' ) ) )
@@ -131,8 +133,10 @@ char *sstrdup( const char *s )
 char *strlwr( char *s )
 {
 	char *t;
+	
 	t = s;
-	while( *t ) {
+	while( *t )
+	{
 		*t = tolower( *t );
 		t++;
 	}
@@ -152,10 +156,11 @@ char *strlwr( char *s )
 
 int ircsplitbuf( char *buf, char ***argv, int colon_special )
 {
-	int argvsize = 8;
+	unsigned int argvsize = 8;
 	int argc;
 	char *s;
 	int colcount = 0;
+	
 	SET_SEGV_LOCATION();
 	*argv = ns_calloc( sizeof( char * ) * argvsize );
 	argc = 0;
@@ -197,17 +202,17 @@ int ircsplitbuf( char *buf, char ***argv, int colon_special )
  * 
  *  @param buf buffer to convert
  *  @param argv list of arguments to write
- *  @param colon_special flag to indicate colon processing
  *
  *  @returns count of arguments created from split
  */
 
-int split_buf( char *buf, char ***argv, int colon_special )
+int split_buf( char *buf, char ***argv )
 {
-	int argvsize = 8;
+	unsigned int argvsize = 8;
 	int argc;
 	char *s;
 	int colcount = 0;
+
 	SET_SEGV_LOCATION();
 	*argv = ns_calloc( sizeof( char * ) * argvsize );
 	argc = 0;

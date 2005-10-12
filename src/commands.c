@@ -475,7 +475,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 
 	SET_SEGV_LOCATION();
 	strlcpy( privmsgbuffer, cmdparams->param, BUFSIZE );
-	ac = split_buf( privmsgbuffer, &av, 0 );
+	ac = split_buf( privmsgbuffer, &av );
 	cmdparams->cmd = av[0];
 	cmdparams->ac = 0;
 	for( i = 1; i < ac; i++ )

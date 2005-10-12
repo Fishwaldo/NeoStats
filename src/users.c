@@ -282,7 +282,7 @@ void KillUser( const char *source, const char *nick, const char *reason )
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->target = u;
 	killbuf = sstrdup( reason );
-	ac = split_buf( killbuf, &av, 0 );
+	ac = split_buf( killbuf, &av );
 	killreason = joinbuf( av, ac, 1 );
 	cmdparams->param = killreason;
 	cmdparams->source = FindUser( source );
@@ -354,7 +354,7 @@ void QuitUser( const char *nick, const char *reason )
 		int ac = 0;
 
 		killbuf = sstrdup( cmdparams->param );
-		ac = split_buf( killbuf, &av, 0 );
+		ac = split_buf( killbuf, &av );
 		killreason = joinbuf( av, ac, 5 );
 		cmdparams->source = FindUser( av[4] );
 		cmdparams->target = u;

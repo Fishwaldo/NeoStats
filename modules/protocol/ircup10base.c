@@ -420,7 +420,7 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 						char **av;
 						int ac;
 						ircsnprintf( ircd_buf, BUFSIZE, "%s +%c %s", argv[0], modechar, base64_to_nick( s ) );
-						ac = split_buf( ircd_buf, &av, 0 );
+						ac = split_buf( ircd_buf, &av );
 						do_mode_channel( me.name, av, ac );
 						ns_free( av );
 					}
@@ -451,7 +451,7 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 					} else {
 						ircsnprintf( ircd_buf, BUFSIZE, "%s +%c", argv[0], *modes );
 					}
-					ac = split_buf( ircd_buf, &av, 0 );
+					ac = split_buf( ircd_buf, &av );
 					do_mode_channel( me.name, av, ac );
 					ns_free( av );
 					modes++;

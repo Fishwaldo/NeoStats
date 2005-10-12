@@ -445,7 +445,7 @@ static int dcc_req_chat( CmdParams* cmdparams )
 		dlog( DEBUG5, "Dropping DCC CHAT request from unauthorised user %s", cmdparams->source->name );
 		return NS_FAILURE;
 	}
-	ac = split_buf( cmdparams->param, &av, 0 );
+	ac = split_buf( cmdparams->param, &av );
 	if( ac == 3 )
 	{
 		dcc = AddDCCClient( cmdparams );

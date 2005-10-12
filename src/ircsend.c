@@ -1073,7 +1073,7 @@ int irc_cmode( const Bot *botptr, const char *chan, const char *mode, const char
 
 	irc_send_cmode( me.name, botptr->u->name, chan, mode, args, ( unsigned long )me.now );
 	ircsnprintf( ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args );
-	ac = split_buf( ircd_buf, &av, 0 );
+	ac = split_buf( ircd_buf, &av );
 	ChanMode( me.name, av, ac );
 	ns_free( av );
 	return NS_SUCCESS;

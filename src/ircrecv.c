@@ -1735,7 +1735,7 @@ void do_sjoin( char *tstime, char *channame, char *modes, char *sjoinnick, char 
 		return;
 	}
 
-	paramcnt = split_buf( argv[argc-1], &param, 0 );
+	paramcnt = split_buf( argv[argc-1], &param );
 		   
 	while( paramcnt > paramidx ) {
 		nicklist = param[paramidx];

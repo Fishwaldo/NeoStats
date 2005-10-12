@@ -701,9 +701,9 @@ Channel *GetRandomChannel( void )
 	unsigned int randno;
 	unsigned int curno = 0;
 	
-	randno = hrand( hash_count( channelhash ), 1 );	
-	if( randno == -1 )
+	if( hash_count( channelhash ) == 0 )
 		return NULL;
+	randno = hrand( hash_count( channelhash ), 1 );	
 	hash_scan_begin( &cs, channelhash );
 	while( ( cn = hash_scan_next( &cs ) ) != NULL )
 	{
