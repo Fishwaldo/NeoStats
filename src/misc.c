@@ -93,7 +93,7 @@ char *make_safe_filename( char *name )
 
 void strip( char *line )
 {
-	char *c;
+	char *c = line;
 
 	if( ( c = strchr( line, '\n' ) ) )
 		*c = '\0';
@@ -154,10 +154,10 @@ char *strlwr( char *s )
  *  @returns count of arguments created from split
  */
 
-int ircsplitbuf( char *buf, char ***argv, int colon_special )
+unsigned int ircsplitbuf( char *buf, char ***argv, int colon_special )
 {
 	unsigned int argvsize = 8;
-	int argc;
+	unsigned int argc;
 	char *s;
 	int colcount = 0;
 	
@@ -206,10 +206,10 @@ int ircsplitbuf( char *buf, char ***argv, int colon_special )
  *  @returns count of arguments created from split
  */
 
-int split_buf( char *buf, char ***argv )
+unsigned int split_buf( char *buf, char ***argv )
 {
 	unsigned int argvsize = 8;
-	int argc;
+	unsigned int argc;
 	char *s;
 	int colcount = 0;
 
@@ -255,7 +255,7 @@ int split_buf( char *buf, char ***argv )
  *  @returns buffer containing combined arguments
  */
 
-char *joinbuf( char **av, int ac, int from )
+char *joinbuf( const char *const *av, int ac, int from )
 {
 	int i;
 	char *buf;
@@ -288,7 +288,7 @@ char *joinbuf( char **av, int ac, int from )
 
 void AddStringToList( char ***List, char S[], int *C )
 {
-	static int numargs = 8;
+	static unsigned int numargs = 8;
 
 	if( *C == 0 ) {
 		numargs = 8;
@@ -356,6 +356,8 @@ void strip_mirc_codes( char *text )
 						text++;		/* also kill the following char */
 				}
 				continue;
+			default:
+				break;
 		}
 		*dd++ = *text++;		/* Move on to the next char */
 	}
@@ -375,29 +377,31 @@ void strip_mirc_codes( char *text )
 void clean_string( char *text, size_t len )
 {
 	char *dd, *start, *orig; 
-	int i = 0;
-	dd = malloc(len);	
+	size_t i = 0;
+
+	dd = ns_malloc( len );	
 	start = dd;
 	orig = text;
-	
 	while( *text ) {
 		i++;
 		switch( *text ) {
 			case '%':
 				/* if our final length is bigger than the buffer, then we just 
 				 * drop the char */
-				if ( (i+1) <= len) {
+				if ( ( i + 1 ) <= len ) {
 					*dd++ = '%';
 				} else {
 					text++;
 				}
 				break;
+			default:
+				break;
 		}
 		*dd++ = *text++;		/* Move on to the next char */
 	}
 	*dd = 0;
-	strncpy(orig,start,len);
-	free(start);	
+	strncpy( orig, start, len );
+	ns_free( start );	
 }
 
 /** @brief sctime
@@ -736,8 +740,8 @@ int IsJustWildcard( const char *mask, int ishostmask )
 {
 	static const char stringset[] = "?*";
 	static const char stringsethost[] = "?*.@";
-	int len;
-	int spanlen;
+	size_t len;
+	size_t spanlen;
 
 	if( !ircstrcasecmp( mask, "*" ) )
 		return NS_TRUE;

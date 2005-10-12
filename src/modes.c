@@ -59,9 +59,9 @@ static mode_data ircd_cmodes[MODE_TABLE_SIZE];
 static mode_data ircd_umodes[MODE_TABLE_SIZE];
 static mode_data ircd_smodes[MODE_TABLE_SIZE];
 
-static char ircd_cmode_char_map[32];
-static char ircd_umode_char_map[32];
-static char ircd_smode_char_map[32];
+static unsigned char ircd_cmode_char_map[32];
+static unsigned char ircd_umode_char_map[32];
+static unsigned char ircd_smode_char_map[32];
 
 static mode_init chan_umodes_default[] =
 {
@@ -144,11 +144,11 @@ static ModeDesc SmodeDesc[] = {
  *  @return 
  */
 
-static void BuildModeCharMap( char *mode_char_map, char mode, unsigned int mask )
+static void BuildModeCharMap( unsigned char *mode_char_map, unsigned char mode, unsigned int mask )
 {
     int bitcount = 0;
 	
-	while( mask >>= 1 )
+	while( ( mask >>= 1 ) )
 		bitcount ++;
 	if( bitcount < 31 )
 		mode_char_map[bitcount] = mode;
@@ -162,7 +162,7 @@ static void BuildModeCharMap( char *mode_char_map, char mode, unsigned int mask 
  * @return 
  */
 
-unsigned int BuildModeTable( char *mode_char_map, mode_data *dest, const mode_init *src, unsigned int flagall )
+unsigned int BuildModeTable( unsigned char *mode_char_map, mode_data *dest, const mode_init *src, unsigned int flagall )
 {
 	unsigned int maskall = 0;
 
@@ -191,7 +191,7 @@ unsigned int BuildModeTable( char *mode_char_map, mode_data *dest, const mode_in
 int InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, const mode_init* user_umodes, const mode_init* user_smodes)
 {
 	/* build cmode lookup table */
-	os_memset(&ircd_cmodes, 0, sizeof(ircd_cmodes));
+	os_memset( ircd_cmodes, 0, sizeof( ircd_cmodes ) );
 	dlog(DEBUG4, "Build channel mode table...");
 	ircd_supported_cmodes |= BuildModeTable( ircd_cmode_char_map, ircd_cmodes, chan_modes_default, 0 );
 	if( chan_modes )
@@ -202,14 +202,14 @@ int InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, c
 	if( chan_umodes )
 		ircd_supported_cumodes |= BuildModeTable( ircd_cmode_char_map, ircd_cmodes, chan_umodes, NICKPARAM );
 	/* build umode lookup table */
-	os_memset(&ircd_umodes, 0, sizeof(ircd_umodes));
+	os_memset( ircd_umodes, 0, sizeof( ircd_umodes ) );
 	dlog(DEBUG4, "Build user mode table...");
 	ircd_supported_umodes |= BuildModeTable( ircd_umode_char_map, ircd_umodes, user_umodes_default, 0 );
 	if( user_umodes )
 		ircd_supported_umodes |= BuildModeTable( ircd_umode_char_map, ircd_umodes, user_umodes, 0 );
 	/* build smode lookup table */
 	if (user_smodes) {
-		os_memset(&ircd_smodes, 0, sizeof(ircd_smodes));
+		os_memset( ircd_smodes, 0, sizeof( ircd_smodes ) );
 		dlog(DEBUG4, "Build user smode table...");
 		ircd_supported_smodes = BuildModeTable( ircd_smode_char_map, ircd_smodes, user_smodes, 0 );
 	}
@@ -220,7 +220,7 @@ int InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, c
 	/* preset our umode mask so we do not have to calculate in real time */
 	me.servicesumodemask = UmodeStringToMask(me.servicesumode);
 	return NS_SUCCESS;
-};
+}
 
 /** @brief ModeMaskToString
  *
@@ -228,7 +228,7 @@ int InitModeTables (const mode_init* chan_umodes, const mode_init* chan_modes, c
  *
  *  @return 
  */
-static char *ModeMaskToString( const mode_data* mode_table, const long mask ) 
+static char *ModeMaskToString( const mode_data* mode_table, const unsigned int mask ) 
 {
 	int i, j;
 
@@ -252,7 +252,7 @@ static char *ModeMaskToString( const mode_data* mode_table, const long mask )
  *
  *  @return 
  */
-static unsigned int ModeStringToMask( mode_data* mode_table, const char *ModeString )
+static unsigned int ModeStringToMask( const mode_data* mode_table, const char *ModeString )
 {
 	unsigned int Umode = 0;
 	int add = 0;
@@ -356,51 +356,51 @@ char *CmodeMaskToPrefixString (const unsigned int mask)
 	return PrefixStringBuf;
 }
 
-unsigned int UmodeCharToMask (const char mode)
+unsigned int UmodeCharToMask (const unsigned char mode)
 {
 	return ircd_umodes[(int)mode].mask;
 }
 
-unsigned int SmodeCharToMask (const char mode)
+unsigned int SmodeCharToMask (const unsigned char mode)
 {
 	return ircd_smodes[(int)mode].mask;
 }
 
-unsigned int CmodeCharToMask (const char mode)
+unsigned int CmodeCharToMask (const unsigned char mode)
 {
 	return ircd_cmodes[(int)mode].mask;
 }
 
-int CmodeCharToFlags (const char mode)
+unsigned int CmodeCharToFlags (const unsigned char mode)
 {
 	return ircd_cmodes[(int)mode].flags;
 }
 
-static char ModeMaskToChar( char *mode_char_map, unsigned int mask )
+static unsigned char ModeMaskToChar( const unsigned char *mode_char_map, unsigned int mask )
 {
     int bitcount = 0;
 	
-	while (mask >>= 1) 
-		bitcount ++;
+	while( ( mask >>= 1 ) ) 
+		bitcount++;
     return mode_char_map[bitcount];
 }
 
-char UmodeMaskToChar( const unsigned int mask )
+unsigned char UmodeMaskToChar( const unsigned int mask )
 {
 	return ModeMaskToChar( ircd_umode_char_map, mask );
 }
 
-char SmodeMaskToChar( const unsigned int mask )
+unsigned char SmodeMaskToChar( const unsigned int mask )
 {
 	return ModeMaskToChar( ircd_smode_char_map, mask );
 }
 
-char CmodeMaskToChar( const unsigned int mask )
+unsigned char CmodeMaskToChar( const unsigned int mask )
 {
 	return ModeMaskToChar( ircd_cmode_char_map, mask );
 }
 
-unsigned int CmodePrefixToMask( const char prefix )
+unsigned int CmodePrefixToMask( const unsigned char prefix )
 {
 	int i;
 
@@ -413,9 +413,9 @@ unsigned int CmodePrefixToMask( const char prefix )
 	return 0;
 }
 
-char CmodePrefixToChar (const char prefix)
+unsigned char CmodePrefixToChar (const unsigned char prefix)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < MODE_TABLE_SIZE; i++)
 	{
@@ -426,12 +426,12 @@ char CmodePrefixToChar (const char prefix)
 	return 0;
 }
 
-char CmodeMaskToPrefix (const unsigned int mask)
+unsigned char CmodeMaskToPrefix (const unsigned int mask)
 {
 	return ircd_cmodes[(int) ModeMaskToChar (ircd_umode_char_map, mask)].sjoin;
 }
 
-char CmodeCharToPrefix (const char mode)
+unsigned char CmodeCharToPrefix (const unsigned char mode)
 {
 	return (ircd_cmodes[(int)mode].sjoin);
 }
@@ -534,7 +534,7 @@ comparemode (const void *v, const void *mask)
  * @return 0 on error, number of modes processed on success.
 */
 
-int ChanModeHandler (Channel* c, char *modes, int j, char **av, int ac)
+int ChanModeHandler (Channel* c, const char *modes, int j, char **av, int ac)
 {
 	int modeexists;
 	ModesParm *m;
@@ -690,7 +690,7 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 	}
 }
 
-void ListChannelModes(CmdParams* cmdparams, Channel* c)
+void ListChannelModes( const CmdParams* cmdparams, const Channel* c )
 {
 	lnode_t *cmn;
 	ModesParm *m;

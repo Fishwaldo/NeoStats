@@ -26,8 +26,8 @@
 
 int InitModeTables( const mode_init *chan_umodes, const mode_init *chan_modes, const mode_init *user_umodes, const mode_init *user_smodes );
 int ChanMode( char *origin, char **av, int ac );
-int ChanModeHandler( Channel* c, char *modes, int j, char **av, int ac );
+int ChanModeHandler( Channel* c, const char *modes, int j, char **av, int ac );
 void ChanUserMode( const char *chan, const char *nick, int add, const unsigned int mode );
-void ListChannelModes( CmdParams* cmdparams, Channel* c );
+void ListChannelModes( const CmdParams* cmdparams, const Channel* c );
 
 #endif /* _MODES_H_ */

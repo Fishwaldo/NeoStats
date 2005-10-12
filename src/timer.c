@@ -215,11 +215,10 @@ void CheckTimers_cb( int notused, short event, void *arg )
 {
 	struct timeval tv;
 
-
 	SET_SEGV_LOCATION();
 	timerclear( &tv );
 	tv.tv_sec = 1;
-	if( me.now - me.tslastping > nsconfig.pingtime )
+	if( ( me.now - me.tslastping ) > nsconfig.pingtime )
 	{
 		PingServers();
 		me.tslastping = me.now;
@@ -249,8 +248,7 @@ void CheckTimers_cb( int notused, short event, void *arg )
 		run_mod_timers( 0 );
 		if( midnight == 1 && is_midnight() == 0 )
 			midnight = 0;
-	}
-	
+	}	
 	/* re-add this timeout */
 	event_add( timers, &tv );
 }
@@ -387,7 +385,7 @@ int DelTimer( const char *name )
  *  @return NS_SUCCESS if deleted, NS_FAILURE if not found
  */
 
-int del_timers( Module *mod_ptr )
+int del_timers( const Module *mod_ptr )
 {
 	Timer *timer;
 	hnode_t *tn;

@@ -228,7 +228,7 @@ EXPORTVAR extern char *numeric351;
 
 EXPORTVAR extern ircd_server ircd_srv;
 
-EXPORTFUNC int ircsplitbuf( char *buf, char ***argv, int colon_special );
+EXPORTFUNC unsigned int ircsplitbuf( char *buf, char ***argv, int colon_special );
 EXPORTFUNC void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int ac );
 
 /* IRCD protocol module API */
