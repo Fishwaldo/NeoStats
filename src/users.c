@@ -175,7 +175,7 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 		ipaddress = strtoul( ip, NULL, 10 );
 	else if( !( ircd_srv.protocol&PROTOCOL_NICKIP ) && me.want_nickip == 1 )
 		ipaddress = process_ip( u->name, host );
-	u->tsconnect = TS ? strtoul( TS, NULL, 10 ) : me.now;
+	u->tsconnect = TS ? strtol( TS, NULL, 10 ) : me.now;
 	if( ( time( NULL ) - u->tsconnect ) > nsconfig.splittime )
 		u->flags |= NS_FLAGS_NETJOIN;
 	strlcpy( u->user->hostname, host, MAXHOST );
@@ -343,7 +343,8 @@ void QuitUser( const char *nick, const char *reason )
 		cmdparams->param = ( char *)reason;
 	SendAllModuleEvent( EVENT_QUIT, cmdparams );
 	/* RX: :m , :[irc.foonet.com] Local kill by Mark( testing ) */
-	if( strstr( reason, "Local kill by" ) && 
+	if( reason &&
+		strstr( reason, "Local kill by" ) && 
 		strstr( reason, "[" ) && 
 		strstr( reason, "]" ) )
 	{
