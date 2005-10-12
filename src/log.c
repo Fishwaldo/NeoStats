@@ -380,12 +380,12 @@ void nlog( LOG_LEVEL level, const char *fmt, ... )
 void nassert_fail( const char *expr, const char *file, const int line, const char *func )
 {
 #ifdef HAVE_BACKTRACE
-	void *array[50];
+	void *array[MAXBACKTRACESIZE];
 	size_t size;
 	char **strings;
 	size_t i;
 
-	size = backtrace( array, 10 );
+	size = backtrace( array, MAXBACKTRACESIZE );
 	strings = backtrace_symbols( array, size );
 #endif /* HAVE_BACKTRACE */
 	nlog( LOG_CRITICAL, "Assertion Failure!" );

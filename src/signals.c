@@ -89,13 +89,13 @@ RETSIGTYPE sighup_handler( int signum )
 static void do_backtrace( void )
 {
 #ifdef HAVE_BACKTRACE
-	static void *array[50];
+	static void *array[MAXBACKTRACESIZE];
 	size_t size;
 	char **strings;
 	int i;
 
 	os_fprintf( segfault, "Backtrace:\n" );
-	size = backtrace( array, 10 );
+	size = backtrace( array, MAXBACKTRACESIZE);
 	strings = backtrace_symbols( array, size );
 	for( i = 1; i < size; i++ ) {
 		os_fprintf( segfault, "BackTrace(%d): %s\n", i - 1, strings[i] );
