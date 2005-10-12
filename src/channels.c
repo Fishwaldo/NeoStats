@@ -846,9 +846,10 @@ int ProcessChannelMembers( Channel *c, const ChannelMemberListHandler handler, v
  *  @return pointer to allocated memory
  */
 
-void *AllocChannelModPtr( Channel* c, int size )
+void *AllocChannelModPtr( Channel* c, size_t size )
 {
 	void *ptr;
+
 	ptr = ns_calloc( size );
 	c->modptr[GET_CUR_MODULE_INDEX()] = ptr;
 	GET_CUR_MODULE()->channeldatacnt++;

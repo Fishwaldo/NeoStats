@@ -1682,19 +1682,19 @@ EXPORTFUNC int ModIsChannelExcluded( const Channel *c );
 
 /* Module data pointer interface */
 /* Module data pointer interface channel */
-EXPORTFUNC void *AllocChannelModPtr( Channel *c, int size );
+EXPORTFUNC void *AllocChannelModPtr( Channel *c, size_t size );
 EXPORTFUNC void FreeChannelModPtr( Channel *c );
 EXPORTFUNC void *GetChannelModPtr( const Channel *c );
 /* Module data pointer interface user */
-EXPORTFUNC void *AllocUserModPtr( Client *u, int size );
+EXPORTFUNC void *AllocUserModPtr( Client *u, size_t size );
 EXPORTFUNC void FreeUserModPtr( Client *u );
 EXPORTFUNC void *GetUserModPtr( const Client *u );
 /* Module data pointer interface server */
-EXPORTFUNC void *AllocServerModPtr( Client *s, int size );
+EXPORTFUNC void *AllocServerModPtr( Client *s, size_t size );
 EXPORTFUNC void FreeServerModPtr( Client *s );
 EXPORTFUNC void *GetServerModPtr( const Client *s );
 /* Module data pointer interface bot */
-EXPORTFUNC void *AllocBotModPtr( Bot *pBot, int size );
+EXPORTFUNC void *AllocBotModPtr( Bot *pBot, size_t size );
 EXPORTFUNC void FreeBotModPtr( Bot *pBot );
 EXPORTFUNC void* GetBotModPtr( const Bot *pBot );
 /* Module data value interface */

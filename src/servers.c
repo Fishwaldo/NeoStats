@@ -521,9 +521,10 @@ void RequestServerUptimes( void )
  *  @return pointer to allocated memory
  */
 
-void *AllocServerModPtr( Client* s, int size )
+void *AllocServerModPtr( Client* s, size_t size )
 {
 	void *ptr;
+
 	ptr = ns_calloc( size );
 	s->modptr[GET_CUR_MODULE_INDEX()] = ptr;
 	GET_CUR_MODULE()->serverdatacnt++;

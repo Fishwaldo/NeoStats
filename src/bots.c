@@ -820,9 +820,10 @@ void handle_dead_channel( Channel *c )
  *  @return pointer to allocated memory
  */
 
-void *AllocBotModPtr( Bot *pBot, int size )
+void *AllocBotModPtr( Bot *pBot, size_t size )
 {
 	void *ptr;
+
 	ptr = ns_calloc( size );
 	pBot->moddata = ptr;
 	return ptr;

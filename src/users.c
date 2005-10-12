@@ -645,7 +645,7 @@ void UserMode( const char *nick, const char *modes )
 {
 	CmdParams *cmdparams;
 	Client *u;
-	long oldmode;
+	unsigned int oldmode;
 
 	SET_SEGV_LOCATION();
 	dlog( DEBUG1, "UserMode: user %s modes %s", nick, modes );
@@ -726,7 +726,7 @@ void SetUserServicesTS( const char *nick, const char *ts )
 
 	u = FindUser( nick );
 	if( u )
-		u->user->servicestamp = strtoul( ts, NULL, 10 );
+		u->user->servicestamp = strtol( ts, NULL, 10 );
 }
 
 /** @brief FiniUsers
@@ -878,15 +878,11 @@ void DelFakeUser( const char *mask )
 {
 	char maskcopy[MAXHOST];
 	char *nick;
-	char *user;
-	char *host;
 	Client *u;
 
 	SET_SEGV_LOCATION();
 	strlcpy( maskcopy, mask, MAXHOST );
 	nick = strtok( maskcopy, "!" );
-	user = strtok( NULL, "@" );
-	host = strtok( NULL, "" );
 	u = FindUser( nick );
 	deluser( u );
 }
@@ -902,9 +898,10 @@ void DelFakeUser( const char *mask )
  *  @return pointer to allocated memory
  */
 
-void *AllocUserModPtr( Client* u, int size )
+void *AllocUserModPtr( Client* u, size_t size )
 {
 	void *ptr;
+
 	ptr = ns_calloc( size );
 	u->modptr[GET_CUR_MODULE_INDEX()] = ptr;
 	GET_CUR_MODULE()->userdatacnt++;
