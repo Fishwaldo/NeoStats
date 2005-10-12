@@ -389,7 +389,7 @@ void clean_string( char *text, size_t len )
 				if ( (i+1) <= len) {
 					*dd++ = '%';
 				} else {
-					*text++;
+					text++;
 				}
 				break;
 		}
