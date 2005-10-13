@@ -55,7 +55,7 @@ typedef struct ModuleAuthInfo
 } ModuleAuthInfo;
 
 /** Command prototypes */
-static int cmd_level( CmdParams *cmdparams );
+static int cmd_level( const CmdParams *cmdparams );
 
 /** Auth command table */
 static bot_cmd auth_command_list[] =
@@ -175,7 +175,7 @@ int UserLevel( Client *u )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int cmd_level( CmdParams *cmdparams )
+static int cmd_level( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( cmdparams->ac < 1 )

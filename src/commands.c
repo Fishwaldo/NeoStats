@@ -34,11 +34,11 @@
 #include "commands.h"
 #include "settings.h"
 
-static int bot_cmd_help( CmdParams *cmdparams );
-static int bot_cmd_about( CmdParams *cmdparams );
-static int bot_cmd_version( CmdParams *cmdparams );
-static int bot_cmd_credits( CmdParams *cmdparams );
-static int bot_cmd_levels( CmdParams *cmdparams );
+static int bot_cmd_help( const CmdParams *cmdparams );
+static int bot_cmd_about( const CmdParams *cmdparams );
+static int bot_cmd_version( const CmdParams *cmdparams );
+static int bot_cmd_credits( const CmdParams *cmdparams );
+static int bot_cmd_levels( const CmdParams *cmdparams );
 
 /* help title strings for different user levels */
 static char *help_level_title[]=
@@ -273,9 +273,9 @@ bot_cmd *find_bot_cmd( const Bot *bot_ptr, const char *cmd)
 
 /** @brief del_bot_cmd deltes a single command to the command hash
  *
- * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ * @return none
  */
-int del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr ) 
+void del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr ) 
 {
 	hnode_t *cmdnode;
 	
@@ -295,9 +295,7 @@ int del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr )
 			ns_free(cmd_ptr->helptext);
 		}
 #endif /* USE_PERL */
-		return NS_SUCCESS;
 	}
-	return NS_FAILURE;
 }
 
 /** @brief add_bot_cmd_list adds a list of commands to the command hash
@@ -331,46 +329,42 @@ int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-int del_bot_cmd_list( const Bot* bot_ptr, const bot_cmd *bot_cmd_list ) 
+void del_bot_cmd_list( const Bot* bot_ptr, const bot_cmd *bot_cmd_list ) 
 {
-	/* If no bot pointer return failure */
-	if( !bot_ptr )
-		return NS_FAILURE;
-	/* If no hash return failure */
-	if( !bot_ptr->botcmds )
-		return NS_FAILURE;
-	/* Cycle through command list and delete them */
-	while( bot_cmd_list->cmd )
+	if( bot_ptr != NULL && bot_ptr->botcmds != NULL )
 	{
-		del_bot_cmd( bot_ptr->botcmds, bot_cmd_list );
-		bot_cmd_list++;
+		/* Cycle through command list and delete them */
+		while( bot_cmd_list->cmd )
+		{
+			del_bot_cmd( bot_ptr->botcmds, bot_cmd_list );
+			bot_cmd_list++;
+		}
 	}
-	return NS_SUCCESS;
 }
 
 /** @brief del_all_bot_cmds delete all commands from the bot
  *
- * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ * @return none
  */
-int del_all_bot_cmds( Bot* bot_ptr ) 
+void del_all_bot_cmds( Bot* bot_ptr ) 
 {
 	hnode_t *cmdnode;
 	hscan_t hs;
 
 	/* Check we have a command hash */
-	if( bot_ptr->botcmds == NULL )
-		return NS_FAILURE;
-	/* Cycle through command hash and delete each command */
-	hash_scan_begin( &hs, bot_ptr->botcmds );
-	while( ( cmdnode = hash_scan_next( &hs ) ) != NULL )
+	if( bot_ptr->botcmds != NULL )
 	{
-		dlog( DEBUG3, "deleting command %s from services bot", ( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
-		hash_scan_delete_destroy_node( bot_ptr->botcmds, cmdnode );
+		/* Cycle through command hash and delete each command */
+		hash_scan_begin( &hs, bot_ptr->botcmds );
+		while( ( cmdnode = hash_scan_next( &hs ) ) != NULL )
+		{
+			dlog( DEBUG3, "deleting command %s from services bot", ( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
+			hash_scan_delete_destroy_node( bot_ptr->botcmds, cmdnode );
+		}
+		/* Destroy command */
+		hash_destroy( bot_ptr->botcmds );
+		bot_ptr->botcmds = NULL;
 	}
-	/* Destroy command */
-	hash_destroy( bot_ptr->botcmds );
-	bot_ptr->botcmds = NULL;
-	return NS_SUCCESS;
 }
 
 /** @brief add_services_cmd_list adds a list of commands to the services bot
@@ -389,18 +383,18 @@ int add_services_cmd_list( bot_cmd *bot_cmd_list )
 
 /** @brief del_services_cmd_list delete a list of commands from the services bot
  *
- * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ * @return none
  */
-int del_services_cmd_list( const bot_cmd *bot_cmd_list ) 
+void del_services_cmd_list( const bot_cmd *bot_cmd_list ) 
 {
-	return del_bot_cmd_list( ns_botptr, bot_cmd_list );
+	del_bot_cmd_list( ns_botptr, bot_cmd_list );
 }
 
 /** @brief intrinsic_handler
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int intrinsic_handler( CmdParams *cmdparams, bot_cmd_handler handler )
+static int intrinsic_handler( const CmdParams *cmdparams, const bot_cmd_handler handler )
 {
 	int cmdret;
 
@@ -415,7 +409,7 @@ static int intrinsic_handler( CmdParams *cmdparams, bot_cmd_handler handler )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int run_intrinsic_cmds( const char *cmd, CmdParams *cmdparams )
+static int run_intrinsic_cmds( const char *cmd, const CmdParams *cmdparams )
 {
 	bot_cmd *cmd_ptr;
 
@@ -562,7 +556,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int bot_cmd_help_set( CmdParams *cmdparams, int userlevel )
+static int bot_cmd_help_set( const CmdParams *cmdparams, int userlevel )
 {
 	hnode_t *setnode;
 	hscan_t hs;
@@ -592,7 +586,7 @@ static int bot_cmd_help_set( CmdParams *cmdparams, int userlevel )
  *
  *  @return none
  */
-static void bot_cmd_help_on_help( CmdParams *cmdparams )
+static void bot_cmd_help_on_help( const CmdParams *cmdparams )
 {
 	/* Generate help on help footer text */
 	irc_prefmsg( cmdparams->bot, cmdparams->source, " " );
@@ -606,7 +600,7 @@ static void bot_cmd_help_on_help( CmdParams *cmdparams )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int bot_cmd_help( CmdParams *cmdparams )
+static int bot_cmd_help( const CmdParams *cmdparams )
 {
 	char *curlevelmsg=NULL;
 	int donemsg=0;
@@ -787,7 +781,7 @@ Client *FindValidUser( const Bot *botptr, const Client *sourceuser, const char *
 /** @brief bot_cmd_about process bot about command
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int bot_cmd_about( CmdParams *cmdparams )
+static int bot_cmd_about( const CmdParams *cmdparams )
 {
 	if( cmdparams->bot->moduleptr )
 	{
@@ -808,7 +802,7 @@ static int bot_cmd_about( CmdParams *cmdparams )
 /** @brief bot_cmd_version process bot version command
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int bot_cmd_version( CmdParams *cmdparams )
+static int bot_cmd_version( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "\2%s version\2", cmdparams->source ), 
 		cmdparams->bot->moduleptr->info->name );
@@ -822,7 +816,7 @@ static int bot_cmd_version( CmdParams *cmdparams )
 /** @brief bot_cmd_credits process bot credits command
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int bot_cmd_credits( CmdParams *cmdparams )
+static int bot_cmd_credits( const CmdParams *cmdparams )
 {
 	if( cmdparams->bot->moduleptr )
 	{
@@ -844,7 +838,7 @@ static int bot_cmd_credits( CmdParams *cmdparams )
 /** @brief bot_cmd_levels process bot level command
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-static int bot_cmd_levels( CmdParams *cmdparams )
+static int bot_cmd_levels( const CmdParams *cmdparams )
 {
 	char confcmd[32];
 	bot_cmd *cmd_ptr;

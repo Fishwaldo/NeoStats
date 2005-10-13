@@ -37,17 +37,17 @@ typedef struct database {
 }database;
 
 /** Bot command function prototypes */
-static int qs_cmd_add( CmdParams *cmdparams );
-static int qs_cmd_list( CmdParams *cmdparams );
-static int qs_cmd_del( CmdParams *cmdparams );
-static int qs_cmd_quote( CmdParams* cmdparams );
+static int qs_cmd_add( const CmdParams *cmdparams );
+static int qs_cmd_list( const CmdParams *cmdparams );
+static int qs_cmd_del( const CmdParams *cmdparams );
+static int qs_cmd_quote( const CmdParams* cmdparams );
 
 /** Set callbacks */
-static int qs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason );
-static int qs_set_signonquote_cb( CmdParams *cmdparams, SET_REASON reason );
+static int qs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int qs_set_signonquote_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 /** Event function prototypes */
-static int event_signon( CmdParams *cmdparams );
+static int event_signon( const CmdParams *cmdparams );
 
 /** Configuration variables */
 int signonquote = 0;
@@ -301,7 +301,7 @@ int ModFini( void )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int qs_cmd_add( CmdParams *cmdparams )
+static int qs_cmd_add( const CmdParams *cmdparams )
 {
 	static char filename[MAXPATH];
 	FILE *fp;
@@ -345,7 +345,7 @@ static int qs_cmd_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int qs_cmd_list( CmdParams *cmdparams )
+static int qs_cmd_list( const CmdParams *cmdparams )
 {
 	database *db;
 	hnode_t *hn;
@@ -378,7 +378,7 @@ static int qs_cmd_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int qs_cmd_del( CmdParams *cmdparams )
+static int qs_cmd_del( const CmdParams *cmdparams )
 {
 	database *db;
 	hnode_t *hn;
@@ -487,7 +487,7 @@ static int do_quote( const Client *target, const char *which, int reporterror )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int qs_cmd_quote( CmdParams* cmdparams )
+static int qs_cmd_quote( const CmdParams* cmdparams )
 {
 	return do_quote( cmdparams->source, cmdparams->ac >= 1 ? cmdparams->av[0] : NULL, 1 );
 }
@@ -502,7 +502,7 @@ static int qs_cmd_quote( CmdParams* cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int event_signon( CmdParams *cmdparams )
+static int event_signon( const CmdParams *cmdparams )
 {
 	return do_quote( cmdparams->source, NULL, 0 );
 }
@@ -518,7 +518,7 @@ static int event_signon( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int qs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
+static int qs_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -538,7 +538,7 @@ static int qs_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int qs_set_signonquote_cb( CmdParams *cmdparams, SET_REASON reason )
+static int qs_set_signonquote_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{

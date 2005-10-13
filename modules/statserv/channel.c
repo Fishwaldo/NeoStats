@@ -274,7 +274,7 @@ static int AddChannel( Channel* c, void *v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_newchan( CmdParams *cmdparams )
+int ss_event_newchan( const CmdParams *cmdparams )
 {
 	AddChannel( cmdparams->channel, NULL );
 	return NS_SUCCESS;
@@ -289,7 +289,7 @@ int ss_event_newchan( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_delchan( CmdParams *cmdparams )
+int ss_event_delchan( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 	lnode_t *ln;
@@ -318,7 +318,7 @@ int ss_event_delchan( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_join( CmdParams *cmdparams )
+int ss_event_join( const CmdParams *cmdparams )
 {										   
 	channelstat *cs;
 
@@ -342,7 +342,7 @@ int ss_event_join( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_part( CmdParams *cmdparams )
+int ss_event_part( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 
@@ -366,7 +366,7 @@ int ss_event_part( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_topic( CmdParams *cmdparams )
+int ss_event_topic( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 
@@ -389,7 +389,7 @@ int ss_event_topic( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_kick( CmdParams *cmdparams )
+int ss_event_kick( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 
@@ -487,7 +487,7 @@ static void top10topicshandler( channelstat *cs, const void *v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_channel( CmdParams *cmdparams )
+int ss_cmd_channel( const CmdParams *cmdparams )
 {
 	channelstat *cs;
 

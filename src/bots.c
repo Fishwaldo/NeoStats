@@ -485,7 +485,7 @@ int BotNickChange( const Bot *botptr, const char *newnick )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_botlist( CmdParams *cmdparams )
+int ns_cmd_botlist( const CmdParams *cmdparams )
 {
 	lnode_t *cm;
 	Bot *botptr;

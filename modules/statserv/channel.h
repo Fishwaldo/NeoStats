@@ -49,13 +49,13 @@ typedef struct channelstat
 typedef void (*ChannelStatHandler)( channelstat *cs, const void *v );
 
 void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, const void *v );
-int ss_event_newchan( CmdParams *cmdparams );
-int ss_event_delchan( CmdParams *cmdparams );
-int ss_event_join( CmdParams *cmdparams );
-int ss_event_part( CmdParams *cmdparams );
-int ss_event_topic( CmdParams *cmdparams );
-int ss_event_kick( CmdParams *cmdparams );
-int ss_cmd_channel( CmdParams *cmdparams );
+int ss_event_newchan( const CmdParams *cmdparams );
+int ss_event_delchan( const CmdParams *cmdparams );
+int ss_event_join( const CmdParams *cmdparams );
+int ss_event_part( const CmdParams *cmdparams );
+int ss_event_topic( const CmdParams *cmdparams );
+int ss_event_kick( const CmdParams *cmdparams );
+int ss_cmd_channel( const CmdParams *cmdparams );
 int DelOldChanTimer( void *v );
 int InitChannelStats( void );
 void FiniChannelStats( void );

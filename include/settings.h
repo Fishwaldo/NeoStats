@@ -24,7 +24,7 @@
 #ifndef _SETTINGS_H_
 #define _SETTINGS_H_
 
-int del_all_bot_settings( Bot *bot_ptr );
-int bot_cmd_set( CmdParams *cmdparams );
+void del_all_bot_settings( Bot *bot_ptr );
+int bot_cmd_set( const CmdParams *cmdparams );
 
 #endif /* _SETTINGS_H_ */

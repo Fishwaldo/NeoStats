@@ -291,9 +291,9 @@ EXPORTFUNC void do_stats( const char *nick, const char *what );
 EXPORTFUNC void do_ping( const char *origin, const char *destination );
 EXPORTFUNC void do_pong( const char *origin, const char *destination );
 EXPORTFUNC void do_version( const char *nick, const char *remoteserver );
-EXPORTFUNC void do_protocol( char *origin, char **argv, int argc );
+EXPORTFUNC void do_protocol( const char *origin, char **argv, int argc );
 #define do_capab do_protocol
-EXPORTFUNC void do_sjoin( char *tstime, char *channame, char *modes, char *sjoinnick, char **argv, int argc );
+EXPORTFUNC void do_sjoin( const char *tstime, const char *channame, const char *modes, const char *sjoinnick, char **argv, int argc );
 EXPORTFUNC void do_netinfo( const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname );
 EXPORTFUNC void do_snetinfo( const char *maxglobalcnt, const char *tsendsync, const char *prot, const char *cloak, const char *netname );
 EXPORTFUNC void do_join( const char *nick, const char *chanlist, const char *keys );

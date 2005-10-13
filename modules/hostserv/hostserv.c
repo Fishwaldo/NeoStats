@@ -59,20 +59,20 @@ struct hs_cfg
 } hs_cfg;
 
 /** prototypes */
-static int hs_event_signon( CmdParams *cmdparams );
-static int hs_event_umode( CmdParams *cmdparams );
+static int hs_event_signon( const CmdParams *cmdparams );
+static int hs_event_umode( const CmdParams *cmdparams );
 
-static int hs_cmd_bans( CmdParams *cmdparams );
-static int hs_cmd_login( CmdParams *cmdparams );
-static int hs_cmd_chpass( CmdParams *cmdparams );
-static int hs_cmd_add( CmdParams *cmdparams );
-static int hs_cmd_list( CmdParams *cmdparams );
-static int hs_cmd_listwild( CmdParams *cmdparams );
-static int hs_cmd_view( CmdParams *cmdparams );
-static int hs_cmd_del( CmdParams *cmdparams );
+static int hs_cmd_bans( const CmdParams *cmdparams );
+static int hs_cmd_login( const CmdParams *cmdparams );
+static int hs_cmd_chpass( const CmdParams *cmdparams );
+static int hs_cmd_add( const CmdParams *cmdparams );
+static int hs_cmd_list( const CmdParams *cmdparams );
+static int hs_cmd_listwild( const CmdParams *cmdparams );
+static int hs_cmd_view( const CmdParams *cmdparams );
+static int hs_cmd_del( const CmdParams *cmdparams );
 
-static int hs_set_regnick_cb( CmdParams* cmdparams, SET_REASON reason );
-static int hs_set_expire_cb( CmdParams* cmdparams, SET_REASON reason );
+static int hs_set_regnick_cb( const CmdParams* cmdparams, SET_REASON reason );
+static int hs_set_expire_cb( const CmdParams* cmdparams, SET_REASON reason );
 
 /** vhost list */
 static list_t *vhost_list;
@@ -328,7 +328,7 @@ static void LoadBans( void )
  *  @return NS_SUCCESS 
  */
 
-static int hs_set_regnick_cb( CmdParams* cmdparams, SET_REASON reason )
+static int hs_set_regnick_cb( const CmdParams* cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
@@ -354,7 +354,7 @@ static int hs_set_regnick_cb( CmdParams* cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS 
  */
 
-static int hs_set_expire_cb( CmdParams* cmdparams, SET_REASON reason )
+static int hs_set_expire_cb( const CmdParams* cmdparams, SET_REASON reason )
 {
 	if( reason == SET_CHANGE )
 	{
@@ -379,7 +379,7 @@ static int hs_set_expire_cb( CmdParams* cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_event_signon( CmdParams *cmdparams )
+static int hs_event_signon( const CmdParams *cmdparams )
 {
 	vhostentry *vhe;
 
@@ -409,7 +409,7 @@ static int hs_event_signon( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_event_umode( CmdParams *cmdparams ) 
+static int hs_event_umode( const CmdParams *cmdparams ) 
 {
 	static char vhost[MAXHOST];
 	int add = 0;
@@ -576,7 +576,7 @@ static void new_vhost( char *nick, char *host, char *vhost, char *pass, char *wh
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_bans_list( CmdParams *cmdparams )
+static int hs_cmd_bans_list( const CmdParams *cmdparams )
 {
 	banentry *ban;
 	hnode_t *hn;
@@ -612,7 +612,7 @@ static int hs_cmd_bans_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_bans_add( CmdParams *cmdparams )
+static int hs_cmd_bans_add( const CmdParams *cmdparams )
 {
 	banentry *ban;
 	char *buf;
@@ -652,7 +652,7 @@ static int hs_cmd_bans_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_bans_del( CmdParams *cmdparams )
+static int hs_cmd_bans_del( const CmdParams *cmdparams )
 {
 	banentry *ban;
 	hnode_t *hn;
@@ -693,7 +693,7 @@ static int hs_cmd_bans_del( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_bans( CmdParams *cmdparams )
+static int hs_cmd_bans( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
@@ -744,7 +744,7 @@ static banentry *FindBan( const char *mask )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_chpass( CmdParams *cmdparams )
+static int hs_cmd_chpass( const CmdParams *cmdparams )
 {
 	vhostentry *vhe;
 
@@ -793,7 +793,7 @@ static int hs_cmd_chpass( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_add( CmdParams *cmdparams )
+static int hs_cmd_add( const CmdParams *cmdparams )
 {
 	banentry *ban;
 	Client *u;
@@ -870,7 +870,7 @@ static int hs_cmd_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_list( CmdParams *cmdparams )
+static int hs_cmd_list( const CmdParams *cmdparams )
 {
 	int i;
 	lnode_t *hn;
@@ -945,7 +945,7 @@ static int hs_cmd_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_listwild( CmdParams *cmdparams )
+static int hs_cmd_listwild( const CmdParams *cmdparams )
 {
 	int i;
 	int wm;
@@ -1006,7 +1006,7 @@ static int hs_cmd_listwild( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_view( CmdParams *cmdparams )
+static int hs_cmd_view( const CmdParams *cmdparams )
 {
 	vhostentry *vhe;
 	char ltime[80];
@@ -1041,7 +1041,7 @@ static int hs_cmd_view( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_del( CmdParams *cmdparams )
+static int hs_cmd_del( const CmdParams *cmdparams )
 {
 	lnode_t *hn;
 	vhostentry *vhe;
@@ -1076,7 +1076,7 @@ static int hs_cmd_del( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int hs_cmd_login( CmdParams *cmdparams )
+static int hs_cmd_login( const CmdParams *cmdparams )
 {
 	vhostentry *vhe;
 

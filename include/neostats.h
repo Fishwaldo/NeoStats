@@ -668,7 +668,7 @@ typedef struct ModesParm {
 typedef struct ChannelMember {
 	Client *u;
 	time_t tsjoin;
-	unsigned int flags;
+	unsigned int modes;
 } ChannelMember;
 
 /** @brief Channel structure
@@ -724,8 +724,8 @@ typedef enum SET_REASON {
 	SET_VALIDATE,
 } SET_REASON;
 
-typedef int (*bot_cmd_handler) ( CmdParams* cmdparams );
-typedef int (*bot_set_handler) ( CmdParams* cmdparams, SET_REASON reason );
+typedef int (*bot_cmd_handler) ( const CmdParams* cmdparams );
+typedef int (*bot_set_handler) ( const CmdParams* cmdparams, SET_REASON reason );
 
 /* Command will only respond to privmsg. !command in channel is ignored.
  * Use of this flag is discouraged.
@@ -856,7 +856,7 @@ struct PerlEvent;
 /** @brief Event function types
  * 
  */
-typedef int (*event_handler) ( CmdParams *cmdparams );
+typedef int (*event_handler) ( const CmdParams *cmdparams );
 
 /** @brief ModuleEvent functions structure
  * 
@@ -936,9 +936,6 @@ typedef struct ModuleInfo {
 	 * Protocol flags for required protocol specfic features e.g. SETHOST
 	 * use 0 if not needed */
 	const ModuleFeatures features;
-	/* DO NOT USE: 
-	 * Reserved for future expansion */
-	const int padding[5];	
 }ModuleInfo;
 
 typedef int (*mod_auth) ( const Client *u );
@@ -1388,7 +1385,7 @@ EXPORTFUNC Client *FindServer( const char *name );
 EXPORTFUNC Channel *FindChannel( const char *chan );
 EXPORTFUNC int test_cmode( const Channel *c, unsigned int mode );
 EXPORTFUNC int IsChannelMember( const Channel *c, const Client *u );
-EXPORTFUNC int test_cumode( const char *chan, const char *nick, unsigned int flag );
+EXPORTFUNC int test_cumode( const Channel *c, const Client *u, unsigned int mode );
 EXPORTFUNC Channel *GetRandomChannel( void );
 EXPORTFUNC Client *GetRandomChannelMember( const Channel *c, int uge );
 EXPORTFUNC char *GetRandomChannelKey( int length );
@@ -1407,13 +1404,13 @@ EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void 
 
 /* services.c */
 EXPORTFUNC int add_services_cmd_list( bot_cmd *bot_cmd_list );
+EXPORTFUNC void del_services_cmd_list( const bot_cmd *bot_cmd_list );
 EXPORTFUNC int add_services_set_list( bot_setting *bot_setting_list );
-EXPORTFUNC int del_services_cmd_list( const bot_cmd *bot_cmd_list );
-EXPORTFUNC int del_services_set_list( bot_setting *bot_setting_list );
+EXPORTFUNC void del_services_set_list( const bot_setting *bot_setting_list );
 EXPORTFUNC int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list );
-EXPORTFUNC int del_bot_cmd_list( const Bot *bot_ptr, const bot_cmd *bot_cmd_list );
+EXPORTFUNC void del_bot_cmd_list( const Bot *bot_ptr, const bot_cmd *bot_cmd_list );
 EXPORTFUNC int add_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
-EXPORTFUNC int del_bot_setting_list( Bot *bot_ptr, bot_setting *bot_setting_list );
+EXPORTFUNC void del_bot_setting_list( const Bot *bot_ptr, const bot_setting *bot_setting_list );
 
 EXPORTFUNC Client *FindValidUser( const Bot *botptr, const Client *u, const char *target_nick );
 

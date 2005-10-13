@@ -114,7 +114,7 @@ const int user_auth_smode_count = ( ( sizeof( user_auth_smodes ) / sizeof( user_
  *  @return NS_SUCCESS if suceeds else result of command
  */
 
-static int auth_cmd_authmodelist( CmdParams *cmdparams )
+static int auth_cmd_authmodelist( const CmdParams *cmdparams )
 {
 	int i;
 

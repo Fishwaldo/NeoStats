@@ -585,7 +585,7 @@ static int ListUser( Client *u, void* v )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_userlist( CmdParams *cmdparams )
+int ns_cmd_userlist( const CmdParams *cmdparams )
 {
 	Client *u;
 

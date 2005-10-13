@@ -32,8 +32,8 @@ typedef struct ss_ctcp_version {
 typedef void (*CTCPVersionHandler)( const ss_ctcp_version *cv, const void *v );
 void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v );
 
-int ss_cmd_ctcpversion( CmdParams *cmdparams );
-int ss_event_ctcpversionbc( CmdParams *cmdparams );
+int ss_cmd_ctcpversion( const CmdParams *cmdparams );
+int ss_event_ctcpversionbc( const CmdParams *cmdparams );
 int InitVersionStats( void );
 void FiniVersionStats( void );
 

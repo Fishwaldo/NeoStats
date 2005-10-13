@@ -481,7 +481,7 @@ int ReportModuleInfo( Module *module_ptr, void *v )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-int ns_cmd_modlist( CmdParams* cmdparams )
+int ns_cmd_modlist( const CmdParams* cmdparams )
 {
 	SET_SEGV_LOCATION();
 	ProcessModuleList( ReportModuleInfo, (void *)cmdparams->source );
@@ -499,7 +499,7 @@ int ns_cmd_modlist( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_load( CmdParams *cmdparams )
+int ns_cmd_load( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( ns_load_module( cmdparams->av[0], cmdparams->source ) )
@@ -519,7 +519,7 @@ int ns_cmd_load( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_unload( CmdParams *cmdparams )
+int ns_cmd_unload( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( unload_module( cmdparams->av[0], cmdparams->source ) > 0 )

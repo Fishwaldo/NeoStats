@@ -35,7 +35,7 @@
 #include "helpstrings.h"
 
 /* Prototype for module exclude command handler */
-static int cmd_exclude( CmdParams *cmdparams );
+static int cmd_exclude( const CmdParams *cmdparams );
 
 /* Exclude types */
 typedef enum NS_EXCLUDE
@@ -458,7 +458,7 @@ static int cmd_exclude_list( list_t *exclude_list, const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int cmd_exclude( CmdParams *cmdparams )
+static int cmd_exclude( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )

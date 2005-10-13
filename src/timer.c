@@ -439,7 +439,7 @@ int SetTimerInterval( const char *name, int interval )
  *  @return none
 */
 
-int ns_cmd_timerlist( CmdParams* cmdparams )
+int ns_cmd_timerlist( const CmdParams *cmdparams )
 {
 	Timer *timer = NULL;
 	hscan_t ts;

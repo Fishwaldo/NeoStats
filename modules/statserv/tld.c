@@ -177,7 +177,7 @@ void GetTLDStats( const TLDStatHandler handler, const void *v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_tldmap( CmdParams *cmdparams )
+int ss_cmd_tldmap( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "Top Level Domain Statistics:" );
@@ -257,7 +257,7 @@ void AddTLDUser( const Client *u )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_nickip( CmdParams *cmdparams )
+int ss_event_nickip( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	AddTLDUser( cmdparams->source );

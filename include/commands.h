@@ -24,10 +24,10 @@
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
 
-int del_all_bot_cmds( Bot* bot_ptr );
+void del_all_bot_cmds( Bot* bot_ptr );
 int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr );
 bot_cmd *find_bot_cmd( const Bot *bot_ptr, const char *cmd);
-int del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr );
+void del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr );
 int run_bot_cmd( CmdParams * cmdparams, int ischancmd );
 int getuserlevel( const CmdParams *cmdparams );
 void msg_permission_denied( const CmdParams *cmdparams, const char *subcommand );

@@ -34,6 +34,6 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
 */
 void DelBan( const char *mask );
 
-int ns_cmd_banlist( CmdParams *cmdparams );
+int ns_cmd_banlist( const CmdParams *cmdparams );
 
 #endif /* _BANS_H_ */

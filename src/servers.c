@@ -279,7 +279,7 @@ static int ListServer( Client *s, void *v )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_serverlist( CmdParams *cmdparams )
+int ns_cmd_serverlist( const CmdParams *cmdparams )
 {
 	Client *s;
 

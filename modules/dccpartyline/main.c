@@ -59,7 +59,7 @@ ModuleInfo module_info =
 	0,
 };
 
-static int dccpartyline_event_dccchatmsg( CmdParams *cmdparams );
+static int dccpartyline_event_dccchatmsg( const CmdParams *cmdparams );
 
 /** Module Events */
 ModuleEvent module_events[] = 
@@ -110,7 +110,7 @@ int ModFini( void )
 	return NS_SUCCESS;
 }
 
-static int dccpartyline_event_dccchatmsg( CmdParams *cmdparams )
+static int dccpartyline_event_dccchatmsg( const CmdParams *cmdparams )
 {
 	static char buf[BUFSIZE];
  

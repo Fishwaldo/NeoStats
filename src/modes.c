@@ -683,10 +683,10 @@ ChanUserMode (const char *chan, const char *nick, int add, const unsigned int ma
 	}
 	if (add) {
 		dlog(DEBUG2, "ChanUserMode: Adding mode %x to Channel %s User %s", mask, c->name, u->name);
-		cm->flags |= mask;
+		cm->modes |= mask;
 	} else {
 		dlog(DEBUG2, "ChanUserMode: Deleting Mode %x to Channel %s User %s", mask, c->name, u->name);
-		cm->flags &= ~mask;
+		cm->modes &= ~mask;
 	}
 }
 

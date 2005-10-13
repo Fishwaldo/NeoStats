@@ -38,22 +38,19 @@
 #include "dns.h"
 #include "base64.h"
 
-
-
-
 #define MOTD_FILENAME	"neostats.motd"
 #define ADMIN_FILENAME	"neostats.admin"
 
-typedef struct protocol_entry {
+typedef struct ProtocolEntry {
 	char *token;
 	unsigned int flag;
-} protocol_entry;
+} ProtocolEntry;
 
 extern ProtocolInfo *protocol_info;
 
 extern irc_cmd *cmd_list;
 
-protocol_entry protocol_list[] =
+ProtocolEntry protocol_list[] =
 {
 	{"TOKEN",	PROTOCOL_TOKEN},
 	{"CLIENT",	PROTOCOL_CLIENT},
@@ -1301,7 +1298,7 @@ void _m_notice( char *origin, char **argv, int argc, int srv )
 		return;
 	}
 #if 0
-	if( ircstrcasecmp( argv[0], "AUTH" ) ) {
+	if( ircstrcasecmp( argv[0], "AUTH" ) == 0 ) {
 		dlog( DEBUG1, "_m_notice: dropping server notice from %s, to %s : %s", origin, argv[0], argv[argc-1] );
 		return;
 	}
@@ -1646,27 +1643,27 @@ void do_stats( const char *nick, const char *what )
 		nlog( LOG_WARNING, "do_stats: message from unknown user %s", nick );
 		return;
 	}
-	if( !ircstrcasecmp( what, "u" ) ) {
+	if( ircstrcasecmp( what, "u" ) == 0 ) {
 		/* server uptime - Shmad */
 		time_t uptime = me.now - me.ts_boot;
 		irc_numeric( RPL_STATSUPTIME, u->name, __( "Statistical Server up %ld days, %ld:%02ld:%02ld", u ), ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_HOUR ) % 24, ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, uptime % 60 );
-	} else if( !ircstrcasecmp( what, "c" ) ) {
+	} else if( ircstrcasecmp( what, "c" ) == 0 ) {
 		/* Connections */
 		irc_numeric( RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, me.port );
 		irc_numeric( RPL_STATSCLINE, u->name, "C *@%s * * %d 50", me.uplink, me.port );
-	} else if( !ircstrcasecmp( what, "o" ) ) {
+	} else if( ircstrcasecmp( what, "o" ) == 0 ) {
 		/* Operators */
-	} else if( !ircstrcasecmp( what, "l" ) ) {
+	} else if( ircstrcasecmp( what, "l" ) == 0 ) {
 		/* Port Lists */
 		tmp = me.now - me.lastmsg;
 		tmp2 = me.now - me.ts_boot;
 		irc_numeric( RPL_STATSLINKINFO, u->name, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE" );
 		irc_numeric( RPL_STATSLLINE, u->name, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, ( int )me.SendM, ( int )me.SendBytes, ( int )me.RcveM, ( int )me.RcveBytes, ( int )tmp2, ( int )tmp );
-        } else if( !ircstrcasecmp( what, "Z" ) ) {
+        } else if( ircstrcasecmp( what, "Z" ) == 0 ) {
                 if( UserLevel( u ) >= NS_ULEVEL_ADMIN ) {
                         do_dns_stats_Z( u );
                 }
-	} else if( !ircstrcasecmp( what, "M" ) ) {
+	} else if( ircstrcasecmp( what, "M" ) == 0 ) {
 		ircd_cmd_ptr = cmd_list;
 		while( ircd_cmd_ptr->name ) {
 			if( ircd_cmd_ptr->usage > 0 ) {
@@ -1688,22 +1685,25 @@ void do_stats( const char *nick, const char *what )
  *  @return none
  */
 
-void do_protocol( char *origin, char **argv, int argc )
+void do_protocol( const char *origin, char **argv, int argc )
 {
-	protocol_entry *protocol_ptr;
+	ProtocolEntry *protocol_ptr;
 	int i;
 
-	for( i = 0; i < argc; i++ ) {
+	for( i = 0; i < argc; ++i )
+	{
 		protocol_ptr = protocol_list;
 		while( protocol_ptr->token )
 		{
-			if( !ircstrcasecmp( protocol_ptr->token, argv[i] ) ) {
-				if( protocol_info->options&protocol_ptr->flag ) {
+			if( ircstrcasecmp( protocol_ptr->token, argv[i] ) == 0 )
+			{
+				if( protocol_info->options&protocol_ptr->flag )
+				{
 					ircd_srv.protocol |= protocol_ptr->flag;
 					break;
 				}
 			}
-			protocol_ptr ++;
+			++protocol_ptr;
 		}
 	}
 }
@@ -1719,7 +1719,7 @@ void do_protocol( char *origin, char **argv, int argc )
 
 /* SJOIN <TS> #<channel> <modes> :[@][+]<nick_1> ...  [@][+]<nick_n> */
 
-void do_sjoin( char *tstime, char *channame, char *modes, char *sjoinnick, char **argv, int argc )
+void do_sjoin( const char *tstime, const char *channame, const char *modes, const char *sjoinnick, char **argv, int argc )
 {
 	char nick[MAXNICK];
 	char *nicklist;
@@ -2216,48 +2216,29 @@ void do_eos( const char *name )
 	Client *s;
 
 	s = FindServer( name );
-	if( s ) {
-		SynchServer( s );
-		dlog( DEBUG1, "do_eos: server %s is now synched", name );
-	} else {
+	if( !s )
+	{
 		nlog( LOG_WARNING, "do_eos: server %s not found", name );
+		return;
 	}
+	SynchServer( s );
+	dlog( DEBUG1, "do_eos: server %s is now synched", name );
 }
 
-/** @brief 
+/** @brief do_svsnick
  *
- *  
+ *  SVSNICK handler
  *
- *  @param 
- *
- *  @return none
- */
-
-void do_setname( const char *nick, const char *realname )
-{
-	Client *u;
-
-	u = FindUser( nick );
-	if( u ) {
-		dlog( DEBUG1, "do_setname: setting realname of user %s to %s", nick, realname );
-		strlcpy( u->info, ( char *)realname, MAXHOST );
-	} else {
-		nlog( LOG_WARNING, "do_setname: user %s not found", nick );
-	}
-}
-
-/** @brief 
- *
- *  
- *
- *  @param 
+ *  @param oldnick of user to change
+ *  @param newnick to change to
+ *  @param ts of change
  *
  *  @return none
  */
 
 void do_svsnick( const char *oldnick, const char *newnick, const char *ts )
 {
-	do_nickchange( oldnick, newnick, ts );
+	UserNickChange( oldnick, newnick, ts );
 }
 
 /** @brief do_sethost
@@ -2275,12 +2256,13 @@ void do_sethost( const char *nick, const char *host )
 	Client *u;
 
 	u = FindUser( nick );
-	if( u ) {
-		dlog( DEBUG1, "do_sethost: setting host of user %s to %s", nick, host );
-		strlcpy( u->user->hostname, ( char *)host, MAXHOST );
-	} else {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "do_sethost: user %s not found", nick );
+		return;
 	}
+	dlog( DEBUG1, "do_sethost: setting host of user %s to %s", nick, host );
+	strlcpy( u->user->hostname, ( char *)host, MAXHOST );
 }
 
 /** @brief do_setident
@@ -2298,12 +2280,37 @@ void do_setident( const char *nick, const char *ident )
 	Client *u;
 
 	u = FindUser( nick );
-	if( u ) {
-		dlog( DEBUG1, "do_setident: setting ident of user %s to %s", nick, ident );
-		strlcpy( u->user->username, ( char *)ident, MAXHOST );
-	} else {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "do_setident: user %s not found", nick );
+		return;
 	}
+	dlog( DEBUG1, "do_setident: setting ident of user %s to %s", nick, ident );
+	strlcpy( u->user->username, ident, MAXHOST );
+}
+
+/** @brief do_setname
+ *
+ *  SETNAME handler
+ *
+ *  @param nick of user to change
+ *  @param realname to change to
+ *
+ *  @return none
+ */
+
+void do_setname( const char *nick, const char *realname )
+{
+	Client *u;
+
+	u = FindUser( nick );
+	if( !u )
+	{
+		nlog( LOG_WARNING, "do_setname: user %s not found", nick );
+		return;
+	}
+	dlog( DEBUG1, "do_setname: setting realname of user %s to %s", nick, realname );
+	strlcpy( u->info, ( char *)realname, MAXHOST );
 }
 
 /** @brief do_chghost
@@ -2327,7 +2334,7 @@ void do_chghost( const char *nick, const char *host )
 		return;
 	}
 	dlog( DEBUG1, "do_chghost: setting host of user %s to %s", nick, host );
-	strlcpy( u->user->hostname, ( char *)host, MAXHOST );
+	strlcpy( u->user->hostname, host, MAXHOST );
 }
 
 /** @brief do_chgident
@@ -2351,7 +2358,7 @@ void do_chgident( const char *nick, const char *ident )
 		return;
 	}
 	dlog( DEBUG1, "do_chgident: setting ident of user %s to %s", nick, ident );
-	strlcpy( u->user->username, ( char *)ident, MAXHOST );
+	strlcpy( u->user->username, ident, MAXHOST );
 }
 
 /** @brief do_chgname
@@ -2375,5 +2382,5 @@ void do_chgname( const char *nick, const char *realname )
 		return;
 	}
 	dlog( DEBUG1, "do_chgname: setting realname of user %s to %s", nick, realname );
-	strlcpy( u->info, ( char *)realname, MAXHOST );
+	strlcpy( u->info, realname, MAXHOST );
 }

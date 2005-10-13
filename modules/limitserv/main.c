@@ -32,17 +32,17 @@ int joinchannels = 0;
 int limitbuffer = 1;
 
 /** Bot command function prototypes */
-static int cmd_add( CmdParams *cmdparams );
-static int cmd_list( CmdParams *cmdparams );
-static int cmd_del( CmdParams *cmdparams );
+static int cmd_add( const CmdParams *cmdparams );
+static int cmd_list( const CmdParams *cmdparams );
+static int cmd_del( const CmdParams *cmdparams );
 
 /** Event function prototypes */
-static int event_join( CmdParams *cmdparams );
-static int event_part( CmdParams *cmdparams );
+static int event_join( const CmdParams *cmdparams );
+static int event_part( const CmdParams *cmdparams );
 
 /** Setting callback prototypes */
-static int set_join_cb( CmdParams* cmdparams, SET_REASON reason );
-static int set_limitbuffer_cb( CmdParams* cmdparams, SET_REASON reason );
+static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int set_limitbuffer_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 
 /** hash to store ls_channel and bot info */
@@ -291,7 +291,7 @@ int ModFini( void )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int cmd_add( CmdParams *cmdparams )
+static int cmd_add( const CmdParams *cmdparams )
 {
 	ls_channel *db;
 
@@ -322,7 +322,7 @@ static int cmd_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int cmd_list( CmdParams *cmdparams )
+static int cmd_list( const CmdParams *cmdparams )
 {
 	ls_channel *db;
 	hnode_t *hn;
@@ -355,7 +355,7 @@ static int cmd_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int cmd_del( CmdParams *cmdparams )
+static int cmd_del( const CmdParams *cmdparams )
 {
 	ls_channel *db;
 	hnode_t *hn;
@@ -394,7 +394,7 @@ static int cmd_del( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int event_join( CmdParams *cmdparams )
+static int event_join( const CmdParams *cmdparams )
 {
 	ls_channel *db;
 
@@ -420,7 +420,7 @@ static int event_join( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int event_part( CmdParams *cmdparams )
+static int event_part( const CmdParams *cmdparams )
 {
 	ls_channel *db;
 
@@ -441,7 +441,7 @@ static int event_part( CmdParams *cmdparams )
  *  @return NS_SUCCESS 
  */
 
-static int set_join_cb( CmdParams* cmdparams, SET_REASON reason )
+static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_CHANGE )
 	{
@@ -453,7 +453,7 @@ static int set_join_cb( CmdParams* cmdparams, SET_REASON reason )
 	return NS_SUCCESS;
 }
 
-static int set_limitbuffer_cb( CmdParams* cmdparams, SET_REASON reason )
+static int set_limitbuffer_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	ls_channel *db;
 	hnode_t *hn;

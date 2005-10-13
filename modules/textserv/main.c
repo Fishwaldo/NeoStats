@@ -60,16 +60,16 @@ typedef struct botchanentry {
 } botchanentry;
 
 /** Bot command function prototypes */
-static int ts_cmd_add( CmdParams *cmdparams );
-static int ts_cmd_list( CmdParams *cmdparams );
-static int ts_cmd_del( CmdParams *cmdparams );
+static int ts_cmd_add( const CmdParams *cmdparams );
+static int ts_cmd_list( const CmdParams *cmdparams );
+static int ts_cmd_del( const CmdParams *cmdparams );
 
-static int ts_cmd_msg( CmdParams* cmdparams );
-static int ts_cmd_about( CmdParams* cmdparams );
-static int ts_cmd_credits( CmdParams* cmdparams );
-static int ts_cmd_version( CmdParams* cmdparams );
-static int ts_cmd_add_chan( CmdParams *cmdparams );
-static int ts_cmd_del_chan( CmdParams *cmdparams );
+static int ts_cmd_msg( const CmdParams* cmdparams );
+static int ts_cmd_about( const CmdParams* cmdparams );
+static int ts_cmd_credits( const CmdParams* cmdparams );
+static int ts_cmd_version( const CmdParams* cmdparams );
+static int ts_cmd_add_chan( const CmdParams *cmdparams );
+static int ts_cmd_del_chan( const CmdParams *cmdparams );
 
 static char emptyline[] = "";
 
@@ -692,7 +692,7 @@ int ModFini( void )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ts_cmd_add( CmdParams *cmdparams )
+static int ts_cmd_add( const CmdParams *cmdparams )
 {
 	static char filename[MAXPATH];
 	FILE *fp;
@@ -760,7 +760,7 @@ static int ts_cmd_add( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ts_cmd_list( CmdParams *cmdparams )
+static int ts_cmd_list( const CmdParams *cmdparams )
 {
 	dbbot *db;
 	hnode_t *hn;
@@ -791,7 +791,7 @@ static int ts_cmd_list( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ts_cmd_del( CmdParams *cmdparams )
+static int ts_cmd_del( const CmdParams *cmdparams )
 {
 	dbbot *db;
 	hnode_t *hn, *hn2;
@@ -842,7 +842,7 @@ static int ts_cmd_del( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int ts_cmd_msg( CmdParams* cmdparams )
+static int ts_cmd_msg( const CmdParams* cmdparams )
 {
 	static char buf[BUFSIZE];
 	char *fmt;
@@ -883,7 +883,7 @@ static int ts_cmd_msg( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-static int ts_cmd_about( CmdParams* cmdparams )
+static int ts_cmd_about( const CmdParams* cmdparams )
 {
 	dbbot *db;
 
@@ -893,7 +893,7 @@ static int ts_cmd_about( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-static int ts_cmd_credits( CmdParams* cmdparams )
+static int ts_cmd_credits( const CmdParams* cmdparams )
 {
 	dbbot *db;
 
@@ -903,7 +903,7 @@ static int ts_cmd_credits( CmdParams* cmdparams )
 	return NS_SUCCESS;
 }
 
-static int ts_cmd_version( CmdParams* cmdparams )
+static int ts_cmd_version( const CmdParams* cmdparams )
 {
 	dbbot *db;
 
@@ -923,7 +923,7 @@ static int ts_cmd_version( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ts_cmd_add_chan( CmdParams *cmdparams )
+static int ts_cmd_add_chan( const CmdParams *cmdparams )
 {
 	dbbot *db;
 	char *channame;
@@ -938,7 +938,7 @@ static int ts_cmd_add_chan( CmdParams *cmdparams )
 	}
 	if ((db->tsbot.public == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
-	if ((db->tsbot.public == 1) && (!IsChanOp(cmdparams->av[0], cmdparams->source->name)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.public == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
 	if( hash_lookup( db->chanhash, cmdparams->av[0] ) != NULL )
 	{
@@ -969,7 +969,7 @@ static int ts_cmd_add_chan( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ts_cmd_del_chan( CmdParams *cmdparams )
+static int ts_cmd_del_chan( const CmdParams *cmdparams )
 {
 	dbbot *db;
 	char *channame, *botchan;
@@ -984,7 +984,7 @@ static int ts_cmd_del_chan( CmdParams *cmdparams )
 	}
 	if ((db->tsbot.public == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
-	if ((db->tsbot.public == 1) && (!IsChanOp(cmdparams->av[0], cmdparams->source->name)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.public == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
 	hn = hash_lookup( db->chanhash, cmdparams->av[0] );
 	if( hn == NULL )

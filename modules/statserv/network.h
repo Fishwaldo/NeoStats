@@ -44,8 +44,8 @@ void DelNetworkChannel( void );
 void DelNetworkUser( void );
 void DelNetworkOper( void );
 void DelNetworkKill( void );
-int ss_cmd_netstats( CmdParams *cmdparams );
-int ss_cmd_daily( CmdParams *cmdparams );
+int ss_cmd_netstats( const CmdParams *cmdparams );
+int ss_cmd_daily( const CmdParams *cmdparams );
 
 void AverageNetworkStatistics( void );
 void ResetNetworkStatistics( void );

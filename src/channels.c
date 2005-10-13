@@ -479,7 +479,7 @@ void JoinChannel( const char *nick, const char *chan )
 	cm = ns_calloc( sizeof( ChannelMember ) );
 	cm->u = FindUser( nick );
 	cm->tsjoin = me.now;
-	cm->flags = 0;
+	cm->modes = 0;
 	lnode_create_append( c->members, cm );
 	c->users++;
 	if( list_isfull( u->user->chans ) )
@@ -522,7 +522,7 @@ static void ListChannelMembers( const CmdParams *cmdparams, const Channel *c )
 	while( cmn )
 	{
 		cm = lnode_get( cmn );
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "            %s Modes %s Joined: %ld", cmdparams->source ), cm->u->name, CmodeMaskToString( cm->flags ), ( long )cm->tsjoin );
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "            %s Modes %s Joined: %ld", cmdparams->source ), cm->u->name, CmodeMaskToString( cm->modes ), ( long )cm->tsjoin );
 		cmn = list_next( c->members, cmn );
 	}
 }
@@ -563,7 +563,7 @@ static int ListChannel( Channel *c, void *v )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_channellist( CmdParams *cmdparams )
+int ns_cmd_channellist( const CmdParams *cmdparams )
 {
 	Channel *c;
 
@@ -571,14 +571,18 @@ int ns_cmd_channellist( CmdParams *cmdparams )
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "================CHANLIST================",cmdparams->source ) );
 	if( cmdparams->ac < 1 )
 	{
-		ProcessChannelList( ListChannel, cmdparams );
+		ProcessChannelList( ListChannel, (void *)cmdparams );
    		return NS_SUCCESS;
 	}
 	c = FindChannel( cmdparams->av[0] );
 	if( c )
-		ListChannel( c, cmdparams );
+	{
+		ListChannel( c, (void *)cmdparams );
+	}
 	else
+	{
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "can't find channel %s", cmdparams->source ), cmdparams->av[0] );
+	}
    	return NS_SUCCESS;
 }
 
@@ -597,7 +601,9 @@ Channel *FindChannel( const char *chan )
 
 	c = ( Channel * )hnode_find( channelhash, chan );
 	if( !c )
+	{
 		dlog( DEBUG3, "FindChannel: %s not found", chan );
+	}
 	return c;
 }
 
@@ -614,9 +620,13 @@ Channel *FindChannel( const char *chan )
 int IsChannelMember( const Channel *c, const Client *u ) 
 {
 	if( !u || !c )
+	{
 		return NS_FALSE;
+	}
 	if( list_find( c->members, u->name, comparechanmember ) )
+	{
 		return NS_TRUE;
+	}
 	return NS_FALSE;
 }
 
@@ -630,21 +640,19 @@ int IsChannelMember( const Channel *c, const Client *u )
  *  @return NS_TRUE if has, else NS_FALSE
  */
 
-int test_cumode( const char *chan, const char *nick, unsigned int flag )
+int test_cumode( const Channel *c, const Client *u, unsigned int mode )
 {
-	Client *u;
-	Channel *c;
  	ChannelMember *cm;
 
-	u = FindUser( nick );
-	c = FindChannel( chan );
 	if( !u || !c )
 		return NS_FALSE;
-	cm = lnode_find( c->members, nick, comparechanmember );
+	cm = lnode_find( c->members, u->name, comparechanmember );
 	if( cm )
 	{
-		if( cm->flags & flag )
+		if( cm->modes & mode )
+		{
 			return NS_TRUE;
+		}
 	}	
 	return NS_FALSE;
 }

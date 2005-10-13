@@ -311,7 +311,7 @@ perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
 }
 
 int
-perl_command_cb(CmdParams *cmdparams) {
+perl_command_cb(const CmdParams *cmdparams) {
 	return execute_perl(GET_CUR_MODULE(), sv_2mortal (newSVpv (cmdparams->cmd_ptr->moddata, 0)), 3, cmdparams->cmd_ptr->cmd, cmdparams->source->name, cmdparams->param);
 }
 
@@ -799,7 +799,10 @@ XS (XS_NeoStats_DelCommand)
 		if (bot)
 			cmd_ptr = find_bot_cmd(bot, SvPV_nolen(ST(1)));
 		if (cmd_ptr) 
-			XSRETURN_UV(del_bot_cmd(bot->botcmds, cmd_ptr));
+		{
+			del_bot_cmd(bot->botcmds, cmd_ptr);
+			XSRETURN_UV( NS_SUCCESS);
+		}
 	}
 	XSRETURN_UV(NS_FAILURE);
 }

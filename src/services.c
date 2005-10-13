@@ -41,17 +41,17 @@
 #include "auth.h"
 
 /* Command function prototypes */
-static int ns_cmd_shutdown( CmdParams *cmdparams );
-static int ns_cmd_reload( CmdParams *cmdparams );
-static int ns_cmd_jupe( CmdParams *cmdparams );
+static int ns_cmd_shutdown( const CmdParams *cmdparams );
+static int ns_cmd_reload( const CmdParams *cmdparams );
+static int ns_cmd_jupe( const CmdParams *cmdparams );
 #ifdef USE_RAW
-static int ns_cmd_raw( CmdParams *cmdparams );
+static int ns_cmd_raw( const CmdParams *cmdparams );
 #endif
-static int ns_cmd_status( CmdParams *cmdparams );
+static int ns_cmd_status( const CmdParams *cmdparams );
 
-static int services_event_ctcpversion( CmdParams *cmdparams );
+static int services_event_ctcpversion( const CmdParams *cmdparams );
 
-static int ns_set_debug_cb( CmdParams *cmdparams, SET_REASON reason );
+static int ns_set_debug_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 config nsconfig;
 tme me;
@@ -184,7 +184,7 @@ ModuleEvent neostats_events[] =
  *  @return none
  */
 
-static int services_event_ctcpversion( CmdParams *cmdparams )
+static int services_event_ctcpversion( const CmdParams *cmdparams )
 {
 	dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
 	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
@@ -262,7 +262,7 @@ int init_services_bot( void )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_shutdown( CmdParams *cmdparams )
+static int ns_cmd_shutdown( const CmdParams *cmdparams )
 {
 	char *message;
 
@@ -288,7 +288,7 @@ static int ns_cmd_shutdown( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_reload( CmdParams *cmdparams )
+static int ns_cmd_reload( const CmdParams *cmdparams )
 {
 	char *message;
 
@@ -314,7 +314,7 @@ static int ns_cmd_reload( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_jupe( CmdParams *cmdparams )
+static int ns_cmd_jupe( const CmdParams *cmdparams )
 {
 	static char infoline[255];
 
@@ -337,7 +337,7 @@ static int ns_cmd_jupe( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_status( CmdParams *cmdparams )
+static int ns_cmd_status( const CmdParams *cmdparams )
 {
 	time_t uptime = me.now - me.ts_boot;
 
@@ -376,7 +376,7 @@ static int ns_cmd_status( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int ns_cmd_raw( CmdParams *cmdparams )
+static int ns_cmd_raw( const CmdParams *cmdparams )
 {
 	char *message;
 
@@ -401,7 +401,7 @@ static int ns_cmd_raw( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int ns_set_debug_cb( CmdParams *cmdparams, SET_REASON reason )
+static int ns_set_debug_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{

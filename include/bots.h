@@ -26,7 +26,7 @@
 
 int InitBots( void );
 void FiniBots( void );
-int ns_cmd_botlist( CmdParams* cmdparams );
+int ns_cmd_botlist( const CmdParams *cmdparams );
 int DelBot( const char *nick );
 void DelModuleBots( const Module *mod_ptr );
 int BotNickChange( const Bot *botptr, const char *newnick );

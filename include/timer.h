@@ -26,7 +26,7 @@
 
 int InitTimers( void );
 void FiniTimers( void );
-int ns_cmd_timerlist( CmdParams* cmdparams );
+int ns_cmd_timerlist( const CmdParams *cmdparams );
 void CheckTimers_cb (int notused, short event, void *arg);
 int del_timers( const Module *mod_ptr );
 

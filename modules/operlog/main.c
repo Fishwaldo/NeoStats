@@ -25,13 +25,13 @@
 #include "operlog.h"
 
 /** Bot event function prototypes */
-static int operlog_event_globops( CmdParams *cmdparams );
-static int operlog_event_chatops( CmdParams *cmdparams );
-static int operlog_event_wallops( CmdParams *cmdparams );
-static int operlog_event_localkill( CmdParams *cmdparams );
-static int operlog_event_globalkill( CmdParams *cmdparams );
-static int operlog_event_serverkill( CmdParams *cmdparams );
-static int operlog_event_umode( CmdParams *cmdparams );
+static int operlog_event_globops( const CmdParams *cmdparams );
+static int operlog_event_chatops( const CmdParams *cmdparams );
+static int operlog_event_wallops( const CmdParams *cmdparams );
+static int operlog_event_localkill( const CmdParams *cmdparams );
+static int operlog_event_globalkill( const CmdParams *cmdparams );
+static int operlog_event_serverkill( const CmdParams *cmdparams );
+static int operlog_event_umode( const CmdParams *cmdparams );
 
 /** Bot pointer */
 static Bot *operlog_bot;
@@ -156,7 +156,7 @@ int ModFini( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_globops( CmdParams *cmdparams )
+static int operlog_event_globops( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	nlog( LOG_NOTICE, "GLOBOPS: %s %s", cmdparams->source->name, cmdparams->param );
@@ -173,7 +173,7 @@ static int operlog_event_globops( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_chatops( CmdParams *cmdparams )
+static int operlog_event_chatops( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	nlog( LOG_NOTICE, "CHATOPS: %s %s", cmdparams->source->name, cmdparams->param );
@@ -190,7 +190,7 @@ static int operlog_event_chatops( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_wallops( CmdParams *cmdparams )
+static int operlog_event_wallops( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	nlog( LOG_NOTICE, "WALLOPS: %s %s", cmdparams->source->name, cmdparams->param );
@@ -207,7 +207,7 @@ static int operlog_event_wallops( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_localkill( CmdParams *cmdparams )
+static int operlog_event_localkill( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	nlog( LOG_NOTICE, "LOCALKILL: %s killed by %s for %s", cmdparams->target->name, cmdparams->source->name, cmdparams->param );
@@ -224,7 +224,7 @@ static int operlog_event_localkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_globalkill( CmdParams *cmdparams )
+static int operlog_event_globalkill( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	nlog( LOG_NOTICE, "GLOBALKILL: %s killed by %s for %s", cmdparams->target->name, cmdparams->source->name, cmdparams->param );
@@ -241,7 +241,7 @@ static int operlog_event_globalkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_serverkill( CmdParams *cmdparams )
+static int operlog_event_serverkill( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	nlog( LOG_NOTICE, "SERVERKILL: %s killed by %s for %s", cmdparams->target->name, cmdparams->source->name, cmdparams->param );
@@ -258,7 +258,7 @@ static int operlog_event_serverkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int operlog_event_umode( CmdParams *cmdparams )
+static int operlog_event_umode( const CmdParams *cmdparams )
 {
 	int add = 1;
 	char *modes = cmdparams->param;

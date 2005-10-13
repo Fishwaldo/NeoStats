@@ -116,7 +116,7 @@ static Ban *new_ban( const char *mask )
 void AddBan( const char *type, const char *user, const char *host, const char *mask,
 			 const char *reason, const char *setby, const char *tsset, const char *tsexpires )
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Ban* ban;
 
 	SET_SEGV_LOCATION();
@@ -132,7 +132,7 @@ void AddBan( const char *type, const char *user, const char *host, const char *m
 	ban->tsset = atol( tsset );
 	ban->tsexpires = atol( tsexpires );
 	/* run the module event */
-	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
+	cmdparams = ( CmdParams * ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->param = ( char * )ban;
 	SendAllModuleEvent( EVENT_ADDBAN, cmdparams );
 	ns_free( cmdparams );
@@ -161,7 +161,7 @@ void DelBan( const char *type, const char *user, const char *host, const char *m
 */
 void DelBan( const char *mask )
 {
-	CmdParams * cmdparams;
+	CmdParams *cmdparams;
 	Ban *ban;
 	hnode_t *bansnode;
 
@@ -174,7 +174,7 @@ void DelBan( const char *mask )
 	}
 	ban = hnode_get( bansnode );
 	/* run the module event */
-	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
+	cmdparams = ( CmdParams * ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->param = ( char * )ban;
 	SendAllModuleEvent( EVENT_DELBAN, cmdparams );
 	ns_free( cmdparams );
@@ -212,7 +212,7 @@ static int ListBan( Ban *ban, void *v )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ns_cmd_banlist( CmdParams *cmdparams )
+int ns_cmd_banlist( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, _( "Ban Listing:" ) );

@@ -45,13 +45,13 @@ static hash_t *serverstathash;
 void AverageServerStatistics( void )
 {
 	serverstat *ss;
-	hscan_t hs;
-	hnode_t *sn;
+	hscan_t scan;
+	hnode_t *node;
 
-	hash_scan_begin( &hs, serverstathash );
-	while( ( sn = hash_scan_next( &hs ) ) )
+	hash_scan_begin( &scan, serverstathash );
+	while( ( node = hash_scan_next( &scan ) ) )
 	{
-		ss = hnode_get( sn );
+		ss = hnode_get( node );
 		AverageStatistic( &ss->users );
 		AverageStatistic( &ss->opers );
 	}
@@ -69,13 +69,13 @@ void AverageServerStatistics( void )
 void ResetServerStatistics( void )
 {
 	serverstat *ss;
-	hscan_t hs;
-	hnode_t *sn;
+	hscan_t scan;
+	hnode_t *node;
 
-	hash_scan_begin( &hs, serverstathash );
-	while( ( sn = hash_scan_next( &hs ) ) )
+	hash_scan_begin( &scan, serverstathash );
+	while( ( node = hash_scan_next( &scan ) ) )
 	{
-		ss = hnode_get( sn );
+		ss = hnode_get( node );
 		ResetStatistic( &ss->users );
 		ResetStatistic( &ss->opers );
 	}
@@ -236,7 +236,7 @@ static int AddServerStat( Client *s, void *v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_server( CmdParams *cmdparams )
+int ss_event_server( const CmdParams *cmdparams )
 {
 	AddServerStat( cmdparams->source, NULL );
 	return NS_SUCCESS;
@@ -271,7 +271,7 @@ static void DelServerStat( Client* s )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_squit( CmdParams *cmdparams )
+int ss_event_squit( const CmdParams *cmdparams )
 {
 	DelServerStat( cmdparams->source );
 	DelNetworkServer();
@@ -318,7 +318,7 @@ static void UpdatePingStats( const Client* s )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_pong( CmdParams *cmdparams )
+int ss_event_pong( const CmdParams *cmdparams )
 {
 	/* we don't want negative pings! */
 	if( cmdparams->source->server->ping > 0 )
@@ -385,7 +385,7 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_map( CmdParams *cmdparams )
+int ss_cmd_map( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ss_bot, cmdparams->source, "%-40s      %-10s %-10s %-10s",
@@ -405,17 +405,17 @@ int ss_cmd_map( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_server_list( CmdParams *cmdparams )
+int ss_cmd_server_list( const CmdParams *cmdparams )
 {
 	serverstat *ss;
-	hscan_t hs;
-	hnode_t *sn;
+	hscan_t scan;
+	hnode_t *node;
 
 	irc_prefmsg( ss_bot, cmdparams->source, "Server listing:" );
-	hash_scan_begin( &hs, serverstathash );
-	while( ( sn = hash_scan_next( &hs ) ) )
+	hash_scan_begin( &scan, serverstathash );
+	while( ( node = hash_scan_next( &scan ) ) )
 	{
-		ss = hnode_get( sn );
+		ss = hnode_get( node );
 		irc_prefmsg( ss_bot, cmdparams->source, "%s (%s)", ss->name, 
 			( ss->s ) ? "ONLINE" : "OFFLINE" );
 	}
@@ -520,7 +520,7 @@ static int ss_server_copy( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ss_cmd_server_stats( CmdParams *cmdparams )
+static int ss_cmd_server_stats( const CmdParams *cmdparams )
 {
 	serverstat *ss;
 	Client *s;
@@ -597,7 +597,7 @@ static int ss_cmd_server_stats( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_server( CmdParams *cmdparams )
+int ss_cmd_server( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
 	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
@@ -641,14 +641,14 @@ static void SaveServer( serverstat *ss )
 void SaveServerStats( void )
 {
 	serverstat *ss;
-	hnode_t *sn;
-	hscan_t hs;
+	hnode_t *node;
+	hscan_t scan;
 
 	/* run through stats and save them */
-	hash_scan_begin( &hs, serverstathash );
-	while( ( sn = hash_scan_next( &hs ) ) )
+	hash_scan_begin( &scan, serverstathash );
+	while( ( node = hash_scan_next( &scan ) ) )
 	{
-		ss = hnode_get( sn );
+		ss = hnode_get( node );
 		SaveServer( ss );
 	}
 }
@@ -697,13 +697,13 @@ int LoadServerStats( void *data, int size )
 void GetServerStats( const ServerStatHandler handler, const void *v )
 {
 	serverstat *ss;
-	hnode_t *sn;
-	hscan_t hs;
+	hnode_t *node;
+	hscan_t scan;
 
-	hash_scan_begin( &hs, serverstathash );
-	while( ( sn = hash_scan_next( &hs ) ) )
+	hash_scan_begin( &scan, serverstathash );
+	while( ( node = hash_scan_next( &scan ) ) )
 	{
-		ss = hnode_get( sn );
+		ss = hnode_get( node );
 		handler( ss, v );
 	}
 }
@@ -743,17 +743,17 @@ int InitServerStats( void )
 void FiniServerStats( void )
 {
 	serverstat *ss;
-	hnode_t *sn;
-	hscan_t hs;
+	hnode_t *node;
+	hscan_t scan;
 
 	SaveServerStats();
 	DBACloseTable( SERVER_TABLE );
-	hash_scan_begin( &hs, serverstathash );
-	while( ( sn = hash_scan_next( &hs ) ) )
+	hash_scan_begin( &scan, serverstathash );
+	while( ( node = hash_scan_next( &scan ) ) )
 	{
-		ss = hnode_get( sn );
+		ss = hnode_get( node );
 		ClearServerModValue( ss->s );
-		hash_scan_delete_destroy_node( serverstathash, sn );
+		hash_scan_delete_destroy_node( serverstathash, node );
 		ns_free( ss );
 	}
 	hash_destroy( serverstathash );

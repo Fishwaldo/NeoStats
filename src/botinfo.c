@@ -24,10 +24,10 @@
 #include "neostats.h"
 #include "helpstrings.h"
 
-static int bot_set_nick_cb( CmdParams* cmdparams, SET_REASON reason );
-static int bot_set_user_cb( CmdParams* cmdparams, SET_REASON reason );
-static int bot_set_host_cb( CmdParams* cmdparams, SET_REASON reason );
-static int bot_set_realname_cb( CmdParams* cmdparams, SET_REASON reason );
+static int bot_set_nick_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int bot_set_user_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int bot_set_host_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int bot_set_realname_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 static bot_setting bot_info_settings[]=
 {
@@ -50,7 +50,7 @@ static bot_setting bot_info_settings[]=
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_set_nick_cb( CmdParams* cmdparams, SET_REASON reason )
+static int bot_set_nick_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	/* Ignore bootup and list callback */
 	if( reason == SET_CHANGE ) {
@@ -70,7 +70,7 @@ static int bot_set_nick_cb( CmdParams* cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_set_user_cb( CmdParams* cmdparams, SET_REASON reason )
+static int bot_set_user_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	/* Ignore bootup and list callback */
 	if( reason == SET_CHANGE ) {
@@ -90,7 +90,7 @@ static int bot_set_user_cb( CmdParams* cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_set_host_cb( CmdParams* cmdparams, SET_REASON reason )
+static int bot_set_host_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	/* Ignore bootup and list callback */
 	if( reason == SET_CHANGE ) {
@@ -110,7 +110,7 @@ static int bot_set_host_cb( CmdParams* cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int bot_set_realname_cb( CmdParams* cmdparams, SET_REASON reason )
+static int bot_set_realname_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	char *buf;
 

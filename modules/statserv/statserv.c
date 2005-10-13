@@ -42,10 +42,10 @@
 tStatServ StatServ;
 
 /** SET callback prototypes */
-static int ss_set_htmltime_cb( CmdParams *cmdparams, SET_REASON reason );
-static int ss_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason );
-static int ss_set_html_cb( CmdParams *cmdparams, SET_REASON reason );
-static int ss_set_htmlpath_cb( CmdParams *cmdparams, SET_REASON reason );
+static int ss_set_htmltime_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int ss_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int ss_set_html_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int ss_set_htmlpath_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 /** Bot pointer */
 Bot *ss_bot;
@@ -253,7 +253,7 @@ int ModFini( void )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int ss_set_html_cb( CmdParams *cmdparams, SET_REASON reason )
+static int ss_set_html_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_CHANGE )
 	{
@@ -283,7 +283,7 @@ static int ss_set_html_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int ss_set_htmlpath_cb( CmdParams *cmdparams, SET_REASON reason )
+static int ss_set_htmlpath_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	FILE *opf;
 
@@ -313,7 +313,7 @@ static int ss_set_htmlpath_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int ss_set_htmltime_cb( CmdParams *cmdparams, SET_REASON reason )
+static int ss_set_htmltime_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_CHANGE )
 	{
@@ -333,7 +333,7 @@ static int ss_set_htmltime_cb( CmdParams *cmdparams, SET_REASON reason )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int ss_set_exclusions_cb( CmdParams *cmdparams, SET_REASON reason )
+static int ss_set_exclusions_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_LOAD || reason == SET_CHANGE )
 	{
