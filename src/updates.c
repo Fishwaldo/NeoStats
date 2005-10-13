@@ -48,8 +48,10 @@ int32 MQSRecvSock(uint8 * buf, uint32 numBytes, void * arg) {
 int InitUpdate(void) 
 {
 #ifndef WIN32
-	dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
-	dlog(DEBUG1, "Updates Initialized successfully");
+	if (mqs.username[0]) {
+		dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
+		dlog(DEBUG1, "Updates Initialized successfully");
+	}
 	mqs.state = MQS_DISCONNECTED;
 #endif
 	return NS_SUCCESS;
@@ -85,9 +87,11 @@ void GotUpdateAddress(void *data, adns_answer *a)
 }
 
 void ResetMQ() {
+	if (mqs.state >= MQS_CONNECTING) {
 		mqs.state = MQS_DISCONNECTED;
 		mqs.Sockinfo = NULL;
 		MGFreeMessageGateway(mqsgw);
+	}
 }
 
 void CheckMQOut() {
@@ -111,7 +115,6 @@ void ProcessMessage(MMessage *msg) {
 	unsigned long what;
 	
 	what = MMGetWhat(msg);
-	printf("%ld\n", MAKETYPE("lgok"));
 	switch (what) {
 		case 1818718059:
 			dlog(DEBUG1, "Login Ok");
