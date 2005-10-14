@@ -681,6 +681,7 @@ int LoadServerStats( void *data, int size )
 	PostLoadStatistic( &ss->operkills );
 	PostLoadStatistic( &ss->serverkills );
 	PostLoadStatistic( &ss->splits );
+	ss->s = NULL;
 	return NS_FALSE;
 }
 
