@@ -381,54 +381,55 @@ mode_init chan_umodes[] =
 
 mode_init chan_modes[] = 
 {
-	{'r', CMODE_RGSTR, 0},
-	{'R', CMODE_RGSTRONLY, 0},
-	{'c', CMODE_NOCOLOR, 0},
-	{'O', CMODE_OPERONLY, 0},
-	{'A', CMODE_ADMONLY, 0},
-	{'L', CMODE_LINK, MODEPARAM},
-	{'Q', CMODE_NOKICKS, 0},
-	{'S', CMODE_STRIP, 0},
-	{'e', CMODE_EXCEPT, MODEPARAM},
-	{'K', CMODE_NOKNOCK, 0},
-	{'V', CMODE_NOINVITE, 0},
-	{'f', CMODE_FLOODLIMIT, MODEPARAM},
-	{'M', CMODE_MODREG, 0},
-	{'G', CMODE_STRIPBADWORDS, 0},
-	{'C', CMODE_NOCTCP, 0},
-	{'u', CMODE_AUDITORIUM, 0},
-	{'z', CMODE_ONLYSECURE, 0},
-	{'N', CMODE_NONICKCHANGE, 0},
+	{'r', CMODE_RGSTR, 0, 0},
+	{'R', CMODE_RGSTRONLY, 0, 0},
+	{'c', CMODE_NOCOLOR, 0, 0},
+	{'O', CMODE_OPERONLY, 0, 0},
+	{'A', CMODE_ADMONLY, 0, 0},
+	{'L', CMODE_LINK, MODEPARAM, 0},
+	{'Q', CMODE_NOKICKS, 0, 0},
+	{'S', CMODE_STRIP, 0, 0},
+	{'e', CMODE_EXCEPT, MODEPARAM, 0},
+	{'K', CMODE_NOKNOCK, 0, 0},
+	{'V', CMODE_NOINVITE, 0, 0},
+	{'f', CMODE_FLOODLIMIT, MODEPARAM, 0},
+	{'M', CMODE_MODREG, 0, 0},
+	{'G', CMODE_STRIPBADWORDS, 0, 0},
+	{'C', CMODE_NOCTCP, 0, 0},
+	{'u', CMODE_AUDITORIUM, 0, 0},
+	{'z', CMODE_ONLYSECURE, 0, 0},
+	{'N', CMODE_NONICKCHANGE, 0, 0},
 	MODE_INIT_END()
 };
 
-mode_init user_umodes[] = {
-	{'S', UMODE_SERVICES},
-	{'N', UMODE_NETADMIN},
-	{'a', UMODE_SADMIN},
-	{'A', UMODE_ADMIN},
-	{'C', UMODE_COADMIN},
-	{'O', UMODE_LOCOP},
-	{'r', UMODE_REGNICK},
-	{'w', UMODE_WALLOP},
-	{'g', UMODE_FAILOP},
-	{'h', UMODE_HELPOP},
-	{'s', UMODE_SERVNOTICE},
-	{'q', UMODE_KIX},
-	{'B', UMODE_BOT},
- 	{'d', UMODE_DEAF},
-	{'R', UMODE_RGSTRONLY},
- 	{'T', UMODE_NOCTCP},
-	{'V', UMODE_WEBTV},
-	{'p', UMODE_HIDEWHOIS},
-	{'H', UMODE_HIDEOPER},
-	{'G', UMODE_STRIPBADWORDS},
-	{'t', UMODE_SETHOST},
-	{'x', UMODE_HIDE},
-	/*{'b', UMODE_CHATOP},*/
-	{'W', UMODE_WHOIS},
-	{'z', UMODE_SECURE},
-	{'v', UMODE_VICTIM},	
+mode_init user_umodes[] =
+{
+	{'S', UMODE_SERVICES, 0, 0},
+	{'N', UMODE_NETADMIN, 0, 0},
+	{'a', UMODE_SADMIN, 0, 0},
+	{'A', UMODE_ADMIN, 0, 0},
+	{'C', UMODE_COADMIN, 0, 0},
+	{'O', UMODE_LOCOP, 0, 0},
+	{'r', UMODE_REGNICK, 0, 0},
+	{'w', UMODE_WALLOP, 0, 0},
+	{'g', UMODE_FAILOP, 0, 0},
+	{'h', UMODE_HELPOP, 0, 0},
+	{'s', UMODE_SERVNOTICE, 0, 0},
+	{'q', UMODE_KIX, 0, 0},
+	{'B', UMODE_BOT, 0, 0},
+ 	{'d', UMODE_DEAF, 0, 0},
+	{'R', UMODE_RGSTRONLY, 0, 0},
+ 	{'T', UMODE_NOCTCP, 0, 0},
+	{'V', UMODE_WEBTV, 0, 0},
+	{'p', UMODE_HIDEWHOIS, 0, 0},
+	{'H', UMODE_HIDEOPER, 0, 0},
+	{'G', UMODE_STRIPBADWORDS, 0, 0},
+	{'t', UMODE_SETHOST, 0, 0},
+	{'x', UMODE_HIDE, 0, 0},
+	/*{'b', UMODE_CHATOP, 0, 0},*/
+	{'W', UMODE_WHOIS, 0, 0},
+	{'z', UMODE_SECURE, 0, 0},
+	{'v', UMODE_VICTIM, 0, 0},	
 	MODE_INIT_END()
 };
 
@@ -444,7 +445,8 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 	state = 0;
 	tarindex = 0;
 
-	while( ( ch = *src++ ) != '\0' ) {
+	while( ( ch = *src++ ) != '\0' )
+	{
 		if( isspace( ch ) )	/* Skip whitespace anywhere. */
 			continue;
 
@@ -455,9 +457,11 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 		if( pos == 0 ) 		/* A non-base64 character. */
 			return( -1 );
 
-		switch( state ) {
+		switch( state )
+		{
 		case 0:
-			if( target ) {
+			if( target )
+			{
 				if( tarindex >= targsize )
 					return( -1 );
 				target[tarindex] = ( unsigned char )( pos - Base64 ) << 2;
@@ -465,7 +469,8 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 			state = 1;
 			break;
 		case 1:
-			if( target ) {
+			if( target )
+			{
 				if( tarindex + 1 >= targsize )
 					return( -1 );
 				target[tarindex]   |= ( pos - Base64 ) >> 4;
@@ -476,7 +481,8 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 			state = 2;
 			break;
 		case 2:
-			if( target ) {
+			if( target )
+			{
 				if( tarindex + 1 >= targsize )
 					return( -1 );
 				target[tarindex]   |= ( pos - Base64 ) >> 2;
@@ -487,7 +493,8 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 			state = 3;
 			break;
 		case 3:
-			if( target ) {
+			if( target )
+			{
 				if( tarindex >= targsize )
 					return( -1 );
 				target[tarindex] |= ( pos - Base64 );
@@ -505,9 +512,11 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 	 * on a byte boundary, and/or with erroneous trailing characters.
 	 */
 
-	if( ch == Pad64 ) {		/* We got a pad char. */
+	if( ch == Pad64 )
+	{		/* We got a pad char. */
 		ch = *src++;		/* Skip it, get next. */
-		switch( state ) {
+		switch( state )
+		{
 		case 0:		/* Invalid = in first position */
 		case 1:		/* Invalid = in second position */
 			return( -1 );
@@ -542,7 +551,9 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 			if( target && target[tarindex] != 0 )
 				return( -1 );
 		}
-	} else {
+	}
+	else
+	{
 		/*
 		 * We ended by seeing the end of the string.  Make sure we
 		 * have no partial bytes lying around.
@@ -556,7 +567,7 @@ int b64_decode( char const *src, unsigned char *target, int targsize )
 
 int decode_ip( const char *buf )
 {
-	int len = strlen( buf );
+	size_t len = strlen( buf );
 	char targ[25];
 	struct in_addr ia;
 
@@ -635,7 +646,8 @@ void send_svstime( const char *source, const unsigned long ts )
 static void m_server( char *origin, char **argv, int argc, int srv )
 {
 	char* s = argv[argc-1];
-	if( *origin== 0 ) {
+	if( *origin== 0 )
+	{
 		/* server desc from uplink includes extra info so we need to 
 		   strip protocol, flags and numeric. We can use the first
 		   space to do this*/
@@ -644,12 +656,14 @@ static void m_server( char *origin, char **argv, int argc, int srv )
 		/* Strip the now leading space */
 		s++;
 	}
-	if( argc > 3 ) {
+	if( argc > 3 )
+	{
 		do_server( argv[0], origin, argv[1], argv[2], s, srv );
-	} else {
+	}
+	else
+	{
 		do_server( argv[0], origin, argv[1], NULL, s, srv );
 	}
-	
 }
 
 /** m_svsmode
@@ -673,9 +687,12 @@ static void m_server( char *origin, char **argv, int argc, int srv )
 
 static void m_svsmode( char *origin, char **argv, int argc, int srv )
 {
-	if( argv[0][0] == '#' ) {
+	if( argv[0][0] == '#' )
+	{
 		do_svsmode_channel( origin, argv, argc );
-	} else {
+	}
+	else
+	{
 		do_svsmode_user( argv[0], argv[1], argv[2] );
 	}
 }
@@ -741,7 +758,8 @@ static void m_umode2( char *origin, char **argv, int argc, int srv )
 
 static void m_nick( char *origin, char **argv, int argc, int srv )
 {
-	if( !srv ) {
+	if( !srv )
+	{
 		if( ircd_srv.protocol & PROTOCOL_NICKv2 )
 		{
 			if( ircd_srv.protocol & PROTOCOL_NICKIP )
@@ -763,7 +781,9 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 			do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
 				NULL, argv[6], NULL, NULL, argv[9], NULL, NULL );
 		}
-	} else {
+	}
+	else
+	{
 		do_nickchange( origin, argv[0], NULL );
 	}
 }

@@ -90,6 +90,7 @@ ModuleInfo module_info = {
 	__TIME__,
 	MODULE_FLAG_CTCP_VERSION,
 	0,
+	0,
 };
 
 /** Bot command table */

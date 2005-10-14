@@ -695,7 +695,7 @@ typedef struct Channel {
 	void *modvalue[NUM_MODULES];
 } Channel;
 
-typedef struct _bot_cmd bot_cmd;
+typedef struct bot_cmd;
 
 typedef struct CmdParams {
 	Client *source;		/* pointer to client triggering command */
@@ -739,7 +739,7 @@ typedef int (*bot_set_handler) ( const CmdParams* cmdparams, SET_REASON reason )
 /** @brief bot_cmd structure
  *  defines command lists for bots
  */
-typedef struct _bot_cmd {
+struct {
 	const char		*cmd;		/* command string */
 	bot_cmd_handler	handler;	/* handler */
 	int				minparams;	/* min num params */

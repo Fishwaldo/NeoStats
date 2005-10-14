@@ -95,20 +95,20 @@ static ModeDesc UmodeDesc[] =
 {
 #ifdef UMODE_DEBUG
 	{UMODE_DEBUG,		"Debug"},
-#endif
+#endif /* UMODE_DEBUG */
 	{UMODE_TECHADMIN,	"Technical Administrator"},
 #ifdef UMODE_SERVICESOPER
 	{UMODE_SERVICESOPER,"Services operator"},
-#endif
+#endif /* UMODE_SERVICESOPER */
 #ifdef UMODE_IRCADMIN
 	{UMODE_IRCADMIN,	"IRC admin"},
-#endif
+#endif /* UMODE_IRCADMIN */
 #ifdef UMODE_SUPER
 	{UMODE_SUPER,		"Super"},
-#endif
+#endif /* UMODE_SUPER */
 #ifdef UMODE_SRA
 	{UMODE_SRA,			"Services root"},
-#endif
+#endif /* UMODE_SRA */
 	{UMODE_SERVICES,	"Network Service"},
 	{UMODE_NETADMIN,	"Network Administrator"},
 	{UMODE_SADMIN,		"Services Administrator"},
@@ -121,7 +121,8 @@ static ModeDesc UmodeDesc[] =
 	{0, 0},
 };
 
-static ModeDesc SmodeDesc[] = {
+static ModeDesc SmodeDesc[] =
+{
 	{SMODE_NETADMIN,	"Network Administrator"},
 	{SMODE_CONETADMIN,	"Co-Network Administrator"},
 	{SMODE_TECHADMIN,	"Technical Administrator"},

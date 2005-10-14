@@ -327,8 +327,6 @@ static void m_smo( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_tkl( char *origin, char **argv, int argc, int srv );
 
-#define NICKV2	
-
 ProtocolInfo protocol_info = 
 {
 	/* Protocol options required by this IRCd */
@@ -382,56 +380,56 @@ mode_init chan_umodes[] =
 
 mode_init chan_modes[] = 
 {
-	{'r', CMODE_RGSTR, 0},
-	{'R', CMODE_RGSTRONLY, 0},
-	{'c', CMODE_NOCOLOR, 0},
-	{'O', CMODE_OPERONLY, 0},
-	{'A', CMODE_ADMONLY, 0},
-	{'L', CMODE_LINK, MODEPARAM},
-	{'Q', CMODE_NOKICKS, 0},
-	{'S', CMODE_STRIP, 0},
-	{'e', CMODE_EXCEPT, MODEPARAM},
-	{'K', CMODE_NOKNOCK, 0},
-	{'V', CMODE_NOINVITE, 0},
-	{'f', CMODE_FLOODLIMIT, MODEPARAM},
-	{'M', CMODE_MODREG, 0},
-	{'G', CMODE_STRIPBADWORDS, 0},
-	{'C', CMODE_NOCTCP, 0},
-	{'u', CMODE_AUDITORIUM, 0},
-	{'z', CMODE_ONLYSECURE, 0},
-	{'N', CMODE_NONICKCHANGE, 0},
+	{'r', CMODE_RGSTR, 0, 0},
+	{'R', CMODE_RGSTRONLY, 0, 0},
+	{'c', CMODE_NOCOLOR, 0, 0},
+	{'O', CMODE_OPERONLY, 0, 0},
+	{'A', CMODE_ADMONLY, 0, 0},
+	{'L', CMODE_LINK, MODEPARAM, 0},
+	{'Q', CMODE_NOKICKS, 0, 0},
+	{'S', CMODE_STRIP, 0, 0},
+	{'e', CMODE_EXCEPT, MODEPARAM, 0},
+	{'K', CMODE_NOKNOCK, 0, 0},
+	{'V', CMODE_NOINVITE, 0, 0},
+	{'f', CMODE_FLOODLIMIT, MODEPARAM, 0},
+	{'M', CMODE_MODREG, 0, 0},
+	{'G', CMODE_STRIPBADWORDS, 0, 0},
+	{'C', CMODE_NOCTCP, 0, 0},
+	{'u', CMODE_AUDITORIUM, 0, 0},
+	{'z', CMODE_ONLYSECURE, 0, 0},
+	{'N', CMODE_NONICKCHANGE, 0, 0},
 	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
 {
-	{'S', UMODE_SERVICES},
-	{'N', UMODE_NETADMIN},
-	{'a', UMODE_SADMIN},
-	{'A', UMODE_ADMIN},
-	{'C', UMODE_COADMIN},
-	{'O', UMODE_LOCOP},
-	{'r', UMODE_REGNICK},
-	{'w', UMODE_WALLOP},
-	{'g', UMODE_FAILOP},
-	{'h', UMODE_HELPOP},
-	{'s', UMODE_SERVNOTICE},
-	{'q', UMODE_KIX},
-	{'B', UMODE_BOT},
- 	{'d', UMODE_DEAF},
-	{'k', UMODE_KILLS},
-	{'e', UMODE_EYES},
-	{'F', UMODE_FCLIENT},
-	{'c', UMODE_CLIENT},
-	{'f', UMODE_FLOOD},
-	{'j', UMODE_JUNK},
-	{'G', UMODE_STRIPBADWORDS},
-	{'t', UMODE_SETHOST},
-	{'x', UMODE_HIDE},
-	/*{'b', UMODE_CHATOP},*/
-	{'W', UMODE_WHOIS},
-	{'z', UMODE_SECURE},
-	{'v', UMODE_VICTIM},	
+	{'S', UMODE_SERVICES, 0, 0},
+	{'N', UMODE_NETADMIN, 0, 0},
+	{'a', UMODE_SADMIN, 0, 0},
+	{'A', UMODE_ADMIN, 0, 0},
+	{'C', UMODE_COADMIN, 0, 0},
+	{'O', UMODE_LOCOP, 0, 0},
+	{'r', UMODE_REGNICK, 0, 0},
+	{'w', UMODE_WALLOP, 0, 0},
+	{'g', UMODE_FAILOP, 0, 0},
+	{'h', UMODE_HELPOP, 0, 0},
+	{'s', UMODE_SERVNOTICE, 0, 0},
+	{'q', UMODE_KIX, 0, 0},
+	{'B', UMODE_BOT, 0, 0},
+ 	{'d', UMODE_DEAF, 0, 0},
+	{'k', UMODE_KILLS, 0, 0},
+	{'e', UMODE_EYES, 0, 0},
+	{'F', UMODE_FCLIENT, 0, 0},
+	{'c', UMODE_CLIENT, 0, 0},
+	{'f', UMODE_FLOOD, 0, 0},
+	{'j', UMODE_JUNK, 0, 0},
+	{'G', UMODE_STRIPBADWORDS, 0, 0},
+	{'t', UMODE_SETHOST, 0, 0},
+	{'x', UMODE_HIDE, 0, 0},
+	/*{'b', UMODE_CHATOP, 0, 0},*/
+	{'W', UMODE_WHOIS, 0, 0},
+	{'z', UMODE_SECURE, 0, 0},
+	{'v', UMODE_VICTIM, 0, 0},	
 	MODE_INIT_END()
 };
 
@@ -440,7 +438,7 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 /* PROTOCTL NOQUIT TOKEN NICKv2 SJOIN SJOIN2 UMODE2 VL SJ3 NS SJB64 */
 	send_cmd( "%s TOKEN NICKv2 VHP SJOIN SJOIN2 SJ3 UMODE2", MSGTOK( PROTOCTL ) );
 	send_cmd( "%s %s", MSGTOK( PASS ), pass );
-	send_cmd( "%s %s %d :%s", MSGTOK( SERVER ), name, numeric, infoline );
+	send_cmd( "%s %s %d :U0-*-%d %s", MSGTOK( SERVER ), name, 1, numeric, infoline );
 }
 
 void send_sjoin( const char *source, const char *target, const char *chan, const unsigned long ts )
@@ -448,25 +446,6 @@ void send_sjoin( const char *source, const char *target, const char *chan, const
 	send_cmd( ":%s %s %lu %s + :%s", source, MSGTOK( SJOIN ), ts, chan, target );
 }
 
-/* m_nick
- *  argv[0] = nickname
- * if from new client
- *  argv[1] = nick password
- * if from server:
- *  argv[1] = hopcount
- *  argv[2] = timestamp
- *  argv[3] = username
- *  argv[4] = hostname
- *  argv[5] = servername
- * if NICK version 1:
- *  argv[6] = servicestamp
- *  argv[7] = info
- * if NICK version 2:
- *  argv[6] = servicestamp
- *  argv[7] = umodes
- *  argv[8] = virthost, * if none
- *  argv[9] = info
- */
 void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK( NICK ), nick, ts, ident, host, server, newmode, realname );
@@ -498,18 +477,32 @@ void send_svstime( const char *source, const unsigned long ts )
 	send_cmd( ":%s %s SVSTIME %lu", source, MSGTOK( TSCTL ), ts );
 }
 
-/* m_server
- *	argv[0] = servername
- *  argv[1] = hopcount
- *  argv[2] = numeric
- *  argv[3] = serverinfo
- * on old protocols, serverinfo is argv[2], and numeric is left out
+/** m_server
+ *
+ *  process SERVER command
+ *  RX:
+ *    SERVER irc.foonet.com 1 :U2305-FinWXOoZE-1 FooNet Server
+ *  Format:
+ *    SERVER servername hopcount numeric :U<protocol>-flags-numeric serverdesc
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *	  argv[0] = servername
+ *    argv[1] = hopcount
+ *    argv[2] = numeric
+ *    argv[3] = serverinfo
+ *  on old protocols, serverinfo is argv[2], and numeric is left out
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
  */
-/*SERVER servername hopcount :U<protocol>-flags-numeric serverdesc*/
+
 static void m_server( char *origin, char **argv, int argc, int srv )
 {
 	char* s = argv[argc-1];
-	if( *origin== 0 ) {
+	if( *origin== 0 )
+	{
 		/* server desc from uplink includes extra info so we need to 
 		   strip protocol, flags and numeric. We can use the first
 		   space to do this*/
@@ -518,124 +511,232 @@ static void m_server( char *origin, char **argv, int argc, int srv )
 		/* Strip the now leading space */
 		s++;
 	}
-	if( argc > 3 ) {
+	if( argc > 3 )
+	{
 		do_server( argv[0], origin, argv[1], argv[2], s, srv );
-	} else {
+	}
+	else
+	{
 		do_server( argv[0], origin, argv[1], NULL, s, srv );
 	}
-	
 }
 
-/* m_svsmode
- *  argv[0] - username to change mode for
- *  argv[1] - modes to change
- *  argv[2] - Service Stamp( if mode == d )
+/** m_svsmode
+ *
+ *  process SVSMODE command
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *    argv[0] - username to change mode for
+ *    argv[1] - modes to change
+ *    argv[2] - Service Stamp( if mode == d )
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
  */
+
 static void m_svsmode( char *origin, char **argv, int argc, int srv )
 {
-	if( argv[0][0] == '#' ) {
+	if( argv[0][0] == '#' )
+	{
 		do_svsmode_channel( origin, argv, argc );
-	} else {
+	}
+	else
+	{
 		do_svsmode_user( argv[0], argv[1], argv[2] );
 	}
 }
 
-/* m_umode2
- * argv[0] - modes to change
+/** m_umode2
+ *
+ *  process UMODE2 command
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *    argv[0] - modes to change
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
  */
+
 static void m_umode2( char *origin, char **argv, int argc, int srv )
 {
 	do_mode_user( origin, argv[0] );
 }
 
-/* m_nick
- *  argv[0] = nickname
- * if from new client
- *  argv[1] = nick password
- * if from server:
- *  argv[1] = hopcount
- *  argv[2] = timestamp
- *  argv[3] = username
- *  argv[4] = hostname
- *  argv[5] = servername
- * if NICK version 1:
- *  argv[6] = servicestamp
- *  argv[7] = info
- * if NICK version 2:
- *  argv[6] = servicestamp
- *  argv[7] = umodes
- *  argv[8] = virthost, * if none
- *  argv[9] = info
+/** m_nick
+ *
+ *  process NICK command
+ *  RX:
+ *    NICK Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP fwAAAQ== :Mark
+ *    NICK Mark 1 1089324634 mark 127.0.0.1 irc.foonet.com 0 +iowghaAxN F72CBABD.ABE021B4.D9E4BB78.IP :Mark
+ *  Format:
+ *    NICK nick hop TS user host uplink servicestamp umode vhost [base64 IP] :realname
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *    argv[0] = nickname
+ *  if from new client
+ *    argv[1] = nick password
+ *  if from server:
+ *    argv[1] = hopcount
+ *    argv[2] = timestamp
+ *    argv[3] = username
+ *    argv[4] = hostname
+ *    argv[5] = servername
+ *  if NICK version 1:
+ *    argv[6] = servicestamp
+ *    argv[7] = info
+ *  if NICK version 2:
+ *    argv[6] = servicestamp
+ *    argv[7] = umodes
+ *    argv[8] = virthost, * if none
+ *    argv[9] = info
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
  */
+
 static void m_nick( char *origin, char **argv, int argc, int srv )
 {
-	if( !srv ) {
-#ifdef NICKV2
-		do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			NULL, argv[6], argv[7], argv[8], argv[9], NULL, NULL );
-#else /* NICKV2 */
-		do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
-			NULL, argv[6], NULL, NULL, argv[9], NULL, NULL );
-#endif /* NICKV2 */
-	} else {
+	if( !srv )
+	{
+		if( ircd_srv.protocol & PROTOCOL_NICKv2 )
+		{
+			do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+				NULL, argv[6], argv[7], argv[8], argv[9], NULL, NULL );
+		}
+		else
+		{
+			do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], 
+				NULL, argv[6], NULL, NULL, argv[9], NULL, NULL );
+		}
+	}
+	else
+	{
 		do_nickchange( origin, argv[0], NULL );
 	}
 }
 
-/* m_sjoin  
- *  argv[0] = channel timestamp
- *    char *argv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
- *  argv[1] = channel name
- *  "ts chname :"
- * if( argc == 3 ) 
- *  argv[2] = nick names + modes - all in one parameter
- *  "ts chname modebuf :"
- *  "ts chname :"@/"""name"	OPT_SJ3
- * if( argc == 4 )
- *  argv[2] = channel modes
- *  argv[3] = nick names + modes - all in one parameter
- *  "ts chname modebuf parabuf :"
- * if( argc > 4 )
- *  argv[2] = channel modes
- *  argv[3 to argc - 2] = mode parameters
- *  argv[argc - 1] = nick names + modes
- *  "ts parabuf :parv[parc - 1]"	OPT_SJOIN | OPT_SJ3 
+/** m_sjoin
+ *
+ *  process SJOIN command
+ *  RX:
+ *    SJOIN 1073861298 #services + <none> :Mark
+ *  Format:
+ *    SJOIN creationtime chname modebuf parabuf :member list
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *    argv[0] = channel timestamp
+ *      char *argv[], pvar[MAXMODEPARAMS][MODEBUFLEN + 3];
+ *    argv[1] = channel name
+ *      "ts chname :"
+ *  if( argc == 3 ) 
+ *    argv[2] = nick names + modes - all in one parameter
+ *      "ts chname modebuf :"
+ *      "ts chname :"@/"""name"	OPT_SJ3
+ *  if( argc == 4 )
+ *    argv[2] = channel modes
+ *    argv[3] = nick names + modes - all in one parameter
+ *      "ts chname modebuf parabuf :"
+ *  if( argc > 4 )
+ *    argv[2] = channel modes
+ *    argv[3 to argc - 2] = mode parameters
+ *    argv[argc - 1] = nick names + modes
+ *      "ts parabuf :parv[parc - 1]"	OPT_SJOIN | OPT_SJ3 
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
  */
-/*    MSG_SJOIN creationtime chname    modebuf parabuf :member list */
-/* R: ~         1073861298   #services +       <none>  :Mark */
+
 static void m_sjoin( char *origin, char **argv, int argc, int srv )
 {
 	do_sjoin( argv[0], argv[1], ( ( argc >= 4 ) ? argv[2] : "" ), origin, argv, argc );
 }
 
-/* m_swhois
- *  argv[0] = nickname
- *  argv[1] = new swhois
+/** m_swhois
+ *
+ *  process SWHOIS command
+ *  RX:
+ *    TODO
+ *  Format:
+ *    TODO
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *    argv[0] = nickname
+ *    argv[1] = new swhois
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
  */
+
 static void m_swhois( char *origin, char **argv, int argc, int srv )
 {
 	do_swhois( argv[0], argv[1] );
 }
+
+/** m_smo
+ *
+ *  process SMO command
+ *  RX:
+ *    :irc.foonet.com SMO o :(\1link\1) Link irc.foonet.com -> stats.neostats.net[@127.0.0.1.2722] established
+ *    :irc.foonet.com SMO o :\1(sync)\1 Possible negative TS split at link stats.neostats.net (1128112841 - 1128112842 = -1)
+ *    :irc.foonet.com SMO o :\1(sync)\1 Link stats.neostats.net -> irc.foonet.com is now synced [secs: 2 recv: 0.825 sent: 0.657]
+ *  Format:
+ *    :origin SMO ? :message
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
+ */
 
 static void m_smo( char *origin, char **argv, int argc, int srv )
 {
 	/* TODO */
 }
 
-/*
- *  argv[0]  +|- 
- *  argv[1]  G   
- *  argv[2]  user 
- *  argv[3]  host 
- *  argv[4]  setby 
- *  argv[5]  expire_at 
- *  argv[6]  set_at 
- *  argv[7]  reason 
-
-R: :server BD + G * mask setter 1074811259 1074206459 :reason
-R: :server BD + Z * mask setter 0 1070062390 :reason
-R: :server c dos_bot* :Reserved nickname: Dosbot
-*/
+/** m_tkl
+ *
+ *  process TKL command
+ *  RX:
+ *    TODO
+ *  Format:
+ *    :server BD + G * mask setter 1074811259 1074206459 :reason
+ *    :server BD + Z * mask setter 0 1070062390 :reason
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *    argv[0]  +|- 
+ *    argv[1]  G   
+ *    argv[2]  user 
+ *    argv[3]  host 
+ *    argv[4]  setby 
+ *    argv[5]  expire_at 
+ *    argv[6]  set_at 
+ *    argv[7]  reason 
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
+ */
 
 static void m_tkl( char *origin, char **argv, int argc, int srv )
 {

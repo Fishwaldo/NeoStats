@@ -130,30 +130,30 @@ mode_init chan_umodes[] =
 
 mode_init chan_modes[] = 
 {
-	{'e', CMODE_EXCEPT, MODEPARAM},
-	{'I', CMODE_INVEX, MODEPARAM},
-	{'a', CMODE_HIDEOPS, 0},
+	{'e', CMODE_EXCEPT, MODEPARAM, 0},
+	{'I', CMODE_INVEX, MODEPARAM, 0},
+	{'a', CMODE_HIDEOPS, 0, 0},
 	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
 {
-	{'d', UMODE_DEBUG},
-	{'a', UMODE_ADMIN},
-	{'l', UMODE_LOCOP},
-	{'b', UMODE_BOTS},
-	{'c', UMODE_CLIENT},
-	{'f', UMODE_FULL},
-	{'g', UMODE_CALLERID},
-	{'k', UMODE_SKILL},
-	{'n', UMODE_NCHANGE},
-	{'r', UMODE_REJ},
-	{'s', UMODE_SERVNOTICE},
-	{'u', UMODE_UNAUTH},
-	{'w', UMODE_WALLOP},
-	{'x', UMODE_EXTERNAL},
-	{'y', UMODE_SPY},
-	{'z', UMODE_OPERWALL},
+	{'d', UMODE_DEBUG, 0, 0},
+	{'a', UMODE_ADMIN, 0, 0},
+	{'l', UMODE_LOCOP, 0, 0},
+	{'b', UMODE_BOTS, 0, 0},
+	{'c', UMODE_CLIENT, 0, 0},
+	{'f', UMODE_FULL, 0, 0},
+	{'g', UMODE_CALLERID, 0, 0},
+	{'k', UMODE_SKILL, 0, 0},
+	{'n', UMODE_NCHANGE, 0, 0},
+	{'r', UMODE_REJ, 0, 0},
+	{'s', UMODE_SERVNOTICE, 0, 0},
+	{'u', UMODE_UNAUTH, 0, 0},
+	{'w', UMODE_WALLOP, 0, 0},
+	{'x', UMODE_EXTERNAL, 0, 0},
+	{'y', UMODE_SPY, 0, 0},
+	{'z', UMODE_OPERWALL, 0, 0},
 	MODE_INIT_END()
 };
 

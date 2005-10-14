@@ -221,6 +221,7 @@ ProtocolInfo protocol_info =
 	/* Default operator modes for NeoStats service bots */
 	"+o",
 	/* Default channel mode for NeoStats service bots */
+	"+o",
 };
 
 /* this is the command list and associated functions to run */
@@ -250,20 +251,20 @@ mode_init chan_umodes[] =
 
 mode_init chan_modes[] = 
 {
-	{'r', CMODE_RGSTRONLY, 0},
+	{'r', CMODE_RGSTRONLY, 0, 0},
 	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
 {
-	{'O', UMODE_LOCOP},
-	{'g', UMODE_DEBUG},
-	{'w', UMODE_WALLOP},
-	{'s', UMODE_SERVNOTICE},
-	{'d', UMODE_DEAF},
-	{'k', UMODE_SERVICES},
-	{'r', UMODE_REGNICK},
-	{'x', UMODE_HIDE},
+	{'O', UMODE_LOCOP, 0, 0},
+	{'g', UMODE_DEBUG, 0, 0},
+	{'w', UMODE_WALLOP, 0, 0},
+	{'s', UMODE_SERVNOTICE, 0, 0},
+	{'d', UMODE_DEAF, 0, 0},
+	{'k', UMODE_SERVICES, 0, 0},
+	{'r', UMODE_REGNICK, 0, 0},
+	{'x', UMODE_HIDE, 0, 0},
 	MODE_INIT_END()
 };
 

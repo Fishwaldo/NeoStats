@@ -98,6 +98,7 @@ ModuleInfo module_info = {
 	__TIME__,
 	0,
 	0,
+	0,
 };
 
 /** Bot command table */

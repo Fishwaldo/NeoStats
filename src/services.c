@@ -82,6 +82,7 @@ ModuleInfo ns_module_info = {
 	__TIME__,
 	0,
 	0,
+	0,
 };
 
 /** Fake Module pointer for run level code */

@@ -280,6 +280,7 @@ ProtocolInfo protocol_info =
 	/* Default operator modes for NeoStats service bots */
 	"+o",
 	/* Default channel mode for NeoStats service bots */
+	"+o",
 };
 
 /* this is the command list and associated functions to run */
@@ -314,42 +315,42 @@ mode_init chan_umodes[] =
 
 mode_init chan_modes[] = 
 {
-	{'c', CMODE_NOCOLOR, 0},
-	{'C', CMODE_NOCTCP, 0},
-	{'N', CMODE_NONOTICE, 0},
-	{'a', CMODE_ADMONLY, 0},
-	{'e', CMODE_EXCEPT, MODEPARAM},
-	{'z', CMODE_PERSIST, 0},
-	{'L', CMODE_NOLISTMODES, 0},
-	{'M', CMODE_MODREG, 0},
-	{'O', CMODE_OPERONLY, 0},
-	{'Q', CMODE_NOQUITPARTS, 0},
-	{'S', CMODE_STRIP, 0},
-	{'T', CMODE_NOAMSG, 0},
-	{'Z', CMODE_ONLYSECURE, 0},
-	{'r', CMODE_RGSTRONLY, 0},
+	{'c', CMODE_NOCOLOR, 0, 0},
+	{'C', CMODE_NOCTCP, 0, 0},
+	{'N', CMODE_NONOTICE, 0, 0},
+	{'a', CMODE_ADMONLY, 0, 0},
+	{'e', CMODE_EXCEPT, MODEPARAM, 0},
+	{'z', CMODE_PERSIST, 0, 0},
+	{'L', CMODE_NOLISTMODES, 0, 0},
+	{'M', CMODE_MODREG, 0, 0},
+	{'O', CMODE_OPERONLY, 0, 0},
+	{'Q', CMODE_NOQUITPARTS, 0, 0},
+	{'S', CMODE_STRIP, 0, 0},
+	{'T', CMODE_NOAMSG, 0, 0},
+	{'Z', CMODE_ONLYSECURE, 0, 0},
+	{'r', CMODE_RGSTRONLY, 0, 0},
 	MODE_INIT_END()
 };
 
 mode_init user_umodes[] = 
 {
-	{'O', UMODE_LOCOP},
-	{'g', UMODE_DEBUG},
-	{'w', UMODE_WALLOP},
-	{'s', UMODE_SERVNOTICE},
-	{'d', UMODE_DEAF},
-	{'k', UMODE_SERVICES},
-	{'r', UMODE_REGNICK},
-	{'x', UMODE_HIDE},
-	{'a', UMODE_ADMIN},
-	{'f', UMODE_FAKEHOST},
-	{'B', UMODE_BOT},
-	{'W', UMODE_WHOIS},
-	{'h', UMODE_SETHOST},
-	{'n', UMODE_NOCHAN},
-	{'I', UMODE_NOIDLE},
-	{'R', UMODE_RGSTRONLY},
-	{'X', UMODE_XTRAOP},
+	{'O', UMODE_LOCOP, 0, 0},
+	{'g', UMODE_DEBUG, 0, 0},
+	{'w', UMODE_WALLOP, 0, 0},
+	{'s', UMODE_SERVNOTICE, 0, 0},
+	{'d', UMODE_DEAF, 0, 0},
+	{'k', UMODE_SERVICES, 0, 0},
+	{'r', UMODE_REGNICK, 0, 0},
+	{'x', UMODE_HIDE, 0, 0},
+	{'a', UMODE_ADMIN, 0, 0},
+	{'f', UMODE_FAKEHOST, 0, 0},
+	{'B', UMODE_BOT, 0, 0},
+	{'W', UMODE_WHOIS, 0, 0},
+	{'h', UMODE_SETHOST, 0, 0},
+	{'n', UMODE_NOCHAN, 0, 0},
+	{'I', UMODE_NOIDLE, 0, 0},
+	{'R', UMODE_RGSTRONLY, 0, 0},
+	{'X', UMODE_XTRAOP, 0, 0},
 	MODE_INIT_END()
 };
 
