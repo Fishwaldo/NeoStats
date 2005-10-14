@@ -45,20 +45,20 @@ typedef struct dbm_sym {
 } dbm_sym;
 
 static void *( *DBMOpenTable )( const char *name );
-static int ( *DBMCloseTable )( void *handle );
-static int ( *DBMGetData )( void *handle, const char *key, void *data, int size );
-static int ( *DBMSetData )( void *handle, const char *key, void *data, int size );
-static int ( *DBMGetTableRows )( void *handle, DBRowHandler handler );
-static int ( *DBMDelData )( void *handle, const char *key );
+static void ( *DBMCloseTable )( void *handle );
+static int ( *DBMFetch )( void *handle, const char *key, void *data, int size );
+static int ( *DBMStore )( void *handle, const char *key, void *data, int size );
+static int ( *DBMFetchRows )( void *handle, DBRowHandler handler );
+static int ( *DBMDelete )( void *handle, const char *key );
 
 static dbm_sym dbm_sym_table[] = 
 {
-	{ ( void * )&DBMOpenTable,		"DBMOpenTable" },
-	{ ( void * )&DBMCloseTable,		"DBMCloseTable" },
-	{ ( void * )&DBMGetData,		"DBMGetData" },
-	{ ( void * )&DBMSetData,		"DBMSetData" },
-	{ ( void * )&DBMGetTableRows,	"DBMGetTableRows" },
-	{ ( void * )&DBMDelData,		"DBMDelData" },
+	{ ( void * )&DBMOpenTable,	"DBMOpenTable" },
+	{ ( void * )&DBMCloseTable,	"DBMCloseTable" },
+	{ ( void * )&DBMFetch,		"DBMFetch" },
+	{ ( void * )&DBMStore,		"DBMStore" },
+	{ ( void * )&DBMFetchRows,	"DBMFetchRows" },
+	{ ( void * )&DBMDelete,		"DBMDelete" },
 	{NULL, NULL},
 };
 
@@ -365,7 +365,7 @@ int DBAFetch( const char *table, const char *key, void *data, int size )
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	ret = DBMGetData( tbe->handle, key, data, size );
+	ret = DBMFetch( tbe->handle, key, data, size );
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;
@@ -393,7 +393,7 @@ int DBAStore( const char *table, const char *key, void *data, int size )
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	ret = DBMSetData( tbe->handle, key, data, size );
+	ret = DBMStore( tbe->handle, key, data, size );
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;
@@ -401,7 +401,7 @@ int DBAStore( const char *table, const char *key, void *data, int size )
 
 /** @brief DBAFetchRows
  *
- *  Walk through database and pass records in turn to handler
+ *  Walk through table and pass records in turn to handler
  *
  *  @param table name
  *  @param handler for records
@@ -419,7 +419,7 @@ int DBAFetchRows( const char *table, DBRowHandler handler )
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return 0;
-	ret = DBMGetTableRows( tbe->handle, handler );	
+	ret = DBMFetchRows( tbe->handle, handler );	
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;
@@ -445,7 +445,7 @@ int DBADelete( const char *table, const char *key )
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	ret = DBMDelData( tbe->handle, key );
+	ret = DBMDelete( tbe->handle, key );
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;

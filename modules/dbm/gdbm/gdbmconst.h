@@ -27,8 +27,12 @@
 *************************************************************************/
 
 /* Start with the constant definitions.  */
+#ifndef TRUE
 #define  TRUE    1
+#endif /* TRUE */
+#ifndef FALSE
 #define  FALSE   0
+#endif /* FALSE */
 
 /* Parameters to gdbm_open. */
 #define  GDBM_READER  0		/* READERS only. */

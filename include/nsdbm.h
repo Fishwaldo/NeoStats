@@ -25,10 +25,10 @@
 #define _NSDBM_H_
 
 MODULEFUNC void *DBMOpenTable( const char *name );
-MODULEFUNC int DBMCloseTable( void *handle );
-MODULEFUNC int DBMGetData( void *handle, char *key, void *data, int size );
-MODULEFUNC int DBMSetData( void *handle, char *key, void *data, int size );
-MODULEFUNC int DBMGetTableRows( void *handle, DBRowHandler handler );
-MODULEFUNC int DBMDelData( void *handle, char * key );
+MODULEFUNC void DBMCloseTable( void *handle );
+MODULEFUNC int DBMFetch( void *handle, char *key, void *data, int size );
+MODULEFUNC int DBMStore( void *handle, char *key, void *data, int size );
+MODULEFUNC int DBMFetchRows( void *handle, DBRowHandler handler );
+MODULEFUNC int DBMDelete( void *handle, char * key );
 
 #endif /* _NSDBM_H_ */

@@ -24,10 +24,18 @@
 #include "neostats.h"
 #include "gdbmdefs.h"
 #include "gdbmerrno.h"
-#include "extern.h"
 #include "nsdbm.h"
 
 extern const char *gdbm_strerror __P( ( gdbm_error ) );
+
+/** @brief DBMOpenTable
+ *
+ *  Open gdbm table
+ *
+ *  @param table name
+ *
+ *  @return handle to table or NULL on error
+ */
 
 void *DBMOpenTable( const char *name )
 {
@@ -51,17 +59,36 @@ void *DBMOpenTable( const char *name )
 	return ( void * )gdbm_file;
 }
 
-int DBMCloseTable( void *handle )
+/** @brief DBMCloseTable
+ *
+ *  Close gdbm table
+ *
+ *  @param handle of table to close
+ *
+ *  @return none
+ */
+
+void DBMCloseTable( void *handle )
 {
-	if( !handle ) 
+	if( handle ) 
 	{
-		return NS_FAILURE;
+		gdbm_close( ( gdbm_file_info * )handle ); 
 	}
-	gdbm_close( ( gdbm_file_info * )handle ); 
-	return NS_SUCCESS;
 }
 
-int DBMGetData( void *handle, char *key, void *data, int size )
+/** @brief DBMFetch
+ *
+ *  Fetch data from table record
+ *
+ *  @param handle of table
+ *  @param record key
+ *  @param pointer to data to fetch data into
+ *  @param size of record
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBMFetch( void *handle, char *key, void *data, int size )
 {
 	datum dbkey;
 	datum dbdata;
@@ -73,7 +100,7 @@ int DBMGetData( void *handle, char *key, void *data, int size )
 	{
 		if( dbdata.dsize != size )
 		{
-			dlog( DEBUG1, "DBMGetData: gdbm_fetch fail: %s data size mismatch", key );
+			dlog( DEBUG1, "DBMFetch: gdbm_fetch fail: %s data size mismatch", key );
 			free( dbdata.dptr );
 			return NS_FAILURE;
 		}
@@ -81,11 +108,23 @@ int DBMGetData( void *handle, char *key, void *data, int size )
 		free( dbdata.dptr );
 		return NS_SUCCESS;
 	}
-	dlog( DEBUG1, "DBMGetData: gdbm_fetch fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
+	dlog( DEBUG1, "DBMFetch: gdbm_fetch fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 	return NS_FAILURE;
 }
 
-int DBMSetData( void *handle, char *key, void *data, int size )
+/** @brief DBMStore
+ *
+ *  Store data in table record
+ *
+ *  @param handle of table
+ *  @param record key
+ *  @param pointer to data to fetch data into
+ *  @param size of record
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBMStore( void *handle, char *key, void *data, int size )
 {
 	datum dbkey;
 	datum dbdata;
@@ -96,13 +135,23 @@ int DBMSetData( void *handle, char *key, void *data, int size )
 	dbdata.dsize = size;
 	if( gdbm_store( ( gdbm_file_info * )handle, dbkey, dbdata, GDBM_REPLACE ) != 0 )
 	{
-		dlog( DEBUG1, "DBMSetData: gdbm_store fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
+		dlog( DEBUG1, "DBMStore: gdbm_store fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
 }
 
-int DBMGetTableRows( void *handle, DBRowHandler handler )
+/** @brief DBMFetchRows
+ *
+ *  Walk through table and pass records in turn to handler
+ *
+ *  @param table handle
+ *  @param handler for records
+ *
+ *  @return number of rows processed by handler
+ */
+
+int DBMFetchRows( void *handle, DBRowHandler handler )
 {
 	datum dbkey;
 	datum dbdata;
@@ -112,10 +161,10 @@ int DBMGetTableRows( void *handle, DBRowHandler handler )
 	while( dbkey.dptr != NULL )
 	{
 		rowcount++;
-		dlog( DEBUG4, "DBMGetTableRows: key %s", dbkey.dptr );
+		dlog( DEBUG4, "DBMFetchRows: key %s", dbkey.dptr );
 		dbdata = gdbm_fetch( ( gdbm_file_info * )handle, dbkey );
 		/* Allow handler to exit the fetch loop */
-		if( handler( dbdata.dptr, dbdata.dsize ) != NS_FALSE  )
+		if( handler( dbdata.dptr, dbdata.dsize ) != 0 )
 		{
 			free( dbdata.dptr );
 			free( dbkey.dptr );
@@ -129,7 +178,17 @@ int DBMGetTableRows( void *handle, DBRowHandler handler )
 	return rowcount;
 }
 
-int DBMDelData( void *handle, char *key )
+/** @brief DBMDelete
+ *
+ *  delete table row
+ *
+ *  @param table handle
+ *  @param record key
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int DBMDelete( void *handle, char *key )
 {
 	datum dbkey;
 
