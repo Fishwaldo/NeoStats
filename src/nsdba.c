@@ -81,7 +81,7 @@ static int InitDBAMSymbols( void )
 
 	ircsnprintf( dbm_path, 255, "%s/%s%s", MOD_PATH, me.dbm, MOD_STDEXT );
 	nlog( LOG_NORMAL, "Using dbm module %s", dbm_path );
-	dbm_module_handle = ns_dlopen( dbm_path, RTLD_NOW || RTLD_GLOBAL );
+	dbm_module_handle = ns_dlopen( dbm_path, RTLD_NOW | RTLD_GLOBAL );
 	if( !dbm_module_handle )
 	{
 		nlog( LOG_CRITICAL, "Unable to load dbm module %s: file not found", dbm_path );

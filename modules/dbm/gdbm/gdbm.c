@@ -71,6 +71,12 @@ int DBMGetData( void *handle, char *key, void *data, int size )
 	dbdata = gdbm_fetch( ( gdbm_file_info * )handle, dbkey );
 	if( dbdata.dptr != NULL )
 	{
+		if( dbdata.dsize != size )
+		{
+			dlog( DEBUG1, "DBMGetData: gdbm_fetch fail: %s data size mismatch", key );
+			free( dbdata.dptr );
+			return NS_FAILURE;
+		}
 		os_memcpy( data, dbdata.dptr, size );
 		free( dbdata.dptr );
 		return NS_SUCCESS;
