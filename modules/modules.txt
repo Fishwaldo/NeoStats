@@ -253,7 +253,6 @@ To add a timer:
 
     type     - Type of timer from
 			   TIMER_TYPE_INTERVAL
-			   TIMER_TYPE_MIDNIGHT
 			   TIMER_TYPE_DAILY
 			   TIMER_TYPE_WEEKLY
 			   TIMER_TYPE_MONTHLY

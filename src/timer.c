@@ -140,8 +140,7 @@ static void run_mod_timers( int ismidnight )
 		{
 			switch( timer->type )
 			{
-				/* TIMER_TYPE_DAILY */
-				case TIMER_TYPE_MIDNIGHT:
+				case TIMER_TYPE_DAILY:
 					if( !ismidnight )
 						continue;
 					break;

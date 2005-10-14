@@ -214,7 +214,7 @@ int ModSynch( void )
 		HTMLOutput();
 	}
 	/* Timer to reset timeslice stats */
-	AddTimer( TIMER_TYPE_MIDNIGHT, ResetStatisticsTimer, "ResetStatisticsTimer", 0, NULL );
+	AddTimer( TIMER_TYPE_DAILY, ResetStatisticsTimer, "ResetStatisticsTimer", 0, NULL );
 	/* Timer to average stats */
 	AddTimer( TIMER_TYPE_INTERVAL, AverageStatisticsTimer, "AverageStatisticsTimer", TS_ONE_HOUR, NULL );
 	/* Initial average at load */

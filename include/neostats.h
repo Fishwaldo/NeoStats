@@ -286,7 +286,6 @@ char *LANGgettext( const char *string, int mylang );
 #define UMODE_CLIENT		0x00004000	/* Show client information */
 #define UMODE_FCLIENT		0x00008000	/* receive client on far connects.. */
 #define UMODE_KIX			0x00010000	/* protected oper, only ulines can kick */
-
 #define UMODE_HELPOP		0x00020000	/* Help system operator */
 #define UMODE_RGSTRONLY		0x00040000	/* only registered nicks may PM */
 
@@ -514,8 +513,8 @@ EXPORTVAR extern const char version_date[];
 EXPORTVAR extern const char version_time[];
 
 /* Forward references for cyclic structs */
-typedef struct _Module Module;
-typedef struct _Bot Bot;
+typedef struct Module Module;
+typedef struct Bot Bot;
 
 /* to avoid warnings for Sock */
 struct Sock;
@@ -695,7 +694,7 @@ typedef struct Channel {
 	void *modvalue[NUM_MODULES];
 } Channel;
 
-typedef struct _bot_cmd bot_cmd;
+typedef struct bot_cmd bot_cmd;
 
 typedef struct CmdParams {
 	Client *source;		/* pointer to client triggering command */
@@ -739,7 +738,7 @@ typedef int (*bot_set_handler) ( const CmdParams* cmdparams, SET_REASON reason )
 /** @brief bot_cmd structure
  *  defines command lists for bots
  */
-typedef struct _bot_cmd {
+typedef struct bot_cmd {
 	const char		*cmd;		/* command string */
 	bot_cmd_handler	handler;	/* handler */
 	int				minparams;	/* min num params */
@@ -967,7 +966,7 @@ struct PerlModInfo;
 /** @brief Module structure
  * 
  */
-typedef struct _Module {
+typedef struct Module {
 	/** type of module  */
 	MOD_TYPE type;
 	/** Pointer to info structure */
@@ -1104,10 +1103,8 @@ typedef struct Sock {
 typedef enum TIMER_TYPE {
 	/* Called at the specified interval */	
 	TIMER_TYPE_INTERVAL,
-	/* Called at midnight */	
-	TIMER_TYPE_MIDNIGHT,
-	/* Called at the beginning of the day */	
-	TIMER_TYPE_DAILY = TIMER_TYPE_MIDNIGHT,
+	/* Called at the beginning of the day (midnight) */
+	TIMER_TYPE_DAILY,
 	/* Called at the beginning of the week */	
 	TIMER_TYPE_WEEKLY,
 	/* Called at the beginning of the month */	
@@ -1162,7 +1159,7 @@ typedef struct BotInfo {
  * 
  */
 
-typedef struct _Bot {
+typedef struct Bot {
 	/** Owner module ptr */
 	Module *moduleptr;
 	/** Nick */
