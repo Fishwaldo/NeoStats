@@ -54,16 +54,15 @@ void *DBMOpenTable (const char *name)
 #endif
 }
 
-int DBMCloseTable (void *handle)
+void DBMCloseTable (void *handle)
 {
 	DB *dbp = (DB *)handle;
 
 	dlog(DEBUG1, "DBACloseTable");
 	dbp->close(dbp, 0); 
-	return NS_SUCCESS;
 }
 
-int DBMGetData (void *handle, char *key, void *data, int size)
+int DBMFetch (void *handle, char *key, void *data, int size)
 {
 	int dbret;
 	DB *dbp = (DB *)handle;
@@ -82,7 +81,7 @@ int DBMGetData (void *handle, char *key, void *data, int size)
 	return NS_FAILURE;
 }
 
-int DBMSetData (void *handle, char *key, void *data, int size)
+int DBMStore (void *handle, char *key, void *data, int size)
 {
 	int dbret;
 	DB *dbp = (DB *)handle;
@@ -101,7 +100,7 @@ int DBMSetData (void *handle, char *key, void *data, int size)
 	return NS_SUCCESS;
 }
 
-int DBMGetTableRows (void *handle, DBRowHandler handler)
+int DBMFetchTableRows (void *handle, DBRowHandler handler)
 {
 	int rowcount = 0;
 
@@ -109,7 +108,7 @@ int DBMGetTableRows (void *handle, DBRowHandler handler)
 	return rowcount;
 }
 
-int DBMDelData (void *handle, char * key)
+int DBMDelete (void *handle, char * key)
 {
 	/* TODO */
 	return NS_SUCCESS;
@@ -121,22 +120,21 @@ void *DBMOpenTable (const char *name)
 	return NULL;
 }
 
-int DBMCloseTable (void *handle)
+void DBMCloseTable (void *handle)
+{
+}
+
+int DBMFetch (void *handle, char *key, void *data, int size)
 {
 	return NS_FAILURE;
 }
 
-int DBMGetData (void *handle, char *key, void *data, int size)
+int DBMStore (void *handle, char *key, void *data, int size)
 {
 	return NS_FAILURE;
 }
 
-int DBMSetData (void *handle, char *key, void *data, int size)
-{
-	return NS_FAILURE;
-}
-
-int DBMGetTableRows (void *handle, DBRowHandler handler)
+int DBMFetchTableRows (void *handle, DBRowHandler handler)
 {
 	int rowcount = 0;
 
@@ -144,7 +142,7 @@ int DBMGetTableRows (void *handle, DBRowHandler handler)
 	return rowcount;
 }
 
-int DBMDelData (void *handle, char * key)
+int DBMDelete (void *handle, char * key)
 {
 	return NS_FAILURE;
 }
