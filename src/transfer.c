@@ -207,7 +207,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 #ifdef DEBUG
 	/* setup verbose mode in debug compile... */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_VERBOSE, 1)) != 0) {
-		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Curl Set verbose failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
 		ns_free(newtrans);
@@ -225,7 +225,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 
 	/* fail for any return above 300 (HTTP)... */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_FAILONERROR, 1)) != 0) {
-		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Curl Set failonerror failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
 		ns_free(newtrans);
@@ -245,7 +245,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	/* setup the url to retrive.*/
 	strlcpy(newtrans->url, url, MAXURL);
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_URL, newtrans->url)) != 0) {
-		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Curl Set url failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
 		ns_free(newtrans);
@@ -254,7 +254,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 
 	/* setup the private data id.*/
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_PRIVATE, newtrans)) != 0) {
-		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Curl Set private failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
 		ns_free(newtrans);
@@ -268,7 +268,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
     if (params) {
 		strlcpy(newtrans->params, params, MAXURL);
 		if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_POSTFIELDS, newtrans->params)) != 0) {
-			nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
+			nlog(LOG_WARNING, "Curl Set postfields failed. Returned %d for url %s", ret, url);
 			nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 			curl_easy_cleanup(newtrans->curleasyhandle);
 			ns_free(newtrans);
@@ -278,7 +278,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 
 	/* the callback function for data received from the server */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_WRITEFUNCTION, neocurl_callback)) != 0) {
-		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Curl Set writefunc failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
 		ns_free(newtrans);
@@ -288,7 +288,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	
 	/* copy our struct to curl so we can reference it when we return */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_WRITEDATA, newtrans)) != 0) {
-		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Curl Set writedata failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
 		ns_free(newtrans);
@@ -358,24 +358,29 @@ void CurlHackReadLoop( void )
 	int SelectResult;
 	fd_set readfds, writefds, errfds;
 	int maxfdsunused;
-
-    /* don't wait */
-	TimeOut.tv_sec = 0;
-	TimeOut.tv_usec = 0;
-	FD_ZERO (&readfds);
-	FD_ZERO (&writefds);
-	FD_ZERO (&errfds);
-	curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
-	SelectResult = select (maxfdsunused+1, &readfds, &writefds, &errfds, &TimeOut);
-	if (SelectResult > 0)
-	{
+#if 0
+         /* XXX our activetransfers list isn't maintained, we should so we do cycle this curl hack when no transfers in progress */
+         if (list_count(activetransfers) > 0) {	
+#endif
+         if (1) {
+             /* don't wait */
+      	    TimeOut.tv_sec = 0;
+      	    TimeOut.tv_usec = 0;
+      	    FD_ZERO (&readfds);
+      	    FD_ZERO (&writefds);
+      	    FD_ZERO (&errfds);
+      	    curl_multi_fdset(curlmultihandle, &readfds, &writefds, &errfds, &maxfdsunused);
+      	    SelectResult = select (maxfdsunused+1, &readfds, &writefds, &errfds, &TimeOut);
+      	    if (SelectResult > 0)
+      	    {
 		/* check CURL fds */
 		while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &maxfdsunused))
 		{
 		}
-    	SET_SEGV_LOCATION();
+		SET_SEGV_LOCATION();
 		transfer_status();
-    }
+             }
+        }
 }
 #endif /* CURLHACK */
 

@@ -28,5 +28,6 @@
 
 int InitCurl( void );
 void FiniCurl( void );
+void CurlHackReadLoop( void );
 
 #endif /* _TRANSFER_H_ */
