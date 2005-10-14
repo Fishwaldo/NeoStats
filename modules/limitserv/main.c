@@ -76,9 +76,9 @@ ModuleInfo module_info = {
 /** Bot command table */
 static bot_cmd ls_commands[]=
 {
-	{"ADD",		cmd_add,	1,	NS_ULEVEL_ADMIN,	help_add},
-	{"DEL",		cmd_del,	1, 	NS_ULEVEL_ADMIN,	help_del},
-	{"LIST",	cmd_list,	0, 	NS_ULEVEL_ADMIN,	help_list},
+	{"ADD",		cmd_add,	1,	NS_ULEVEL_ADMIN,	help_add, 0, NULL, NULL},
+	{"DEL",		cmd_del,	1, 	NS_ULEVEL_ADMIN,	help_del, 0, NULL, NULL},
+	{"LIST",	cmd_list,	0, 	NS_ULEVEL_ADMIN,	help_list, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -106,8 +106,8 @@ static BotInfo ls_botinfo =
 /** Module Events */
 ModuleEvent module_events[] = 
 {
-	{EVENT_JOIN,	event_join},
-	{EVENT_PART,	event_part},
+	{EVENT_JOIN,	event_join, 0},
+	{EVENT_PART,	event_part, 0},
 	NS_EVENT_END()
 };
 
@@ -120,7 +120,7 @@ ModuleEvent module_events[] =
  *  @return none
  */
 
-static void ManageLimit( char *name, int users, int curlimit, int add )
+static void ManageLimit( const char *name, int users, int curlimit, int add )
 {
 	static char limitsize[10];
 	int limit;
@@ -210,7 +210,7 @@ static int LoadChannel( void *data, int size )
 	ls_channel *db;
 
 	db = ns_calloc( sizeof( ls_channel ) );
-	os_memcpy( &db->name, data, MAXCHANLEN );
+	os_memcpy( db, data, MAXCHANLEN );
 	hnode_create_insert( qshash, db, db->name );
 	return NS_FALSE;
 }
