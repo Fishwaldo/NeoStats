@@ -57,7 +57,7 @@ int os_mkdir( const char *filename, mode_t mode )
  *  Wrapper function for check_create_dir
  */
 
-int os_check_create_dir( const char *dirname )
+int os_create_dir( const char *dirname )
 {
 	struct stat st;
 	int res;
@@ -80,7 +80,7 @@ int os_check_create_dir( const char *dirname )
 			return NS_FAILURE;
 		}
 	} else if( !S_ISDIR( st.st_mode ) )	{
-		nlog( LOG_CRITICAL, "%s is not a Directory", dirname );
+		nlog( LOG_CRITICAL, "%s is not a directory", dirname );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;

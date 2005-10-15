@@ -1589,7 +1589,7 @@ EXPORTFUNC int match( const char *mask, const char *name );
 
 /* File system functions */
 EXPORTFUNC int os_mkdir( const char *filename, mode_t mode );
-EXPORTFUNC int os_check_create_dir( const char *dirname );
+EXPORTFUNC int os_create_dir( const char *dirname );
 EXPORTFUNC FILE *os_fopen( const char *filename, const char *filemode );
 EXPORTFUNC int os_fclose( FILE *handle );
 EXPORTFUNC int os_fseek( FILE *handle, long offset, int origin );
