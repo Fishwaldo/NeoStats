@@ -28,8 +28,8 @@ typedef struct ls_channel {
 	char name[MAXCHANLEN];
 }ls_channel;
 
-int joinchannels = 0;
-int limitbuffer = 1;
+int lsjoin = 0;
+int lsbuffer = 1;
 
 /** Bot command function prototypes */
 static int cmd_add( const CmdParams *cmdparams );
@@ -42,7 +42,7 @@ static int event_part( const CmdParams *cmdparams );
 
 /** Setting callback prototypes */
 static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int set_limitbuffer_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int set_buffer_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 
 /** hash to store ls_channel and bot info */
@@ -85,8 +85,8 @@ static bot_cmd ls_commands[]=
 /** Bot setting table */
 static bot_setting ls_settings[]=
 {
-	{"JOIN",		&joinchannels,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void* )0	},
-	{"LIMITBUFFER", 	&limitbuffer, 	SET_TYPE_INT,	0, 100,		NS_ULEVEL_ADMIN, NULL,	help_set_limitbuffer, set_limitbuffer_cb, (void *)1	},
+	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void* )0	},
+	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,	0, 100,		NS_ULEVEL_ADMIN, NULL,	help_set_buffer, set_buffer_cb, (void *)1	},
 	NS_SETTING_END()
 };
 
@@ -125,18 +125,9 @@ static void ManageLimit( const char *name, int users, int curlimit, int add )
 	static char limitsize[10];
 	int limit;
 
-	if (curlimit > 0) {
-		limit = curlimit;
-	} else {
+	limit = ( add == 1 ) ? ( users + lsbuffer ) : ( curlimit - lsbuffer );
+	if( limit < users )
 		limit = users;
-	}
-	if( add )
-		limit = users + limitbuffer;
-	else
-		limit = users - limitbuffer;
-
-	if( limit <= users )
-		limit = ( users + limitbuffer );
 	ircsnprintf( limitsize, 10, "%d", limit );	
 	irc_cmode( ls_bot, name, "+l", limitsize );
 }
@@ -152,22 +143,22 @@ static void ManageLimit( const char *name, int users, int curlimit, int add )
 
 static void JoinChannels( void )
 {
-	ls_channel *db;
-	hnode_t *hn;
-	hscan_t hs;
+	ls_channel *ls_chan;
+	hnode_t *node;
+	hscan_t scan;
 
-	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+	hash_scan_begin( &scan, qshash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL ) 
 	{
 		Channel *c;
 
-		db = ( ( ls_channel * )hnode_get( hn ) );
-		c = FindChannel( db->name );
+		ls_chan = ( ( ls_channel * )hnode_get( node ) );
+		c = FindChannel( ls_chan->name );
 		if( c )
 		{
-			if( joinchannels )
-				irc_join (ls_bot, db->name, "+o");
-			ManageLimit( db->name, c->users, 0, 1 );
+			if( lsjoin )
+				irc_join( ls_bot, ls_chan->name, "+o" );
+			ManageLimit( ls_chan->name, c->users, 0, 1 );
 		}
 	}
 }
@@ -183,16 +174,16 @@ static void JoinChannels( void )
 
 static void PartChannels( void )
 {
-	ls_channel *db;
-	hnode_t *hn;
-	hscan_t hs;
+	ls_channel *ls_chan;
+	hnode_t *node;
+	hscan_t scan;
 
-	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+	hash_scan_begin( &scan, qshash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL ) 
 	{
-		db = ( ( ls_channel * )hnode_get( hn ) );
-		if( FindChannel( db->name ) )
-			irc_part( ls_bot, db->name, NULL);
+		ls_chan = ( ( ls_channel * )hnode_get( node ) );
+		if( IsChannelMember( FindChannel( ls_chan->name ) ), ls_bot->u );
+			irc_part( ls_bot, ls_chan->name, NULL);
 	}
 }
 
@@ -207,11 +198,11 @@ static void PartChannels( void )
 
 static int LoadChannel( void *data, int size )
 {
-	ls_channel *db;
+	ls_channel *ls_chan;
 
-	db = ns_calloc( sizeof( ls_channel ) );
-	os_memcpy( db, data, MAXCHANLEN );
-	hnode_create_insert( qshash, db, db->name );
+	ls_chan = ns_calloc( sizeof( ls_channel ) );
+	os_memcpy( ls_chan, data, MAXCHANLEN );
+	hnode_create_insert( qshash, ls_chan, ls_chan->name );
 	return NS_FALSE;
 }
 
@@ -266,17 +257,17 @@ int ModSynch( void )
 
 int ModFini( void )
 {
-	ls_channel *db;
-	hnode_t *hn;
-	hscan_t hs;
+	ls_channel *ls_chan;
+	hnode_t *node;
+	hscan_t scan;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	hash_scan_begin( &scan, qshash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
-		db = ( ( ls_channel * )hnode_get( hn ) );
-		hash_delete_destroy_node( qshash, hn );
-		ns_free( db );
+		ls_chan = ( ( ls_channel * )hnode_get( node ) );
+		hash_scan_delete_destroy_node( qshash, node );
+		ns_free( ls_chan );
 	}
 	hash_destroy( qshash );
 	return NS_SUCCESS;
@@ -294,7 +285,7 @@ int ModFini( void )
 
 static int cmd_add( const CmdParams *cmdparams )
 {
-	ls_channel *db;
+	ls_channel *ls_chan;
 
 	SET_SEGV_LOCATION();
 	if( hash_lookup( qshash, cmdparams->av[0] ) != NULL ) 
@@ -303,10 +294,10 @@ static int cmd_add( const CmdParams *cmdparams )
 			"%s already exists in the channel list", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	db = ns_calloc( sizeof( ls_channel ) );
-	strlcpy( db->name, cmdparams->av[0], MAXCHANLEN );
-	hnode_create_insert( qshash, db, db->name );
-	DBAStore( "channels", db->name, ( void * )db->name, MAXCHANLEN );
+	ls_chan = ns_calloc( sizeof( ls_channel ) );
+	strlcpy( ls_chan->name, cmdparams->av[0], MAXCHANLEN );
+	hnode_create_insert( qshash, ls_chan, ls_chan->name );
+	DBAStore( "channels", ls_chan->name, ( void * )ls_chan->name, MAXCHANLEN );
 	CommandReport( ls_bot, "%s added %s to the channel list",
 		cmdparams->source->name, cmdparams->av[0] );
 	nlog( LOG_NOTICE, "%s added %s to the channel list",
@@ -325,9 +316,9 @@ static int cmd_add( const CmdParams *cmdparams )
 
 static int cmd_list( const CmdParams *cmdparams )
 {
-	ls_channel *db;
-	hnode_t *hn;
-	hscan_t hs;
+	ls_channel *ls_chan;
+	hnode_t *node;
+	hscan_t scan;
 
 	SET_SEGV_LOCATION();
 	if( hash_count( qshash ) == 0 )
@@ -335,12 +326,12 @@ static int cmd_list( const CmdParams *cmdparams )
 		irc_prefmsg( ls_bot, cmdparams->source, "No channels are defined." );
 		return NS_SUCCESS;
 	}
-	hash_scan_begin( &hs, qshash );
+	hash_scan_begin( &scan, qshash );
 	irc_prefmsg( ls_bot, cmdparams->source, "channels" );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
-		db = ( ( ls_channel * )hnode_get( hn ) );
-		irc_prefmsg( ls_bot, cmdparams->source, "%s", db->name );
+		ls_chan = ( ( ls_channel * )hnode_get( node ) );
+		irc_prefmsg( ls_bot, cmdparams->source, "%s", ls_chan->name );
 	}
 	irc_prefmsg( ls_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
@@ -358,16 +349,16 @@ static int cmd_list( const CmdParams *cmdparams )
 
 static int cmd_del( const CmdParams *cmdparams )
 {
-	ls_channel *db;
-	hnode_t *hn;
-	hscan_t hs;
+	ls_channel *ls_chan;
+	hnode_t *node;
+	hscan_t scan;
 
 	SET_SEGV_LOCATION();
-	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	hash_scan_begin( &scan, qshash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
-		db = ( ls_channel * )hnode_get( hn );
-		if( ircstrcasecmp( db->name, cmdparams->av[0] ) == 0 )
+		ls_chan = ( ls_channel * )hnode_get( node );
+		if( ircstrcasecmp( ls_chan->name, cmdparams->av[0] ) == 0 )
 		{
 			irc_prefmsg( ls_bot, cmdparams->source, 
 				"Deleted %s from the channel list", cmdparams->av[0] );
@@ -375,9 +366,9 @@ static int cmd_del( const CmdParams *cmdparams )
 				cmdparams->source->name, cmdparams->av[0] );
 			nlog( LOG_NOTICE, "%s deleted %s from the channel list",
 				cmdparams->source->name, cmdparams->av[0] );
-			hash_scan_delete_destroy_node( qshash, hn );
-			DBADelete( "channels", db->name );
-			ns_free( db );
+			hash_scan_delete_destroy_node( qshash, node );
+			DBADelete( "channels", ls_chan->name );
+			ns_free( ls_chan );
 			return NS_SUCCESS;
 		}
 	}
@@ -397,15 +388,15 @@ static int cmd_del( const CmdParams *cmdparams )
 
 static int event_join( const CmdParams *cmdparams )
 {
-	ls_channel *db;
+	ls_channel *ls_chan;
 
 	SET_SEGV_LOCATION();
-	db = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
-	if( db )
+	ls_chan = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
+	if( ls_chan )
 	{
 		/* Join channel if we are not a member */
-		if( joinchannels && !IsChannelMember( cmdparams->channel, ls_bot->u ) )
-			irc_join( ls_bot, db->name, "+o" );
+		if( lsjoin && !IsChannelMember( cmdparams->channel, ls_bot->u ) )
+			irc_join( ls_bot, ls_chan->name, "+o" );
 		ManageLimit( cmdparams->channel->name, cmdparams->channel->users, cmdparams->channel->limit, 1 );
 	}
 	return NS_SUCCESS;
@@ -423,11 +414,11 @@ static int event_join( const CmdParams *cmdparams )
 
 static int event_part( const CmdParams *cmdparams )
 {
-	ls_channel *db;
+	ls_channel *ls_chan;
 
 	SET_SEGV_LOCATION();
-	db = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
-	if( db )
+	ls_chan = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
+	if( ls_chan )
 		ManageLimit( cmdparams->channel->name, cmdparams->channel->users, cmdparams->channel->limit, 0 );
 	return NS_SUCCESS;
 }
@@ -446,7 +437,7 @@ static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	if( reason == SET_CHANGE )
 	{
-		if( joinchannels )
+		if( lsjoin )
 			JoinChannels();
 		else
 			PartChannels();
@@ -454,23 +445,33 @@ static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason )
 	return NS_SUCCESS;
 }
 
-static int set_limitbuffer_cb( const CmdParams *cmdparams, SET_REASON reason )
+/** @brief set_buffer_cb
+ *
+ *  SET BUFFER callback
+ *
+ *  @param cmdparams
+ *  @param reason
+ *
+ *  @return NS_SUCCESS 
+ */
+
+static int set_buffer_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
-	ls_channel *db;
-	hnode_t *hn;
-	hscan_t hs;
+	ls_channel *ls_chan;
+	hnode_t *node;
+	hscan_t scan;
 
 	SET_SEGV_LOCATION();
 	if( reason == SET_CHANGE )
 	{
-		hash_scan_begin( &hs, qshash );
-		while( ( hn = hash_scan_next( &hs ) ) != NULL ) 
+		hash_scan_begin( &scan, qshash );
+		while( ( node = hash_scan_next( &scan ) ) != NULL ) 
 		{
 			Channel *c;
-			db = ( ( ls_channel * )hnode_get( hn ) );
-			c = FindChannel( db->name );
+			ls_chan = ( ( ls_channel * )hnode_get( node ) );
+			c = FindChannel( ls_chan->name );
 			if( c )
-				ManageLimit( db->name, c->users, cmdparams->channel->limit, 1 );
+				ManageLimit( ls_chan->name, c->users, cmdparams->channel->limit, 1 );
 		}
 	}
 	return NS_SUCCESS;

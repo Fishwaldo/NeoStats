@@ -140,7 +140,7 @@ int parse( void *notused, void *rline, size_t len )
 	if( !( *line ) )
 		return NS_FAILURE;
 	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
-	dlog( DEBUGRX, "RX: %s", line );
+	dlog( DEBUGRX, "%s", line );
 	if( *line == ':' )
 	{
 		coreLine = strpbrk( line, " " );

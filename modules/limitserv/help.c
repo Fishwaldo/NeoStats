@@ -60,8 +60,8 @@ const char *help_set_join[] = {
 	NULL
 };
 
-const char *help_set_limitbuffer[] = {
-	"\2LIMITBUFFER <number>\2",
+const char *help_set_buffer[] = {
+	"\2BUFFER <number>\2",
 	"Sets the number of extra user slots allocated when adjusting the limit",
 	NULL
 };
