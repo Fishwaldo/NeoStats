@@ -300,8 +300,6 @@ static int cmd_add( const CmdParams *cmdparams )
 	DBAStore( "channels", ls_chan->name, ( void * )ls_chan->name, MAXCHANLEN );
 	CommandReport( ls_bot, "%s added %s to the channel list",
 		cmdparams->source->name, cmdparams->av[0] );
-	nlog( LOG_NOTICE, "%s added %s to the channel list",
-		cmdparams->source->name, cmdparams->av[0] );
 	return NS_SUCCESS;
 }
 
@@ -363,8 +361,6 @@ static int cmd_del( const CmdParams *cmdparams )
 			irc_prefmsg( ls_bot, cmdparams->source, 
 				"Deleted %s from the channel list", cmdparams->av[0] );
 			CommandReport( ls_bot, "%s deleted %s from the channel list",
-				cmdparams->source->name, cmdparams->av[0] );
-			nlog( LOG_NOTICE, "%s deleted %s from the channel list",
 				cmdparams->source->name, cmdparams->av[0] );
 			hash_scan_delete_destroy_node( qshash, node );
 			DBADelete( "channels", ls_chan->name );

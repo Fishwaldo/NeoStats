@@ -28,7 +28,8 @@
 #include "neostats.h"
 #include "quoteserv.h"
 
-typedef struct database {
+typedef struct database
+{
 	char name[MAXNICK];
 	char *prefixstring;
 	char *suffixstring;
@@ -60,14 +61,16 @@ static hash_t *qshash;
 static Bot *qs_bot;
 
 /** Copyright info */
-const char *qs_copyright[] = {
+const char *qs_copyright[] =
+{
 	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
 
 /** Module info */
-ModuleInfo module_info = {
+ModuleInfo module_info =
+{
 	"QuoteServ",
 	"Quote service",
 	qs_copyright,
@@ -84,10 +87,10 @@ ModuleInfo module_info = {
 /** Bot command table */
 static bot_cmd qs_commands[]=
 {
-	{"ADD",		qs_cmd_add,		1,	NS_ULEVEL_ADMIN,	qs_help_add},
-	{"DEL",		qs_cmd_del,		1, 	NS_ULEVEL_ADMIN,	qs_help_del},
-	{"LIST",	qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list},
-	{"QUOTE",	qs_cmd_quote,	0, 	0,		qs_help_quote},
+	{"ADD",		qs_cmd_add,		1,	NS_ULEVEL_ADMIN,	qs_help_add, 0, NULL, NULL},
+	{"DEL",		qs_cmd_del,		1, 	NS_ULEVEL_ADMIN,	qs_help_del, 0, NULL, NULL},
+	{"LIST",	qs_cmd_list,	0, 	NS_ULEVEL_ADMIN,	qs_help_list, 0, NULL, NULL},
+	{"QUOTE",	qs_cmd_quote,	0, 	0,					qs_help_quote, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -115,7 +118,7 @@ static BotInfo qs_botinfo =
 /** Module Events */
 ModuleEvent module_events[] = 
 {
-	{EVENT_SIGNON,	event_signon},
+	{EVENT_SIGNON,	event_signon, 0},
 	NS_EVENT_END()
 };
 
@@ -142,7 +145,7 @@ static int qs_read_database( database *db )
 		return NS_SUCCESS;
 	while( os_fgets( buf, BUFSIZE*4, fp ) != NULL )
 	{
-		int len;
+		size_t len;
 		
 		/* comment char */
 		if( buf[0] == '#' )
@@ -188,18 +191,18 @@ static int qs_read_database( database *db )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int qs_free_database( database *db )
+static void qs_free_database( database *db )
 {
 	int i;
 
 	ns_free( db->prefixstring );
 	ns_free( db->suffixstring );
-	for (i = 0; i < db->stringcount; i++) {
+	for( i = 0; i < db->stringcount; i++ )
+	{
 		ns_free( db->stringlist[i] );
 	}
 	ns_free( db->stringlist );
 	ns_free( db );
-	return NS_SUCCESS;
 }
 
 
@@ -217,7 +220,7 @@ static int load_database( void *data, int size )
 	database *db;
 
 	db = ns_calloc( sizeof( database ) );
-	os_memcpy( &db->name, data, MAXNICK );
+	os_memcpy( db->name, data, MAXNICK );
 	if( qs_read_database( db ) == NS_FAILURE )
 		qs_free_database( db );
 	else
@@ -237,7 +240,8 @@ static int load_database( void *data, int size )
 int ModInit( void )
 {
 	qshash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
-	if( !qshash ) {
+	if( !qshash )
+	{
 		nlog( LOG_CRITICAL, "Unable to create database hash" );
 		return NS_FAILURE;
 	}
@@ -283,7 +287,8 @@ int ModFini( void )
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
 		db = ( ( database * )hnode_get( hn ) );
 		hash_delete_destroy_node( qshash, hn );
 		qs_free_database( db );
@@ -354,13 +359,15 @@ static int qs_cmd_list( const CmdParams *cmdparams )
 	int i = 1;
 
 	SET_SEGV_LOCATION();
-	if( hash_count( qshash ) == 0 ) {
+	if( hash_count( qshash ) == 0 )
+	{
 		irc_prefmsg( qs_bot, cmdparams->source, "No databases are defined." );
 		return NS_SUCCESS;
 	}
 	hash_scan_begin( &hs, qshash );
 	irc_prefmsg( qs_bot, cmdparams->source, "Databases" );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
 		db = ( ( database * )hnode_get( hn ) );
 		irc_prefmsg( qs_bot, cmdparams->source, "%d - %s", i, db->name );
 		i++;
@@ -387,14 +394,14 @@ static int qs_cmd_del( const CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	hash_scan_begin( &hs, qshash );
-	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
+	while( ( hn = hash_scan_next( &hs ) ) != NULL )
+	{
 		db = ( database * )hnode_get( hn );
-		if( ircstrcasecmp( db->name, cmdparams->av[0] ) == 0 ) {
+		if( ircstrcasecmp( db->name, cmdparams->av[0] ) == 0 )
+		{
 			irc_prefmsg( qs_bot, cmdparams->source, 
 				"Deleted %s from the database list", cmdparams->av[0] );
 			CommandReport( qs_bot, "%s deleted %s from the database list",
-				cmdparams->source->name, cmdparams->av[0] );
-			nlog( LOG_NOTICE, "%s deleted %s from the database list",
 				cmdparams->source->name, cmdparams->av[0] );
 			hash_scan_delete_destroy_node( qshash, hn );
 			DBADelete( "databases", db->name );
@@ -421,7 +428,7 @@ static int do_quote( const Client *target, const char *which, int reporterror )
 {
 	int flag = 0;
 	database *db = NULL;
-	int randno;
+	unsigned int randno;
 	
 	SET_SEGV_LOCATION();
 	if( which != NULL )
@@ -432,24 +439,22 @@ static int do_quote( const Client *target, const char *which, int reporterror )
 	{
 		hnode_t *hn;
 		hscan_t hs;
-		int randdb;
-		int i = 0;
+		unsigned int i = 0;
 		
-		/* return if no databases defined */
-		if (hash_count( qshash ) >= 1)
+		if( hash_count( qshash ) >= 1 )
 		{
-			randdb = hrand( hash_count( qshash ) , 1 );	
+			randno = hrand( hash_count( qshash ) , 1 );	
 			hash_scan_begin( &hs, qshash );
 			while( ( hn = hash_scan_next( &hs ) ) != NULL )
 			{
 				i++;
 				db = ( database * )hnode_get( hn );
-				if( i == randdb )
+				if( i == randno )
 					break;
 			}
 		}		
 	}
-	if (!db)
+	if( !db )
 	{
 		if( reporterror )
 			irc_prefmsg( qs_bot, target, "not available" );

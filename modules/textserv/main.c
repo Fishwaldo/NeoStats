@@ -818,9 +818,7 @@ static int ts_cmd_del( const CmdParams *cmdparams )
 			PartBot( db );
 			irc_prefmsg( ts_bot, cmdparams->source, 
 				"Deleted %s from the Bot list", cmdparams->av[0] );
-			CommandReport( ts_bot, "%s deleted %s from the Bot list",
-				cmdparams->source->name, cmdparams->av[0] );
-			nlog( LOG_NOTICE, "%s deleted %s from the Bot list",
+			CommandReport( ts_bot, "%s deleted %s from the bot list",
 				cmdparams->source->name, cmdparams->av[0] );
 			hash_scan_delete_destroy_node( tshash, hn );
 			DBADelete( "Bots", db->tsbot.botname );

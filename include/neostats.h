@@ -747,7 +747,7 @@ typedef struct bot_cmd {
 	int				flags;		/* command flags */
 	void			*moddata;	/* pointer for module use */
 	Module			*modptr;	/* NeoStats internal use only */
-}_bot_cmd;
+} bot_cmd;
 
 #define NS_CMD_END() { NULL, NULL, 0, 0, NULL, 0, NULL, NULL }
 

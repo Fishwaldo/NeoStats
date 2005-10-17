@@ -121,12 +121,12 @@ void CommandReport( const Bot *botptr, const char *fmt, ... )
 	static char buf[BUFSIZE];
 	va_list ap;
 
-	if( !IsNeoStatsSynched() || !botptr || !nsconfig.cmdreport )
-		return;
 	va_start( ap, fmt );
 	ircvsnprintf( buf, BUFSIZE, fmt, ap );
 	va_end( ap );
-	irc_chanalert( botptr, buf );
+	if( IsNeoStatsSynched() && botptr && !nsconfig.cmdreport )
+		irc_chanalert( botptr, "%s", buf );
+	nlog( LOG_NOTICE, "%s", buf );
 }
 
 void msg_permission_denied( const CmdParams *cmdparams, const char *subcommand )

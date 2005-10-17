@@ -129,6 +129,10 @@ ModuleInfo module_info =
 	 * use 0 if not needed */
 	0,
 	/* OPTIONAL: 
+	 * Protocol flags for required protocol specfic features e.g. NICKIP
+	 * use 0 if not needed */
+	0,
+	/* OPTIONAL: 
 	 * Protocol flags for required protocol specfic features e.g. SETHOST
 	 * use 0 if not needed */
 	0,
@@ -155,16 +159,22 @@ static int template_hello_world( const CmdParams *cmdparams )
 static bot_cmd template_commands[]=
 {
 	{
-	/* Command string*/
-	"HELLO",	
+	/* Command string */
+	"HELLO",
 	/* Function to call when this command is received */
-	template_hello_world,	
+	template_hello_world,
 	/* Minimum number of parameters for this command */
-	0, 	
+	0,
 	/* Minimum user level for this command */
-	0,	
+	0,
 	/* Multi line help text for this command */
-	template_help_hello_world,		
+	template_help_hello_world,
+	/* Command flags */
+	0,
+	/* Module specific pointer, NULL if not required */
+	NULL,
+	/* NeoStats internal use only, must be NULL */
+	NULL,
 	},
 	/* End command list with a NULL entry */
 	NS_CMD_END()

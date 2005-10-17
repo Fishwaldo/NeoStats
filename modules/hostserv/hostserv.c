@@ -109,14 +109,14 @@ ModuleInfo module_info =
 /** Bot command table */
 static bot_cmd hs_commands[] =
 {
-	{"ADD",		hs_cmd_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add},
-	{"DEL",		hs_cmd_del,		1, 	NS_ULEVEL_LOCOPER,	hs_help_del},
-	{"LIST",	hs_cmd_list,	0, 	NS_ULEVEL_LOCOPER,	hs_help_list},
-	{"LISTWILD",hs_cmd_listwild,2, 	NS_ULEVEL_LOCOPER,	hs_help_listwild},
-	{"BANS",	hs_cmd_bans,	1,  NS_ULEVEL_ADMIN,	hs_help_bans},
-	{"VIEW",	hs_cmd_view,	1, 	NS_ULEVEL_OPER,		hs_help_view},
-	{"LOGIN",	hs_cmd_login,	2, 	0,					hs_help_login},
-	{"CHPASS",	hs_cmd_chpass,	3, 	0,					hs_help_chpass},
+	{"ADD",		hs_cmd_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add, 0, NULL, NULL},
+	{"DEL",		hs_cmd_del,		1, 	NS_ULEVEL_LOCOPER,	hs_help_del, 0, NULL, NULL},
+	{"LIST",	hs_cmd_list,	0, 	NS_ULEVEL_LOCOPER,	hs_help_list, 0, NULL, NULL},
+	{"LISTWILD",hs_cmd_listwild,2, 	NS_ULEVEL_LOCOPER,	hs_help_listwild, 0, NULL, NULL},
+	{"BANS",	hs_cmd_bans,	1,  NS_ULEVEL_ADMIN,	hs_help_bans, 0, NULL, NULL},
+	{"VIEW",	hs_cmd_view,	1, 	NS_ULEVEL_OPER,		hs_help_view, 0, NULL, NULL},
+	{"LOGIN",	hs_cmd_login,	2, 	0,					hs_help_login, 0, NULL, NULL},
+	{"CHPASS",	hs_cmd_chpass,	3, 	0,					hs_help_chpass, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -451,8 +451,8 @@ static int hs_event_umode( const CmdParams *cmdparams )
 						}
 
 					}
-			}
-			break;
+				}
+				break;
 		}
 		modes++;
 	}
@@ -553,7 +553,7 @@ int ModFini( void )
  *  @return none
  */
 
-static void new_vhost( char *nick, char *host, char *vhost, char *pass, char *who )
+static void new_vhost( const char *nick, const char *host, const char *vhost, const char *pass, const char *who )
 {
 	vhostentry *vhe;
 
@@ -581,7 +581,7 @@ static int hs_cmd_bans_list( const CmdParams *cmdparams )
 	banentry *ban;
 	hnode_t *hn;
 	hscan_t hs;
-	int i = 1;
+	int index = 1;
 
 	SET_SEGV_LOCATION();
 	if( hash_count( banhash ) == 0 )
@@ -594,8 +594,8 @@ static int hs_cmd_bans_list( const CmdParams *cmdparams )
 	while( ( hn = hash_scan_next( &hs ) ) != NULL )
 	{
 		ban = ( ( banentry * )hnode_get( hn ) );
-		irc_prefmsg( hs_bot, cmdparams->source, "%d - %s added by %s for %s", i, ban->host, ban->who, ban->reason );
-		i++;
+		irc_prefmsg( hs_bot, cmdparams->source, "%d - %s added by %s for %s", index, ban->host, ban->who, ban->reason );
+		index++;
 	}
 	irc_prefmsg( hs_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
@@ -670,8 +670,6 @@ static int hs_cmd_bans_del( const CmdParams *cmdparams )
 			irc_prefmsg( hs_bot, cmdparams->source, 
 				"Deleted %s from the banned vhost list", cmdparams->av[1] );
 			CommandReport( hs_bot, "%s deleted %s from the banned vhost list",
-				cmdparams->source->name, cmdparams->av[1] );
-			nlog( LOG_NOTICE, "%s deleted %s from the banned vhost list",
 				cmdparams->source->name, cmdparams->av[1] );
 			hash_scan_delete_destroy_node( banhash, hn );
 			DBADelete( "bans", ban->host );
@@ -832,13 +830,11 @@ static int hs_cmd_add( const CmdParams *cmdparams )
 		return NS_SUCCESS;
 	}
 	new_vhost( cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3], cmdparams->source->name );
-	nlog( LOG_NOTICE, "%s added a vhost for %s with realhost %s vhost %s and password %s",
-	    cmdparams->source->name, cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3] );
 	irc_prefmsg( hs_bot, cmdparams->source, 
 		"%s has successfully been registered under realhost: %s vhost: %s and password: %s",
 		cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3] );
-	CommandReport( hs_bot, "%s added a vhost %s for %s with realhost %s",
-		cmdparams->source->name, cmdparams->av[2], cmdparams->av[0], cmdparams->av[1] );
+	CommandReport( hs_bot, "%s added a vhost for %s with realhost %s vhost %s and password %s",
+	    cmdparams->source->name, cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3] );
 	/* Apply hostname if user online */
 	u = FindUser( cmdparams->av[0] );
 	if( u && !IsMe( u ) )
@@ -872,11 +868,11 @@ static int hs_cmd_add( const CmdParams *cmdparams )
 
 static int hs_cmd_list( const CmdParams *cmdparams )
 {
-	int i;
 	lnode_t *hn;
 	vhostentry *vhe;
-	int start = 0;
-	int vhostcount;
+	listcount_t start = 0;
+	listcount_t index;
+	listcount_t vhostcount;
 
 	SET_SEGV_LOCATION();
 	vhostcount = list_count( vhost_list );
@@ -901,25 +897,25 @@ static int hs_cmd_list( const CmdParams *cmdparams )
 		irc_prefmsg( hs_bot, cmdparams->source, "Value out of range. There are only %d entries", ( int )vhostcount );
 		return NS_SUCCESS;
 	}		
-	i = 1;
+	index = 1;
 	irc_prefmsg( hs_bot, cmdparams->source, "Current vhost list: " );
 	irc_prefmsg( hs_bot, cmdparams->source, "Showing %d to %d entries of %d vhosts", start + 1, start + PAGESIZE, ( int )vhostcount );
 	irc_prefmsg( hs_bot, cmdparams->source, "%-5s %-12s %-30s", "Num", "Nick", "Vhost" );
 	hn = list_first( vhost_list );
 	while( hn != NULL )
 	{
-		if( i <= start )
+		if( index <= start )
 		{
-			i++;
+			index++;
 			hn = list_next( vhost_list, hn );
 			continue;
 		}
 		vhe = lnode_get( hn );
-		irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", i,
+		irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", index,
 			vhe->nick, vhe->vhost );
-		i++;
+		index++;
 		/* limit to PAGESIZE entries per screen */
-		if( i > start + PAGESIZE ) 
+		if( index > start + PAGESIZE ) 
 			break;
 		hn = list_next( vhost_list, hn );
 	}
@@ -927,9 +923,9 @@ static int hs_cmd_list( const CmdParams *cmdparams )
 		"For detailed information on a vhost use /msg %s VIEW <nick>",
 		hs_bot->name );
 	irc_prefmsg( hs_bot, cmdparams->source, "End of list." );
-	if( vhostcount >= i )
+	if( vhostcount >= index )
 	{
-		irc_prefmsg( hs_bot, cmdparams->source, "Type \2/msg %s LIST %d\2 to see next %d", hs_bot->name, i-1, PAGESIZE );
+		irc_prefmsg( hs_bot, cmdparams->source, "Type \2/msg %s LIST %d\2 to see next %d", hs_bot->name, index - 1, PAGESIZE );
 	}
 	return NS_SUCCESS;
 }
@@ -947,11 +943,11 @@ static int hs_cmd_list( const CmdParams *cmdparams )
 
 static int hs_cmd_listwild( const CmdParams *cmdparams )
 {
-	int i;
-	int wm;
 	lnode_t *hn;
 	vhostentry *vhe;
-	int vhostcount;
+	listcount_t vhostcount;
+	listcount_t index;
+	listcount_t start;
 
 	SET_SEGV_LOCATION();
 	vhostcount = list_count( vhost_list );
@@ -965,8 +961,8 @@ static int hs_cmd_listwild( const CmdParams *cmdparams )
 		irc_prefmsg( hs_bot, cmdparams->source, "%s wildcard too broad, refine wildcard limit (%s).", cmdparams->av[0], cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
-	i = 1;
-	wm = 0;
+	index = 1;
+	start = 0;
 	irc_prefmsg( hs_bot, cmdparams->source, "Current vhost list: " );
 	irc_prefmsg( hs_bot, cmdparams->source, "Showing entries matching %s of %s", cmdparams->av[0], cmdparams->av[1]);
 	irc_prefmsg( hs_bot, cmdparams->source, "%-5s %-12s %-30s", "Num", "Nick", "Vhost" );
@@ -976,20 +972,20 @@ static int hs_cmd_listwild( const CmdParams *cmdparams )
 		vhe = lnode_get( hn );
 		if ( (!ircstrcasecmp(cmdparams->av[0], "nick") && match(cmdparams->av[1], vhe->nick)) || (!ircstrcasecmp(cmdparams->av[0], "host") && match(cmdparams->av[1], vhe->host)) || (!ircstrcasecmp(cmdparams->av[0], "vhost") && match(cmdparams->av[1], vhe->vhost)) )
 		{
-			wm++;
+			start++;
 			/* limit to PAGESIZE entries per screen */
-			if ( wm > PAGESIZE )
+			if ( start > PAGESIZE )
 				break;
-			irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", i, vhe->nick, vhe->vhost );
+			irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", index, vhe->nick, vhe->vhost );
 		}
-		i++;
+		index++;
 		hn = list_next( vhost_list, hn );
 	}
 	irc_prefmsg( hs_bot, cmdparams->source, 
 		"For detailed information on a vhost use /msg %s VIEW <nick>",
 		hs_bot->name );
 	irc_prefmsg( hs_bot, cmdparams->source, "End of list." );
-	if( wm > PAGESIZE )
+	if( start > PAGESIZE )
 	{
 		irc_prefmsg( hs_bot, cmdparams->source, "Not all matching entries shown, refine match to limit display");
 	}
@@ -1056,8 +1052,6 @@ static int hs_cmd_del( const CmdParams *cmdparams )
 	vhe = ( vhostentry * ) lnode_get( hn );
 	irc_prefmsg( hs_bot, cmdparams->source, "removed vhost %s for %s",
 		vhe->nick, vhe->vhost );
-	nlog( LOG_NOTICE, "%s removed the vhost %s for %s", 
-			cmdparams->source->name, vhe->vhost, vhe->nick );
 	CommandReport( hs_bot, "%s removed vhost %s for %s",
 			cmdparams->source->name, vhe->vhost, vhe->nick );
 	DelVhost( vhe );
