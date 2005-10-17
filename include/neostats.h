@@ -738,7 +738,8 @@ typedef int (*bot_set_handler) ( const CmdParams* cmdparams, SET_REASON reason )
 /** @brief bot_cmd structure
  *  defines command lists for bots
  */
-typedef struct bot_cmd {
+struct bot_cmd
+{
 	const char		*cmd;		/* command string */
 	bot_cmd_handler	handler;	/* handler */
 	int				minparams;	/* min num params */
@@ -747,7 +748,7 @@ typedef struct bot_cmd {
 	int				flags;		/* command flags */
 	void			*moddata;	/* pointer for module use */
 	Module			*modptr;	/* NeoStats internal use only */
-} bot_cmd;
+};
 
 #define NS_CMD_END() { NULL, NULL, 0, 0, NULL, 0, NULL, NULL }
 
@@ -966,7 +967,7 @@ struct PerlModInfo;
 /** @brief Module structure
  * 
  */
-typedef struct Module {
+struct Module {
 	/** type of module  */
 	MOD_TYPE type;
 	/** Pointer to info structure */
@@ -995,7 +996,7 @@ typedef struct Module {
 #ifdef USE_PERL
 	struct PerlModInfo *pm;
 #endif /* USE_PERL */
-}_Module;
+};
 
 /* Set module status */
 #define SetModuleSynched( m ) ( ( m )->status |= MODULE_STATUS_SYNCHED )
@@ -1159,7 +1160,8 @@ typedef struct BotInfo {
  * 
  */
 
-typedef struct Bot {
+struct Bot
+{
 	/** Owner module ptr */
 	Module *moduleptr;
 	/** Nick */
@@ -1180,7 +1182,7 @@ typedef struct Bot {
 	BotInfo *botinfo;
 	/* pointer for module use */
 	void *moddata;
-}_Bot;
+};
 
 typedef enum MQS_STATE {
 	MQS_DISCONNECTED,
