@@ -153,7 +153,23 @@ validate_args arg_validate[] = {
 
 static void ConfParseError( int err )
 {
-#ifndef WIN32
+#ifdef WIN32
+	static char cwd[MAXPATH];
+
+	switch( err )
+	{
+		case CFG_FILE_ERROR:
+			getcwd( cwd, MAXPATH );
+			nlog( LOG_ERROR, "Config file not found in %s", cwd );
+			break;
+		case CFG_PARSE_ERROR:
+			nlog( LOG_ERROR, "Config Parse Error" );
+			break;
+		default:
+			nlog( LOG_ERROR, "Unknown Error" );
+			break;
+	}
+#else /* WIN32 */
 	printf( "***************************************************\n" );
 	printf( "*                  Error!                         *\n" );
 	printf( "*                                                 *\n" );
