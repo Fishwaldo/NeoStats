@@ -28,6 +28,7 @@
 
 #ifdef WIN32
 #include "configwin32.h"
+#include <winsock2.h>
 #else /* WIN32 */
 #include "config.h"
 #endif /* WIN32 */
@@ -44,9 +45,6 @@
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif /* HAVE_ERRNO_H */
-#ifdef WIN32
-#include <winsock2.h>
-#endif /* WIN32 */
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif /* HAVE_SYS_SOCKET_H */
@@ -871,7 +869,7 @@ typedef struct ModuleEvent {
 #endif /* USE_PERL */
 }ModuleEvent;
 
-#define NS_EVENT_END() { EVENT_NULL,	NULL ,0 }
+#define NS_EVENT_END() { EVENT_NULL, NULL, 0 }
 
 typedef int ModuleProtocol;
 typedef int ModuleFeatures;
@@ -1380,6 +1378,8 @@ EXPORTFUNC int UserLevel( Client *u );
 /* server.c */
 EXPORTFUNC Client *FindServer( const char *name );
 
+EXPORTFUNC Client *FindClient( const char *name );
+
 /* chans.c */
 EXPORTFUNC Channel *FindChannel( const char *chan );
 EXPORTFUNC int test_cmode( const Channel *c, unsigned int mode );
@@ -1630,12 +1630,8 @@ EXPORTFUNC int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const ch
 EXPORTFUNC int os_sock_ioctl( OS_SOCKET s, int cmd, void *argp );
 EXPORTVAR extern int os_sock_errno;
 EXPORTFUNC char *os_sock_getlasterrorstring( void );
-EXPORTFUNC char *os_sock_strerror( const int sockerrno );
-#ifdef WIN32
-EXPORTFUNC int os_sock_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout );
-#else /* WIN32 */
+EXPORTFUNC char *os_sock_strerror( int sockerrno );
 EXPORTFUNC int os_sock_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout );
-#endif /* WIN32 */
 
 /* Memory functions */
 EXPORTFUNC void *os_memset( void *dest, int c, size_t count );

@@ -754,3 +754,33 @@ int IsJustWildcard( const char *mask, int ishostmask )
 		return NS_FALSE;
 	return NS_TRUE;
 }
+
+/** @brief FindClient
+ *
+ *  Find client based on name
+ *  NeoStats core and module use.
+ *
+ *  @param name to find
+ *
+ *  @return pointer to Client or NULL if fails
+ */
+
+Client *FindClient( const char *name )
+{
+	Client *c;
+
+	/* Check for server name first since the will generally
+	 * be far fewer servers than users.
+	 */
+	c = ( Client * )FindServer( name );
+	if( c == NULL )
+	{
+		/* No server with this name so check users */
+		c = ( Client * )FindUser( name );
+		if( c == NULL )
+		{
+			dlog( DEBUG3, "FindClient: %s not found", name );
+		}
+	}
+	return c;
+}

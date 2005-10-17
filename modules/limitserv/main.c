@@ -182,7 +182,7 @@ static void PartChannels( void )
 	while( ( node = hash_scan_next( &scan ) ) != NULL ) 
 	{
 		ls_chan = ( ( ls_channel * )hnode_get( node ) );
-		if( IsChannelMember( FindChannel( ls_chan->name ) ), ls_bot->u );
+		if( IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
 			irc_part( ls_bot, ls_chan->name, NULL);
 	}
 }

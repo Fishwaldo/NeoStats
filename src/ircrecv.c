@@ -1363,18 +1363,14 @@ void do_globops( const char *origin, const char *message )
 	CmdParams * cmdparams;
 
 	dlog( DEBUG1, "GLOBOPS: %s %s", origin, message );
-	c = FindServer( origin );
-	if( !c ) 
+	c = FindClient( origin );
+	if( c )
 	{
-		c = FindUser( origin );
-		if( c )
-		{
-			cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
-			cmdparams->source = c;
-			cmdparams->param = ( char * )message;
-			SendAllModuleEvent( EVENT_GLOBOPS, cmdparams );
-			ns_free( cmdparams );
-		}
+		cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+		cmdparams->source = c;
+		cmdparams->param = ( char * )message;
+		SendAllModuleEvent( EVENT_GLOBOPS, cmdparams );
+		ns_free( cmdparams );
 	}
 }
 
@@ -1394,18 +1390,14 @@ void do_wallops( const char *origin, const char *message )
 	CmdParams * cmdparams;
 
 	dlog( DEBUG1, "WALLOPS: %s %s", origin, message );
-	c = FindServer( origin );
-	if( !c ) 
+	c = FindClient( origin );
+	if( c )
 	{
-		c = FindUser( origin );
-		if( c )
-		{
-			cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
-			cmdparams->source = c;
-			cmdparams->param = ( char * )message;
-			SendAllModuleEvent( EVENT_WALLOPS, cmdparams );
-			ns_free( cmdparams );
-		}
+		cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+		cmdparams->source = c;
+		cmdparams->param = ( char * )message;
+		SendAllModuleEvent( EVENT_WALLOPS, cmdparams );
+		ns_free( cmdparams );
 	}
 }
 
@@ -1425,18 +1417,14 @@ void do_chatops( const char *origin, const char *message )
 	CmdParams * cmdparams;
 
 	dlog( DEBUG1, "CHATOPS: %s %s", origin, message );
-	c = FindServer( origin );
-	if( !c ) 
+	c = FindClient( origin );
+	if( c )
 	{
-		c = FindUser( origin );
-		if( c )
-		{
-			cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
-			cmdparams->source = c;
-			cmdparams->param = ( char * )message;
-			SendAllModuleEvent( EVENT_CHATOPS, cmdparams );
-			ns_free( cmdparams );
-		}
+		cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
+		cmdparams->source = c;
+		cmdparams->param = ( char * )message;
+		SendAllModuleEvent( EVENT_CHATOPS, cmdparams );
+		ns_free( cmdparams );
 	}
 }
 

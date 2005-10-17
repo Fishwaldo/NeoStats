@@ -40,7 +40,7 @@ int os_sock_errno = 0;
 #define OS_SOCK_SET_ERRNO() os_sock_errno = errno;
 #endif /* WIN32 */
 
-char *os_sock_strerror( const int sockerrno )
+char *os_sock_strerror( int sockerrno )
 {
 #ifdef WIN32
 	static char unknown[256];
@@ -312,7 +312,7 @@ int os_sock_close( OS_SOCKET sock )
  *  Wrapper function for write
  */
 
-int os_sock_write( OS_SOCKET s, const char* buf, int len )
+int os_sock_write( OS_SOCKET s, const char *buf, int len )
 {
 	int ret;
 
@@ -335,7 +335,7 @@ int os_sock_write( OS_SOCKET s, const char* buf, int len )
  *  Wrapper function for sendto
  */
 
-int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const struct sockaddr* to, int tolen )
+int os_sock_sendto( OS_SOCKET s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen )
 {
 	int ret;
 
@@ -354,7 +354,7 @@ int os_sock_sendto( OS_SOCKET s, const char* buf, int len, int flags, const stru
  *  Wrapper function for read
  */
 
-int os_sock_read( OS_SOCKET s, char* buf, int len )
+int os_sock_read( OS_SOCKET s, char *buf, int len )
 {
 	int ret;
 
@@ -377,7 +377,7 @@ int os_sock_read( OS_SOCKET s, char* buf, int len )
  *  Wrapper function for recvfrom
  */
 
-int os_sock_recvfrom( OS_SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int *fromlen )
+int os_sock_recvfrom( OS_SOCKET s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen )
 {
 	int ret;
 
@@ -436,7 +436,7 @@ int os_sock_set_nonblocking( OS_SOCKET s )
  *  Wrapper function for connect
  */
 
-int os_sock_connect( OS_SOCKET s, const struct sockaddr* name, int namelen )
+int os_sock_connect( OS_SOCKET s, const struct sockaddr *name, int namelen )
 {
 	int ret;
 
@@ -482,7 +482,7 @@ OS_SOCKET os_sock_socket(int socket_family, int socket_type, int protocol )
  *  Wrapper function for bind
  */
 
-int os_sock_bind( OS_SOCKET s, const struct sockaddr* name, int namelen )
+int os_sock_bind( OS_SOCKET s, const struct sockaddr *name, int namelen )
 {
 	int ret;
 
@@ -520,7 +520,7 @@ int os_sock_listen( OS_SOCKET s, int backlog )
  *  Wrapper function for setsockopt
  */
 
-int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval, int optlen )
+int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char *optval, int optlen )
 {
 	int ret;
 
@@ -539,7 +539,7 @@ int os_sock_setsockopt( OS_SOCKET s, int level, int optname, const char* optval,
  *  Wrapper function for ioctl
  */
 
-int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
+int os_sock_ioctl( OS_SOCKET s, int cmd, void *argp )
 {
 #ifdef WIN32
 	return ioctlsocket( s, cmd, argp );
@@ -552,11 +552,7 @@ int os_sock_ioctl( OS_SOCKET s, int cmd, void* argp )
  *  Wrapper function for select
  */
 
-#ifdef WIN32
-int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, const struct timeval* timeout )
-#else /* WIN32 */
-int os_sock_select( int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, struct timeval* timeout )
-#endif /* WIN32 */
+int os_sock_select( int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout )
 {
 	int ret;
 

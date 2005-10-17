@@ -285,15 +285,14 @@ void KillUser( const char *source, const char *nick, const char *reason )
 	ac = split_buf( killbuf, &av );
 	killreason = joinbuf( av, ac, 1 );
 	cmdparams->param = killreason;
-	cmdparams->source = FindUser( source );
-	if( cmdparams->source )
+	cmdparams->source = FindClient( source );
+	if( cmdparams->source->user )
 	{
 		SendAllModuleEvent( EVENT_KILL, cmdparams );
 		SendAllModuleEvent( EVENT_GLOBALKILL, cmdparams );
 	}
 	else
 	{
-		cmdparams->source = FindServer( source );
 		SendAllModuleEvent( EVENT_KILL, cmdparams );
 		SendAllModuleEvent( EVENT_SERVERKILL, cmdparams ); 		
 	}
@@ -357,10 +356,11 @@ void QuitUser( const char *nick, const char *reason )
 		ac = split_buf( killbuf, &av );
 		killreason = joinbuf( av, ac, 5 );
 		cmdparams->source = FindUser( av[4] );
-		cmdparams->target = u;
-		cmdparams->param = killreason;
-		if (cmdparams->source) {
-			/* it could be a faked kill... */
+		/* it could be a faked kill... */
+		if (cmdparams->source)
+		{
+			cmdparams->target = u;
+			cmdparams->param = killreason;
 			SendAllModuleEvent( EVENT_LOCALKILL, cmdparams );
 		}
 		ns_free( killbuf );
@@ -504,8 +504,10 @@ Client *FindUser( const char *nick )
 	Client *u;
 
 	u = ( Client * )hnode_find( userhash, nick );
-	if( !u )
+	if( u == NULL )
+	{
 		dlog( DEBUG3, "FindUser: %s not found", nick );
+	}
 	return u;
 }
 

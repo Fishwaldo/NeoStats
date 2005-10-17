@@ -627,18 +627,16 @@ int ChanMode (char *origin, char **av, int ac)
 	int i, j = 2;
 
 	c = FindChannel (av[0]);
-	if (!c) {
+	if( c == NULL )
+	{
 		return 0;
 	}	
 	cmdparams = (CmdParams*) ns_calloc (sizeof(CmdParams));
 	cmdparams->channel = c;
-	cmdparams->source = FindUser( origin );
-	if( !cmdparams->source )
-	{
-		cmdparams->source = FindServer( origin );
-	}
+	cmdparams->source = FindClient( origin );
 	AddStringToList(&cmdparams->av, origin, &cmdparams->ac);
-	for (i = 0; i < ac; i++) {
+	for (i = 0; i < ac; i++)
+	{
 		AddStringToList(&cmdparams->av, av[i], &cmdparams->ac);	
 	}
 	SendAllModuleEvent(EVENT_CMODE, cmdparams);

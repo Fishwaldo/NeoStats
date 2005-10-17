@@ -128,12 +128,12 @@ Client *AddServer( const char *name, const char *uplink, const char *hops, const
 static void del_server_leaves( Client * hub )
 {
 	Client *s;
-	hscan_t ss;
+	hscan_t scan;
 	hnode_t *node;
 
 	dlog( DEBUG1, "del_server_leaves: %s", hub->name );
-	hash_scan_begin( &ss, serverhash );
-	while( ( node = hash_scan_next( &ss ) ) != NULL )
+	hash_scan_begin( &scan, serverhash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		s = hnode_get( node );
 		if( ircstrcasecmp( hub->name, s->uplinkname ) == 0 )
@@ -200,11 +200,11 @@ void DelServer( const char *name, const char *reason )
 Client *find_server_base64( const char *num )
 {
 	Client *s;
-	hscan_t ss;
+	hscan_t scan;
 	hnode_t *node;
 
-	hash_scan_begin( &ss, serverhash );
-	while( ( node = hash_scan_next( &ss ) ) != NULL )
+	hash_scan_begin( &scan, serverhash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		s = hnode_get( node );
 		if( strncmp( s->name64, num, BASE64SERVERSIZE ) == 0 )
@@ -229,13 +229,14 @@ Client *find_server_base64( const char *num )
 
 Client *FindServer( const char *name )
 {
-	hnode_t *node;
+	Client *s;
 
-	node = hash_lookup( serverhash, name );
-	if( node )
-		return( Client * ) hnode_get( node );
-	dlog( DEBUG3, "FindServer: %s not found!", name );
-	return NULL;
+	s = (Client *)hnode_find( serverhash, name );
+	if( s == NULL )
+	{
+		dlog( DEBUG3, "FindServer: %s not found!", name );
+	}
+	return s;
 }
 
 /** @brief ListServer

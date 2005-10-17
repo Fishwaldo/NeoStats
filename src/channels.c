@@ -135,9 +135,7 @@ void ChannelTopic( const char *chan, const char *owner, const char *ts, const ch
 	strlcpy( c->topicowner, owner, MAXHOST );
 	c->topictime = ( ts ) ? atoi( ts ) : me.now;
 	cmdparams = (CmdParams *) ns_calloc( sizeof( CmdParams ) );
-	cmdparams->source = FindUser( owner );
-	if( !cmdparams->source )
-		cmdparams->source = FindServer( owner );
+	cmdparams->source = FindClient( owner );
 	cmdparams->channel = c;
 	SendAllModuleEvent( EVENT_TOPIC, cmdparams );
 	ns_free( cmdparams );
@@ -396,9 +394,7 @@ void PartChannel( Client *u, const char *chan, const char *reason )
 	{
 		u->flags &= ~CLIENT_FLAG_ZOMBIE;
 		cmdparams->target = u;
-		cmdparams->source = FindUser( savekicker );
-		if( !cmdparams->source )
-			cmdparams->source = FindServer( savekicker );
+		cmdparams->source = FindClient( savekicker );
 		cmdparams->param = savekickreason[0] ? savekickreason : NULL;
 		SendAllModuleEvent( EVENT_KICK, cmdparams );
 		if( IsMe( u ) )
@@ -600,7 +596,7 @@ Channel *FindChannel( const char *chan )
 	Channel *c;
 
 	c = ( Channel * )hnode_find( channelhash, chan );
-	if( !c )
+	if( c == NULL )
 	{
 		dlog( DEBUG3, "FindChannel: %s not found", chan );
 	}

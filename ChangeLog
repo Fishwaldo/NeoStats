@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Add FindClient function. (M)
  - Add logging support to CommandReport function. (M)
  - Fix a crash with faked localkill messages (F)
  - Increase the backtrace size, as we go a lot deeper than we used to (F)

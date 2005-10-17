@@ -64,7 +64,7 @@ static int dccpartyline_event_dccchatmsg( const CmdParams *cmdparams );
 /** Module Events */
 ModuleEvent module_events[] = 
 {
-	{EVENT_DCCCHATMSG,	dccpartyline_event_dccchatmsg},
+	{EVENT_DCCCHATMSG,	dccpartyline_event_dccchatmsg, 0},
 	NS_EVENT_END()
 };
 
