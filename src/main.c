@@ -516,6 +516,7 @@ void do_exit( NS_EXIT_TYPE exitcode, const char *quitmsg )
 			irc_quit( ns_botptr, quitmsg );
 			irc_squit( me.name, quitmsg );
 		}
+		event_loop( EVLOOP_ONCE );
 		sleep( 1 );
 		/* cleanup up core subsystems */
 		FiniCore();

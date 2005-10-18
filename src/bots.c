@@ -210,9 +210,11 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 	{
 		botptr = hnode_get( bn );
 		/* Use an internal flag for handling DEAF so we can fake support
-		 * on IRCd's which do not have the mode natively
+		 * on IRCd's which do not have the mode natively and prohibit
+		 * channel commands in services channel due to potentially
+		 * many bots trying to handle the command.
 		 */
-		if( !( botptr->flags & BOT_FLAG_DEAF ) )
+		if( !( botptr->flags & BOT_FLAG_DEAF ) && !IsServicesChannel( cmdparams->channel ) )
 		{
 			cm = list_first( botptr->u->user->chans );
 			while( cm )

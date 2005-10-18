@@ -135,7 +135,7 @@ void read_loop( void )
 		SET_SEGV_LOCATION();
 		update_time_now();
 #ifdef CURLHACK
-	         event_loop(EVLOOP_ONCE);
+		event_loop(EVLOOP_ONCE);
 		SET_SEGV_LOCATION();
 		/* this is a hack till CURL gets the new socket code */
 		CurlHackReadLoop();

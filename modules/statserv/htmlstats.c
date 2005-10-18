@@ -704,13 +704,11 @@ void HTMLOutput( void )
 		}
 		buftemp = strcasestr( bufptr, "</html>" );
 		if( buftemp ) {
-			os_fwrite( bufptr, ( int )buftemp -( int )bufptr, 1, opf );
+			os_fwrite( bufptr, ( int )buftemp - ( int )bufptr, 1, opf );
 			put_copyright();
 			bufptr = buftemp;
-			os_fputs( bufptr, opf );
-		} else {
-			os_fputs( bufptr, opf );
 		}
+		os_fputs( bufptr, opf );
 	}
 	os_fclose( tpl );
 	os_fclose( opf );
