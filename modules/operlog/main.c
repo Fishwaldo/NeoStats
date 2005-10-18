@@ -37,7 +37,7 @@ static int operlog_event_umode( const CmdParams *cmdparams );
 static Bot *operlog_bot;
 
 /** Copyright info */
-const char *operlog_copyright[] = 
+static const char *operlog_copyright[] = 
 {
 	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",
@@ -82,13 +82,13 @@ static BotInfo operlog_botinfo =
 /** Module Events */
 ModuleEvent module_events[] = 
 {
-	{EVENT_GLOBOPS,		operlog_event_globops },
-	{EVENT_CHATOPS,		operlog_event_chatops },
-	{EVENT_WALLOPS,		operlog_event_wallops },
-	{EVENT_LOCALKILL,	operlog_event_localkill },
-	{EVENT_GLOBALKILL,	operlog_event_globalkill },
-	{EVENT_SERVERKILL,	operlog_event_serverkill },
-	{EVENT_UMODE,		operlog_event_umode },	
+	{EVENT_GLOBOPS,		operlog_event_globops, 0 },
+	{EVENT_CHATOPS,		operlog_event_chatops, 0 },
+	{EVENT_WALLOPS,		operlog_event_wallops, 0 },
+	{EVENT_LOCALKILL,	operlog_event_localkill, 0 },
+	{EVENT_GLOBALKILL,	operlog_event_globalkill, 0 },
+	{EVENT_SERVERKILL,	operlog_event_serverkill, 0 },
+	{EVENT_UMODE,		operlog_event_umode, 0 },
 	NS_EVENT_END()
 };
 

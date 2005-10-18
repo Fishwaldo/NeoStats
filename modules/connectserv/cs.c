@@ -32,7 +32,7 @@
 
 /** local structures */
 /** Configuration structure */
-struct cs_cfg 
+static struct cs_cfg 
 { 
 	unsigned int sign_watch;
 	unsigned int kill_watch;
@@ -150,7 +150,7 @@ static int cs_set_serv_watch_cb( const CmdParams *cmdparams, SET_REASON reason )
 static Bot *cs_bot;
 
 /** Copyright info */
-const char *cs_copyright[] = 
+static const char *cs_copyright[] = 
 {
 	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",

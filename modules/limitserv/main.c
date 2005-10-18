@@ -28,8 +28,8 @@ typedef struct ls_channel {
 	char name[MAXCHANLEN];
 }ls_channel;
 
-int lsjoin = 0;
-int lsbuffer = 1;
+static unsigned int lsjoin = 0;
+static unsigned int lsbuffer = 1;
 
 /** Bot command function prototypes */
 static int cmd_add( const CmdParams *cmdparams );
@@ -52,7 +52,7 @@ static hash_t *qshash;
 static Bot *ls_bot;
 
 /** Copyright info */
-const char *ls_copyright[] = {
+static const char *ls_copyright[] = {
 	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",
 	NULL
@@ -106,8 +106,8 @@ static BotInfo ls_botinfo =
 /** Module Events */
 ModuleEvent module_events[] = 
 {
-	{EVENT_JOIN,	event_join, 0},
-	{EVENT_PART,	event_part, 0},
+	{EVENT_JOIN, event_join, 0},
+	{EVENT_PART, event_part, 0},
 	NS_EVENT_END()
 };
 
@@ -120,10 +120,10 @@ ModuleEvent module_events[] =
  *  @return none
  */
 
-static void ManageLimit( const char *name, int users, int curlimit, int add )
+static void ManageLimit( const char *name, unsigned int users, unsigned int curlimit, int add )
 {
 	static char limitsize[10];
-	int limit;
+	unsigned int limit;
 
 	limit = ( add == 1 ) ? ( users + lsbuffer ) : ( curlimit - lsbuffer );
 	if( limit < users )

@@ -51,8 +51,8 @@ static int qs_set_signonquote_cb( const CmdParams *cmdparams, SET_REASON reason 
 static int event_signon( const CmdParams *cmdparams );
 
 /** Configuration variables */
-int signonquote = 0;
-int useexclusions = 0;
+static int signonquote = 0;
+static int useexclusions = 0;
 
 /** hash to store database and bot info */
 static hash_t *qshash;
@@ -61,7 +61,7 @@ static hash_t *qshash;
 static Bot *qs_bot;
 
 /** Copyright info */
-const char *qs_copyright[] =
+static const char *qs_copyright[] =
 {
 	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",

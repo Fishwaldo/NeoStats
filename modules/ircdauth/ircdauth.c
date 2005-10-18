@@ -138,7 +138,7 @@ static int auth_cmd_authmodelist( const CmdParams *cmdparams )
 /** Bot command table */
 static bot_cmd ircdauth_commands[] =
 {
-	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist},
+	{"AUTHMODELIST",	auth_cmd_authmodelist,	0,	NS_ULEVEL_OPER, auth_help_authmodelist, 0, NULL, NULL},
 	NS_CMD_END()
 };
 

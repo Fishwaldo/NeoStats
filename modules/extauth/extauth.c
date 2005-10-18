@@ -89,7 +89,7 @@ static hash_t *accesshash;
 /** Bot command table */
 static bot_cmd extauth_commands[] =
 {
-	{"ACCESS",	ea_cmd_access,	1,	NS_ULEVEL_ROOT, ea_help_access},
+	{"ACCESS",	ea_cmd_access,	1,	NS_ULEVEL_ROOT, ea_help_access, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
