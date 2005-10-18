@@ -22,11 +22,12 @@ section on support or your entry will be removed.
 NeoStats 3.0 will co exist with an existing 2.5 series installation so you
 can run both together for testing this version if you wish.
 
-Settings and data files from 2.5.x will not work with 3.0. Settings and data
-files for versions of 3.0 may not be compatible with this version. You should 
-delete all files from the directory ~/NeoStats 3.0/data before using this 
-version.
+Settings and data files from 2.5.x will not work with 3.0. 
+
+Settings and data files for previous 3.0 alpha versions may not be compatible
+with this version. You should delete all files with "gdbm" in the filename
+from the directory ~/NeoStats 3.0/data before using this version.
 
 Known issues that we are aware of and should not be reported:
 
-None
+* None at present
