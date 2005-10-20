@@ -1309,7 +1309,7 @@ EXPORTFUNC int irc_setname( const Bot *botptr, const char *realname );
 
 /*  Mode functions
  */
-EXPORTFUNC int irc_umode( const Bot *botptr, const char *target, long mode );
+EXPORTFUNC int irc_umode( const Bot *botptr, const char *target, unsigned int mode );
 EXPORTFUNC int irc_cmode( const Bot *botptr, const char *chan, const char *mode, const char *args );
 EXPORTFUNC int irc_chanusermode( const Bot *botptr, const char *chan, const char *mode, const char *target );
 

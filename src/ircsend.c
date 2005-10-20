@@ -908,7 +908,7 @@ int irc_cloakhost( const Bot *botptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_umode( const Bot *botptr, const char *target, long mode )
+int irc_umode( const Bot *botptr, const char *target, unsigned int mode )
 {
 	char *newmode;
 	
