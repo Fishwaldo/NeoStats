@@ -1050,7 +1050,7 @@ typedef enum SOCK_TYPE {
 }SOCK_TYPE;
 
 typedef int (*sockcb)(int, void *data);
-typedef int (*sockfunccb)(void *, void *, size_t);
+typedef int (*sockfunccb)(void *, void *, int);
 
 /** @brief Module socket list structure
  * 
