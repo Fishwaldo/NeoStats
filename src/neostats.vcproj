@@ -349,12 +349,6 @@
 				RelativePath=".\match.c">
 			</File>
 			<File
-				RelativePath=".\MiniMessage.c">
-			</File>
-			<File
-				RelativePath=".\MiniMessageGateway.c">
-			</File>
-			<File
 				RelativePath=".\misc.c">
 			</File>
 			<File
@@ -422,9 +416,6 @@
 			</File>
 			<File
 				RelativePath=".\transfer.c">
-			</File>
-			<File
-				RelativePath=".\updates.c">
 			</File>
 			<File
 				RelativePath=".\users.c">
