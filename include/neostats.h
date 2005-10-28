@@ -1707,8 +1707,6 @@ EXPORTFUNC void ClearBotModValue( Bot *pBot );
 EXPORTFUNC void SetBotModValue( Bot *pBot, void *data );
 EXPORTFUNC void *GetBotModValue( const Bot *pBot );
 
-
 EXPORTFUNC void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len);
-int InitUpdate(void);
 
 #endif /* NEOSTATS_H */

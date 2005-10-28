@@ -13,7 +13,8 @@ noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
 				bots.h dcc.h ircstring.h numeric.h timer.h \
 				channels.h dl.h lang.h transfer.h nsdbm.h \
 				nsdba.h main.h numerics.h settings.h botinfo.h confuse.h \
-				adnsdlist.h adnsinternal.h adnstvarith.h MiniMessage.h MiniMessageGateway.h
+				adnsdlist.h adnsinternal.h adnstvarith.h \
+				updates.h MiniMessage.h MiniMessageGateway.h
 
 version.h:	stamp-h1
 	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
