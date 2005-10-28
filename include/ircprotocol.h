@@ -35,6 +35,6 @@ int irc_squit( const char *server, const char *quitmsg );
 /*int seob_cmd( const char *server );*/
 int irc_smo( const char *source, const char *umodetarget, const char *msg );
 
-extern int (*irc_parse) (void *notused, void *rline, size_t len);
+extern int (*irc_parse) (void *notused, void *rline, int len);
 
 #endif /* _IRCPROTOCOL_H_ */

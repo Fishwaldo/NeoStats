@@ -31,12 +31,12 @@
  */
 
 /* DCC command handler type */
-typedef int( *dcc_cmd_handler )( CmdParams* cmdparams );
+typedef int( *dcc_cmd_handler )( CmdParams *cmdparams );
 
 /* DCC command lookup table */
 typedef struct dcc_cmd
 {
-	const char* cmd;
+	const char *cmd;
 	dcc_cmd_handler req_handler;
 } dcc_cmd;
 
@@ -44,11 +44,8 @@ typedef struct dcc_cmd
 static list_t *dcclist;
 
 /* DCC command type prototypes */
-static int dcc_req_send( CmdParams* cmdparams );
-static int dcc_req_chat( CmdParams* cmdparams );
-static int dcc_parse( void *arg, void *line, size_t );
-static int dcc_error( int what, void *arg );
-static int dcc_write( Client *dcc, char *buf );
+static int dcc_req_send( CmdParams *cmdparams );
+static int dcc_req_chat( CmdParams *cmdparams );
 
 /* DCC command lookup table */
 static dcc_cmd dcc_cmds[]= 
@@ -103,6 +100,115 @@ static void DelDCCClient( Client *dcc )
 		lnode_destroy( list_delete( dcclist, dccnode ) );
 		ns_free( dcc );
 	}
+}
+
+/** @brief dcc_write
+ *
+ *  Send message to a DCC client
+ *  DCC subsystem use only.
+ *
+ *  @param dcc client to send to
+ *  @param buf to send
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int dcc_write( Client *dcc, const char *buf )
+{
+	static char dcc_buf[BUFSIZE];
+
+	dlog( DEBUG1, "DCCTX: %s", buf );
+	strlcpy( dcc_buf, buf, BUFSIZE );
+	strlcat( dcc_buf, "\n", BUFSIZE );
+	if( send_to_sock( dcc->sock, dcc_buf, strlen( dcc_buf ) ) == NS_FAILURE )
+	{
+		nlog( LOG_WARNING, "Got a write error when attempting to write %d", errno );
+		DelDCCClient( dcc );
+		return NS_FAILURE;
+	}
+	return NS_SUCCESS;
+}
+
+/** @brief dcc_parse
+ *
+ *  dcc_parse
+ *  DCC subsystem use only.
+ *
+ *  @param arg Justin????
+ *  @param rline Justin????
+ *  @param len Justin????
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int dcc_parse( void *arg, void *rline, int len )
+{
+	static char buf[BUFSIZE];
+	char *cmd;
+	char *line = ( char * )rline;
+	Client *dcc = ( Client * )arg;
+	CmdParams *cmdparams;
+
+	strcpy( buf, line );
+	dlog( DEBUG1, "DCCRX: %s", line );
+	if( buf[0] == '.' )
+	{
+		cmd = strchr( buf, ' ' );
+		if( !cmd ) {
+	         dcc_write( dcc, "Error, You must specify a command to execute" );
+	         return NS_SUCCESS;
+		}
+   		*cmd = 0;
+   		cmd++;
+		cmdparams = ( CmdParams *) ns_calloc( sizeof( CmdParams ) );
+		cmdparams->source = dcc;
+		if( cmdparams->source ) {
+			cmdparams->target = FindUser( buf + 1 );
+			if( cmdparams->target ) {
+				cmdparams->bot = cmdparams->target->user->bot;
+			} else {
+				dcc_write( dcc, "Use .<botname> to send a command to a NeoStats bot" );
+				return NS_SUCCESS;
+			}
+			if( cmdparams->bot->flags & BOT_FLAG_SERVICEBOT ) 
+			{
+				cmdparams->param = cmd;
+				run_bot_cmd( cmdparams, 0 );
+				return NS_SUCCESS;
+			} 
+		}
+		ns_free( cmdparams );
+		return NS_SUCCESS;
+	}
+	cmdparams = ( CmdParams *) ns_calloc( sizeof( CmdParams ) );
+	cmdparams->source = dcc;
+	cmdparams->param = buf;
+	if( cmdparams->source )
+		SendAllModuleEvent( EVENT_DCCCHATMSG, cmdparams );
+	ns_free( cmdparams );
+	return NS_SUCCESS;
+}
+
+/** @brief dcc_error
+ *
+ *  Justin???
+ *  DCC subsystem use only.
+ *
+ *  @param sock_no Justin???
+ *  @param name Justin???
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+static int dcc_error( int sock_no, void *name )
+{
+	Sock *sock = ( Sock * )name;
+	if( sock->data )
+		DelDCCClient( sock->data );
+	else
+		nlog( LOG_WARNING, "Problem, Sock->data is NULL, therefore we can't delete DCCClient!" );
+	DelSock( sock );
+	return NS_SUCCESS;
 }
 
 /** @brief DCCChatConnect
@@ -246,93 +352,6 @@ int irc_dccmsgall( const char *fmt, ...)
 	return NS_SUCCESS;
 }
 
-/** @brief dcc_parse
- *
- *  dcc_parse
- *  DCC subsystem use only.
- *
- *  @param arg Justin????
- *  @param rline Justin????
- *  @param len Justin????
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int dcc_parse( void *arg, void *rline, size_t len )
-{
-	static char buf[BUFSIZE];
-	char *cmd;
-	char *line = ( char * )rline;
-	Client *dcc = ( Client * )arg;
-	CmdParams *cmdparams;
-
-	strcpy( buf, line );
-	dlog( DEBUG1, "DCCRX: %s", line );
-	if( buf[0] == '.' )
-	{
-		cmd = strchr( buf, ' ' );
-		if( !cmd ) {
-	         dcc_write( dcc, "Error, You must specify a command to execute" );
-	         return NS_SUCCESS;
-		}
-   		*cmd = 0;
-   		cmd++;
-		cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
-		cmdparams->source = dcc;
-		if( cmdparams->source ) {
-			cmdparams->target = FindUser( buf + 1 );
-			if( cmdparams->target ) {
-				cmdparams->bot = cmdparams->target->user->bot;
-			} else {
-				dcc_write( dcc, "Use .<botname> to send a command to a NeoStats bot" );
-				return NS_SUCCESS;
-			}
-			if( cmdparams->bot->flags & BOT_FLAG_SERVICEBOT ) 
-			{
-				cmdparams->param = cmd;
-				run_bot_cmd( cmdparams, 0 );
-				return NS_SUCCESS;
-			} 
-		}
-		ns_free( cmdparams );
-		return NS_SUCCESS;
-	}
-	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
-	cmdparams->source = dcc;
-	cmdparams->param = buf;
-	if( cmdparams->source )
-		SendAllModuleEvent( EVENT_DCCCHATMSG, cmdparams );
-	ns_free( cmdparams );
-	return NS_SUCCESS;
-}
-
-/** @brief dcc_write
- *
- *  Send message to a DCC client
- *  DCC subsystem use only.
- *
- *  @param dcc client to send to
- *  @param buf to send
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int dcc_write( Client *dcc, char *buf )
-{
-	static char dcc_buf[BUFSIZE];
-
-	dlog( DEBUG1, "DCCTX: %s", buf );
-	strlcpy( dcc_buf, buf, BUFSIZE );
-	strlcat( dcc_buf, "\n", BUFSIZE );
-	if( send_to_sock( dcc->sock, dcc_buf, strlen( dcc_buf ) ) == NS_FAILURE )
-	{
-		nlog( LOG_WARNING, "Got a write error when attempting to write %d", errno );
-		DelDCCClient( dcc );
-		return NS_FAILURE;
-	}
-	return NS_SUCCESS;
-}
-
 /** @brief dcc_send_msg
  *
  *  Send message to a DCC client
@@ -349,28 +368,6 @@ void dcc_send_msg( const Client* dcc, char * buf )
 	dcc_write( ( Client * )dcc, buf );
 }
 
-/** @brief dcc_error
- *
- *  Justin???
- *  DCC subsystem use only.
- *
- *  @param sock_no Justin???
- *  @param name Justin???
- *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
- */
-
-static int dcc_error( int sock_no, void *name )
-{
-	Sock *sock = ( Sock * )name;
-	if( sock->data )
-		DelDCCClient( sock->data );
-	else
-		nlog( LOG_WARNING, "Problem, Sock->data is NULL, therefore we can't delete DCCClient!" );
-	DelSock( sock );
-	return NS_SUCCESS;
-}
-
 /** @brief dcc_req
  *
  *  Handle DCC requests
@@ -381,7 +378,7 @@ static int dcc_error( int sock_no, void *name )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int dcc_req( CmdParams* cmdparams )
+int dcc_req( CmdParams *cmdparams )
 {
 	dcc_cmd* cmd;
 	size_t len;
@@ -416,7 +413,7 @@ int dcc_req( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int dcc_req_send( CmdParams* cmdparams )
+static int dcc_req_send( CmdParams *cmdparams )
 {
 	dlog( DEBUG5, "DCC SEND request from %s to %s", cmdparams->source->name, cmdparams->bot->name );
 	SendModuleEvent( EVENT_DCCSEND, cmdparams, cmdparams->bot->moduleptr );
@@ -435,7 +432,7 @@ static int dcc_req_send( CmdParams* cmdparams )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-static int dcc_req_chat( CmdParams* cmdparams )
+static int dcc_req_chat( CmdParams *cmdparams )
 {
 	int userlevel;
 	Client *dcc;
@@ -511,5 +508,5 @@ void FiniDCC( void )
 		dccnode = list_next( dcclist, dccnode );
 	}
 	list_destroy_nodes( dcclist );
-	list_destroy(dcclist);
+	list_destroy( dcclist );
 }

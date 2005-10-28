@@ -52,9 +52,9 @@ typedef struct DnsLookup {
 } DnsLookup;
 
 adns_state nsads;
-struct event *dnstimeout;
+static struct event *dnstimeout;
 
-struct DNSStats {
+static struct DNSStats {
 	unsigned int totalq;
 	unsigned int maxqueued;
 	unsigned int totalqueued;
@@ -70,9 +70,7 @@ static list_t *dnslist;
 /** @brief list of DNS queries that are queued up
  * 
  */
-list_t *dnsqueue;
-
-void dns_check_queue();
+static list_t *dnsqueue;
 
 /** @brief starts a DNS lookup
  *
@@ -135,8 +133,8 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (void *data, adns_
 	return 1;
 }
 
-int
-adns_read(void *data, void *notused, size_t len) {
+static int adns_read(void *data, void *notused, int len)
+{
     Sock *sock = (Sock *)data;
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -148,8 +146,9 @@ adns_read(void *data, void *notused, size_t len) {
     do_dns(0,0,NULL);
     return NS_SUCCESS;
 }
-int
-adns_write(int fd, void *data) {
+
+static int adns_write(int fd, void *data)
+{
     struct timeval tv;
     gettimeofday(&tv, NULL);
     adns_processwriteable(nsads, fd, &tv);
@@ -157,7 +156,7 @@ adns_write(int fd, void *data) {
     return NS_SUCCESS;
 }
 
-void sock_update (int fd, short what) 
+static void sock_update (int fd, short what) 
 {
     static char tmpname[32];
     Sock *sock;
@@ -257,6 +256,56 @@ void FiniDns (void)
 	free(dnstimeout);
 	adns_finish(nsads);
 }
+
+/** @brief Checks the DNS queue and if we can
+ * add new queries to the active DNS queries and remove from Queue 
+*/
+static void dns_check_queue(void)
+{
+	lnode_t *dnsnode, *dnsnode2;
+	DnsLookup *dnsdata;
+	struct sockaddr_in sa;
+	int status;
+	
+	/* first, if the DNSLIST is full, just exit straight away */
+	if (list_isfull(dnslist)) {
+		dlog(DEBUG2, "DNS list is still full. Can't work on queue");
+		return;
+	}
+	/* if the dnsqueue isn't empty, then lets process some more till we are full again */
+	if (!list_isempty(dnsqueue)) {
+		dnsnode = list_first(dnsqueue);
+		while ((dnsnode) && (!list_isfull(dnslist))) {
+			dnsdata = lnode_get(dnsnode);	
+			dlog(DEBUG2, "Moving DNS query from queue to active");
+			if (dnsdata->type == adns_r_ptr) {
+				sa.sin_family = AF_INET;
+				sa.sin_addr.s_addr = inet_addr (dnsdata->lookupdata);
+				status = adns_submit_reverse (nsads, (const struct sockaddr *) &sa, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+			} else {
+				status = adns_submit (nsads, dnsdata->lookupdata, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
+			}
+			if (status) {
+				/* delete from queue and delete node */
+				nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
+				ns_free (dnsdata);
+				dnsnode2 = dnsnode;
+				dnsnode = list_next(dnsqueue, dnsnode);
+				list_delete_destroy_node( dnsqueue, dnsnode2 );
+				continue;
+			}
+			/* move from queue to active list */
+			dnsnode2 = dnsnode;
+			dnsnode = list_next(dnsqueue, dnsnode);
+			list_delete(dnsqueue, dnsnode2);
+			list_append(dnslist, dnsnode2);
+			dlog(DEBUG1, "DNS: Added dns query to list");
+		/* while loop */
+		}
+	/* isempty */
+	}
+}
+
 /** @brief Canx any DNS queries for modules we might be unloading
  * 
  * @param module name
@@ -360,55 +409,6 @@ void do_dns (int notused, short event, void *arg)
 		}
 	}
 	dns_check_queue();
-}
-
-/** @brief Checks the DNS queue and if we can
- * add new queries to the active DNS queries and remove from Queue 
-*/
-void dns_check_queue() 
-{
-	lnode_t *dnsnode, *dnsnode2;
-	DnsLookup *dnsdata;
-	struct sockaddr_in sa;
-	int status;
-	
-	/* first, if the DNSLIST is full, just exit straight away */
-	if (list_isfull(dnslist)) {
-		dlog(DEBUG2, "DNS list is still full. Can't work on queue");
-		return;
-	}
-	/* if the dnsqueue isn't empty, then lets process some more till we are full again */
-	if (!list_isempty(dnsqueue)) {
-		dnsnode = list_first(dnsqueue);
-		while ((dnsnode) && (!list_isfull(dnslist))) {
-			dnsdata = lnode_get(dnsnode);	
-			dlog(DEBUG2, "Moving DNS query from queue to active");
-			if (dnsdata->type == adns_r_ptr) {
-				sa.sin_family = AF_INET;
-				sa.sin_addr.s_addr = inet_addr (dnsdata->lookupdata);
-				status = adns_submit_reverse (nsads, (const struct sockaddr *) &sa, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
-			} else {
-				status = adns_submit (nsads, dnsdata->lookupdata, dnsdata->type, adns_qf_owner | adns_qf_cname_loose, NULL, &dnsdata->q);
-			}
-			if (status) {
-				/* delete from queue and delete node */
-				nlog (LOG_WARNING, "DNS: adns_submit error: %s", strerror (status));
-				ns_free (dnsdata);
-				dnsnode2 = dnsnode;
-				dnsnode = list_next(dnsqueue, dnsnode);
-				list_delete_destroy_node( dnsqueue, dnsnode2 );
-				continue;
-			}
-			/* move from queue to active list */
-			dnsnode2 = dnsnode;
-			dnsnode = list_next(dnsqueue, dnsnode);
-			list_delete(dnsqueue, dnsnode2);
-			list_append(dnslist, dnsnode2);
-			dlog(DEBUG1, "DNS: Added dns query to list");
-		/* while loop */
-		}
-	/* isempty */
-	}
 }
 
 void do_dns_stats_Z(Client *u) 

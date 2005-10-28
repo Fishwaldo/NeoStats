@@ -406,6 +406,4 @@ MODULEFUNC void cloakhost( const char *host );
 
 EXPORTFUNC void send_cmd( const char *fmt, ... )__attribute__( ( format( printf, 1, 2 ) ) ); /* 2=format 3=params */
 
-MODULEFUNC int parse (void *notused, void *rline, size_t len);
-
 #endif /* _PROTOCOL_H_ */

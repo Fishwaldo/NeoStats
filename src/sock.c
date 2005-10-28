@@ -43,7 +43,7 @@ char recbuf[BUFSIZE];
 
 /** @brief Event Subsystem Callback
  */
-void libevent_log(int severity, const char *msg) 
+static void libevent_log(int severity, const char *msg) 
 {
 	switch (severity) {
 		case _EVENT_LOG_DEBUG:
@@ -297,8 +297,8 @@ send_to_sock(Sock *sock, const char *buf, const int buflen) {
  * @return Nothing
  *
  */
-void
-linemode_read(struct bufferevent *bufferevent, void *arg) {
+static void linemode_read(struct bufferevent *bufferevent, void *arg)
+{
 	Sock *thisock = (Sock*)arg;
 
 	char buf[512];
@@ -374,8 +374,8 @@ linemode_read(struct bufferevent *bufferevent, void *arg) {
  *
  */
 
-void
-socket_linemode_write_done (struct bufferevent *bufferevent, void *arg) {
+static void socket_linemode_write_done (struct bufferevent *bufferevent, void *arg)
+{
 /* NOOP - We require this otherwise the event subsystem segv's */
 }
 
@@ -392,9 +392,8 @@ socket_linemode_write_done (struct bufferevent *bufferevent, void *arg) {
  *
  */
 
-
-void 
-socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg) {
+static void socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg)
+{
 	Sock *sock = (Sock*)arg;
 	switch (what) {
 		case EVBUFFER_READ:
@@ -700,8 +699,8 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
  * @return Nothing
  */
 
-void
-read_sock_activity(int fd, short what, void *data) {
+static void read_sock_activity(int fd, short what, void *data)
+{
 	Sock *sock = (Sock *)data;
 	char *p = NULL;
 	int n;
@@ -846,7 +845,7 @@ Sock *AddSock( SOCK_TYPE type, const char *sock_name, int socknum, sockfunccb re
  *  @return none
  */
 
-void CloseSock( Sock *sock )
+static void CloseSock( Sock *sock )
 {
 	switch (sock->socktype) {
 		case SOCK_STANDARD:

@@ -69,7 +69,7 @@ size_t strlcpy( char *dst, const char *src, size_t size )
 	size_t copycount;
 
     /* check size is safe */
-	if ( size <= 0 )
+	if ( size == 0 )
 		return 0;
 	/* NULL pointer checks */
 	if( !dst || !src )
@@ -103,7 +103,7 @@ size_t strlcat( char *dst, const char *src, size_t size )
 	size_t copycount;
 
     /* check size is safe */
-	if ( size <= 0 )
+	if ( size == 0 )
 		return 0;
 	/* NULL pointer checks */
 	if( !dst || !src )
@@ -152,7 +152,7 @@ char *strndup( const char *src, size_t count )
 	char *dup;
 	
 	/* validate inputs */
-	if ( ( src == NULL ) || ( count < 0 ) )
+	if ( ( src == NULL ) || ( count == 0 ) )
 		return NULL;
 	/* Allocate count plus one for trailing NULL */
 	dup = ( char* ) ns_malloc( count + 1 );

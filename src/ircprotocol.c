@@ -38,7 +38,7 @@ static char protocol_path[MAXPATH];
 ProtocolInfo *protocol_info;
 void *protocol_module_handle;
 irc_cmd *cmd_list;
-int (*irc_parse) (void *notused, void *rline, size_t len);
+int (*irc_parse) (void *notused, void *rline, int len);
  
 /** @brief process_ircd_cmd
  *
@@ -128,7 +128,7 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int parse( void *notused, void *rline, size_t len )
+static int parse( void *notused, void *rline, int len )
 {
 	char origin[64], cmd[64], *coreLine;
 	char *line = (char *)rline;
@@ -194,7 +194,7 @@ int parse( void *notused, void *rline, size_t len )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int parsep10( void *notused, void *rline, size_t len )
+static int parsep10( void *notused, void *rline, int len )
 {
 	char origin[64], cmd[64], *coreLine;
 	char *line = ( char * )rline;

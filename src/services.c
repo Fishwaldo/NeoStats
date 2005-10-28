@@ -42,16 +42,20 @@
 
 /* Command function prototypes */
 static int ns_cmd_shutdown( const CmdParams *cmdparams );
+#ifndef WIN32
 static int ns_cmd_reload( const CmdParams *cmdparams );
+#endif /* !WIN32 */
 static int ns_cmd_jupe( const CmdParams *cmdparams );
 #ifdef USE_RAW
 static int ns_cmd_raw( const CmdParams *cmdparams );
-#endif
+#endif /* USE_RAW */
 static int ns_cmd_status( const CmdParams *cmdparams );
 
 static int services_event_ctcpversion( const CmdParams *cmdparams );
 
+#ifndef DEBUG
 static int ns_set_debug_cb( const CmdParams *cmdparams, SET_REASON reason );
+#endif /* DEBUG */
 
 config nsconfig;
 tme me;
@@ -88,37 +92,48 @@ ModuleInfo ns_module_info = {
 /** Fake Module pointer for run level code */
 Module ns_module = {
 	MOD_TYPE_STANDARD,
-	&ns_module_info
+	&ns_module_info,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	0,
+	0,
+	0,
+	0,
+	0,
 };
 
 /** Bot command table */
 static bot_cmd ns_commands[] =
 {
-	{"STATUS",		ns_cmd_status,		0, 	0,					ns_help_status},
-	{"SHUTDOWN",	ns_cmd_shutdown,	1, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown},
+	{"STATUS",		ns_cmd_status,		0, 	0,					ns_help_status, 0, NULL, NULL},
+	{"SHUTDOWN",	ns_cmd_shutdown,	1, 	NS_ULEVEL_ADMIN, 	ns_help_shutdown, 0, NULL, NULL},
 #ifndef WIN32
-	{"RELOAD",		ns_cmd_reload,		1, 	NS_ULEVEL_ADMIN, 	ns_help_reload},
+	{"RELOAD",		ns_cmd_reload,		1, 	NS_ULEVEL_ADMIN, 	ns_help_reload, 0, NULL, NULL},
 #endif /* !WIN32 */
-	{"MODLIST",		ns_cmd_modlist,		0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist},
-	{"LOAD",		ns_cmd_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load},
-	{"UNLOAD",		ns_cmd_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload},
-	{"JUPE",		ns_cmd_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe},
-#ifdef USE_RAW																
-	{"RAW",			ns_cmd_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw},
-#endif																	
+	{"MODLIST",		ns_cmd_modlist,		0, 	NS_ULEVEL_ADMIN,  	ns_help_modlist, 0, NULL, NULL},
+	{"LOAD",		ns_cmd_load,		1, 	NS_ULEVEL_ADMIN, 	ns_help_load, 0, NULL, NULL},
+	{"UNLOAD",		ns_cmd_unload,		1,	NS_ULEVEL_ADMIN, 	ns_help_unload, 0, NULL, NULL},
+	{"JUPE",		ns_cmd_jupe,		1, 	NS_ULEVEL_ADMIN, 	ns_help_jupe, 0, NULL, NULL},
+#ifdef USE_RAW
+	{"RAW",			ns_cmd_raw,			0, 	NS_ULEVEL_ADMIN, 	ns_help_raw, 0, NULL, NULL},
+#endif /* USE_RAW */
 	NS_CMD_END()
 };
 
 /** Bot command table */
 static bot_cmd ns_debug_commands[] =
 {
-	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist},
-	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist},
-	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist},
-	{"USERLIST",	ns_cmd_userlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_userlist},
-	{"CHANNELLIST",	ns_cmd_channellist,	0, 	NS_ULEVEL_ROOT,  	ns_help_channellist},
-	{"SERVERLIST",	ns_cmd_serverlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverlist},
-	{"BANLIST",		ns_cmd_banlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_banlist},
+	{"BOTLIST",		ns_cmd_botlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_botlist, 0, NULL, NULL},
+	{"SOCKLIST",	ns_cmd_socklist,	0, 	NS_ULEVEL_ROOT,  	ns_help_socklist, 0, NULL, NULL},
+	{"TIMERLIST",	ns_cmd_timerlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_timerlist, 0, NULL, NULL},
+	{"USERLIST",	ns_cmd_userlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_userlist, 0, NULL, NULL},
+	{"CHANNELLIST",	ns_cmd_channellist,	0, 	NS_ULEVEL_ROOT,  	ns_help_channellist, 0, NULL, NULL},
+	{"SERVERLIST",	ns_cmd_serverlist,	0, 	NS_ULEVEL_ROOT,  	ns_help_serverlist, 0, NULL, NULL},
+	{"BANLIST",		ns_cmd_banlist,		0, 	NS_ULEVEL_ROOT,  	ns_help_banlist, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -145,7 +160,7 @@ static bot_setting ns_debugsettings[] =
 {
 #ifndef DEBUG
 	{"DEBUG",			&nsconfig.debug,			SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debug, ns_set_debug_cb, ( void* )0 },
-#endif
+#endif /* DEBUG */
 	{"DEBUGMODULE",		nsconfig.debugmodule,		SET_TYPE_STRING,	0, MAX_MOD_NAME,NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugmodule, NULL, ( void* )"all" },
 	{"DEBUGLEVEL",		&nsconfig.debuglevel,		SET_TYPE_INT,		1, 10, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debuglevel, NULL, ( void* )0 },
 	{"DEBUGTOCHAN",		&nsconfig.debugtochan,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugtochan, NULL, ( void* )0 },
@@ -156,7 +171,7 @@ static bot_setting ns_debugsettings[] =
 Bot* ns_botptr = NULL;
 
 /** Core bot info */
-BotInfo ns_botinfo =
+static BotInfo ns_botinfo =
 {
 	"NeoStats",
 	"NeoStats1",
@@ -170,7 +185,7 @@ BotInfo ns_botinfo =
 };
 
 /** Core event table */
-ModuleEvent neostats_events[] =
+static ModuleEvent neostats_events[] =
 {
 	{EVENT_CTCPVERSIONRPL,	services_event_ctcpversion,	EVENT_FLAG_IGNORE_SYNCH},
 	NS_EVENT_END()
@@ -279,6 +294,7 @@ static int ns_cmd_shutdown( const CmdParams *cmdparams )
    	return NS_SUCCESS;
 }
 
+#ifndef WIN32
 /** @brief ns_cmd_reload
  *
  *  RELOAD command handler
@@ -304,6 +320,7 @@ static int ns_cmd_reload( const CmdParams *cmdparams )
 	do_exit( NS_EXIT_RELOAD, quitmsg );
    	return NS_SUCCESS;
 }
+#endif /* !WIN32 */
 
 /** @brief ns_cmd_jupe
  *
@@ -389,8 +406,9 @@ static int ns_cmd_raw( const CmdParams *cmdparams )
 	ns_free( message );
    	return NS_SUCCESS;
 }
-#endif
+#endif /* USE_RAW */
 
+#ifndef DEBUG
 /** @brief ns_set_debug_cb
  *
  *  Set callback for debug
@@ -413,3 +431,4 @@ static int ns_set_debug_cb( const CmdParams *cmdparams, SET_REASON reason )
 	}
 	return NS_SUCCESS;
 }
+#endif /* DEBUG */

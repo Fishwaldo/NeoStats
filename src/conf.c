@@ -61,7 +61,7 @@ static int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt );
  * Contains Configuration Items for the Core NeoStats service
  */
 
-cfg_opt_t server_details[] = {
+static cfg_opt_t server_details[] = {
 	CFG_STR ("Name", "neostats.nonetwork.org", CFGF_NONE),
 	CFG_STR ("Info", "NeoStats 3.0 Services", CFGF_NONE),
 	CFG_STR ("ServiceChannel", "#services", CFGF_NONE),
@@ -71,7 +71,7 @@ cfg_opt_t server_details[] = {
 	CFG_END()
 };
 
-cfg_opt_t options[] = {
+static cfg_opt_t options[] = {
 	CFG_INT ("ReconnectTime", 10, CFGF_NONE),
 	CFG_BOOL ("UsePrivmsg", cfg_false, CFGF_NONE),
 	CFG_BOOL ("OperOnly", cfg_false, CFGF_NONE),
@@ -84,24 +84,24 @@ cfg_opt_t options[] = {
 	CFG_END()
 };
 
-cfg_opt_t servers[] = {
+static cfg_opt_t servers[] = {
 	CFG_STR ("IpAddress", 0, CFGF_NONE),
 	CFG_INT ("Port", 6667, CFGF_NONE),
 	CFG_STR ("Password", 0, CFGF_NONE),
 	CFG_END()
 };
 
-cfg_opt_t serviceroot[] = {
+static cfg_opt_t serviceroot[] = {
 	CFG_STR ("Mask", 0, CFGF_NODEFAULT),
 	CFG_END()
 };
 
-cfg_opt_t modules[] = {
+static cfg_opt_t modules[] = {
 	CFG_STR_LIST ("ModuleName", 0, CFGF_NODEFAULT),
 	CFG_END()
 };
 
-cfg_opt_t neonet[] = {
+static cfg_opt_t neonet[] = {
 	CFG_STR ("HostName", "mqpool.neostats.net", CFGF_NONE),
 	CFG_INT ("Port", 2960, CFGF_NONE),
 	CFG_STR ("UserName", NULL, CFGF_NODEFAULT),
@@ -109,7 +109,7 @@ cfg_opt_t neonet[] = {
 	CFG_END()
 };
 
-cfg_opt_t fileconfig[] = {
+static cfg_opt_t fileconfig[] = {
 	CFG_SEC ("ServerConfig", server_details, CFGF_NONE),
 	CFG_SEC ("Options", options, CFGF_NONE),
 #if 0
@@ -124,7 +124,7 @@ cfg_opt_t fileconfig[] = {
 	CFG_END()
 };
 
-validate_args arg_validate[] = {
+static validate_args arg_validate[] = {
 	{"ServerConfig|Name", cb_verify_neohost},
 	{"ServerConfig|ServiceChannel", cb_verify_chan},
 	{"ServerConfig|ServerNumeric", cb_verify_numeric},

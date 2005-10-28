@@ -50,7 +50,7 @@ extern ProtocolInfo *protocol_info;
 
 extern irc_cmd *cmd_list;
 
-ProtocolEntry protocol_list[] =
+static ProtocolEntry protocol_list[] =
 {
 	{"TOKEN",	PROTOCOL_TOKEN},
 	{"CLIENT",	PROTOCOL_CLIENT},

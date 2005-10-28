@@ -118,7 +118,7 @@ static const char *EventStrings[] =
  *  @return none
  */
 
-static void SendEvent( ModuleEvent *eventptr, Event event, CmdParams *cmdparams, Module *module_ptr )
+static void SendEvent( const ModuleEvent *eventptr, Event event, const CmdParams *cmdparams, Module *module_ptr )
 {
 	if( !eventptr )
 	{
@@ -169,7 +169,7 @@ static void SendEvent( ModuleEvent *eventptr, Event event, CmdParams *cmdparams,
 	if( setjmp( sigvbuf ) == 0 )
 	{
 		SET_RUN_LEVEL( module_ptr );
-		module_ptr->event_list[event]->handler( cmdparams );
+		( void )module_ptr->event_list[event]->handler( cmdparams );
 		RESET_RUN_LEVEL();
 	}
 	else
@@ -190,7 +190,7 @@ static void SendEvent( ModuleEvent *eventptr, Event event, CmdParams *cmdparams,
  *  @return none
  */
 
-void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr )
+void SendModuleEvent( Event event, const CmdParams *cmdparams, Module *module_ptr )
 {
 	SET_SEGV_LOCATION();
 	dlog( DEBUG5, "SendModuleEvent: %s to module %s", EventStrings[event], module_ptr->info->name );
@@ -347,7 +347,7 @@ void DeleteEvent( Event event )
  *  @return none
  */
 
-void DeleteEventList( ModuleEvent *eventlistptr )
+void DeleteEventList( const ModuleEvent *eventlistptr )
 {
 	if( !eventlistptr )
 	{

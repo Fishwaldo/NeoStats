@@ -99,6 +99,8 @@ void _m_numeric242( char *origin, char **argv, int argc, int srv )
 		strtok( NULL, " " );
 		/* current string: "d days, hh:mm:ss" */
 		ptr = strtok( NULL, " " );
+		if( ptr == NULL )
+			return;
 		secs = atoi( ptr ) * TS_ONE_DAY;
 		/* current string: "days, hh:mm:ss" */
 		strtok( NULL, " " );
@@ -106,12 +108,18 @@ void _m_numeric242( char *origin, char **argv, int argc, int srv )
 		ptr = strtok( NULL, "" );
 		/* current string: "hh:mm:ss" */
 		ptr = strtok( ptr , ":" );
+		if( ptr == NULL )
+			return;
 		secs += atoi( ptr ) * TS_ONE_HOUR;
 		/* current string: "mm:ss" */
 		ptr = strtok( NULL, ":" );
+		if( ptr == NULL )
+			return;
 		secs += atoi( ptr )*60;
 		/* current string: "ss" */
 		ptr = strtok( NULL, "" );
+		if( ptr == NULL )
+			return;
 		secs += atoi( ptr );
 
 		s->server->uptime = secs;

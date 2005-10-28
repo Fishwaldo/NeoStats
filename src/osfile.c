@@ -142,7 +142,7 @@ long os_ftell( FILE *handle )
  *  Wrapper function for fprintf
  */
 
-int os_fprintf( FILE *handle, char *fmt, ... )
+int os_fprintf( FILE *handle, const char *fmt, ... )
 {
 	int retval;
 	va_list ap;
@@ -172,9 +172,9 @@ int os_fputs( const char *string, FILE *handle )
  *  Wrapper function for fread
  */
 
-int os_fread( void *buffer, size_t size, size_t count, FILE* handle )
+size_t os_fread( void *buffer, size_t size, size_t count, FILE* handle )
 {
-	int retval;
+	size_t retval;
 
 	retval = fread( buffer, size, count, handle );
 	os_file_errno = errno;
@@ -198,9 +198,9 @@ char *os_fgets( char *string, int n, FILE* handle )
  *  Wrapper function for fwrite
  */
 
-int os_fwrite( const void *buffer, size_t size, size_t count, FILE* handle )
+size_t os_fwrite( const void *buffer, size_t size, size_t count, FILE* handle )
 {
-	int retval;
+	size_t retval;
 
 	retval = fwrite( buffer, size, count, handle );
 	os_file_errno = errno;

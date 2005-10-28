@@ -408,7 +408,7 @@ int os_sock_set_nonblocking( OS_SOCKET s )
 {
 #ifdef WIN32
 	int ret;
-	unsigned int flags;
+	unsigned long flags;
 
 	/* reset local errno implementation */
 	os_sock_errno = 0;

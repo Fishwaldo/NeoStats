@@ -163,7 +163,7 @@ static void BuildModeCharMap( unsigned char *mode_char_map, unsigned char mode, 
  * @return 
  */
 
-unsigned int BuildModeTable( unsigned char *mode_char_map, mode_data *dest, const mode_init *src, unsigned int flagall )
+static unsigned int BuildModeTable( unsigned char *mode_char_map, mode_data *dest, const mode_init *src, unsigned int flagall )
 {
 	unsigned int maskall = 0;
 

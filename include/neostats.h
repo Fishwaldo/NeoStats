@@ -1566,7 +1566,7 @@ EXPORTFUNC int HaveFeature( int mask );
 EXPORTFUNC void AddEvent( ModuleEvent *eventptr );
 EXPORTFUNC void AddEventList( ModuleEvent *eventlistptr );
 EXPORTFUNC void DeleteEvent( Event event );
-EXPORTFUNC void DeleteEventList( ModuleEvent *eventlistptr );
+EXPORTFUNC void DeleteEventList( const ModuleEvent *eventlistptr );
 EXPORTFUNC void SetAllEventFlags( unsigned int flag, unsigned int enable );
 EXPORTFUNC void SetEventFlags( Event event, unsigned int flag, unsigned int enable );
 EXPORTFUNC void EnableEvent( Event event );
@@ -1596,11 +1596,11 @@ EXPORTFUNC FILE *os_fopen( const char *filename, const char *filemode );
 EXPORTFUNC int os_fclose( FILE *handle );
 EXPORTFUNC int os_fseek( FILE *handle, long offset, int origin );
 EXPORTFUNC long os_ftell( FILE *handle );
-EXPORTFUNC int os_fprintf( FILE *handle, char *fmt, ...) __attribute__((format(printf,2,3)) ); /* 2=format 3=params */
+EXPORTFUNC int os_fprintf( FILE *handle, const char *fmt, ...) __attribute__((format(printf,2,3)) ); /* 2=format 3=params */
 EXPORTFUNC int os_fputs( const char *string, FILE *handle );
-EXPORTFUNC int os_fread( void *buffer, size_t size, size_t count, FILE *handle );
+EXPORTFUNC size_t os_fread( void *buffer, size_t size, size_t count, FILE *handle );
 EXPORTFUNC char *os_fgets( char *string, int n, FILE *handle );
-EXPORTFUNC int os_fwrite( const void *buffer, size_t size, size_t count, FILE *handle );
+EXPORTFUNC size_t os_fwrite( const void *buffer, size_t size, size_t count, FILE *handle );
 EXPORTFUNC int os_fflush( FILE *handle );
 EXPORTFUNC int os_rename( const char *oldname, const char *newname );
 EXPORTFUNC int os_stat( const char *path, struct stat *buffer );

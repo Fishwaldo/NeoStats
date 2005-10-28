@@ -163,7 +163,7 @@ static void _send_version( const char *source, const char *target );
 
 static char ircd_buf[BUFSIZE];
 
-protocol_sym protocol_sym_table[] = 
+static protocol_sym protocol_sym_table[] = 
 {
 	{( void * )&irc_send_privmsg, _send_privmsg, "send_privmsg", &MSG_PRIVATE, "MSG_PRIVATE", &TOK_PRIVATE, "TOK_PRIVATE", 1, 0},
 	{( void * )&irc_send_notice, _send_notice, "send_notice", &MSG_NOTICE, "MSG_NOTICE", &TOK_NOTICE, "TOK_NOTICE", 1, 0},

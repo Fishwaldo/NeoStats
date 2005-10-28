@@ -47,7 +47,7 @@ static char msg_sigterm[] = "SIGTERM received, shutting down server.";
  *
  */
 
-RETSIGTYPE sigterm_handler( int signum )
+static RETSIGTYPE sigterm_handler( int signum )
 {
 	nlog( LOG_CRITICAL, msg_sigterm );
 	/* XXX-Mark something is wrong with irc_globops */
@@ -64,7 +64,7 @@ RETSIGTYPE sigterm_handler( int signum )
  *
  * @todo Implement a Rehash function. What can we actually rehash?
  */
-RETSIGTYPE sighup_handler( int signum )
+static RETSIGTYPE sighup_handler( int signum )
 {
 	irc_globops( NULL, _( "SIGHUP received, attempted to rehash" ) );
 	/* at the moment, the rehash just checks for a the SQL port is opened, if enabled */
@@ -106,7 +106,7 @@ static void do_backtrace( void )
 #endif
 }
 
-void report_segfault( const char* modulename )
+static void report_segfault( const char* modulename )
 {
 	static char segfault_fmttime[TIMEBUFSIZE];
 
@@ -138,7 +138,7 @@ void report_segfault( const char* modulename )
 	fclose( segfault );		
 }
 
-RETSIGTYPE sigsegv_handler( int signum )
+static RETSIGTYPE sigsegv_handler( int signum )
 {
 	static char name[MAX_MOD_NAME];
     static int running = 0;
@@ -180,8 +180,8 @@ RETSIGTYPE sigsegv_handler( int signum )
  * @return Nothing
  *
  */
-void
-InitSignals( void )
+
+void InitSignals( void )
 {
 #ifndef WIN32
 	struct sigaction act;

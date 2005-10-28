@@ -39,18 +39,18 @@ extern void read_loop();
 extern void do_exit( int exitcode, char *quitmsg );
 
 static char* szNeoStatsErrorTitle="NeoStats for Windows Error";
-HINSTANCE hInstance = 0;
-HANDLE hNeoStatsThread = 0;
-HWND hDialog = 0;
-HICON hIcon;
-NOTIFYICONDATA nsNotifyIconData;
-HMENU hTrayPopMenu;
-POINT TrayPoint;
+static HINSTANCE hInstance = 0;
+static HANDLE hNeoStatsThread = 0;
+static HWND hDialog = 0;
+static HICON hIcon;
+static NOTIFYICONDATA nsNotifyIconData;
+static HMENU hTrayPopMenu;
+static POINT TrayPoint;
 
-char szConfigFileName[ MAX_PATH ];
+static char szConfigFileName[ MAX_PATH ];
 
 #ifndef NDEBUG
-void InitDebugConsole( void )
+static void InitDebugConsole( void )
 {
 	HANDLE lStdHandle;
 	int hConHandle;
@@ -70,18 +70,18 @@ void InitDebugConsole( void )
 	setvbuf( stderr, NULL, _IONBF, 0 );
 }
 
-void FiniDebugConsole( void )
+static void FiniDebugConsole( void )
 {
 	FreeConsole();
 }
 #endif
 
-void ErrorMessageBox( char* error )
+static void ErrorMessageBox( char* error )
 {
 	MessageBox( NULL, error, szNeoStatsErrorTitle, MB_ICONEXCLAMATION | MB_OK );
 }
 
-INT_PTR CALLBACK AboutDialogProc(HWND hwndDlg, UINT msg, WPARAM wparam, LPARAM lparam)
+static INT_PTR CALLBACK AboutDialogProc(HWND hwndDlg, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg)
 	{
@@ -104,9 +104,8 @@ INT_PTR CALLBACK AboutDialogProc(HWND hwndDlg, UINT msg, WPARAM wparam, LPARAM l
 	return FALSE;
 }
 
-INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
+static INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	int error;
     switch( message )
     {
 		case WM_INITDIALOG:
@@ -153,16 +152,16 @@ INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 					break;
 
 				case IDM_EDITCONFIG:
-					//error = ( int )ShellExecute( hDialog, "edit", szConfigFileName, NULL, NULL, SW_SHOWNORMAL );
+					//ShellExecute( hDialog, "edit", szConfigFileName, NULL, NULL, SW_SHOWNORMAL );
 					MessageBox( NULL, "TODO", "TODO", MB_ICONEXCLAMATION | MB_OK );
 					break;
 
 				case IDM_WEBHOME:
-					error = ( int )ShellExecute( hDialog, "open", "http://www.neostats.net", NULL, NULL, SW_SHOWNORMAL );
+					ShellExecute( hDialog, "open", "http://www.neostats.net", NULL, NULL, SW_SHOWNORMAL );
 					break;
 
 				case IDM_WEBFORUMS:
-					error = ( int )ShellExecute( hDialog, "open", "http://www.neostats.net/boards", NULL, NULL, SW_SHOWNORMAL );
+					ShellExecute( hDialog, "open", "http://www.neostats.net/boards", NULL, NULL, SW_SHOWNORMAL );
 					break;
 
 				case IDM_CLOSE:

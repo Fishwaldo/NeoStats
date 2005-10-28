@@ -188,7 +188,7 @@ void SynchAllModules( void )
  *  @return none
  */
 
-int ModuleVersion( Module *module_ptr, void *v )
+static int ModuleVersion( Module *module_ptr, void *v )
 {
 	irc_numeric( RPL_VERSION, (char *)v, _( "Module %s version: %s %s %s" ),
 		module_ptr->info->name, module_ptr->info->version, 
@@ -464,7 +464,7 @@ void insert_module( Module *mod_ptr )
  *  @return none
  */
 
-int ReportModuleInfo( Module *module_ptr, void *v )
+static int ReportModuleInfo( Module *module_ptr, void *v )
 {
 	Client *u = (Client *)v;
 	irc_prefmsg( ns_botptr, u, __( "Module: %d %s (%s)", u ), module_ptr->modnum, module_ptr->info->name, module_ptr->info->version );

@@ -61,11 +61,11 @@ static void do_reconnect( void );
 static int in_do_exit = 0;
 
 #ifdef WIN32
-void *( *old_malloc )( size_t );
-void( *old_free )( void * );
+static void *( *old_malloc )( size_t );
+static void( *old_free )( void * );
 #endif /* WIN32 */
 
-struct
+static struct
 {
 	int exit_code;
 	char *exit_message;
@@ -292,7 +292,7 @@ static int InitCore( void )
  *  @return none
  */
 
-void FiniCore( void )
+static void FiniCore( void )
 {
 	FiniDCC();
 	FiniCurl();
