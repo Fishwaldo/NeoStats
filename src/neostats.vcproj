@@ -522,19 +522,10 @@
 				RelativePath="..\include\main.h">
 			</File>
 			<File
-				RelativePath="..\include\MiniMessage.h">
-			</File>
-			<File
-				RelativePath="..\include\MiniMessageGateway.h">
-			</File>
-			<File
 				RelativePath="..\include\modes.h">
 			</File>
 			<File
 				RelativePath="..\include\modules.h">
-			</File>
-			<File
-				RelativePath="..\include\MuscleSupport.h">
 			</File>
 			<File
 				RelativePath="..\include\neostats.h">
@@ -591,9 +582,6 @@
 				RelativePath="..\include\transfer.h">
 			</File>
 			<File
-				RelativePath="..\include\updates.h">
-			</File>
-			<File
 				RelativePath="..\include\users.h">
 			</File>
 		</Filter>
@@ -643,13 +631,7 @@
 			RelativePath="..\ChangeLog">
 		</File>
 		<File
-			RelativePath="..\configure.in">
-		</File>
-		<File
 			RelativePath="..\makeconf">
-		</File>
-		<File
-			RelativePath=".\Makefile.am">
 		</File>
 		<File
 			RelativePath="..\modules\modules.txt">

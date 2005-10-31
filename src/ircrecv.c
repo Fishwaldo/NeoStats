@@ -1620,49 +1620,64 @@ void do_credits( const char *nick, const char *remoteserver )
 
 void do_stats( const char *nick, const char *what )
 {
-	irc_cmd* ircd_cmd_ptr;
-	time_t tmp;
-	time_t tmp2;
 	Client *u;
 
 	SET_SEGV_LOCATION();
 	u = FindUser( nick );
-	if( !u ) {
+	if( !u )
+	{
 		nlog( LOG_WARNING, "do_stats: message from unknown user %s", nick );
 		return;
 	}
-	if( ircstrcasecmp( what, "u" ) == 0 ) {
-		/* server uptime - Shmad */
-		time_t uptime = me.now - me.ts_boot;
-		irc_numeric( RPL_STATSUPTIME, u->name, __( "Statistical Server up %ld days, %ld:%02ld:%02ld", u ), ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_HOUR ) % 24, ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, uptime % 60 );
-	} else if( ircstrcasecmp( what, "c" ) == 0 ) {
-		/* Connections */
-		irc_numeric( RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, me.port );
-		irc_numeric( RPL_STATSCLINE, u->name, "C *@%s * * %d 50", me.uplink, me.port );
-	} else if( ircstrcasecmp( what, "o" ) == 0 ) {
-		/* Operators */
-	} else if( ircstrcasecmp( what, "l" ) == 0 ) {
-		/* Port Lists */
-		tmp = me.now - me.lastmsg;
-		tmp2 = me.now - me.ts_boot;
-		irc_numeric( RPL_STATSLINKINFO, u->name, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE" );
-		irc_numeric( RPL_STATSLLINE, u->name, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, ( int )me.SendM, ( int )me.SendBytes, ( int )me.RcveM, ( int )me.RcveBytes, ( int )tmp2, ( int )tmp );
-        } else if( ircstrcasecmp( what, "Z" ) == 0 ) {
-                if( UserLevel( u ) >= NS_ULEVEL_ADMIN ) {
-                        do_dns_stats_Z( u );
-                }
-	} else if( ircstrcasecmp( what, "M" ) == 0 ) {
-		ircd_cmd_ptr = cmd_list;
-		while( ircd_cmd_ptr->name ) {
-			if( ircd_cmd_ptr->usage > 0 ) {
-				irc_numeric( RPL_STATSCOMMANDS, u->name, "Command %s Usage %d", *ircd_cmd_ptr->name, ircd_cmd_ptr->usage );
+	switch( *what )
+	{
+		case 'u':	/* uptime */
+			{
+				time_t uptime = me.now - me.ts_boot;
+				irc_numeric( RPL_STATSUPTIME, u->name, __( "Statistical Server up %ld days, %ld:%02ld:%02ld", u ), ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_HOUR ) % 24, ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, uptime % 60 );
 			}
-			ircd_cmd_ptr ++;
-		}
+			break;
+		case 'c':	/* Connections */
+			irc_numeric( RPL_STATSNLINE, u->name, "N *@%s * * %d 50", me.uplink, me.port );
+			irc_numeric( RPL_STATSCLINE, u->name, "C *@%s * * %d 50", me.uplink, me.port );
+			break;
+		case 'o':	/* Operators */
+			break;
+		case 'l':	/* Port Lists */
+			{
+				time_t tmp, tmp2;
+				tmp = me.now - me.lastmsg;
+				tmp2 = me.now - me.ts_boot;
+				irc_numeric( RPL_STATSLINKINFO, u->name, "l SendQ SendM SendBytes RcveM RcveBytes Open_Since CPU :IDLE" );
+				irc_numeric( RPL_STATSLLINE, u->name, "%s 0 %d %d %d %d %d 0 :%d", me.uplink, ( int )me.SendM, ( int )me.SendBytes, ( int )me.RcveM, ( int )me.RcveBytes, ( int )tmp2, ( int )tmp );
+			}
+			break;
+		case 'Z':	/*  */
+			if( UserLevel( u ) >= NS_ULEVEL_ADMIN )
+			{
+				do_dns_stats_Z( u );
+			}
+			break;
+		case 'M':	/*  */
+			{
+				irc_cmd* ircd_cmd_ptr;
+				ircd_cmd_ptr = cmd_list;
+				while( ircd_cmd_ptr->name )
+				{
+					if( ircd_cmd_ptr->usage > 0 )
+					{
+						irc_numeric( RPL_STATSCOMMANDS, u->name, "Command %s Usage %d", *ircd_cmd_ptr->name, ircd_cmd_ptr->usage );
+					}
+					ircd_cmd_ptr ++;
+				}
+			}
+			break;
+		default:
+			break;
 	}
 	irc_numeric( RPL_ENDOFSTATS, u->name, __( "%s :End of /STATS report", u ), what );
 	irc_chanalert( ns_botptr, _( "%s Requested Stats %s" ), u->name, what );
-};
+}
 
 /** @brief 
  *

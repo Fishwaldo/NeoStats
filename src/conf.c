@@ -615,7 +615,7 @@ static int cb_verify_settime( cfg_t *cfg, cfg_opt_t *opt )
 {
 	long int time = opt->values[0]->number;
 
-	if( time <= 0 )
+	if( time < 0 )
 	{
 		cfg_error( cfg, "%d is out of range for %s", time, opt->name );
 		return CFG_PARSE_ERROR;
