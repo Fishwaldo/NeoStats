@@ -429,16 +429,20 @@ void UserAway( const char *nick, const char *awaymsg )
 
 void UserNickChange( const char *oldnick, const char *newnick, const char *ts )
 {
+	static char oldnickbuffer[MAXNICK];
+		
 	CmdParams *cmdparams;
 	hnode_t *un;
 	Client *u;
 
 	SET_SEGV_LOCATION();
 	dlog( DEBUG2, "UserNickChange: %s -> %s", oldnick, newnick );
-	un = hash_lookup( userhash, oldnick );
+	/* Since oldnick might point to where newnick will be written, we need to save a copy */
+	strlcpy( oldnickbuffer, oldnick, MAXNICK );
+	un = hash_lookup( userhash, oldnickbuffer );
 	if( !un )
 	{
-		nlog( LOG_WARNING, "UserNickChange: can't find user %s", oldnick );
+		nlog( LOG_WARNING, "UserNickChange: can't find user %s", oldnickbuffer );
 		return;
 	}
 	u = ( Client * ) hnode_get( un );
@@ -451,7 +455,7 @@ void UserNickChange( const char *oldnick, const char *newnick, const char *ts )
 	hash_insert( userhash, un, u->name );
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->source = u;
-	cmdparams->param = ( char * )oldnick;
+	cmdparams->param = ( char * )oldnickbuffer;
 	SendAllModuleEvent( EVENT_NICK, cmdparams );
 	ns_free( cmdparams );
 	if( IsMe( u ) )
