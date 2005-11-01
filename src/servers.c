@@ -317,8 +317,6 @@ int InitServers( void )
 		nlog( LOG_CRITICAL, "Unable to create server hash" );
 		return NS_FAILURE;
 	}
-	me.s = AddServer( me.name, NULL, 0, NULL, me.infoline );
-	strlcpy( me.s->version, me.version, VERSIONSIZE );
 	return NS_SUCCESS;
 }
 
@@ -446,17 +444,15 @@ static void TransverseMap( const ServerMapHandler handler, int useexclusions, co
 		if( ( depth == 0 ) && ( s->uplinkname[0] == 0 ) )
 		{
 			/* its the root server */
-			if( useexclusions && IsExcluded( s ) )
-				TransverseMap( handler, useexclusions, s->name, depth, v );
-			handler( s, 1, depth, v );
+			if( !useexclusions || !IsExcluded( s ) )
+				handler( s, 1, depth, v );
 			TransverseMap( handler, useexclusions, s->name, depth + 1, v );
 		}
 		else if( ( depth > 0 ) && ( s->uplink ) &&  !ircstrcasecmp( s->uplink->name, uplink ) )
 		{
-			if( useexclusions && IsExcluded( s ) )
-				TransverseMap( handler, useexclusions, s->name, depth, v );
 			/* its not the root server */
-			handler( s, 0, depth, v );
+			if( !useexclusions || !IsExcluded( s ) )
+				handler( s, 0, depth, v );
 			TransverseMap( handler, useexclusions, s->name, depth + 1, v );
 		}
 	}

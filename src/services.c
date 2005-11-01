@@ -219,6 +219,8 @@ static int services_event_ctcpversion( const CmdParams *cmdparams )
 void InitServices( void )
 {
 	InitExcludes( &ns_module );
+	me.s = AddServer( me.name, NULL, 0, NULL, me.infoline );
+	strlcpy( me.s->version, me.version, VERSIONSIZE );
 	ModuleConfig( ns_settings );
 }
 
