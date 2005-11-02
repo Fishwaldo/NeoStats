@@ -62,13 +62,10 @@ int InitTimers( void )
 		return NS_FAILURE;
 	}
 	timers = os_malloc( sizeof( struct event ) );
-
 	timerclear( &tv );
 	tv.tv_sec = 1;
-
 	event_set( timers, 0, EV_TIMEOUT|EV_PERSIST, CheckTimers_cb, NULL );
 	event_add( timers, &tv );
-
 	return NS_SUCCESS;
 }
 
@@ -419,7 +416,7 @@ int SetTimerInterval( const char *name, int interval )
 	Timer *timer;
 
 	SET_SEGV_LOCATION();
-	timer = ( Timer * )hnode_find( timerhash, name );
+	timer = FindTimer( name );
 	if( timer )
 	{
 		timer->interval = interval;

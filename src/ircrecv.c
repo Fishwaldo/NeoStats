@@ -1440,7 +1440,7 @@ void do_chatops( const char *origin, const char *message )
 void do_synch_neostats( void )
 {
 	init_services_bot();
-	irc_globops( NULL, _( "Link with Network \2Complete!\2" ) );
+	irc_globops( NULL, "Link with Network \2Complete!\2" );
 }
 
 /** @brief do_ping
@@ -1523,10 +1523,10 @@ void do_motd( const char *nick, const char *remoteserver )
 	SET_SEGV_LOCATION();
 	fp = fopen( MOTD_FILENAME, "rt" );
 	if( !fp ) {
-		irc_numeric( ERR_NOMOTD, nick, _( ":- MOTD file Missing" ) );
+		irc_numeric( ERR_NOMOTD, nick, ":- MOTD file Missing" );
 	} else {
-		irc_numeric( RPL_MOTDSTART, nick, _( ":- %s Message of the Day -" ), me.name );
-		irc_numeric( RPL_MOTD, nick, _( ":- %s. Copyright (c) 1999 - 2005 The NeoStats Group" ), me.version );
+		irc_numeric( RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name );
+		irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
 		irc_numeric( RPL_MOTD, nick, ":-" );
 
 		while( fgets( buf, sizeof( buf ), fp ) ) {
@@ -1534,7 +1534,7 @@ void do_motd( const char *nick, const char *remoteserver )
 			irc_numeric( RPL_MOTD, nick, ":- %s", buf );
 		}
 		fclose( fp );
-		irc_numeric( RPL_ENDOFMOTD, nick, _( ":End of MOTD command." ) );
+		irc_numeric( RPL_ENDOFMOTD, nick, ":End of MOTD command." );
 	}
 }
 
@@ -1555,16 +1555,16 @@ void do_admin( const char *nick, const char *remoteserver )
 
 	fp = fopen( ADMIN_FILENAME, "rt" );
 	if( !fp ) {
-		irc_numeric( ERR_NOADMININFO, nick, _( "%s :No administrative info available" ), me.name );
+		irc_numeric( ERR_NOADMININFO, nick, "%s :No administrative info available", me.name );
 	} else {
-		irc_numeric( RPL_ADMINME, nick, _( ":%s :Administrative info" ), me.name );
-		irc_numeric( RPL_ADMINME, nick, _( ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group" ), me.version );
+		irc_numeric( RPL_ADMINME, nick, ":%s :Administrative info", me.name );
+		irc_numeric( RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
 		while( fgets( buf, sizeof( buf ), fp ) ) {
 			buf[strnlen( buf, BUFSIZE ) - 1] = 0;
 			irc_numeric( RPL_ADMINLOC1, nick, ":- %s", buf );
 		}
 		fclose( fp );
-		irc_numeric( RPL_ADMINLOC2, nick, _( "End of /ADMIN command." ) );
+		irc_numeric( RPL_ADMINLOC2, nick, "End of /ADMIN command." );
 	}
 }
 
@@ -1634,7 +1634,7 @@ void do_stats( const char *nick, const char *what )
 		case 'u':	/* uptime */
 			{
 				time_t uptime = me.now - me.ts_boot;
-				irc_numeric( RPL_STATSUPTIME, u->name, __( "Statistical Server up %ld days, %ld:%02ld:%02ld", u ), ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_HOUR ) % 24, ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, uptime % 60 );
+				irc_numeric( RPL_STATSUPTIME, u->name, "Server up %ld days, %ld:%02ld:%02ld", ( uptime / TS_ONE_DAY ), ( uptime / TS_ONE_HOUR ) % 24, ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE, uptime % 60 );
 			}
 			break;
 		case 'c':	/* Connections */
@@ -1675,8 +1675,8 @@ void do_stats( const char *nick, const char *what )
 		default:
 			break;
 	}
-	irc_numeric( RPL_ENDOFSTATS, u->name, __( "%s :End of /STATS report", u ), what );
-	irc_chanalert( ns_botptr, _( "%s Requested Stats %s" ), u->name, what );
+	irc_numeric( RPL_ENDOFSTATS, u->name, "%s :End of /STATS report", what );
+	irc_chanalert( ns_botptr, "%s requested STATS %s", u->name, what );
 }
 
 /** @brief 

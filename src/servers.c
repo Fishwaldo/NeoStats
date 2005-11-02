@@ -334,10 +334,10 @@ int InitServers( void )
 
 static int PingServer( Client *s, void *v )
 {
-	if( IsMe( s ) )
-		s->server->ping = 0;
-	else
+	if( !IsMe( s ) )
+	{
 		irc_ping( me.name, me.name, s->name );
+	}
 	return NS_FALSE;
 }
 
