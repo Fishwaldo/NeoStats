@@ -848,9 +848,10 @@ static int hs_cmd_add( const CmdParams *cmdparams )
 			irc_prefmsg( hs_bot, u, 
 				"Your vhost has been created with hostmask of %s and username %s with password %s",
 				cmdparams->av[1], cmdparams->av[0], cmdparams->av[3] );
-			irc_prefmsg( hs_bot, u, 
-				"For security, you should change your vhost password. See /msg %s help chpass",
-				hs_bot->name );
+			if( u != cmdparams->source )
+				irc_prefmsg( hs_bot, u, 
+					"For security, you should change your vhost password. See /msg %s help chpass",
+					hs_bot->name );
 		}
 	}
 	return NS_SUCCESS;
