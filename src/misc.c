@@ -751,8 +751,8 @@ int IsJustWildcard( const char *mask, int ishostmask )
 	else
 		spanlen = strspn( mask, stringset );
 	if( spanlen == len )
-		return NS_FALSE;
-	return NS_TRUE;
+		return NS_TRUE;
+	return NS_FALSE;
 }
 
 /** @brief FindClient
