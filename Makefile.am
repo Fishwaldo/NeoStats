@@ -6,7 +6,7 @@ dist_bin_SCRIPTS 	= makeconf
 dist_data_DATA		= neostats.motd
 
 docdir			= @prefix@/doc
-dist_doc_DATA		= doc/FAQ doc/README.sqlsrv doc/USERMAN
+dist_doc_DATA		= doc/FAQ doc/USERMAN
 
 DISTCLEANFILES		= ccdv
 

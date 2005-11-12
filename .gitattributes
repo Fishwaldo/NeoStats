@@ -44,7 +44,6 @@ data/tlds.nfo -text
 doc/FAQ -text
 doc/README.dev -text
 doc/README.french -text
-doc/README.sqlsrv -text
 doc/USERMAN -text
 doc/USERMAN.xml -text
 doc/old/ChangeLog.connectserv.old -text

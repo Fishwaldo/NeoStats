@@ -28552,7 +28552,7 @@ CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 
 
-                                                                                                                                                                                                                                                ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile modules/protocol/Makefile modules/dbm/Makefile modules/dbm/bdb/Makefile modules/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/quoteserv/Makefile modules/limitserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile modules/perltest/Makefile neostats"
+                                                                                                                                                                                                                                      ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile modules/protocol/Makefile modules/dbm/Makefile modules/dbm/bdb/Makefile modules/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/quoteserv/Makefile modules/limitserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile neostats"
 
 
 cat >confcache <<\_ACEOF
@@ -29215,7 +29215,6 @@ do
   "modules/limitserv/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/limitserv/Makefile" ;;
   "modules/operlog/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/operlog/Makefile" ;;
   "modules/dccpartyline/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/dccpartyline/Makefile" ;;
-  "modules/perltest/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/perltest/Makefile" ;;
   "neostats" ) CONFIG_FILES="$CONFIG_FILES neostats" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h" ;;
