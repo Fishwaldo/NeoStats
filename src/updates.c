@@ -31,7 +31,7 @@
 
 void GotUpdateAddress(void *data, adns_answer *a);
 static int mqswrite(int fd, void *data);
-static int mqsread(void *data, void *notused, size_t len);
+static int mqsread(void *data, void *notused, int len);
 int mqs_login();
 
 updateserver mqs;
@@ -142,7 +142,7 @@ int mqswrite(int fd, void *data) {
 	return NS_SUCCESS;
 }
 
-int mqsread(void *data, void *notused, size_t len) {
+int mqsread(void *data, void *notused, int len) {
 	MMessage *msg;
 	
 	if (len == -2 && mqs.state < MQS_OK) {
