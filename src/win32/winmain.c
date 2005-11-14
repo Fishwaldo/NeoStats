@@ -208,7 +208,7 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int c
 	WSADATA WSAData;
     MSG msg;
 	
-	_fmode = _O_BINARY;
+	//_fmode = _O_BINARY;
 	hInstance = hInst;
 
 	GetCurrentDirectory( MAX_PATH, szConfigFileName );

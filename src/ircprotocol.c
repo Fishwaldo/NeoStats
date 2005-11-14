@@ -62,8 +62,8 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
 	ircd_cmd_ptr = cmd_list;
 	while( ircd_cmd_ptr->name )
 	{
-		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) || 
-		  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && !ircstrcasecmp( *ircd_cmd_ptr->token, cmd ) ) ) {
+		if( ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) == 0 || 
+		  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && ircstrcasecmp( *ircd_cmd_ptr->token, cmd ) == 0 ) ) {
 			if( ircd_cmd_ptr->handler )
 			{
 				dlog( DEBUG3, "process_ircd_cmd: running command %s", *ircd_cmd_ptr->name );
@@ -83,8 +83,8 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
 	{
 		if( *intrinsic_cmd_ptr->name )
 		{
-			if( !ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) || 
-			  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && *intrinsic_cmd_ptr->token && !ircstrcasecmp( *intrinsic_cmd_ptr->token, cmd ) ) ) 
+			if( ircstrcasecmp( *intrinsic_cmd_ptr->name, cmd ) == 0 || 
+			  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && *intrinsic_cmd_ptr->token && ircstrcasecmp( *intrinsic_cmd_ptr->token, cmd ) == 0 ) ) 
 			{
 				dlog( DEBUG3, "process_ircd_cmd: running command %s", *intrinsic_cmd_ptr->name );
 				intrinsic_cmd_ptr->handler( origin, av, ac, cmdptr );
@@ -98,7 +98,7 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
 	/* Process numeric replies */
 	while( ircd_cmd_ptr->name )
 	{
-		if( !ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) )
+		if( ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) == 0 )
 		{
 			if( ircd_cmd_ptr->handler ) {
 				dlog( DEBUG3, "process_ircd_cmd: running command %s", *ircd_cmd_ptr->name );
@@ -217,7 +217,7 @@ static int parsep10( void *notused, void *rline, int len )
 	{
 		coreLine = line + strlen( line );
 	}
-	if( ( !ircstrcasecmp( line, "SERVER" ) ) ||( !ircstrcasecmp( line, "PASS" ) ) )
+	if( ( ircstrcasecmp( line, "SERVER" ) ) == 0 || ( ircstrcasecmp( line, "PASS" ) == 0 ) )
 	{
 		strlcpy( cmd, line, sizeof( cmd ) );
 		dlog( DEBUG1, "cmd   : %s", cmd );

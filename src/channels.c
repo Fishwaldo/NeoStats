@@ -446,7 +446,7 @@ void JoinChannel( const char *nick, const char *chan )
 		nlog( LOG_WARNING, "JoinChannel: tried to join unknown user %s to channel %s", nick, chan );
 		return;
 	}
-	if( !ircstrcasecmp( "0", chan ) )
+	if( ircstrcasecmp( "0", chan ) == 0 )
 	{
 		/* join 0 is actually part all chans */
 		dlog( DEBUG2, "JoinChannel: parting %s from all channels", u->name );

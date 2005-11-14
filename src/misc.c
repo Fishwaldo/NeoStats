@@ -121,7 +121,7 @@ char *sstrdup( const char *s )
 	return t;
 }
 
-/** @brief strlwr
+/** @brief ns_strlwr
  * 
  *  make string string lowercase
  * 
@@ -130,7 +130,7 @@ char *sstrdup( const char *s )
  *  @returns pointer to the new string
  */
 
-char *strlwr( char *s )
+char *ns_strlwr( char *s )
 {
 	char *t;
 	
@@ -743,7 +743,7 @@ int IsJustWildcard( const char *mask, int ishostmask )
 	size_t len;
 	size_t spanlen;
 
-	if( !ircstrcasecmp( mask, "*" ) )
+	if( ircstrcasecmp( mask, "*" ) == 0 )
 		return NS_TRUE;
 	len = strlen( mask );
 	if( ishostmask )

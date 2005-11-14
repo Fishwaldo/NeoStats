@@ -328,7 +328,7 @@ static int cmd_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "Error, exclusion list is full" );
 		return NS_SUCCESS;
 	}
-	if( !ircstrcasecmp( "HOST", cmdparams->av[1] ) )
+	if( ircstrcasecmp( "HOST", cmdparams->av[1] ) == 0 )
 	{
 		if( !ValidateHostWild( cmdparams->av[2] ) )
 		{
@@ -337,7 +337,7 @@ static int cmd_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 		}
 		return AddExclude( exclude_list, NS_EXCLUDE_HOST, cmdparams );
 	} 
-	if( !ircstrcasecmp( "CHANNEL", cmdparams->av[1] ) )
+	if( ircstrcasecmp( "CHANNEL", cmdparams->av[1] ) == 0 )
 	{
 		if( !ValidateChannelWild( cmdparams->av[2]) )
 		{
@@ -346,7 +346,7 @@ static int cmd_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 		}
 		return AddExclude( exclude_list, NS_EXCLUDE_CHANNEL, cmdparams );
 	} 
-	if( !ircstrcasecmp( "SERVER", cmdparams->av[1] ) )
+	if( ircstrcasecmp( "SERVER", cmdparams->av[1] ) == 0 )
 	{
 		if( !ValidateHostWild( cmdparams->av[2] ) )
 		{
@@ -355,7 +355,7 @@ static int cmd_exclude_add( list_t *exclude_list, const CmdParams *cmdparams )
 		}
 		return AddExclude( exclude_list, NS_EXCLUDE_SERVER, cmdparams );
 	} 
-	if( !ircstrcasecmp( "USERHOST", cmdparams->av[1] ) )
+	if( ircstrcasecmp( "USERHOST", cmdparams->av[1] ) == 0 )
 	{
 		if( !ValidateUserHostWild( cmdparams->av[2] ) )
 		{
@@ -461,11 +461,11 @@ static int cmd_exclude_list( list_t *exclude_list, const CmdParams *cmdparams )
 static int cmd_exclude( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "ADD" ) == 0 )
 		return cmd_exclude_add( GET_CUR_MODULE()->exclude_list, cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "DEL" ) == 0 )
 		return cmd_exclude_del( GET_CUR_MODULE()->exclude_list, cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "LIST" ) == 0 )
 		return cmd_exclude_list( GET_CUR_MODULE()->exclude_list, cmdparams );
 	return NS_ERR_SYNTAX_ERROR;
 }
@@ -591,7 +591,7 @@ static int ModExcludeUserHandler( Exclude *exclude, void *v )
 int ModIsUserExcluded( const Client *u ) 
 {
 	SET_SEGV_LOCATION();
-	if( !ircstrcasecmp( u->uplink->name, me.name ) )
+	if( ircstrcasecmp( u->uplink->name, me.name ) == 0 )
 	{
 		dlog( DEBUG1, "User %s excluded as neostats or module user.", u->name );
 		return NS_TRUE;

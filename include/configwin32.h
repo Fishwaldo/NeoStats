@@ -273,7 +273,7 @@
 /* #undef HAVE_STRNDUP */
 
 /* Define to 1 if you have the `strnlen' function. */
-/* #undef HAVE_STRNLEN */
+#define HAVE_STRNLEN
 
 /* Define to 1 if you have the `strstr' function. */
 #define HAVE_STRSTR 1

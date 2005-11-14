@@ -730,7 +730,7 @@ static int ts_cmd_add( const CmdParams *cmdparams )
 	strlcpy( db->tsbot.dbname, cmdparams->av[1], MAXNICK );
 	strlcpy( db->tsbot.channel, cmdparams->av[2], MAXCHANLEN );
 	if( cmdparams->ac > 3 )
-		if( !ircstrcasecmp( cmdparams->av[3], "public" ) )
+		if( ircstrcasecmp( cmdparams->av[3], "public" ) == 0 )
 			db->tsbot.public = 1;
 	if( cmdparams->ac > 4 )
 		if( ValidateUser( cmdparams->av[4] ) == NS_SUCCESS )

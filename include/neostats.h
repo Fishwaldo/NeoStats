@@ -1251,7 +1251,7 @@ EXPORTFUNC void _ns_free( void **ptr );
 EXPORTFUNC unsigned hrand( const unsigned upperbound, const unsigned lowerbound );
 EXPORTFUNC void strip( char *line );
 EXPORTFUNC char *sstrdup( const char *s );
-char *strlwr( char *s );
+EXPORTFUNC char *ns_strlwr( char *s );
 EXPORTFUNC void AddStringToList( char ***List, char S[], int *C );
 EXPORTFUNC void strip_mirc_codes( char *text );
 EXPORTFUNC void clean_string(char *text, size_t len);

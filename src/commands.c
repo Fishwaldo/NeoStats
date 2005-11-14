@@ -414,18 +414,18 @@ static int run_intrinsic_cmds( const char *cmd, const CmdParams *cmdparams )
 	bot_cmd *cmd_ptr;
 
 	/* Handle SET if we have it */
-	if( cmdparams->bot->botsettings && !ircstrcasecmp( cmd, "SET" ) )
+	if( cmdparams->bot->botsettings && ircstrcasecmp( cmd, "SET" ) == 0 )
 	{
 		intrinsic_handler( cmdparams, bot_cmd_set );
 		return NS_SUCCESS;
 	}
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
-	if( !ircstrcasecmp( cmd, "LEVELS" ) && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS ) 
+	if( ircstrcasecmp( cmd, "LEVELS" ) == 0 && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS ) 
 		return NS_FAILURE;
 	while( cmd_ptr->cmd )
 	{
-		if( !ircstrcasecmp( cmd, cmd_ptr->cmd ) )
+		if( ircstrcasecmp( cmd, cmd_ptr->cmd ) == 0 )
 		{
 			intrinsic_handler( cmdparams, cmd_ptr->handler );
 			return NS_SUCCESS;
@@ -627,7 +627,7 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 		while( cmd_ptr->cmd )
 		{
 			/* Check for module override */	
-			if( !ircstrcasecmp( cmd_ptr->cmd, "LEVELS" ) && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS )
+			if( ircstrcasecmp( cmd_ptr->cmd, "LEVELS" ) == 0 && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS )
 			{
 				cmd_ptr++;
 				continue;
@@ -734,7 +734,7 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 	cmd_ptr = intrinsic_commands;
 	while( cmd_ptr->cmd )
 	{
-		if( !ircstrcasecmp( cmdparams->av[0], cmd_ptr->cmd ) )
+		if( ircstrcasecmp( cmdparams->av[0], cmd_ptr->cmd ) == 0 )
 		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext + 1 );
 			return NS_SUCCESS;
@@ -742,7 +742,7 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 		cmd_ptr++;
 	}
 	/* Handle SET if we have it */	
-	if( cmdparams->bot->botsettings && userlevel >= cmdparams->bot->set_ulevel && !ircstrcasecmp( cmdparams->av[0], "SET" ) )
+	if( cmdparams->bot->botsettings && userlevel >= cmdparams->bot->set_ulevel && ircstrcasecmp( cmdparams->av[0], "SET" ) == 0 )
 	{
 		bot_cmd_help_set( cmdparams, userlevel );		
 		return NS_SUCCESS;
@@ -851,7 +851,7 @@ static int bot_cmd_levels( const CmdParams *cmdparams )
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "No commands found." );
 		return NS_SUCCESS;
 	}
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "LIST" ) == 0 )
 	{
 		hnode_t *cmdnode;
 		hscan_t hs;

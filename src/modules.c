@@ -396,7 +396,7 @@ Module *ns_load_module( const char *modfilename, Client * u )
 	struct stat buf;
 
 	strlcpy( loadmodname, modfilename, 255 );
-	strlwr( loadmodname );
+	ns_strlwr( loadmodname );
 	ircsnprintf( path, 255, "%s/%s%s", MOD_PATH, loadmodname, MOD_STDEXT );
 	if( stat( path, &buf ) != -1 ) {
 		return load_stdmodule( path, u );

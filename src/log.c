@@ -112,7 +112,7 @@ static void make_log_filename( char *modname, char *logname )
 	
 	time_t t = time( NULL );
 	strftime( log_file_fmttime, TIMEBUFSIZE, LogFileNameFormat, localtime( &t ) );
-	strlwr( modname );
+	ns_strlwr( modname );
 	ircsnprintf( logname, MAXPATH, "logs/%s%s.log", modname, log_file_fmttime );
 }
 

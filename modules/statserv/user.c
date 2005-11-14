@@ -260,7 +260,7 @@ int ss_cmd_operlist( CmdParams *cmdparams )
 		flags = cmdparams->av[0];
 		operlistserver = cmdparams->av[1];
 	}
-	if( flags && !ircstrcasecmp( flags, "NOAWAY" ) )
+	if( flags && ircstrcasecmp( flags, "NOAWAY" ) == 0 )
 	{
 		operlistaway = 1;
 		flags = NULL;

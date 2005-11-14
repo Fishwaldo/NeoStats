@@ -694,11 +694,11 @@ static int hs_cmd_bans_del( const CmdParams *cmdparams )
 static int hs_cmd_bans( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "LIST" ) == 0 )
 		return hs_cmd_bans_list( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "ADD" ) == 0 )
 		return hs_cmd_bans_add( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "DEL" ) == 0 )
 		return hs_cmd_bans_del( cmdparams );
 	return NS_ERR_SYNTAX_ERROR;
 }
@@ -760,7 +760,7 @@ static int hs_cmd_chpass( const CmdParams *cmdparams )
 	if( ( match( vhe->host, cmdparams->source->user->hostname ) )
 		||( UserLevel( cmdparams->source ) >= 100 ) )
 	{
-		if( !ircstrcasecmp( vhe->passwd, cmdparams->av[1] ) )
+		if( ircstrcasecmp( vhe->passwd, cmdparams->av[1] ) == 0 )
 		{
 			strlcpy( vhe->passwd, cmdparams->av[2], MAXPASS );
 			irc_prefmsg( hs_bot, cmdparams->source, "Password changed" );
@@ -884,7 +884,9 @@ static int hs_cmd_list( const CmdParams *cmdparams )
 	}
 	if( cmdparams->ac == 2 )
 	{
-		if( !ircstrcasecmp(cmdparams->av[0], "nick") || !ircstrcasecmp(cmdparams->av[0], "host") || !ircstrcasecmp(cmdparams->av[0], "vhost"))
+		if( ircstrcasecmp(cmdparams->av[0], "nick") == 0 
+			|| ircstrcasecmp(cmdparams->av[0], "host") == 0 
+			|| ircstrcasecmp(cmdparams->av[0], "vhost") == 0 )
 		{
 			return hs_cmd_listwild(cmdparams);
 		}
@@ -957,7 +959,7 @@ static int hs_cmd_listwild( const CmdParams *cmdparams )
 		irc_prefmsg( hs_bot, cmdparams->source, "No vhosts are defined." );
 		return NS_SUCCESS;
 	}
-	if( !ircstrcasecmp( cmdparams->av[1], "*" ) )
+	if( ircstrcasecmp( cmdparams->av[1], "*" ) == 0 )
 	{
 		irc_prefmsg( hs_bot, cmdparams->source, "%s wildcard too broad, refine wildcard limit (%s).", cmdparams->av[0], cmdparams->av[1] );
 		return NS_SUCCESS;
@@ -971,7 +973,7 @@ static int hs_cmd_listwild( const CmdParams *cmdparams )
 	while( hn != NULL )
 	{
 		vhe = lnode_get( hn );
-		if ( (!ircstrcasecmp(cmdparams->av[0], "nick") && match(cmdparams->av[1], vhe->nick)) || (!ircstrcasecmp(cmdparams->av[0], "host") && match(cmdparams->av[1], vhe->host)) || (!ircstrcasecmp(cmdparams->av[0], "vhost") && match(cmdparams->av[1], vhe->vhost)) )
+		if ( ( ircstrcasecmp(cmdparams->av[0], "nick") == 0 && match(cmdparams->av[1], vhe->nick)) || (ircstrcasecmp(cmdparams->av[0], "host") == 0 && match(cmdparams->av[1], vhe->host)) || (ircstrcasecmp(cmdparams->av[0], "vhost") == 0 && match(cmdparams->av[1], vhe->vhost)) )
 		{
 			start++;
 			/* limit to PAGESIZE entries per screen */
@@ -1080,7 +1082,7 @@ static int hs_cmd_login( const CmdParams *cmdparams )
 	vhe = lnode_find( vhost_list, cmdparams->av[0], findnick );
 	if( vhe )
 	{
-		if( !ircstrcasecmp( vhe->passwd, cmdparams->av[1] ) )
+		if( ircstrcasecmp( vhe->passwd, cmdparams->av[1] ) == 0 )
 		{
 			irc_svshost( hs_bot, cmdparams->source, vhe->vhost );
 			irc_prefmsg( hs_bot, cmdparams->source, 

@@ -256,11 +256,11 @@ static int AccessList( const CmdParams *cmdparams )
 static int ea_cmd_access( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( !ircstrcasecmp( cmdparams->av[0], "ADD" ) ) 
+	if( ircstrcasecmp( cmdparams->av[0], "ADD" ) == 0 )
 		return AccessAdd( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) ) 
+	if( ircstrcasecmp( cmdparams->av[0], "DEL" ) == 0 )
 		return AccessDel( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) ) 
+	if( ircstrcasecmp( cmdparams->av[0], "LIST" ) == 0 )
 		return AccessList( cmdparams );
 	return NS_ERR_SYNTAX_ERROR;
 }

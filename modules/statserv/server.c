@@ -600,11 +600,11 @@ static int ss_cmd_server_stats( const CmdParams *cmdparams )
 int ss_cmd_server( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "LIST" ) == 0 )
 		return ss_cmd_server_list( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "DEL" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "DEL" ) == 0 )
 		return ss_server_del( cmdparams );
-	if( !ircstrcasecmp( cmdparams->av[0], "COPY" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "COPY" ) == 0 )
 		return ss_server_copy( cmdparams );	
 	return ss_cmd_server_stats( cmdparams );
 }

@@ -498,21 +498,21 @@ int ss_cmd_channel( const CmdParams *cmdparams )
 		GetChannelStats( top10membershandler, CHANNEL_SORT_MEMBERS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
 		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	}
-	else if( !ircstrcasecmp( cmdparams->av[0], "POP" ) )
+	else if( ircstrcasecmp( cmdparams->av[0], "POP" ) == 0 )
 	{
 		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Join Channels (Ever):" );
 		irc_prefmsg( ss_bot, cmdparams->source, "============================" );
 		GetChannelStats( top10joinshandler, CHANNEL_SORT_JOINS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
 		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	}
-	else if( !ircstrcasecmp( cmdparams->av[0], "KICKS" ) )
+	else if( ircstrcasecmp( cmdparams->av[0], "KICKS" ) == 0 )
 	{
 		irc_prefmsg( ss_bot,cmdparams->source, "Top 10 Kick Channels (Ever):" );
 		irc_prefmsg( ss_bot,cmdparams->source, "============================" );
 		GetChannelStats( top10kickshandler, CHANNEL_SORT_KICKS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
 		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	}
-	else if( !ircstrcasecmp( cmdparams->av[0], "TOPICS" ) )
+	else if( ircstrcasecmp( cmdparams->av[0], "TOPICS" ) == 0 )
 	{
 		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Topic Channels (Ever):" );
 		irc_prefmsg( ss_bot, cmdparams->source, "=============================" );

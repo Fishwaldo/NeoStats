@@ -78,7 +78,7 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 		nlog(LOG_WARNING, "Tried to execute a perl call when perl isn't loaded!");
 		return NS_FAILURE;
 	}
-
+	{
 	dSP;
 	ENTER;
 	SAVETMPS;
@@ -120,6 +120,7 @@ execute_perl (Module *mod, SV * function, int numargs, ...)
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
+	}
 #if 0
 	RESET_RUN_LEVEL();
 #endif

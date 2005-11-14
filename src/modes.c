@@ -573,7 +573,7 @@ int ChanModeHandler (Channel* c, const char *modes, int j, char **av, int ac)
 					modeexists = 0;
 					while (mn) {
 						m = lnode_get (mn);
-						if ((m->mask == mask) && !ircstrcasecmp (m->param, av[j])) {
+						if ((m->mask == mask) && ircstrcasecmp (m->param, av[j])== 0 ) {
 							dlog(DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, av[j]);
 							j++;
 							modeexists = 1;

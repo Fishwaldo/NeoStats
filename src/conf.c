@@ -595,7 +595,7 @@ static int cb_verify_neohost( cfg_t *cfg, cfg_opt_t *opt )
 		cfg_error( cfg, "Invalid hostname %s for option %s", opt->values[0]->string, opt->name );
 		return CFG_PARSE_ERROR;
 	}
-	if ((!ircstrcasecmp(opt->values[0]->string, "stats.neostats.net")) || (!ircstrcasecmp(opt->values[0]->string, "stats.somenet.net"))) {
+	if ((ircstrcasecmp(opt->values[0]->string, "stats.neostats.net")) == 0 || (ircstrcasecmp(opt->values[0]->string, "stats.somenet.net") == 0 )) {
 		cfg_error( cfg, "You must use a hostname other than %s", opt->values[0]->string);
 		return CFG_PARSE_ERROR;
 	}
@@ -644,7 +644,7 @@ static void cb_module( char *name )
 	{
 		for ( i = 0; ( i < NUM_MODULES ) && ( load_mods[i] != 0 ); i++ )
 		{
-			if( !ircstrcasecmp( load_mods[i], name ) )
+			if( ircstrcasecmp( load_mods[i], name ) == 0 )
 				return;
 		}
 		if( i < NUM_MODULES )

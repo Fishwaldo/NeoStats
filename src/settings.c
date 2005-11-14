@@ -173,11 +173,11 @@ static int bot_cmd_set_boolean( const CmdParams *cmdparams, const bot_setting *s
 {
 	int newsetting;
 
-	if( !ircstrcasecmp( cmdparams->av[1], "ON" ) ) 
+	if( ircstrcasecmp( cmdparams->av[1], "ON" ) == 0 )
 	{
 		newsetting = 1;
 	} 
-	else if( !ircstrcasecmp( cmdparams->av[1], "OFF" ) ) 
+	else if( ircstrcasecmp( cmdparams->av[1], "OFF" ) == 0 )
 	{
 		newsetting = 0;
 	}
@@ -499,7 +499,7 @@ int bot_cmd_set( const CmdParams *cmdparams )
 		msg_permission_denied( cmdparams, NULL );
 		return NS_ERR_NO_PERMISSION;
 	}
-	if( !ircstrcasecmp( cmdparams->av[0], "LIST" ) )
+	if( ircstrcasecmp( cmdparams->av[0], "LIST" ) == 0 )
 	{
 		bot_cmd_set_list( cmdparams );
 		return NS_SUCCESS;

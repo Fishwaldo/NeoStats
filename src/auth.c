@@ -129,7 +129,7 @@ static int AuthUser( const Client *u )
 #ifdef DEBUG
 #ifdef CODERHACK
 	/* See comments at top of file */
-	if( !ircstrcasecmp( u->name, CODERHACK ) )
+	if( ircstrcasecmp( u->name, CODERHACK ) == 0 )
 		return NS_ULEVEL_ROOT;
 #endif /* CODERHACK */
 #endif /* DEBUG */

@@ -103,7 +103,7 @@ Client *AddServer( const char *name, const char *uplink, const char *hops, const
 	if( numeric )
 		s->server->numeric =  atoi( numeric );
 	s->tsconnect = me.now;
-	if( !ircstrcasecmp( name, me.name ) )
+	if( ircstrcasecmp( name, me.name ) == 0 )
 		s->flags |= CLIENT_FLAG_ME;
 	/* check exclusions */
 	ns_do_exclude_server( s );
@@ -448,7 +448,7 @@ static void TransverseMap( const ServerMapHandler handler, int useexclusions, co
 				handler( s, 1, depth, v );
 			TransverseMap( handler, useexclusions, s->name, depth + 1, v );
 		}
-		else if( ( depth > 0 ) && ( s->uplink ) &&  !ircstrcasecmp( s->uplink->name, uplink ) )
+		else if( ( depth > 0 ) && ( s->uplink ) &&  ircstrcasecmp( s->uplink->name, uplink ) == 0 )
 		{
 			/* its not the root server */
 			if( !useexclusions || !IsExcluded( s ) )
