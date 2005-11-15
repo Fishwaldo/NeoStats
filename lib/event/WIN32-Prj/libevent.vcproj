@@ -288,15 +288,7 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="..\acconfig.h"
-				>
-			</File>
-			<File
 				RelativePath="..\WIN32-Code\config.h"
-				>
-			</File>
-			<File
-				RelativePath="..\compat\err.h"
 				>
 			</File>
 			<File
