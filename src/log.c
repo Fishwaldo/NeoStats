@@ -285,7 +285,7 @@ static void dlog_write( const char *time, const char *level, const char *line )
  *  @return none
  */
 
-void dlog( DEBUG_LEVEL level, const char *fmt, ... )
+void dlog( NS_DEBUG_LEVEL level, const char *fmt, ... )
 {
 	va_list ap;
 	
@@ -347,7 +347,7 @@ static void nlog_write( const char *time, const char *level, const char *line )
  *  @return none
  */
 
-void nlog( LOG_LEVEL level, const char *fmt, ... )
+void nlog( NS_LOG_LEVEL level, const char *fmt, ... )
 {
 	va_list ap;
 	

@@ -1336,7 +1336,6 @@ EXPORTFUNC int irc_setident( const Bot *botptr, const char *ident );
 /* Other */
 EXPORTFUNC int irc_stats( const char *source, const char type, const char *target );
 
-
 int irc_ping( const char *source, const char *reply, const char *to );
 int irc_pong( const char *reply );
 
@@ -1481,7 +1480,7 @@ EXPORTFUNC int DBAFetchRows( const char *table, DBRowHandler handler );
 /* log.c API export */
 /* define the log levels */
 
-typedef enum LOG_LEVEL {
+typedef enum NS_LOG_LEVEL {
 	LOG_CRITICAL=1,	/* critical crash type notices */
 	LOG_ERROR,		/* something is majorly wrong */
 	LOG_WARNING,	/* Hey, you should know about this type messages */
@@ -1489,11 +1488,11 @@ typedef enum LOG_LEVEL {
 	LOG_NORMAL,		/* our normal logging level? */
 	LOG_INFO,		/* lots of info about what we are doing */
 	LOG_LEVELMAX = LOG_INFO,
-} LOG_LEVEL;
+} NS_LOG_LEVEL;
 
 /* define debug levels */
 
-typedef enum DEBUG_LEVEL {
+typedef enum NS_DEBUG_LEVEL {
 	DEBUGRX=1,
 	DEBUGTX,
 	DEBUG1,
@@ -1507,7 +1506,7 @@ typedef enum DEBUG_LEVEL {
 	DEBUG9,
 	DEBUG10,
 	DEBUGMAX = DEBUG10,
-} DEBUG_LEVEL;
+} NS_DEBUG_LEVEL;
 
 /* this is for the neostats assert replacement. */
 /* Version 2.4 and later of GCC define a magical variable _PRETTY_FUNCTION__'
@@ -1536,8 +1535,8 @@ extern void nassert_fail( const char *expr, const char *file, const int line, co
 #define nassert(expr) (__ASSERT_VOID_CAST (0))
 #endif /* NDEBUG */
 
-EXPORTFUNC void nlog( LOG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
-EXPORTFUNC void dlog( DEBUG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void nlog( NS_LOG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
+EXPORTFUNC void dlog( NS_DEBUG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 
 /* List walk handler type */
 typedef int (*ChannelListHandler) ( Channel *c, void *v );

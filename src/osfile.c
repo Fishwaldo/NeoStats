@@ -45,7 +45,7 @@ int os_mkdir( const char *filename, mode_t mode )
 	int retval;
 
 #ifdef WIN32
-	retval = mkdir( filename );
+	retval = _mkdir( filename );
 #else
 	retval = mkdir( filename, mode );
 #endif
@@ -276,7 +276,11 @@ int os_write( int fd, const void *buffer, unsigned int count )
 {
 	int retval;
 
+#ifdef WIN32
+	retval = _write( fd, buffer, count );
+#else /* WIN32 */
 	retval = write( fd, buffer, count );
+#endif /* WIN32 */
 	os_file_errno = errno;
 	return retval;
 }
@@ -289,7 +293,11 @@ int os_close( int fd )
 {
 	int retval;
 
+#ifdef WIN32
+	retval = _close( fd );
+#else /* WIN32 */
 	retval = close( fd );
+#endif /* WIN32 */
 	os_file_errno = errno;
 	return retval;
 }
@@ -304,10 +312,10 @@ int os_mkstemp( char *ftemplate )
 	int retval;
 	char *name;
 
-	name = mktemp( ftemplate );
+	name = _mktemp( ftemplate );
 	if( name )
 	{
-		retval = open( name, _O_CREAT, _S_IREAD | _S_IWRITE );
+		retval = _open( name, _O_CREAT, _S_IREAD | _S_IWRITE );
 		os_file_errno = errno;
 		return retval;
 	}
@@ -326,7 +334,7 @@ int os_write_temp_file( char *ftemplate, const void *buffer, unsigned int count 
 #ifdef WIN32
 	char *name;
 
-	name = mktemp( ftemplate );
+	name = _mktemp( ftemplate );
 	if( name )
 	{
 		FILE* file;

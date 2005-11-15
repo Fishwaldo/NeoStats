@@ -33,9 +33,9 @@ typedef struct neoroot {
 /* general configuration items */
 typedef struct config {
 	/* log level */
-	LOG_LEVEL	loglevel;
+	NS_LOG_LEVEL	loglevel;
 	/* debug level */
-	DEBUG_LEVEL debuglevel;
+	NS_DEBUG_LEVEL debuglevel;
 	/* dont load modules on startup */
 	unsigned int modnoload:1;
 	/* dont output anything on start */
