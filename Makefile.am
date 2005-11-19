@@ -8,9 +8,9 @@ dist_data_DATA		= neostats.motd
 docdir			= @prefix@/doc
 dist_doc_DATA		= doc/FAQ doc/USERMAN
 
-DISTCLEANFILES		= ccdv
+DISTCLEANFILES		= autotools/ccdv
 
-EXTRA_DIST		= ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
+EXTRA_DIST		= autotools/ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
 
 all-local:
 		if test ! -f .message; then \

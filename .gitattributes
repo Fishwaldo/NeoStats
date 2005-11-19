@@ -24,6 +24,7 @@ autotools/aclocal.m4 -text
 autotools/ax_maintainer_mode_auto_silent.m4 -text
 autotools/ax_path_lib_curl.m4 -text
 autotools/ax_path_lib_pcre.m4 -text
+autotools/ccdv.c -text
 autotools/ccdv.m4 -text
 autotools/compile -text
 autotools/config.guess -text
@@ -36,7 +37,6 @@ autotools/missing -text
 autotools/mkinstalldirs -text
 autotools/rules.mk -text
 autotools/shtool -text
-/ccdv.c -text
 /configure -text
 /configure.in -text
 data/niconfig.db -text

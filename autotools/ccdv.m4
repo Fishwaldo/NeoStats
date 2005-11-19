@@ -73,7 +73,7 @@ do
 	fi
 done
 if test "x$CCDV" = "x" ; then
-	${CC-cc} $DEFS $CPPFLAGS $CFLAGS "ccdv.c" -o "ccdv" >/dev/null 2>&1
+	${CC-cc} $DEFS $CPPFLAGS $CFLAGS "autotools/ccdv.c" -o "ccdv" >/dev/null 2>&1
 	strip ./ccdv >/dev/null 2>&1
 	./ccdv >/dev/null 2>&1
 	if test $? -eq 96 ; then
