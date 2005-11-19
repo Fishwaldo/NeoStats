@@ -833,8 +833,8 @@ static int hs_cmd_add( const CmdParams *cmdparams )
 	irc_prefmsg( hs_bot, cmdparams->source, 
 		"%s has successfully been registered under realhost: %s vhost: %s and password: %s",
 		cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3] );
-	CommandReport( hs_bot, "%s added a vhost for %s with realhost %s vhost %s and password %s",
-	    cmdparams->source->name, cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3] );
+	CommandReport( hs_bot, "%s added a vhost for %s with realhost %s vhost %s",
+	    cmdparams->source->name, cmdparams->av[0], cmdparams->av[1], cmdparams->av[2] );
 	/* Apply hostname if user online */
 	u = FindUser( cmdparams->av[0] );
 	if( u && !IsMe( u ) )
