@@ -1708,4 +1708,10 @@ EXPORTFUNC void *GetBotModValue( const Bot *pBot );
 
 EXPORTFUNC void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len);
 
+#ifdef BUILDINGMOD
+/* these defines collide with modules that include neostats.h */
+#undef PACKAGE
+#undef VERSION
+#endif
+
 #endif /* NEOSTATS_H */
