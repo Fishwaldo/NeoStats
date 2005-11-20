@@ -140,7 +140,7 @@ void ResetStatisticEntry( statisticentry *stat, unsigned int current )
 
 void ResetStatistic( statistic *stat )
 {
-	struct tm *ts = gmtime( &me.now );
+	struct tm *ts = localtime( &me.now );
 
 	/* Reset daily on first hour of day( i.e. midnight ) */
 	if( ts->tm_hour == 0 )
