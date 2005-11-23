@@ -23,8 +23,8 @@
 ** $Id$
 */
 
-#ifndef NEOSTATS_H
-#define NEOSTATS_H
+#ifndef _NEOSTATS_H_
+#define _NEOSTATS_H_
 
 #ifdef WIN32
 #include "configwin32.h"
@@ -1229,7 +1229,7 @@ EXPORTFUNC Sock *FindSock( const char *sock_name );
 EXPORTFUNC OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port );
 EXPORTFUNC Sock *add_listen_sock( const char *sock_name, const int port, int type, sockcb acceptcb, void *data );
 EXPORTFUNC Sock *add_linemode_socket( const char *sock_name, OS_SOCKET socknum, sockfunccb readcb, sockcb errcb, void *arg );
-EXPORTFUNC int send_to_sock( Sock *sock, const char *buf, const int buflen );
+EXPORTFUNC int send_to_sock( Sock *sock, const char *buf, size_t buflen );
 
 /* Add a new bot to NeoStats */
 EXPORTFUNC Bot *AddBot( BotInfo *botinfo );
@@ -1237,8 +1237,8 @@ EXPORTFUNC Bot *AddBot( BotInfo *botinfo );
 EXPORTFUNC Bot *FindBot( const char *bot_name );
 
 /* main.c */
-EXPORTFUNC void fatal_error( char *file, int line, const char *func, char *error_text) __attribute__((noreturn));;
-#define FATAL_ERROR(error_text) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__, (error_text) ); 
+EXPORTFUNC void fatal_error( char *file, int line, const char *func, char *error_text ) __attribute__( ( noreturn ) );
+#define FATAL_ERROR( error_text ) fatal_error(__FILE__, __LINE__, __PRETTY_FUNCTION__, ( error_text ) ); 
 
 /* nsmemory.c */
 EXPORTFUNC void *ns_malloc( size_t size );
@@ -1609,6 +1609,7 @@ EXPORTFUNC int os_close( int fd );
 EXPORTFUNC int os_mkstemp( char *ftemplate );
 EXPORTFUNC int os_write_temp_file( char *ftemplate, const void *buffer, unsigned int count );
 EXPORTFUNC int os_file_get_size( const char *filename );
+EXPORTFUNC int os_chmod( const char *filename, int pmode );
 EXPORTVAR extern int os_file_errno;
 
 EXPORTFUNC char *os_strerror( void );
@@ -1714,4 +1715,4 @@ EXPORTFUNC void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len);
 #undef VERSION
 #endif
 
-#endif /* NEOSTATS_H */
+#endif /* _NEOSTATS_H_ */

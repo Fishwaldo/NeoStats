@@ -184,7 +184,7 @@ char *strdup( const char *src )
 	/* Allocate count plus one for trailing NULL */
 	dup = ( char* )ns_malloc( strlen( src ) + 1 );
 	/* Copy string into created buffer */
-	strcpy( dup, src );
+	strlcpy( dup, src, strlen( src ) + 1 );
 	/* Return pointer to duplicated string */
 	return dup;
 }

@@ -523,6 +523,11 @@
 /* Define if we have __va_copy. */
 /* #undef HAVE___VA_COPY */
 
+/* "PCRE Lnk size" */
+#define LINK_SIZE   2
+#define MATCH_LIMIT 10000000
+#define POSIX_MALLOC_THRESHOLD 10
+
 /* Additional Win32 specifics */
 #define __PRETTY_FUNCTION__ __FUNCTION__
 #define inline __inline
@@ -542,13 +547,6 @@
 typedef int int_t;
 /* perl uses a different typedef, this will avoid it */
 typedef unsigned short mode_t; 
-
-/* Disable warning for:
-   warning C4267: 'function' : conversion from 'size_t' to 'const int', possible loss of data */
-#pragma warning( disable : 4267 )
-/* Disable warning for:
-   warning C4311: 'type cast' : pointer truncation from 'void *' to 'int' */
-#pragma warning( disable : 4311 )
 
 struct pollfd { int fd; short events; short revents; };
 #define POLLIN  1

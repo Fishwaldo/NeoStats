@@ -286,6 +286,23 @@ int os_write( int fd, const void *buffer, unsigned int count )
 }
 
 /*
+ *  Wrapper function for chmod
+ */
+
+int os_chmod( const char *filename, int pmode )
+{
+	int retval;
+
+#ifdef WIN32
+	retval = _chmod( filename, pmode );
+#else /* WIN32 */
+	retval = chmod( filename, pmode );
+#endif /* WIN32 */
+	os_file_errno = errno;
+	return retval;
+}
+
+/*
  *  Wrapper function for close
  */
 

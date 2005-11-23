@@ -120,7 +120,7 @@ static int dcc_write( Client *dcc, const char *buf )
 	dlog( DEBUG1, "DCCTX: %s", buf );
 	strlcpy( dcc_buf, buf, BUFSIZE );
 	strlcat( dcc_buf, "\n", BUFSIZE );
-	if( send_to_sock( dcc->sock, dcc_buf, strlen( dcc_buf ) ) == NS_FAILURE )
+	if( send_to_sock( dcc->sock, dcc_buf, strnlen( dcc_buf, BUFSIZE ) ) == NS_FAILURE )
 	{
 		nlog( LOG_WARNING, "Got a write error when attempting to write %d", errno );
 		DelDCCClient( dcc );
@@ -149,7 +149,7 @@ static int dcc_parse( void *arg, void *rline, int len )
 	Client *dcc = ( Client * )arg;
 	CmdParams *cmdparams;
 
-	strcpy( buf, line );
+	strlcpy( buf, line, BUFSIZE );
 	dlog( DEBUG1, "DCCRX: %s", line );
 	if( buf[0] == '.' )
 	{

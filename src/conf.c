@@ -154,13 +154,10 @@ static validate_args arg_validate[] = {
 static void ConfParseError( int err )
 {
 #ifdef WIN32
-	static char cwd[MAXPATH];
-
 	switch( err )
 	{
 		case CFG_FILE_ERROR:
-			getcwd( cwd, MAXPATH );
-			nlog( LOG_ERROR, "Config file not found in %s", cwd );
+			nlog( LOG_ERROR, "Config file not found" );
 			break;
 		case CFG_PARSE_ERROR:
 			nlog( LOG_ERROR, "Config Parse Error" );

@@ -713,7 +713,7 @@ void HTMLOutput( void )
 	os_fclose( tpl );
 	os_fclose( opf );
     /* update the umode so others can read it and owner can overwrite it */
-    chmod(StatServ.htmlpath, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+    os_chmod( StatServ.htmlpath, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH );
 }
 
 /** @brief HTMLOutputTimer

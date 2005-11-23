@@ -602,7 +602,7 @@ void send_cmd( const char *fmt, ... )
 {
 	va_list ap;
 	char buf[BUFSIZE];
-	int buflen;
+	size_t buflen;
 	
 	va_start( ap, fmt );
 	ircvsnprintf( buf, BUFSIZE, fmt, ap );
@@ -616,7 +616,7 @@ void send_cmd( const char *fmt, ... )
 		buf[BUFSIZE - 2] = '\n';
 	}
 	buflen = strnlen( buf, BUFSIZE );
-	send_to_sock(me.servsock, buf, buflen);
+	send_to_sock( me.servsock, buf, buflen );
 }
 
 /** @brief unsupported_cmd

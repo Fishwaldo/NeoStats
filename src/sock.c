@@ -247,8 +247,8 @@ OS_SOCKET sock_connect( int socktype, struct in_addr ip, int port )
  * @return NS_SUCCESS or NS_FAILURE
  */
 
-int
-send_to_sock(Sock *sock, const char *buf, const int buflen) {
+int send_to_sock( Sock *sock, const char *buf, size_t buflen )
+{
 	int sent;
 
 	if (!sock) {
