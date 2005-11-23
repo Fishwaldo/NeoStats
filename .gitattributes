@@ -320,7 +320,6 @@ lib/pcre/COPYING -text
 lib/pcre/Makefile.am -text
 lib/pcre/Makefile.in -text
 lib/pcre/README -text
-lib/pcre/configwin32.h -text
 lib/pcre/dftables.c eol=lf
 lib/pcre/get.c eol=lf
 lib/pcre/internal.h eol=lf

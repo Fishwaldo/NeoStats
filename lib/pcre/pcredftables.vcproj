@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="pcredftables"
 	ProjectGUID="{310EA68C-162C-4C51-803D-32F800E6F311}"
+	RootNamespace="pcredftables"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -40,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\..\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,6 +119,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="..\..\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
