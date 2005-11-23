@@ -255,7 +255,7 @@ int send_to_sock( Sock *sock, const char *buf, size_t buflen )
 		nlog(LOG_WARNING, "Not sending to socket as we have a invalid socket");
 		return NS_FAILURE;
 	}
-	if ((sock->socktype == SOCK_BUFFERED) | (sock->socktype == SOCK_LINEMODE)) {
+	if ((sock->socktype == SOCK_BUFFERED) || (sock->socktype == SOCK_LINEMODE)) {
     	/* the linemode socket is a buffered socket */
     	sent = bufferevent_write(sock->event.buffered, (void *)buf, buflen);
     	if (sent == -1) {
@@ -265,7 +265,7 @@ int send_to_sock( Sock *sock, const char *buf, size_t buflen )
     		DelSock(sock);
 	    	return NS_FAILURE;		
     	}
-    } else if ((sock->socktype == SOCK_NATIVE) | (sock->socktype == SOCK_STANDARD)) {
+    } else if ((sock->socktype == SOCK_NATIVE) || (sock->socktype == SOCK_STANDARD)) {
         sent = os_sock_write(sock->sock_no, buf, buflen);
         if (sent == -1) {
 			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
