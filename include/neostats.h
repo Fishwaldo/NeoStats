@@ -1448,6 +1448,52 @@ EXPORTFUNC int ValidateChannelWild( const char *channel_name );
 EXPORTFUNC int ValidateChannelKey( const char *key );
 EXPORTFUNC int IsJustWildcard( const char *mask, int ishostmask );
 
+/* Database descriptor framework (work in progress) */
+typedef enum NS_FIELD_TYPE
+{
+	NS_FIELD_TYPE_NONE = -1,
+	NS_FIELD_TYPE_BOOLEAN = 0,
+	NS_FIELD_TYPE_INT,
+	NS_FIELD_TYPE_STRING,
+} NS_FIELD_TYPE;
+
+typedef struct NS_FIELD
+{
+	/* name */
+	const char *name;
+	/* description */
+	const char *desc;
+	/* type */
+	NS_FIELD_TYPE type;
+	/* size */
+	size_t size;
+	/* offset in record */
+	size_t offset;
+	/* flags */
+	unsigned int flags;
+} NS_FIELD;
+
+typedef struct NS_TABLE
+{
+	/* name */
+	const char *name;
+	/* description */
+	const char *desc;
+	/* pointer to field list */
+	NS_FIELD *fields;
+	/* pointer to data */
+	void *address;
+	/* Record size */
+	size_t size;
+	/* flags */
+	unsigned int flags;
+} NS_TABLE;
+
+#define NS_FIELD_INT( name, desc, offset ) { ( name ), ( desc ), NS_FIELD_TYPE_INT, sizeof( int ), ( offset ), 0 }
+
+#define NS_FIELD_END() { NULL, NULL, NS_FIELD_TYPE_NONE, 0, 0, 0 }
+
+/* DBA */
 #define CONFIG_TABLE_NAME	"config"
 
 /* Row fetch handler type */

@@ -91,12 +91,13 @@ static int irc_sock_error( int what, void *data )
  * @return socket connected to on success
  *         NS_FAILURE on failure 
  */
-static OS_SOCKET ConnectTo (char *host, int port)
+static OS_SOCKET ConnectTo( const char *host, int port )
 {
 	struct hostent *hp;
 	OS_SOCKET s;
 
-	if ((hp = gethostbyname (host)) == NULL) {
+	if ((hp = gethostbyname (host)) == NULL)
+	{
 		return NS_FAILURE;
 	}
 	os_memset( &me.srvip, 0, sizeof( me.srvip ) );
@@ -131,7 +132,8 @@ static
 void read_loop( void )
 {
 	me.lastmsg = me.now;
-	while (1) { /* loop till we get a error */
+	for( ; ; ) /* loop till we get a error */
+	{
 		SET_SEGV_LOCATION();
 		update_time_now();
 #ifdef CURLHACK
@@ -656,11 +658,10 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
 	os_memset( ( void * ) &srvskt, 0, sizeof( struct sockaddr_in ) );
 	srvskt.sin_family = AF_INET;
 	/* bind to the local IP */
-	if (me.dobind) {
+	if (me.dobind)
 		srvskt.sin_addr = me.lsa.sin_addr;
-	} else {
+	else
 		srvskt.sin_addr.s_addr = INADDR_ANY;
-	}
 	srvskt.sin_port = htons( port );
 	if( ( s = os_sock_socket( AF_INET, type, 0 ) ) < 0 )
 	{
@@ -845,7 +846,7 @@ Sock *AddSock( SOCK_TYPE type, const char *sock_name, int socknum, sockfunccb re
  *  @return none
  */
 
-static void CloseSock( Sock *sock )
+static void CloseSock( const Sock *sock )
 {
 	switch (sock->socktype) {
 		case SOCK_STANDARD:
@@ -898,8 +899,7 @@ int DelSock( Sock *sock )
  * 
  * @return NS_SUCCESS if deleted, NS_FAILURE if not found
 */
-int
-del_sockets (Module *mod_ptr)
+int del_sockets( const Module *mod_ptr )
 {
 	Sock *sock;
 	hnode_t *socknode;

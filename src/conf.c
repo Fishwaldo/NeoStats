@@ -437,12 +437,12 @@ static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 		cfg_error( cfg, "Error testing bind setting." );
 		return CFG_PARSE_ERROR;
 	}
-	os_memset(&me.lsa, 0, sizeof(me.lsa));
 	if ( ( hp = gethostbyname( opt->values[0]->string ) ) == NULL )
 	{
 		cfg_error( cfg, "Unable to bind to address %s for option %s: %s", opt->values[0]->string, opt->name, strerror( errno ) );
 		return CFG_PARSE_ERROR;
 	}
+	os_memset(&me.lsa, 0, sizeof(me.lsa));
     os_memcpy( ( char * )&me.lsa.sin_addr, hp->h_addr, hp->h_length );
 	me.lsa.sin_family = hp->h_addrtype;
 	if( os_sock_bind( s, ( struct sockaddr * ) &me.lsa, sizeof( me.lsa ) ) == SOCKET_ERROR )
@@ -450,7 +450,7 @@ static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 		cfg_error( cfg, "Unable to bind to address %s for option %s: %s", opt->values[0]->string, opt->name, os_sock_getlasterrorstring() );
 		return CFG_PARSE_ERROR;
 	}
-	/* if we get here, the socket is ok*/
+	/* if we get here, the socket is ok */
 	os_sock_close( s );
 	me.dobind = 1;
 	return CFG_SUCCESS;

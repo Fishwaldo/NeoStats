@@ -31,7 +31,7 @@
 int InitSocks( void );
 void FiniSocks( void );
 int ns_cmd_socklist( const CmdParams *cmdparams );
-int del_sockets( Module *mod_ptr );
+int del_sockets( const Module *mod_ptr );
 void Connect( void );
 int check_sql_sock( void );
 
