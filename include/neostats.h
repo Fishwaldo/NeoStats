@@ -314,26 +314,26 @@ EXPORTVAR extern unsigned int ircd_supported_cumodes;
 #define IsServerOperMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
 #define IsServerOperSMode( mode ) ( mode & ( UMODE_ADMIN | UMODE_COADMIN | UMODE_OPER | UMODE_LOCOP ) )
 
-EXPORTFUNC unsigned int UmodeCharToMask( const unsigned char mode );
-EXPORTFUNC const char *GetUmodeDesc( const unsigned int mask );
-EXPORTFUNC unsigned int SmodeCharToMask( const unsigned char mode );
-EXPORTFUNC const char *GetSmodeDesc( const unsigned int mask );
+EXPORTFUNC unsigned int UmodeCharToMask( unsigned char mode );
+EXPORTFUNC const char *GetUmodeDesc( unsigned int mask );
+EXPORTFUNC unsigned int SmodeCharToMask( unsigned char mode );
+EXPORTFUNC const char *GetSmodeDesc( unsigned int mask );
 EXPORTFUNC unsigned int UmodeStringToMask( const char *UmodeString );
-EXPORTFUNC char *UmodeMaskToString( const unsigned int mask );
-EXPORTFUNC unsigned char UmodeMaskToChar( const unsigned int mask );
+EXPORTFUNC char *UmodeMaskToString( unsigned int mask );
+EXPORTFUNC unsigned char UmodeMaskToChar( unsigned int mask );
 EXPORTFUNC unsigned int SmodeStringToMask( const char *UmodeString );
-EXPORTFUNC char *SmodeMaskToString( const unsigned int mask );
-EXPORTFUNC unsigned char SmodeMaskToChar( const unsigned int mask );
+EXPORTFUNC char *SmodeMaskToString( unsigned int mask );
+EXPORTFUNC unsigned char SmodeMaskToChar( unsigned int mask );
 EXPORTFUNC unsigned int CmodeStringToMask( const char *UmodeString );
-EXPORTFUNC char *CmodeMaskToString( const unsigned int mask );
-EXPORTFUNC char *CmodeMaskToPrefixString( const unsigned int mask );
-EXPORTFUNC unsigned int CmodeCharToMask( const unsigned char mode );
-EXPORTFUNC unsigned char CmodeMaskToChar( const unsigned int mask );
-EXPORTFUNC unsigned int CmodeCharToFlags( const unsigned char mode );
-EXPORTFUNC unsigned int CmodePrefixToMask( const unsigned char prefix );
-EXPORTFUNC unsigned char CmodePrefixToChar( const unsigned char prefix );
-EXPORTFUNC unsigned char CmodeMaskToPrefix( const unsigned int mask );
-EXPORTFUNC unsigned char CmodeCharToPrefix( const unsigned char mode );
+EXPORTFUNC char *CmodeMaskToString( unsigned int mask );
+EXPORTFUNC char *CmodeMaskToPrefixString( unsigned int mask );
+EXPORTFUNC unsigned int CmodeCharToMask( unsigned char mode );
+EXPORTFUNC unsigned char CmodeMaskToChar( unsigned int mask );
+EXPORTFUNC unsigned int CmodeCharToFlags( unsigned char mode );
+EXPORTFUNC unsigned int CmodePrefixToMask( unsigned char prefix );
+EXPORTFUNC unsigned char CmodePrefixToChar( unsigned char prefix );
+EXPORTFUNC unsigned char CmodeMaskToPrefix( unsigned int mask );
+EXPORTFUNC unsigned char CmodeCharToPrefix( unsigned char mode );
 
 #ifdef NEOSTATS_REVISION
 #define NEOSTATS_VERSION VERSION " (" NEOSTATS_REVISION ") " NS_HOST

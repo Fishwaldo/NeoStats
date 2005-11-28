@@ -113,6 +113,7 @@ irc_cmd intrinsic_cmd_list[] =
 	{&MSG_GLINE, &TOK_GLINE, _m_gline, 0},
 	{&MSG_REMGLINE, &TOK_REMGLINE, _m_remgline, 0},
 	{&MSG_ERROR, &TOK_ERROR, _m_error, 0},
+	{&MSG_WHOIS, &TOK_WHOIS, _m_whois, 0},
 	{0, 0, 0, 0},
 };
 
@@ -212,6 +213,31 @@ void _m_error( char *origin, char **argv, int argc, int srv )
 	fprintf(stderr, "IRCD reported error: %s", argv[0] );
 	nlog (LOG_ERROR, "IRCD reported error: %s", argv[0] );
 	do_exit (NS_EXIT_ERROR, argv[0] );
+}
+
+/** @brief _m_whois
+ *
+ *  process WHOIS command
+ *  RX:
+ *    :Mark WHOIS neostats :neostats
+ *  Format:
+ *    :origin WHOIS server :target
+ *
+ *  @param origin source of message (user/server)
+ *  @param argv list of message parameters
+ *	  argv[0] = 
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
+ */
+
+void _m_whois( char *origin, char **argv, int argc, int srv )
+{
+	if( ircd_srv.protocol & PROTOCOL_P10 )
+		do_whois( base64_to_nick( origin ), argv[0], argv[1] );
+	else
+		do_whois( origin, argv[0], argv[1] );
 }
 
 /** @brief _m_ignorecommand
@@ -2386,4 +2412,46 @@ void do_chgname( const char *nick, const char *realname )
 	}
 	dlog( DEBUG1, "do_chgname: setting realname of user %s to %s", nick, realname );
 	strlcpy( u->info, realname, MAXHOST );
+}
+
+/** @brief do_whois
+ *
+ *  WHOIS handler
+ *
+ *  @param origin nick requesting whois
+ *  @param server to query
+ *  @param target nick to whois
+ *
+ *  @return none
+ */
+
+void do_whois( const char *origin, const char *server, const char *target )
+{
+	Client *u, *t;
+
+	dlog( DEBUG4, "do_whois: %s %s %s", origin, server, target );
+	u = FindUser( origin );
+	if( !u )
+	{
+		nlog( LOG_WARNING, "do_whois: origin %s not found", origin );
+		return;
+	}
+	t = FindUser( target );
+	if( t == NULL )
+	{
+		irc_numeric( ERR_NOSUCHNICK, origin, "%s :No such nick/channel", target );
+	}
+	else
+	{
+		irc_numeric( RPL_WHOISUSER, origin, "%s %s@%s * :%s", t->name, t->user->username, t->user->vhost, t->info );
+		if( t->user->bot == NULL )
+		{
+			irc_numeric( RPL_WHOISSERVER, origin, "%s %s :%s", target, t->uplink->name, t->uplink->info );
+		}
+		else if( t->user->bot->flags & BOT_FLAG_SERVICEBOT )
+		{
+			irc_numeric( RPL_WHOISUSER, origin, "%s :is an IRC operator", target );
+		}
+	}
+	irc_numeric( RPL_ENDOFWHOIS, origin, "%s :End of WHOIS list", target );
 }

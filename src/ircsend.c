@@ -224,6 +224,7 @@ static protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_cloakhost, NULL, "cloakhost", NULL, NULL, NULL, NULL, 0, 0},
 	{( void * )&irc_send_stats, _send_stats, "send_stats", &MSG_STATS, "MSG_STATS", &TOK_STATS, "TOK_STATS", 0, 0 },
 	{( void * )&irc_send_version, _send_version, "send_version", &MSG_VERSION, "MSG_VERSION", &TOK_VERSION, "TOK_VERSION", 0, 0 },
+	{( void * )NULL, NULL ,NULL, &MSG_WHOIS, "MSG_WHOIS", &TOK_WHOIS, "TOK_WHOIS", 0, 0 },
 	{( void * )NULL, NULL ,NULL, &MSG_MOTD, "MSG_MOTD", &TOK_MOTD, "TOK_MOTD", 0, 0 },
 	{( void * )NULL, NULL ,NULL, &MSG_ADMIN, "MSG_ADMIN", &TOK_ADMIN, "TOK_ADMIN", 0, 0 },
 	{( void * )NULL, NULL ,NULL, &MSG_CREDITS, "MSG_CREDITS", &TOK_CREDITS, "TOK_CREDITS", 0, 0 },
@@ -308,7 +309,7 @@ static void _send_numeric( const char *source, const int numeric, const char *ta
 	if( ircd_srv.protocol & PROTOCOL_P10 )
 		send_cmd( "%s %d %s :%s", me.s->name64, numeric, nick_to_base64( target ), buf );
 	else
-		send_cmd( ":%s %d %s :%s", source, numeric, target, buf );
+		send_cmd( ":%s %d %s %s", source, numeric, target, buf );
 }
 
 static void _send_privmsg( const char *source, const char *target, const char *buf )

@@ -221,6 +221,8 @@ MSGDEF( MSG_GLINE );
 MSGDEF( TOK_GLINE );
 MSGDEF( MSG_REMGLINE );
 MSGDEF( TOK_REMGLINE );
+MSGDEF( MSG_WHOIS );
+MSGDEF( TOK_WHOIS );
 
 EXPORTVAR extern char *numeric219;
 EXPORTVAR extern char *numeric242;
@@ -281,6 +283,7 @@ EXPORTFUNC void _m_unkline( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_gline( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_remgline( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_error( char *origin, char **argv, int argc, int srv );
+EXPORTFUNC void _m_whois( char *origin, char **argv, int argc, int srv );
 EXPORTFUNC void _m_ignorecommand( char *origin, char **argv, int argc, int srv );
 
 EXPORTFUNC void do_synch_neostats( void );
@@ -342,6 +345,7 @@ EXPORTFUNC void do_chgname( const char *nick, const char *realname );
 EXPORTFUNC void do_globops( const char *origin, const char *message );
 EXPORTFUNC void do_wallops( const char *origin, const char *message );
 EXPORTFUNC void do_chatops( const char *origin, const char *message );
+EXPORTFUNC void do_whois( const char *origin, const char *server, const char *target );
 
 /* Defined in ircd specific files */
 MODULEFUNC void send_privmsg( const char *source, const char *target, const char *buf );

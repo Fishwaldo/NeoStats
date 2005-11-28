@@ -303,6 +303,11 @@ void KillUser( const char *source, const char *nick, const char *reason )
 		nlog( LOG_NOTICE, "KillUser: deleting bot %s as it was killed", u->name );
 		SendModuleEvent( EVENT_BOTKILL, cmdparams, u->user->bot->moduleptr );
 	}
+	/* Send QUIT event so modules can just watch signon/off rather than being forced 
+	   to watch and process KILL */
+	cmdparams->target = NULL;
+	cmdparams->source = u;
+	SendAllModuleEvent( EVENT_QUIT, cmdparams );
 	deluser( u );
 	ns_free( killbuf );
 	ns_free( killreason );
