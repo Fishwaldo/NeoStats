@@ -78,6 +78,7 @@ static NS_TABLE ModuleTable =
 	"Modules",
 	"List of modules",
 	ModuleTableFields,
+	NULL,
 	sizeof( Module ),
 	0
 };
