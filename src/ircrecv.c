@@ -2453,5 +2453,5 @@ void do_whois( const char *origin, const char *server, const char *target )
 			irc_numeric( RPL_WHOISUSER, origin, "%s :is an IRC operator", target );
 		}
 	}
-	irc_numeric( RPL_ENDOFWHOIS, origin, "%s :End of WHOIS list", target );
+	irc_numeric( RPL_ENDOFWHOIS, origin, "%s :End of /WHOIS list", target );
 }
