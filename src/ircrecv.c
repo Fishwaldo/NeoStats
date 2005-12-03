@@ -667,11 +667,14 @@ void _m_away( char *origin, char **argv, int argc, int srv )
 	{
 		char *buf;
 
-		if( argc > 0 ) {
+		if( argc > 0 )
+		{
 			buf = joinbuf( argv, argc, 0 );
 			do_away( base64_to_nick( origin ), buf );
 			ns_free( buf );
-		} else {
+		}
+		else
+		{
 			do_away( base64_to_nick( origin ), NULL );
 		}
 	}
@@ -732,7 +735,7 @@ void _m_squit( char *origin, char **argv, int argc, int srv )
 		const char *b64argv0;
 
 		b64argv0 = base64_to_server( argv[0] );
-		if( b64argv0 )
+		if( b64argv0 != NULL )
 			do_squit( b64argv0, argv[2] );
 		else
 			do_squit( argv[0], argv[2] );
@@ -1313,18 +1316,21 @@ void _m_remgline( char *origin, char **argv, int argc, int srv )
 void _m_notice( char *origin, char **argv, int argc, int srv )
 {
 	SET_SEGV_LOCATION();
-	if( argv[0] == NULL ) {
+	if( argv[0] == NULL )
+	{
 		dlog( DEBUG1, "_m_notice: dropping notice from %s to NULL: %s", origin, argv[argc-1] );
 		return;
 	}
 	dlog( DEBUG1, "_m_notice: from %s, to %s : %s", origin, argv[0], argv[argc-1] );
 	/* who to */
-	if( argv[0][0] == '#' ) {
+	if( argv[0][0] == '#' )
+	{
 		bot_chan_notice( origin, argv, argc );
 		return;
 	}
 #if 0
-	if( ircstrcasecmp( argv[0], "AUTH" ) == 0 ) {
+	if( ircstrcasecmp( argv[0], "AUTH" ) == 0 )
+	{
 		dlog( DEBUG1, "_m_notice: dropping server notice from %s, to %s : %s", origin, argv[0], argv[argc-1] );
 		return;
 	}
@@ -1353,20 +1359,25 @@ void _m_private( char *origin, char **argv, int argc, int cmdptr )
 	char target[64];
 
 	SET_SEGV_LOCATION();
-	if( argv[0] == NULL ) {
+	if( argv[0] == NULL )
+	{
 		dlog( DEBUG1, "_m_private: dropping privmsg from %s to NULL: %s", origin, argv[argc-1] );
 		return;
 	}
 	dlog( DEBUG1, "_m_private: from %s, to %s : %s", origin, argv[0], argv[argc-1] );
 	/* who to */
-	if( argv[0][0] == '#' ) {
+	if( argv[0][0] == '#' )
+	{
 		bot_chan_private( origin, argv, argc );
 		return;
 	}
-	if( strstr( argv[0], "!" ) ) {
+	if( strstr( argv[0], "!" ) != NULL )
+	{
 		strlcpy( target, argv[0], 64 );
 		argv[0] = strtok( target, "!" );
-	} else if( strstr( argv[0], "@" ) ) {
+	}
+	else if( strstr( argv[0], "@" ) != NULL )
+	{
 		strlcpy( target, argv[0], 64 );
 		argv[0] = strtok( target, "@" );
 	}
@@ -1390,7 +1401,7 @@ void do_globops( const char *origin, const char *message )
 
 	dlog( DEBUG1, "GLOBOPS: %s %s", origin, message );
 	c = FindClient( origin );
-	if( c )
+	if( c != NULL )
 	{
 		cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 		cmdparams->source = c;
@@ -1417,7 +1428,7 @@ void do_wallops( const char *origin, const char *message )
 
 	dlog( DEBUG1, "WALLOPS: %s %s", origin, message );
 	c = FindClient( origin );
-	if( c )
+	if( c != NULL )
 	{
 		cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 		cmdparams->source = c;
@@ -1444,7 +1455,7 @@ void do_chatops( const char *origin, const char *message )
 
 	dlog( DEBUG1, "CHATOPS: %s %s", origin, message );
 	c = FindClient( origin );
-	if( c )
+	if( c != NULL )
 	{
 		cmdparams = ( CmdParams* )ns_calloc( sizeof( CmdParams ) );
 		cmdparams->source = c;
@@ -1481,7 +1492,8 @@ void do_synch_neostats( void )
 void do_ping( const char *origin, const char *destination )
 {
 	irc_pong( origin );
-	if( ircd_srv.burst ) {
+	if( ircd_srv.burst )
+	{
 		irc_ping( me.name, origin, origin );
 	}
 }
@@ -1501,7 +1513,8 @@ void do_pong( const char *origin, const char *destination )
 	CmdParams * cmdparams;
 
 	s = FindServer( origin );
-	if( s ) {
+	if( s != NULL )
+	{
 		s->server->ping = me.now - me.tslastping;
 		if( me.ulag > 1 )
 			s->server->ping -= me.ulag;
@@ -1548,20 +1561,21 @@ void do_motd( const char *nick, const char *remoteserver )
 
 	SET_SEGV_LOCATION();
 	fp = fopen( MOTD_FILENAME, "rt" );
-	if( !fp ) {
+	if( fp == NULL )
+	{
 		irc_numeric( ERR_NOMOTD, nick, ":- MOTD file Missing" );
-	} else {
-		irc_numeric( RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name );
-		irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
-		irc_numeric( RPL_MOTD, nick, ":-" );
-
-		while( fgets( buf, sizeof( buf ), fp ) ) {
-			buf[strnlen( buf, BUFSIZE ) - 1] = 0;
-			irc_numeric( RPL_MOTD, nick, ":- %s", buf );
-		}
-		fclose( fp );
-		irc_numeric( RPL_ENDOFMOTD, nick, ":End of MOTD command." );
+		return;
 	}
+	irc_numeric( RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name );
+	irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
+	irc_numeric( RPL_MOTD, nick, ":-" );
+	while( fgets( buf, sizeof( buf ), fp ) )
+	{
+		buf[strnlen( buf, BUFSIZE ) - 1] = 0;
+		irc_numeric( RPL_MOTD, nick, ":- %s", buf );
+	}
+	fclose( fp );
+	irc_numeric( RPL_ENDOFMOTD, nick, ":End of MOTD command." );
 }
 
 /** @brief Display the ADMIN Message from the external stats.admin file
@@ -1580,18 +1594,20 @@ void do_admin( const char *nick, const char *remoteserver )
 	SET_SEGV_LOCATION();
 
 	fp = fopen( ADMIN_FILENAME, "rt" );
-	if( !fp ) {
+	if( fp == NULL )
+	{
 		irc_numeric( ERR_NOADMININFO, nick, "%s :No administrative info available", me.name );
-	} else {
-		irc_numeric( RPL_ADMINME, nick, ":%s :Administrative info", me.name );
-		irc_numeric( RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
-		while( fgets( buf, sizeof( buf ), fp ) ) {
-			buf[strnlen( buf, BUFSIZE ) - 1] = 0;
-			irc_numeric( RPL_ADMINLOC1, nick, ":- %s", buf );
-		}
-		fclose( fp );
-		irc_numeric( RPL_ADMINLOC2, nick, "End of /ADMIN command." );
+		return;
 	}
+	irc_numeric( RPL_ADMINME, nick, ":%s :Administrative info", me.name );
+	irc_numeric( RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
+	while( fgets( buf, sizeof( buf ), fp ) )
+	{
+		buf[strnlen( buf, BUFSIZE ) - 1] = 0;
+		irc_numeric( RPL_ADMINLOC1, nick, ":- %s", buf );
+	}
+	fclose( fp );
+	irc_numeric( RPL_ADMINLOC2, nick, "End of /ADMIN command." );
 }
 
 /** @brief 
@@ -1650,7 +1666,7 @@ void do_stats( const char *nick, const char *what )
 
 	SET_SEGV_LOCATION();
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_stats: message from unknown user %s", nick );
 		return;
@@ -1726,7 +1742,7 @@ void do_protocol( const char *origin, char **argv, int argc )
 		{
 			if( ircstrcasecmp( protocol_ptr->token, argv[i] ) == 0 )
 			{
-				if( protocol_info->options&protocol_ptr->flag )
+				if( protocol_info->options & protocol_ptr->flag )
 				{
 					ircd_srv.protocol |= protocol_ptr->flag;
 					break;
@@ -1752,32 +1768,35 @@ void do_sjoin( const char *tstime, const char *channame, const char *modes, cons
 {
 	char nick[MAXNICK];
 	char *nicklist;
-	long mask = 0;
-	int ok = 1, j = 3;
+	unsigned int mask = 0;
+	int j = 3;
 	Channel *c;
 	char **param;
-	int paramcnt = 0;
-	int paramidx = 0;
+	unsigned int paramcnt = 0;
+	unsigned int paramidx = 0;
 
-	if( *modes == '#' ) {
+	if( *modes == '#' )
+	{
 		JoinChannel( sjoinnick, modes );
 		return;
 	}
-
-	paramcnt = split_buf( argv[argc-1], &param );
-		   
-	while( paramcnt > paramidx ) {
+	paramcnt = split_buf( argv[argc-1], &param );		   
+	while( paramcnt > paramidx )
+	{
 		nicklist = param[paramidx];
-		if( ircd_srv.protocol & PROTOCOL_SJ3 ) {
+		if( ircd_srv.protocol & PROTOCOL_SJ3 )
+		{
 			/* Unreal passes +b( & ) and +e( " ) via SJ3 so skip them for now */	
-			if( *nicklist == '&' || *nicklist == '"' ) {
+			if( *nicklist == '&' || *nicklist == '"' )
+			{
 				dlog( DEBUG1, "Skipping %s", nicklist );
 				paramidx++;
 				continue;
 			}
 		}
 		mask = 0;
-		while( CmodePrefixToMask( *nicklist ) ) {
+		while( CmodePrefixToMask( *nicklist ) )
+		{
 			mask |= CmodePrefixToMask( *nicklist );
 			nicklist ++;
 		}
@@ -1785,10 +1804,10 @@ void do_sjoin( const char *tstime, const char *channame, const char *modes, cons
 		JoinChannel( nick, channame ); 
 		ChanUserMode( channame, nick, 1, mask );
 		paramidx++;
-		ok = 1;
 	}
 	c = FindChannel( channame );
-	if (c) {
+	if (c)
+	{
 		/* update the TS time */
 		c->creationtime = atoi( tstime );
 		j = ChanModeHandler( c, modes, j, argv, argc );
@@ -1847,9 +1866,10 @@ void do_join( const char *nick, const char *chanlist, const char *keys )
 {
 	char *s, *t;
 	t = ( char *)chanlist;
-	while( *( s = t ) ) {
+	while( *( s = t ) )
+	{
 		t = s + strcspn( s, "," );
-		if( *t )
+		if( *t != '\0' )
 			*t++ = 0;
 		JoinChannel( nick, s );
 	}
@@ -1884,20 +1904,18 @@ void do_nick( const char *nick, const char *hopcount, const char *TS,
 		 const char *vhost, const char *realname, const char *numeric, 
 		 const char *smodes )
 {
-	if( !nick ) {
+	if( nick == NULL )
+	{
 		nlog( LOG_CRITICAL, "do_nick: trying to add user with NULL nickname" );
 		return;
 	}
 	AddUser( nick, user, host, realname, server, ip, TS, numeric );
-	if( modes ) {
+	if( modes != NULL )
 		UserMode( nick, modes );
-	}
-	if( vhost ) {
+	if( vhost != NULL )
 		SetUserVhost( nick, vhost );
-	}
-	if( smodes ) {
+	if( smodes != NULL )
 		UserSMode( nick, smodes );
-	}
 }
 
 /** @brief 
@@ -2049,21 +2067,25 @@ void do_svsmode_user( const char *targetnick, const char *modes, const char *ts 
 {
 	char modebuf[MODESIZE];
 	
-	if( ts && isdigit( *ts ) ) {
+	if( ts != NULL && isdigit( *ts ) )
+	{
 		const char *pModes;	
 		char *pNewModes;	
 
 		SetUserServicesTS( targetnick, ts );
 		/* If only setting TS, we do not need further mode processing */
-		if( ircstrcasecmp( modes, "+d" ) == 0 ) {
+		if( ircstrcasecmp( modes, "+d" ) == 0 )
+		{
 			dlog( DEBUG3, "dropping modes since this is a services TS %s", modes );
 			return;
 		}
 		/* We need to strip the d from the mode string */
 		pNewModes = modebuf;
 		pModes = modes;
-		while( *pModes ) {
-			if( *pModes != 'd' ) {
+		while( *pModes )
+		{
+			if( *pModes != 'd' )
+			{
 				*pNewModes = *pModes;
 			}
 			pModes++;
@@ -2072,7 +2094,9 @@ void do_svsmode_user( const char *targetnick, const char *modes, const char *ts 
 		/* NULL terminate */
 		*pNewModes = 0;
 		UserMode( targetnick, modebuf );
-	} else {
+	}
+	else
+	{
 		UserMode( targetnick, modes );
 	}
 }
@@ -2158,13 +2182,15 @@ void do_topic( const char *chan, const char *owner, const char *ts, const char *
 
 void do_server( const char *name, const char *uplink, const char *hops, const char *numeric, const char *infoline, int srv )
 {
-	if( !srv ) {
-		if( uplink == NULL || *uplink == 0 ) {
+	if( srv == 0 )
+	{
+		if( uplink == NULL || *uplink == 0 )
 			AddServer( name, me.name, hops, numeric, infoline );
-		} else {
+		else
 			AddServer( name, uplink, hops, numeric, infoline );
-		}
-	} else {
+	}
+	else
+	{
 		AddServer( name, uplink, hops, numeric, infoline );
 	}
 	irc_version( me.name, name );
@@ -2181,13 +2207,17 @@ void do_server( const char *name, const char *uplink, const char *hops, const ch
 
 void do_burst( char *origin, char **argv, int argc )
 {
-	if( argc > 0 ) {
-		if( ircd_srv.burst == 1 ) {
+	if( argc > 0 )
+	{
+		if( ircd_srv.burst == 1 )
+		{
 			irc_burst( 0 );
 			ircd_srv.burst = 0;
 			do_synch_neostats();
 		}
-	} else {
+	}
+	else
+	{
 		ircd_srv.burst = 1;
 	}
 }
@@ -2205,7 +2235,7 @@ void do_swhois( const char *who, const char *swhois )
 {
 	Client *u;
 	u = FindUser( who );
-	if( u )
+	if( u != NULL )
 		strlcpy( u->user->swhois, swhois, MAXHOST );
 }
 
@@ -2223,9 +2253,12 @@ void do_tkl( const char *add, const char *type, const char *user, const char *ho
 	static char mask[MAXHOST];
 
 	ircsnprintf( mask, MAXHOST, "%s@%s", user, host );
-	if( add[0] == '+' ) {
+	if( add[0] == '+' )
+	{
 		AddBan( type, user, host, mask, reason, setby, tsset, tsexpire );
-	} else {
+	}
+	else
+	{
 		/*TEMPDelBan( type, user, host, mask, reason, setby, tsset, tsexpire );*/
 		DelBan( mask );
 	}
@@ -2245,7 +2278,7 @@ void do_eos( const char *name )
 	Client *s;
 
 	s = FindServer( name );
-	if( !s )
+	if( s == NULL )
 	{
 		nlog( LOG_WARNING, "do_eos: server %s not found", name );
 		return;
@@ -2285,7 +2318,7 @@ void do_sethost( const char *nick, const char *host )
 	Client *u;
 
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_sethost: user %s not found", nick );
 		return;
@@ -2309,7 +2342,7 @@ void do_setident( const char *nick, const char *ident )
 	Client *u;
 
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_setident: user %s not found", nick );
 		return;
@@ -2333,7 +2366,7 @@ void do_setname( const char *nick, const char *realname )
 	Client *u;
 
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_setname: user %s not found", nick );
 		return;
@@ -2357,7 +2390,7 @@ void do_chghost( const char *nick, const char *host )
 	Client *u;
 
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_chghost: user %s not found", nick );
 		return;
@@ -2381,7 +2414,7 @@ void do_chgident( const char *nick, const char *ident )
 	Client *u;
 
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_chgident: user %s not found", nick );
 		return;
@@ -2405,7 +2438,7 @@ void do_chgname( const char *nick, const char *realname )
 	Client *u;
 
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_chgname: user %s not found", nick );
 		return;
@@ -2431,7 +2464,7 @@ void do_whois( const char *origin, const char *server, const char *target )
 
 	dlog( DEBUG4, "do_whois: %s %s %s", origin, server, target );
 	u = FindUser( origin );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "do_whois: origin %s not found", origin );
 		return;
