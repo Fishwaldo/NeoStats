@@ -695,7 +695,7 @@ NeoNet {
 #        UserName = "somenet"
 
 # This is your IRC Network User account password.
-#        PassWord = "baby69"
+#        PassWord = "password"
 
 # Leave the port at 2960 unless otherwise instructed.
 #        Port = 2960
