@@ -25,7 +25,16 @@
 
 #ifndef _UPDATES_H_
 #define _UPDATES_H_
+#include "MiniMessage.h"
+#include "MiniMessageGateway.h"
+#include "NeoNet.h"
+
 
 int InitUpdate( void );
+void MQStatusMsg(const Bot *bot, const CmdParams *cmdparams);
+
+/* this is the NeoNet Command Handler callback prototype */
+typedef void (*mq_cmd_handler) ( MMessage *msg );
+
 
 #endif /* _UPDATES_H_ */

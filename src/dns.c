@@ -107,7 +107,7 @@ int dns_lookup (char *str, adns_rrtype type, void (*callback) (void *data, adns_
 	if (list_isfull (dnslist)) {
 		dlog(DEBUG1, "DNS: Lookup list is full, adding to queue");
 		strlcpy(dnsdata->lookupdata, str, 254);
-		lnode_create_append (dnslist, dnsdata);
+		lnode_create_append (dnsqueue, dnsdata);
 		DNSStats.totalqueued++;
 		if (list_count(dnsqueue) > DNSStats.maxqueued) {
 			DNSStats.maxqueued = list_count(dnsqueue);

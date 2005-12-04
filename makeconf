@@ -669,6 +669,47 @@ MODULENAME = {
 
 }
 }
+
+#####################################
+# NeoNetConfigurations and Loading  #
+#####################################
+
+# NeoNet is a protocol that links all NeoStats installations back to the main
+# NeoStats sites, such as http://secure.irc-chat.net etc.
+# This allows you to take advantage of some of the aditional features or modules
+# that we support, such as updated definitions for SecureServ accounts, or 
+# reporting options for OPSB.
+
+# You must visit http://accounts.neostats.net/ to create your NeoNet account
+# and select what aditional options you would like. (some might require 3rd
+# party modules, such as SecureServ or OPSB). 
+
+# If you have been using SecureServ on the 2.5 series, please visit
+# http://accounts.neostats.net/migrate/ for information on how to 
+# use your existing Secure.irc-chat.net account with NeoNet.
+NeoNet {
+
+# This is the username, as supplied on the NeoNet pages.
+# It should be your IRC Network user account and not your 
+# personal accounts. 
+#        UserName = "somenet"
+
+# This is your IRC Network User account password.
+#        PassWord = "baby69"
+
+# Leave the port at 2960 unless otherwise instructed.
+#        Port = 2960
+
+# This option handles how NeoNet connections are established. The available
+# options are:
+#	yes 	- Connect to NeoNet during startup
+#	no 	- Never connect to NeoNet (Note, some features might not work if Connect
+#	     	is set to No
+#	demand 	- Only connect to NeoNet when there is a pending NeoNet Message
+#	     	to be sent. 
+	Connect = "no"
+}                                
+
 ###############################################################################
 ## End of Configuration                                                      ##
 ###############################################################################

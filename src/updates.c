@@ -25,46 +25,272 @@
  */
 
 #include "neostats.h"
+#include "services.h"
 #include "event.h"
 #include "MiniMessage.h"
 #include "MiniMessageGateway.h"
+#include "NeoNet.h"
+#include "updates.h"
 
 void GotUpdateAddress(void *data, adns_answer *a);
 static int mqswrite(int fd, void *data);
 static int mqsread(void *data, void *notused, int len);
 int mqs_login();
+char *MQGetStatus(MQS_STATE state);
+void CheckMQOut();
+void MQcmd_Broadcast(MMessage *msg);
+void MQcmd_Shutdown(MMessage *msg);
+void ResetMQ();
+
+
+list_t *MQlist;
+hash_t *MQcmds;
+
+typedef struct NeoNetCmds {
+	const char *topic; /* topic string we are interested in */
+	mq_cmd_handler handler; /* function to call when we recieve this message */
+	Module *modptr;
+} NeoNetCmds;
+
+
+/* this is our standard commands we handle internally */
+static NeoNetCmds stdcmds[]=
+{
+	{"BROADCAST",	MQcmd_Broadcast},
+	{"SHUTDOWN", 	MQcmd_Shutdown},
+	{NULL,		NULL}
+};
+	
 
 updateserver mqs;
 MMessageGateway *mqsgw;
+
+void MQcmd_Broadcast(MMessage *msg) {
+	MByteBuffer **message;
+	message = MMGetStringField(msg, "message", NULL);
+	if (message) {
+		if (IsModuleSynched(&ns_module))
+			irc_chanalert(ns_botptr, "NeoNet BroadCast Message: %s",(char *)message[0]+sizeof(uint32));
+		nlog(LOG_WARNING, "NeoNet BroadCast Message: %s",(char *)message[0]+sizeof(uint32));
+
+	}
+}
+void MQcmd_Shutdown(MMessage *msg) {
+	MByteBuffer **message;
+	message = MMGetStringField(msg, "message", NULL);
+	if (message) {
+		if (IsModuleSynched(&ns_module))
+			irc_chanalert(ns_botptr, "NeoNet Shutdown Message: %s",(char *)message[0]+sizeof(uint32));
+		nlog(LOG_WARNING, "NeoNet Shutdown Message: %s",(char *)message[0]+sizeof(uint32));
+	}
+	ResetMQ();
+}
+
+int MQAddcmd(NeoNetCmds *cmd) {
+	while (cmd->topic) {
+		if (hnode_find(MQcmds, cmd->topic)) {
+			nlog(LOG_WARNING, "Can't Add MQCommand Handler %s. Exists already", cmd->topic);
+		} else {
+			hnode_create_insert(MQcmds, cmd, cmd->topic);
+			cmd->modptr = GET_CUR_MODULE();
+			dlog(LOG_WARNING, "Added %s to MQCommand Handler", cmd->topic);
+		}
+		cmd++;
+	}
+	return NS_SUCCESS;
+}
+int MQDelcmd(NeoNetCmds *cmd) {
+	hnode_t *cmdnode;
+	while (cmd->topic) {
+		if ((cmdnode = hnode_find(MQcmds, cmd->topic)) != NULL) {
+			dlog(DEBUG3, "Deleting %s Command from MQCommand Handlers", cmd->topic);
+			hash_delete_destroy_node(MQcmds, cmdnode);
+		} else {
+			nlog(LOG_WARNING, "Couldn't find %s handler for MQCommand Handler Delete", cmd->topic);
+		}
+		cmd++;
+	}
+	return NS_SUCCESS;
+}
+int MQModuleDelcmd(Module *modptr) {
+	hnode_t *cmdnode;
+	hscan_t hs;
+	NeoNetCmds *cmds;
+	hash_scan_begin(&hs, MQcmds);
+	while ( ( cmdnode = hash_scan_next(&hs)) != NULL) {
+		cmds = hnode_get(cmdnode);
+		if (cmds->modptr == modptr) {
+			dlog(DEBUG3, "Deleting %s Command from MQCommand Module Delete", cmds->topic);
+			hash_scan_delete_destroy_node(MQcmds, cmdnode);
+		}
+	}
+	return NS_SUCCESS;
+}
+
+int MQCheckGroups(char *group) {
+	int i;
+	for (i = 0; i < mqs.nogroups; i++) {
+		if (!strcasecmp(mqs.groups[i], group)) {
+			return NS_SUCCESS;
+		}
+	}
+	return NS_FAILURE;
+}
+
+MMessage *MQCreateMessage(char *topic, char *target, int flags, char *groups, int peermsg) {
+	MByteBuffer **MMtopic;
+	MByteBuffer **MMtarget;
+	MByteBuffer **MMFrom;
+	MMessage *msg;
+
+	/* if the message is for a queue, check we are subscribed to the groups for this message
+	* else, just send the message to the peer, and let the peer decide if they are authed
+	* or not 
+	*/ 
+	if (((groups != NULL) && (peermsg > 0)) && (!MQCheckGroups(groups))) {
+		dlog(DEBUG3, "Message for Group membership %s did not pass", groups);
+		return NULL;
+	}
+	msg = MMAllocMessage(0);
+	if (!msg) {
+		nlog(LOG_WARNING, "Warning, Couldn't create MiniMessage in MQCreateMessage");
+		return NULL;
+	}
+	/* not necessarly required, but for completness, so MQServer doesn't have to add it */
+	MMFrom = MMPutStringField(msg, false, NNFLD_FROM, 1);
+	MMFrom[0] = MBStrdupByteBuffer(mqs.username);
+	
+	MMtopic = MMPutStringField(msg, false, NNFLD_TOPIC, 1);
+	MMtopic[0] = MBStrdupByteBuffer(topic);
+	MMtarget = MMPutStringField(msg, false, NNFLD_TARGET, 1);
+	MMtarget[0] = MBStrdupByteBuffer(target);
+	
+	/* is this a peer to peer message, or a queue message */
+	if (peermsg > 0) 
+		MMSetWhat(msg, NNMSG_SNDTOUSER);
+	else
+		MMSetWhat(msg, NNMSG_SNDTOQUEUE);
+			
+	/* ok, our standard fields are inserted, now return the msg */
+	return msg;
+}
+
+int MQSendMessage(MMessage *msg, int canqueue) {
+	if ((mqs.state != MQS_OK) && (canqueue == 0)) {
+		nlog(LOG_WARNING, "NeoNet is not connected, and canqueue is false. Dropping Msg");
+		return NS_FAILURE;
+	}
+	else if ((mqs.state != MQS_OK) && (canqueue > 0)) {
+		/* Queue the message */
+		lnode_create_append(MQlist, msg);
+		/* if we are on demand connect, then start connect now */
+		if (mqs.connect == MQ_CONNECT_DEMAND) 
+			dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
+			
+		dlog(DEBUG3, "MQ Message is queued up for sending later");
+		return NS_SUCCESS;
+	}
+	/* else we just send the message now */
+#ifdef DEBUG
+	MMPrintToStream(msg);
+#endif
+	MGAddOutgoingMessage(mqsgw, msg);
+	MMFreeMessage(msg);
+
+	CheckMQOut();
+	return NS_SUCCESS;	
+}
+void MQStatusMsg(const Bot *bot, const CmdParams *cmdparams) {
+	int i;
+	irc_prefmsg( bot, cmdparams->source, __("NeoNet Status: %s", cmdparams->source), MQGetStatus(mqs.state));
+	if (mqs.state == MQS_OK) {
+		irc_prefmsg( bot, cmdparams->source, __("NeoNet Group Memberships:", cmdparams->source));
+		for (i = 0; i < mqs.nogroups; i++) irc_prefmsg(bot, cmdparams->source, "%d) %s", i, mqs.groups[i]);
+	}
+}
+
+char *MQGetStatus(MQS_STATE state) {
+	switch (state) {
+		case MQS_DISCONNECTED:
+			return "Disconnected";
+			break;
+		case MQS_CONNECTING:
+			return "Connecting";
+			break;
+		case MQS_SENTAUTH:
+			return "Logging In";
+			break;
+		case MQS_OK:
+			return "Connected";
+			break;
+	}
+	return "Unknown State";
+}
 
 int32 MQSSendSock(const uint8 * buf, uint32 numBytes, void * arg) {
 	return send_to_sock(mqs.Sockinfo, (char *)buf, numBytes); 
 }
 
 int32 MQSRecvSock(uint8 * buf, uint32 numBytes, void * arg) {
-	return os_sock_read( mqs.sock, (char *)buf, numBytes );
+	return  os_sock_read( mqs.sock, (char *)buf, numBytes );
+}
+
+int MQPingSrv(void *unused) {
+	if (mqs.state != MQS_OK) { 
+		/* just return silently */
+		return NS_SUCCESS;
+	}
+	MMessage *msg = MMAllocMessage(0);
+	if (!msg) {
+		nlog(LOG_WARNING, "Warning, Couldn't create MQ Ping Packet");
+		return NS_SUCCESS;
+	}
+	int64 *ping = MMPutInt64Field(msg, false, NNFLD_SNDTIME, 1);
+	if (ping) ping[0] = time(NULL);
+	
+	MMSetWhat(msg, NNMSG_PING);
+	MQSendMessage(msg, 0);
+		
+	return NS_SUCCESS;
+
 }
 
 int InitUpdate(void) 
 {
-	if (mqs.username[0] && mqs.password[0]) {
-		dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
-		dlog(DEBUG1, "Updates Initialized successfully");
+	if (mqs.connect == MQ_CONNECT_YES) {
+		if (mqs.username[0] && mqs.password[0]) {
+			dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
+			nlog(LOG_INFO, "NeoNet Initialized successfully, connecting to %s", mqs.hostname);
+		}
+	} else if (mqs.connect == MQ_CONNECT_DEMAND) {
+		if (!(mqs.username[0] && mqs.password[0])) {
+			nlog(LOG_WARNING, "Can't do OnDemand Connect to NeoNet as no username/password has been set");
+			mqs.connect = MQ_CONNECT_ERROR;
+		}
 	}
 	mqs.state = MQS_DISCONNECTED;
+	MQlist = list_create(LISTCOUNT_T_MAX);
+	MQcmds = hash_create(HASHCOUNT_T_MAX, 0, 0);
+	MQAddcmd(stdcmds);
+	AddTimer(TIMER_TYPE_INTERVAL, MQPingSrv, "MQPingSrv", 30, NULL);
 	return NS_SUCCESS;
 }
 
 void FiniUpdate(void) 
 {
+	MQDelcmd(stdcmds);
 }
 
 void GotUpdateAddress(void *data, adns_answer *a) 
 {
 	struct timeval tv;
+	struct in_addr ip;
+	
 	SET_SEGV_LOCATION();
 	if( a && a->nrrs > 0 && a->status == adns_s_ok ) {
-			mqs.sock = sock_connect(SOCK_STREAM, a->rrs.addr->addr.inet.sin_addr, mqs.port);
+			ip.s_addr = a->rrs.inaddr->s_addr;
+			
+			mqs.sock = sock_connect(SOCK_STREAM, ip, mqs.port);
 			
 			if (mqs.sock > 0) {
 				tv.tv_sec = 60;
@@ -76,9 +302,7 @@ void GotUpdateAddress(void *data, adns_answer *a)
 				mqs.Sockinfo = AddSock(SOCK_NATIVE, "MQS", mqs.sock, mqsread, mqswrite, EV_WRITE|EV_TIMEOUT|EV_READ|EV_PERSIST, NULL, &tv);
 				mqs.state = MQS_CONNECTING;
 			}
-#if 0
-			nlog (LOG_NORMAL, "Got DNS for MQ Pool Server: %s", inet_ntoa(a->rrs.addr->addr.inet.sin_addr));
-#endif
+			nlog (LOG_NORMAL, "Got DNS for MQ Pool Server: %s", inet_ntoa(ip));
 	} else {
 		nlog(LOG_WARNING, "DNS error Checking for MQ Server Pool: %s", adns_strerror(a->status));
 	}
@@ -87,6 +311,7 @@ void GotUpdateAddress(void *data, adns_answer *a)
 void ResetMQ() {
 	if (mqs.state >= MQS_CONNECTING) {
 		mqs.state = MQS_DISCONNECTED;
+		DelSock(mqs.Sockinfo);
 		mqs.Sockinfo = NULL;
 		MGFreeMessageGateway(mqsgw);
 	}
@@ -109,16 +334,96 @@ void CheckMQOut() {
 	}
 }
 
+void ProcessMQError(MMessage *msg) {
+	MBool * fatal;
+	MByteBuffer **error;
+	int32 * status;
+	fatal = MMGetBoolField(msg, NNFLD_FATAL, NULL);
+	error = MMGetStringField(msg, NNFLD_ERROR, NULL);
+	status = MMGetInt32Field(msg, NNFLD_STATUS, NULL);
+	if (error && status) {
+		if (IsModuleSynched(&ns_module))
+			irc_chanalert(ns_botptr, "NeoNet Error %lld: %s", (long long int)status[0], (char *)error[0]+sizeof(uint32));
+		nlog(LOG_WARNING, "NeoNet Error %lld: %s", (long long int)status[0], (char *)error[0]+sizeof(uint32));
+
+	}
+	if (fatal[0] > 0) {
+		if (IsModuleSynched(&ns_module))
+			irc_chanalert(ns_botptr, "Fatal NeoNet Error. Disconnecting From NeoNet");
+		nlog(LOG_WARNING, "Fatal NeoNet Error. Disconnecting from NeoNet");
+		ResetMQ();
+	}
+}
+
 void ProcessMessage(MMessage *msg) {
 	unsigned long what;
-	
+	MByteBuffer **groups;
+	uint32 nogroups;
+	int i;
+	lnode_t *node;
+	MMessage *qmsg;
+	int64 *sndtime;
+	MByteBuffer **topic;
+	NeoNetCmds *nncmd;
+	hnode_t *cmdnode;
+
 	what = MMGetWhat(msg);
 	switch (what) {
-		case 1818718059:
+		case NNMSG_LOGINOK:
 			dlog(DEBUG1, "Login Ok");
+			mqs.state = MQS_OK;
+			groups = MMGetStringField(msg, "group", &nogroups);
+			for (i = 0; i < nogroups; i++) {
+				/* max groups so far */
+				if (i > 8) break;
+				int len = strlen((char *)groups[i]+sizeof(uint32));
+				if (len > MAXUSER) len = MAXUSER;
+				strncpy(mqs.groups[i], (char *)groups[i]+sizeof(uint32), len);
+			}
+			mqs.nogroups = i;
+			/* if there are any queued messages, send them now */
+			if (list_count(MQlist) > 0) {
+				while ((node = list_first(MQlist)) != NULL) {
+					qmsg = lnode_get(node);
+					MGAddOutgoingMessage(mqsgw, qmsg);
+					MMFreeMessage(qmsg);
+					list_del_first(MQlist);
+				}
+				/* send them out */
+				CheckMQOut();
+			}				
+			break;
+		case NNMSG_ERROR:
+			ProcessMQError(msg);
+			break;
+		case NNMSG_PONG:
+			sndtime = MMGetInt64Field(msg, NNFLD_SNDTIME, NULL);
+			if (sndtime) 
+				dlog(DEBUG3, "MQ Ping Time Took %lld Seconds", time(NULL) - sndtime[0]);
+			break;
+		case NNMSG_PING:
+			sndtime = MMPutInt64Field(msg, false, NNFLD_RCVDTIME, 1);
+			if (sndtime) sndtime[0] = time(NULL);
+			MMSetWhat(msg, NNMSG_PONG);
+			MQSendMessage(msg, 0);
+			break;			
+		case NNMSG_MSGFROMUSER:
+		case NNMSG_MSGFROMQUEUE:
+			topic = MMGetStringField(msg, NNFLD_TOPIC, NULL);
+			if (topic) {
+				dlog(DEBUG3, "MQ Message Topic %s recieved", (char *)topic[0]+sizeof(uint32));
+				cmdnode = hash_lookup(MQcmds, (char *)topic[0]+sizeof(uint32));
+				if (!cmdnode) {
+					nlog(LOG_INFO, "No Handler registered for NeoNet Message %s", (char *)topic[0]+sizeof(uint32));
+				} else {
+					nncmd = hnode_get(cmdnode);
+					dlog(DEBUG3, "Running Handler for %s NeoNet Message", nncmd->topic);
+					nncmd->handler(msg);
+				}
+			}	
 			break;
 		default:
-			dlog(DEBUG1, "Got message type %d", what);
+			dlog(DEBUG1, "Got message type %lu", what);
 			break;
 	}
 
@@ -131,6 +436,8 @@ int mqswrite(int fd, void *data) {
 			break;
 		/* we are connected */
 		case MQS_CONNECTING:
+			/* once I'm connected, update the sock flags */
+			UpdateSock(mqs.Sockinfo, EV_READ|EV_PERSIST, 1, NULL);			
 			return mqs_login();
 			break;
 		case MQS_SENTAUTH:
@@ -164,7 +471,7 @@ int mqsread(void *data, void *notused, int len) {
 #endif
 		/* do something */
 		ProcessMessage(msg);
-		MMFreeMessage(msg);
+		if (msg) MMFreeMessage(msg);
 	}
 	return NS_SUCCESS;
 }
@@ -187,7 +494,7 @@ int mqs_login()
 	password[0] = MBStrdupByteBuffer(mqs.password);
 	version = MMPutStringField(msg, false, "version", 1);
 	version[0] = MBStrdupByteBuffer(me.version);
-	MMSetWhat(msg, MAKETYPE("lgn"));
+	MMSetWhat(msg, NNMSG_LOGIN);
 #ifdef DEBUG
 	MMPrintToStream(msg);
 #endif
@@ -201,8 +508,8 @@ int mqs_login()
 	return NS_SUCCESS;
 }
 void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len) {
-	char *buf;
 	
+#if 0
 	if (mqs.state == MQS_OK) {
 		/* for now, we know that data is always a char string */
 		buf = malloc(sizeof(int) + len);
@@ -211,4 +518,5 @@ void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len) {
 		os_sock_sendto(mqs.sock, buf, strlen(buf), 0,  (struct sockaddr *) &mqs.sendtomq, sizeof(mqs.sendtomq));
 		free(buf);
 	}
+#endif
 }

@@ -39,7 +39,7 @@
 #include "services.h"
 #include "bans.h"
 #include "auth.h"
-
+#include "updates.h"
 /* Command function prototypes */
 static int ns_cmd_shutdown( const CmdParams *cmdparams );
 #ifndef WIN32
@@ -383,6 +383,7 @@ static int ns_cmd_status( const CmdParams *cmdparams )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode enabled", cmdparams->source ) );
 	else
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode disabled", cmdparams->source ) );
+	MQStatusMsg(ns_botptr, cmdparams);
 	return NS_SUCCESS;
 }
 

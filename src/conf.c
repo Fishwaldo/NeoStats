@@ -106,6 +106,7 @@ static cfg_opt_t neonet[] = {
 	CFG_INT ("Port", 2960, CFGF_NONE),
 	CFG_STR ("UserName", NULL, CFGF_NODEFAULT),
 	CFG_STR ("Password", NULL,CFGF_NODEFAULT ),
+	CFG_STR ("Connect", "yes", CFGF_NONE),
 	CFG_END()
 };
 
@@ -292,6 +293,14 @@ static int set_config_values( cfg_t *cfg )
 	strlcpy(mqs.hostname, cfg_getstr(cfg, "NeoNet|HostName"), MAXHOST);
 	/* has a default */
 	mqs.port = cfg_getint(cfg, "NeoNet|Port");
+
+	if (!strcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "yes")) {
+		mqs.connect = MQ_CONNECT_YES;
+	} else if (!strcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "demand")) {
+		mqs.connect = MQ_CONNECT_DEMAND;
+	} else {
+		mqs.connect = MQ_CONNECT_NO;
+	}
 #endif /* WIN32 */
 	return NS_SUCCESS;
 }

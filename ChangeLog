@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - Finish up the core side NeoNet support. Modules such as SecureServ and
+   OPSB are next (F)
+ - Fix problem with DNS queries going to the wrong list when it needs to be queued up (F)
  - EVENT_KILL now also sends EVENT_QUIT so modules can just watch sign on/off 
    rather than being forced to watch and process KILL. (M)
  - Add WHOIS processing. (M)

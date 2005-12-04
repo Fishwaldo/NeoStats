@@ -89,10 +89,11 @@ if test "x$CCDV" != x ; then
 	wi_cv_path_ccdv="$CCDV"
 	CC="$CCDV $CC"	# trailing space needed
 	USECCDV="#"
+	AC_MSG_RESULT($ccdv)
 else
 	wi_cv_path_ccdv=""
 	USECCDV=""
-
+	AC_MSG_RESULT("Not Found")
 fi
 ])
 if test "$wi_used_cache_path_ccdv" = yes ; then

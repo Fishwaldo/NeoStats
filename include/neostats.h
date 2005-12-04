@@ -1182,6 +1182,7 @@ struct Bot
 	void *moddata;
 };
 
+/* current state */
 typedef enum MQS_STATE {
 	MQS_DISCONNECTED,
 	MQS_CONNECTING,
@@ -1189,16 +1190,28 @@ typedef enum MQS_STATE {
 	MQS_OK,
 } MQS_STATE;
 
+/* connection strategy */
+typedef enum MQS_CONNECT {
+        MQ_CONNECT_NO,
+        MQ_CONNECT_YES,
+        MQ_CONNECT_DEMAND,
+        MQ_CONNECT_ERROR,
+} MQS_CONNECT;
+
+
 /* this is the NeoNet details */
 typedef struct updateserver {
 	MQS_STATE state;
-	struct sockaddr_in sendtomq;
 	OS_SOCKET sock;
+	MQS_CONNECT connect;
 	char username[MAXUSER];
 	char password [MAXUSER];
 	char hostname[MAXHOST];
 	int port;
 	Sock *Sockinfo;
+	/* max of 8 groups so far */
+	char groups[8][MAXUSER];
+	int nogroups;
 }updateserver;
 
 extern updateserver mqs;

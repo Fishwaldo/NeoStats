@@ -40,6 +40,10 @@ int os_sock_errno = 0;
 #define OS_SOCK_SET_ERRNO() os_sock_errno = errno;
 #endif /* WIN32 */
 
+int get_os_sock_errno() {
+	return os_sock_errno;
+}
+
 char *os_sock_strerror( int sockerrno )
 {
 #ifdef WIN32
@@ -368,7 +372,15 @@ int os_sock_read( OS_SOCKET s, char *buf, int len )
 	if( ret == SOCKET_ERROR )
 	{
 		OS_SOCK_SET_ERRNO();
-		nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
+		switch( os_sock_errno )
+		{
+			case OS_SOCK_EWOULDBLOCK:
+			case OS_SOCK_EINPROGRESS:
+				/* non-fatal errors */
+				return 0;
+			default:
+				nlog( LOG_ERROR, "os_sock_read: failed for socket %d with error %s", s, os_sock_strerror( os_sock_errno ) );
+		}	
 	}
 	return ret;
 }
