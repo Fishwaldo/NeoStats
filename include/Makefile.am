@@ -4,7 +4,7 @@ CLEANFILES = version.h
 include_HEADERS		=	neostats.h config.h version.h \
 				list.h hash.h support.h events.h numeric.h \
 				adns.h protocol.h perlmod.h \
-				updates.h MiniMessage.h MiniMessageGateway.h MuscleSupport.h
+				updates.h MiniMessage.h MiniMessageGateway.h MuscleSupport.h NeoNet.h
 
 
 noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
