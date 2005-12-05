@@ -272,7 +272,7 @@ int InitUpdate(void)
 	MQlist = list_create(LISTCOUNT_T_MAX);
 	MQcmds = hash_create(HASHCOUNT_T_MAX, 0, 0);
 	MQAddcmd(stdcmds);
-	AddTimer(TIMER_TYPE_INTERVAL, MQPingSrv, "MQPingSrv", 30, NULL);
+	AddTimer(TIMER_TYPE_INTERVAL, MQPingSrv, "MQPingSrv", 300, NULL);
 	return NS_SUCCESS;
 }
 

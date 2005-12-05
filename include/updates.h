@@ -36,5 +36,7 @@ void MQStatusMsg(const Bot *bot, const CmdParams *cmdparams);
 /* this is the NeoNet Command Handler callback prototype */
 typedef void (*mq_cmd_handler) ( MMessage *msg );
 
+MMessage *MQCreateMessage(char *topic, char *target, int flags, char *groups, int peermsg);
+int MQSendMessage(MMessage *msg, int canqueue);
 
 #endif /* _UPDATES_H_ */
