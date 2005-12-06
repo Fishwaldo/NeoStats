@@ -383,7 +383,9 @@ static int ns_cmd_status( const CmdParams *cmdparams )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode enabled", cmdparams->source ) );
 	else
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Debugging mode disabled", cmdparams->source ) );
+#ifndef WIN32
 	MQStatusMsg(ns_botptr, cmdparams);
+#endif
 	return NS_SUCCESS;
 }
 
