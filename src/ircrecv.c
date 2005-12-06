@@ -1541,7 +1541,7 @@ void do_pong( const char *origin, const char *destination )
 void do_version( const char *nick, const char *remoteserver )
 {
 	SET_SEGV_LOCATION();
-	irc_numeric( RPL_VERSION, nick, "%s :%s -> %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time );
+	irc_numeric( RPL_VERSION, nick, "%s :%s %s %s", me.version, me.name, ns_module_info.build_date, ns_module_info.build_time );
 	AllModuleVersions( nick, remoteserver );
 }
 
@@ -1575,7 +1575,7 @@ void do_motd( const char *nick, const char *remoteserver )
 		irc_numeric( RPL_MOTD, nick, ":- %s", buf );
 	}
 	fclose( fp );
-	irc_numeric( RPL_ENDOFMOTD, nick, ":End of MOTD command." );
+	irc_numeric( RPL_ENDOFMOTD, nick, ":End of /MOTD command." );
 }
 
 /** @brief Display the ADMIN Message from the external stats.admin file
@@ -1600,14 +1600,14 @@ void do_admin( const char *nick, const char *remoteserver )
 		return;
 	}
 	irc_numeric( RPL_ADMINME, nick, ":%s :Administrative info", me.name );
-	irc_numeric( RPL_ADMINME, nick, ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
+	irc_numeric( RPL_ADMINLOC1, nick, ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
 	while( fgets( buf, sizeof( buf ), fp ) )
 	{
 		buf[strnlen( buf, BUFSIZE ) - 1] = 0;
-		irc_numeric( RPL_ADMINLOC1, nick, ":- %s", buf );
+		irc_numeric( RPL_ADMINLOC2, nick, ":- %s", buf );
 	}
 	fclose( fp );
-	irc_numeric( RPL_ADMINLOC2, nick, "End of /ADMIN command." );
+	irc_numeric( RPL_ADMINLOC2, nick, ":End of /ADMIN command." );
 }
 
 /** @brief 
@@ -2475,14 +2475,14 @@ void do_whois( const char *origin, const char *server, const char *target )
 	}
 	else
 	{
-		irc_numeric( RPL_WHOISUSER, origin, "%s %s@%s * :%s", t->name, t->user->username, t->user->vhost, t->info );
+		irc_numeric( RPL_WHOISUSER, origin, "%s %s %s * :%s", t->name, t->user->username, t->user->vhost, t->info );
 		if( t->user->bot == NULL )
 		{
-			irc_numeric( RPL_WHOISSERVER, origin, "%s %s :%s", target, t->uplink->name, t->uplink->info );
+			irc_numeric( RPL_WHOISSERVER, origin, "%s %s :%s", t->name, t->uplink->name, t->uplink->info );
 		}
 		else if( t->user->bot->flags & BOT_FLAG_SERVICEBOT )
 		{
-			irc_numeric( RPL_WHOISUSER, origin, "%s :is an IRC operator", target );
+			irc_numeric( RPL_WHOISOPERATOR, origin, "%s :is an IRC operator", t->name );
 		}
 	}
 	irc_numeric( RPL_ENDOFWHOIS, origin, "%s :End of /WHOIS list", target );
