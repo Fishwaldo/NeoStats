@@ -26,5 +26,3 @@ extern const char *ts_about[];
 extern const char *ts_help_add[];
 extern const char *ts_help_del[];
 extern const char *ts_help_list[];
-extern const char *ts_help_addchan[];
-extern const char *ts_help_delchan[];

@@ -80,7 +80,7 @@ static hash_t *tshash;
 static Bot *ts_bot;
 
 /** Copyright info */
-const char *ts_copyright[] = {
+static const char *ts_copyright[] = {
 	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",
 	NULL
@@ -104,9 +104,9 @@ ModuleInfo module_info = {
 /** Bot command table */
 static bot_cmd ts_commands[]=
 {
-	{"ADD",		ts_cmd_add,	3,	NS_ULEVEL_ADMIN,	ts_help_add},
-	{"DEL",		ts_cmd_del,	1, 	NS_ULEVEL_ADMIN,	ts_help_del},
-	{"LIST",	ts_cmd_list,	0, 	0,			ts_help_list},
+	{"ADD",		ts_cmd_add,	3,	NS_ULEVEL_ADMIN,	ts_help_add, 0, NULL, NULL},
+	{"DEL",		ts_cmd_del,	1, 	NS_ULEVEL_ADMIN,	ts_help_del, 0, NULL, NULL},
+	{"LIST",	ts_cmd_list,	0, 	0,				ts_help_list, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -117,7 +117,7 @@ static bot_setting ts_settings[]=
 };
 
 /** Sub bot command table template */
-const char *ts_help_about[] = {
+static const char *ts_help_about[] = {
 	"Display about text",
 	"Syntax: \2ABOUT\2",
 	"",
@@ -125,7 +125,7 @@ const char *ts_help_about[] = {
 	NULL
 };
 
-const char *ts_help_credits[] = {
+static const char *ts_help_credits[] = {
 	"Display credits",
 	"Syntax: \2CREDITS\2",
 	"",
@@ -133,7 +133,7 @@ const char *ts_help_credits[] = {
 	NULL
 };
 
-const char *ts_help_version[] = {
+static const char *ts_help_version[] = {
 	"Display version",
 	"Syntax: \2VERSION\2",
 	"",
@@ -141,7 +141,7 @@ const char *ts_help_version[] = {
 	NULL
 };
 
-const char *ts_help_addchan[] = {
+static const char *ts_help_addchan[] = {
 	"Add Channel to Client",
 	"Syntax: \2ADD <#channel>\2",
 	"",
@@ -149,7 +149,7 @@ const char *ts_help_addchan[] = {
 	NULL
 };
 
-const char *ts_help_delchan[] = {
+static const char *ts_help_delchan[] = {
 	"Remove Channel from Client",
 	"Syntax: \2DEL <#channel>\2",
 	"",
@@ -157,44 +157,44 @@ const char *ts_help_delchan[] = {
 	NULL
 };
 
-static bot_cmd ts_commandtemplate[]=
+static bot_cmd ts_commandtemplate =
 {
-	{NULL,	ts_cmd_msg,	1, 	0,	NULL, CMD_FLAG_CHANONLY },
+	NULL,	ts_cmd_msg,	1, 	0,	NULL, CMD_FLAG_CHANONLY, NULL, NULL
 };
 
-static bot_cmd ts_commandtemplateabout[]=
+static bot_cmd ts_commandtemplateabout =
 {
-	{"ABOUT",	ts_cmd_about,	0, 	0,	ts_help_about},
+	"ABOUT",	ts_cmd_about,	0, 	0,	ts_help_about, 0, NULL, NULL
 };
 
-static bot_cmd ts_commandtemplatecredits[]=
+static bot_cmd ts_commandtemplatecredits =
 {
-	{"CREDITS",	ts_cmd_credits,	0, 	0,	ts_help_credits},
+	"CREDITS",	ts_cmd_credits,	0, 	0,	ts_help_credits, 0, NULL, NULL
 };
 
-static bot_cmd ts_commandtemplateversion[]=
+static bot_cmd ts_commandtemplateversion =
 {
-	{"VERSION",	ts_cmd_version,	0, 	0,	ts_help_version},
+	"VERSION",	ts_cmd_version,	0, 	0,	ts_help_version, 0, NULL, NULL
 };
 
-static bot_cmd ts_commandtemplateaddchanpublic[]=
+static bot_cmd ts_commandtemplateaddchanpublic =
 {
-	{"ADD",	ts_cmd_add_chan,	1, 	0,	ts_help_addchan},
+	"ADD",	ts_cmd_add_chan,	1, 	0,	ts_help_addchan, 0, NULL, NULL
 };
 
-static bot_cmd ts_commandtemplatedelchanpublic[]=
+static bot_cmd ts_commandtemplatedelchanpublic =
 {
-	{"DEL",	ts_cmd_del_chan,	1, 	0,	ts_help_delchan},
+	"DEL",	ts_cmd_del_chan,	1, 	0,	ts_help_delchan, 0, NULL, NULL
 };
 
-static bot_cmd ts_commandtemplateaddchanprivate[]=
+static bot_cmd ts_commandtemplateaddchanprivate =
 {
-	{"ADD",	ts_cmd_add_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_addchan},
+	"ADD",	ts_cmd_add_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_addchan, 0, NULL, NULL
 };
 
-static bot_cmd ts_commandtemplatedelchanprivate[]=
+static bot_cmd ts_commandtemplatedelchanprivate =
 {
-	{"DEL",	ts_cmd_del_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_delchan},
+	"DEL",	ts_cmd_del_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_delchan, 0, NULL, NULL
 };
 
 /** Sub bot setting table template */
@@ -227,7 +227,7 @@ static BotInfo ts_botinfo =
  *  @return number of characters written excluding terminating null
  */
 
-int tsprintf( char *botname, char *from, char *target, char *buf, const size_t size, const char *fmt, ... )
+static int tsprintf( char *botname, char *from, char *target, char *buf, const size_t size, const char *fmt, ... )
 {
 	static char nullstring[] = "(null)";
 	size_t len = 0;
@@ -326,9 +326,9 @@ int tsprintf( char *botname, char *from, char *target, char *buf, const size_t s
  *
  *  @param none
  *
- *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ *  @return none
  */
-static int parse_line( dbbot *db, char *buf, int *commandreadcount )
+static void parse_line( dbbot *db, char *buf, int *commandreadcount )
 {
 	int readcount = 0;
 	char *ptr;
@@ -337,39 +337,39 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
 	/* Get command text */
 	ptr = strtok( buf, "|" );
 	if( !ptr )
-		return NS_FAILURE;
+		return;
 	if( ircstrcasecmp( ptr, "ABOUT" ) == 0 )
 	{
 		ptr = strtok( NULL, "|" );
 		if( !ptr )
-			return NS_FAILURE;
+			return;
 		dlog( DEBUG1, "about %s", ptr );
 		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
 		db->abouttext = ptr2;
-		return NS_SUCCESS;		
+		return;		
 	}
 	if( ircstrcasecmp( ptr, "CREDITS" ) == 0 )
 	{
 		ptr = strtok( NULL, "|" );
 		if( !ptr )
-			return NS_FAILURE;
+			return;
 		dlog( DEBUG1, "credits %s", ptr );
 		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
 		db->creditstext = ptr2;
-		return NS_SUCCESS;		
+		return;		
 	}
 	if( ircstrcasecmp( ptr, "VERSION" ) == 0 )
 	{
 		ptr = strtok( NULL, "|" );
 		if( !ptr )
-			return NS_FAILURE;
+			return;
 		dlog( DEBUG1, "credits %s", ptr );
 		ptr2 = ns_malloc( strlen( ptr ) + 1 );
 		strcpy( ptr2, ptr );
 		db->versiontext = ptr2;
-		return NS_SUCCESS;		
+		return;		
 	}
 	while( ptr )
 	{
@@ -381,9 +381,8 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
 		ptr = strtok( NULL, "|" );
 	}
 	if( readcount != 4 )
-		return NS_FAILURE;
+		return;
 	(*commandreadcount)++;
-	return NS_SUCCESS;
 }
 
 /** @brief ts_read_database
@@ -392,10 +391,10 @@ static int parse_line( dbbot *db, char *buf, int *commandreadcount )
  *
  *  @param none
  *
- *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ *  @return none
  */
 
-static int ts_read_database( dbbot *db )
+static void ts_read_database( dbbot *db )
 {
 	static char filename[MAXPATH];
 	static char buf[BUFSIZE*4];
@@ -408,7 +407,7 @@ static int ts_read_database( dbbot *db )
 	strlcat( filename, db->tsbot.dbname, MAXPATH );
 	fp = os_fopen( filename, "rt" );
 	if( !fp )
-		return NS_SUCCESS;
+		return;
 	while( os_fgets( buf, BUFSIZE*4, fp ) != NULL )
 	{
 		/* comment char */
@@ -451,7 +450,6 @@ static int ts_read_database( dbbot *db )
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanprivate, sizeof( bot_cmd ) );
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanprivate, sizeof( bot_cmd ) );
 	}
-	return NS_SUCCESS;
 }
 
 /** @brief BuildBot
@@ -463,7 +461,7 @@ static int ts_read_database( dbbot *db )
  *  @return none
  */
 
-void BuildBot( dbbot *db )
+static void BuildBot( dbbot *db )
 {
 	strlcpy( db->botinfo.nick, db->tsbot.botname, MAXNICK );
 	strlcpy( db->botinfo.altnick, db->tsbot.botname, MAXNICK );
@@ -485,7 +483,7 @@ void BuildBot( dbbot *db )
  *  @return none
  */
 
-void JoinBot( dbbot *db )
+static void JoinBot( dbbot *db )
 {
 	hnode_t *hn;
 	hscan_t hs;
@@ -512,7 +510,7 @@ void JoinBot( dbbot *db )
  *  @return none
  */
 
-void PartBot( dbbot *db )
+static void PartBot( dbbot *db )
 {
 	hnode_t *hn;
 	hscan_t hs;
