@@ -31,6 +31,7 @@ void KillUser( const char *source, const char *nick, const char *reason );
 void QuitUser( const char *nick, const char *reason );
 void SetUserVhost( const char *nick, const char *vhost );
 void SetUserServicesTS( const char *nick, const char *ts );
+void SetUserVersion( Client *client, const char *version );
 void UserNickChange( const char *oldnick, const char *newnick, const char *ts );
 void UserMode( const char *nick, const char *modes );
 void UserSMode( const char *nick, const char *modes );

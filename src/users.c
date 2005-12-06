@@ -740,6 +740,25 @@ void SetUserServicesTS( const char *nick, const char *ts )
 		u->user->servicestamp = strtol( ts, NULL, 10 );
 }
 
+/** @brief SetUserVersion
+ *
+ *  Set user version information
+ *
+ *  @param client pointer to user to process
+ *  @param version data
+ *
+ *  @return none
+ */
+
+void SetUserVersion( Client *client, const char *version )
+{
+	if( !( client->flags & CLIENT_FLAG_GOTVERSION ) )
+	{
+		client->flags |= CLIENT_FLAG_GOTVERSION;
+		strlcpy( client->version, version, MAXHOST );
+	}
+}
+
 /** @brief FiniUsers
  *
  *  Fini user subsystem

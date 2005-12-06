@@ -197,19 +197,19 @@ void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v 
 
 int ss_cmd_ctcpversion( const CmdParams *cmdparams )
 {
-	int num;
+	int limit;
 
-	num = cmdparams->ac > 0 ? atoi( cmdparams->av[0] ) : 10;
-	if( num < 10 )
-		num = 10;
+	limit = cmdparams->ac > 0 ? atoi( cmdparams->av[0] ) : 10;
+	if( limit < 10 )
+		limit = 10;
 	if( list_count( ctcp_version_list ) == 0 )
 	{
 		irc_prefmsg( ss_bot, cmdparams->source, "No Stats Available." );
 		return NS_SUCCESS;
 	}
-	irc_prefmsg( ss_bot, cmdparams->source, "Top %d Client Versions:", num );
+	irc_prefmsg( ss_bot, cmdparams->source, "Top %d Client Versions:", limit );
 	irc_prefmsg( ss_bot, cmdparams->source, "======================" );
-	GetClientStats( ClientVersionReport, num, ( void * )cmdparams->source );
+	GetClientStats( ClientVersionReport, limit, ( void * )cmdparams->source );
 	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
@@ -228,7 +228,10 @@ int ss_event_ctcpversionbc( const CmdParams *cmdparams )
 	static char nocols[BUFSIZE];
 	ss_ctcp_version *cv;
 
-    strlcpy( nocols, cmdparams->param, BUFSIZE );
+	/* drop multiple replies and additional lines in multi line replies */
+	if( cmdparams->source->flags & CLIENT_FLAG_GOTVERSION )
+		return NS_SUCCESS;
+	strlcpy( nocols, cmdparams->param, BUFSIZE );
 	strip_mirc_codes( nocols );
 	cv = findctcpversion( nocols );
 	if( !cv )

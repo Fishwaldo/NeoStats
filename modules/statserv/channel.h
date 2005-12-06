@@ -48,7 +48,7 @@ typedef struct channelstat
 
 typedef void (*ChannelStatHandler)( channelstat *cs, const void *v );
 
-void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, const void *v );
+void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int limit, int ignorehidden, const void *v );
 int ss_event_newchan( const CmdParams *cmdparams );
 int ss_event_delchan( const CmdParams *cmdparams );
 int ss_event_join( const CmdParams *cmdparams );

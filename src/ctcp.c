@@ -26,6 +26,7 @@
 #include "ctcp.h"
 #include "dcc.h"
 #include "services.h"
+#include "users.h"
 
 /** CTCP subsystem
  *
@@ -241,6 +242,7 @@ static int ctcp_rpl_version( CmdParams *cmdparams )
 	dlog( DEBUG5, "RX: CTCP VERSION reply from %s to %s", cmdparams->source->name, cmdparams->bot->name );
 	SendAllModuleEvent( EVENT_CTCPVERSIONRPLBC, cmdparams );
 	SendModuleEvent( EVENT_CTCPVERSIONRPL, cmdparams, cmdparams->bot->moduleptr );
+	SetUserVersion( cmdparams->source, cmdparams->param );
 	return NS_SUCCESS;
 }
 
@@ -277,7 +279,7 @@ int master_ctcp_version_req( const Client *target )
 	const Bot *botptr;
 
 	botptr = CTCPVersionMasterBot;
-	if( !botptr )
+	if( botptr == NULL )
 		botptr = ns_botptr;
 	dlog( DEBUG5, "TX: CTCP VERSION request from %s to %s", botptr->name, target->name );
 	irc_privmsg( botptr, target, "\1VERSION\1" );

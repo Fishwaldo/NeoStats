@@ -51,8 +51,6 @@ static int ns_cmd_raw( const CmdParams *cmdparams );
 #endif /* USE_RAW */
 static int ns_cmd_status( const CmdParams *cmdparams );
 
-static int services_event_ctcpversion( const CmdParams *cmdparams );
-
 #ifndef DEBUG
 static int ns_set_debug_cb( const CmdParams *cmdparams, SET_REASON reason );
 #endif /* DEBUG */
@@ -187,25 +185,8 @@ static BotInfo ns_botinfo =
 /** Core event table */
 static ModuleEvent neostats_events[] =
 {
-	{EVENT_CTCPVERSIONRPL,	services_event_ctcpversion,	EVENT_FLAG_IGNORE_SYNCH},
 	NS_EVENT_END()
 };
-
-/** @brief services_event_ctcpversion
- *
- *  NeoStats CTCP VERSION reply event handler
- *
- *  @param cmdparams structure with command information
- *
- *  @return none
- */
-
-static int services_event_ctcpversion( const CmdParams *cmdparams )
-{
-	dlog(DEBUG1, "Got Version reply event in services.c from %s: %s", cmdparams->source->name, cmdparams->param);
-	strlcpy( cmdparams->source->version, cmdparams->param, MAXHOST );
-	return NS_SUCCESS;
-}
 
 /** @brief InitServices
  *

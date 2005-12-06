@@ -667,14 +667,14 @@ int DelOldChanTimer( void *userptr )
  *
  *  @param handler pointer to handler function
  *  @param sortstyle
- *  @param maxcount
+ *  @param limit
  *  @param ignorehidden
  *  @param v pointer to client to send to
  *
  *  @return none
  */
 
-void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int maxcount, int ignorehidden, const void *v )
+void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, int limit, int ignorehidden, const void *v )
 {
 	int count = 0;
 	lnode_t *ln;
@@ -706,7 +706,7 @@ void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, 
 	while( ln )
 	{
 		cs = ( channelstat * )lnode_get( ln );
-		if( maxcount != -1 && count >= maxcount )
+		if( limit != -1 && count >= limit )
 			break;
 		if( !ignorehidden || !is_hidden_chan( cs->c ) )
 		{

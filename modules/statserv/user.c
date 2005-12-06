@@ -38,7 +38,7 @@
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int AddUser( Client *u, void *v )
+static int AddUser( const Client *u, void *v )
 {
 	SET_SEGV_LOCATION();
 	AddServerUser( u );
@@ -77,7 +77,7 @@ static void DelUser( const Client *u )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_mode( CmdParams *cmdparams )
+int ss_event_mode( const CmdParams *cmdparams )
 {
 	int add = 1;
 	serverstat *ss;
@@ -135,7 +135,7 @@ int ss_event_mode( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_globalkill( CmdParams *cmdparams )
+int ss_event_globalkill( const CmdParams *cmdparams )
 {
 	serverstat *ss;
 
@@ -153,7 +153,7 @@ int ss_event_globalkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_serverkill( CmdParams *cmdparams )
+int ss_event_serverkill( const CmdParams *cmdparams )
 {
 	serverstat *ss;
 
@@ -171,7 +171,7 @@ int ss_event_serverkill( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_quit( CmdParams *cmdparams )
+int ss_event_quit( const CmdParams *cmdparams )
 {
 	DelUser( cmdparams->source );
 	return NS_SUCCESS;
@@ -186,7 +186,7 @@ int ss_event_quit( CmdParams *cmdparams )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_event_signon( CmdParams *cmdparams )
+int ss_event_signon( const CmdParams *cmdparams )
 {
 	AddUser( cmdparams->source, NULL );
 	return NS_SUCCESS;
