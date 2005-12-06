@@ -177,6 +177,7 @@ void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v 
 		cv = ( ss_ctcp_version * ) lnode_get( cn );
 		handler( cv, v );	
 		cn = list_next( ctcp_version_list, cn );
+		count++;
 		if( limit != -1 && count >= limit )
 			break;
 	}
