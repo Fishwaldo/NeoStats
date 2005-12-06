@@ -294,9 +294,9 @@ static int set_config_values( cfg_t *cfg )
 	/* has a default */
 	mqs.port = cfg_getint(cfg, "NeoNet|Port");
 
-	if (!strcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "yes")) {
+	if (!ircstrcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "yes")) {
 		mqs.connect = MQ_CONNECT_YES;
-	} else if (!strcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "demand")) {
+	} else if (!ircstrcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "demand")) {
 		mqs.connect = MQ_CONNECT_DEMAND;
 	} else {
 		mqs.connect = MQ_CONNECT_NO;
