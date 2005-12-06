@@ -100,7 +100,10 @@ static htmlfunc htmlfuncs[]=
 
 static void html_title( void )
 {
-	os_fprintf( opf, "Network Statistics for %s", me.netname );
+	if( me.netname[0] != '\0' )
+		os_fprintf( opf, "Network Statistics for %s", me.netname );
+	else
+		os_fprintf( opf, "Network Statistics" );
 }
 
 /** @brief html_version
