@@ -130,7 +130,7 @@ int MQModuleDelcmd(Module *modptr) {
 int MQCheckGroups(char *group) {
 	int i;
 	for (i = 0; i < mqs.nogroups; i++) {
-		if (!strcasecmp(mqs.groups[i], group)) {
+		if (!ircstrcasecmp(mqs.groups[i], group)) {
 			return NS_SUCCESS;
 		}
 	}
