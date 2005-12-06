@@ -236,16 +236,18 @@ int32 MQSRecvSock(uint8 * buf, uint32 numBytes, void * arg) {
 }
 
 int MQPingSrv(void *unused) {
+	MMessage *msg;
+	int64 *ping;
 	if (mqs.state != MQS_OK) { 
 		/* just return silently */
 		return NS_SUCCESS;
 	}
-	MMessage *msg = MMAllocMessage(0);
+	msg = MMAllocMessage(0);
 	if (!msg) {
 		nlog(LOG_WARNING, "Warning, Couldn't create MQ Ping Packet");
 		return NS_SUCCESS;
 	}
-	int64 *ping = MMPutInt64Field(msg, false, NNFLD_SNDTIME, 1);
+	ping = MMPutInt64Field(msg, false, NNFLD_SNDTIME, 1);
 	if (ping) ping[0] = time(NULL);
 	
 	MMSetWhat(msg, NNMSG_PING);
@@ -374,9 +376,10 @@ void ProcessMessage(MMessage *msg) {
 			mqs.state = MQS_OK;
 			groups = MMGetStringField(msg, "group", &nogroups);
 			for (i = 0; i < nogroups; i++) {
+				int len;
 				/* max groups so far */
 				if (i > 8) break;
-				int len = strlen((char *)groups[i]+sizeof(uint32));
+				len = strlen((char *)groups[i]+sizeof(uint32));
 				if (len > MAXUSER) len = MAXUSER;
 				strncpy(mqs.groups[i], (char *)groups[i]+sizeof(uint32), len);
 			}
