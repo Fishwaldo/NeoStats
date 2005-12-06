@@ -518,6 +518,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MiniMessage.c"
+				>
+			</File>
+			<File
+				RelativePath=".\MiniMessageGateway.c"
+				>
+			</File>
+			<File
 				RelativePath=".\misc.c"
 				>
 			</File>
@@ -607,6 +615,10 @@
 			</File>
 			<File
 				RelativePath=".\transfer.c"
+				>
+			</File>
+			<File
+				RelativePath=".\updates.c"
 				>
 			</File>
 			<File
@@ -744,11 +756,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\MiniMessage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\MiniMessageGateway.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\modes.h"
 				>
 			</File>
 			<File
 				RelativePath="..\include\modules.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\MuscleSupport.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\NeoNet.h"
 				>
 			</File>
 			<File
@@ -784,11 +812,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\resource.h"
+				RelativePath=".\win32\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\win32\resource.h"
+				RelativePath="..\..\src\win32\resource.h"
 				>
 			</File>
 			<File
@@ -821,6 +849,10 @@
 			</File>
 			<File
 				RelativePath="..\include\transfer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\updates.h"
 				>
 			</File>
 			<File

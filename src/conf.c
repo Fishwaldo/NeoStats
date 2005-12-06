@@ -284,7 +284,6 @@ static int set_config_values( cfg_t *cfg )
 		dlog( DEBUG6, "                     %s", cfg_getnstr( cfg, "Modules|ModuleName", i ));
 	}	
 	dlog( DEBUG6, "-----------------------------------------------" );
-#ifndef WIN32
 	if (cfg_size(cfg, "NeoNet|UserName") > 0) 
 		strlcpy(mqs.username, cfg_getstr(cfg, "NeoNet|UserName"), MAXUSER);
 	if (cfg_size(cfg, "NeoNet|Password") > 0)
@@ -293,7 +292,6 @@ static int set_config_values( cfg_t *cfg )
 	strlcpy(mqs.hostname, cfg_getstr(cfg, "NeoNet|HostName"), MAXHOST);
 	/* has a default */
 	mqs.port = cfg_getint(cfg, "NeoNet|Port");
-
 	if (!ircstrcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "yes")) {
 		mqs.connect = MQ_CONNECT_YES;
 	} else if (!ircstrcasecmp(cfg_getstr(cfg, "NeoNet|Connect"), "demand")) {
@@ -301,7 +299,6 @@ static int set_config_values( cfg_t *cfg )
 	} else {
 		mqs.connect = MQ_CONNECT_NO;
 	}
-#endif /* WIN32 */
 	return NS_SUCCESS;
 }
 

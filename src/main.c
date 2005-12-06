@@ -46,8 +46,8 @@
 #include "signals.h"
 #ifndef WIN32
 #include "lang.h"
-#include "updates.h"
 #endif /* !WIN32 */
+#include "updates.h"
 #include "nsdba.h"
 #include "dcc.h"
 #ifdef USE_PERL
@@ -450,9 +450,7 @@ int main( int argc, char *argv[] )
 	/* Load modules after we fork. This fixes the load->fork-exit->call 
 	   _fini problems when we fork */
 	ConfLoadModules();
-#ifndef WIN32
 	InitUpdate();
-#endif /* WIN32 */
 	/* Connect to server */
 	Connect();
 #ifdef WIN32
