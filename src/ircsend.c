@@ -259,12 +259,14 @@ int InitIrcdSymbols( void )
 	{
 		char **ptr;
 
+		dlog( DEBUG7, "InitIrcdSymbols: start" );
 		/* Find MSG_cmd */
 		if( pprotocol_sym->msgptr )
 		{
 			ptr = ns_dlsym( protocol_module_handle, pprotocol_sym->msgsym );
 			if( ptr )
 				*pprotocol_sym->msgptr = *ptr;
+			dlog( DEBUG7, "InitIrcdSymbols: %s: %s", pprotocol_sym->msgsym, ptr ? *ptr : "NONE" );
 		}
 		/* Find TOK_cmd */
 		if( pprotocol_sym->tokptr )
@@ -272,22 +274,35 @@ int InitIrcdSymbols( void )
 			ptr = ns_dlsym( protocol_module_handle, pprotocol_sym->toksym );
 			if( ptr )
 				*pprotocol_sym->tokptr = *ptr;
+			dlog( DEBUG7, "InitIrcdSymbols: %s: %s", pprotocol_sym->toksym, ptr ? *ptr : "NONE" );
 		}
 		/* If we have a message or token, apply default handler */
 		if( ( pprotocol_sym->msgptr || pprotocol_sym->tokptr ) && pprotocol_sym->handler )
+		{
 			*pprotocol_sym->handler = pprotocol_sym->defaulthandler;
+			dlog( DEBUG7, "InitIrcdSymbols: default handler for: %s %p", pprotocol_sym->sym ? pprotocol_sym->sym : "NONE", pprotocol_sym->defaulthandler );
+		}
 		/* Check for IRCd override handler */
 		if( pprotocol_sym->sym )
+		{
 			protocol_handler = ns_dlsym( protocol_module_handle, pprotocol_sym->sym );
+			dlog( DEBUG7, "InitIrcdSymbols: override handler for: %s %p", pprotocol_sym->sym ? pprotocol_sym->sym : "NONE", protocol_handler );
+		}
 		/* If we need a handler */
 		if( pprotocol_sym->handler )
 		{
 			/* Apply IRCd override handler */
 			if( protocol_handler )
+			{
 				*pprotocol_sym->handler = protocol_handler;
+				dlog( DEBUG7, "InitIrcdSymbols: apply override handler for: %s %p", pprotocol_sym->sym ? pprotocol_sym->sym : "NONE", protocol_handler );
+			}
 			/* Try to apply handler if no IRCd override and we have not already set the default */
 			if( *pprotocol_sym->handler == NULL ) 
+			{
 				*pprotocol_sym->handler = pprotocol_sym->defaulthandler;
+				dlog( DEBUG7, "InitIrcdSymbols: apply default handler for: %s %p", pprotocol_sym->sym ? pprotocol_sym->sym : "NONE", pprotocol_sym->defaulthandler );
+			}
 			/* If no default or IRCd handler but we require the function, quit with error */
 			if( pprotocol_sym->required && !*pprotocol_sym->handler ) 
 			{
@@ -298,6 +313,7 @@ int InitIrcdSymbols( void )
 			if( *pprotocol_sym->handler ) 
 				ircd_srv.features |= pprotocol_sym->feature;
 		}
+		dlog( DEBUG7, "InitIrcdSymbols: end" );
 		/* Next... */
 		pprotocol_sym ++;
 	}
