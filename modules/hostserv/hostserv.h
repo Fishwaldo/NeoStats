@@ -32,7 +32,6 @@ extern const char *hs_help_listwild[];
 extern const char *hs_help_login[];
 extern const char *hs_help_chpass[];
 extern const char *hs_help_bans[];
-extern const char *hs_help_levels[];
 extern const char *hs_help_set_expire[];
 extern const char *hs_help_set_hiddenhost[];
 extern const char *hs_help_set_hostname[];

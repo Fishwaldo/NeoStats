@@ -48,7 +48,7 @@ typedef struct banentry
 } banentry;
 
 /** config struct */
-struct hs_cfg
+static struct hs_cfg
 {
 	char vhostdom[MAXHOST];
 	int expire;
@@ -83,7 +83,7 @@ static hash_t *banhash;
 static Bot *hs_bot;
 
 /** Copyright info */
-const char *hs_copyright[] =
+static const char *hs_copyright[] =
 {
 	"Copyright (c) 1999-2005, NeoStats",
 	"http://www.neostats.net/",
