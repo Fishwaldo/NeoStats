@@ -166,7 +166,7 @@ static Channel *new_chan( const char *chan )
 		c->flags |= CHANNEL_FLAG_ME;
 	hnode_create_insert( channelhash, c, c->name );
 	c->members = list_create( CHANNEL_MEM_SIZE );
-	c->modeparms = list_create( CHANNEL_MAXMODES );
+	c->modeparams = list_create( CHANNEL_MAXMODES );
 	c->creationtime = me.now;
 	/* XXX TODO: Set the channel language */
 	c->lang = me.lang;
@@ -207,7 +207,7 @@ static void del_chan( Channel *c )
 	cmdparams->channel = c;
 	SendAllModuleEvent( EVENT_DELCHAN, cmdparams );
 	ns_free( cmdparams );
-	list_destroy_auto( c->modeparms );
+	list_destroy_auto( c->modeparams );
 	list_destroy( c->members );
 	hash_delete_destroy_node( channelhash, cn );
 	ns_free( c );

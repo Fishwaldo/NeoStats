@@ -680,7 +680,7 @@ const char *GetSmodeDesc( unsigned int mask )
 */
 int test_cmode( const Channel *c, unsigned int mask )
 {
-	ModesParm *m;
+	ModeParams *m;
 	lnode_t *mn;
 
 	if( !c )
@@ -694,7 +694,7 @@ int test_cmode( const Channel *c, unsigned int mask )
 		return 1;
 	}
 	/* if we get here, we have to check the modeparm list first */
-	mn = list_first( c->modeparms );
+	mn = list_first( c->modeparams );
 	while( mn )
 	{
 		m = lnode_get( mn );
@@ -703,7 +703,7 @@ int test_cmode( const Channel *c, unsigned int mask )
 			/* its a match */
 			return 1;
 		}
-		mn = list_next( c->modeparms, mn );
+		mn = list_next( c->modeparams, mn );
 	}
 	return 0;
 }
@@ -730,16 +730,13 @@ int test_cmode( const Channel *c, unsigned int mask )
 
 static int comparemode( const void *v, const void *mask )
 {
-	ModesParm *m =( void * ) v;
+	ModeParams *m = ( void * ) v;
 
-	if( m->mask ==( unsigned int ) mask )
+	if( m->mask == ( unsigned int ) mask )
 	{
 		return 0;
 	}
-	else
-	{
-		return 1;
-	}
+	return 1;
 }
 
 /** @brief
@@ -762,10 +759,10 @@ static int comparemode( const void *v, const void *mask )
  * @return 0 on error, number of modes processed on success.
 */
 
-int ChanModeHandler( Channel *c, const char *modes, int j, char **av, int ac )
+void ChanModeHandler( Channel *c, const char *modes, int avindex, char **av, int ac )
 {
 	int modeexists;
-	ModesParm *m;
+	ModeParams *m;
 	lnode_t *mn;
 	int add = 0;
 
@@ -788,50 +785,50 @@ int ChanModeHandler( Channel *c, const char *modes, int j, char **av, int ac )
 		default:
 			if( flags&NICKPARAM )
 			{
-				ChanUserMode( av[0], av[j], add, mask );
-				j++;
+				ChanUserMode( av[0], av[avindex], add, mask );
+				avindex++;
 			}
 			else if( add )
 			{
 				/* mode limit and mode key replace current values */
 				if( mask == CMODE_LIMIT )
 				{
-					c->limit = atoi( av[j] );
-					j++;
+					c->limit = atoi( av[avindex] );
+					avindex++;
 				}
 				else if( mask == CMODE_KEY )
 				{
-					strlcpy( c->key, av[j], KEYLEN );
-					j++;
+					strlcpy( c->key, av[avindex], KEYLEN );
+					avindex++;
 				}
-				else if( flags )
+				else if( flags & MODEPARAM )
 				{
-					mn = list_first( c->modeparms );
+					mn = list_first( c->modeparams );
 					modeexists = 0;
 					while( mn )
 					{
 						m = lnode_get( mn );
-						if( ( m->mask == mask ) && ircstrcasecmp( m->param, av[j] )== 0 )
+						if( ( m->mask == mask ) && ircstrcasecmp( m->param, av[avindex] )== 0 )
 						{
-							dlog( DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, av[j] );
-							j++;
+							dlog( DEBUG1, "ChanMode: Mode %c (%s) already exists, not adding again", *modes, av[avindex] );
+							avindex++;
 							modeexists = 1;
 							break;
 						}
-						mn = list_next( c->modeparms, mn );
+						mn = list_next( c->modeparams, mn );
 					}
 					if( modeexists != 1 )
 					{
-						m = ns_calloc( sizeof( ModesParm ) );
+						m = ns_calloc( sizeof( ModeParams ) );
 						m->mask = mask;
-						strlcpy( m->param, av[j], PARAMSIZE );
-						if( list_isfull( c->modeparms ) )
+						strlcpy( m->param, av[avindex], PARAMSIZE );
+						if( list_isfull( c->modeparams ) )
 						{
 							nlog( LOG_CRITICAL, "ChanMode: modelist is full adding to channel %s", c->name );
 							do_exit( NS_EXIT_ERROR, "List full - see log file" );
 						}
-						lnode_create_append( c->modeparms, m );
-						j++;
+						lnode_create_append( c->modeparams, m );
+						avindex++;
 					}
 				}
 				else
@@ -848,11 +845,11 @@ int ChanModeHandler( Channel *c, const char *modes, int j, char **av, int ac )
 				else if( mask == CMODE_KEY )
 				{
 					c->key[0] = 0;
-					j++;
+					avindex++;
 				}
-				else if( flags )
+				else if( flags & MODEPARAM )
 				{
-					mn = list_find( c->modeparms,( void * ) mask, comparemode );
+					mn = list_find( c->modeparams,( void * ) mask, comparemode );
 					if( !mn )
 					{
 						dlog( DEBUG1, "ChanMode: can't find mode %c for channel %s", *modes, c->name );
@@ -860,9 +857,10 @@ int ChanModeHandler( Channel *c, const char *modes, int j, char **av, int ac )
 					else
 					{
 						m = lnode_get( mn );
-						list_delete_destroy_node( c->modeparms, mn );
+						list_delete_destroy_node( c->modeparams, mn );
 						ns_free( m );
 					}
+					avindex++;
 				}
 				else
 				{
@@ -872,7 +870,6 @@ int ChanModeHandler( Channel *c, const char *modes, int j, char **av, int ac )
 		}
 		modes++;
 	}
-	return j;
 }
 
 /** @brief
@@ -884,16 +881,16 @@ int ChanModeHandler( Channel *c, const char *modes, int j, char **av, int ac )
  *  @return 
  */
 
-int ChanMode( char *origin, char **av, int ac )
+void ChanMode( char *origin, char **av, int ac )
 {
 	Channel *c;
 	CmdParams * cmdparams;
-	int i, j = 2;
+	int i;
 
 	c = FindChannel( av[0] );
 	if( c == NULL )
 	{
-		return 0;
+		return;
 	}	
 	cmdparams =( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->channel = c;
@@ -906,8 +903,7 @@ int ChanMode( char *origin, char **av, int ac )
 	SendAllModuleEvent( EVENT_CMODE, cmdparams );
 	ns_free( cmdparams->av );
 	ns_free( cmdparams );	
-	j = ChanModeHandler( c, av[1], j, av, ac );
-	return j;
+	ChanModeHandler( c, av[1], 2, av, ac );
 }
 
 /** @brief
@@ -980,11 +976,11 @@ ChanUserMode( const char *chan, const char *nick, int add, const unsigned int ma
 void ListChannelModes( const CmdParams *cmdparams, const Channel *c )
 {
 	lnode_t *cmn;
-	ModesParm *m;
+	ModeParams *m;
 	int i;
 
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Mode:       %s", cmdparams->source ), UmodeMaskToString( c->modes ) );
-	cmn = list_first( c->modeparms );
+	cmn = list_first( c->modeparams );
 	while( cmn )
 	{
 		m = lnode_get( cmn );
@@ -995,6 +991,6 @@ void ListChannelModes( const CmdParams *cmdparams, const Channel *c )
 				irc_prefmsg( ns_botptr, cmdparams->source, __( "Modes:      %c Parms %s", cmdparams->source ), i, m->param );
 			}
 		}
-		cmn = list_next( c->modeparms, cmn );
+		cmn = list_next( c->modeparams, cmn );
 	}
 }

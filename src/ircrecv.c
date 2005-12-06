@@ -1769,7 +1769,6 @@ void do_sjoin( const char *tstime, const char *channame, const char *modes, cons
 	char nick[MAXNICK];
 	char *nicklist;
 	unsigned int mask = 0;
-	int j = 3;
 	Channel *c;
 	char **param;
 	unsigned int paramcnt = 0;
@@ -1810,7 +1809,7 @@ void do_sjoin( const char *tstime, const char *channame, const char *modes, cons
 	{
 		/* update the TS time */
 		c->creationtime = atoi( tstime );
-		j = ChanModeHandler( c, modes, j, argv, argc );
+		ChanModeHandler( c, modes, 3, argv, argc );
 	}
 	ns_free( param );
 }

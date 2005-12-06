@@ -300,22 +300,16 @@ static void m_mode( char *origin, char **argv, int argc, int srv )
 					add = 0;
 					break;
 				default:
-					if( flags&NICKPARAM ) {
+					if( flags & NICKPARAM ) {
 						AddStringToList( &av, base64_to_nick( argv[j] ), &ac );
 						j++;
 					} else if( add ) {
-						if( mask == CMODE_LIMIT ) {
-							AddStringToList( &av, argv[j], &ac );
-							j++;
-						} else if( mask == CMODE_KEY ) {
-							AddStringToList( &av, argv[j], &ac );
-							j++;
-						} else if( flags ) {
+						if( flags & MODEPARAM ) {
 							AddStringToList( &av, argv[j], &ac );
 							j++;
 						}
 					} else {
-						if( mask == CMODE_KEY ) {
+						if( ( flags & MODEPARAM ) && ( mask != CMODE_LIMIT ) ) {
 							AddStringToList( &av, argv[j], &ac );
 							j++;
 						}

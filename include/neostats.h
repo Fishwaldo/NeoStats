@@ -651,13 +651,13 @@ typedef struct Ban {
 } Ban;
 
 
-/** @brief ModesParm structure
+/** @brief ModeParams structure
  *  
  */
-typedef struct ModesParm {
+typedef struct ModeParams {
 	unsigned int mask;
 	char param[PARAMSIZE];
-} ModesParm;
+} ModeParams;
 
 /** @brief ChannelMember structure
  *  
@@ -685,7 +685,7 @@ typedef struct Channel {
 	time_t topictime;
 	int  limit;
 	char key[KEYLEN];
-	list_t *modeparms;
+	list_t *modeparams;
 	time_t creationtime;
 	unsigned int flags;
 	void *modptr[NUM_MODULES];
