@@ -85,7 +85,7 @@ static bot_cmd ls_commands[]=
 /** Bot setting table */
 static bot_setting ls_settings[]=
 {
-	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void* )0	},
+	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void * )0	},
 	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,	0, 100,		NS_ULEVEL_ADMIN, NULL,	help_set_buffer, set_buffer_cb, (void *)1	},
 	NS_SETTING_END()
 };

@@ -310,7 +310,7 @@ Timer *FindTimer( const char *name )
 int AddTimer( TIMER_TYPE type, timer_handler handler, const char *name, int interval, void *userptr )
 {
 	Timer *timer;
-	Module* moduleptr;
+	Module *moduleptr;
 
 	SET_SEGV_LOCATION();
 	moduleptr = GET_CUR_MODULE();

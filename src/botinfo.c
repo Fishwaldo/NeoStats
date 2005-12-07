@@ -29,7 +29,7 @@ static int bot_set_user_cb( const CmdParams *cmdparams, SET_REASON reason );
 static int bot_set_host_cb( const CmdParams *cmdparams, SET_REASON reason );
 static int bot_set_realname_cb( const CmdParams *cmdparams, SET_REASON reason );
 
-static bot_setting bot_info_settings[]=
+static bot_setting bot_info_settings[] =
 {
 	{"NICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_nick, bot_set_nick_cb, NULL },
 	{"ALTNICK",	NULL,	SET_TYPE_NICK,		0, MAXNICK, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_altnick, NULL, NULL },
@@ -53,7 +53,8 @@ static bot_setting bot_info_settings[]=
 static int bot_set_nick_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	/* Ignore bootup and list callback */
-	if( reason == SET_CHANGE ) {
+	if( reason == SET_CHANGE )
+	{
 		irc_nickchange( cmdparams->bot, cmdparams->av[1] );
 	}
 	return NS_SUCCESS;
@@ -73,7 +74,8 @@ static int bot_set_nick_cb( const CmdParams *cmdparams, SET_REASON reason )
 static int bot_set_user_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	/* Ignore bootup and list callback */
-	if( reason == SET_CHANGE ) {
+	if( reason == SET_CHANGE )
+	{
 		irc_setident( cmdparams->bot, cmdparams->av[1] );
 	}
 	return NS_SUCCESS;
@@ -93,7 +95,8 @@ static int bot_set_user_cb( const CmdParams *cmdparams, SET_REASON reason )
 static int bot_set_host_cb( const CmdParams *cmdparams, SET_REASON reason )
 {
 	/* Ignore bootup and list callback */
-	if( reason == SET_CHANGE ) {
+	if( reason == SET_CHANGE )
+	{
 		irc_sethost( cmdparams->bot, cmdparams->av[1] );
 	}
 	return NS_SUCCESS;
@@ -115,7 +118,8 @@ static int bot_set_realname_cb( const CmdParams *cmdparams, SET_REASON reason )
 	char *buf;
 
 	/* Ignore bootup and list callback */
-	if( reason == SET_CHANGE ) {
+	if( reason == SET_CHANGE )
+	{
 		buf = joinbuf( cmdparams->av, cmdparams->ac, 1 );
 		irc_setname( cmdparams->bot, buf );
 		ns_free( buf );
@@ -137,7 +141,8 @@ static int bot_set_realname_cb( const CmdParams *cmdparams, SET_REASON reason )
 int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
 {
 	bot_ptr->bot_info_settings = ns_calloc( sizeof( bot_info_settings ) );
-	if( bot_ptr->bot_info_settings ) {
+	if( bot_ptr->bot_info_settings )
+	{
 		os_memcpy( bot_ptr->bot_info_settings, bot_info_settings, sizeof( bot_info_settings ) );
 		bot_ptr->bot_info_settings[0].varptr = botinfo->nick;
 		bot_ptr->bot_info_settings[1].varptr = botinfo->altnick;
@@ -162,7 +167,8 @@ int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
 
 int del_bot_info_settings( Bot *bot_ptr )
 {
-	if( bot_ptr->bot_info_settings ) {
+	if( bot_ptr->bot_info_settings )
+	{
 		del_bot_setting_list( bot_ptr, bot_ptr->bot_info_settings );
 		ns_free( bot_ptr->bot_info_settings );
 	}

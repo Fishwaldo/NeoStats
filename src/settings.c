@@ -587,7 +587,7 @@ static void del_bot_setting( hash_t *set_hash, const bot_setting *set_ptr )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int add_bot_setting_list( Bot* bot_ptr, bot_setting *set_ptr ) 
+int add_bot_setting_list( Bot *bot_ptr, bot_setting *set_ptr ) 
 {
 	if( !set_ptr )
 	{
@@ -629,7 +629,7 @@ int add_bot_setting_list( Bot* bot_ptr, bot_setting *set_ptr )
  *  @return none
  */
 
-void del_bot_setting_list( const Bot* bot_ptr, const bot_setting *set_ptr ) 
+void del_bot_setting_list( const Bot *bot_ptr, const bot_setting *set_ptr ) 
 {
 	/* If no bot pointer return failure */
 	if( bot_ptr != NULL && bot_ptr->botsettings != NULL )

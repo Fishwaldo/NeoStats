@@ -166,7 +166,7 @@ static bot_setting ns_debugsettings[] =
 };
 
 /** Bot pointer */
-Bot* ns_botptr = NULL;
+Bot *ns_botptr = NULL;
 
 /** Core bot info */
 static BotInfo ns_botinfo =

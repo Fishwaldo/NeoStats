@@ -24,7 +24,7 @@
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
 
-void del_all_bot_cmds( Bot* bot_ptr );
+void del_all_bot_cmds( Bot *bot_ptr );
 int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr );
 bot_cmd *find_bot_cmd( const Bot *bot_ptr, const char *cmd);
 void del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr );

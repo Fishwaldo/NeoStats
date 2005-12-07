@@ -552,7 +552,7 @@ int InitUsers( void )
  *  @return NS_FALSE
  */
 
-static int ListUser( Client *u, void* v )
+static int ListUser( Client *u, void *v )
 {
 	CmdParams *cmdparams;
 	lnode_t *cm;
@@ -928,7 +928,7 @@ void DelFakeUser( const char *mask )
  *  @return pointer to allocated memory
  */
 
-void *AllocUserModPtr( Client* u, size_t size )
+void *AllocUserModPtr( Client *u, size_t size )
 {
 	void *ptr;
 
@@ -948,7 +948,7 @@ void *AllocUserModPtr( Client* u, size_t size )
  *  @return none
  */
 
-void FreeUserModPtr( Client* u )
+void FreeUserModPtr( Client *u )
 {
 	ns_free( u->modptr[GET_CUR_MODULE_INDEX()] );
 	GET_CUR_MODULE()->userdatacnt--;
@@ -964,7 +964,7 @@ void FreeUserModPtr( Client* u )
  *  @return none
  */
 
-void* GetUserModPtr( const Client* u )
+void *GetUserModPtr( const Client *u )
 {
 	return u->modptr[GET_CUR_MODULE_INDEX()];
 }

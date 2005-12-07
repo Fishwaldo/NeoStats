@@ -850,7 +850,7 @@ int ProcessChannelMembers( Channel *c, const ChannelMemberListHandler handler, v
  *  @return pointer to allocated memory
  */
 
-void *AllocChannelModPtr( Channel* c, size_t size )
+void *AllocChannelModPtr( Channel *c, size_t size )
 {
 	void *ptr;
 
@@ -886,7 +886,7 @@ void FreeChannelModPtr( Channel *c )
  *  @return none
  */
 
-void* GetChannelModPtr( const Channel *c )
+void *GetChannelModPtr( const Channel *c )
 {
 	if( c )
 		return c->modptr[GET_CUR_MODULE_INDEX()];

@@ -849,7 +849,7 @@ list_destroy_auto (list_t * list)
 
 	ln = list_first (list);
 	while (ln) {
-		void* ptr =	(void*)lnode_get (ln);
+		void *ptr =	( void * )lnode_get (ln);
 		ns_free (ptr);
 		ln = list_next (list, ln);
 	}

@@ -98,7 +98,7 @@ static int IsServiceRoot( const Client *u )
 
 static int ModuleAuthHandler( Module *module_ptr, void *v )
 {
-	if( ( module_ptr->info->flags & MODULE_FLAG_AUTH ) && module_ptr->userauth )
+	if( ( module_ptr->info->flags & MODULE_FLAG_AUTH ) && module_ptr->userauth != NULL )
 	{
 		int auth = 0;
 		ModuleAuthInfo *mai = (ModuleAuthInfo *)v;
@@ -139,7 +139,7 @@ static int AuthUser( const Client *u )
 	mai.auth = 0;
 	mai.u = u;
 	/* Run through list of authentication modules */
-	ProcessModuleList( ModuleAuthHandler, (void *)&mai );
+	ProcessModuleList( ModuleAuthHandler, ( void * )&mai );
 	/* Return calculated auth level */
 	return mai.auth;
 }

@@ -68,7 +68,7 @@ extern config nsconfig;
 
 extern ModuleInfo ns_module_info;
 extern Module ns_module;
-EXPORTVAR extern Bot* ns_botptr;
+EXPORTVAR extern Bot *ns_botptr;
 
 void InitServices( void );
 void FiniServices( void );

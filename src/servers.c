@@ -518,7 +518,7 @@ void RequestServerUptimes( void )
  *  @return pointer to allocated memory
  */
 
-void *AllocServerModPtr( Client* s, size_t size )
+void *AllocServerModPtr( Client *s, size_t size )
 {
 	void *ptr;
 
@@ -538,7 +538,7 @@ void *AllocServerModPtr( Client* s, size_t size )
  *  @return none
  */
 
-void FreeServerModPtr( Client* s )
+void FreeServerModPtr( Client *s )
 {
 	if( s )
 	{
@@ -557,7 +557,7 @@ void FreeServerModPtr( Client* s )
  *  @return none
  */
 
-void* GetServerModPtr( const Client* s )
+void *GetServerModPtr( const Client *s )
 {
 	if( s )
 		return s->modptr[GET_CUR_MODULE_INDEX()];
@@ -574,7 +574,7 @@ void* GetServerModPtr( const Client* s )
  *  @return none
  */
 
-void ClearServerModValue( Client* s )
+void ClearServerModValue( Client *s )
 {
 	if( s )
 	{
@@ -594,7 +594,7 @@ void ClearServerModValue( Client* s )
  *  @return none
  */
 
-void SetServerModValue( Client* s, void *data )
+void SetServerModValue( Client *s, void *data )
 {
 	if( s )
 	{
@@ -613,7 +613,7 @@ void SetServerModValue( Client* s, void *data )
  *  @return none
  */
 
-void *GetServerModValue( const Client* s )
+void *GetServerModValue( const Client *s )
 {
 	if( s )
 		return s->modvalue[GET_CUR_MODULE_INDEX()];

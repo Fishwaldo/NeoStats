@@ -329,7 +329,7 @@ int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list )
  *
  * @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
-void del_bot_cmd_list( const Bot* bot_ptr, const bot_cmd *bot_cmd_list ) 
+void del_bot_cmd_list( const Bot *bot_ptr, const bot_cmd *bot_cmd_list ) 
 {
 	if( bot_ptr != NULL && bot_ptr->botcmds != NULL )
 	{
@@ -346,7 +346,7 @@ void del_bot_cmd_list( const Bot* bot_ptr, const bot_cmd *bot_cmd_list )
  *
  * @return none
  */
-void del_all_bot_cmds( Bot* bot_ptr ) 
+void del_all_bot_cmds( Bot *bot_ptr ) 
 {
 	hnode_t *cmdnode;
 	hscan_t hs;

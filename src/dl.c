@@ -39,14 +39,14 @@ char *ns_dlerrormsg;
 void *ns_dlsym (void *handle, const char *name)
 {
 #ifdef WIN32
-	void* ret;
+	void *ret;
 
-	ret = (void*)GetProcAddress((HMODULE)handle, name);
+	ret = ( void * )GetProcAddress((HMODULE)handle, name);
 	return ret;
 #else /* WIN32 */
 #ifdef NEED_UNDERSCORE_PREFIX
 	static char sym[128];
-	void* ret;
+	void *ret;
 
 	/* reset error */
 	ns_dlerrormsg = 0;
@@ -76,19 +76,19 @@ void *ns_dlsym (void *handle, const char *name)
 void *ns_dlopen (const char *file, int mode)
 {
 #ifdef WIN32
-	void* ret;
+	void *ret;
 
 	mode = mode; /* supress warning */
 	/* reset error */
 	ns_dlerrormsg = 0;
-	ret = (void*)LoadLibrary(file);
+	ret = ( void * )LoadLibrary(file);
 	/* Check for error */
 	if(ret == NULL)
 	{
 	}
 	return ret;
 #else /* WIN32 */
-	void* ret;
+	void *ret;
 
 	/* reset error */
 	ns_dlerrormsg = 0;

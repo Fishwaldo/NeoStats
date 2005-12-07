@@ -54,7 +54,7 @@ static hash_t *bothash;
 int InitBots( void )
 {
 	bothash = hash_create( BOT_TABLE_SIZE, 0, 0 );
-	if( !bothash )
+	if( bothash == NULL )
 	{
 		nlog( LOG_CRITICAL, "Failed to create bot hash" );
 		return NS_FAILURE;
@@ -77,9 +77,9 @@ void FiniBots( void )
 	hash_destroy( bothash );
 }
 
-/** @brief flood_test
+/** @brief is_flood
  *
- *  Check whether client is flooding NeoStats
+ *  calculate and test flood values to determine if a client is flooding
  *  Bot subsystem use only.
  *
  *  @param pointer to client to test
@@ -87,12 +87,11 @@ void FiniBots( void )
  *  @return NS_TRUE if client flooded, NS_FALSE if not 
  */
 
-static int flood_test( Client *u )
+static int is_flood( Client *u )
 {
 	/* locop or higher are exempt from flood checks */
 	if( UserLevel( u ) >= NS_ULEVEL_OPER )	
 		return NS_FALSE;
-	/* calculate and test flood values */
 	if( ( me.now - u->user->tslastmsg ) > nsconfig.msgsampletime )
 	{
 		u->user->tslastmsg = me.now;
@@ -109,7 +108,7 @@ static int flood_test( Client *u )
 	return NS_FALSE;
 }
 
-/** @brief process_origin
+/** @brief is_valid_origin
  *
  *  validate message origin and populate cmdparams structure
  *  Bot subsystem use only.
@@ -120,14 +119,13 @@ static int flood_test( Client *u )
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
 
-static int process_origin( CmdParams *cmdparams, const char *origin )
+static int is_valid_origin( CmdParams *cmdparams, const char *origin )
 {
 	cmdparams->source = FindUser( origin );
 	if( cmdparams->source )
 	{
-		if( flood_test( cmdparams->source ) )
-			return NS_FALSE;
-		return NS_TRUE;
+		/* Since is_flood is a truth value, return its inverse */
+		return !is_flood( cmdparams->source );
 	}
 	cmdparams->source = FindServer( origin );
 	if( cmdparams->source )
@@ -135,7 +133,7 @@ static int process_origin( CmdParams *cmdparams, const char *origin )
 	return NS_FALSE;
 }
 
-/** @brief process_target_user
+/** @brief is_valid_target
  *
  *  validate message target and populate cmdparams structure
  *  Bot subsystem use only.
@@ -146,7 +144,7 @@ static int process_origin( CmdParams *cmdparams, const char *origin )
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
 
-static int process_target_user( CmdParams *cmdparams, const char *target )
+static int is_valid_target( CmdParams *cmdparams, const char *target )
 {
 	cmdparams->target = FindUser( target );
 	if( cmdparams->target )
@@ -155,11 +153,11 @@ static int process_target_user( CmdParams *cmdparams, const char *target )
 		if( cmdparams->bot )
 			return NS_TRUE;
 	}
-	dlog( DEBUG1, "process_target_user: user %s not found", target );
+	dlog( DEBUG1, "is_valid_target: user %s not found", target );
 	return NS_FALSE;
 }
 
-/** @brief process_target_chan
+/** @brief is_valid_target_chan
  *
  *  validate message target and populate cmdparams structure
  *  Bot subsystem use only.
@@ -170,7 +168,7 @@ static int process_target_user( CmdParams *cmdparams, const char *target )
  *  @return NS_TRUE if valid, NS_FALSE if not 
  */
 
-static int process_target_chan( CmdParams *cmdparams, const char *target )
+static int is_valid_target_chan( CmdParams *cmdparams, const char *target )
 {
 	cmdparams->channel = FindChannel( target );
 	if( cmdparams->channel )
@@ -259,11 +257,9 @@ void bot_notice( const char *origin, char *const *av, int ac )
 
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
-	/* Check origin validity */
-	if( process_origin( cmdparams, origin ) )
+	if( is_valid_origin( cmdparams, origin ) )
 	{
-		/* Find target bot */
-		if( process_target_user( cmdparams, av[0] ) )
+		if( is_valid_target( cmdparams, av[0] ) )
 		{
 			cmdparams->param = av[ac - 1];
 			if( IS_CTCP_MSG( cmdparams->param ) )
@@ -297,9 +293,9 @@ void bot_chan_notice( const char *origin, char *const *av, int ac )
 
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof(CmdParams ) );
-	if( process_origin( cmdparams, origin ) )
+	if( is_valid_origin( cmdparams, origin ) )
 	{
-		if( process_target_chan( cmdparams, av[0] ) )
+		if( is_valid_target_chan( cmdparams, av[0] ) )
 		{
 			cmdparams->param = av[ac - 1];
 			if( IS_CTCP_MSG( cmdparams->param ) )
@@ -333,13 +329,11 @@ void bot_private( const char *origin, char *const *av, int ac )
 
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof(CmdParams ) );
-	if( process_origin( cmdparams, origin ) )
+	if( is_valid_origin( cmdparams, origin ) )
 	{
-		/* Find target bot */
-		if( process_target_user( cmdparams, av[0] ) )
+		if( is_valid_target( cmdparams, av[0] ) )
 		{
 			cmdparams->param = av[ac - 1];
-			/* Check CTCP first to avoid Unknown command messages later */
 			if( IS_CTCP_MSG( cmdparams->param ) )
 			{
 				ctcp_private( cmdparams );
@@ -375,9 +369,9 @@ void bot_chan_private( const char *origin, char *const *av, int ac )
 
 	SET_SEGV_LOCATION();
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof(CmdParams ) );
-	if( process_origin( cmdparams, origin ) )
+	if( is_valid_origin( cmdparams, origin ) )
 	{
-		if( process_target_chan( cmdparams, av[0] ) )
+		if( is_valid_target_chan( cmdparams, av[0] ) )
 		{
 			cmdparams->param = av[ac - 1];
 			if( IS_CTCP_MSG( cmdparams->param ) )
@@ -430,7 +424,7 @@ int DelBot( const char *bot_name )
 
 	SET_SEGV_LOCATION();
 	bn = hash_lookup( bothash, bot_name );
-	if( !bn )
+	if( bn == NULL )
 	{
 		nlog( LOG_WARNING, "DelBot: %s not found", bot_name );
 		return NS_FAILURE;
@@ -463,7 +457,7 @@ int BotNickChange( const Bot *botptr, const char *newnick )
 
 	SET_SEGV_LOCATION();
 	bn = hash_lookup( bothash, botptr->name );
-	if( !bn )
+	if( bn == NULL )
 	{
 		nlog( LOG_WARNING, "BotNickChange: %s not found", botptr->name );
 		return NS_FAILURE;
@@ -737,7 +731,7 @@ Bot *AddBot( BotInfo *botinfo )
 		return NULL;
 	}
 	botptr = new_bot( nick );
-	if( !botptr )
+	if( botptr == NULL )
 		return NULL;
 	/* For more efficient transversal of bot/user lists, link 
 	 * associated user struct to bot and link bot into user struct */
@@ -857,7 +851,7 @@ void FreeBotModPtr( Bot *pBot )
  *  @return none
  */
 
-void* GetBotModPtr( const Bot *pBot )
+void *GetBotModPtr( const Bot *pBot )
 {
 	if( pBot )
 		return pBot->moddata;

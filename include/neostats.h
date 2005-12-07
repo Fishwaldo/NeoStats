@@ -836,7 +836,7 @@ typedef struct bot_setting {
 /** @brief Message function types
  * 
  */
-typedef int (*timer_handler) ( void* );
+typedef int (*timer_handler) ( void * );
 
 /* Event system flags */
 #define	EVENT_FLAG_DISABLED			0x00000001	/* Event is disabled */
@@ -1375,7 +1375,7 @@ EXPORTFUNC int irc_ctcp_finger_req( const Bot *botptr, const Client *target );
 EXPORTFUNC int irc_ctcp_action_req( const Bot *botptr, const Client *target, const char *action );
 EXPORTFUNC int irc_ctcp_action_req_channel( const Bot *botptr, const Channel *channel, const char *action );
 
-EXPORTFUNC int irc_ctcp_time_req( const Bot* botptr, const Client* target );
+EXPORTFUNC int irc_ctcp_time_req( const Bot *botptr, const Client *target );
 
 EXPORTFUNC int irc_ctcp_unhandled_req( const Bot *botptr, const Client *target, const char *ctcp_command );
 EXPORTFUNC int irc_ctcp_unhandled_rpl( const Bot *botptr, const Client *target, const char *ctcp_command, const char *ctcp_parameters );
@@ -1412,7 +1412,7 @@ EXPORTFUNC char *GetRandomChannelKey( int length );
 EXPORTVAR extern unsigned char UmodeChRegNick;
 
 /* dns.c */
-EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void *data, adns_answer * a), void *data );
+EXPORTFUNC int dns_lookup( char *str, adns_rrtype type, void (*callback) ( void *data, adns_answer *a), void *data );
 
 /* services.c */
 EXPORTFUNC int add_services_cmd_list( bot_cmd *bot_cmd_list );
@@ -1553,7 +1553,7 @@ typedef enum NS_LOG_LEVEL {
 /* define debug levels */
 
 typedef enum NS_DEBUG_LEVEL {
-	DEBUGRX=1,
+	DEBUGRX = 1,
 	DEBUGTX,
 	DEBUG1,
 	DEBUG2,
@@ -1748,7 +1748,7 @@ EXPORTFUNC void *GetServerModPtr( const Client *s );
 /* Module data pointer interface bot */
 EXPORTFUNC void *AllocBotModPtr( Bot *pBot, size_t size );
 EXPORTFUNC void FreeBotModPtr( Bot *pBot );
-EXPORTFUNC void* GetBotModPtr( const Bot *pBot );
+EXPORTFUNC void *GetBotModPtr( const Bot *pBot );
 /* Module data value interface */
 /* Module data value interface channel */
 EXPORTFUNC void ClearChannelModValue( Channel *c );

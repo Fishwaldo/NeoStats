@@ -156,7 +156,7 @@ void FiniModules( void )
  *  @return result of ModSynch
  */
 
-int SynchModule( Module* module_ptr )
+int SynchModule( Module *module_ptr )
 {
 	int err = NS_SUCCESS;
 	int( *ModSynch )( void );

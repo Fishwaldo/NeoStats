@@ -48,7 +48,7 @@ typedef struct DnsLookup {
 	char lookupdata[255]; /**< the look up data, only populated if we add to a queue */
 	void (*callback) (void *data, adns_answer * a);
 						      /**< a function pointer to call when we have a result */
-	Module* modptr;
+	Module *modptr;
 } DnsLookup;
 
 adns_state nsads;
@@ -311,7 +311,7 @@ static void dns_check_queue(void)
  * @param module name
  * @return Nothing
  */
-void canx_dns(Module* modptr) 
+void canx_dns(Module *modptr) 
 {
 	lnode_t *dnsnode, *lnode2;
 	DnsLookup *dnsdata;
