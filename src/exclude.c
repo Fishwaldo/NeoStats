@@ -65,7 +65,7 @@ typedef struct Exclude
 typedef int (*ExcludeHandler) ( Exclude *exclude, void *v );
 
 /* String descriptions of exclude types */
-static const char* ExcludeDesc[ NS_EXCLUDE_LIMIT ] =
+static const char *ExcludeDesc[ NS_EXCLUDE_LIMIT ] =
 {
 	"Host",
 	"Server",

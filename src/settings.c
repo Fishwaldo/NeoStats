@@ -108,7 +108,7 @@ static int bot_cmd_set_list( const CmdParams *cmdparams )
 				case SET_TYPE_IPV4:	
 				case SET_TYPE_CHANNEL:							
 					irc_prefmsg( cmdparams->bot, cmdparams->source, "%s: %s",
-						set_ptr->option, ( char* )set_ptr->varptr );
+						set_ptr->option, ( char * )set_ptr->varptr );
 					break;
 				case SET_TYPE_CUSTOM:
 					if( set_ptr->handler )
@@ -264,7 +264,7 @@ static int bot_cmd_set_string( const CmdParams *cmdparams, const bot_setting *se
 		if( set_ptr->handler( cmdparams, SET_VALIDATE ) != NS_SUCCESS )
 			return NS_FAILURE;
 	}
-	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, cmdparams->av[1], set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
 	return NS_SUCCESS;
@@ -295,7 +295,7 @@ static int bot_cmd_set_channel( const CmdParams *cmdparams, const bot_setting *s
 		if( set_ptr->handler( cmdparams, SET_VALIDATE ) != NS_SUCCESS )
 			return NS_FAILURE;
 	}
-	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, cmdparams->av[1], set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
 	return NS_SUCCESS;
@@ -317,7 +317,7 @@ static int bot_cmd_set_msg( const CmdParams *cmdparams, const bot_setting *set_p
 	char *buf;
 
 	buf = joinbuf( cmdparams->av, cmdparams->ac, 1 );
-	strlcpy( ( char* )set_ptr->varptr, buf, set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, buf, set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, buf, set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, buf );
 	ns_free( buf );
@@ -343,7 +343,7 @@ static int bot_cmd_set_nick( const CmdParams *cmdparams, const bot_setting *set_
 			__( "%s contains invalid characters", cmdparams->source ), cmdparams->av[1] );
 		return NS_ERR_SYNTAX_ERROR;
 	}
-	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, cmdparams->av[1], set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
 	return NS_SUCCESS;
@@ -368,7 +368,7 @@ static int bot_cmd_set_user( const CmdParams *cmdparams, const bot_setting *set_
 			__( "%s contains invalid characters", cmdparams->source ), cmdparams->av[1] );
 		return NS_ERR_SYNTAX_ERROR;
 	}
-	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, cmdparams->av[1], set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
 	return NS_SUCCESS;
@@ -399,7 +399,7 @@ static int bot_cmd_set_host( const CmdParams *cmdparams, const bot_setting *set_
 			__( "%s contains invalid characters", cmdparams->source ), cmdparams->av[1] );
 		return NS_ERR_SYNTAX_ERROR;
 	}
-	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, cmdparams->av[1], set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
 	return NS_SUCCESS;
@@ -421,7 +421,7 @@ static int bot_cmd_set_realname( const CmdParams *cmdparams, const bot_setting *
 	char *buf;
 
 	buf = joinbuf( cmdparams->av, cmdparams->ac, 1 );
-	strlcpy( ( char* )set_ptr->varptr, buf, set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, buf, set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, buf, set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, buf );
 	ns_free( buf );
@@ -447,7 +447,7 @@ static int bot_cmd_set_ipv4( const CmdParams *cmdparams, const bot_setting *set_
 			__( "Invalid IPV4 format. Should be dotted quad, e.g. 1.2.3.4", cmdparams->source ) );
 		return NS_ERR_SYNTAX_ERROR;
 	}
-	strlcpy( ( char* )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
+	strlcpy( ( char * )set_ptr->varptr, cmdparams->av[1], set_ptr->max );
 	DBAStoreConfigStr( set_ptr->option, cmdparams->av[1], set_ptr->max );
 	bot_cmd_set_report( cmdparams, set_ptr, cmdparams->av[1] );
 	return NS_SUCCESS;

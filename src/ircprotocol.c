@@ -137,14 +137,14 @@ static int parse( void *notused, void *rline, int len )
 	char **av = NULL;
 
 	SET_SEGV_LOCATION();
-	if( !( *line ) )
+	if( *line == '\0' )
 		return NS_FAILURE;
 	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
 	dlog( DEBUGRX, "%s", line );
 	if( *line == ':' )
 	{
 		coreLine = strpbrk( line, " " );
-		if( !coreLine )
+		if( coreLine == NULL )
 			return NS_FAILURE;
 		*coreLine = 0;
 		while( isspace( *++coreLine ) );
@@ -157,7 +157,7 @@ static int parse( void *notused, void *rline, int len )
 		cmdptr = 0;
 		*origin = 0;
 	}
-	if( !*line )
+	if( *line == '\0' )
 		return NS_FAILURE;
 	coreLine = strpbrk( line, " " );
 	if( coreLine )
@@ -203,7 +203,7 @@ static int parsep10( void *notused, void *rline, int len )
 	char **av = NULL;
 
 	SET_SEGV_LOCATION();
-	if( !( *line ) )
+	if( *line == '\0' )
 		return NS_FAILURE;
 	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
 	dlog( DEBUGRX, "%s", line );
@@ -272,7 +272,7 @@ static int parsep10( void *notused, void *rline, int len )
 static int InitIrcdProtocol( void )
 {
 	protocol_info = ns_dlsym( protocol_module_handle, "protocol_info" );
-	if( !protocol_info )
+	if( protocol_info == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to find protocol_info in protocol module %s", protocol_path );
 		return NS_FAILURE;	
@@ -294,7 +294,7 @@ static int InitIrcdProtocol( void )
 			irc_parse = parse;
 	}
 	cmd_list = ns_dlsym( protocol_module_handle, "cmd_list" );
-	if( !cmd_list )
+	if( cmd_list == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to find command list in selected IRCd module" );
 		return NS_FAILURE;	
@@ -347,7 +347,7 @@ int InitIrcd( void )
 	ircsnprintf( protocol_path, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_STDEXT );
 	nlog( LOG_NORMAL, "Using protocol module %s", protocol_path );
 	protocol_module_handle = ns_dlopen( protocol_path, RTLD_NOW || RTLD_GLOBAL );
-	if( !protocol_module_handle )
+	if( protocol_module_handle == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to load protocol module %s", protocol_path );
 		return NS_FAILURE;	

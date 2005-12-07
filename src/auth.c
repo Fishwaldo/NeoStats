@@ -191,7 +191,8 @@ static int cmd_level( const CmdParams *cmdparams )
 		otheruser = FindUser( cmdparams->av[0] );
 		/* Force recalc user level */
 		otheruser->user->ulevel = -1;
-		if( !otheruser ) {
+		if( otheruser == NULL )
+		{
 			irc_prefmsg( ns_botptr, cmdparams->source, __( "User %s not found", cmdparams->source ), cmdparams->av[0] );
 			return NS_FAILURE;
 		}

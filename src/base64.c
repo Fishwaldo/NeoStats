@@ -48,12 +48,13 @@
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int set_server_base64( const char *name, const char* base64name )
+int set_server_base64( const char *name, const char *base64name )
 {
 	Client *s;
 
 	s = FindServer( name );
-	if( !s ) {
+	if( s == NULL )
+	{
 		dlog( DEBUG1, "set_server_base64: cannot find %s for %s", name, base64name );
 		return NS_FAILURE;
 	}
@@ -72,13 +73,14 @@ int set_server_base64( const char *name, const char* base64name )
  *  @return base64 name or NULL if not found
  */
 
-char *server_to_base64( const char* name )
+char *server_to_base64( const char *name )
 {
 	Client *s;
 
-	dlog( DEBUG1, "server_to_base64: scanning for %s", name );
+	dlog( DEBUG7, "server_to_base64: scanning for %s", name );
 	s = FindServer( name );
-	if( s ) {
+	if( s != NULL )
+	{
 		return s->name64;
 	}
 	dlog( DEBUG1, "server_to_base64: cannot find %s", name );
@@ -95,13 +97,14 @@ char *server_to_base64( const char* name )
  *  @return name or NULL if not found
  */
 
-char *base64_to_server( const char* base64name )
+char *base64_to_server( const char *base64name )
 {
 	Client *s;
 
-	dlog( DEBUG1, "base64_to_server: scanning for %s", base64name );
+	dlog( DEBUG7, "base64_to_server: scanning for %s", base64name );
 	s = find_server_base64( base64name );
-	if( s ) {
+	if( s )
+	{
 		return s->name;
 	}
 	dlog( DEBUG1, "base64_to_server: cannot find %s", base64name );
@@ -119,12 +122,13 @@ char *base64_to_server( const char* base64name )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int set_nick_base64( const char *nick, const char* base64name )
+int set_nick_base64( const char *nick, const char *base64name )
 {
 	Client *u;
 
 	u = FindUser( nick );
-	if( !u ) {
+	if( u == NULL )
+	{
 		dlog( DEBUG1, "set_nick_base64: cannot find %s for %s", nick, base64name );
 		return NS_FAILURE;
 	}
@@ -143,13 +147,14 @@ int set_nick_base64( const char *nick, const char* base64name )
  *  @return base64 name or NULL if not found
  */
 
-char *nick_to_base64( const char* nick )
+char *nick_to_base64( const char *nick )
 {
 	Client *u;
 
 	dlog( DEBUG1, "nick_to_base64: scanning for %s", nick );
 	u = FindUser( nick );
-	if( u ) {
+	if( u != NULL )
+	{
 		return u->name64;
 	}
 	dlog( DEBUG1, "nick_to_base64: cannot find %s", nick );
@@ -166,13 +171,14 @@ char *nick_to_base64( const char* nick )
  *  @return name or NULL if not found
  */
 
-char *base64_to_nick( const char* base64name )
+char *base64_to_nick( const char *base64name )
 {
 	Client *u;
 
 	dlog( DEBUG1, "base64_to_nick: scanning for %s", base64name );
 	u = find_user_base64( base64name );
-	if( u ) {
+	if( u != NULL )
+	{
 		return u->name;
 	}
 	dlog( DEBUG1, "base64_to_nick: cannot find %s", base64name );
@@ -189,17 +195,21 @@ char *base64_to_nick( const char* base64name )
  *  @return name or NULL if not found
  */
 
-char *base64_to_name( const char* base64name )
+char *base64_to_name( const char *base64name )
 {
 	Client *c;
 
 	dlog( DEBUG1, "base64_to_name: scanning for %s", base64name );
 	c = find_user_base64( base64name );
-	if( c )
+	if( c != NULL )
+	{
 		return c->name;
+	}
 	c = find_server_base64( base64name );
-	if( c )
+	if( c != NULL )
+	{
 		return c->name;
+	}
 	dlog( DEBUG1, "base64_to_name: cannot find %s", base64name );
 	return NULL;
 }

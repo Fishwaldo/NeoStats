@@ -402,7 +402,7 @@ static Module *load_stdmodule( const char *modfilename, Client * u )
 		}
 	}
 	cmd = ns_calloc( sizeof( CmdParams ) );
-	cmd->param = ( char* )infoptr->name;
+	cmd->param = ( char * )infoptr->name;
 	SendAllModuleEvent( EVENT_MODULELOAD, cmd );
 	ns_free( cmd );
 	if( u ) {
@@ -649,7 +649,7 @@ int unload_module( const char *modname, Client * u )
 		FiniModExcludes( mod_ptr );
 	}
 	cmdparams = ns_calloc( sizeof( CmdParams ) );
-	cmdparams->param = ( char* )modname;
+	cmdparams->param = ( char * )modname;
 	SendAllModuleEvent( EVENT_MODULEUNLOAD, cmdparams );
 	ns_free( cmdparams );
 	RESET_RUN_LEVEL();

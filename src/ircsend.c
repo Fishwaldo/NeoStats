@@ -304,7 +304,7 @@ int InitIrcdSymbols( void )
 				dlog( DEBUG7, "InitIrcdSymbols: apply default handler for: %s %p", pprotocol_sym->sym ? pprotocol_sym->sym : "NONE", pprotocol_sym->defaulthandler );
 			}
 			/* If no default or IRCd handler but we require the function, quit with error */
-			if( pprotocol_sym->required && !*pprotocol_sym->handler ) 
+			if( pprotocol_sym->required && ( *pprotocol_sym->handler == NULL ) ) 
 			{
 				nlog( LOG_CRITICAL, "Unable to find %s in selected IRCd module", pprotocol_sym->sym );
 				return NS_FAILURE;	
@@ -977,7 +977,7 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 	Channel *c;
 
 	c = FindChannel( chan );
-	ts = ( !c ) ? me.now : c->creationtime;
+	ts = ( c == NULL ) ? me.now : c->creationtime;
 	/* Use sjoin if available */
 	if( ( ircd_srv.protocol & PROTOCOL_SJOIN ) && irc_send_sjoin ) 
 	{
@@ -1204,7 +1204,7 @@ int irc_kick( const Bot *botptr, const char *chan, const char *target, const cha
 		return NS_FAILURE;
 	}
 	irc_send_kick( botptr->u->name, chan, target, reason );
-	PartChannel( FindUser( target ), ( char *) chan, reason[0] != 0 ?( char *)reason : NULL );
+	PartChannel( FindUser( target ), ( char *) chan, reason[0] != '\0' ?( char *)reason : NULL );
 	return NS_SUCCESS;
 }
 

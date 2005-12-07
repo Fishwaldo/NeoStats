@@ -25,9 +25,9 @@
 #define _DNS_H_
 
 int InitDns( void );
-void do_dns(int notused, short event, void *arg);
+void do_dns( int notused, short event, void *arg );
 void FiniDns( void );
-void canx_dns( Module* modptr );
-void do_dns_stats_Z( Client * );
+void canx_dns( Module *modptr );
+void do_dns_stats_Z( const Client *u );
 
 #endif /* _DNS_H_ */

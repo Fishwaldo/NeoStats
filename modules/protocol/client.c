@@ -173,7 +173,7 @@ char *MSG_SENDSNO = "SENDSNO";
 #define CMODE_ONLYSECURE	0x40000000
 #define CMODE_NONICKCHANGE	0x80000000
 
-static void m_private( char* origin, char **av, int ac, int srv );
+static void m_private( char *origin, char **av, int ac, int srv );
 static void m_nick( char *origin, char **argv, int argc, int srv );
 static void m_topic( char *origin, char **argv, int argc, int srv );
 static void m_kick( char *origin, char **argv, int argc, int srv );
@@ -298,7 +298,7 @@ void send_cmode( const char *sourceserver, const char *sourceuser, const char *c
 	send_cmd( ":%s %s %s %s %s %lu", sourceuser, MSG_MODE, chan, mode, args, ts );
 }
 
-void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
+void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
 	send_cmd( "%s %s", MSG_NICK, nick );
 }
@@ -369,7 +369,7 @@ static void m_part( char *origin, char **argv, int argc, int srv )
  * @return none
  */
 
-static void m_private( char* origin, char **av, int ac, int srv )
+static void m_private( char *origin, char **av, int ac, int srv )
 {
 	char *p;
 	char nick[MAXNICK];

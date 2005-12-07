@@ -591,7 +591,7 @@ void send_sjoin( const char *source, const char *target, const char *chan, const
 	send_cmd( ":%s %s %lu %s + :%s", source, MSGTOK( SJOIN ), ts, chan, target );
 }
 
-void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
+void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK( NICK ), nick, ts, ident, host, server, newmode, realname );
 }
@@ -645,7 +645,7 @@ void send_svstime( const char *source, const unsigned long ts )
 
 static void m_server( char *origin, char **argv, int argc, int srv )
 {
-	char* s = argv[argc-1];
+	char *s = argv[argc-1];
 	if( *origin== 0 )
 	{
 		/* server desc from uplink includes extra info so we need to 

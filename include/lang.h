@@ -68,7 +68,7 @@ extern struct lang_stats {
 typedef void (*LANGDebugFunc) (const char *fmt, ...);
 
 
-void LANGSetData( char* key, void* data, int size, char *lang, int keydone );
+void LANGSetData( char *key, void *data, int size, char *lang, int keydone );
 int LANGGotData( char *key, char *lang );
 int LANGDumpDB( char *lang, int missing, void *mylist );
 int LANGNewLang( char *lang );

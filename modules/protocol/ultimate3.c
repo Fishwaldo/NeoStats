@@ -317,12 +317,12 @@ void send_cmode( const char *sourceserver, const char *sourceuser, const char *c
 	send_cmd( ":%s %s %s %s %s %lu", sourceuser, MSG_MODE, chan, mode, args, ts );
 }
 
-void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
+void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, ts, newmode, ident, host, server, ts, realname );
 }
 
-void send_vctrl( const int uprot, const int nicklen, const int modex, const int gc, const char* netname )
+void send_vctrl( const int uprot, const int nicklen, const int modex, const int gc, const char *netname )
 {
 	send_cmd( "%s %d %d %d %d 0 0 0 0 0 0 0 0 0 0 :%s", MSG_VCTRL, uprot, nicklen, modex, gc, netname );
 }

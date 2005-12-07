@@ -40,7 +40,7 @@ typedef void( *htmlhandler )( void );
 
 /** HTML handler table struct */
 typedef struct htmlfunc {
-	char* directive;
+	char *directive;
 	htmlhandler handler;
 }htmlfunc;
 

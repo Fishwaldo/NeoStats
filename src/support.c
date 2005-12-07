@@ -155,7 +155,7 @@ char *strndup( const char *src, size_t count )
 	if ( ( src == NULL ) || ( count == 0 ) )
 		return NULL;
 	/* Allocate count plus one for trailing NULL */
-	dup = ( char* ) ns_malloc( count + 1 );
+	dup = ( char * ) ns_malloc( count + 1 );
 	/* Copy string into created buffer */
 	os_memcpy( dup, src, count );
 	dup[count] = 0;
@@ -182,7 +182,7 @@ char *strdup( const char *src )
 	if ( src == NULL )
 		return NULL;
 	/* Allocate count plus one for trailing NULL */
-	dup = ( char* )ns_malloc( strlen( src ) + 1 );
+	dup = ( char * )ns_malloc( strlen( src ) + 1 );
 	/* Copy string into created buffer */
 	strlcpy( dup, src, strlen( src ) + 1 );
 	/* Return pointer to duplicated string */

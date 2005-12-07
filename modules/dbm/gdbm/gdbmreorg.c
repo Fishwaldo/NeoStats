@@ -40,8 +40,8 @@
 
 static int
 _gdbm_rename (old_name, new_name)
-     char* old_name;
-     char* new_name;
+     char *old_name;
+     char *new_name;
 {
   if (unlink (new_name) != 0)   
     return -1;

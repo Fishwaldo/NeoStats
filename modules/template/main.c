@@ -41,7 +41,7 @@ static Bot *template_bot;
  *  You must change this or your module will not load.
  */
 
-const char* template_copyright[] = 
+const char *template_copyright[] = 
 {
 	"Copyright (c) <year>, <your name>",
 	NULL

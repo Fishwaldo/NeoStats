@@ -182,7 +182,7 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 	send_cmd( "%s %s :%s", MSG_SERVER, name, infoline );
 }
 
-void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
+void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s %s :%s", MSG_NICK, nick, ts, newmode, ident, host, server, realname );
 }

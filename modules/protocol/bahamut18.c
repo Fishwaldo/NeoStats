@@ -249,7 +249,7 @@ void send_sjoin( const char *source, const char *target, const char *chan, const
 	send_cmd( ":%s %s %lu %s + :%s", source, MSG_SJOIN, ts, chan, target );
 }
 
-void send_nick( const char *nick, const unsigned long ts, const char* newmode, const char *ident, const char *host, const char* server, const char *realname )
+void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s %s 0 %lu :%s", MSG_NICK, nick, ts, newmode, ident, host, server, ts, realname );
 }

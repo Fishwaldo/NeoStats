@@ -121,7 +121,7 @@ void AddBan( const char *type, const char *user, const char *host, const char *m
 
 	SET_SEGV_LOCATION();
 	ban = new_ban( mask );
-	if( !ban )
+	if( ban == NULL )
 		return;
 	strlcpy( ban->type, type, 8 );
 	strlcpy( ban->user, user, MAXUSER );
@@ -167,7 +167,7 @@ void DelBan( const char *mask )
 
 	SET_SEGV_LOCATION();
 	bansnode = hash_lookup( banhash, mask );
-	if( !bansnode )
+	if( bansnode == NULL )
 	{
 		nlog( LOG_WARNING, "DelBan: unknown ban %s", mask );
 		return;
@@ -260,7 +260,7 @@ void FiniBans( void )
 int InitBans( void )
 {
 	banhash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
-	if( !banhash )
+	if( banhash == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to create bans hash" );
 		return NS_FAILURE;

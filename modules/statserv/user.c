@@ -204,7 +204,7 @@ int ss_event_signon( const CmdParams *cmdparams )
  */
 
 static int operlistaway = 0;
-static char* operlistserver;
+static char *operlistserver;
 
 static int operlist( Client *u, void * v )
 {
