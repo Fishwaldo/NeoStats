@@ -86,7 +86,7 @@ static ctcp_cmd ctcp_cmds[] =
 static void strip_ctcp_codes( char *line )
 {
 	char *outline = line;
-	while( *line )
+	while( *line != '\0' )
 	{
 		if( (*line ) != '\1' )
 		{
@@ -117,7 +117,7 @@ int ctcp_private( CmdParams *cmdparams )
 	{
 		strip_ctcp_codes( cmdparams->param );
 		cmd = ctcp_cmds;
-		while( cmd->cmd )
+		while( cmd->cmd != NULL )
 		{	
 			len = strlen( cmd->cmd );
 			if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )
@@ -157,7 +157,7 @@ int ctcp_notice( CmdParams *cmdparams )
 	{
 		strip_ctcp_codes( cmdparams->param );
 		cmd = ctcp_cmds;
-		while( cmd->cmd )
+		while( cmd->cmd != NULL )
 		{
 			len = strlen( cmd->cmd );
 			if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )

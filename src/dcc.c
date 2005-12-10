@@ -344,7 +344,8 @@ int irc_dccmsgall( const char *fmt, ...)
 	va_end( ap );
 
 	dccnode = list_first( dcclist );
-	while( dccnode ) {
+	while( dccnode != NULL )
+	{
 		todcc = ( Client * )lnode_get( dccnode );
 		dcc_write( todcc, buf );
 		dccnode = list_next( dcclist, dccnode );
@@ -384,7 +385,7 @@ int dcc_req( CmdParams *cmdparams )
 	size_t len;
     
 	cmd = dcc_cmds;
-	while( cmd->cmd ) 
+	while( cmd->cmd != NULL ) 
 	{
 		len = strlen( cmd->cmd );
 		if( ircstrncasecmp( cmd->cmd, cmdparams->param, len  ) == 0 )
@@ -500,7 +501,7 @@ void FiniDCC( void )
 	lnode_t *dccnode;
  
 	dccnode = list_first( dcclist );
-	while( dccnode )
+	while( dccnode != NULL )
 	{
 		dcc = ( Client * )lnode_get( dccnode );
 		DCCChatDisconnect( dcc );

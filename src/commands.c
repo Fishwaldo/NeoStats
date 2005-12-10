@@ -317,7 +317,7 @@ int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list )
 		}
 	}
 	/* Cycle through command list and add them */
-	while( bot_cmd_list->cmd )
+	while( bot_cmd_list->cmd != NULL )
 	{
 		add_bot_cmd( bot_ptr->botcmds, bot_cmd_list );
 		bot_cmd_list++;
@@ -334,7 +334,7 @@ void del_bot_cmd_list( const Bot *bot_ptr, const bot_cmd *bot_cmd_list )
 	if( bot_ptr != NULL && bot_ptr->botcmds != NULL )
 	{
 		/* Cycle through command list and delete them */
-		while( bot_cmd_list->cmd )
+		while( bot_cmd_list->cmd != NULL )
 		{
 			del_bot_cmd( bot_ptr->botcmds, bot_cmd_list );
 			bot_cmd_list++;
@@ -423,7 +423,7 @@ static int run_intrinsic_cmds( const char *cmd, const CmdParams *cmdparams )
 	cmd_ptr = intrinsic_commands;
 	if( ircstrcasecmp( cmd, "LEVELS" ) == 0 && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS ) 
 		return NS_FAILURE;
-	while( cmd_ptr->cmd )
+	while( cmd_ptr->cmd != NULL )
 	{
 		if( ircstrcasecmp( cmd, cmd_ptr->cmd ) == 0 )
 		{
@@ -624,7 +624,7 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 
 		/* Handle intrinsic commands */
 		cmd_ptr = intrinsic_commands;
-		while( cmd_ptr->cmd )
+		while( cmd_ptr->cmd != NULL )
 		{
 			/* Check for module override */	
 			if( ircstrcasecmp( cmd_ptr->cmd, "LEVELS" ) == 0 && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS )
@@ -732,7 +732,7 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
-	while( cmd_ptr->cmd )
+	while( cmd_ptr->cmd != NULL )
 	{
 		if( ircstrcasecmp( cmdparams->av[0], cmd_ptr->cmd ) == 0 )
 		{

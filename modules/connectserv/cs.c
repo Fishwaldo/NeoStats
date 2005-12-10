@@ -449,7 +449,7 @@ static int cs_event_umode( const CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	modes = cmdparams->param;
-	while( *modes )
+	while( *modes != '\0' )
 	{
 		switch( *modes ) 
 		{
@@ -499,7 +499,7 @@ static int cs_event_smode( const CmdParams *cmdparams )
 
 	SET_SEGV_LOCATION();
 	modes = cmdparams->param;
-	while( *modes )
+	while( *modes != '\0' )
 	{
 		switch( *modes ) 
 		{

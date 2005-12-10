@@ -1105,6 +1105,7 @@ void _m_eob( char *origin, char **argv, int argc, int srv )
 
 void _m_sqline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_sqline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_unsqline
@@ -1126,6 +1127,7 @@ void _m_sqline( char *origin, char **argv, int argc, int srv )
 
 void _m_unsqline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_unsqline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_zline
@@ -1148,6 +1150,7 @@ void _m_unsqline( char *origin, char **argv, int argc, int srv )
 
 void _m_zline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_zline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_unzline
@@ -1169,6 +1172,7 @@ void _m_zline( char *origin, char **argv, int argc, int srv )
 
 void _m_unzline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_unzline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_akill
@@ -1189,6 +1193,7 @@ void _m_unzline( char *origin, char **argv, int argc, int srv )
 
 void _m_akill( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_akill: WORK IN PROGRESS" );
 }
 
 /** @brief _m_rakill
@@ -1209,6 +1214,7 @@ void _m_akill( char *origin, char **argv, int argc, int srv )
 
 void _m_rakill( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_rakill: WORK IN PROGRESS" );
 }
 
 /** @brief _m_kline
@@ -1231,6 +1237,7 @@ void _m_rakill( char *origin, char **argv, int argc, int srv )
 
 void _m_kline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_kline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_unkline
@@ -1252,6 +1259,7 @@ void _m_kline( char *origin, char **argv, int argc, int srv )
 
 void _m_unkline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_unkline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_gline
@@ -1274,6 +1282,7 @@ void _m_unkline( char *origin, char **argv, int argc, int srv )
 
 void _m_gline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_gline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_remgline
@@ -1295,6 +1304,7 @@ void _m_gline( char *origin, char **argv, int argc, int srv )
 
 void _m_remgline( char *origin, char **argv, int argc, int srv )
 {
+	dlog( DEBUG1, "_m_remgline: WORK IN PROGRESS" );
 }
 
 /** @brief _m_notice
@@ -1569,7 +1579,7 @@ void do_motd( const char *nick, const char *remoteserver )
 	irc_numeric( RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name );
 	irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
 	irc_numeric( RPL_MOTD, nick, ":-" );
-	while( fgets( buf, sizeof( buf ), fp ) )
+	while( fgets( buf, sizeof( buf ), fp ) != NULL )
 	{
 		buf[strnlen( buf, BUFSIZE ) - 1] = 0;
 		irc_numeric( RPL_MOTD, nick, ":- %s", buf );
@@ -1601,7 +1611,7 @@ void do_admin( const char *nick, const char *remoteserver )
 	}
 	irc_numeric( RPL_ADMINME, nick, ":%s :Administrative info", me.name );
 	irc_numeric( RPL_ADMINLOC1, nick, ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
-	while( fgets( buf, sizeof( buf ), fp ) )
+	while( fgets( buf, sizeof( buf ), fp ) != NULL )
 	{
 		buf[strnlen( buf, BUFSIZE ) - 1] = 0;
 		irc_numeric( RPL_ADMINLOC2, nick, ":- %s", buf );
@@ -1704,7 +1714,7 @@ void do_stats( const char *nick, const char *what )
 			{
 				irc_cmd* ircd_cmd_ptr;
 				ircd_cmd_ptr = cmd_list;
-				while( ircd_cmd_ptr->name )
+				while( ircd_cmd_ptr->name != NULL )
 				{
 					if( ircd_cmd_ptr->usage > 0 )
 					{
@@ -1738,7 +1748,7 @@ void do_protocol( const char *origin, char **argv, int argc )
 	for( i = 0; i < argc; ++i )
 	{
 		protocol_ptr = protocol_list;
-		while( protocol_ptr->token )
+		while( protocol_ptr->token != NULL )
 		{
 			if( ircstrcasecmp( protocol_ptr->token, argv[i] ) == 0 )
 			{
@@ -1794,7 +1804,7 @@ void do_sjoin( const char *tstime, const char *channame, const char *modes, cons
 			}
 		}
 		mask = 0;
-		while( CmodePrefixToMask( *nicklist ) )
+		while( CmodePrefixToMask( *nicklist ) != 0 )
 		{
 			mask |= CmodePrefixToMask( *nicklist );
 			nicklist ++;
@@ -1865,7 +1875,7 @@ void do_join( const char *nick, const char *chanlist, const char *keys )
 {
 	char *s, *t;
 	t = ( char *)chanlist;
-	while( *( s = t ) )
+	while( *( s = t ) != '\0' )
 	{
 		t = s + strcspn( s, "," );
 		if( *t != '\0' )
@@ -2081,7 +2091,7 @@ void do_svsmode_user( const char *targetnick, const char *modes, const char *ts 
 		/* We need to strip the d from the mode string */
 		pNewModes = modebuf;
 		pModes = modes;
-		while( *pModes )
+		while( *pModes != '\0' )
 		{
 			if( *pModes != 'd' )
 			{

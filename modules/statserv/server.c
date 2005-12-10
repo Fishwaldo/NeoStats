@@ -49,7 +49,7 @@ void AverageServerStatistics( void )
 	hnode_t *node;
 
 	hash_scan_begin( &scan, serverstathash );
-	while( ( node = hash_scan_next( &scan ) ) )
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		ss = hnode_get( node );
 		AverageStatistic( &ss->users );
@@ -73,7 +73,7 @@ void ResetServerStatistics( void )
 	hnode_t *node;
 
 	hash_scan_begin( &scan, serverstathash );
-	while( ( node = hash_scan_next( &scan ) ) )
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		ss = hnode_get( node );
 		ResetStatistic( &ss->users );
@@ -413,7 +413,7 @@ int ss_cmd_server_list( const CmdParams *cmdparams )
 
 	irc_prefmsg( ss_bot, cmdparams->source, "Server listing:" );
 	hash_scan_begin( &scan, serverstathash );
-	while( ( node = hash_scan_next( &scan ) ) )
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		ss = hnode_get( node );
 		irc_prefmsg( ss_bot, cmdparams->source, "%s (%s)", ss->name, 
@@ -646,7 +646,7 @@ void SaveServerStats( void )
 
 	/* run through stats and save them */
 	hash_scan_begin( &scan, serverstathash );
-	while( ( node = hash_scan_next( &scan ) ) )
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		ss = hnode_get( node );
 		SaveServer( ss );
@@ -702,7 +702,7 @@ void GetServerStats( const ServerStatHandler handler, const void *v )
 	hscan_t scan;
 
 	hash_scan_begin( &scan, serverstathash );
-	while( ( node = hash_scan_next( &scan ) ) )
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		ss = hnode_get( node );
 		handler( ss, v );
@@ -750,7 +750,7 @@ void FiniServerStats( void )
 	SaveServerStats();
 	DBACloseTable( SERVER_TABLE );
 	hash_scan_begin( &scan, serverstathash );
-	while( ( node = hash_scan_next( &scan ) ) )
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		ss = hnode_get( node );
 		ClearServerModValue( ss->s );

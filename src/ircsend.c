@@ -190,10 +190,8 @@ static protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_swhois, NULL, "send_swhois", NULL, NULL, NULL, NULL, 0, FEATURE_SWHOIS},
 	{( void * )&irc_send_smo, NULL, "send_smo", NULL, NULL, NULL, NULL, 0, FEATURE_SMO},
 	{( void * )&irc_send_svstime, NULL, "send_svstime", NULL, NULL, NULL, NULL, 0, FEATURE_SVSTIME},
-
 	{( void * )&irc_send_akill, NULL, "send_akill", &MSG_AKILL, "MSG_AKILL", &TOK_AKILL, "TOK_AKILL", 0, 0},
 	{( void * )&irc_send_rakill, NULL, "send_rakill", &MSG_RAKILL, "MSG_RAKILL", &TOK_RAKILL, "TOK_RAKILL", 0, 0},
-#if 0 /* Work in progress */
 	{( void * )&irc_send_sqline, NULL, "send_sqline", &MSG_UNSQLINE, "MSG_UNSQLINE", &TOK_UNSQLINE, "TOK_UNSQLINE", 0, 0},
 	{( void * )&irc_send_unsqline, NULL, "send_unsqline", &MSG_SQLINE, "MSG_SQLINE", &TOK_SQLINE, "TOK_SQLINE", 0, 0},
 	{( void * )&irc_send_zline, NULL, "send_zline", &MSG_ZLINE, "MSG_ZLINE", &TOK_ZLINE, "TOK_ZLINE", 0, 0},
@@ -202,7 +200,6 @@ static protocol_sym protocol_sym_table[] =
 	{( void * )&irc_send_unkline, NULL, "send_unkline", &MSG_UNKLINE, "MSG_UNKLINE", &TOK_UNKLINE, "TOK_UNKLINE", 0, 0},
 	{( void * )&irc_send_gline, NULL, "send_gline", &MSG_GLINE, "MSG_GLINE", &TOK_GLINE, "TOK_GLINE", 0, 0},
 	{( void * )&irc_send_remgline, NULL, "send_remgline", &MSG_REMGLINE, "MSG_REMGLINE", &TOK_REMGLINE, "TOK_REMGLINE", 0, 0},
-#endif /* 0 Work in progress */
 	{( void * )&irc_send_ping, _send_ping, "send_ping", &MSG_PING, "MSG_PING", &TOK_PING, "TOK_PING", 0, 0},
 	{( void * )&irc_send_pong, _send_pong, "send_pong", &MSG_PONG, "MSG_PONG", &TOK_PONG, "TOK_PONG", 0, 0},
 	{( void * )&irc_send_server, _send_server, "send_server", &MSG_SERVER, "MSG_SERVER", &TOK_SERVER, "TOK_SERVER", 0, 0},
@@ -255,7 +252,7 @@ int InitIrcdSymbols( void )
 
 	/* Build up supported message and function table */
 	pprotocol_sym = protocol_sym_table;
-	while( pprotocol_sym->msgptr || pprotocol_sym->handler )
+	while( pprotocol_sym->msgptr != NULL || pprotocol_sym->handler != NULL )
 	{
 		char **ptr;
 
@@ -677,7 +674,7 @@ int irc_prefmsg_list( const Bot *botptr, const Client * target, const char **tex
 		nlog( LOG_NOTICE, "Dropping irc_prefmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name );
 		return NS_SUCCESS;
 	}
-	while( *text )
+	while( *text != '\0' )
 	{
 		if( **text )
 		{
@@ -704,7 +701,7 @@ int irc_privmsg_list( const Bot *botptr, const Client * target, const char **tex
 		nlog( LOG_NOTICE, "Dropping irc_privmsg_list from bot (%s) to bot (%s)", botptr->u->name, target->name );
 		return NS_SUCCESS;
 	}
-	while( *text )
+	while( *text != '\0' )
 	{
 		if( **text )
 		{

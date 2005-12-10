@@ -515,7 +515,7 @@ static void ListChannelMembers( const CmdParams *cmdparams, const Channel *c )
 
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Members:    %d (List %d)", cmdparams->source ), c->users, ( int )list_count( c->members ) );
 	cmn = list_first( c->members );
-	while( cmn )
+	while( cmn != NULL )
 	{
 		cm = lnode_get( cmn );
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "            %s Modes %s Joined: %ld", cmdparams->source ), cm->u->name, CmodeMaskToString( cm->modes ), ( long )cm->tsjoin );
@@ -738,7 +738,7 @@ Client *GetRandomChannelMember( const Channel *c, int uge )
 	
 	randno = hrand( list_count( c->members ), 1 );	
 	ln = list_first( c->members );
-	while( ln ) 
+	while( ln != NULL ) 
 	{
 		cm = lnode_get(ln);
 		if( !uge || !IsExcluded( cm->u ) )
@@ -828,7 +828,7 @@ int ProcessChannelMembers( Channel *c, const ChannelMemberListHandler handler, v
 	int ret = 0;
 
 	cmn = list_first( c->members );
-	while( cmn )
+	while( cmn != NULL )
 	{
 		cm = lnode_get( cmn );
 		ret = handler( c, cm, v );

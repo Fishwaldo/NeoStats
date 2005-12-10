@@ -88,7 +88,7 @@ static int InitDBAMSymbols( void )
 		return NS_FAILURE;	
 	}
 	pdbm_sym = dbm_sym_table;
-	while( pdbm_sym->ptr )
+	while( pdbm_sym->ptr != NULL )
 	{
 		*pdbm_sym->ptr = ns_dlsym( dbm_module_handle, pdbm_sym->sym );
 		if( *pdbm_sym->ptr == NULL)

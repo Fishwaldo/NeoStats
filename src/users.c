@@ -573,7 +573,7 @@ static int ListUser( Client *u, void *v )
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Version:  %s", cmdparams->source ), u->version );
 
 	cm = list_first( u->user->chans );
-	while( cm )
+	while( cm != NULL )
 	{
 		if( i==0 )
 			irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels: %s", cmdparams->source ), ( char * ) lnode_get( cm ) );

@@ -693,10 +693,12 @@ void HTMLOutput( void )
 		irc_chanalert( ss_bot, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
 		return;
 	}
-	while( os_fgets( buf, HTMLREADBUFSIZE, tpl ) ) {
+	while( os_fgets( buf, HTMLREADBUFSIZE, tpl ) != NULL )
+	{
 		bufptr = buf;
 		htmlfuncptr = htmlfuncs;
-		while( htmlfuncptr->directive ) {
+		while( htmlfuncptr->directive != NULL )
+		{
 			buftemp = strstr( bufptr, htmlfuncptr->directive );
 			if( buftemp ) {
 				os_fwrite( bufptr, ( int )buftemp -( int )bufptr, 1, opf );

@@ -203,12 +203,12 @@ char *strdup( const char *src )
 
 char *strcasestr( const char *s1, const char *s2 )
 {
-	while( *s1 )
+	while( *s1 != '\0' )
 	{
 		const char *ps1 = s1;
 		const char *ps2 = s2;
 
-		while( *ps2 )
+		while( *ps2 != '\0' )
 		{
 			if( toupper( *ps2 ) != toupper( *ps1 ) ) 
 				break;

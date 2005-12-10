@@ -713,7 +713,7 @@ int ModuleConfig( bot_setting* set_ptr )
 {
 	SET_SEGV_LOCATION();
 	DBAOpenTable( CONFIG_TABLE_NAME );
-	while( set_ptr->option )
+	while( set_ptr->option != NULL )
 	{
 		switch( set_ptr->type ) {
 			case SET_TYPE_BOOLEAN:

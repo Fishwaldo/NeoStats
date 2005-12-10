@@ -635,7 +635,7 @@ void del_bot_setting_list( const Bot *bot_ptr, const bot_setting *set_ptr )
 	if( bot_ptr != NULL && bot_ptr->botsettings != NULL )
 	{
 		/* Cycle through command list and delete them */
-		while( set_ptr->option )
+		while( set_ptr->option != NULL )
 		{
 			del_bot_setting( bot_ptr->botsettings, set_ptr );
 			set_ptr++;

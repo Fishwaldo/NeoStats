@@ -215,7 +215,7 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 		if( !( botptr->flags & BOT_FLAG_DEAF ) && !IsServicesChannel( cmdparams->channel ) )
 		{
 			cm = list_first( botptr->u->user->chans );
-			while( cm )
+			while( cm != NULL )
 			{	
 				chan = ( char * ) lnode_get( cm );
 				cmdparams->bot = botptr;
@@ -501,7 +501,7 @@ int ns_cmd_botlist( const CmdParams *cmdparams )
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Bot: %s", cmdparams->source ), botptr->name );
 		cm = list_first( botptr->u->user->chans );
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Channels:", cmdparams->source ) );
-		while( cm )
+		while( cm != NULL )
 		{
 			irc_prefmsg( ns_botptr, cmdparams->source, "    %s", ( char * ) lnode_get( cm ) );
 			cm = list_next( botptr->u->user->chans, cm );
@@ -788,7 +788,7 @@ void handle_dead_channel( Channel *c )
 	{
 		cmdparams->bot = hnode_get( bn );
 		cm = list_first( cmdparams->bot->u->user->chans );
-		while( cm )
+		while( cm != NULL )
 		{
 			chan = ( char * ) lnode_get( cm );
 			if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 )

@@ -160,7 +160,7 @@ void GetTLDStats( const TLDStatHandler handler, const void *v )
 	
 	list_sort( tldstatlist, sortusers );
 	tn = list_first( tldstatlist );
-	while( tn )
+	while( tn != NULL )
 	{
 		t = lnode_get( tn );
 		handler( t, v );

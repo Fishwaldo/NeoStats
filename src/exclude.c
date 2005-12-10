@@ -101,7 +101,7 @@ static Exclude *FindExclude( const list_t *exclude_list, NS_EXCLUDE type, const 
 	if( !exclude_list )
 		return NULL;
 	node = list_first( exclude_list );
-	while( node )
+	while( node != NULL )
 	{
 		exclude = lnode_get( node );
 		if( exclude->type == type )
@@ -137,7 +137,7 @@ static int ProcessExcludeList( const list_t *exclude_list, ExcludeHandler handle
 
 	SET_SEGV_LOCATION();
 	node = list_first( exclude_list );
-	while( node )
+	while( node != NULL )
 	{
 		exclude = lnode_get( node );
 		ret = handler( exclude, v );

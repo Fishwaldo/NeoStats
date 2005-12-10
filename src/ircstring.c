@@ -83,7 +83,7 @@ int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args )
 						str = nullstring;
 					}
 					/* copy string to output observing limit */
-					while( *str && len < size ) {
+					while( *str != '\0' && len < size ) {
 						buf[len++] = *str++;
 					}
 					/* next char... */
@@ -111,7 +111,7 @@ int ircvsnprintf( char *buf, size_t size, const char *fmt, va_list args )
 						i /= 10;
 					} while( i != 0 );
 					/* copy number string from temp buffer to output observing limit */
-					while( *str && len < size )
+					while( *str != '\0' && len < size )
 						buf[len++] = *str++;
 					/* next char... */
 					format++;

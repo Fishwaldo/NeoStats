@@ -61,7 +61,7 @@ char *make_safe_filename( char *name )
 	char *ptr;
 
 	ptr = name;
-	while( *ptr )
+	while( *ptr != '\0' )
 	{
 		switch( *ptr )
 		{
@@ -135,7 +135,7 @@ char *ns_strlwr( char *s )
 	char *t;
 	
 	t = s;
-	while( *t )
+	while( *t != '\0' )
 	{
 		*t = tolower( *t );
 		t++;
@@ -166,7 +166,7 @@ unsigned int ircsplitbuf( char *buf, char ***argv, int colon_special )
 	argc = 0;
 	/*if( *buf == ':' )
 		buf++;*/
-	while( *buf ) {
+	while( *buf != '\0' ) {
 		if( argc == argvsize ) {
 			argvsize += 8;
 			*argv = ns_realloc( *argv, sizeof( char * ) * argvsize );
@@ -218,7 +218,7 @@ unsigned int split_buf( char *buf, char ***argv )
 	argc = 0;
 	if( *buf == ':' )
 		buf++;
-	while( *buf ) {
+	while( *buf != '\0' ) {
 		if( argc == argvsize ) {
 			argvsize += 8;
 			*argv = ns_realloc( *argv, sizeof( char * ) * argvsize );
@@ -315,7 +315,7 @@ void strip_mirc_codes( char *text )
 {
 	char *dd = text;
 
-	while( *text ) {
+	while( *text != '\0' ) {
 		switch( *text ) {
 			case 1:			/* CTCP */
 				text++;	
@@ -382,7 +382,7 @@ void clean_string( char *text, size_t len )
 	dd = ns_malloc( len );	
 	start = dd;
 	orig = text;
-	while( *text ) {
+	while( *text != '\0' ) {
 		i++;
 		switch( *text ) {
 			case '%':
@@ -454,7 +454,7 @@ char *sftime( time_t stuff )
 
 int ValidateNick( const char *nick )
 {
-	while( *nick )
+	while( *nick != '\0' )
 	{
 		if( !IsNickChar( *nick ) )
 			return NS_FAILURE;
@@ -475,7 +475,7 @@ int ValidateNick( const char *nick )
 
 int ValidateNickWild( const char *nick )
 {
-	while( *nick )
+	while( *nick != '\0' )
 	{
 		if( !IsNickChar( *nick ) && !IsWildChar( *nick ) )
 			return NS_FAILURE;
@@ -495,7 +495,7 @@ int ValidateNickWild( const char *nick )
 
 int ValidateUser( const char *username )
 {
-	while( *username )
+	while( *username != '\0' )
 	{
 		if( !IsUserChar( *username ) )
 			return NS_FAILURE;
@@ -516,7 +516,7 @@ int ValidateUser( const char *username )
 
 int ValidateUserWild( const char *username )
 {
-	while( *username )
+	while( *username != '\0' )
 	{
 		if( !IsUserChar( *username ) && !IsWildChar( *username ) )
 			return NS_FAILURE;
@@ -539,7 +539,7 @@ int ValidateHost( const char *hostname )
 {
 	if( !strchr( hostname, '.' ) )
 		return NS_FAILURE;
-	while( *hostname )
+	while( *hostname != '\0' )
 	{
 		if( !IsHostChar( *hostname ) )
 			return NS_FAILURE;
@@ -560,7 +560,7 @@ int ValidateHost( const char *hostname )
 
 int ValidateHostWild( const char *hostname )
 {
-	while( *hostname )
+	while( *hostname != '\0' )
 	{
 		if( !IsHostChar( *hostname ) && !IsWildChar( *hostname ) )
 			return NS_FAILURE;
@@ -648,7 +648,7 @@ int ValidateURL( const char *url )
 		return NS_FAILURE;
 	/* Get pointer to rest of URL to test */
 	url += 7;
-	while( *url )
+	while( *url != '\0' )
 	{
 		if( !IsURLChar( *url ) )
 			return NS_FAILURE;
@@ -672,7 +672,7 @@ int ValidateChannel( const char *channel_name )
 	if( !IsChanPrefix( *channel_name ) )
 		return NS_FAILURE;
 	channel_name ++;
-	while( *channel_name )
+	while( *channel_name != '\0' )
 	{
 		if( !IsChanChar( *channel_name ) )
 			return NS_FAILURE;
@@ -697,7 +697,7 @@ int ValidateChannelWild( const char *channel_name )
 	if( !IsChanPrefix( *channel_name ) )
 		return NS_FAILURE;
 	channel_name ++;
-	while( *channel_name )
+	while( *channel_name != '\0' )
 	{
 		if( !IsChanChar( *channel_name ) && !IsWildChar( *channel_name ) )
 			return NS_FAILURE;
@@ -717,7 +717,7 @@ int ValidateChannelWild( const char *channel_name )
 
 int ValidateChannelKey( const char *key )
 {
-	while( *key )
+	while( *key != '\0' )
 	{
 		if( !IsChanKeyChar( *key ) )
 			return NS_FAILURE;

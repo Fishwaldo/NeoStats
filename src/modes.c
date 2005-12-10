@@ -180,7 +180,7 @@ static unsigned int BuildModeTable( unsigned char *mode_char_map, mode_data *des
 {
 	unsigned int maskall = 0;
 
-	while( src->mode ) 
+	while( src->mode != '\0' ) 
 	{
 		dest[( int )src->mode].mask = src->mask;
 		dest[( int )src->mode].flags = src->flags;
@@ -285,7 +285,7 @@ static unsigned int ModeStringToMask( const mode_data *mode_table, const char *M
 
 	/* Walk through mode string and convert to mask */
 	tmpmode =( char * ) ModeString;
-	while( *tmpmode )
+	while( *tmpmode != '\0' )
 	{
 		switch( *tmpmode )
 		{
@@ -620,7 +620,7 @@ unsigned char CmodeCharToPrefix( unsigned char mode )
 
 static const char *get_mode_desc( ModeDesc *desc, unsigned int mask )
 {
-	while( desc->mask )
+	while( desc->mask != 0 )
 	{
 		if( desc->mask == mask )
 		{
@@ -695,7 +695,7 @@ int test_cmode( const Channel *c, unsigned int mask )
 	}
 	/* if we get here, we have to check the modeparm list first */
 	mn = list_first( c->modeparams );
-	while( mn )
+	while( mn != NULL )
 	{
 		m = lnode_get( mn );
 		if( m->mask & mask )
@@ -766,7 +766,7 @@ void ChanModeHandler( Channel *c, const char *modes, int avindex, char **av, int
 	lnode_t *mn;
 	int add = 0;
 
-	while( *modes )
+	while( *modes != '\0' )
 	{
 		unsigned int mask;
 		unsigned int flags;      
@@ -805,7 +805,7 @@ void ChanModeHandler( Channel *c, const char *modes, int avindex, char **av, int
 				{
 					mn = list_first( c->modeparams );
 					modeexists = 0;
-					while( mn )
+					while( mn != NULL )
 					{
 						m = lnode_get( mn );
 						if( ( m->mask == mask ) && ircstrcasecmp( m->param, av[avindex] )== 0 )
@@ -981,7 +981,7 @@ void ListChannelModes( const CmdParams *cmdparams, const Channel *c )
 
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Mode:       %s", cmdparams->source ), UmodeMaskToString( c->modes ) );
 	cmn = list_first( c->modeparams );
-	while( cmn )
+	while( cmn != NULL )
 	{
 		m = lnode_get( cmn );
 		for( i = 0; i < MODE_TABLE_SIZE; i++ )

@@ -90,7 +90,7 @@ int ss_event_mode( const CmdParams *cmdparams )
 		nlog( LOG_WARNING, "Unable to find stats for %s", cmdparams->source->uplink->name );
 		return NS_SUCCESS;
 	}
-	while( *modes )
+	while( *modes != '\0' )
 	{
 		switch( *modes )
 		{

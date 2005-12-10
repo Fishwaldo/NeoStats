@@ -251,7 +251,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 						str = nullstring;
 					}
 					/* copy string to output observing limit */
-					while( *str && len < size ) {
+					while( *str != '\0' && len < size ) {
 						buf[len++] = *str++;
 					}
 					/* next char... */
@@ -265,7 +265,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 						str = nullstring;
 					}
 					/* copy string to output observing limit */
-					while( *str && len < size ) {
+					while( *str != '\0' && len < size ) {
 						buf[len++] = *str++;
 					}
 					/* next char... */
@@ -279,7 +279,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 						str = nullstring;
 					}
 					/* copy string to output observing limit */
-					while( *str && len < size ) {
+					while( *str != '\0' && len < size ) {
 						buf[len++] = *str++;
 					}
 					/* next char... */
@@ -293,7 +293,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 						str = nullstring;
 					}
 					/* copy string to output observing limit */
-					while( *str && len < size ) {
+					while( *str != '\0' && len < size ) {
 						buf[len++] = *str++;
 					}
 					/* next char... */
@@ -371,7 +371,7 @@ static void parse_line( dbbot *db, char *buf, int *commandreadcount )
 		db->versiontext = ptr2;
 		return;		
 	}
-	while( ptr )
+	while( ptr != NULL )
 	{
 		readcount++;
 		dlog( DEBUG1, "read %s", ptr );

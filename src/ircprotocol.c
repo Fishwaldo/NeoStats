@@ -60,7 +60,7 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
 
 	SET_SEGV_LOCATION();
 	ircd_cmd_ptr = cmd_list;
-	while( ircd_cmd_ptr->name )
+	while( ircd_cmd_ptr->name != NULL )
 	{
 		if( ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) == 0 || 
 		  ( ( ircd_srv.protocol & PROTOCOL_TOKEN ) && ircd_cmd_ptr->token && ircstrcasecmp( *ircd_cmd_ptr->token, cmd ) == 0 ) ) {
@@ -79,7 +79,7 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
 		ircd_cmd_ptr ++;
 	}
 	intrinsic_cmd_ptr = intrinsic_cmd_list;
-	while( intrinsic_cmd_ptr->handler )
+	while( intrinsic_cmd_ptr->handler != NULL )
 	{
 		if( *intrinsic_cmd_ptr->name )
 		{
@@ -96,7 +96,7 @@ void process_ircd_cmd( int cmdptr, const char *cmd, char *origin, char **av, int
 	}
 	ircd_cmd_ptr = numeric_cmd_list;	
 	/* Process numeric replies */
-	while( ircd_cmd_ptr->name )
+	while( ircd_cmd_ptr->name != NULL )
 	{
 		if( ircstrcasecmp( *ircd_cmd_ptr->name, cmd ) == 0 )
 		{

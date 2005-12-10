@@ -105,7 +105,8 @@ unsigned int base64toint( const char *s )
 	int max = 0;
 	unsigned int i = convert2n[( unsigned char ) *s++];
 	max++;
-	while( *s ) {
+	while( *s != '\0' )
+	{
 		i <<= NUMNICKLOG;
 		i += convert2n[( unsigned char ) *s++];
 		max++;
@@ -118,7 +119,8 @@ unsigned int base64toint( const char *s )
 unsigned int base64toIP( const char *s )
 {
 	unsigned int i = convert2n[( unsigned char ) *s++];
-	while( *s ) {
+	while( *s != '\0' )
+	{
 		i <<= NUMNICKLOG;
 		i += convert2n[( unsigned char ) *s++];
 	}
@@ -128,7 +130,8 @@ unsigned int base64toIP( const char *s )
 const char *inttobase64( char *buf, unsigned int v, unsigned int count )
 {
 	buf[count] = '\0';  
-	while( count > 0 ) {
+	while( count > 0 )
+	{
 		buf[--count] = convert2y[( v & NUMNICKMASK )];
 		v >>= NUMNICKLOG;
 	}
@@ -285,7 +288,8 @@ static void m_mode( char *origin, char **argv, int argc, int srv )
 		modes = argv[1];
 		AddStringToList( &av, argv[1], &ac );
 
-		while( *modes ) {
+		while( *modes != '\0' )
+		{
 			unsigned int mask;
 			unsigned int flags;      
 
@@ -371,7 +375,8 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 	 * then process modes and ignore clients - look into better system for NS2.6
 	 */
 	param = 2;
-	while( param < argc ) {
+	while( param < argc )
+	{
 	    switch( argv[param][0] ) {
 			case '+': /* mode string */
 			{
@@ -380,8 +385,10 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 				modes = argv[param];
 				param++;
 				modes++;
-				while( *modes ) {
-					if( CmodeCharToFlags( *modes ) & MODEPARAM ) {
+				while( *modes )
+				{
+					if( CmodeCharToFlags( *modes ) & MODEPARAM )
+					{
 						param ++;
 					}
 					modes++;
@@ -402,7 +409,8 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 				char modechar = 0;
 			
 				t = ( char *)argv[param];
-				while( *( s = t ) ) {
+				while( *( s = t ) != '\0' )
+				{
 					t = s + strcspn( s, "," );
 					if( *t )
 						*t++ = 0;
@@ -426,7 +434,8 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 	}
 
 	param = 2;
-	while( param < argc ) {
+	while( param < argc )
+	{
 	    switch( argv[param][0] ) {
 			case '+': /* mode string */
 			{
@@ -435,7 +444,8 @@ static void m_burst( char *origin, char **argv, int argc, int srv )
 				modes = argv[param];
 				param++;
 				modes++;
-				while( *modes ) {
+				while( *modes != '\0' )
+				{
 					char **av;
 					int ac;
 

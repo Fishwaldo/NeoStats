@@ -420,7 +420,7 @@ static int hs_event_umode( const CmdParams *cmdparams )
 		return NS_SUCCESS;
 	/* first, find if its a regnick mode */
 	modes = cmdparams->param;
-	while( *modes )
+	while( *modes != '\0' )
 	{
 		switch( *modes )
 		{

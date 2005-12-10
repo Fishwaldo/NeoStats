@@ -354,7 +354,7 @@ void DeleteEventList( const ModuleEvent *eventlistptr )
 		nlog( LOG_ERROR, "DeleteEventList: eventlistptr passed as NULL" );
 		return;
 	}
-	while( eventlistptr->event )
+	while( eventlistptr->event != EVENT_NULL )
 	{
 		DeleteEvent( eventlistptr->event );
 		eventlistptr++;

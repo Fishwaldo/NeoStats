@@ -235,7 +235,7 @@ void FiniDns (void)
 
 	SET_SEGV_LOCATION();
 	dnsnode = list_first (dnslist);
-	while (dnsnode) {
+	while (dnsnode != NULL) {
 		dnsdata = lnode_get(dnsnode);
 		adns_cancel(dnsdata->q);
 		ns_free (dnsdata->a);
@@ -245,7 +245,7 @@ void FiniDns (void)
 	list_destroy_nodes (dnslist);
 	list_destroy (dnslist);
 	dnsnode = list_first(dnsqueue);
-	while (dnsnode) {
+	while (dnsnode != NULL) {
 		dnsdata = lnode_get(dnsnode);
 		ns_free(dnsdata);
 		dnsnode = list_next(dnsqueue, dnsnode);
@@ -275,7 +275,7 @@ static void dns_check_queue(void)
 	/* if the dnsqueue isn't empty, then lets process some more till we are full again */
 	if (!list_isempty(dnsqueue)) {
 		dnsnode = list_first(dnsqueue);
-		while ((dnsnode) && (!list_isfull(dnslist))) {
+		while ((dnsnode != NULL) && (!list_isfull(dnslist))) {
 			dnsdata = lnode_get(dnsnode);	
 			dlog(DEBUG2, "Moving DNS query from queue to active");
 			if (dnsdata->type == adns_r_ptr) {
@@ -318,7 +318,7 @@ void canx_dns(Module *modptr)
 
 	SET_SEGV_LOCATION();
 	dnsnode = list_first (dnslist);
-	while (dnsnode) {
+	while (dnsnode != NULL) {
 		dnsdata = lnode_get(dnsnode);
 		if (dnsdata->modptr == modptr) {
 			adns_cancel(dnsdata->q);
@@ -331,7 +331,7 @@ void canx_dns(Module *modptr)
 		dnsnode = list_next(dnslist, dnsnode);
 	}
 	dnsnode = list_first(dnsqueue);
-	while (dnsnode) {
+	while (dnsnode != NULL) {
 		dnsdata = lnode_get(dnsnode);
 		if (dnsdata->modptr == modptr) {
 			ns_free(dnsdata);
@@ -371,7 +371,7 @@ void do_dns (int notused, short event, void *arg)
 		return;
 	}
 	dnsnode = list_first (dnslist);
-	while (dnsnode) {
+	while (dnsnode != NULL) {
 		/* loop through the list */
 		dnsdata = lnode_get (dnsnode);
 		status = adns_check (nsads, &dnsdata->q, &dnsdata->a, NULL);

@@ -565,7 +565,7 @@ void SaveChanStats( void )
 	lnode_t *cn;
 
 	cn = list_first( channelstatlist );
-	while( cn )
+	while( cn != NULL )
 	{
 		cs = lnode_get( cn );
 		SaveChannel( cs );
@@ -593,7 +593,7 @@ void SaveChanStatsProgressive( void )
 	/* we want to only do 25% each progressive save */
 	limit = ( list_count( channelstatlist ) / 4 );
 	cn = list_first( channelstatlist );
-	while( cn )
+	while( cn != NULL )
 	{
 		cs = lnode_get( cn );
 		/* do progressive save if we have more than 100 channels */
@@ -703,7 +703,7 @@ void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, 
 	}
 
 	ln = list_first( channelstatlist );
-	while( ln )
+	while( ln != NULL )
 	{
 		cs = ( channelstat * )lnode_get( ln );
 		if( limit != -1 && count >= limit )
@@ -756,7 +756,7 @@ void FiniChannelStats( void )
 	SaveChanStats();
 	DBACloseTable( CHANNEL_TABLE );
 	ln = list_first( channelstatlist );
-	while( ln )
+	while( ln != NULL )
 	{
 		cs = ( channelstat * )lnode_get( ln );
 		ClearChannelModValue( cs->c );

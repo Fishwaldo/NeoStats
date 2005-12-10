@@ -437,7 +437,7 @@ static void TransverseMap( const ServerMapHandler handler, int useexclusions, co
 	Client *s;
 
 	hash_scan_begin( &hs, serverhash );
-	while( ( node = hash_scan_next( &hs ) ) )
+	while( ( node = hash_scan_next( &hs ) ) != NULL )
 	{
 		s = hnode_get( node );
 		/*printf( "%d %s %s (%s)\n", depth, s->name, s->uplink ? s->uplink->name : "", uplink );*/

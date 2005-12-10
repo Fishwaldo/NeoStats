@@ -235,7 +235,7 @@ static int AccessList( const CmdParams *cmdparams )
 	SET_SEGV_LOCATION();	
 	irc_prefmsg( NULL, cmdparams->source, "Access List (%d):", ( int )hash_count( accesshash ) );
 	hash_scan_begin( &accessscan, accesshash );
-	while( ( node = hash_scan_next( &accessscan ) )!= NULL) 
+	while( ( node = hash_scan_next( &accessscan ) ) != NULL) 
 	{
 		access = hnode_get( node );
 		irc_prefmsg( NULL, cmdparams->source, "%s %s (%d)", access->nick, access->mask, access->level );
@@ -318,7 +318,7 @@ int ModFini( void )
 
 
 	hash_scan_begin( &accessscan, accesshash );
-	while( ( node = hash_scan_next( &accessscan ) )!= NULL) 
+	while( ( node = hash_scan_next( &accessscan ) ) != NULL) 
 	{
 		access = hnode_get( node );
 		ns_free (access);

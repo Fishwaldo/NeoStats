@@ -264,7 +264,7 @@ static int operlog_event_umode( const CmdParams *cmdparams )
 	char *modes = cmdparams->param;
 
 	SET_SEGV_LOCATION();
-	while( *modes )
+	while( *modes != '\0' )
 	{
 		switch( *modes )
 		{
