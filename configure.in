@@ -332,7 +332,29 @@ AX_PATH_LIB_CURL
 
 			if test "$PERL_VER" = "yes"; then
 				AC_MSG_RESULT(yes)
-				AC_DEFINE_UNQUOTED(USE_PERL, 1, 'Enable Perl Support')
+				AC_MSG_CHECKING([Checking for perl compiler, linker, libraries and headers])
+	    			PERL_CC=`$perlpath -MConfig -e 'print $Config{cc},"\n";'`
+			    	PERL_LD=`$perlpath -MConfig -e 'print $Config{ld},"\n";'`
+
+				rm -f testperl$ac_exeext testperl.$ac_objext testperl.c testperl.err
+	    			cat > testperl.c <<EOF
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+int main () { (void)&perl_construct; return 0; }
+EOF
+				$PERL_CC $PERL_CFLAGS -c testperl.c >testperl.err 2>&1 &&
+	   	 		$PERL_LD -o testperl testperl.o $PERL_LDFLAGS >testperl.err 2>&1 &&
+	    			test -x testperl &&
+	    			have_perl=yes
+				if test "$have_perl" = "yes"; then
+					AC_MSG_RESULT(ok)
+					AC_DEFINE_UNQUOTED(USE_PERL, 1, 'Enable Perl Support')
+				else
+					PERL_LDFLAGS=""
+					PERL_CFLAGS=""
+					AC_MSG_ERROR([Failed try ./configure --disable-perl])
+				fi
 			else
 				AC_MSG_RESULT(no)
 				PERL_LDFLAGS=""

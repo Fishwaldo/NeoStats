@@ -30,4 +30,18 @@ from the directory ~/NeoStats 3.0/data before using this version.
 
 Known issues that we are aware of and should not be reported:
 
-* None at present
+==============================================================================
+* I get a link error: /usr/bin/ld: cannot find -lperl during the make step
+of the installation on Debian. What's wrong?
+
+- You need to install the libperl-dev package.
+
+Alternatively, create a symbolic link from libperl.so.5.6.1 to libperl.so in
+/usr/lib:
+
+    % cd /usr/lib; ln -s libperl.so.5.6.1 libperl.so
+and re-run the make step of the installation.
+
+or if you dont want to take advantage of perl modules and extensions, then
+you can run ./configure --disable-perl
+==============================================================================
