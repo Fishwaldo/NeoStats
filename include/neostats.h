@@ -1193,10 +1193,10 @@ typedef enum MQS_STATE {
 
 /* connection strategy */
 typedef enum MQS_CONNECT {
-        MQ_CONNECT_NO,
-        MQ_CONNECT_YES,
-        MQ_CONNECT_DEMAND,
         MQ_CONNECT_ERROR,
+        MQ_CONNECT_NO,
+        MQ_CONNECT_DEMAND,
+        MQ_CONNECT_YES,
 } MQS_CONNECT;
 
 

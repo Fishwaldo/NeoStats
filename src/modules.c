@@ -590,6 +590,8 @@ int unload_module( const char *modname, Client * u )
 	}
 	mod_ptr = hnode_get( modnode );
 	irc_chanalert( ns_botptr, _( "Unloading module %s" ), modname );
+
+	MQModuleDelcmd(mod_ptr);
 	
 	if( mod_ptr->info->flags & MODULE_FLAG_AUTH )
 		DelAuthModule( mod_ptr );

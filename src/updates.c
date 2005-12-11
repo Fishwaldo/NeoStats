@@ -41,7 +41,7 @@ void CheckMQOut();
 void MQcmd_Broadcast(MMessage *msg);
 void MQcmd_Shutdown(MMessage *msg);
 void ResetMQ();
-
+char *MQGetConnect(MQS_CONNECT connect);
 
 list_t *MQlist;
 hash_t *MQcmds;
@@ -184,7 +184,7 @@ int MQSendMessage(MMessage *msg, int canqueue) {
 		/* Queue the message */
 		lnode_create_append(MQlist, msg);
 		/* if we are on demand connect, then start connect now */
-		if (mqs.connect == MQ_CONNECT_DEMAND) 
+		if (mqs.connect >= MQ_CONNECT_DEMAND) 
 			dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
 			
 		dlog(DEBUG3, "MQ Message is queued up for sending later");
@@ -202,11 +202,30 @@ int MQSendMessage(MMessage *msg, int canqueue) {
 }
 void MQStatusMsg(const Bot *bot, const CmdParams *cmdparams) {
 	int i;
+	irc_prefmsg( bot, cmdparams->source, __("NeoNet Connection Enabled: %s", cmdparams->source), MQGetConnect(mqs.connect));
 	irc_prefmsg( bot, cmdparams->source, __("NeoNet Status: %s", cmdparams->source), MQGetStatus(mqs.state));
 	if (mqs.state == MQS_OK) {
 		irc_prefmsg( bot, cmdparams->source, __("NeoNet Group Memberships:", cmdparams->source));
 		for (i = 0; i < mqs.nogroups; i++) irc_prefmsg(bot, cmdparams->source, "%d) %s", i, mqs.groups[i]);
 	}
+}
+
+char *MQGetConnect(MQS_CONNECT connect) {
+	switch (connect) {
+		case MQ_CONNECT_ERROR:
+			return "No (NeoNet Error/Failure - Please consult Log files)";
+			break;
+		case MQ_CONNECT_NO:
+			return "No (disabled)";
+			break;
+		case MQ_CONNECT_DEMAND:
+			return "Yes - On Demand";
+			break;
+		case MQ_CONNECT_YES:
+			return "Yes";
+			break;
+	}
+	return "Uknown Connect Style";
 }
 
 char *MQGetStatus(MQS_STATE state) {
@@ -239,7 +258,7 @@ int MQPingSrv(void *unused) {
 	MMessage *msg;
 	int64 *ping;
 	if (mqs.state != MQS_OK) { 
-		/* just return silently */
+		/* just return silently cause this is only a ping*/
 		return NS_SUCCESS;
 	}
 	msg = MMAllocMessage(0);
