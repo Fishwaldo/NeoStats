@@ -300,6 +300,9 @@ static int cmd_add( const CmdParams *cmdparams )
 	DBAStore( "channels", ls_chan->name, ( void * )ls_chan->name, MAXCHANLEN );
 	CommandReport( ls_bot, "%s added %s to the channel list",
 		cmdparams->source->name, cmdparams->av[0] );
+	if( lsjoin )
+		if( IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
+			irc_join( ls_bot, ls_chan->name, NULL);
 	return NS_SUCCESS;
 }
 
@@ -358,6 +361,9 @@ static int cmd_del( const CmdParams *cmdparams )
 		ls_chan = ( ls_channel * )hnode_get( node );
 		if( ircstrcasecmp( ls_chan->name, cmdparams->av[0] ) == 0 )
 		{
+			if( lsjoin )
+				if( IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
+					irc_part( ls_bot, ls_chan->name, NULL);
 			irc_prefmsg( ls_bot, cmdparams->source, 
 				"Deleted %s from the channel list", cmdparams->av[0] );
 			CommandReport( ls_bot, "%s deleted %s from the channel list",

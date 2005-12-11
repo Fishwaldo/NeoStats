@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a3-dev
+ - LimitServ: join/part bot on adding/deleteing channels if JOIN enabled (D)
  - HostServ: fix loading of previously added bans (D)
  - Finish up the core side NeoNet support. Modules such as SecureServ and
    OPSB are next (F)
