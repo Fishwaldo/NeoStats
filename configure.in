@@ -353,7 +353,7 @@ EOF
 				else
 					PERL_LDFLAGS=""
 					PERL_CFLAGS=""
-					AC_MSG_ERROR([Failed try ./configure --disable-perl])
+					AC_MSG_ERROR([Failed. See the RELNOTES file])
 				fi
 			else
 				AC_MSG_RESULT(no)
