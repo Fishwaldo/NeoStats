@@ -257,15 +257,34 @@ int MQPingSrv(void *unused) {
 
 }
 
+int MQCredOk() 
+{
+	if (mqs.username[0] != '\0' && mqs.password[0] != '\0') {
+		return NS_SUCCESS;
+	} else {
+		return NS_FAILURE;
+	}
+}
+
+char *MQUsername() 
+{
+	return mqs.username;
+}
+
+char *MQPassword()
+{
+	return mqs.password;
+}
+
 int InitUpdate(void) 
 {
 	if (mqs.connect == MQ_CONNECT_YES) {
-		if (mqs.username[0] && mqs.password[0]) {
+		if (MQCredOk() == NS_SUCCESS) {
 			dns_lookup( mqs.hostname,  adns_r_a, GotUpdateAddress, NULL );
 			nlog(LOG_INFO, "NeoNet Initialized successfully, connecting to %s", mqs.hostname);
 		}
 	} else if (mqs.connect == MQ_CONNECT_DEMAND) {
-		if (!(mqs.username[0] && mqs.password[0])) {
+		if (MQCredOk() != NS_SUCCESS) {
 			nlog(LOG_WARNING, "Can't do OnDemand Connect to NeoNet as no username/password has been set");
 			mqs.connect = MQ_CONNECT_ERROR;
 		}
