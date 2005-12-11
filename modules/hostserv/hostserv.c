@@ -109,25 +109,25 @@ ModuleInfo module_info =
 /** Bot command table */
 static bot_cmd hs_commands[] =
 {
-	{"ADD",		hs_cmd_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add, 0, NULL, NULL},
-	{"DEL",		hs_cmd_del,		1, 	NS_ULEVEL_LOCOPER,	hs_help_del, 0, NULL, NULL},
-	{"LIST",	hs_cmd_list,	0, 	NS_ULEVEL_LOCOPER,	hs_help_list, 0, NULL, NULL},
-	{"LISTWILD",hs_cmd_listwild,2, 	NS_ULEVEL_LOCOPER,	hs_help_listwild, 0, NULL, NULL},
-	{"BANS",	hs_cmd_bans,	1,  NS_ULEVEL_ADMIN,	hs_help_bans, 0, NULL, NULL},
-	{"VIEW",	hs_cmd_view,	1, 	NS_ULEVEL_OPER,		hs_help_view, 0, NULL, NULL},
-	{"LOGIN",	hs_cmd_login,	2, 	0,					hs_help_login, 0, NULL, NULL},
-	{"CHPASS",	hs_cmd_chpass,	3, 	0,					hs_help_chpass, 0, NULL, NULL},
+	{"ADD",		hs_cmd_add,		4,	NS_ULEVEL_LOCOPER,	hs_help_add,		0,	NULL,	NULL},
+	{"DEL",		hs_cmd_del,		1,	NS_ULEVEL_LOCOPER,	hs_help_del,		0,	NULL,	NULL},
+	{"LIST",	hs_cmd_list,		0,	NS_ULEVEL_LOCOPER,	hs_help_list,		0,	NULL,	NULL},
+	{"LISTWILD",	hs_cmd_listwild,	2,	NS_ULEVEL_LOCOPER,	hs_help_listwild,	0,	NULL,	NULL},
+	{"BANS",	hs_cmd_bans,		1,	NS_ULEVEL_ADMIN,	hs_help_bans,		0,	NULL,	NULL},
+	{"VIEW",	hs_cmd_view,		1,	NS_ULEVEL_OPER,		hs_help_view,		0,	NULL,	NULL},
+	{"LOGIN",	hs_cmd_login,		2,	0,			hs_help_login,		0,	NULL,	NULL},
+	{"CHPASS",	hs_cmd_chpass,		3,	0,			hs_help_chpass,		0,	NULL,	NULL},
 	NS_CMD_END()
 };
 
 /** Bot setting table */
 static bot_setting hs_settings[] =
 {
-	{"EXPIRE",		&hs_cfg.expire,		SET_TYPE_INT,		0, 99, 		NS_ULEVEL_ADMIN, "days",hs_help_set_expire,	hs_set_expire_cb,	( void* )TS_ONE_MINUTE	},
+	{"EXPIRE",	&hs_cfg.expire,		SET_TYPE_INT,		0, 99, 		NS_ULEVEL_ADMIN, "days",hs_help_set_expire,	hs_set_expire_cb,	( void* )TS_ONE_MINUTE	},
 	{"HIDDENHOST",	&hs_cfg.regnick,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_hiddenhost, hs_set_regnick_cb,	( void* )0	},
 	{"HOSTNAME",	hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST,	NS_ULEVEL_ADMIN, NULL,	hs_help_set_hostname,	NULL,			( void* )""	},
 	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_operhosts,	NULL,			( void* )0	},
-	{"VERBOSE",		&hs_cfg.verbose,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_verbose,	NULL,			( void* )1	},
+	{"VERBOSE",	&hs_cfg.verbose,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_verbose,	NULL,			( void* )1	},
 	{"ADDLEVEL",	&hs_cfg.addlevel,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_addlevel,	NULL,			( void* )NS_ULEVEL_LOCOPER },
 	NS_SETTING_END()
 };
@@ -279,10 +279,10 @@ static void SaveVhost( vhostentry *vhe )
 
 static void SaveBan( banentry *ban )
 {
-	DBAStore( "bans", ban->host, ( void * )ban, sizeof( ban ) );
+	DBAStore( "bans", ban->host, ( void * )ban, sizeof( banentry ) );
 }
 
-/** @brief LoadBans
+/** @brief LoadBan
  *
  *  Load banned vhost
  *
@@ -315,7 +315,7 @@ static int LoadBan( void *data, int size )
 
 static void LoadBans( void )
 {
-	DBAFetchRows( "ban", LoadBan );
+	DBAFetchRows( "bans", LoadBan );
 }
 
 /** @brief hs_set_regnick_cb
