@@ -215,7 +215,7 @@ int AddAuthModule( Module *mod_ptr )
 {
 	/* Set entry for authentication if module has auth function */
 	mod_ptr->userauth = ns_dlsym( mod_ptr->handle, "ModAuthUser" );
-	if( mod_ptr->userauth )
+	if( mod_ptr->userauth != NULL )
 		return NS_SUCCESS;
 	return NS_FAILURE;
 }

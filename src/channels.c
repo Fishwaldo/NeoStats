@@ -96,7 +96,7 @@ static void ChanPartHandler( list_t *list, lnode_t *node, void *v )
 void PartAllChannels( Client *u, const char *reason )
 {
 	os_memset( quitreason, 0, BUFSIZE );
-	if( reason )
+	if( reason != NULL )
 	{
 		strlcpy( quitreason, reason, BUFSIZE );
 		strip_mirc_codes( quitreason );
@@ -123,12 +123,12 @@ void ChannelTopic( const char *chan, const char *owner, const char *ts, const ch
 	Channel *c;
 
 	c = FindChannel( chan );
-	if( !c )
+	if( c == NULL )
 	{
 		nlog( LOG_WARNING, "ChannelTopic: can't find channel %s", chan );
 		return;
 	}
-	if( topic )
+	if( topic != NULL )
 		strlcpy( c->topic, topic, BUFSIZE );
 	else
 		c->topic[0] = 0;
@@ -197,7 +197,7 @@ static void del_chan( Channel *c )
 	SET_SEGV_LOCATION();
 	dlog( DEBUG2, "del_chan: deleting channel %s", c->name );
 	cn = hash_lookup( channelhash, c->name );
-	if( !cn )
+	if( cn == NULL )
 	{
 		nlog( LOG_WARNING, "del_chan: channel %s not found.", c->name );
 		return;
@@ -229,7 +229,7 @@ static void del_user_channel( Channel *c, Client *u )
 	lnode_t *un;
 
 	un = list_find( u->user->chans, c->name, comparef );
-	if( !un )
+	if( un == NULL )
 		nlog( LOG_WARNING, "del_user_channel: %s not found in channel %s", u->name, c->name );
 	else
 		list_delete_destroy_node( u->user->chans, un );
@@ -252,7 +252,7 @@ static void del_channel_member( Channel *c, Client *u )
 	lnode_t *un;
 	
 	un = list_find( c->members, u->name, comparechanmember );
-	if( !un )
+	if( un == NULL )
 	{
 		nlog( LOG_WARNING, "%s isn't a member of channel %s", u->name, c->name );
 		return;
@@ -310,13 +310,13 @@ void KickChannel( const char *kickby, const char *chan, const char *kicked, cons
 	SET_SEGV_LOCATION();
 	dlog( DEBUG2, "KickChannel: %s kicked %s from %s for %s", kickby, kicked, chan, kickreason ? kickreason : "no reason" );
 	u = FindUser( kicked );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "KickChannel: user %s not found", kicked );
 		return;
 	}
 	c = FindChannel( chan );
-	if( !c )
+	if( c == NULL )
 	{
 		nlog( LOG_WARNING, "KickChannel: channel %s not found", chan );
 		return;
@@ -326,7 +326,7 @@ void KickChannel( const char *kickby, const char *chan, const char *kicked, cons
 	{
 		u->flags |= CLIENT_FLAG_ZOMBIE;
 		strlcpy( savekicker, kickby, MAXHOST );
-		if( kickreason )
+		if( kickreason != NULL )
 			strlcpy( savekickreason, kickreason, BUFSIZE );
 		else 
 			savekickreason[0] = 0;
@@ -339,7 +339,7 @@ void KickChannel( const char *kickby, const char *chan, const char *kicked, cons
 		cmdparams->target = u;
 		cmdparams->channel = c;
 		cmdparams->source = FindUser( kickby );
-		if( !cmdparams->source )
+		if( cmdparams->source == NULL )
 			cmdparams->source = FindServer( kickby );
 		cmdparams->param = (char *)kickreason;
 		SendAllModuleEvent( EVENT_KICK, cmdparams );
@@ -375,13 +375,13 @@ void PartChannel( Client *u, const char *chan, const char *reason )
 
 	SET_SEGV_LOCATION();
 	dlog( DEBUG2, "PartChannel: parting %s from %s", u->name, chan );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "PartChannel: trying to part NULL user from %s", chan );
 		return;
 	}
 	c = FindChannel( chan );
-	if( !c )
+	if( c == NULL )
 	{
 		nlog( LOG_WARNING, "PartChannel: channel %s not found", chan );
 		return;
@@ -441,7 +441,7 @@ void JoinChannel( const char *nick, const char *chan )
 	
 	SET_SEGV_LOCATION();
 	u = FindUser( nick );
-	if( !u )
+	if( u == NULL )
 	{
 		nlog( LOG_WARNING, "JoinChannel: tried to join unknown user %s to channel %s", nick, chan );
 		return;
@@ -454,14 +454,14 @@ void JoinChannel( const char *nick, const char *chan )
 		return;
 	}
 	c = FindChannel( chan );
-	if( !c )
+	if( c == NULL )
 	{
 		/* its a new Channel */
 		dlog( DEBUG2, "JoinChannel: new channel %s", chan );
 		c = new_chan( chan );
 	}
 	/* add this users details to the channel members hash */
-	if( list_find( c->members, u->name, comparechanmember ) )
+	if( list_find( c->members, u->name, comparechanmember ) != NULL )
 	{
 		nlog( LOG_WARNING, "JoinChannel: tried to add %s to channel %s but they are already a member", u->name, chan );
 		return;
@@ -571,7 +571,7 @@ int ns_cmd_channellist( const CmdParams *cmdparams )
    		return NS_SUCCESS;
 	}
 	c = FindChannel( cmdparams->av[0] );
-	if( c )
+	if( c != NULL )
 	{
 		ListChannel( c, (void *)cmdparams );
 	}
@@ -615,11 +615,11 @@ Channel *FindChannel( const char *chan )
 
 int IsChannelMember( const Channel *c, const Client *u ) 
 {
-	if( !u || !c )
+	if( u == NULL || c == NULL )
 	{
 		return NS_FALSE;
 	}
-	if( list_find( c->members, u->name, comparechanmember ) )
+	if( list_find( c->members, u->name, comparechanmember ) != NULL )
 	{
 		return NS_TRUE;
 	}
@@ -640,10 +640,10 @@ int test_cumode( const Channel *c, const Client *u, unsigned int mode )
 {
  	ChannelMember *cm;
 
-	if( !u || !c )
+	if( u == NULL || c == NULL )
 		return NS_FALSE;
 	cm = lnode_find( c->members, u->name, comparechanmember );
-	if( cm )
+	if( cm != NULL )
 	{
 		if( cm->modes & mode )
 		{
@@ -666,7 +666,7 @@ int test_cumode( const Channel *c, const Client *u, unsigned int mode )
 int InitChannels( void )
 {
 	channelhash = hash_create( CHANNEL_TABLE_SIZE, 0, 0 );
-	if( !channelhash )
+	if( channelhash == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to create channel hash" );
 		return NS_FAILURE;
@@ -741,7 +741,7 @@ Client *GetRandomChannelMember( const Channel *c, int uge )
 	while( ln != NULL ) 
 	{
 		cm = lnode_get(ln);
-		if( !uge || !IsExcluded( cm->u ) )
+		if( uge == NULL || !IsExcluded( cm->u ) )
 		{
 			if( curno == randno )
 				return cm->u;
@@ -888,7 +888,7 @@ void FreeChannelModPtr( Channel *c )
 
 void *GetChannelModPtr( const Channel *c )
 {
-	if( c )
+	if( c != NULL )
 		return c->modptr[GET_CUR_MODULE_INDEX()];
 	return NULL;
 }
@@ -905,7 +905,7 @@ void *GetChannelModPtr( const Channel *c )
 
 void ClearChannelModValue( Channel *c )
 {
-	if( c )
+	if( c != NULL )
 	{
 		c->modvalue[GET_CUR_MODULE_INDEX()] = NULL;
 		GET_CUR_MODULE()->channeldatacnt--;
@@ -925,7 +925,7 @@ void ClearChannelModValue( Channel *c )
 
 void SetChannelModValue( Channel *c, void *data )
 {
-	if( c )
+	if( c != NULL )
 	{
 		c->modvalue[GET_CUR_MODULE_INDEX()] = data;
 		GET_CUR_MODULE()->channeldatacnt++;
@@ -944,7 +944,7 @@ void SetChannelModValue( Channel *c, void *data )
 
 void *GetChannelModValue( const Channel *c )
 {
-	if( c )
+	if( c != NULL )
 		return c->modvalue[GET_CUR_MODULE_INDEX()];
 	return NULL;	
 }
@@ -961,7 +961,7 @@ void *GetChannelModValue( const Channel *c )
 
 static int CleanupChannelModdataHandler( Channel *c, void *v )
 {
-	if( c->modptr[GET_CUR_MODULE_INDEX()] )
+	if( c->modptr[GET_CUR_MODULE_INDEX()] != NULL )
 		ns_free( c->modptr[GET_CUR_MODULE_INDEX()] );		
 	c->modvalue[GET_CUR_MODULE_INDEX()] = NULL;
 	return NS_FALSE;

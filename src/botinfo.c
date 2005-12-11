@@ -141,7 +141,7 @@ static int bot_set_realname_cb( const CmdParams *cmdparams, SET_REASON reason )
 int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
 {
 	bot_ptr->bot_info_settings = ns_calloc( sizeof( bot_info_settings ) );
-	if( bot_ptr->bot_info_settings )
+	if( bot_ptr->bot_info_settings != NULL )
 	{
 		os_memcpy( bot_ptr->bot_info_settings, bot_info_settings, sizeof( bot_info_settings ) );
 		bot_ptr->bot_info_settings[0].varptr = botinfo->nick;
@@ -167,7 +167,7 @@ int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
 
 int del_bot_info_settings( Bot *bot_ptr )
 {
-	if( bot_ptr->bot_info_settings )
+	if( bot_ptr->bot_info_settings != NULL )
 	{
 		del_bot_setting_list( bot_ptr, bot_ptr->bot_info_settings );
 		ns_free( bot_ptr->bot_info_settings );

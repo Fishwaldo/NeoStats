@@ -122,13 +122,13 @@ static int is_flood( Client *u )
 static int is_valid_origin( CmdParams *cmdparams, const char *origin )
 {
 	cmdparams->source = FindUser( origin );
-	if( cmdparams->source )
+	if( cmdparams->source != NULL )
 	{
 		/* Since is_flood is a truth value, return its inverse */
 		return !is_flood( cmdparams->source );
 	}
 	cmdparams->source = FindServer( origin );
-	if( cmdparams->source )
+	if( cmdparams->source != NULL )
 		return NS_TRUE;
 	return NS_FALSE;
 }
@@ -147,10 +147,10 @@ static int is_valid_origin( CmdParams *cmdparams, const char *origin )
 static int is_valid_target( CmdParams *cmdparams, const char *target )
 {
 	cmdparams->target = FindUser( target );
-	if( cmdparams->target )
+	if( cmdparams->target != NULL )
 	{
 		cmdparams->bot = cmdparams->target->user->bot;
-		if( cmdparams->bot )
+		if( cmdparams->bot != NULL )
 			return NS_TRUE;
 	}
 	dlog( DEBUG1, "is_valid_target: user %s not found", target );
@@ -171,7 +171,7 @@ static int is_valid_target( CmdParams *cmdparams, const char *target )
 static int is_valid_target_chan( CmdParams *cmdparams, const char *target )
 {
 	cmdparams->channel = FindChannel( target );
-	if( cmdparams->channel )
+	if( cmdparams->channel != NULL )
 		return NS_TRUE;
 	dlog( DEBUG1, "cmdparams->channel: chan %s not found", target );
 	return NS_FALSE;
@@ -221,14 +221,14 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 				cmdparams->bot = botptr;
 				if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 )
 				{
-					if( !cmdflag || !( botptr->flags & BOT_FLAG_SERVICEBOT ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS )
+					if( cmdflag == 0 || !( botptr->flags & BOT_FLAG_SERVICEBOT ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS )
 					{
 						/* Reset message if we have stripped cmdchar */
-						if( cmdflag )
+						if( cmdflag != 0 )
 							cmdparams->param --;
 						SendModuleEvent( event, cmdparams, botptr->moduleptr );
 						/* Reset message if we have unstripped cmdchar */
-						if( cmdflag )
+						if( cmdflag != 0 )
 							cmdparams->param ++;
 					}
 				}
@@ -402,7 +402,7 @@ Bot *FindBot( const char *bot_name )
 
 	SET_SEGV_LOCATION(); 
 	bot = ( Bot * ) hnode_find( bothash, bot_name );
-	if( !bot )
+	if( bot == NULL )
 		dlog( DEBUG3, "FindBot: %s not found", bot_name );
 	return bot;
 }
@@ -603,7 +603,7 @@ int GenerateBotNick( char *nickbuf, size_t stublen, int alphacount, int numcount
 			nickbuf[stublen] = '\0';
 		}
 	}
-	if( FindUser( nickbuf ) )
+	if( FindUser( nickbuf ) != NULL )
 	{
 		nlog( LOG_WARNING, "GenerateBotNick, %s already in use", nickbuf );
 		return NS_FAILURE;
@@ -719,7 +719,7 @@ Bot *AddBot( BotInfo *botinfo )
 		return NULL;
 	}
 	/* In single bot mode, just add all commands and settings to main bot */
-	if( nsconfig.singlebotmode && ns_botptr )
+	if( nsconfig.singlebotmode && ns_botptr != NULL )
 	{
 		add_bot_cmd_list( ns_botptr, botinfo->bot_cmd_list );
 		add_bot_setting_list( ns_botptr, botinfo->bot_setting_list );
@@ -779,7 +779,7 @@ void handle_dead_channel( Channel *c )
 	if( IsServicesChannel ( c ) )
 		return;
 	/* If channel has persistent bot(s) ignore it */
-	if( c->persistentusers )
+	if( c->persistentusers > 0 )
 		return;
 	hash_scan_begin( &bs, bothash );
 	cmdparams = ns_calloc( sizeof( CmdParams ) );
@@ -837,7 +837,7 @@ void *AllocBotModPtr( Bot *pBot, size_t size )
 
 void FreeBotModPtr( Bot *pBot )
 {
-	if( pBot )
+	if( pBot != NULL )
 		ns_free( pBot->moddata );
 }
 
@@ -853,7 +853,7 @@ void FreeBotModPtr( Bot *pBot )
 
 void *GetBotModPtr( const Bot *pBot )
 {
-	if( pBot )
+	if( pBot != NULL )
 		return pBot->moddata;
 	return NULL;
 }
@@ -870,7 +870,7 @@ void *GetBotModPtr( const Bot *pBot )
 
 void ClearBotModValue( Bot *pBot )
 {
-	if( pBot )
+	if( pBot != NULL )
 		pBot->moddata = NULL;
 }
 
@@ -887,7 +887,7 @@ void ClearBotModValue( Bot *pBot )
 
 void SetBotModValue( Bot *pBot, void *data )
 {
-	if( pBot )
+	if( pBot != NULL )
 		pBot->moddata = data;
 }
 
@@ -903,7 +903,7 @@ void SetBotModValue( Bot *pBot, void *data )
 
 void *GetBotModValue( const Bot *pBot )
 {
-	if( pBot )
+	if( pBot != NULL )
 		return pBot->moddata;
 	return NULL;	
 }

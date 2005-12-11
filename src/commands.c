@@ -105,7 +105,7 @@ int getuserlevel( const CmdParams *cmdparams )
 	/* If less than a locop see if the module can give us a user level */
 	if( ulevel < NS_ULEVEL_LOCOPER )
 	{
-		if( cmdparams->bot->moduleptr->authcb )
+		if( cmdparams->bot->moduleptr->authcb != NULL )
 		{
 			modlevel = cmdparams->bot->moduleptr->authcb( cmdparams->source );
 			if( modlevel > ulevel )
@@ -215,24 +215,24 @@ int add_bot_cmd( hash_t *cmd_hash, bot_cmd *cmd_ptr )
 	 * check validity during processing. Only check critical elements.
 	 * For now we verify help during processing since it is not critical. */
 	/* No command, we cannot recover from this */
-	if( !cmd_ptr->cmd )
+	if( cmd_ptr->cmd == NULL )
 	{
 		nlog( LOG_ERROR, "add_bot_cmd: missing command" );
 		return NS_FAILURE;
 	}
-	if( hash_lookup( cmd_hash, cmd_ptr->cmd ) )
+	if( hash_lookup( cmd_hash, cmd_ptr->cmd ) != NULL )
 	{
 		nlog( LOG_ERROR, "add_bot_cmd: attempt to add duplicate command %s", cmd_ptr->cmd );
 		return NS_FAILURE;
 	}
 	/* No handler, we cannot recover from this */
-	if( !cmd_ptr->handler )
+	if( cmd_ptr->handler == NULL )
 	{
 		nlog( LOG_ERROR, "add_bot_cmd: missing command handler, command %s not added", 
 			cmd_ptr->cmd );
 		return NS_FAILURE;
 	}
-	if( !cmd_ptr->helptext )
+	if( cmd_ptr->helptext == NULL )
 	{
 		nlog( LOG_ERROR, "add_bot_cmd: missing help text, command %s not added", 
 			cmd_ptr->cmd );
@@ -262,10 +262,10 @@ bot_cmd *find_bot_cmd( const Bot *bot_ptr, const char *cmd)
 	hnode_t *cmdnode;
 	
 	/* Find the command */
-	if( !bot_ptr->botcmds )
+	if( bot_ptr->botcmds == NULL )
 		return NULL;
 	cmdnode = hash_lookup( bot_ptr->botcmds, cmd );
-	if( cmdnode )
+	if( cmdnode != NULL )
 		return hnode_get(cmdnode);
 	return NULL;
 }	
@@ -281,7 +281,7 @@ void del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr )
 	
 	/* Delete the command */
 	cmdnode = hash_lookup( cmd_hash, cmd_ptr->cmd );
-	if( cmdnode )
+	if( cmdnode != NULL )
 	{
 		dlog( DEBUG3, "deleting command %s from services bot", ( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
 		hash_delete_destroy_node( cmd_hash, cmdnode );
@@ -304,13 +304,13 @@ void del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr )
  */
 int add_bot_cmd_list( Bot *bot_ptr, bot_cmd *bot_cmd_list ) 
 {
-	if( !bot_cmd_list )
+	if( bot_cmd_list == NULL )
 		return NS_FAILURE;
 	/* If no hash create */
 	if( bot_ptr->botcmds == NULL )
 	{
 		bot_ptr->botcmds = hash_create( HASHCOUNT_T_MAX, 0, 0 );
-		if( !bot_ptr->botcmds )
+		if( bot_ptr->botcmds == NULL )
 		{
 			nlog( LOG_CRITICAL, "Unable to create botcmds hash" );
 			return NS_FAILURE;

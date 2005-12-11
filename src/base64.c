@@ -103,7 +103,7 @@ char *base64_to_server( const char *base64name )
 
 	dlog( DEBUG7, "base64_to_server: scanning for %s", base64name );
 	s = find_server_base64( base64name );
-	if( s )
+	if( s != NULL )
 	{
 		return s->name;
 	}

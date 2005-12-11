@@ -109,7 +109,7 @@ static channelstat *findchanstats( const char *name )
 	channelstat *cs;
 
 	cs = lnode_find( channelstatlist, name, comparef );
-	if( !cs )
+	if( cs == NULL  )
 		dlog( DEBUG2, "findchanstats: %s not found", name );
 	return cs;
 }
@@ -297,7 +297,7 @@ int ss_event_delchan( const CmdParams *cmdparams )
 	ClearChannelModValue( cmdparams->channel );
 	DelNetworkChannel();
 	ln = list_find( channelstatlist, cmdparams->channel->name, comparef );
-	if( !ln )
+	if( ln == NULL  )
 	{
 		nlog( LOG_WARNING, "Couldn't find channel %s when deleting from stats", cmdparams->channel->name );
 		return NS_SUCCESS;
@@ -323,7 +323,7 @@ int ss_event_join( const CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
-	if( !cs )
+	if( cs == NULL  )
 	{
 		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
 		return NS_SUCCESS;
@@ -347,7 +347,7 @@ int ss_event_part( const CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
-	if( !cs )
+	if( cs == NULL  )
 	{
 		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
 		return NS_SUCCESS;
@@ -371,7 +371,7 @@ int ss_event_topic( const CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
-	if( !cs )
+	if( cs == NULL  )
 	{
 		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
 		return NS_SUCCESS;
@@ -394,7 +394,7 @@ int ss_event_kick( const CmdParams *cmdparams )
 	channelstat *cs;
 
 	cs = GetChannelModValue( cmdparams->channel );
-	if( !cs )
+	if( cs == NULL )
 	{
 		dlog( DEBUG4, "Cannot find stats for channel %s", cmdparams->channel->name );
 		return NS_SUCCESS;
@@ -522,7 +522,7 @@ int ss_cmd_channel( const CmdParams *cmdparams )
 	else
 	{
 		cs = findchanstats( cmdparams->av[0] );
-		if( !cs )
+		if( cs == NULL  )
 		{
 			irc_prefmsg( ss_bot,cmdparams->source, 
 				"No statistics for %s", cmdparams->av[0] );
@@ -543,7 +543,7 @@ int ss_cmd_channel( const CmdParams *cmdparams )
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks: %d", cs->kicks.alltime.runningtotal );
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks today %d (Max %d on %s)",
 			cs->kicks.daily.max, cs->kicks.alltime.max, sftime( cs->kicks.alltime.ts_max ) );
-		if( !cs->c )
+		if( cs->c == NULL  )
 			irc_prefmsg( ss_bot, cmdparams->source, "Channel last seen at %s",
 				sftime( cs->ts_lastseen ) );
 	}
@@ -729,7 +729,7 @@ void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, 
 int InitChannelStats( void )
 {
 	channelstatlist = list_create( LISTCOUNT_T_MAX );
-	if( !channelstatlist )
+	if( channelstatlist == NULL  )
 	{
 		nlog( LOG_CRITICAL, "Unable to create channel stat list" );
 		return NS_FAILURE;
