@@ -30,6 +30,7 @@ typedef struct ls_channel {
 
 static unsigned int lsjoin = 0;
 static unsigned int lsbuffer = 1;
+static unsigned int lstimer = 10;
 
 /** Bot command function prototypes */
 static int cmd_add( const CmdParams *cmdparams );
@@ -38,12 +39,12 @@ static int cmd_del( const CmdParams *cmdparams );
 
 /** Event function prototypes */
 static int event_join( const CmdParams *cmdparams );
-static int event_part( const CmdParams *cmdparams );
+
+/** Timer function prototypes */
+int limitservtimer(void *userptr);
 
 /** Setting callback prototypes */
 static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason );
-static int set_buffer_cb( const CmdParams *cmdparams, SET_REASON reason );
-
 
 /** hash to store ls_channel and bot info */
 static hash_t *qshash;
@@ -85,8 +86,9 @@ static bot_cmd ls_commands[]=
 /** Bot setting table */
 static bot_setting ls_settings[]=
 {
-	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	help_set_join,	set_join_cb,	( void * )0	},
-	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,	0, 100,		NS_ULEVEL_ADMIN, NULL,	help_set_buffer, set_buffer_cb, (void *)1	},
+	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0,	NS_ULEVEL_ADMIN, NULL,	help_set_join,		set_join_cb,	(void *)0	},
+	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,		0, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_buffer,	NULL,		(void *)1	},
+	{"TIMER", 	&lstimer,	SET_TYPE_INT,		1, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_timer,		NULL,		(void *)10	},
 	NS_SETTING_END()
 };
 
@@ -107,30 +109,8 @@ static BotInfo ls_botinfo =
 ModuleEvent module_events[] = 
 {
 	{EVENT_JOIN, event_join, 0},
-	{EVENT_PART, event_part, 0},
 	NS_EVENT_END()
 };
-
-/** @brief ManageLimit
- *
- *  manage channel limit
- *
- *  @param none
- *
- *  @return none
- */
-
-static void ManageLimit( const char *name, unsigned int users, unsigned int curlimit, int add )
-{
-	static char limitsize[10];
-	unsigned int limit;
-
-	limit = ( add == 1 ) ? ( users + lsbuffer ) : ( curlimit - lsbuffer );
-	if( limit < users )
-		limit = users;
-	ircsnprintf( limitsize, 10, "%d", limit );	
-	irc_cmode( ls_bot, name, "+l", limitsize );
-}
 
 /** @brief JoinChannels
  *
@@ -158,7 +138,6 @@ static void JoinChannels( void )
 		{
 			if( lsjoin )
 				irc_join( ls_bot, ls_chan->name, "+o" );
-			ManageLimit( ls_chan->name, c->users, 0, 1 );
 		}
 	}
 }
@@ -224,6 +203,7 @@ int ModInit( void )
 	}
 	DBAFetchRows( "channels", LoadChannel );
 	ModuleConfig( ls_settings );
+	AddTimer (TIMER_TYPE_INTERVAL, limitservtimer, "limitservtimer", 10, NULL);
 	return NS_SUCCESS;
 }
 
@@ -262,6 +242,7 @@ int ModFini( void )
 	hscan_t scan;
 
 	SET_SEGV_LOCATION();
+	DelTimer ("limitservtimer");
 	hash_scan_begin( &scan, qshash );
 	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
@@ -399,29 +380,43 @@ static int event_join( const CmdParams *cmdparams )
 		/* Join channel if we are not a member */
 		if( lsjoin && !IsChannelMember( cmdparams->channel, ls_bot->u ) )
 			irc_join( ls_bot, ls_chan->name, "+o" );
-		ManageLimit( cmdparams->channel->name, cmdparams->channel->users, cmdparams->channel->limit, 1 );
 	}
 	return NS_SUCCESS;
 }
 
-/** @brief event_part
+/** @brief limitservtimer
  *
- *  part event handler
- *  manage limit on channels
+ *  update channel user limit
  *
- *  @params cmdparams pointer to commands param struct
+ *  @param none
  *
- *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ *  @return none
  */
-
-static int event_part( const CmdParams *cmdparams )
+int limitservtimer(void *userptr) 
 {
+	static char limitsize[10];
+	unsigned int limit;
 	ls_channel *ls_chan;
+	hnode_t *node;
+	hscan_t scan;
+	Channel *c;
 
 	SET_SEGV_LOCATION();
-	ls_chan = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
-	if( ls_chan )
-		ManageLimit( cmdparams->channel->name, cmdparams->channel->users, cmdparams->channel->limit, 0 );
+	hash_scan_begin( &scan, qshash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
+	{
+		ls_chan = ( ( ls_channel * )hnode_get( node ) );
+		c = FindChannel(ls_chan->name);
+		if( c != NULL )
+		{
+			if( c->users != ( c->limit + lsbuffer ) )
+			{
+				limit = ( c->users + lsbuffer );
+				ircsnprintf( limitsize, 10, "%d", limit );	
+				irc_cmode( ls_bot, ls_chan->name, "+l", limitsize );
+			}
+		}		
+	}
 	return NS_SUCCESS;
 }
 
@@ -443,38 +438,6 @@ static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason )
 			JoinChannels();
 		else
 			PartChannels();
-	}
-	return NS_SUCCESS;
-}
-
-/** @brief set_buffer_cb
- *
- *  SET BUFFER callback
- *
- *  @param cmdparams
- *  @param reason
- *
- *  @return NS_SUCCESS 
- */
-
-static int set_buffer_cb( const CmdParams *cmdparams, SET_REASON reason )
-{
-	ls_channel *ls_chan;
-	hnode_t *node;
-	hscan_t scan;
-
-	SET_SEGV_LOCATION();
-	if( reason == SET_CHANGE )
-	{
-		hash_scan_begin( &scan, qshash );
-		while( ( node = hash_scan_next( &scan ) ) != NULL ) 
-		{
-			Channel *c;
-			ls_chan = ( ( ls_channel * )hnode_get( node ) );
-			c = FindChannel( ls_chan->name );
-			if( c )
-				ManageLimit( ls_chan->name, c->users, cmdparams->channel->limit, 1 );
-		}
 	}
 	return NS_SUCCESS;
 }

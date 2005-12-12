@@ -65,3 +65,9 @@ const char *help_set_buffer[] = {
 	"Sets the number of extra user slots allocated when adjusting the limit",
 	NULL
 };
+
+const char *help_set_timer[] = {
+	"\2TIMER <seconds>\2",
+	"Sets the number of seconds between user limit updates",
+	NULL
+};
