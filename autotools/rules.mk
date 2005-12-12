@@ -130,3 +130,4 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 
 pkglibdir = $(prefix)/modules
 datadir = $(prefix)/data
+docdir = $(prefix)/doc
