@@ -32,25 +32,19 @@
 #include "NeoNet.h"
 #include "updates.h"
 
-void GotUpdateAddress(void *data, adns_answer *a);
+static void GotUpdateAddress(void *data, adns_answer *a);
 static int mqswrite(int fd, void *data);
 static int mqsread(void *data, void *notused, int len);
-int mqs_login();
-char *MQGetStatus(MQS_STATE state);
-void CheckMQOut();
+static int mqs_login();
+static char *MQGetStatus(MQS_STATE state);
+static void CheckMQOut();
 void MQcmd_Broadcast(MMessage *msg);
 void MQcmd_Shutdown(MMessage *msg);
-void ResetMQ();
-char *MQGetConnect(MQS_CONNECT connect);
+static void ResetMQ();
+static char *MQGetConnect(MQS_CONNECT connect);
 
 list_t *MQlist;
 hash_t *MQcmds;
-
-typedef struct NeoNetCmds {
-	const char *topic; /* topic string we are interested in */
-	mq_cmd_handler handler; /* function to call when we recieve this message */
-	Module *modptr;
-} NeoNetCmds;
 
 
 /* this is our standard commands we handle internally */
@@ -210,7 +204,7 @@ void MQStatusMsg(const Bot *bot, const CmdParams *cmdparams) {
 	}
 }
 
-char *MQGetConnect(MQS_CONNECT connect) {
+static char *MQGetConnect(MQS_CONNECT connect) {
 	switch (connect) {
 		case MQ_CONNECT_ERROR:
 			return "No (NeoNet Error/Failure - Please consult Log files)";
@@ -228,7 +222,7 @@ char *MQGetConnect(MQS_CONNECT connect) {
 	return "Uknown Connect Style";
 }
 
-char *MQGetStatus(MQS_STATE state) {
+static char *MQGetStatus(MQS_STATE state) {
 	switch (state) {
 		case MQS_DISCONNECTED:
 			return "Disconnected";
@@ -246,15 +240,15 @@ char *MQGetStatus(MQS_STATE state) {
 	return "Unknown State";
 }
 
-int32 MQSSendSock(const uint8 * buf, uint32 numBytes, void * arg) {
+static int32 MQSSendSock(const uint8 * buf, uint32 numBytes, void * arg) {
 	return send_to_sock(mqs.Sockinfo, (char *)buf, numBytes); 
 }
 
-int32 MQSRecvSock(uint8 * buf, uint32 numBytes, void * arg) {
+static int32 MQSRecvSock(uint8 * buf, uint32 numBytes, void * arg) {
 	return  os_sock_read( mqs.sock, (char *)buf, numBytes );
 }
 
-int MQPingSrv(void *unused) {
+static int MQPingSrv(void *unused) {
 	MMessage *msg;
 	int64 *ping;
 	if (mqs.state != MQS_OK) { 
@@ -321,7 +315,7 @@ void FiniUpdate(void)
 	MQDelcmd(stdcmds);
 }
 
-void GotUpdateAddress(void *data, adns_answer *a) 
+static void GotUpdateAddress(void *data, adns_answer *a) 
 {
 	struct timeval tv;
 	struct in_addr ip;
@@ -348,7 +342,7 @@ void GotUpdateAddress(void *data, adns_answer *a)
 	}
 }
 
-void ResetMQ() {
+static void ResetMQ() {
 	if (mqs.state >= MQS_CONNECTING) {
 		mqs.state = MQS_DISCONNECTED;
 		DelSock(mqs.Sockinfo);
@@ -357,7 +351,7 @@ void ResetMQ() {
 	}
 }
 
-void CheckMQOut() {
+static void CheckMQOut() {
 	int i;
 	if (mqs.state < MQS_SENTAUTH) {
 			nlog(LOG_WARNING, "MQ Server Not Connected....");
@@ -374,7 +368,7 @@ void CheckMQOut() {
 	}
 }
 
-void ProcessMQError(MMessage *msg) {
+static void ProcessMQError(MMessage *msg) {
 	MBool * fatal;
 	MByteBuffer **error;
 	int32 * status;
@@ -395,7 +389,7 @@ void ProcessMQError(MMessage *msg) {
 	}
 }
 
-void ProcessMessage(MMessage *msg) {
+static void ProcessMessage(MMessage *msg) {
 	unsigned long what;
 	MByteBuffer **groups;
 	uint32 nogroups;
@@ -470,7 +464,7 @@ void ProcessMessage(MMessage *msg) {
 
 }
 
-int mqswrite(int fd, void *data) {
+static int mqswrite(int fd, void *data) {
 	switch (mqs.state) {
 		case MQS_DISCONNECTED:
 			nlog(LOG_CRITICAL, "Trying to send a message to MQ while disconnected?");
@@ -490,7 +484,7 @@ int mqswrite(int fd, void *data) {
 	return NS_SUCCESS;
 }
 
-int mqsread(void *data, void *notused, int len) {
+static int mqsread(void *data, void *notused, int len) {
 	MMessage *msg;
 	
 	if (len == -2 && mqs.state < MQS_OK) {
@@ -517,7 +511,7 @@ int mqsread(void *data, void *notused, int len) {
 	return NS_SUCCESS;
 }
 
-int mqs_login() 
+static int mqs_login() 
 {
 	MMessage *msg = MMAllocMessage(0);
 	MByteBuffer **username;
@@ -547,17 +541,4 @@ int mqs_login()
 	CheckMQOut();
 		
 	return NS_SUCCESS;
-}
-void sendtoMQ( MQ_MSG_TYPE type, void *data, size_t len) {
-	
-#if 0
-	if (mqs.state == MQS_OK) {
-		/* for now, we know that data is always a char string */
-		buf = malloc(sizeof(int) + len);
-		ircsnprintf(buf, (sizeof(int)+len+1), "%d\n%s", type, (char *)data);
-		dlog(DEBUG1, "Send Update: %s", buf);
-		os_sock_sendto(mqs.sock, buf, strlen(buf), 0,  (struct sockaddr *) &mqs.sendtomq, sizeof(mqs.sendtomq));
-		free(buf);
-	}
-#endif
 }

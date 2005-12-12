@@ -29,18 +29,30 @@
 #include "MiniMessageGateway.h"
 #include "NeoNet.h"
 
+/* this is the NeoNet Command Handler callback prototype */
+typedef void (*mq_cmd_handler) ( MMessage *msg );
+
+typedef struct NeoNetCmds {
+	const char *topic; /* topic string we are interested in */
+	mq_cmd_handler handler; /* function to call when we recieve this message */
+	Module *modptr;
+} NeoNetCmds;
+
+
 
 int InitUpdate( void );
 void MQStatusMsg(const Bot *bot, const CmdParams *cmdparams);
 
-/* this is the NeoNet Command Handler callback prototype */
-typedef void (*mq_cmd_handler) ( MMessage *msg );
 
 EXPORTFUNC MMessage *MQCreateMessage(char *topic, char *target, int flags, char *groups, int peermsg);
 EXPORTFUNC int MQSendMessage(MMessage *msg, int canqueue);
 EXPORTFUNC int MQCredOk();
 EXPORTFUNC char *MQUsername();
 EXPORTFUNC char *MQPassword(); 
+EXPORTFUNC int MQAddcmd(NeoNetCmds *cmd);
+EXPORTFUNC int MQDelcmd(NeoNetCmds *cmd);
+EXPORTFUNC int MQModuleDelcmd(Module *modptr);
+EXPORTFUNC int MQCheckGroups(char *group);
 
 
 #endif /* _UPDATES_H_ */

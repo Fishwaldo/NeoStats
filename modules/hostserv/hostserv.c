@@ -902,7 +902,7 @@ static int hs_cmd_list( const CmdParams *cmdparams )
 	}		
 	index = 1;
 	irc_prefmsg( hs_bot, cmdparams->source, "Current vhost list: " );
-	irc_prefmsg( hs_bot, cmdparams->source, "Showing %d to %d entries of %d vhosts", start + 1, start + PAGESIZE, ( int )vhostcount );
+	irc_prefmsg( hs_bot, cmdparams->source, "Showing %ld to %ld entries of %d vhosts", start + 1, start + PAGESIZE, ( int )vhostcount );
 	irc_prefmsg( hs_bot, cmdparams->source, "%-5s %-12s %-30s", "Num", "Nick", "Vhost" );
 	hn = list_first( vhost_list );
 	while( hn != NULL )
@@ -914,7 +914,7 @@ static int hs_cmd_list( const CmdParams *cmdparams )
 			continue;
 		}
 		vhe = lnode_get( hn );
-		irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", index,
+		irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", (int)index,
 			vhe->nick, vhe->vhost );
 		index++;
 		/* limit to PAGESIZE entries per screen */
@@ -928,7 +928,7 @@ static int hs_cmd_list( const CmdParams *cmdparams )
 	irc_prefmsg( hs_bot, cmdparams->source, "End of list." );
 	if( vhostcount >= index )
 	{
-		irc_prefmsg( hs_bot, cmdparams->source, "Type \2/msg %s LIST %d\2 to see next %d", hs_bot->name, index - 1, PAGESIZE );
+		irc_prefmsg( hs_bot, cmdparams->source, "Type \2/msg %s LIST %ld\2 to see next %d", hs_bot->name, index - 1, PAGESIZE );
 	}
 	return NS_SUCCESS;
 }
@@ -979,7 +979,7 @@ static int hs_cmd_listwild( const CmdParams *cmdparams )
 			/* limit to PAGESIZE entries per screen */
 			if ( start > PAGESIZE )
 				break;
-			irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", index, vhe->nick, vhe->vhost );
+			irc_prefmsg( hs_bot, cmdparams->source, "%-5d %-12s %-30s", (int)index, vhe->nick, vhe->vhost );
 		}
 		index++;
 		hn = list_next( vhost_list, hn );

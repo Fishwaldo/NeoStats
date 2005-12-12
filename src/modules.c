@@ -36,6 +36,7 @@
 #include "channels.h"
 #include "servers.h"
 #include "exclude.h"
+#include "updates.h"
 #ifdef USE_PERL
 #undef _
 #define PERLDEFINES
@@ -50,8 +51,9 @@ int RunLevel = 0;
 /* @brief Module hash list */
 static hash_t *modulehash;
 
+/* WIP */
+#if 0
 /* Database descriptors */
-
 static NS_FIELD ModuleTableFields[] =
 {
 	NS_FIELD_INT( "type", "type of module", offsetof( Module, type ) ),
@@ -82,7 +84,8 @@ static NS_TABLE ModuleTable =
 	sizeof( Module ),
 	0
 };
-
+#endif
+/* WIP */
 /** @brief ProcessModuleList
  *
  *  Calls handler for all modules

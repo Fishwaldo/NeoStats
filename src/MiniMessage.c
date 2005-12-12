@@ -1304,6 +1304,10 @@ static void PrintMMessageFieldToStream(const MMessageField * field, int indent)
          break;
       }
    }
+   /* just to shut up the warnings */
+   if (0) {
+     DoIndent(0);
+   }
 }
 
 static void PrintMMessageToStreamAux(const MMessage * msg, int indent)

@@ -38,7 +38,7 @@
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int AddUser( const Client *u, void *v )
+static int AddUser( Client *u, void *v )
 {
 	SET_SEGV_LOCATION();
 	AddServerUser( u );

@@ -69,7 +69,7 @@ typedef struct PerlModInfo {
 	const char *extname;
 } PerlModInfo;
 
-int execute_perl(Module *mod, SV *function, int numargs, ...);
+int execute_perl(const Module *mod, SV *function, int numargs, ...);
 
 #endif /* PERLDEFINES */
 
@@ -85,7 +85,7 @@ void ns_cmd_modperlist(CmdParams *cmd);
 Module *load_perlmodule(const char *filename, Client *u);
 int load_perlextension(const char *filename, perl_xs_init init_func, Client *u);
 int perl_sync_module(Module *mod);
-int perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr);
+int perl_event_cb(const Event evt, const CmdParams *cmdparams, const Module *mod_ptr);
 
 
 

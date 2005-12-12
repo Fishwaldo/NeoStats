@@ -187,7 +187,7 @@ evbuffer_remove(struct evbuffer *buf, void *data, size_t datlen)
 char *
 evbuffer_readline(struct evbuffer *buffer)
 {
-	char *data = EVBUFFER_DATA(buffer);
+	char *data = (char *)EVBUFFER_DATA(buffer);
 	size_t len = EVBUFFER_LENGTH(buffer);
 	char *line;
 	int i;

@@ -66,7 +66,7 @@ dump_hash(HV *rethash) {
   this is used for autoload and shutdown callbacks
 */
 int
-execute_perl (Module *mod, SV * function, int numargs, ...)
+execute_perl (const Module *mod, SV * function, int numargs, ...)
 {
 
 	int count, ret_value = 1;
@@ -134,7 +134,7 @@ int perl_sync_module(Module *mod)
 }
 
 int
-perl_event_cb(Event evt, CmdParams *cmdparams, Module *mod_ptr) {
+perl_event_cb(const Event evt, const CmdParams *cmdparams, const Module *mod_ptr) {
 	int ret = NS_FAILURE;
 	switch (evt) {
 		case EVENT_NULL:
