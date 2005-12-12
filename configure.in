@@ -478,6 +478,9 @@ AC_CONFIG_FILES([Makefile
 		modules/limitserv/Makefile
 		modules/operlog/Makefile
 		modules/dccpartyline/Makefile
+		modules/perltest/Makefile
+		modules/templateauth/Makefile
+		modules/template/Makefile
 		neostats])
 
 AC_CACHE_SAVE
