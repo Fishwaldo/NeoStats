@@ -1555,7 +1555,7 @@ fi
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="a3-dev"
+x_rev="a3"
 x_package='NeoStats'
 MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline"
 #dont edit anything after this line!
@@ -27125,9 +27125,8 @@ _ACEOF
 				else
 					PERL_LDFLAGS=""
 					PERL_CFLAGS=""
-					{ { echo "$as_me:$LINENO: error: Failed. See the RELNOTES file" >&5
-echo "$as_me: error: Failed. See the RELNOTES file" >&2;}
-   { (exit 1); exit 1; }; }
+					echo "$as_me:$LINENO: result: Failed. Perl Support Disabled. See the RELNOTES file" >&5
+echo "${ECHO_T}Failed. Perl Support Disabled. See the RELNOTES file" >&6
 				fi
 			else
 				echo "$as_me:$LINENO: result: no" >&5

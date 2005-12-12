@@ -11,7 +11,7 @@ AC_CACHE_LOAD
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="a3-dev"
+x_rev="a3"
 x_package='NeoStats'
 MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline"
 #dont edit anything after this line!
@@ -353,7 +353,7 @@ EOF
 				else
 					PERL_LDFLAGS=""
 					PERL_CFLAGS=""
-					AC_MSG_ERROR([Failed. See the RELNOTES file])
+					AC_MSG_RESULT([Failed. Perl Support Disabled. See the RELNOTES file])
 				fi
 			else
 				AC_MSG_RESULT(no)
