@@ -45,6 +45,7 @@ int limitservtimer(void *userptr);
 
 /** Setting callback prototypes */
 static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int set_timer_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 /** hash to store ls_channel and bot info */
 static hash_t *qshash;
@@ -88,7 +89,7 @@ static bot_setting ls_settings[]=
 {
 	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0,	NS_ULEVEL_ADMIN, NULL,	help_set_join,		set_join_cb,	(void *)0	},
 	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,		0, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_buffer,	NULL,		(void *)1	},
-	{"TIMER", 	&lstimer,	SET_TYPE_INT,		1, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_timer,		NULL,		(void *)10	},
+	{"TIMER", 	&lstimer,	SET_TYPE_INT,		1, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_timer,		set_timer_cb,	(void *)10	},
 	NS_SETTING_END()
 };
 
@@ -203,7 +204,7 @@ int ModInit( void )
 	}
 	DBAFetchRows( "channels", LoadChannel );
 	ModuleConfig( ls_settings );
-	AddTimer (TIMER_TYPE_INTERVAL, limitservtimer, "limitservtimer", 10, NULL);
+	AddTimer (TIMER_TYPE_INTERVAL, limitservtimer, "limitservtimer", lstimer, NULL);
 	return NS_SUCCESS;
 }
 
@@ -439,5 +440,22 @@ static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason )
 		else
 			PartChannels();
 	}
+	return NS_SUCCESS;
+}
+
+/** @brief set_timer_cb
+ *
+ *  SET TIMER callback
+ *
+ *  @param cmdparams
+ *  @param reason
+ *
+ *  @return NS_SUCCESS 
+ */
+
+static int set_timer_cb( const CmdParams *cmdparams, SET_REASON reason )
+{
+	if( reason == SET_CHANGE )
+		SetTimerInterval( "limitservtimer", lstimer );
 	return NS_SUCCESS;
 }

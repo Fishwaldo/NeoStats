@@ -1,4 +1,4 @@
-VERSION|3.0.a3-dev
+VERSION|3.0.a3
 ABOUT|Restaurant Service.
 CREDITS|Copyright (c) 1999-2005, NeoStats. http://www.neostats.net/
 BURGER|<TYPE>|Order a burger & fries|ACTION fixes up a %M burger and fries, and brings it to %F
