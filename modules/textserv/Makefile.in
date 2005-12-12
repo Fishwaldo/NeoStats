@@ -38,7 +38,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = $(dist_data_DATA) $(srcdir)/Makefile.am \
+DIST_COMMON = $(dist_tsdb_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk
 subdir = modules/textserv
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -59,7 +59,7 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(datadir)"
+am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(tsdbdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 textserv_la_LIBADD =
@@ -76,8 +76,8 @@ LTCOMPILE = $(LIBTOOL) --mode=compile --tag=CC $(CC) $(DEFS) \
 CCLD = $(CC)
 SOURCES = $(textserv_la_SOURCES)
 DIST_SOURCES = $(textserv_la_SOURCES)
-dist_dataDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(dist_data_DATA)
+dist_tsdbDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(dist_tsdb_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -215,7 +215,8 @@ pkglib_LTLIBRARIES = textserv.la
 textserv_la_SOURCES = main.c textserv.h help.c
 textserv_la_LDFLAGS = -module -avoid-version
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
-dist_data_DATA = data/*
+tsdbdir = $(datadir)/TSDB/
+dist_tsdb_DATA = data/*
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -290,13 +291,22 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-
-uninstall-dist_dataDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(dist_data_DATA)'; for p in $$list; do \
+install-dist_tsdbDATA: $(dist_tsdb_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(tsdbdir)" || $(mkdir_p) "$(DESTDIR)$(tsdbdir)"
+	@list='$(dist_tsdb_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(datadir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(datadir)/$$f"; \
+	  echo " $(dist_tsdbDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(tsdbdir)/$$f'"; \
+	  $(dist_tsdbDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(tsdbdir)/$$f"; \
+	done
+
+uninstall-dist_tsdbDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_tsdb_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(tsdbdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(tsdbdir)/$$f"; \
 	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
@@ -379,7 +389,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(datadir)"; do \
+	for dir in "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(tsdbdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -427,7 +437,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-dist_dataDATA
+install-data-am: install-dist_tsdbDATA
 
 install-exec-am: install-pkglibLTLIBRARIES
 
@@ -455,7 +465,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-dist_dataDATA uninstall-info-am \
+uninstall-am: uninstall-dist_tsdbDATA uninstall-info-am \
 	uninstall-pkglibLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
@@ -463,13 +473,13 @@ uninstall-am: uninstall-dist_dataDATA uninstall-info-am \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am \
-	install-dist_dataDATA install-exec install-exec-am \
+	install-dist_tsdbDATA install-exec install-exec-am \
 	install-info install-info-am install-man \
 	install-pkglibLTLIBRARIES install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-dist_dataDATA \
+	tags uninstall uninstall-am uninstall-dist_tsdbDATA \
 	uninstall-info-am uninstall-pkglibLTLIBRARIES
 
 
