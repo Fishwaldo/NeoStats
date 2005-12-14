@@ -591,6 +591,11 @@ void send_sjoin( const char *source, const char *target, const char *chan, const
 	send_cmd( ":%s %s %lu %s + :%s", source, MSGTOK( SJOIN ), ts, chan, target );
 }
 
+void send_cmode( const char *server, const char *user, const char *chan, const char *mode, const char *args, unsigned long ts )
+{
+	send_cmd( ":%s %s %s %s %s", user, MSGTOK( MODE ), chan, mode, args );
+}
+
 void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
 	send_cmd( "%s %s 1 %lu %s %s %s 0 %s * :%s", MSGTOK( NICK ), nick, ts, ident, host, server, newmode, realname );
