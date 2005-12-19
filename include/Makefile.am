@@ -17,7 +17,9 @@ noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
 				nsdba.h main.h numerics.h settings.h botinfo.h confuse.h \
 				adnsdlist.h adnsinternal.h adnstvarith.h 
 
+extra_DIST		=	version.h
+
 version.h:	stamp-h1
-	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
+	@(if test -f version.sh ; then $(SHELL) version.sh; fi)
 
 include $(top_srcdir)/autotools/rules.mk

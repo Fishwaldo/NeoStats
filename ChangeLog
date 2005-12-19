@@ -5,6 +5,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
  - have Pseudo Client change Channel modes on unreal3.2 instead of the Server (D)
+ - Fix /msg neostats level when specifing a invalid nick (F)
 * NeoStats * Version 3.0.a3
  - LimitServ: join/part bot on adding/deleteing channels if JOIN enabled (D)
  - HostServ: fix loading of previously added bans (D)
