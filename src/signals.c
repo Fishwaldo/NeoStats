@@ -106,6 +106,12 @@ static void do_backtrace( void )
 #endif
 }
 
+static int modules_loaded(Module *mod_ptr, void *sock) {
+	FILE *sf = (FILE *) sock;
+	os_fprintf(sf, "%s", mod_ptr->info->name);
+	return NS_FAILURE;
+}
+
 static void report_segfault( const char* modulename )
 {
 	static char segfault_fmttime[TIMEBUFSIZE];
@@ -123,14 +129,16 @@ static void report_segfault( const char* modulename )
 	os_fprintf( segfault, "------------------------SEGFAULT REPORT-------------------------\n" );
 	os_fprintf( segfault, "Please view the README for how to submit a bug report\n" );
 	os_fprintf( segfault, "and include this segfault report in your submission.\n" );
-	os_fprintf (segfault, "(%s)\n", segfault_fmttime);
+	os_fprintf( segfault, "(%s)\n", segfault_fmttime);
 	os_fprintf( segfault, "NeoStats Version:  %s\n", me.version );
 	os_fprintf( segfault, "Protocol:  %s\n", me.protocol );
 	if( modulename ) {
 		os_fprintf( segfault, "Module:           %s\n", GET_CUR_MODNAME() );
 		os_fprintf( segfault, "Module Version:   %s\n", GET_CUR_MODVERSION() );
 	}
-	os_fprintf( segfault, "Location: %s\n", segv_location );
+	os_fprintf( segfault, "Modules Loaded:");
+	ProcessModuleList(modules_loaded, (void *)segfault);
+	os_fprintf( segfault, "\nLocation: %s\n", segv_location );
 	os_fprintf( segfault, "recbuf:   %s\n", recbuf );
 	do_backtrace();
 	os_fprintf( segfault, "-------------------------END OF REPORT--------------------------\n" );
