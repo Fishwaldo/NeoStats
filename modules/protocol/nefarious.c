@@ -464,7 +464,7 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 			} /* for( ) */
 		} /* if( modes ) */
 
-		IP = htonl( base64toIP( argv[argc-3] ) );
+		IP = ntohl( base64toIP( argv[argc-3] ) );
 		ircsnprintf( IPAddress, 32, "%lu", IP );
 
 		/*       nick,    hopcount, TS,     user,    host, */       
