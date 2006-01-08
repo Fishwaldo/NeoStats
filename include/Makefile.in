@@ -41,7 +41,9 @@ DIST_COMMON = $(include_HEADERS) $(noinst_HEADERS) \
 subdir = include
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
+	$(top_srcdir)/autotools/ax_compare_version.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
+	$(top_srcdir)/autotools/ax_path_bdb.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_curl.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_pcre.m4 \
 	$(top_srcdir)/autotools/ccdv.m4 \
@@ -75,6 +77,9 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BDB_CPPFLAGS = @BDB_CPPFLAGS@
+BDB_LDFLAGS = @BDB_LDFLAGS@
+BDB_LIBS = @BDB_LIBS@
 BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
 BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
 BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
@@ -94,6 +99,8 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DO_BDB_FALSE = @DO_BDB_FALSE@
+DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
 DO_PERL_TRUE = @DO_PERL_TRUE@
 ECHO = @ECHO@
@@ -212,9 +219,11 @@ noinst_HEADERS = commands.h dns.h servers.h users.h conf.h \
 				nsdba.h main.h numerics.h settings.h botinfo.h confuse.h \
 				adnsdlist.h adnsinternal.h adnstvarith.h 
 
+extra_DIST = version.h
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
+docdir = $(prefix)/doc
 all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -457,7 +466,7 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am
 
 
 version.h:	stamp-h1
-	@(if test -f version.sh ; then $(SHELL) version.sh; else echo > version.h; fi)
+	@(if test -f version.sh ; then $(SHELL) version.sh; fi)
 
 .c.o:
 @USECCDV@		@echo "Building $@"

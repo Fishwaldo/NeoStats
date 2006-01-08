@@ -1,3 +1,4 @@
+
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.57)
@@ -261,11 +262,6 @@ then
   AC_DEFINE(NEED_UNDERSCORE_PREFIX, 1, "Our Platfrom requires Underscores")
 fi
 
-dnl check for berkeley db support
-AC_CHECK_HEADER(db.h, AC_DEFINE(HAVE_DB_H, 1, [Define to 1 if you have the <db.h> header file.])
-				AC_CHECK_LIB(db, db_create, LIBDB="-ldb"))
-
-
 dnl How to copy one va_list to another?
 AC_CACHE_CHECK([for va_copy], ns_va_copy, [AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);])],
@@ -379,6 +375,15 @@ wi_ARG_DISABLE_CCDV
 wi_PROG_CCDV
 AC_MSG_HEADER([Configuring LibEvent Now])
 CHK_LIBEVNT
+AC_MSG_HEADER([Checking for Berkeley Database])
+AX_PATH_BDB([4.1], 
+[AC_SUBST(BDB_CPPFLAGS)
+AC_SUBST(BDB_LDFLAGS)
+AC_SUBST(BDB_LIBS)
+AM_CONDITIONAL(DO_BDB, true)],
+[AM_CONDITIONAL(DO_BDB, false)]
+)
+
 
 AC_MSG_HEADER([NeoStats Configuration Summary:])
 

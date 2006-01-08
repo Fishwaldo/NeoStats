@@ -21,7 +21,9 @@ NeoStats.xcode/project.pbxproj -text
 /aclocal.m4 -text
 autotools/acinclude.m4 -text
 autotools/aclocal.m4 -text
+autotools/ax_compare_version.m4 -text
 autotools/ax_maintainer_mode_auto_silent.m4 -text
+autotools/ax_path_bdb.m4 -text
 autotools/ax_path_lib_curl.m4 -text
 autotools/ax_path_lib_pcre.m4 -text
 autotools/ccdv.c -text
@@ -347,6 +349,7 @@ modules/dbm/bdb/Makefile.am -text
 modules/dbm/bdb/Makefile.in -text
 modules/dbm/bdb/bdb.c -text
 modules/dbm/bdb/bdb.vcproj -text
+modules/dbm/convertdb.c -text
 modules/dbm/gdbm/Makefile.am -text
 modules/dbm/gdbm/Makefile.in -text
 modules/dbm/gdbm/bucket.c -text

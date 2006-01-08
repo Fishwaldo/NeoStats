@@ -47,7 +47,9 @@ DIST_COMMON = README $(am__configure_deps) $(dist_bin_SCRIPTS) \
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
+	$(top_srcdir)/autotools/ax_compare_version.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
+	$(top_srcdir)/autotools/ax_path_bdb.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_curl.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_pcre.m4 \
 	$(top_srcdir)/autotools/ccdv.m4 \
@@ -104,6 +106,9 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BDB_CPPFLAGS = @BDB_CPPFLAGS@
+BDB_LDFLAGS = @BDB_LDFLAGS@
+BDB_LIBS = @BDB_LIBS@
 BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
 BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
 BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
@@ -123,6 +128,8 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DO_BDB_FALSE = @DO_BDB_FALSE@
+DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
 DO_PERL_TRUE = @DO_PERL_TRUE@
 ECHO = @ECHO@
@@ -230,13 +237,15 @@ ACLOCAL_AMFLAGS = -I autotools
 AM_MAKEFLAGS = -s
 dist_bin_SCRIPTS = makeconf
 dist_data_DATA = neostats.motd
-docdir = @prefix@/doc
+
+#docdir			= @prefix@/doc
 dist_doc_DATA = doc/FAQ doc/USERMAN
 DISTCLEANFILES = autotools/ccdv
 EXTRA_DIST = autotools/ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
+docdir = $(prefix)/doc
 all: all-recursive
 
 .SUFFIXES:

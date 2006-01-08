@@ -42,7 +42,9 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 subdir = modules/dbm/bdb
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
+	$(top_srcdir)/autotools/ax_compare_version.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
+	$(top_srcdir)/autotools/ax_path_bdb.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_curl.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_pcre.m4 \
 	$(top_srcdir)/autotools/ccdv.m4 \
@@ -61,7 +63,7 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(pkglibdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
-bdb_la_LIBADD =
+bdb_la_DEPENDENCIES =
 am_bdb_la_OBJECTS = bdb.lo
 bdb_la_OBJECTS = $(am_bdb_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -88,6 +90,9 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BDB_CPPFLAGS = @BDB_CPPFLAGS@
+BDB_LDFLAGS = @BDB_LDFLAGS@
+BDB_LIBS = @BDB_LIBS@
 BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
 BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
 BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
@@ -107,6 +112,8 @@ CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DO_BDB_FALSE = @DO_BDB_FALSE@
+DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
 DO_PERL_TRUE = @DO_PERL_TRUE@
 ECHO = @ECHO@
@@ -210,11 +217,13 @@ unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = bdb.la
 bdb_la_SOURCES = bdb.c
-AM_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = -I$(top_srcdir)/lib/adns/ @PCRE_CFLAGS@ @CURL_CFLAGS@
+bdb_la_LIBADD = @BDB_LIBS@
+AM_LDFLAGS = -module -avoid-version -no-undefined @BDB_LDFLAGS@ 
+AM_CFLAGS = @BDB_CPPFLAGS@ @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
+docdir = $(prefix)/doc
 all: all-am
 
 .SUFFIXES:

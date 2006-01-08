@@ -5,7 +5,7 @@ AM_MAKEFLAGS		= -s
 dist_bin_SCRIPTS 	= makeconf
 dist_data_DATA		= neostats.motd
 
-docdir			= @prefix@/doc
+#docdir			= @prefix@/doc
 dist_doc_DATA		= doc/FAQ doc/USERMAN
 
 DISTCLEANFILES		= autotools/ccdv
