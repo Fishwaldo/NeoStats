@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - Really fix IRCu IP address conversions (F)
  - Include Modules loaded in segfault report (F)
  - Fix IRCu IP address detections (F)
  - have Pseudo Client change Channel modes on unreal3.2 instead of the Server (D)

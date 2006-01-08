@@ -307,9 +307,8 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 			} /* for( ) */
 		} /* if( modes ) */
 
-		IP = ntohl( base64toIP( argv[argc-3] ) );
-		ircsnprintf( IPAddress, 32, "%lu", IP );
-
+		ircsnprintf( IPAddress, 32, "%lu", base64toIP( argv[argc-3]) );
+		
 		/*       nick,    hopcount, TS,     user,    host, */       
 		do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], 
 			/* server, ip, servicestamp, modes, */
