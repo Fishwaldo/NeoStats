@@ -151,6 +151,7 @@ static int qs_read_database( database *db )
 		if( buf[0] == '#' )
 			continue;
 		dlog( DEBUG1, "read %s", buf );
+		strip(buf);
 		len = strlen( buf );
 		if( len == 0 )
 			continue;
@@ -159,13 +160,13 @@ static int qs_read_database( database *db )
 		if( ircstrncasecmp( buf, "PREFIX:", 7 ) == 0 )
 		{
 			len -= 7;
-			strlcpy( ( ptr + 7 ), buf, len );
+			strlcpy(ptr, buf +7, len );
 			db->prefixstring = ptr;
 		}
 		else if( ircstrncasecmp( buf, "SUFFIX:", 7 ) == 0 )
 		{
 			len -= 7;
-			strlcpy( ( ptr + 7 ), buf, len );
+			strlcpy(ptr, buf +7, len );
 			db->suffixstring = ptr;
 		}
 		else
