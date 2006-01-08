@@ -218,7 +218,7 @@ wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = bdb.la
 bdb_la_SOURCES = bdb.c
 bdb_la_LIBADD = @BDB_LIBS@
-AM_LDFLAGS = -module -avoid-version -no-undefined @BDB_LDFLAGS@ 
+AM_LDFLAGS = -module -avoid-version @BDB_LDFLAGS@ 
 AM_CFLAGS = @BDB_CPPFLAGS@ @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
