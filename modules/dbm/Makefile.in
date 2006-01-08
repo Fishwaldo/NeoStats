@@ -219,6 +219,7 @@ unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 SUBDIRS = bdb gdbm
 convertdb_SOURCES = convertdb.c
+AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
