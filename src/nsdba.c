@@ -32,6 +32,7 @@
 typedef struct dbentry {
 	char name[MAX_MOD_NAME];
 	hash_t *tablehash;
+	void *handle;
 } dbentry;
 
 typedef struct tableentry {
@@ -44,15 +45,19 @@ typedef struct dbm_sym {
 	char *sym;
 } dbm_sym;
 
-static void *( *DBMOpenTable )( const char *name );
-static void ( *DBMCloseTable )( void *handle );
-static int ( *DBMFetch )( void *handle, const char *key, void *data, int size );
-static int ( *DBMStore )( void *handle, const char *key, void *data, int size );
-static int ( *DBMFetchRows )( void *handle, DBRowHandler handler );
-static int ( *DBMDelete )( void *handle, const char *key );
+static void *( *DBMOpenDB )( const char *name );
+static void ( *DBMCloseDB )( void *dbhandle );
+static void *( *DBMOpenTable )( void *dbhandle, const char *name );
+static void ( *DBMCloseTable )( void *dbhandle, void *tbhandle );
+static int ( *DBMFetch )( void *dbhandle, void *tbhandle, const char *key, void *data, int size );
+static int ( *DBMStore )( void *dbhandle, void *tbhandle, const char *key, void *data, int size );
+static int ( *DBMFetchRows )( void *dbhandle, void *tbhandle, DBRowHandler handler );
+static int ( *DBMDelete )( void *dbhandle, void *tbhandle, const char *key );
 
 static dbm_sym dbm_sym_table[] = 
 {
+	{ ( void * )&DBMOpenDB,		"DBMOpenTable" },
+	{ ( void * )&DBMCloseDB,	"DBMCloseTable" },
 	{ ( void * )&DBMOpenTable,	"DBMOpenTable" },
 	{ ( void * )&DBMCloseTable,	"DBMCloseTable" },
 	{ ( void * )&DBMFetch,		"DBMFetch" },
@@ -151,10 +156,11 @@ void FiniDBA( void )
 		{
 			tbe = (tableentry *) hnode_get( tnode );
 			dlog( DEBUG5, "Closing Table %s", tbe->name );
-			DBMCloseTable( tbe->handle );
+			DBMCloseTable( dbe->handle, tbe->handle );
 			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
 		}
+		DBMCloseDB(dbe->handle);
 		hash_destroy( dbe->tablehash );
 		hash_scan_delete_destroy_node( dbhash, node );
 		ns_free( dbe );
@@ -184,10 +190,18 @@ int DBAOpenDatabase( void )
 	}
 	dbe = ns_calloc( sizeof( dbentry ) );
 	strlcpy( dbe->name, GET_CUR_MODNAME(), MAX_MOD_NAME );
+
+	dbe->handle = DBMOpenDB( dbe->name );
+	if (!dbe->handle) {
+		nlog (LOG_CRITICAL, "DBAOpenDatabase: Unable to open Database");
+		ns_free(dbe);
+		return NS_FAILURE;
+	}
 	dbe->tablehash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
 	if( !dbe->tablehash )
 	{
 		nlog( LOG_CRITICAL, "DBAOpenDatabase: Unable to create table hash" );
+		ns_free(dbe);
 		return NS_FAILURE;
 	}
 	hnode_create_insert( dbhash, dbe, dbe->name );
@@ -222,10 +236,11 @@ int DBACloseDatabase( void )
 		{
 			tbe = (tableentry *) hnode_get( tnode );
 			dlog( DEBUG5, "Closing Table %s", tbe->name );
-			DBMCloseTable( tbe->handle );
+			DBMCloseTable( dbe->handle, tbe->handle );
 			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
 		}
+		DBMCloseDB(dbe->handle);
 		hash_destroy( dbe->tablehash );
 		hash_scan_delete_destroy_node( dbhash, node );
 		ns_free( dbe );
@@ -259,9 +274,10 @@ int DBAOpenTable( const char *table )
 	if( hnode_find( dbe->tablehash, tbe->name ) )
 	{
 		dlog( DEBUG5, "DBAOpenTable %s already open", table );
+		ns_free (tbe);
 		return NS_SUCCESS;
 	}
-	tbe->handle = DBMOpenTable( tbe->name );
+	tbe->handle = DBMOpenTable( dbe->handle, tbe->name );
 	if( !tbe->handle )
 	{
 		ns_free( tbe );
@@ -272,6 +288,24 @@ int DBAOpenTable( const char *table )
 	return NS_SUCCESS;
 }
 
+/** @brief DBAFetchDBEntry 
+ *
+ *  Get the Database entry info
+ *  DBA subsystem use only
+ */
+static dbentry *DBAFetchDBEntry()
+{
+	dbentry *dbe;
+
+	dlog( DEBUG5, "DBAFetchDBEntry %s", GET_CUR_MODNAME() );
+	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
+	if( !dbe )
+	{
+		nlog( LOG_WARNING, "Database %s not open", GET_CUR_MODNAME());
+		return NULL;
+	}
+	return dbe;
+} 
 /** @brief DBAFetchTableEntry
  *
  *  Get table entry info
@@ -289,7 +323,7 @@ static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 	tableentry *tbe;
 
 	dlog( DEBUG5, "DBAFetchTableEntry %s", table );
-	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
+	dbe = DBAFetchDBEntry();
 	if( !dbe )
 	{
 		nlog( LOG_WARNING, "Database %s for table %s not open", GET_CUR_MODNAME(), table );
@@ -336,7 +370,7 @@ int DBACloseTable( const char *table )
 	if( node )
 	{
 		tbe = (tableentry *)hnode_get( node );
-		DBMCloseTable( tbe->handle );
+		DBMCloseTable( dbe->handle, tbe->handle );
 		hash_delete_destroy_node( dbe->tablehash, node );
 		ns_free( tbe );
 	}
@@ -360,12 +394,15 @@ int DBAFetch( const char *table, const char *key, void *data, int size )
 	int islocalopen = 0;
 	int ret = 0;
 	tableentry *tbe;
+	dbentry *dbe = DBAFetchDBEntry();
 
 	dlog( DEBUG5, "DBAFetch %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	ret = DBMFetch( tbe->handle, key, data, size );
+	if (!dbe)
+		return NS_FAILURE;
+	ret = DBMFetch( dbe->handle, tbe->handle, key, data, size );
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;
@@ -388,12 +425,13 @@ int DBAStore( const char *table, const char *key, void *data, int size )
 	int islocalopen = 0;
 	int ret = 0;
 	tableentry *tbe;
+	dbentry *dbe = DBAFetchDBEntry();
 
 	dlog( DEBUG5, "DBAStore %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	ret = DBMStore( tbe->handle, key, data, size );
+	ret = DBMStore( dbe->handle, tbe->handle, key, data, size );
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;
@@ -414,12 +452,15 @@ int DBAFetchRows( const char *table, DBRowHandler handler )
 	int islocalopen = 0;
 	int ret = 0;
 	tableentry *tbe;
+	dbentry *dbe = DBAFetchDBEntry();
 
 	dlog( DEBUG5, "DBAFetchRows %s", table );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
-		return 0;
-	ret = DBMFetchRows( tbe->handle, handler );	
+		return NS_FAILURE;;
+	if (!dbe) 
+		return NS_FAILURE;
+	ret = DBMFetchRows( dbe->handle, tbe->handle, handler );	
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;
@@ -440,12 +481,16 @@ int DBADelete( const char *table, const char *key )
 	int islocalopen = 0;
 	int ret = 0;
 	tableentry *tbe;
+	dbentry *dbe = DBAFetchDBEntry();
+	
 
 	dlog( DEBUG5, "DBADelete %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;
-	ret = DBMDelete( tbe->handle, key );
+	if (!dbe )
+		return NS_FAILURE;
+	ret = DBMDelete( dbe->handle, tbe->handle, key );
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;

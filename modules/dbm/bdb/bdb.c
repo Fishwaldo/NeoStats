@@ -24,14 +24,18 @@
 #include "neostats.h"
 #include "nsdbm.h"
 
-/*#ifdef HAVE_DB_H*/
-#if 0
+#ifdef HAVE_DB_H*/
 #include <db.h>
 
 static DBT dbkey;
 static DBT dbdata;
+void *DBMOpenDB (const char *name)
+{
+	/* TODO */
+	return NULL;
+}
 
-void *DBMOpenTable (const char *name)
+void *DBMOpenTable (void *dbhandle, const char *name)
 {
 	static char filename[MAXPATH];
 	int dbret;
@@ -43,29 +47,25 @@ void *DBMOpenTable (const char *name)
 		dlog(DEBUG1, "db_create: %s", db_strerror(dbret));
 		return NULL;
 	}
-#if 0 /* Temp since it does not compile */
-	if ((dbret = dbp->open(dbp, filename, "Data", DB_BTREE, DB_CREATE, 0664)) != 0) {
+	if ((dbret = dbp->open(dbp, filename, "Data", NULL, DB_BTREE, DB_CREATE, 0664)) != 0) {
 		dlog(DEBUG1, "dbp->open: %s", db_strerror(dbret));
 		return NULL;
 	}
 	return (void *)dbp;
-#else
-	return NULL;
-#endif
 }
 
-void DBMCloseTable (void *handle)
+void DBMCloseTable (void *dbhandle, void *tbhandle)
 {
-	DB *dbp = (DB *)handle;
+	DB *dbp = (DB *)tbhandle;
 
 	dlog(DEBUG1, "DBACloseTable");
 	dbp->close(dbp, 0); 
 }
 
-int DBMFetch (void *handle, char *key, void *data, int size)
+int DBMFetch (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 {
 	int dbret;
-	DB *dbp = (DB *)handle;
+	DB *dbp = (DB *)tbhandle;
 
 	dlog(DEBUG1, "DBAFetch %s", key);
 	memset(&dbkey, 0, sizeof(dbkey));
@@ -81,10 +81,10 @@ int DBMFetch (void *handle, char *key, void *data, int size)
 	return NS_FAILURE;
 }
 
-int DBMStore (void *handle, char *key, void *data, int size)
+int DBMStore (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 {
 	int dbret;
-	DB *dbp = (DB *)handle;
+	DB *dbp = (DB *)tbhandle;
 
 	dlog(DEBUG1, "DBAStore %s %s", key, (char *)data);
 	memset(&dbkey, 0, sizeof(dbkey));
@@ -100,7 +100,7 @@ int DBMStore (void *handle, char *key, void *data, int size)
 	return NS_SUCCESS;
 }
 
-int DBMFetchTableRows (void *handle, DBRowHandler handler)
+int DBMFetchTableRows (void *dbhandle, void *tbhandle, DBRowHandler handler)
 {
 	int rowcount = 0;
 
@@ -108,42 +108,10 @@ int DBMFetchTableRows (void *handle, DBRowHandler handler)
 	return rowcount;
 }
 
-int DBMDelete (void *handle, char * key)
+int DBMDelete (void *dbhandle, void *tbhandle, char * key)
 {
 	/* TODO */
 	return NS_SUCCESS;
 }
 
-#else
-void *DBMOpenTable (const char *name)
-{
-	return NULL;
-}
-
-void DBMCloseTable (void *handle)
-{
-}
-
-int DBMFetch (void *handle, char *key, void *data, int size)
-{
-	return NS_FAILURE;
-}
-
-int DBMStore (void *handle, char *key, void *data, int size)
-{
-	return NS_FAILURE;
-}
-
-int DBMFetchTableRows (void *handle, DBRowHandler handler)
-{
-	int rowcount = 0;
-
-	/* TODO */
-	return rowcount;
-}
-
-int DBMDelete (void *handle, char * key)
-{
-	return NS_FAILURE;
-}
 #endif

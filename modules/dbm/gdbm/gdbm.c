@@ -28,6 +28,18 @@
 
 extern const char *gdbm_strerror __P( ( gdbm_error ) );
 
+void *DBMOpenDB(const char *name) 
+{
+	/* not required for GDBM */
+	return (void *)NS_SUCCESS;
+}
+
+void DBMCloseDB(void *dbhandle)
+{	
+	/* not required for gdbm */
+	return;
+}
+
 /** @brief DBMOpenTable
  *
  *  Open gdbm table
@@ -37,7 +49,7 @@ extern const char *gdbm_strerror __P( ( gdbm_error ) );
  *  @return handle to table or NULL on error
  */
 
-void *DBMOpenTable( const char *name )
+void *DBMOpenTable( void *unused, const char *name )
 {
 	static char filename[MAXPATH];
 	gdbm_file_info *gdbm_file;
@@ -68,7 +80,7 @@ void *DBMOpenTable( const char *name )
  *  @return none
  */
 
-void DBMCloseTable( void *handle )
+void DBMCloseTable( void *unused, void *handle )
 {
 	if( handle ) 
 	{
@@ -88,7 +100,7 @@ void DBMCloseTable( void *handle )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBMFetch( void *handle, char *key, void *data, int size )
+int DBMFetch( void *unused, void *handle, char *key, void *data, int size )
 {
 	datum dbkey;
 	datum dbdata;
@@ -124,7 +136,7 @@ int DBMFetch( void *handle, char *key, void *data, int size )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBMStore( void *handle, char *key, void *data, int size )
+int DBMStore( void *unused, void *handle, char *key, void *data, int size )
 {
 	datum dbkey;
 	datum dbdata;
@@ -151,7 +163,7 @@ int DBMStore( void *handle, char *key, void *data, int size )
  *  @return number of rows processed by handler
  */
 
-int DBMFetchRows( void *handle, DBRowHandler handler )
+int DBMFetchRows( void *unused, void *handle, DBRowHandler handler )
 {
 	datum dbkey;
 	datum dbdata;
@@ -188,7 +200,7 @@ int DBMFetchRows( void *handle, DBRowHandler handler )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int DBMDelete( void *handle, char *key )
+int DBMDelete( void *unused, void *handle, char *key )
 {
 	datum dbkey;
 

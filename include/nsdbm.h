@@ -24,11 +24,13 @@
 #ifndef _NSDBM_H_
 #define _NSDBM_H_
 
-MODULEFUNC void *DBMOpenTable( const char *name );
-MODULEFUNC void DBMCloseTable( void *handle );
-MODULEFUNC int DBMFetch( void *handle, char *key, void *data, int size );
-MODULEFUNC int DBMStore( void *handle, char *key, void *data, int size );
-MODULEFUNC int DBMFetchRows( void *handle, DBRowHandler handler );
-MODULEFUNC int DBMDelete( void *handle, char * key );
+MODULEFUNC void *DBMOpenDB( const char *name );
+MODULEFUNC void DBMCloseDB( void *dbhandle );
+MODULEFUNC void *DBMOpenTable( void *dbhandle, const char *name );
+MODULEFUNC void DBMCloseTable( void *dbhandle, void *tbhandle );
+MODULEFUNC int DBMFetch( void *dbhandle, void *tbhandle, char *key, void *data, int size );
+MODULEFUNC int DBMStore( void *dbhandle, void *tbhandle, char *key, void *data, int size );
+MODULEFUNC int DBMFetchRows( void *dbhandle, void *tbhandle, DBRowHandler handler );
+MODULEFUNC int DBMDelete( void *dbhandle, void *tbhandle, char * key );
 
 #endif /* _NSDBM_H_ */
