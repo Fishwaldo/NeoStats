@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - Finish the Berkeley DB interface module (F)
  - Fix quoteserv prefix and suffix processing (F)
  - Really fix IRCu IP address conversions (F)
  - Include Modules loaded in segfault report (F)

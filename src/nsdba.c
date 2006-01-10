@@ -56,8 +56,8 @@ static int ( *DBMDelete )( void *dbhandle, void *tbhandle, const char *key );
 
 static dbm_sym dbm_sym_table[] = 
 {
-	{ ( void * )&DBMOpenDB,		"DBMOpenTable" },
-	{ ( void * )&DBMCloseDB,	"DBMCloseTable" },
+	{ ( void * )&DBMOpenDB,		"DBMOpenDB" },
+	{ ( void * )&DBMCloseDB,	"DBMCloseDB" },
 	{ ( void * )&DBMOpenTable,	"DBMOpenTable" },
 	{ ( void * )&DBMCloseTable,	"DBMCloseTable" },
 	{ ( void * )&DBMFetch,		"DBMFetch" },
@@ -270,7 +270,7 @@ int DBAOpenTable( const char *table )
 		return NS_FAILURE;
 	}
 	tbe = ns_calloc( sizeof( tableentry ) );
-	ircsnprintf( tbe->name, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
+	ircsnprintf( tbe->name, MAXPATH, "%s", table);
 	if( hnode_find( dbe->tablehash, tbe->name ) )
 	{
 		dlog( DEBUG5, "DBAOpenTable %s already open", table );
@@ -318,7 +318,6 @@ static dbentry *DBAFetchDBEntry()
 
 static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 {
-	static char dbname[MAXPATH];
 	dbentry *dbe;
 	tableentry *tbe;
 
@@ -329,14 +328,11 @@ static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 		nlog( LOG_WARNING, "Database %s for table %s not open", GET_CUR_MODNAME(), table );
 		return NULL;
 	}
-	ircsnprintf( dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
-	tbe = (tableentry *)hnode_find( dbe->tablehash, dbname );
+	tbe = (tableentry *)hnode_find( dbe->tablehash, table );
 	if( !tbe )
 	{
 		DBAOpenTable( table );
-		tbe = (tableentry *)hnode_find( dbe->tablehash, dbname );
-		if( !tbe )
-			nlog( LOG_WARNING, "Open table failed for %s %s", dbname, table );
+		tbe = (tableentry *)hnode_find( dbe->tablehash, table );
 		*islocalopen = 1;
 	}
 	return tbe;
@@ -353,7 +349,6 @@ static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 
 int DBACloseTable( const char *table )
 {
-	static char dbname[MAXPATH];
 	dbentry *dbe;
 	tableentry *tbe;
 	hnode_t *node;
@@ -365,8 +360,7 @@ int DBACloseTable( const char *table )
 		nlog( LOG_WARNING, "Database %s for table %s not open", GET_CUR_MODNAME(), table );
 		return NS_FAILURE;
 	}
-	ircsnprintf( dbname, MAXPATH, "data/%s%s", GET_CUR_MODNAME(), table ? table : "" );
-	node = hash_lookup( dbe->tablehash, dbname );
+	node = hash_lookup( dbe->tablehash, table);
 	if( node )
 	{
 		tbe = (tableentry *)hnode_get( node );
@@ -398,10 +392,14 @@ int DBAFetch( const char *table, const char *key, void *data, int size )
 
 	dlog( DEBUG5, "DBAFetch %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
-	if( !tbe )
+	if (!dbe ) {
+		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
 		return NS_FAILURE;
-	if (!dbe)
+	}
+	if( !tbe ) {
+		nlog(LOG_WARNING, "No Such Table %s in database %s", tbe->name, dbe->name);
 		return NS_FAILURE;
+	}
 	ret = DBMFetch( dbe->handle, tbe->handle, key, data, size );
 	if( islocalopen )
 		DBACloseTable( table );
@@ -429,8 +427,14 @@ int DBAStore( const char *table, const char *key, void *data, int size )
 
 	dlog( DEBUG5, "DBAStore %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
-	if( !tbe )
+	if (!dbe ) {
+		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
 		return NS_FAILURE;
+	}
+	if( !tbe ) {
+		nlog(LOG_WARNING, "No Such Table %s in database %s", tbe->name, dbe->name);
+		return NS_FAILURE;
+	}
 	ret = DBMStore( dbe->handle, tbe->handle, key, data, size );
 	if( islocalopen )
 		DBACloseTable( table );
@@ -455,11 +459,15 @@ int DBAFetchRows( const char *table, DBRowHandler handler )
 	dbentry *dbe = DBAFetchDBEntry();
 
 	dlog( DEBUG5, "DBAFetchRows %s", table );
+	if (!dbe) {
+		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
+		return ret;
+	}
 	tbe = DBAFetchTableEntry( table, &islocalopen );
-	if( !tbe )
-		return NS_FAILURE;;
-	if (!dbe) 
-		return NS_FAILURE;
+	if( !tbe ) {
+		nlog(LOG_WARNING, "FetchRow: No Such Table %s in DB %s", table, dbe->name);
+		return ret;
+	}
 	ret = DBMFetchRows( dbe->handle, tbe->handle, handler );	
 	if( islocalopen )
 		DBACloseTable( table );

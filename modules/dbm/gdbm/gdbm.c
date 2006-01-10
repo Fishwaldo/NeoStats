@@ -31,12 +31,13 @@ extern const char *gdbm_strerror __P( ( gdbm_error ) );
 void *DBMOpenDB(const char *name) 
 {
 	/* not required for GDBM */
-	return (void *)NS_SUCCESS;
+	return strndup(name, strlen(name));;
 }
 
 void DBMCloseDB(void *dbhandle)
 {	
 	/* not required for gdbm */
+	ns_free(dbhandle)
 	return;
 }
 
@@ -49,15 +50,16 @@ void DBMCloseDB(void *dbhandle)
  *  @return handle to table or NULL on error
  */
 
-void *DBMOpenTable( void *unused, const char *name )
+void *DBMOpenTable( void *dbname, const char *name )
 {
 	static char filename[MAXPATH];
 	gdbm_file_info *gdbm_file;
 	int cache_size = DEFAULT_CACHESIZE;
 
 	dlog( DEBUG4, "DBMOpenTable %s", name );
-	ircsprintf( filename, "%s.gdbm", name );
-	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00664, NULL );
+	ircsprintf( filename, "data/%s%s.gdbm", (char *)dbname, name );
+	printf("filename %s\n", filename);
+	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00600, NULL );
 	if( gdbm_file == NULL )
 	{
 		nlog( LOG_ERROR, "gdbm_open fail: %s", gdbm_strerror( gdbm_errno ) );
