@@ -220,7 +220,7 @@ target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 SUBDIRS = bdb gdbm
-convertdb_SOURCES = convertdb.c ../../src/log.c ../../src/nsdba.c ../../src/dl.c ../../src/hash.c ../../src/list.c ../../src/ircstring.c ../../src/nsmemory.c ../../src/osfile.c ../../src/misc.
+convertdb_SOURCES = convertdb.c ../../src/log.c ../../src/nsdba.c ../../src/dl.c ../../src/hash.c ../../src/list.c ../../src/ircstring.c ../../src/nsmemory.c ../../src/osfile.c
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
