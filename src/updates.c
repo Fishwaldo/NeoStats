@@ -313,7 +313,22 @@ int InitUpdate(void)
 
 void FiniUpdate(void) 
 {
+	MMessage *qmsg;
+	lnode_t *node;
+	ResetMQ();
+	DelTimer("MQPingSrv");
+	if (list_count(MQlist) > 0) {
+		while ((node = list_first(MQlist)) != NULL) {
+			qmsg = lnode_get(node);
+			MMFreeMessage(qmsg);
+			list_del_first(MQlist);
+		}
+	}
+#if 0
 	MQDelcmd(stdcmds);
+	list_destroy(MQlist);
+	hash_destroy(MQcmds);
+#endif
 }
 
 static void GotUpdateAddress(void *data, adns_answer *a) 

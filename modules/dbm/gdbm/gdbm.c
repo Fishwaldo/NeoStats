@@ -58,7 +58,6 @@ void *DBMOpenTable( void *dbname, const char *name )
 
 	dlog( DEBUG4, "DBMOpenTable %s", name );
 	ircsprintf( filename, "data/%s%s.gdbm", (char *)dbname, name );
-	printf("filename %s\n", filename);
 	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00600, NULL );
 	if( gdbm_file == NULL )
 	{

@@ -83,6 +83,18 @@ void FiniTimers( void )
 {
 	event_del( timers );
 	os_free( timers );
+	hscan_t tscan;
+	hnode_t *tn;
+
+	if (hash_count(timerhash) > 0) {
+		hash_scan_begin( &tscan, timerhash );
+		while( ( tn = hash_scan_next( &tscan ) ) != NULL )
+		{
+			Timer *timer = NULL;
+			timer = hnode_get( tn );
+			dlog( DEBUG3, "FiniTimers() BUG: Timer %s not deleted for module %s", timer->name, timer->moduleptr->info->name );
+		}
+	}
 	hash_destroy( timerhash );
 }
 

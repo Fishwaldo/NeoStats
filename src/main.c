@@ -306,6 +306,7 @@ static void FiniCore( void )
 	FiniModules();
 	FiniServices();
 	FiniBots();
+	FiniUpdate();
 	FiniTimers();
 	FiniSocks();
 	FiniIrcd();

@@ -32,6 +32,8 @@ static DBT dbdata;
 
 static DB_ENV *db_env;
 
+static int dbopened = 0;
+
 void db_log_cb(const char *prefix, char *msg) {
 	dlog(DEBUG1, "%s", msg);
 }
@@ -58,12 +60,19 @@ void *DBMOpenDB (const char *name)
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 #endif
 	}
+	dbopened++;
 	return strndup(name, strlen(name));
 }
 
 void DBMCloseDB (void *dbhandle)
 {
 	ns_free(dbhandle);
+	dbopened--;
+	if (dbopened <= 0) {
+		db_env->close(db_env, 0);
+	} else {
+		dlog(DEBUG5, "DBMClose: Databases still opened, not destroying enviroment");
+	}
 	return;
 }
 

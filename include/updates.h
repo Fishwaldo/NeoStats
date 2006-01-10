@@ -41,6 +41,7 @@ typedef struct NeoNetCmds {
 
 
 int InitUpdate( void );
+void FiniUpdate( void );
 void MQStatusMsg(const Bot *bot, const CmdParams *cmdparams);
 
 
