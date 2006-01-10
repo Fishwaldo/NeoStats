@@ -40,7 +40,6 @@ void *DBMOpenDB (const char *name)
 {
 	int dbret;
 	
-printf("DBMOpenDB %s\n", name);
 	if (!db_env) {
 		if ((dbret = db_env_create(&db_env, 0)) != 0) {
 			nlog(LOG_WARNING, "db_env_create failed: %s", db_strerror(dbret));
@@ -76,7 +75,6 @@ void *DBMOpenTable (void *dbhandle, const char *name)
 
 	dlog (DEBUG1, "DBMOpenTable %s", name);
 	ircsprintf (filename, "%s.bdb", (char *)dbhandle);
- printf("filename %s\n", filename);
 	if ((dbret = db_create(&dbp, db_env, 0)) != 0) {
 		dlog(DEBUG1, "db_create: %s", db_strerror(dbret));
 		return NULL;
