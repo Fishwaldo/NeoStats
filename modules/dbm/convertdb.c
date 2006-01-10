@@ -23,6 +23,10 @@
 
 #include "neostats.h"
 
+
+Module *RunModule[10];
+int RunLevel = 0;
+
 /** @brief print_copyright
  *
  *  print copyright notice
