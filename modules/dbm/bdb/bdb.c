@@ -24,7 +24,7 @@
 #include "neostats.h"
 #include "nsdbm.h"
 
-#ifdef HAVE_DB_H*/
+#ifdef HAVE_DB_H
 #include <db.h>
 #include <sys/types.h>
 #include <dirent.h>
