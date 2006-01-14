@@ -60,7 +60,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_convertdb_OBJECTS = convertdb.$(OBJEXT) dl.$(OBJEXT) hash.$(OBJEXT) \
 	list.$(OBJEXT) ircstring.$(OBJEXT) nsmemory.$(OBJEXT) \
-	osfile.$(OBJEXT)
+	osfile.$(OBJEXT) support.$(OBJEXT)
 convertdb_OBJECTS = $(am_convertdb_OBJECTS)
 convertdb_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -220,7 +220,7 @@ target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 SUBDIRS = bdb gdbm
-convertdb_SOURCES = convertdb.c ../../src/dl.c ../../src/hash.c ../../src/list.c ../../src/ircstring.c ../../src/nsmemory.c ../../src/osfile.c
+convertdb_SOURCES = convertdb.c ../../src/dl.c ../../src/hash.c ../../src/list.c ../../src/ircstring.c ../../src/nsmemory.c ../../src/osfile.c ../../src/support.c
 convertdb_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -292,6 +292,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsmemory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/osfile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support.Po@am__quote@
 
 dl.o: ../../src/dl.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dl.o -MD -MP -MF "$(DEPDIR)/dl.Tpo" -c -o dl.o `test -f '../../src/dl.c' || echo '$(srcdir)/'`../../src/dl.c; \
@@ -376,6 +377,20 @@ osfile.obj: ../../src/osfile.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../src/osfile.c' object='osfile.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o osfile.obj `if test -f '../../src/osfile.c'; then $(CYGPATH_W) '../../src/osfile.c'; else $(CYGPATH_W) '$(srcdir)/../../src/osfile.c'; fi`
+
+support.o: ../../src/support.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT support.o -MD -MP -MF "$(DEPDIR)/support.Tpo" -c -o support.o `test -f '../../src/support.c' || echo '$(srcdir)/'`../../src/support.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/support.Tpo" "$(DEPDIR)/support.Po"; else rm -f "$(DEPDIR)/support.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../src/support.c' object='support.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o support.o `test -f '../../src/support.c' || echo '$(srcdir)/'`../../src/support.c
+
+support.obj: ../../src/support.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT support.obj -MD -MP -MF "$(DEPDIR)/support.Tpo" -c -o support.obj `if test -f '../../src/support.c'; then $(CYGPATH_W) '../../src/support.c'; else $(CYGPATH_W) '$(srcdir)/../../src/support.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/support.Tpo" "$(DEPDIR)/support.Po"; else rm -f "$(DEPDIR)/support.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../src/support.c' object='support.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o support.obj `if test -f '../../src/support.c'; then $(CYGPATH_W) '../../src/support.c'; else $(CYGPATH_W) '$(srcdir)/../../src/support.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
