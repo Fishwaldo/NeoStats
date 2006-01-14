@@ -58,9 +58,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_convertdb_OBJECTS = convertdb.$(OBJEXT) log.$(OBJEXT) \
-	nsdba.$(OBJEXT) dl.$(OBJEXT) hash.$(OBJEXT) list.$(OBJEXT) \
-	ircstring.$(OBJEXT) nsmemory.$(OBJEXT) osfile.$(OBJEXT)
+am_convertdb_OBJECTS = convertdb.$(OBJEXT) dl.$(OBJEXT) hash.$(OBJEXT) \
+	list.$(OBJEXT) ircstring.$(OBJEXT) nsmemory.$(OBJEXT) \
+	osfile.$(OBJEXT)
 convertdb_OBJECTS = $(am_convertdb_OBJECTS)
 convertdb_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
@@ -220,7 +220,8 @@ target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 SUBDIRS = bdb gdbm
-convertdb_SOURCES = convertdb.c ../../src/log.c ../../src/nsdba.c ../../src/dl.c ../../src/hash.c ../../src/list.c ../../src/ircstring.c ../../src/nsmemory.c ../../src/osfile.c
+convertdb_SOURCES = convertdb.c ../../src/dl.c ../../src/hash.c ../../src/list.c ../../src/ircstring.c ../../src/nsmemory.c ../../src/osfile.c
+convertdb_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -289,38 +290,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircstring.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsdba.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsmemory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/osfile.Po@am__quote@
-
-log.o: ../../src/log.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT log.o -MD -MP -MF "$(DEPDIR)/log.Tpo" -c -o log.o `test -f '../../src/log.c' || echo '$(srcdir)/'`../../src/log.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/log.Tpo" "$(DEPDIR)/log.Po"; else rm -f "$(DEPDIR)/log.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../src/log.c' object='log.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o log.o `test -f '../../src/log.c' || echo '$(srcdir)/'`../../src/log.c
-
-log.obj: ../../src/log.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT log.obj -MD -MP -MF "$(DEPDIR)/log.Tpo" -c -o log.obj `if test -f '../../src/log.c'; then $(CYGPATH_W) '../../src/log.c'; else $(CYGPATH_W) '$(srcdir)/../../src/log.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/log.Tpo" "$(DEPDIR)/log.Po"; else rm -f "$(DEPDIR)/log.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../src/log.c' object='log.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o log.obj `if test -f '../../src/log.c'; then $(CYGPATH_W) '../../src/log.c'; else $(CYGPATH_W) '$(srcdir)/../../src/log.c'; fi`
-
-nsdba.o: ../../src/nsdba.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nsdba.o -MD -MP -MF "$(DEPDIR)/nsdba.Tpo" -c -o nsdba.o `test -f '../../src/nsdba.c' || echo '$(srcdir)/'`../../src/nsdba.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/nsdba.Tpo" "$(DEPDIR)/nsdba.Po"; else rm -f "$(DEPDIR)/nsdba.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../src/nsdba.c' object='nsdba.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nsdba.o `test -f '../../src/nsdba.c' || echo '$(srcdir)/'`../../src/nsdba.c
-
-nsdba.obj: ../../src/nsdba.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT nsdba.obj -MD -MP -MF "$(DEPDIR)/nsdba.Tpo" -c -o nsdba.obj `if test -f '../../src/nsdba.c'; then $(CYGPATH_W) '../../src/nsdba.c'; else $(CYGPATH_W) '$(srcdir)/../../src/nsdba.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/nsdba.Tpo" "$(DEPDIR)/nsdba.Po"; else rm -f "$(DEPDIR)/nsdba.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../../src/nsdba.c' object='nsdba.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o nsdba.obj `if test -f '../../src/nsdba.c'; then $(CYGPATH_W) '../../src/nsdba.c'; else $(CYGPATH_W) '$(srcdir)/../../src/nsdba.c'; fi`
 
 dl.o: ../../src/dl.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dl.o -MD -MP -MF "$(DEPDIR)/dl.Tpo" -c -o dl.o `test -f '../../src/dl.c' || echo '$(srcdir)/'`../../src/dl.c; \
