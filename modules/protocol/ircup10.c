@@ -287,7 +287,6 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 {
 	if( argc > 2 ) {
 		char IPAddress[32];
-		unsigned long IP;
 		const char *modes;
 		const char *modeptr;
 		const char *account = NULL;
@@ -307,7 +306,7 @@ static void m_nick( char *origin, char **argv, int argc, int srv )
 			} /* for( ) */
 		} /* if( modes ) */
 
-		ircsnprintf( IPAddress, 32, "%lu", base64toIP( argv[argc-3]) );
+		ircsnprintf( IPAddress, 32, "%du", base64toIP( argv[argc-3]) );
 		
 		/*       nick,    hopcount, TS,     user,    host, */       
 		do_nick( argv[0], argv[1], argv[2], argv[3], argv[4], 

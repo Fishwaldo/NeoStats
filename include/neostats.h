@@ -1513,6 +1513,9 @@ typedef struct NS_TABLE
 /* Row fetch handler type */
 typedef int (*DBRowHandler) ( void *data, int size );
 
+/* Row fetch handler type version 2 (returns key as well) */
+typedef int (*DBRowHandler2) ( char *key, void *data, int size );
+
 /* DB API */
 EXPORTFUNC int DBAOpenDatabase( void );
 EXPORTFUNC int DBACloseDatabase( void );

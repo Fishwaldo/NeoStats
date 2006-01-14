@@ -52,6 +52,7 @@ static void ( *DBMCloseTable )( void *dbhandle, void *tbhandle );
 static int ( *DBMFetch )( void *dbhandle, void *tbhandle, const char *key, void *data, int size );
 static int ( *DBMStore )( void *dbhandle, void *tbhandle, const char *key, void *data, int size );
 static int ( *DBMFetchRows )( void *dbhandle, void *tbhandle, DBRowHandler handler );
+static int ( *DBMFetchRows2 )( void *dbhandle, void *tbhandle, DBRowHandler2 handler );
 static int ( *DBMDelete )( void *dbhandle, void *tbhandle, const char *key );
 
 static dbm_sym dbm_sym_table[] = 
@@ -63,6 +64,7 @@ static dbm_sym dbm_sym_table[] =
 	{ ( void * )&DBMFetch,		"DBMFetch" },
 	{ ( void * )&DBMStore,		"DBMStore" },
 	{ ( void * )&DBMFetchRows,	"DBMFetchRows" },
+	{ ( void * )&DBMFetchRows2,	"DBMFetchRows2" },
 	{ ( void * )&DBMDelete,		"DBMDelete" },
 	{NULL, NULL},
 };
@@ -469,6 +471,40 @@ int DBAFetchRows( const char *table, DBRowHandler handler )
 		return ret;
 	}
 	ret = DBMFetchRows( dbe->handle, tbe->handle, handler );	
+	if( islocalopen )
+		DBACloseTable( table );
+	return ret;
+}
+
+/** @brief DBAFetchRows2
+ *
+ *  Walk through table and pass records in turn to handler
+ *  This version also passes the Key used to store the record back to the handler
+ *
+ *  @param table name
+ *  @param handler for records
+ *
+ *  @return number of rows processed by handler
+ */
+
+int DBAFetchRows2( const char *table, DBRowHandler2 handler )
+{
+	int islocalopen = 0;
+	int ret = 0;
+	tableentry *tbe;
+	dbentry *dbe = DBAFetchDBEntry();
+
+	dlog( DEBUG5, "DBAFetchRows %s", table );
+	if (!dbe) {
+		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
+		return ret;
+	}
+	tbe = DBAFetchTableEntry( table, &islocalopen );
+	if( !tbe ) {
+		nlog(LOG_WARNING, "FetchRow: No Such Table %s in DB %s", table, dbe->name);
+		return ret;
+	}
+	ret = DBMFetchRows2( dbe->handle, tbe->handle, handler );	
 	if( islocalopen )
 		DBACloseTable( table );
 	return ret;

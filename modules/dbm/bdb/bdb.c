@@ -26,7 +26,9 @@
 
 #ifdef HAVE_DB_H*/
 #include <db.h>
-
+#include <sys/types.h>
+#include <dirent.h>
+          
 static DBT dbkey;
 static DBT dbdata;
 
@@ -70,6 +72,7 @@ void DBMCloseDB (void *dbhandle)
 	dbopened--;
 	if (dbopened <= 0) {
 		db_env->close(db_env, 0);
+		db_env = NULL;
 	} else {
 		dlog(DEBUG5, "DBMClose: Databases still opened, not destroying enviroment");
 	}
@@ -83,6 +86,10 @@ void *DBMOpenTable (void *dbhandle, const char *name)
 	DB *dbp;
 
 	dlog (DEBUG1, "DBMOpenTable %s", name);
+	if (db_env == NULL) {
+		nlog(DEBUG1, "DataBase Enviroment is not created\n");
+		return NULL;
+	}
 	ircsprintf (filename, "%s.bdb", (char *)dbhandle);
 	if ((dbret = db_create(&dbp, db_env, 0)) != 0) {
 		dlog(DEBUG1, "db_create: %s", db_strerror(dbret));
@@ -182,6 +189,39 @@ int DBMFetchRows (void *dbhandle, void *tbhandle, DBRowHandler handler)
 	return rowcount;
 }
 
+int DBMFetchRows2 (void *dbhandle, void *tbhandle, DBRowHandler2 handler)
+{
+	int rowcount = 0;
+	int dbret;
+	DB *dbp = (DB *)tbhandle;
+	DBC *dbcp;
+
+	dlog(DEBUG1, "DBMFetchRows2 here");
+	memset(&dbkey, 0, sizeof(dbkey));
+	memset(&dbdata, 0, sizeof(dbdata));
+	/* initilize the cursors */
+	if ((dbret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
+		nlog(LOG_WARNING, "DB Cursor failed: %s", db_strerror(dbret));
+		return rowcount;
+	}
+	
+	while ((dbret = dbcp->c_get(dbcp, &dbkey, &dbdata, DB_NEXT)) == 0)
+	{
+
+		rowcount++;
+                if( handler( dbkey.data, dbdata.data, dbdata.size ) != 0 ) {
+                        break;
+		}
+	} 
+	if (dbret != 0 && dbret != DB_NOTFOUND) {
+		dlog(DEBUG1, "dbp->c_get failed: %s", db_strerror(dbret));
+	}
+	if ((dbret = dbcp->c_close(dbcp)) != 0) {
+		dlog(DEBUG1, "dbcpp->close failed: %s", db_strerror(dbret));
+	}	
+	return rowcount;
+}
+
 int DBMDelete (void *dbhandle, void *tbhandle, char * key)
 {
 	int dbret;
@@ -201,5 +241,93 @@ int DBMDelete (void *dbhandle, void *tbhandle, char * key)
 	}
 	return NS_SUCCESS;
 }
+
+int file_select (struct dirent *entry) {
+	char *ptr;
+	if ((ircstrcasecmp(entry->d_name, ".")==0) || (ircstrcasecmp(entry->d_name, "..")==0)) 
+		return 0;
+	/* check filename extension */
+	ptr = strrchr(entry->d_name, '.');
+	if ((ptr) && !(ircstrcasecmp(ptr, ".bdb"))) {
+		return NS_SUCCESS;
+	}
+	return 0;	
+}
+
+char **DBMListDB()
+{
+	struct dirent **files;
+	int count, i, sl = 0;
+	char *filename;
+	char **DBList = NULL;;
+	
+	count = scandir ("data/", &files, file_select, alphasort);
+	for (i = 2; i <= count; i++) 
+	{
+		
+		filename = ns_malloc(strlen(files[i-1]->d_name) - 3);
+		strlcpy(filename, files[i-1]->d_name, strlen(files[i-1]->d_name) - 3);
+		AddStringToList(&DBList, filename, &sl);
+	}
+	return DBList;;
+}
+
+char **DBMListTables(char *Database)
+{
+	static char filename[MAXPATH];
+	int dbret;
+	DB *dbp;
+	int rowcount = 0;
+	DBC *dbcp;
+	char *table;
+	char **Tables = NULL;;
+	int tl = 0;
+
+	dlog(DEBUG1, "DBMListTables %s\n", Database);
+	ircsprintf (filename, "data/%s.bdb", Database);
+	if ((dbret = db_create(&dbp, NULL, 0)) != 0) {
+		nlog(LOG_WARNING, "db_create: %s\n", db_strerror(dbret));
+		return NULL;
+	}
+#if (DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR >= 1)
+	if ((dbret = dbp->open(dbp, NULL, filename, NULL, DB_UNKNOWN, DB_RDONLY, 0600)) != 0) {
+#else
+	if ((dbret = dbp->open(dbp, filename, NULL, DB_UNKNOWN, DB_RDONLY, 0600)) != 0) {
+#endif
+		nlog(LOG_WARNING,"dbp->open: %s\n", db_strerror(dbret));
+		return NULL;
+	}
+
+	memset(&dbkey, 0, sizeof(dbkey));
+	memset(&dbdata, 0, sizeof(dbdata));
+	/* initilize the cursors */
+	if ((dbret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
+		nlog(LOG_WARNING, "DB Cursor failed: %s\n", db_strerror(dbret));
+		return NULL;
+	}
+	
+	while ((dbret = dbcp->c_get(dbcp, &dbkey, &dbdata, DB_NEXT)) == 0)
+	{
+		rowcount++;
+		if (dbkey.size > 0) {
+			table = ns_malloc(dbkey.size+1);
+			strlcpy(table, dbkey.data, dbkey.size+1);
+			AddStringToList(&Tables, table, &tl);
+		} else {
+			nlog(LOG_WARNING, "Hrm, Table name is null?\n");
+		}
+	} 
+	if (dbret != 0 && dbret != DB_NOTFOUND) {
+		nlog(LOG_WARNING, "dbp->c_get failed: %s\n", db_strerror(dbret));
+	}
+	if ((dbret = dbcp->c_close(dbcp)) != 0) {
+		nlog(LOG_WARNING, "dbcpp->close failed: %s\n", db_strerror(dbret));
+	}	
+	dbp->close(dbp, 0); 
+
+	return Tables;
+
+}
+
 
 #endif

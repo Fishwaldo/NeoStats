@@ -25,11 +25,47 @@
 #include "gdbmdefs.h"
 #include "gdbmerrno.h"
 #include "nsdbm.h"
+#include <sys/types.h>
+#include <dirent.h>
+#include <glob.h>
+#include <errno.h>
 
 extern const char *gdbm_strerror __P( ( gdbm_error ) );
+char **DBMListDB();
+
+int convertdone = 0;
+char *dbnametmp;
+
 
 void *DBMOpenDB(const char *name) 
 {
+	int i = 0;
+	glob_t g;
+	char search[MAXPATH];
+	char *table;
+	char newname[MAXPATH];
+	
+	if (convertdone == 0) {
+		ircsnprintf(search, MAXPATH, "data/%s*.gdbm", name);
+		if (glob(search, 0, NULL, &g) == 0) {
+			for (i = 0; i < g.gl_pathc; i++) {
+				/* start of table name is 5 ("data/") + length of Database */
+				table = strdup(g.gl_pathv[i]+strlen(name)+5);
+				if (table[0] == '-') {
+					/* already converted */
+					break;
+				}
+				ircsnprintf(newname, MAXPATH, "data/%s-%s", name, table);
+				nlog(LOG_WARNING, "Renaming GDBM Datafiles for %s (%s) from Alpha2 Format", name, table);
+				if (rename(g.gl_pathv[i], newname) != 0) {
+					nlog(LOG_WARNING, "Rename Failed for %s", g.gl_pathv[i]);
+				};
+				free(table);
+			}
+		} else {
+			nlog(LOG_WARNING, "Glob Failed: %s", strerror(errno));
+		} 
+	}	
 	/* not required for GDBM */
 	return strndup(name, strlen(name));;
 }
@@ -57,7 +93,7 @@ void *DBMOpenTable( void *dbname, const char *name )
 	int cache_size = DEFAULT_CACHESIZE;
 
 	dlog( DEBUG4, "DBMOpenTable %s", name );
-	ircsprintf( filename, "data/%s%s.gdbm", (char *)dbname, name );
+	ircsprintf( filename, "data/%s-%s.gdbm", (char *)dbname, name );
 	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00600, NULL );
 	if( gdbm_file == NULL )
 	{
@@ -191,6 +227,34 @@ int DBMFetchRows( void *unused, void *handle, DBRowHandler handler )
 	return rowcount;
 }
 
+int DBMFetchRows2 (void *dbhandle, void *tbhandle, DBRowHandler2 handler)
+{
+	datum dbkey;
+	datum dbdata;
+	int rowcount = 0;
+
+	dbkey = gdbm_firstkey( ( gdbm_file_info * )tbhandle );
+	while( dbkey.dptr != NULL )
+	{
+		rowcount++;
+		dlog( DEBUG4, "DBMFetchRows2: key %s", dbkey.dptr );
+		dbdata = gdbm_fetch( ( gdbm_file_info * )tbhandle, dbkey );
+		/* Allow handler to exit the fetch loop */
+		if( handler( dbkey.dptr, dbdata.dptr, dbdata.dsize ) != 0 )
+		{
+			free( dbdata.dptr );
+			free( dbkey.dptr );
+			break;
+		}
+		free( dbdata.dptr );
+		dbdata = gdbm_nextkey( ( gdbm_file_info * )tbhandle, dbkey );
+		free( dbkey.dptr );
+		dbkey = dbdata;
+	}
+	return rowcount;
+}
+
+
 /** @brief DBMDelete
  *
  *  delete table row
@@ -212,4 +276,81 @@ int DBMDelete( void *unused, void *handle, char *key )
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
+}
+
+int file_select (struct dirent *entry) {
+	char *ptr;
+	if ((ircstrcasecmp(entry->d_name, ".")==0) || (ircstrcasecmp(entry->d_name, "..")==0)) 
+		return 0;
+	/* check filename extension */
+	ptr = strrchr(entry->d_name, '.');
+	if ((ptr) && !(ircstrcasecmp(ptr, ".gdbm"))) {
+		return NS_SUCCESS;
+	}
+	return 0;	
+}
+
+
+char **DBMListDB()
+{
+	struct dirent **files;
+	int count, i, sl = 0;
+	int j = 0;
+	char *filename;
+	char *dbname;
+	char **DBList = NULL;;
+	int gotit;
+	
+	count = scandir ("data/", &files, file_select, alphasort);
+	for (i = 2; i <= count; i++) 
+	{
+		filename = strdup(files[i-1]->d_name);
+		dbname = strchr(filename, '-');
+		if (dbname) {
+			filename[dbname-filename] = '\0';
+			if (sl > 0) {
+				gotit = 0;
+				for (j = 0; j < sl; j++) {
+					if (!(ircstrcasecmp(DBList[j], filename))) {
+						gotit = 1;
+					} 
+				}
+				if (gotit != 1) {
+					AddStringToList(&DBList, filename, &sl);
+				}
+			} else {
+				AddStringToList(&DBList, filename, &sl);
+			}
+		}
+	}
+	return DBList;
+}
+
+
+char **DBMListTables(char *Database)
+{
+	char **Tables = NULL;
+	int tl = 0;
+	int i = 0;
+	glob_t g;
+	char search[MAXPATH];
+	char *table;
+	
+
+	dlog(DEBUG1, "DBMListTables %s\n", Database);
+	ircsnprintf(search, MAXPATH, "data/%s*.gdbm", Database);
+	if (glob(search, 0, NULL, &g) == 0) {
+		for (i = 0; i < g.gl_pathc; i++) {
+			/* start of table name is 5 ("data/") + length of Database */
+			table = strdup(g.gl_pathv[i]+strlen(Database)+6);
+
+			if (table[strlen(table)-5] == '.') {
+				table[strlen(table)-5] = '\0';
+			}
+			AddStringToList(&Tables, table, &tl);
+		}
+	} else {
+		nlog(LOG_WARNING, "Glob Failed: %s", strerror(errno));
+	} 
+	return Tables;
 }

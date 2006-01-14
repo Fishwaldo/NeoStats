@@ -4,6 +4,11 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - NSDBAFetchRows2 function added, that also returns the key used to store
+   the records to the handler as a string (F)
+ - Utility tool called convertdb added to convert betweeen database modules (F)
+ - GDBM Database files are now named <Module>-<table>.gdbm. GDBM database
+   module will automatically rename files when first loaded (F)
  - Finish the Berkeley DB interface module (F)
  - Fix quoteserv prefix and suffix processing (F)
  - Really fix IRCu IP address conversions (F)
