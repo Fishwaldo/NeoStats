@@ -63,7 +63,7 @@ void *DBMOpenDB (const char *name)
 #endif
 	}
 	dbopened++;
-	return strndup(name, strlen(name));
+	return strdup(name);
 }
 
 void DBMCloseDB (void *dbhandle)

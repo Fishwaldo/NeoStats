@@ -362,37 +362,6 @@ char *ns_strlwr( char *s )
 }
 
 
-#ifndef HAVE_STRNDUP
-/** @brief strndup
- *
- *  allocate RAM and duplicate the passed string into the created buffer. 
- *  Always NULL terminates the new string.
- *  Suitable for partial string copies.
- *  Returned string will be count + 1 in length
- *
- *  @param src to copy from
- *  @param count max size to copy
- *
- *  @return pointer to new string or NULL if failed to allocate
- */
-
-char *strndup( const char *src, size_t count )
-{
-	char *dup;
-	
-	/* validate inputs */
-	if ( ( src == NULL ) || ( count == 0 ) )
-		return NULL;
-	/* Allocate count plus one for trailing NULL */
-	dup = ( char * ) ns_malloc( count + 1 );
-	/* Copy string into created buffer */
-	os_memcpy( dup, src, count );
-	dup[count] = 0;
-	/* Return pointer to duplicated string */
-	return dup;
-}
-#endif /* HAVE_STRNDUP */
-
 void *os_memcpy( void *dest, const void *src, size_t count )
 {
 	return memcpy( dest, src, count );
