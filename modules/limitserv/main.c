@@ -410,7 +410,7 @@ int limitservtimer(void *userptr)
 		c = FindChannel(ls_chan->name);
 		if( c != NULL )
 		{
-			if( c->users != ( c->limit + lsbuffer ) )
+			if( c->users != ( c->limit - lsbuffer ) )
 			{
 				limit = ( c->users + lsbuffer );
 				ircsnprintf( limitsize, 10, "%d", limit );	
