@@ -432,6 +432,10 @@ static int do_quote( const Client *target, const char *which, int reporterror )
 	unsigned int randno;
 	
 	SET_SEGV_LOCATION();
+	if (IsMe(target)) {
+		/* drop message, as we don't send to ourselves */
+		return NS_SUCCESS;
+	}
 	if( which != NULL )
 	{
 		db = (database *)hnode_find( qshash, which );

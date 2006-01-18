@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - QuoteServ shouldn't send signon messages to Neo Bots (F)
+ - Fix LimitServ timer to not set limits every time (F)
  - NSDBAFetchRows2 function added, that also returns the key used to store
    the records to the handler as a string (F)
  - Utility tool called convertdb added to convert betweeen database modules (F)
