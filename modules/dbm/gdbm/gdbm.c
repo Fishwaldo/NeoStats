@@ -298,7 +298,7 @@ char **DBMListDB()
 	int j = 0;
 	char *filename;
 	char *dbname;
-	char **DBList = NULL;;
+	char **DBList = NULL;
 	int gotit;
 	
 	count = scandir ("data/", &files, file_select, alphasort);

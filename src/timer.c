@@ -81,10 +81,10 @@ int InitTimers( void )
 
 void FiniTimers( void )
 {
-	event_del( timers );
-	os_free( timers );
 	hscan_t tscan;
 	hnode_t *tn;
+	event_del( timers );
+	os_free( timers );
 
 	if (hash_count(timerhash) > 0) {
 		hash_scan_begin( &tscan, timerhash );
