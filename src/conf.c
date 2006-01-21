@@ -75,7 +75,7 @@ static cfg_opt_t options[] = {
 	CFG_INT ("ReconnectTime", 10, CFGF_NONE),
 	CFG_BOOL ("UsePrivmsg", cfg_false, CFGF_NONE),
 	CFG_BOOL ("OperOnly", cfg_false, CFGF_NONE),
-	CFG_INT ("ServerSettime", 1, CFGF_NONE),
+	CFG_INT ("ServerSettime", 0, CFGF_NONE),
 	CFG_STR ("DatabaseType", "gdbm", CFGF_NONE),
 	CFG_STR ("LogFileNameFormat", "-%m-%d", CFGF_NONE),
 	CFG_STR ("RootNick", "NeoStats", CFGF_NONE),
