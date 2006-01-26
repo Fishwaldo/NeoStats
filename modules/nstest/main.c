@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 2005 Mark Hetherington
+** Copyright (c) 2006 Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ const char *ns_about[] =
 /** Copyright info */
 const char *ns_copyright[] = 
 {
-	"Copyright (c) 1999-2005, NeoStats",
+	"Copyright (c) 1999-2006, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };

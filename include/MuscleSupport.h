@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services
-** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2006 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000 - 2001 ^Enigma^
@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-/* This file is Copyright 2005 Level Control Systems.  See the included LICENSE.txt file for details. */
+/* This file is Copyright 2006 Level Control Systems.  See the included LICENSE.txt file for details. */
 
 /******************************************************************************
 /

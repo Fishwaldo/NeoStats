@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2006 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -1577,7 +1577,7 @@ void do_motd( const char *nick, const char *remoteserver )
 		return;
 	}
 	irc_numeric( RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name );
-	irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
+	irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2006 The NeoStats Group", me.version );
 	irc_numeric( RPL_MOTD, nick, ":-" );
 	while( fgets( buf, sizeof( buf ), fp ) != NULL )
 	{
@@ -1610,7 +1610,7 @@ void do_admin( const char *nick, const char *remoteserver )
 		return;
 	}
 	irc_numeric( RPL_ADMINME, nick, ":%s :Administrative info", me.name );
-	irc_numeric( RPL_ADMINLOC1, nick, ":%s.  Copyright (c) 1999 - 2005 The NeoStats Group", me.version );
+	irc_numeric( RPL_ADMINLOC1, nick, ":%s.  Copyright (c) 1999 - 2006 The NeoStats Group", me.version );
 	while( fgets( buf, sizeof( buf ), fp ) != NULL )
 	{
 		buf[strnlen( buf, BUFSIZE ) - 1] = 0;

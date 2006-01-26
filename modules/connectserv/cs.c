@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2006 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Portions Copyright (c) 2000-2001 ^Enigma^
@@ -152,7 +152,7 @@ static Bot *cs_bot;
 /** Copyright info */
 static const char *cs_copyright[] = 
 {
-	"Copyright (c) 1999-2005, NeoStats",
+	"Copyright (c) 1999-2006, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };

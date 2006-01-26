@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services
-** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2006 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -124,7 +124,7 @@ void update_time_now( void )
 static void print_copyright( void )
 {
 	printf( "-----------------------------------------------\n" );
-	printf( "Copyright: NeoStats Group. 2000-2005\n" );
+	printf( "Copyright: NeoStats Group. 2000-2006\n" );
 	printf( "Justin Hammond (fish@neostats.net)\n" );
 	printf( "Mark Hetherington (m@neostats.net)\n" );
 	printf( "-----------------------------------------------\n\n" );

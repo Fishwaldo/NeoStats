@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2005 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2006 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ static int perlext_pong (CmdParams *cmds);
 
 const char* perl_copyright[] = 
 {
-	"Copyright (c) 2005, Justin Hammond",
+	"Copyright (c) 2006, Justin Hammond",
 	NULL
 };
 

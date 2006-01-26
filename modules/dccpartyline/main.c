@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 2005 Justin Hammond, Mark Hetherington
+** Copyright (c) 2006 Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 /** Copyright info */
 static const char *dccpartyline_copyright[] = 
 {
-	"Copyright (c) 2005, NeoStats",
+	"Copyright (c) 2006, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };
