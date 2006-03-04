@@ -108,8 +108,8 @@ static void do_backtrace( void )
 
 static int modules_loaded(Module *mod_ptr, void *sock) {
 	FILE *sf = (FILE *) sock;
-	os_fprintf(sf, "%s", mod_ptr->info->name);
-	return NS_FAILURE;
+	os_fprintf(sf, "%s ", mod_ptr->info->name);
+	return NS_FALSE;
 }
 
 static void report_segfault( const char* modulename )
