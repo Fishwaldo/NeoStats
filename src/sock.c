@@ -176,30 +176,6 @@ void Connect( void )
 	}
 }
 
-/** @brief get max available sockets
- *
- * @param none
- * 
- * @return returns the max available socket 
- */
-static int
-getmaxsock (void)
-{
-#ifdef WIN32
-	return 0xffff;
-#else
-	struct rlimit *lim;
-	int ret;
-
-	lim = ns_calloc (sizeof (struct rlimit));
-	getrlimit (RLIMIT_NOFILE, lim);
-	ret = lim->rlim_max;
-	ns_free (lim);
-	if(ret<0)
-		ret = 0xffff;
-	return ret;
-#endif
-}
 
 /** @brief connect to a socket
  *
@@ -426,7 +402,6 @@ int InitSocks (void)
 #if 0
 	struct hostent *hp;
 #endif
-	me.maxsocks = getmaxsock ();
 	sockethash = hash_create (me.maxsocks, 0, 0);
 	if(!sockethash) {
 		nlog (LOG_CRITICAL, "Unable to create socks hash");

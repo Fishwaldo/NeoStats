@@ -47,6 +47,7 @@ static void *load_mods[NUM_MODULES];
 static void cb_module( char *name );
 static int cb_verify_chan( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_numsocks (cfg_t *cfg, cfg_opt_t *opt);
 static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt );
@@ -81,6 +82,7 @@ static cfg_opt_t options[] = {
 	CFG_STR ("RootNick", "NeoStats", CFGF_NONE),
 	CFG_STR ("ServicesHost", "services.neostats.net", CFGF_NONE),
 	CFG_BOOL ("NOLOAD", cfg_true, CFGF_NONE),
+	CFG_INT ("MaxSockets", 1024, CFGF_NONE),
 	CFG_END()
 };
 
@@ -136,6 +138,7 @@ static validate_args arg_validate[] = {
 	{"Options|LogFileNameFormat", cb_verify_log},
 	{"Options|RootNick", cb_verify_mask},
 	{"Options|NOLOAD", cb_noload},
+	{"Options|MaxSockets", cb_verify_numsocks},
 	{"Servers|IpAddress", cb_verify_host},
 	{"ServiceRoot|Mask", cb_verify_mask},
 	{"Modules|ModuleName", cb_verify_file},
@@ -246,6 +249,8 @@ static int set_config_values( cfg_t *cfg )
 	}
 	/* LogFile Format has a default */
 	strlcpy (LogFileNameFormat, cfg_getstr (cfg, "Options|LogFileNameFormat"), MAX_LOGFILENAME);
+	/* max socks has a default */
+	me.maxsocks = cfg_getint(cfg, "Options|MaxSockets");
 	/* numeric has a default */
 	me.numeric = cfg_getint (cfg, "ServerConfig|ServerNumeric");
 	/* has a default */
@@ -419,6 +424,32 @@ static int cb_verify_numeric( cfg_t *cfg, cfg_opt_t *opt )
 	}
 	return CFG_SUCCESS;
 }
+
+static int cb_verify_numsocks (cfg_t *cfg, cfg_opt_t *opt)
+{
+	long int num = opt->values[0]->number;
+	long int socks;
+#ifndef WIN32
+	struct rlimit *lim;
+#endif
+#ifdef WIN32
+	socks = 1024;
+#else
+	lim = ns_calloc (sizeof (struct rlimit));
+	getrlimit (RLIMIT_NOFILE, lim);
+	socks = lim->rlim_max;
+	ns_free (lim);
+	if(socks<0)
+		socks = 1024;
+#endif
+	if( ( num <= 0 ) || ( socks > 254 ) )
+	{
+		cfg_error( cfg, "%d is out of range for %s", num, opt->name );
+		return CFG_PARSE_ERROR;
+	}
+	return CFG_SUCCESS;
+}
+
 
 /** @brief cb_verify_bind
  *
