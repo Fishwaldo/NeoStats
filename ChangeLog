@@ -23,6 +23,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
  - New Config option "Options, MaxSockets" to limit the number of available
    sockets that NeoStats can use (F)
  - Fix adns to correctly handle EINPROGRESS for TCP connections (F)
+ - Make sure SET LIST shows the correct host entry if we using the default (F)
 
 * NeoStats * Version 3.0.a3
  - LimitServ: join/part bot on adding/deleteing channels if JOIN enabled (D)
