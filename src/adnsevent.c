@@ -145,11 +145,11 @@ void adns__tcp_tryconnect(adns_state ads, struct timeval now)
 			tcp_connected(ads, now);
 			return;
 		}
-		if( os_sock_errno == OS_SOCK_EWOULDBLOCK && os_sock_errno == OS_SOCK_EINPROGRESS )
+		if((os_sock_errno == OS_SOCK_EWOULDBLOCK) | (os_sock_errno == OS_SOCK_EINPROGRESS) )
 		{
 			ads->tcptimeout = now;
 			/* EVNT addsock write */
-            if (ads->fdfunc)
+			if (ads->fdfunc)
 				ads->fdfunc(ads->tcpsocket, POLLOUT);
 			timevaladd(&ads->tcptimeout, TCPCONNMS);
 			return;
