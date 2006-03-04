@@ -725,20 +725,11 @@ Bot *AddBot( BotInfo *botinfo )
 		add_bot_setting_list( ns_botptr, botinfo->bot_setting_list );
 		return(ns_botptr );
 	}
-	if( GetBotNick( botinfo, nick ) == NS_FAILURE )
-	{
-		nlog( LOG_WARNING, "Failed to find free nick for bot %s", botinfo->nick );
-		return NULL;
-	}
-	botptr = new_bot( nick );
+	/* create the bot record so we can load the settings and get the bots nicks/user/realname and host from DB */
+	botptr = new_bot( botinfo->nick );
 	if( botptr == NULL )
 		return NULL;
-	/* For more efficient transversal of bot/user lists, link 
-	 * associated user struct to bot and link bot into user struct */
-	botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.servicehost : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
-	botptr->u->user->bot = botptr;
 	botptr->flags = botinfo->flags;
-	ConnectBot( botptr );
 	/* Only add commands and settings for service bots */
 	if( botptr->flags & BOT_FLAG_SERVICEBOT )
 	{
@@ -753,6 +744,21 @@ Bot *AddBot( BotInfo *botinfo )
 	}
 	if( botptr->flags & BOT_FLAG_CTCPVERSIONMASTER )
 		SetCTCPVersionMaster( botptr );
+	/* ok, now botinfo should be loaded from the DB, get the nickname */
+	if( GetBotNick( botinfo, nick ) == NS_FAILURE )
+	{
+		nlog( LOG_WARNING, "Failed to find free nick for bot %s", botinfo->nick );
+		return NULL;
+	}
+	if (ircstrcasecmp(nick, botptr->name)) {
+		/* if the generated nick doesn't match what we created this bot as, rename it */
+		BotNickChange(botptr, nick);
+	}
+	botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.servicehost : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
+	/* For more efficient transversal of bot/user lists, link 
+	 * associated user struct to bot and link bot into user struct */
+	botptr->u->user->bot = botptr;
+	ConnectBot( botptr );
 	return botptr;
 }
 

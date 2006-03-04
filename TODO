@@ -6,8 +6,6 @@ http://bugs.neostats.net)
 
 <StatServ> rollergirl.sg.as.irc-chat.net is lagged out with a ping of 1123867742
 
-=FloodServ= HOST: - default host is always empty
-
 My NeoStats is using 29Mb of memory on 150 users.... most modules loaded. Valgrind is overdue
 just to check memory allocations
 
