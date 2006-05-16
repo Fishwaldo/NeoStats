@@ -447,6 +447,7 @@ modules/protocol/nefarious.c -text
 modules/protocol/nefarious.vcproj -text
 modules/protocol/plexus.c -text
 modules/protocol/plexus.vcproj -text
+modules/protocol/plexus3.c -text
 modules/protocol/protocol.txt -text
 modules/protocol/ultimate2.c eol=lf
 modules/protocol/ultimate2.vcproj -text

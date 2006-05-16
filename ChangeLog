@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - add plexus 3 protocol file for reference (D)
  - Fix compile errors on GCC 2.95.4 (D)
  - QuoteServ shouldn't send signon messages to Neo Bots (F)
  - Fix LimitServ timer to not set limits every time (F)
