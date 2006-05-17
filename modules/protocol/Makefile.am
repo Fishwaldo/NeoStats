@@ -2,7 +2,7 @@ pkglib_LTLIBRARIES	= bahamut14.la bahamut18.la \
 						client.la \
 						hybrid6.la hybrid7.la \
 						ircup10.la asuka.la nefarious.la \
-						plexus.la \
+						plexus.la plexus3.la \
 						ultimate2.la ultimate3.la \
 						unreal31.la unreal32.la
 bahamut14_la_SOURCES = bahamut14.c
@@ -15,6 +15,7 @@ EXTRA_DIST = ircup10base.c
 asuka_la_SOURCES = asuka.c
 nefarious_la_SOURCES = nefarious.c
 plexus_la_SOURCES = plexus.c
+plexus3_la_SOURCES = plexus3.c
 ultimate2_la_SOURCES = ultimate2.c
 ultimate3_la_SOURCES = ultimate3.c
 unreal31_la_SOURCES = unreal31.c

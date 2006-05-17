@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(nefarious_la_SOURCES) $(plexus_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
+SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) $(bahamut18_la_SOURCES) $(client_la_SOURCES) $(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) $(ircup10_la_SOURCES) $(nefarious_la_SOURCES) $(plexus_la_SOURCES) $(plexus3_la_SOURCES) $(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -90,6 +90,9 @@ nefarious_la_OBJECTS = $(am_nefarious_la_OBJECTS)
 plexus_la_LIBADD =
 am_plexus_la_OBJECTS = plexus.lo
 plexus_la_OBJECTS = $(am_plexus_la_OBJECTS)
+plexus3_la_LIBADD =
+am_plexus3_la_OBJECTS = plexus3.lo
+plexus3_la_OBJECTS = $(am_plexus3_la_OBJECTS)
 ultimate2_la_LIBADD =
 am_ultimate2_la_OBJECTS = ultimate2.lo
 ultimate2_la_OBJECTS = $(am_ultimate2_la_OBJECTS)
@@ -115,16 +118,16 @@ SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) \
 	$(bahamut18_la_SOURCES) $(client_la_SOURCES) \
 	$(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) \
 	$(ircup10_la_SOURCES) $(nefarious_la_SOURCES) \
-	$(plexus_la_SOURCES) $(ultimate2_la_SOURCES) \
-	$(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) \
-	$(unreal32_la_SOURCES)
+	$(plexus_la_SOURCES) $(plexus3_la_SOURCES) \
+	$(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) \
+	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 DIST_SOURCES = $(asuka_la_SOURCES) $(bahamut14_la_SOURCES) \
 	$(bahamut18_la_SOURCES) $(client_la_SOURCES) \
 	$(hybrid6_la_SOURCES) $(hybrid7_la_SOURCES) \
 	$(ircup10_la_SOURCES) $(nefarious_la_SOURCES) \
-	$(plexus_la_SOURCES) $(ultimate2_la_SOURCES) \
-	$(ultimate3_la_SOURCES) $(unreal31_la_SOURCES) \
-	$(unreal32_la_SOURCES)
+	$(plexus_la_SOURCES) $(plexus3_la_SOURCES) \
+	$(ultimate2_la_SOURCES) $(ultimate3_la_SOURCES) \
+	$(unreal31_la_SOURCES) $(unreal32_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -267,7 +270,7 @@ pkglib_LTLIBRARIES = bahamut14.la bahamut18.la \
 						client.la \
 						hybrid6.la hybrid7.la \
 						ircup10.la asuka.la nefarious.la \
-						plexus.la \
+						plexus.la plexus3.la \
 						ultimate2.la ultimate3.la \
 						unreal31.la unreal32.la
 
@@ -281,6 +284,7 @@ EXTRA_DIST = ircup10base.c
 asuka_la_SOURCES = asuka.c
 nefarious_la_SOURCES = nefarious.c
 plexus_la_SOURCES = plexus.c
+plexus3_la_SOURCES = plexus3.c
 ultimate2_la_SOURCES = ultimate2.c
 ultimate3_la_SOURCES = ultimate3.c
 unreal31_la_SOURCES = unreal31.c
@@ -359,6 +363,8 @@ nefarious.la: $(nefarious_la_OBJECTS) $(nefarious_la_DEPENDENCIES)
 	$(LINK) -rpath $(pkglibdir) $(nefarious_la_LDFLAGS) $(nefarious_la_OBJECTS) $(nefarious_la_LIBADD) $(LIBS)
 plexus.la: $(plexus_la_OBJECTS) $(plexus_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(plexus_la_LDFLAGS) $(plexus_la_OBJECTS) $(plexus_la_LIBADD) $(LIBS)
+plexus3.la: $(plexus3_la_OBJECTS) $(plexus3_la_DEPENDENCIES) 
+	$(LINK) -rpath $(pkglibdir) $(plexus3_la_LDFLAGS) $(plexus3_la_OBJECTS) $(plexus3_la_LIBADD) $(LIBS)
 ultimate2.la: $(ultimate2_la_OBJECTS) $(ultimate2_la_DEPENDENCIES) 
 	$(LINK) -rpath $(pkglibdir) $(ultimate2_la_LDFLAGS) $(ultimate2_la_OBJECTS) $(ultimate2_la_LIBADD) $(LIBS)
 ultimate3.la: $(ultimate3_la_OBJECTS) $(ultimate3_la_DEPENDENCIES) 
@@ -383,6 +389,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ircup10.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nefarious.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plexus.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/plexus3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ultimate3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unreal31.Plo@am__quote@
