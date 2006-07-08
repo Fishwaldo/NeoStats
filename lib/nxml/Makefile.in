@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -37,11 +36,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = dftables$(EXEEXT)
-DIST_COMMON = README $(include_HEADERS) $(noinst_HEADERS) \
+DIST_COMMON = $(include_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/autotools/rules.mk COPYING
-subdir = lib/pcre
+	$(top_srcdir)/autotools/rules.mk
+subdir = lib/nxml
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 	$(top_srcdir)/autotools/ax_compare_version.m4 \
@@ -58,15 +56,15 @@ CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
-libpcre_a_AR = $(AR) $(ARFLAGS)
-libpcre_a_LIBADD =
-am_libpcre_a_OBJECTS = chartables.$(OBJEXT) get.$(OBJEXT) \
-	pcre.$(OBJEXT) study.$(OBJEXT)
-libpcre_a_OBJECTS = $(am_libpcre_a_OBJECTS)
-PROGRAMS = $(noinst_PROGRAMS)
-am_dftables_OBJECTS = dftables.$(OBJEXT)
-dftables_OBJECTS = $(am_dftables_OBJECTS)
-dftables_LDADD = $(LDADD)
+libnxml_a_AR = $(AR) $(ARFLAGS)
+libnxml_a_LIBADD =
+am_libnxml_a_OBJECTS = nxml_download.$(OBJEXT) nxml_easy.$(OBJEXT) \
+	nxml_entity.$(OBJEXT) nxml_free.$(OBJEXT) \
+	nxml_namespace.$(OBJEXT) nxml_string.$(OBJEXT) \
+	nxml_utf.$(OBJEXT) nxml_dtd.$(OBJEXT) nxml_edit.$(OBJEXT) \
+	nxml_error.$(OBJEXT) nxml_init.$(OBJEXT) nxml_parser.$(OBJEXT) \
+	nxml_tools.$(OBJEXT) nxml_write.$(OBJEXT)
+libnxml_a_OBJECTS = $(am_libnxml_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -76,8 +74,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-SOURCES = $(libpcre_a_SOURCES) $(dftables_SOURCES)
-DIST_SOURCES = $(libpcre_a_SOURCES) $(dftables_SOURCES)
+SOURCES = $(libnxml_a_SOURCES)
+DIST_SOURCES = $(libnxml_a_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -225,13 +223,14 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-noinst_LIBRARIES = libpcre.a
-libpcre_a_SOURCES = chartables.c get.c pcre.c study.c internal.h pcre.h
-dftables_SOURCES = dftables.c internal.h pcre.h
-dftables_DEPENDENCES = maketables.c
-noinst_HEADERS = maketables.c
-include_HEADERS = pcre.h
-AM_CFLAGS = @PCRE_CFLAGS@
+noinst_LIBRARIES = libnxml.a
+libnxml_a_SOURCES = nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c nxml_dtd.c \
+       			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c
+
+include_HEADERS = nxml.h
+noinst_HEADERS = nxml_internal.h
+INCLUDES = -I../curl/
+EXTRA_DIST = 
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
@@ -249,9 +248,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  lib/pcre/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  lib/nxml/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  lib/pcre/Makefile
+	  $(AUTOMAKE) --gnu  lib/nxml/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -272,20 +271,10 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libpcre.a: $(libpcre_a_OBJECTS) $(libpcre_a_DEPENDENCIES) 
-	-rm -f libpcre.a
-	$(libpcre_a_AR) libpcre.a $(libpcre_a_OBJECTS) $(libpcre_a_LIBADD)
-	$(RANLIB) libpcre.a
-
-clean-noinstPROGRAMS:
-	@list='$(noinst_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
-dftables$(EXEEXT): $(dftables_OBJECTS) $(dftables_DEPENDENCIES) 
-	@rm -f dftables$(EXEEXT)
-	$(LINK) $(dftables_LDFLAGS) $(dftables_OBJECTS) $(dftables_LDADD) $(LIBS)
+libnxml.a: $(libnxml_a_OBJECTS) $(libnxml_a_DEPENDENCIES) 
+	-rm -f libnxml.a
+	$(libnxml_a_AR) libnxml.a $(libnxml_a_OBJECTS) $(libnxml_a_LIBADD)
+	$(RANLIB) libnxml.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -293,11 +282,20 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chartables.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dftables.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pcre.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/study.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_download.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_dtd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_easy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_edit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_entity.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_error.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_free.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_init.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_namespace.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_string.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_tools.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_utf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_write.Po@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -395,7 +393,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS)
+all-am: Makefile $(LIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -427,7 +425,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
-	clean-noinstPROGRAMS mostlyclean-am
+	mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -476,21 +474,18 @@ ps-am:
 uninstall-am: uninstall-includeHEADERS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLIBRARIES clean-noinstPROGRAMS ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-exec install-exec-am \
-	install-includeHEADERS install-info install-info-am \
-	install-man install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-includeHEADERS uninstall-info-am
+	clean-libtool clean-noinstLIBRARIES ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-exec \
+	install-exec-am install-includeHEADERS install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-includeHEADERS \
+	uninstall-info-am
 
-
-chartables.c: dftables
-	$(top_builddir)/lib/pcre/dftables > $@
 
 .c.o:
 @USECCDV@		@echo "Building $@"

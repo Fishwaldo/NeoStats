@@ -29,6 +29,9 @@ Fish (F), Mark (M), DeadNotBuried (D)
  - Make sure SET LIST shows the correct host entry if we using the default (F)
  - Fix the ordering of AddBot so that stored settings such as
    nick/ident/host etc are applied when the bots load (F)
+ - Change LibCurl and LibPCRE to be statically compiled into NeoStats rather
+   than as dynamic libraries (F)
+ - Add libnxml library for Feature request 292 and new module "NewsServ" (F)
 
 * NeoStats * Version 3.0.a3
  - LimitServ: join/part bot on adding/deleteing channels if JOIN enabled (D)

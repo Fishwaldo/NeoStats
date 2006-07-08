@@ -472,6 +472,7 @@ AC_CONFIG_FILES([Makefile
 		lib/curl/Makefile
 		lib/pcre/Makefile 
 		lib/event/Makefile
+		lib/nxml/Makefile
 		modules/Makefile 
 		modules/connectserv/Makefile
 		modules/extauth/Makefile
