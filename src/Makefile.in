@@ -95,7 +95,8 @@ neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/curl/libcurl.a \
 	$(top_srcdir)/lib/pcre/libpcre.a \
 	$(top_srcdir)/lib/event/libevent.a \
-	$(top_srcdir)/lib/nxml/libnxml.a
+	$(top_srcdir)/lib/nxml/libnxml.a \
+	$(top_srcdir)/lib/nxml/libmrss.a
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -262,7 +263,7 @@ AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 
 neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ \
 		$(top_srcdir)/lib/curl/libcurl.a $(top_srcdir)/lib/pcre/libpcre.a \
-		$(top_srcdir)/lib/event/libevent.a $(top_srcdir)/lib/nxml/libnxml.a
+		$(top_srcdir)/lib/event/libevent.a $(top_srcdir)/lib/nxml/libnxml.a $(top_srcdir)/lib/nxml/libmrss.a
 
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@
 noinst_HEADERS = confuselexer.l NeoStats.pm

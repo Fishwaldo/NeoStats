@@ -56,6 +56,12 @@ CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
+libmrss_a_AR = $(AR) $(ARFLAGS)
+libmrss_a_LIBADD =
+am_libmrss_a_OBJECTS = mrss_download.$(OBJEXT) mrss_edit.$(OBJEXT) \
+	mrss_free.$(OBJEXT) mrss_generic.$(OBJEXT) \
+	mrss_parser.$(OBJEXT) mrss_write.$(OBJEXT)
+libmrss_a_OBJECTS = $(am_libmrss_a_OBJECTS)
 libnxml_a_AR = $(AR) $(ARFLAGS)
 libnxml_a_LIBADD =
 am_libnxml_a_OBJECTS = nxml_download.$(OBJEXT) nxml_easy.$(OBJEXT) \
@@ -74,8 +80,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-SOURCES = $(libnxml_a_SOURCES)
-DIST_SOURCES = $(libnxml_a_SOURCES)
+SOURCES = $(libmrss_a_SOURCES) $(libnxml_a_SOURCES)
+DIST_SOURCES = $(libmrss_a_SOURCES) $(libnxml_a_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -223,12 +229,13 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-noinst_LIBRARIES = libnxml.a
+noinst_LIBRARIES = libnxml.a libmrss.a
 libnxml_a_SOURCES = nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c nxml_dtd.c \
        			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c
 
-include_HEADERS = nxml.h
-noinst_HEADERS = nxml_internal.h
+libmrss_a_SOURCES = mrss_download.c mrss_edit.c mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c
+include_HEADERS = nxml.h mrss.h
+noinst_HEADERS = nxml_internal.h mrss_internal.h
 INCLUDES = -I../curl/
 EXTRA_DIST = 
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -271,6 +278,10 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libmrss.a: $(libmrss_a_OBJECTS) $(libmrss_a_DEPENDENCIES) 
+	-rm -f libmrss.a
+	$(libmrss_a_AR) libmrss.a $(libmrss_a_OBJECTS) $(libmrss_a_LIBADD)
+	$(RANLIB) libmrss.a
 libnxml.a: $(libnxml_a_OBJECTS) $(libnxml_a_DEPENDENCIES) 
 	-rm -f libnxml.a
 	$(libnxml_a_AR) libnxml.a $(libnxml_a_OBJECTS) $(libnxml_a_LIBADD)
@@ -282,6 +293,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_download.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_edit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_free.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_generic.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_download.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_dtd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_easy.Po@am__quote@

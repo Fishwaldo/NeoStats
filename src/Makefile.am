@@ -20,7 +20,7 @@ AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event
 neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ \
 		$(top_srcdir)/lib/curl/libcurl.a $(top_srcdir)/lib/pcre/libpcre.a \
-		$(top_srcdir)/lib/event/libevent.a $(top_srcdir)/lib/nxml/libnxml.a
+		$(top_srcdir)/lib/event/libevent.a $(top_srcdir)/lib/nxml/libnxml.a $(top_srcdir)/lib/nxml/libmrss.a
 
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@
 noinst_HEADERS          =       confuselexer.l NeoStats.pm
