@@ -320,6 +320,14 @@ lib/event/select.c -text
 lib/event/signal.c -text
 lib/nxml/Makefile.am -text
 lib/nxml/Makefile.in -text
+lib/nxml/mrss.h -text
+lib/nxml/mrss_download.c -text
+lib/nxml/mrss_edit.c -text
+lib/nxml/mrss_free.c -text
+lib/nxml/mrss_generic.c -text
+lib/nxml/mrss_internal.h -text
+lib/nxml/mrss_parser.c -text
+lib/nxml/mrss_write.c -text
 lib/nxml/nxml.h -text
 lib/nxml/nxml_download.c -text
 lib/nxml/nxml_dtd.c -text
