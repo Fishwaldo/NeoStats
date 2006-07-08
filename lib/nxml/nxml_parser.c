@@ -1,5 +1,5 @@
-/* nXml - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,14 +43,6 @@ __nxml_parse_unique_attribute (nxml_attr_t * attr, char *name)
   return 0;
 }
 
-static int
-__nxml_atoi (char *str)
-{
-  int ret;
-  sscanf (str, "%x", &ret);
-  return ret;
-}
-
 static char *
 __nxml_parse_string (nxml_t * doc, char *buffer, int size)
 {
@@ -58,7 +50,7 @@ __nxml_parse_string (nxml_t * doc, char *buffer, int size)
   int i, j;
   int q;
 
-  if (!(ret = (char *) malloc (sizeof (char) * ((size * 4) + 1))))
+  if (!(ret = (char *) malloc (sizeof (char) * ((size * 6) + 1))))
     return NULL;
 
   for (q = i = j = 0; i < size; i++)

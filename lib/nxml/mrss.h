@@ -1,5 +1,5 @@
-/* mRss - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This source code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Public License as published 
@@ -197,7 +197,12 @@ typedef enum {
  * \brief 
  * Struct data for item elements */
 struct mrss_item_t {
+
+  /** For internal use only: */
   mrss_element_t element;
+  int allocated;
+
+  /* Data: */
 
   				/*	0.91	0.92	1.0	2.0	*/
   char *title;			/*	R	O	O	O	*/
@@ -228,7 +233,11 @@ struct mrss_item_t {
  * \brief 
  * Struct data for skipHours elements */
 struct mrss_hour_t {
+  /** For internal use only: */
   mrss_element_t element;
+  int allocated;
+
+  /* Data: */
   				/*	0.91	0.92	1.0	2.0	*/
   char *hour;			/*	R	R	-	R	*/
   mrss_hour_t *next;
@@ -239,7 +248,11 @@ struct mrss_hour_t {
  * \brief 
  * Struct data for skipDays elements */
 struct mrss_day_t {
+  /** For internal use only: */
   mrss_element_t element;
+  int allocated;
+
+  /* Data: */
   				/*	0.91	0.92	1.0	2.0	*/
   char *day;			/*	R	R	-	R	*/
   mrss_day_t *next;
@@ -250,7 +263,11 @@ struct mrss_day_t {
  * \brief 
  * Struct data for category elements */
 struct mrss_category_t {
+  /** For internal use only: */
   mrss_element_t element;
+  int allocated;
+
+  /* Data: */
   				/*	0.91	0.92	1.0	2.0	*/
   char *category;		/*	-	R	-	R	*/
   char *domain;			/*	-	O	-	O	*/
@@ -262,10 +279,15 @@ struct mrss_category_t {
  * \brief 
  * Principal data struct. It contains pointers to any other structures */
 struct mrss_t {
+  /** For internal use only: */
   mrss_element_t element;
+  int allocated;
+
+  /* Data: */
 
   char *file;
   size_t size;
+  char *encoding;
 
   mrss_version_t version;	/*	0.91	0.92	1.0	2.0	*/
 
@@ -323,8 +345,8 @@ struct mrss_t {
  * \param mrss the pointer to your data struct
  * \return the error code
  */
-mrss_error_t	mrss_parse_url		(char *url,
-					 mrss_t **mrss);
+mrss_error_t	mrss_parse_url		(char *		url,
+					 mrss_t **	mrss);
 
 /** 
  * Parses a file and creates the data struct of the feed RSS url
@@ -332,8 +354,8 @@ mrss_error_t	mrss_parse_url		(char *url,
  * \param mrss the pointer to your data struct
  * \return the error code
  */
-mrss_error_t	mrss_parse_file		(char *file,
-					 mrss_t **mrss);
+mrss_error_t	mrss_parse_file		(char *		file,
+					 mrss_t **	mrss);
 
 /** 
  * Parses a buffer and creates the data struct of the feed RSS url
@@ -342,9 +364,9 @@ mrss_error_t	mrss_parse_file		(char *file,
  * \param mrss the pointer to your data struct
  * \return the error code
  */
-mrss_error_t	mrss_parse_buffer	(char *buffer,
-					 size_t size_buffer,
-					 mrss_t **mrss);
+mrss_error_t	mrss_parse_buffer	(char *		buffer,
+					 size_t		size_buffer,
+					 mrss_t **	mrss);
 
 /** WRITE FUNCTIONS *********************************************************/
 
@@ -354,8 +376,8 @@ mrss_error_t	mrss_parse_buffer	(char *buffer,
  * \param file the local file
  * \return the error code
  */
-mrss_error_t	mrss_write_file		(mrss_t *mrss,
-					 char *file);
+mrss_error_t	mrss_write_file		(mrss_t *	mrss,
+					 char *		file);
 
 /**
  * Write a RSS struct data in a buffer.
@@ -371,13 +393,15 @@ mrss_error_t	mrss_write_file		(mrss_t *mrss,
  * \param buffer the buffer
  * \return the error code
  */
-mrss_error_t	mrss_write_buffer	(mrss_t *mrss,
-					 char **buffer);
+mrss_error_t	mrss_write_buffer	(mrss_t *	mrss,
+					 char **	buffer);
 
 /** FREE FUNCTION ***********************************************************/
 
 /** 
- * This function frees any type of data struct of libmrss.
+ * This function frees any type of data struct of libmrss. If the element
+ * is alloced by libmrss, it will be freed, else this function frees
+ * only the internal data.
  *
  * \code
  * mrss_t *t=....;
@@ -390,7 +414,7 @@ mrss_error_t	mrss_write_buffer	(mrss_t *mrss,
  * \param element the data struct
  * \return the error code
  */
-mrss_error_t	mrss_free		(mrss_generic_t element);
+mrss_error_t	mrss_free		(mrss_generic_t	element);
 
 /** GENERIC FUNCTION ********************************************************/
 
@@ -399,7 +423,7 @@ mrss_error_t	mrss_free		(mrss_generic_t element);
  * \param err the error code that you need as string
  * \return a string. Don't free this string!
  */
-char *		mrss_strerror		(mrss_error_t err);
+char *		mrss_strerror		(mrss_error_t	err);
 
 /**
  * This function returns the mrss_element_t of a mrss data struct.
@@ -407,7 +431,7 @@ char *		mrss_strerror		(mrss_error_t err);
  * \param ret it is a pointer to a mrss_element_t. It will be sets.
  * \return the error code
  */
-mrss_error_t	mrss_element		(mrss_generic_t element,
+mrss_error_t	mrss_element		(mrss_generic_t	element,
 					 mrss_element_t *ret);
 
 /**
@@ -418,15 +442,27 @@ mrss_error_t	mrss_element		(mrss_generic_t element,
  *  the value of this variable.
  * \return the error code
  */
-mrss_error_t	mrss_set_timeout	(int timeout);
+mrss_error_t	mrss_set_timeout	(int		timeout);
 
 /**
- * This function get the timeout for the download of URI.
+ * This function gets the timeout for the download of URI.
  *
  * \param timeout pointer to a int.
  * \return the error code
  */
-mrss_error_t	mrss_get_timeout	(int *timeout);
+mrss_error_t	mrss_get_timeout	(int *		timeout);
+
+/**
+ * This function returns the number of seconds sinze Jennuary 1st 1970 in the
+ * UTC time zone, for the url that the urlstring parameter specifies.
+ *
+ * \param urlstring the url
+ * \param lastmodified is a pointer to a time_t struct. The return value can
+ * be 0 if the HEAD request does not return a Last-Modified value.
+ * \return the error code
+ */
+mrss_error_t	mrss_get_last_modified	(char *		urlstring,
+					 time_t *	lastmodified);
 
 /** EDIT FUNCTIONS **********************************************************/
 
@@ -439,7 +475,7 @@ mrss_error_t	mrss_get_timeout	(int *timeout);
  * char *string;
  * int integer;
  *
- * d=NULL; // ->this is important!
+ * d=NULL; // ->this is important! If d!=NULL, mrss_new doesn't alloc memory.
  * mrss_new(&d);
  *
  * err=mrss_set (d,
@@ -464,7 +500,7 @@ mrss_error_t	mrss_get_timeout	(int *timeout);
  * \param mrss is the pointer to the new data struct
  * \return the error code
  */
-mrss_error_t	mrss_new		(mrss_t **mrss);
+mrss_error_t	mrss_new		(mrss_t **	mrss);
 
 /**
  * For insert/replace/remove a flags use this function as this example:
@@ -479,7 +515,7 @@ mrss_error_t	mrss_new		(mrss_t **mrss);
  * \see mrss_flag_t
  * \return the error code
  */
-mrss_error_t	mrss_set		(mrss_generic_t element,
+mrss_error_t	mrss_set		(mrss_generic_t	element,
 					 ...);
 
 /**
@@ -493,7 +529,7 @@ mrss_error_t	mrss_set		(mrss_generic_t element,
  * \param element it is any type of mrss data struct.
  * \return the error code
  */
-mrss_error_t	mrss_get		(mrss_generic_t element,
+mrss_error_t	mrss_get		(mrss_generic_t	element,
 					 ...);
 
 /**
@@ -519,9 +555,9 @@ mrss_error_t	mrss_get		(mrss_generic_t element,
  * \return the error code
  * \see mrss_element_t
  */
-mrss_error_t	mrss_new_subdata	(mrss_generic_t element,
+mrss_error_t	mrss_new_subdata	(mrss_generic_t	element,
 					 mrss_element_t	subelement,
-					 mrss_generic_t subdata);
+					 mrss_generic_t	subdata);
 
 /**
  * This function remove a subdata element. As first argoment you must specify
@@ -535,8 +571,8 @@ mrss_error_t	mrss_new_subdata	(mrss_generic_t element,
  * and reinsert it after.
  * \return the error code
  */
-mrss_error_t	mrss_remove_subdata	(mrss_generic_t element,
-					 mrss_generic_t subdata);
+mrss_error_t	mrss_remove_subdata	(mrss_generic_t	element,
+					 mrss_generic_t	subdata);
 
 #endif
 

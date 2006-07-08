@@ -1,5 +1,5 @@
-/* nXml - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This source code is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Public License as published 
@@ -120,6 +120,8 @@ char *				__nxml_string_free	(__nxml_string_t *st);
 void				__nxml_namespace_parse	(nxml_t *nxml);
 
 void				__nxml_entity_parse	(nxml_t * nxml);
+
+int				__nxml_atoi		(char *str);
 
 #endif
 

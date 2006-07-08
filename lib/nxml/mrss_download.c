@@ -1,5 +1,5 @@
-/* mRss - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -64,12 +64,16 @@ __mrss_download_file (char *fl, int timeout)
   curl_global_init (CURL_GLOBAL_DEFAULT);
   if (!(curl = curl_easy_init ()))
     {
+      if (chunk->mm)
+	free (chunk->mm);
+
       free (chunk);
       return NULL;
     }
 
   curl_easy_setopt (curl, CURLOPT_URL, fl);
   curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, __mrss_memorize_file);
+  curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1);
   curl_easy_setopt (curl, CURLOPT_FILE, (void *) chunk);
 
   if (timeout > 0)
@@ -85,13 +89,10 @@ __mrss_download_file (char *fl, int timeout)
       free (chunk);
 
       curl_easy_cleanup (curl);
-      curl_global_cleanup ();
-
       return NULL;
     }
 
   curl_easy_cleanup (curl);
-  curl_global_cleanup ();
 
   return chunk;
 }

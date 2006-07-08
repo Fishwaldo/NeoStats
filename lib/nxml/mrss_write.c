@@ -1,5 +1,5 @@
-/* mRss - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -239,7 +239,13 @@ __mrss_write_real_cloud (mrss_t * mrss, void (*func) (void *, char *, ...),
 			 void *obj)
 {
   if ((mrss->version == MRSS_VERSION_0_92
-       || mrss->version == MRSS_VERSION_2_0) && mrss->cloud)
+       || mrss->version == MRSS_VERSION_2_0) && (mrss->cloud
+						 || mrss->cloud_domain
+						 || mrss->cloud_port
+						 || mrss->cloud_path
+						 || mrss->
+						 cloud_registerProcedure
+						 || mrss->cloud_protocol))
     {
       func (obj, "    <cloud");
 
@@ -274,7 +280,10 @@ __mrss_write_real_cloud (mrss_t * mrss, void (*func) (void *, char *, ...),
 	  func (obj, "\"");
 	}
 
-      func (obj, ">%s</cloud>\n", mrss->cloud);
+      if (mrss->cloud)
+	func (obj, ">%s</cloud>\n", mrss->cloud);
+      else
+	func (obj, " />\n", mrss->cloud);
     }
 }
 
@@ -429,7 +438,7 @@ __mrss_write_real_item (mrss_t * mrss, void (*func) (void *, char *, ...),
       if (mrss->version == MRSS_VERSION_2_0
 	  || mrss->version == MRSS_VERSION_0_92)
 	{
-	  if (item->source)
+	  if (item->source || item->source_url)
 	    {
 	      func (obj, "      <source");
 
@@ -440,12 +449,18 @@ __mrss_write_real_item (mrss_t * mrss, void (*func) (void *, char *, ...),
 		  func (obj, "\"");
 		}
 
-	      func (obj, ">");
-	      __mrss_write_string (func, obj, item->source);
-	      func (obj, "</source>\n");
+	      if (item->source)
+		{
+		  func (obj, ">");
+		  __mrss_write_string (func, obj, item->source);
+		  func (obj, "</source>\n");
+		}
+	      else
+		func (obj, " />\n");
 	    }
 
-	  if (item->enclosure)
+	  if (item->enclosure || item->enclosure_length
+	      || item->enclosure_type)
 	    {
 	      func (obj, "      <enclosure");
 
@@ -466,9 +481,14 @@ __mrss_write_real_item (mrss_t * mrss, void (*func) (void *, char *, ...),
 		  func (obj, "\"");
 		}
 
-	      func (obj, ">");
-	      __mrss_write_string (func, obj, item->enclosure);
-	      func (obj, "</enclosure>\n");
+	      if (item->enclosure)
+		{
+		  func (obj, ">");
+		  __mrss_write_string (func, obj, item->enclosure);
+		  func (obj, "</enclosure>\n");
+		}
+	      else
+		func (obj, " />\n");
 
 	    }
 
@@ -719,7 +739,7 @@ __mrss_buffer_write (void *obj, char *str, ...)
       if (!(*buffer = (char *) malloc (sizeof (char) * (len + 1))))
 	return;
 
-      strncpy (*buffer, s, len);
+      strncpy (*buffer, s, len + 1);
     }
   else
     {
@@ -727,7 +747,7 @@ __mrss_buffer_write (void *obj, char *str, ...)
 					sizeof (char) * (strlen (*buffer) +
 							 len + 1))))
 	return;
-      strncat (*buffer, s, len);
+      strncat (*buffer, s, len + 1);
     }
 }
 

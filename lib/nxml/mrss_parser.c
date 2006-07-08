@@ -1,5 +1,5 @@
-/* mRss - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,6 +45,7 @@ __mrss_parser_rss_image (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	  else if (!strcmp (cur->value, "url") && !data->image_url
 		   && (c = nxmle_get_string (cur, NULL)))
 	    {
+	      free (c);
 	    }
 
 	  /* link */
@@ -55,12 +56,18 @@ __mrss_parser_rss_image (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	  /* width */
 	  else if (!strcmp (cur->value, "width") && !data->image_width
 		   && (c = nxmle_get_string (cur, NULL)))
-	    data->image_width = atoi (c);
+	    {
+	      data->image_width = atoi (c);
+	      free (c);
+	    }
 
 	  /* height */
 	  else if (!strcmp (cur->value, "height") && !data->image_height
 		   && (c = nxmle_get_string (cur, NULL)))
-	    data->image_height = atoi (c);
+	    {
+	      data->image_height = atoi (c);
+	      free (c);
+	    }
 
 	  /* description */
 	  else if (!strcmp (cur->value, "description")
@@ -126,6 +133,7 @@ __mrss_parser_rss_skipHours (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 
 	      memset (hour, 0, sizeof (mrss_hour_t));
 	      hour->element = MRSS_ELEMENT_SKIPHOURS;
+	      hour->allocated = 1;
 	      hour->hour = c;
 
 	      if (!data->skipHours)
@@ -167,6 +175,7 @@ __mrss_parser_rss_skipDays (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 
 	      memset (day, 0, sizeof (mrss_day_t));
 	      day->element = MRSS_ELEMENT_SKIPDAYS;
+	      day->allocated = 1;
 	      day->day = c;
 
 	      if (!data->skipDays)
@@ -198,6 +207,7 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 
   memset (item, 0, sizeof (mrss_item_t));
   item->element = MRSS_ELEMENT_ITEM;
+  item->allocated = 1;
 
   for (cur = cur->children; cur; cur = cur->next)
     {
@@ -219,26 +229,27 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	    item->description = c;
 
 	  /* source */
-	  else if (!strcmp (cur->value, "source") && !item->source
-		   && (c = nxmle_get_string (cur, NULL)))
+	  else if (!strcmp (cur->value, "source") && !item->source)
 	    {
-	      item->source = c;
+	      item->source = nxmle_get_string (cur, NULL);
 
 	      if ((attr = nxmle_find_attribute (cur, "url", NULL)))
 		item->source_url = attr;
 	    }
 
 	  /* enclosure */
-	  else if (!strcmp (cur->value, "enclosure") && !item->enclosure
-		   && (c = nxmle_get_string (cur, NULL)))
+	  else if (!strcmp (cur->value, "enclosure") && !item->enclosure)
 	    {
-	      item->enclosure = c;
+	      item->enclosure = nxmle_get_string (cur, NULL);
 
 	      if ((attr = nxmle_find_attribute (cur, "url", NULL)))
 		item->enclosure_url = attr;
 
 	      if ((attr = nxmle_find_attribute (cur, "length", NULL)))
-		item->enclosure_length = atoi (attr);
+		{
+		  item->enclosure_length = atoi (attr);
+		  free (attr);
+		}
 
 	      if ((attr = nxmle_find_attribute (cur, "type", NULL)))
 		item->enclosure_type = attr;
@@ -253,11 +264,15 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	      if (!
 		  (category =
 		   (mrss_category_t *) malloc (sizeof (mrss_category_t))))
-		return;
+		{
+		  free (c);
+		  return;
+		}
 
 	      memset (category, 0, sizeof (mrss_category_t));
 
 	      category->element = MRSS_ELEMENT_CATEGORY;
+	      category->allocated = 1;
 	      category->category = c;
 
 	      if ((attr = nxmle_find_attribute (cur, "domain", NULL)))
@@ -292,12 +307,15 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	    {
 	      item->guid = c;
 
-	      if ((attr = nxmle_find_attribute (cur, "isPermaLink", NULL))
-		  && !strcmp (attr, "false"))
-		item->guid_isPermaLink = 0;
-	      else
-		item->guid_isPermaLink = 1;
+	      if ((attr = nxmle_find_attribute (cur, "isPermaLink", NULL)))
+		{
+		  if (!strcmp (attr, "false"))
+		    item->guid_isPermaLink = 0;
+		  else
+		    item->guid_isPermaLink = 1;
 
+		  free (attr);
+		}
 	    }
 
 	  /* pubDate */
@@ -335,7 +353,14 @@ __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 
   memset (data, 0, sizeof (mrss_t));
   data->element = MRSS_ELEMENT_CHANNEL;
+  data->allocated = 1;
   data->version = v;
+
+  if (doc->encoding && !(data->encoding = strdup (doc->encoding)))
+    {
+      mrss_free (data);
+      return MRSS_ERR_POSIX;
+    }
 
   if (data->version == MRSS_VERSION_1_0)
     {
@@ -369,7 +394,7 @@ __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 
   if (!cur)
     {
-      free (data);
+      mrss_free (data);
       return MRSS_ERR_PARSER;
     }
 
@@ -471,12 +496,14 @@ __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 		   (mrss_category_t *) malloc (sizeof (mrss_category_t))))
 		{
 		  mrss_free ((mrss_generic_t *) data);
+		  free (c);
 		  return MRSS_ERR_POSIX;
 		}
 
 	      memset (category, 0, sizeof (mrss_category_t));
 
 	      category->element = MRSS_ELEMENT_CATEGORY;
+	      category->allocated = 1;
 	      category->category = c;
 
 	      if ((attr = nxmle_find_attribute (cur, "domain", NULL)))
@@ -496,26 +523,25 @@ __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 	    }
 
 	  /* enclosure */
-	  else if (!strcmp (cur->value, "cloud") && !data->cloud
-		   && (c = nxmle_get_string (cur, NULL)))
+	  else if (!strcmp (cur->value, "cloud") && !data->cloud)
 	    {
-	      data->cloud = c;
+	      data->cloud = nxmle_get_string (cur, NULL);
 
-	      if ((attr = nxmle_find_attribute (cur, "domain", NULL))
-		  && !data->cloud_domain)
+	      if (!data->cloud_domain
+		  && (attr = nxmle_find_attribute (cur, "domain", NULL)))
 		data->cloud_domain = attr;
 
-	      if ((attr = nxmle_find_attribute (cur, "port", NULL))
-		  && !data->cloud_port)
+	      if (!data->cloud_port
+		  && (attr = nxmle_find_attribute (cur, "port", NULL)))
 		data->cloud_port = atoi (attr);
 
-	      if ((attr =
-		   nxmle_find_attribute (cur, "registerProcedure", NULL))
-		  && !data->cloud_registerProcedure)
+	      if (!data->cloud_registerProcedure
+		  && (attr =
+		      nxmle_find_attribute (cur, "registerProcedure", NULL)))
 		data->cloud_registerProcedure = attr;
 
-	      if ((attr = nxmle_find_attribute (cur, "protocol", NULL))
-		  && !data->cloud_protocol)
+	      if (!data->cloud_protocol
+		  && (attr = nxmle_find_attribute (cur, "protocol", NULL)))
 		data->cloud_protocol = attr;
 	    }
 
@@ -527,7 +553,10 @@ __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 	  /* ttl */
 	  else if (!strcmp (cur->value, "ttl") && !data->ttl
 		   && (c = nxmle_get_string (cur, NULL)))
-	    data->ttl = atoi (c);
+	    {
+	      data->ttl = atoi (c);
+	      free (c);
+	    }
 
 	}
     }
@@ -545,10 +574,7 @@ __mrss_parser (nxml_t * doc, mrss_t ** ret)
   char *c;
 
   if (!(cur = nxmle_root_element (doc, NULL)))
-    {
-      nxml_free (doc);
-      return MRSS_ERR_PARSER;
-    }
+    return MRSS_ERR_PARSER;
 
   if (!strcmp (cur->value, "rss"))
     {
@@ -570,6 +596,8 @@ __mrss_parser (nxml_t * doc, mrss_t ** ret)
 
 	  else
 	    r = MRSS_ERR_VERSION;
+
+	  free (c);
 	}
 
       else
@@ -582,7 +610,6 @@ __mrss_parser (nxml_t * doc, mrss_t ** ret)
   else
     r = MRSS_ERR_PARSER;
 
-  nxml_free (doc);
   return r;
 }
 
@@ -608,6 +635,9 @@ mrss_parse_url (char *url, mrss_t ** ret)
     {
       free (download->mm);
       free (download);
+
+      nxml_free (doc);
+
       return MRSS_ERR_PARSER;
     }
 
@@ -615,7 +645,12 @@ mrss_parse_url (char *url, mrss_t ** ret)
     {
       if (!((*ret)->file = strdup (url)))
 	{
-	  *ret = NULL;
+	  free (download->mm);
+	  free (download);
+
+	  mrss_free (*ret);
+	  nxml_free (doc);
+
 	  return MRSS_ERR_POSIX;
 	}
 
@@ -624,6 +659,8 @@ mrss_parse_url (char *url, mrss_t ** ret)
 
   free (download->mm);
   free (download);
+
+  nxml_free (doc);
 
   return err;
 }
@@ -645,18 +682,25 @@ mrss_parse_file (char *file, mrss_t ** ret)
     return MRSS_ERR_POSIX;
 
   if (nxml_parse_file (doc, file) != NXML_OK)
-    return MRSS_ERR_PARSER;
+    {
+      nxml_free (doc);
+      return MRSS_ERR_PARSER;
+    }
 
   if (!(err = __mrss_parser (doc, ret)))
     {
       if (!((*ret)->file = strdup (file)))
 	{
-	  *ret = NULL;
+	  nxml_free (doc);
+	  mrss_free (*ret);
+
 	  return MRSS_ERR_POSIX;
 	}
 
       (*ret)->size = st.st_size;
     }
+
+  nxml_free (doc);
 
   return err;
 }
@@ -670,16 +714,19 @@ mrss_parse_buffer (char *buffer, size_t size, mrss_t ** ret)
   if (!buffer || !size || !ret)
     return MRSS_ERR_DATA;
 
-  doc = NULL;
   if (nxml_new (&doc) != NXML_OK)
     return MRSS_ERR_POSIX;
 
   if (nxml_parse_buffer (doc, buffer, size))
-    return MRSS_ERR_PARSER;
+    {
+      nxml_free (doc);
+      return MRSS_ERR_PARSER;
+    }
 
   if (!(err = __mrss_parser (doc, ret)))
     (*ret)->size = size;
 
+  nxml_free (doc);
   return err;
 }
 

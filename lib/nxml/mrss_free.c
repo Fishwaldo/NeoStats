@@ -1,5 +1,5 @@
-/* mRss - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,6 +45,9 @@ __mrss_free_channel (mrss_t * mrss)
 
   if (mrss->file)
     free (mrss->file);
+
+  if (mrss->encoding)
+    free (mrss->encoding);
 
   if (mrss->title)
     free (mrss->title);
@@ -159,6 +162,9 @@ __mrss_free_channel (mrss_t * mrss)
 
       __mrss_free_item ((mrss_item_t *) old);
     }
+
+  if (mrss->allocated)
+    free (mrss);
 }
 
 static void
@@ -173,7 +179,8 @@ __mrss_free_category (mrss_category_t * category)
   if (category->domain)
     free (category->domain);
 
-  free (category);
+  if (category->allocated)
+    free (category);
 }
 
 static void
@@ -185,7 +192,8 @@ __mrss_free_hour (mrss_hour_t * hour)
   if (hour->hour)
     free (hour->hour);
 
-  free (hour);
+  if (hour->allocated)
+    free (hour);
 }
 
 static void
@@ -197,7 +205,8 @@ __mrss_free_day (mrss_day_t * day)
   if (day->day)
     free (day->day);
 
-  free (day);
+  if (day->allocated)
+    free (day);
 }
 
 static void
@@ -253,7 +262,8 @@ __mrss_free_item (mrss_item_t * item)
       __mrss_free_category (old);
     }
 
-  free (item);
+  if (item->allocated)
+    free (item);
 }
 
 /*************************** EXTERNAL FUNCTION ******************************/

@@ -1,5 +1,5 @@
-/* nXml - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,8 @@
 
 #include "nxml.h"
 #include "nxml_internal.h"
+
+static char *__nxml_entity_standard_trim (nxml_t * nxml, char *str);
 
 int
 __nxml_escape_spaces (nxml_t * doc, char **buffer, size_t * size)
@@ -54,7 +56,7 @@ __nxml_escape_spaces (nxml_t * doc, char **buffer, size_t * size)
 char *
 __nxml_get_value (nxml_t * doc, char **buffer, size_t * size)
 {
-  char *attr;
+  char *attr, *real;
   int i;
   int quot;
 
@@ -100,7 +102,10 @@ __nxml_get_value (nxml_t * doc, char **buffer, size_t * size)
   (*buffer) += i;
   (*size) -= i;
 
-  return attr;
+  real = __nxml_entity_standard_trim (doc, attr);
+  free (attr);
+
+  return real;
 }
 
 char *
@@ -229,6 +234,112 @@ __nxml_entity_trim (nxml_t * nxml, char *str)
   free (tmp);
 
   return ret_str;
+}
+
+static char *
+__nxml_entity_standard_trim (nxml_t * nxml, char *str)
+{
+  char *ret, *real;
+  int i, j, q, len;
+
+  len = strlen (str);
+
+  if (!(ret = (char *) malloc (sizeof (char) * ((len * 6) + 1))))
+    return NULL;
+
+  for (q = i = j = 0; i < len; i++)
+    {
+      if (*(str + i) == '&')
+	{
+	  if (!strncmp (str + i, "&lt;", 4))
+	    {
+	      ret[j++] = '<';
+	      i += 3;
+	      q = 0;
+	    }
+
+	  else if (!strncmp (str + i, "&gt;", 4))
+	    {
+	      ret[j++] = '>';
+	      i += 3;
+	      q = 0;
+	    }
+
+	  else if (!strncmp (str + i, "&amp;", 5))
+	    {
+	      ret[j++] = '&';
+	      i += 4;
+	      q = 0;
+	    }
+
+	  else if (!strncmp (str + i, "&apos;", 6))
+	    {
+	      ret[j++] = '\'';
+	      i += 5;
+	      q = 0;
+	    }
+
+	  else if (!strncmp (str + i, "&quot;", 6))
+	    {
+	      ret[j++] = '"';
+	      i += 5;
+	      q = 0;
+	    }
+
+	  else if (*(str + i + 1) == '#')
+	    {
+	      char buf[1024];
+	      int k = i;
+	      int last;
+
+	      while (*(str + k) != ';')
+		k++;
+
+	      last = k - (i + 2) > sizeof (buf) ? sizeof (buf) : k - (i + 2);
+	      strncpy (buf, str + i + 2, last);
+	      buf[last] = 0;
+
+	      if (buf[0] != 'x')
+		last = atoi (buf);
+	      else
+		last = __nxml_atoi (&buf[1]);
+
+	      if ((last =
+		   __nxml_int_charset (last, (unsigned char *) (ret + j),
+				       nxml->encoding)) > 0)
+		j += last;
+
+	      i += k - i;
+	      q = 0;
+	    }
+
+	  else
+	    {
+	      q = 0;
+	      ret[j++] = *(str + i);
+	    }
+	}
+
+      else
+	{
+	  q = 0;
+	  ret[j++] = *(str + i);
+	}
+    }
+
+  ret[j] = 0;
+  real = strdup (ret);
+  free (ret);
+
+  return real;
+}
+
+int
+__nxml_atoi (char *str)
+{
+  int ret;
+  sscanf (str, "%x", &ret);
+  return ret;
 }
 
 /* EOF */

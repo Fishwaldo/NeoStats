@@ -1,5 +1,5 @@
-/* mRss - Copyright (C) 2005 bakunin - Andrea Marchesini 
- *                                <bakunin@autistici.org>
+/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+ *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -66,14 +66,24 @@ static mrss_error_t __mrss_remove_subdata_item (mrss_item_t *,
 mrss_error_t
 mrss_new (mrss_t ** data)
 {
+  int allocated;
+
   if (!data)
     return MRSS_ERR_DATA;
 
-  if (!*data && !(*data = (mrss_t *) malloc (sizeof (mrss_t))))
-    return MRSS_ERR_POSIX;
+  if (!*data)
+    {
+      if (!(*data = (mrss_t *) malloc (sizeof (mrss_t))))
+	return MRSS_ERR_POSIX;
+
+      allocated = 1;
+    }
+  else
+    allocated = 0;
 
   memset (*data, 0, sizeof (mrss_t));
   (*data)->element = MRSS_ELEMENT_CHANNEL;
+  (*data)->allocated = allocated;
 
   return MRSS_OK;
 }
@@ -802,18 +812,27 @@ __mrss_new_subdata_channel (mrss_t * mrss, mrss_element_t element,
   mrss_hour_t **hour;
   mrss_day_t **day;
   mrss_category_t **category;
+  int allocated;
 
   switch (element)
     {
     case MRSS_ELEMENT_ITEM:
       item = (mrss_item_t **) data;
 
-      if (!*item && !(*item = (mrss_item_t *) malloc (sizeof (mrss_item_t))))
-	return MRSS_ERR_POSIX;
+      if (!*item)
+	{
+	  if (!(*item = (mrss_item_t *) malloc (sizeof (mrss_item_t))))
+	    return MRSS_ERR_POSIX;
+
+	  allocated = 1;
+	}
+      else
+	allocated = 0;
 
       memset (*item, 0, sizeof (mrss_item_t));
 
       (*item)->element = MRSS_ELEMENT_ITEM;
+      (*item)->allocated = allocated;
       (*item)->next = mrss->item;
       mrss->item = (*item);
 
@@ -822,12 +841,20 @@ __mrss_new_subdata_channel (mrss_t * mrss, mrss_element_t element,
     case MRSS_ELEMENT_SKIPHOURS:
       hour = (mrss_hour_t **) data;
 
-      if (!*hour && !(*hour = (mrss_hour_t *) malloc (sizeof (mrss_hour_t))))
-	return MRSS_ERR_POSIX;
+      if (!*hour)
+	{
+	  if (!(*hour = (mrss_hour_t *) malloc (sizeof (mrss_hour_t))))
+	    return MRSS_ERR_POSIX;
+
+	  allocated = 1;
+	}
+      else
+	allocated = 0;
 
       memset (*hour, 0, sizeof (mrss_hour_t));
 
       (*hour)->element = MRSS_ELEMENT_SKIPHOURS;
+      (*hour)->allocated = allocated;
       (*hour)->next = mrss->skipHours;
       mrss->skipHours = (*hour);
 
@@ -836,12 +863,20 @@ __mrss_new_subdata_channel (mrss_t * mrss, mrss_element_t element,
     case MRSS_ELEMENT_SKIPDAYS:
       day = (mrss_day_t **) data;
 
-      if (!*day && !(*day = (mrss_day_t *) malloc (sizeof (mrss_day_t))))
-	return MRSS_ERR_POSIX;
+      if (!*day)
+	{
+	  if (!(*day = (mrss_day_t *) malloc (sizeof (mrss_day_t))))
+	    return MRSS_ERR_POSIX;
+
+	  allocated = 1;
+	}
+      else
+	allocated = 0;
 
       memset (*day, 0, sizeof (mrss_day_t));
 
       (*day)->element = MRSS_ELEMENT_SKIPDAYS;
+      (*day)->allocated = allocated;
       (*day)->next = mrss->skipDays;
       mrss->skipDays = (*day);
 
@@ -850,14 +885,21 @@ __mrss_new_subdata_channel (mrss_t * mrss, mrss_element_t element,
     case MRSS_ELEMENT_CATEGORY:
       category = (mrss_category_t **) data;
 
-      if (!*category
-	  && !(*category =
+      if (!*category)
+	{
+	  if (!
+	      (*category =
 	       (mrss_category_t *) malloc (sizeof (mrss_category_t))))
-	return MRSS_ERR_POSIX;
+	    return MRSS_ERR_POSIX;
+	  allocated = 1;
+	}
+      else
+	allocated = 0;
 
       memset (*category, 0, sizeof (mrss_category_t));
 
       (*category)->element = MRSS_ELEMENT_CATEGORY;
+      (*category)->allocated = allocated;
       (*category)->next = mrss->category;
       mrss->category = (*category);
 
@@ -875,20 +917,29 @@ __mrss_new_subdata_item (mrss_item_t * item, mrss_element_t element,
 			 mrss_generic_t data)
 {
   mrss_category_t **category;
+  int allocated;
 
   switch (element)
     {
     case MRSS_ELEMENT_CATEGORY:
       category = (mrss_category_t **) data;
 
-      if (!*category
-	  && !(*category =
+      if (!*category)
+	{
+	  if (!
+	      (*category =
 	       (mrss_category_t *) malloc (sizeof (mrss_category_t))))
-	return MRSS_ERR_POSIX;
+	    return MRSS_ERR_POSIX;
+
+	  allocated = 1;
+	}
+      else
+	allocated = 0;
 
       memset (*category, 0, sizeof (mrss_category_t));
 
       (*category)->element = MRSS_ELEMENT_CATEGORY;
+      (*category)->allocated = allocated;
       (*category)->next = item->category;
       item->category = (*category);
 
