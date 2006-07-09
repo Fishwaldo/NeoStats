@@ -54,23 +54,17 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-ARFLAGS = cru
-libmrss_a_AR = $(AR) $(ARFLAGS)
-libmrss_a_LIBADD =
-am_libmrss_a_OBJECTS = mrss_download.$(OBJEXT) mrss_edit.$(OBJEXT) \
-	mrss_free.$(OBJEXT) mrss_generic.$(OBJEXT) \
-	mrss_parser.$(OBJEXT) mrss_write.$(OBJEXT)
-libmrss_a_OBJECTS = $(am_libmrss_a_OBJECTS)
-libnxml_a_AR = $(AR) $(ARFLAGS)
-libnxml_a_LIBADD =
-am_libnxml_a_OBJECTS = nxml_download.$(OBJEXT) nxml_easy.$(OBJEXT) \
-	nxml_entity.$(OBJEXT) nxml_free.$(OBJEXT) \
-	nxml_namespace.$(OBJEXT) nxml_string.$(OBJEXT) \
-	nxml_utf.$(OBJEXT) nxml_dtd.$(OBJEXT) nxml_edit.$(OBJEXT) \
-	nxml_error.$(OBJEXT) nxml_init.$(OBJEXT) nxml_parser.$(OBJEXT) \
-	nxml_tools.$(OBJEXT) nxml_write.$(OBJEXT)
-libnxml_a_OBJECTS = $(am_libnxml_a_OBJECTS)
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+libmrss_la_LIBADD =
+am_libmrss_la_OBJECTS = mrss_download.lo mrss_edit.lo mrss_free.lo \
+	mrss_generic.lo mrss_parser.lo mrss_write.lo
+libmrss_la_OBJECTS = $(am_libmrss_la_OBJECTS)
+libnxml_la_LIBADD =
+am_libnxml_la_OBJECTS = nxml_download.lo nxml_easy.lo nxml_entity.lo \
+	nxml_free.lo nxml_namespace.lo nxml_string.lo nxml_utf.lo \
+	nxml_dtd.lo nxml_edit.lo nxml_error.lo nxml_init.lo \
+	nxml_parser.lo nxml_tools.lo nxml_write.lo
+libnxml_la_OBJECTS = $(am_libnxml_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -80,8 +74,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-SOURCES = $(libmrss_a_SOURCES) $(libnxml_a_SOURCES)
-DIST_SOURCES = $(libmrss_a_SOURCES) $(libnxml_a_SOURCES)
+SOURCES = $(libmrss_la_SOURCES) $(libnxml_la_SOURCES)
+DIST_SOURCES = $(libmrss_la_SOURCES) $(libnxml_la_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -229,11 +223,11 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-noinst_LIBRARIES = libnxml.a libmrss.a
-libnxml_a_SOURCES = nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c nxml_dtd.c \
+noinst_LTLIBRARIES = libnxml.la libmrss.la
+libnxml_la_SOURCES = nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c nxml_dtd.c \
        			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c
 
-libmrss_a_SOURCES = mrss_download.c mrss_edit.c mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c
+libmrss_la_SOURCES = mrss_download.c mrss_edit.c mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c
 include_HEADERS = nxml.h mrss.h
 noinst_HEADERS = nxml_internal.h mrss_internal.h
 INCLUDES = -I../curl/
@@ -276,16 +270,18 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libmrss.a: $(libmrss_a_OBJECTS) $(libmrss_a_DEPENDENCIES) 
-	-rm -f libmrss.a
-	$(libmrss_a_AR) libmrss.a $(libmrss_a_OBJECTS) $(libmrss_a_LIBADD)
-	$(RANLIB) libmrss.a
-libnxml.a: $(libnxml_a_OBJECTS) $(libnxml_a_DEPENDENCIES) 
-	-rm -f libnxml.a
-	$(libnxml_a_AR) libnxml.a $(libnxml_a_OBJECTS) $(libnxml_a_LIBADD)
-	$(RANLIB) libnxml.a
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libmrss.la: $(libmrss_la_OBJECTS) $(libmrss_la_DEPENDENCIES) 
+	$(LINK)  $(libmrss_la_LDFLAGS) $(libmrss_la_OBJECTS) $(libmrss_la_LIBADD) $(LIBS)
+libnxml.la: $(libnxml_la_OBJECTS) $(libnxml_la_DEPENDENCIES) 
+	$(LINK)  $(libnxml_la_LDFLAGS) $(libnxml_la_OBJECTS) $(libnxml_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -293,26 +289,26 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_download.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_edit.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_free.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_generic.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_parser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_write.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_download.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_dtd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_easy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_edit.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_entity.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_error.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_free.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_init.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_namespace.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_parser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_string.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_tools.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_utf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_download.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_edit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_free.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_generic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_download.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_dtd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_easy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_edit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_entity.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_free.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_init.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_namespace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_tools.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_utf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_write.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -410,7 +406,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -441,7 +437,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -491,7 +487,7 @@ ps-am:
 uninstall-am: uninstall-includeHEADERS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLIBRARIES ctags distclean \
+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \

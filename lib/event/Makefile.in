@@ -53,16 +53,12 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-ARFLAGS = cru
-libevent_a_AR = $(AR) $(ARFLAGS)
-libevent_a_LIBADD =
-am_libevent_a_OBJECTS = buffer.$(OBJEXT) devpoll.$(OBJEXT) \
-	epoll.$(OBJEXT) epoll_sub.$(OBJEXT) evbuffer.$(OBJEXT) \
-	event.$(OBJEXT) kqueue.$(OBJEXT) poll.$(OBJEXT) \
-	rtsig.$(OBJEXT) select.$(OBJEXT) signal.$(OBJEXT) \
-	log.$(OBJEXT)
-libevent_a_OBJECTS = $(am_libevent_a_OBJECTS)
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+libevent_la_LIBADD =
+am_libevent_la_OBJECTS = buffer.lo devpoll.lo epoll.lo epoll_sub.lo \
+	evbuffer.lo event.lo kqueue.lo poll.lo rtsig.lo select.lo \
+	signal.lo log.lo
+libevent_la_OBJECTS = $(am_libevent_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -72,8 +68,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-SOURCES = $(libevent_a_SOURCES)
-DIST_SOURCES = $(libevent_a_SOURCES)
+SOURCES = $(libevent_la_SOURCES)
+DIST_SOURCES = $(libevent_la_SOURCES)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -221,8 +217,8 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-noinst_LIBRARIES = libevent.a
-libevent_a_SOURCES = buffer.c devpoll.c epoll.c epoll_sub.c evbuffer.c event.c kqueue.c poll.c rtsig.c select.c signal.c log.c
+noinst_LTLIBRARIES = libevent.la
+libevent_la_SOURCES = buffer.c devpoll.c epoll.c epoll_sub.c evbuffer.c event.c kqueue.c poll.c rtsig.c select.c signal.c log.c
 include_HEADERS = event.h
 INCLUDES = -Icompat
 EXTRA_DIST = err.c event.h event-internal.h evsignal.h \
@@ -272,12 +268,16 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libevent.a: $(libevent_a_OBJECTS) $(libevent_a_DEPENDENCIES) 
-	-rm -f libevent.a
-	$(libevent_a_AR) libevent.a $(libevent_a_OBJECTS) $(libevent_a_LIBADD)
-	$(RANLIB) libevent.a
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libevent.la: $(libevent_la_OBJECTS) $(libevent_la_DEPENDENCIES) 
+	$(LINK)  $(libevent_la_LDFLAGS) $(libevent_la_OBJECTS) $(libevent_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -285,18 +285,18 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/devpoll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/epoll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/epoll_sub.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/evbuffer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kqueue.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/poll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rtsig.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/select.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/devpoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/epoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/epoll_sub.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/evbuffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kqueue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/poll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rtsig.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/select.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/signal.Plo@am__quote@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -394,7 +394,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
@@ -425,7 +425,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLIBRARIES \
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -475,7 +475,7 @@ ps-am:
 uninstall-am: uninstall-includeHEADERS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLIBRARIES ctags distclean \
+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \

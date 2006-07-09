@@ -18,11 +18,11 @@ endif
 
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event
-neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ \
-		$(top_srcdir)/lib/curl/libcurl.a $(top_srcdir)/lib/pcre/libpcre.a \
-		$(top_srcdir)/lib/event/libevent.a $(top_srcdir)/lib/nxml/libnxml.a $(top_srcdir)/lib/nxml/libmrss.a
+neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ 
 
-neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@
+neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ -Wl,--whole-archive,$(top_srcdir)/lib/curl/libcurl.a -Wl,--whole-archive,$(top_srcdir)/lib/pcre/libpcre.a \
+		-Wl,--whole-archive,$(top_srcdir)/lib/event/libevent.a -Wl,--whole-archive,$(top_srcdir)/lib/nxml/libnxml.a -Wl,--whole-archive,$(top_srcdir)/lib/nxml/libmrss.a -Wl,--no-whole-archive
+
 noinst_HEADERS          =       confuselexer.l NeoStats.pm
 
 neostats.pm.h: NeoStats.pm 	 

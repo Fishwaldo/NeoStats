@@ -1,5 +1,5 @@
-noinst_LIBRARIES	= libevent.a
-libevent_a_SOURCES 	= buffer.c devpoll.c epoll.c epoll_sub.c evbuffer.c event.c kqueue.c poll.c rtsig.c select.c signal.c log.c
+noinst_LTLIBRARIES	= libevent.la
+libevent_la_SOURCES 	= buffer.c devpoll.c epoll.c epoll_sub.c evbuffer.c event.c kqueue.c poll.c rtsig.c select.c signal.c log.c
 include_HEADERS 	= event.h
 INCLUDES 		= -Icompat
 

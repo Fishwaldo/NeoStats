@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = foreign nostdinc
 
 EXTRA_DIST = getdate.y 
 
-noinst_LIBRARIES = libcurl.a
+noinst_LTLIBRARIES = libcurl.la
 
 # we use srcdir/include for the static global include files
 # we use builddir/lib for the generated lib/config.h file to get found
@@ -56,7 +56,7 @@ VERSION=-version-info 2:2:0
 
 #libcurl_a_LDFLAGS = $(VERSION)
 
-libcurl_a_SOURCES = arpa_telnet.h file.c netrc.h timeval.c	\
+libcurl_la_SOURCES = arpa_telnet.h file.c netrc.h timeval.c	\
 base64.c file.h hostip.c progress.c timeval.h base64.h formdata.c	\
 hostip.h progress.h cookie.c formdata.h http.c sendf.c cookie.h ftp.c	\
 http.h sendf.h url.c dict.c ftp.h if2ip.c speedcheck.c url.h dict.h	\
