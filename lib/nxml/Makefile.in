@@ -54,17 +54,23 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
-LTLIBRARIES = $(noinst_LTLIBRARIES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
+libLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(lib_LTLIBRARIES)
 libmrss_la_LIBADD =
-am_libmrss_la_OBJECTS = mrss_download.lo mrss_edit.lo mrss_free.lo \
-	mrss_generic.lo mrss_parser.lo mrss_write.lo
-libmrss_la_OBJECTS = $(am_libmrss_la_OBJECTS)
-libnxml_la_LIBADD =
-am_libnxml_la_OBJECTS = nxml_download.lo nxml_easy.lo nxml_entity.lo \
+am_libmrss_la_OBJECTS = nxml_download.lo nxml_easy.lo nxml_entity.lo \
 	nxml_free.lo nxml_namespace.lo nxml_string.lo nxml_utf.lo \
 	nxml_dtd.lo nxml_edit.lo nxml_error.lo nxml_init.lo \
-	nxml_parser.lo nxml_tools.lo nxml_write.lo
-libnxml_la_OBJECTS = $(am_libnxml_la_OBJECTS)
+	nxml_parser.lo nxml_tools.lo nxml_write.lo mrss_download.lo \
+	mrss_edit.lo mrss_free.lo mrss_generic.lo mrss_parser.lo \
+	mrss_write.lo
+libmrss_la_OBJECTS = $(am_libmrss_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -74,15 +80,8 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-SOURCES = $(libmrss_la_SOURCES) $(libnxml_la_SOURCES)
-DIST_SOURCES = $(libmrss_la_SOURCES) $(libnxml_la_SOURCES)
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(includedir)"
+SOURCES = $(libmrss_la_SOURCES)
+DIST_SOURCES = $(libmrss_la_SOURCES)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
@@ -223,11 +222,10 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-noinst_LTLIBRARIES = libnxml.la libmrss.la
-libnxml_la_SOURCES = nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c nxml_dtd.c \
-       			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c
+lib_LTLIBRARIES = libmrss.la
+libmrss_la_SOURCES = nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c nxml_dtd.c \
+       			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c mrss_download.c mrss_edit.c mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c
 
-libmrss_la_SOURCES = mrss_download.c mrss_edit.c mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c
 include_HEADERS = nxml.h mrss.h
 noinst_HEADERS = nxml_internal.h mrss_internal.h
 INCLUDES = -I../curl/
@@ -270,18 +268,24 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
+	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
 libmrss.la: $(libmrss_la_OBJECTS) $(libmrss_la_DEPENDENCIES) 
-	$(LINK)  $(libmrss_la_LDFLAGS) $(libmrss_la_OBJECTS) $(libmrss_la_LIBADD) $(LIBS)
-libnxml.la: $(libnxml_la_OBJECTS) $(libnxml_la_DEPENDENCIES) 
-	$(LINK)  $(libnxml_la_LDFLAGS) $(libnxml_la_OBJECTS) $(libnxml_la_LIBADD) $(LIBS)
+	$(LINK) -rpath $(libdir) $(libmrss_la_LDFLAGS) $(libmrss_la_OBJECTS) $(libmrss_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -408,7 +412,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-am
@@ -437,7 +441,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
+clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -458,7 +462,7 @@ info-am:
 
 install-data-am: install-includeHEADERS
 
-install-exec-am:
+install-exec-am: install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -484,20 +488,22 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS uninstall-info-am
+uninstall-am: uninstall-includeHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
+	clean-libLTLIBRARIES clean-libtool ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
 	install-exec-am install-includeHEADERS install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-includeHEADERS \
-	uninstall-info-am
+	install-info-am install-libLTLIBRARIES install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-includeHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES
 
 
 .c.o:

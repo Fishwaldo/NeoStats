@@ -92,7 +92,10 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	osfile.$(OBJEXT) updates.$(OBJEXT) MiniMessage.$(OBJEXT) \
 	MiniMessageGateway.$(OBJEXT) $(am__objects_1) $(am__objects_2)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
-neostats_DEPENDENCIES =
+neostats_DEPENDENCIES = $(top_srcdir)/lib/curl/libcurl.la \
+	$(top_srcdir)/lib/pcre/libpcre.la \
+	$(top_srcdir)/lib/event/libevent.la \
+	$(top_srcdir)/lib/nxml/libmrss.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -255,12 +258,12 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
 	osfile.c updates.c MiniMessage.c MiniMessageGateway.c \
 	$(am__append_1) $(am__append_2)
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
-		-I$(top_srcdir)/lib/event
+		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml
 
-neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ 
-neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ -Wl,--whole-archive,$(top_srcdir)/lib/curl/libcurl.a -Wl,--whole-archive,$(top_srcdir)/lib/pcre/libpcre.a \
-		-Wl,--whole-archive,$(top_srcdir)/lib/event/libevent.a -Wl,--whole-archive,$(top_srcdir)/lib/nxml/libnxml.a -Wl,--whole-archive,$(top_srcdir)/lib/nxml/libmrss.a -Wl,--no-whole-archive
+neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_srcdir)/lib/curl/libcurl.la $(top_srcdir)/lib/pcre/libpcre.la \
+		$(top_srcdir)/lib/event/libevent.la $(top_srcdir)/lib/nxml/libmrss.la
 
+neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 noinst_HEADERS = confuselexer.l NeoStats.pm
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@

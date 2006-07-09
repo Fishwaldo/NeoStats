@@ -1,4 +1,4 @@
-noinst_LTLIBRARIES	= libpcre.la
+lib_LTLIBRARIES		= libpcre.la
 noinst_PROGRAMS		= dftables
 libpcre_la_SOURCES	= chartables.c get.c pcre.c study.c internal.h pcre.h
 dftables_SOURCES	= dftables.c internal.h pcre.h

@@ -53,6 +53,8 @@
 #ifdef USE_PERL
 #include "perlmod.h"
 #endif /* USE_PERL */
+#include "nxml.h"
+#include "mrss.h"
 
 #ifndef WIN32
 #define PID_FILENAME	"neostats.pid"
@@ -230,6 +232,12 @@ static int InitMe( void )
 #endif /* WIN32 */
 	/* default DBM */
 	strlcpy(me.dbm, "gdbm" ,MAXHOST );
+	/* this is a hack to compile in pcre and nxml and mrss static libary files */
+	if (me.numeric != 1) {
+		pcre_config(0, NULL);
+		nxml_new(NULL);
+		mrss_parse_file(NULL, NULL);
+	}
 	return NS_SUCCESS;
 }
 
