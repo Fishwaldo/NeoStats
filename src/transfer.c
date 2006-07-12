@@ -232,6 +232,15 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		return NS_FAILURE;
 	}	
 
+	/* fail for any return above 300 (HTTP)... */
+	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_FOLLOWLOCATION, 1)) != 0) {
+		nlog(LOG_WARNING, "Curl Set followlocation failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
+		curl_easy_cleanup(newtrans->curleasyhandle);
+		ns_free(newtrans);
+		return NS_FAILURE;
+	}	
+
 	/* setup the user agent */
 	ircsnprintf(newtrans->useragent, MAXURL, "NeoStats %s (%s)", me.version, GET_CUR_MODNAME()); 
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_USERAGENT, newtrans->useragent)) != 0) {
