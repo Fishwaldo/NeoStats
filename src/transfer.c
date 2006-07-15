@@ -28,7 +28,7 @@
 #include "transfer.h"
 #include "curl.h"
 
-#define MAXURL 64	/* max URL size */
+#define MAXURL BUFSIZE	/* max URL size */
 #define MAX_TRANSFERS	10	/* number of curl transfers */
 
 /* this struct contains info for each transfer in progress */
