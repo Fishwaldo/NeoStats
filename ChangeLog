@@ -32,6 +32,9 @@ Fish (F), Mark (M), DeadNotBuried (D)
  - Change LibCurl and LibPCRE to be statically compiled into NeoStats rather
    than as dynamic libraries (F)
  - Add libnxml library for Feature request 292 and new module "NewsServ" (F)
+ - Module Runlevels were not being set for Curl Transfer callbacks, causing
+   DB issues (F)
+ - Add a prototype for the DBAFetchRows2, which returns the DBA key as well (F)
 
 * NeoStats * Version 3.0.a3
  - LimitServ: join/part bot on adding/deleteing channels if JOIN enabled (D)

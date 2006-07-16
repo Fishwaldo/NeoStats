@@ -1525,6 +1525,7 @@ EXPORTFUNC int DBAStore( const char *table, const char *key, void *data, int siz
 EXPORTFUNC int DBAFetch( const char *table, const char *key, void *data, int size );
 EXPORTFUNC int DBADelete( const char *table, const char * key );
 EXPORTFUNC int DBAFetchRows( const char *table, DBRowHandler handler );
+EXPORTFUNC int DBAFetchRows2( const char *table, DBRowHandler2 handler );
 /* DB API Macros to wrap common types */
 #define DBAStoreBool( table, key, data ) DBAStore( table, key, ( void * )data, sizeof ( int ) )
 #define DBAStoreInt( table, key, data ) DBAStore( table, key, ( void * )data, sizeof ( int ) )

@@ -59,6 +59,8 @@ typedef struct neo_transfer {
 	char params[512];
 	/* the callback function */
 	transfer_callback *callback;
+	/* the module that is using this function */
+	Module *module_ptr;
 } neo_transfer;
 
 /* this is the curl multi handle we use */
@@ -159,6 +161,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}
 
 	newtrans = ns_calloc(sizeof(neo_transfer));
+	newtrans->module_ptr=GET_CUR_MODULE();
 	switch (savetofileormemory) {
 		case NS_FILE:
 			/* if we don't have a filename, bail out */
@@ -226,6 +229,15 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	/* fail for any return above 300 (HTTP)... */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_FAILONERROR, 1)) != 0) {
 		nlog(LOG_WARNING, "Curl Set failonerror failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
+		curl_easy_cleanup(newtrans->curleasyhandle);
+		ns_free(newtrans);
+		return NS_FAILURE;
+	}	
+
+	/* fail for any return above 300 (HTTP)... */
+	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_FOLLOWLOCATION, 1)) != 0) {
+		nlog(LOG_WARNING, "Curl Set followlocation failed. Returned %d for url %s", ret, url);
 		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
 		curl_easy_cleanup(newtrans->curleasyhandle);
 		ns_free(newtrans);
@@ -338,16 +350,19 @@ static void transfer_status( void )
 				case NS_MEMORY:
 					break;
 			}
-
 			/* check if it failed etc */
 			if (msg->data.result != 0) {
 				/* it failed for whatever reason */
 				nlog(LOG_NOTICE, "Transfer %s Failed. Error was: %s", neotrans->url, neotrans->curlerror);
+                                SET_RUN_LEVEL(neotrans->module_ptr);
 				neotrans->callback(neotrans->data, NS_FAILURE, neotrans->curlerror, strlen(neotrans->curlerror));
+                                RESET_RUN_LEVEL();
 			} else {
 				dlog(DEBUG1, "Transfer %s succeded.", neotrans->url);
 				/* success, so we must callback with success */
+                                SET_RUN_LEVEL(neotrans->module_ptr);
 				neotrans->callback(neotrans->data, NS_SUCCESS, neotrans->savefileormem == NS_MEMORY ? neotrans->savemem : NULL, neotrans->savememsize);
+                                RESET_RUN_LEVEL();
 			}
 			/* regardless, clean up the transfer */
 			curl_multi_remove_handle(curlmultihandle, neotrans->curleasyhandle);
