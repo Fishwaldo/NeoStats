@@ -35,6 +35,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
  - Module Runlevels were not being set for Curl Transfer callbacks, causing
    DB issues (F)
  - Add a prototype for the DBAFetchRows2, which returns the DBA key as well (F)
+ - Update to libnxml 0.12 to fix a parser bug (F)
 
 * NeoStats * Version 3.0.a3
  - LimitServ: join/part bot on adding/deleteing channels if JOIN enabled (D)

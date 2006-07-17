@@ -111,7 +111,7 @@ __nxml_parse_string (nxml_t * doc, char *buffer, int size)
 	      int k = i;
 	      int last;
 
-	      while (*(buffer + k) != ';')
+	      while (*(buffer + k) != ';' && k < size)
 		k++;
 
 	      last = k - (i + 2) > sizeof (buf) ? sizeof (buf) : k - (i + 2);
