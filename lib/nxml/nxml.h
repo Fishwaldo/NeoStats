@@ -19,7 +19,7 @@
 #ifndef __N_XML_H__
 #define __N_XML_H__
 
-#include <curl/curl.h>
+#include <curl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

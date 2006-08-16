@@ -103,7 +103,8 @@ int ProcessModuleList( const ModuleListHandler handler, void *v )
 	hnode_t *node;
 	int ret = 0;
 
-	SET_SEGV_LOCATION();
+/*	SET_SEGV_LOCATION(); */
+
 	hash_scan_begin( &ms, modulehash );
 	while( ( node = hash_scan_next( &ms ) ) != NULL )
 	{

@@ -147,7 +147,7 @@ int add_bot_info_settings( Bot *bot_ptr, BotInfo* botinfo )
 		bot_ptr->bot_info_settings[0].varptr = botinfo->nick;
 		bot_ptr->bot_info_settings[1].varptr = botinfo->altnick;
 		bot_ptr->bot_info_settings[2].varptr = botinfo->user;
-		bot_ptr->bot_info_settings[3].varptr = ((*botinfo->host) == 0 ? me.servicehost : botinfo->host);
+		bot_ptr->bot_info_settings[3].varptr = (strlen(botinfo->host) > 0 ? me.servicehost : botinfo->host);
 		bot_ptr->bot_info_settings[4].varptr = botinfo->realname;
 		ModuleConfig( bot_ptr->bot_info_settings );
 		add_bot_setting_list( bot_ptr, bot_ptr->bot_info_settings );

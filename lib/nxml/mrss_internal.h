@@ -19,7 +19,7 @@
 #ifndef __M_RSS_INTERNAL_H__
 #define __M_RSS_INTERNAL_H__
 
-#include <curl/curl.h>
+#include <curl.h>
 #include <nxml.h>
 #include <sys/types.h>
 #include <sys/stat.h>
