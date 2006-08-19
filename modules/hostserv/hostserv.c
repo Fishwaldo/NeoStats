@@ -128,7 +128,7 @@ static bot_setting hs_settings[] =
 	{"HOSTNAME",	hs_cfg.vhostdom,	SET_TYPE_STRING,	0, MAXHOST,	NS_ULEVEL_ADMIN, NULL,	hs_help_set_hostname,	NULL,			( void* )""	},
 	{"OPERHOSTS",	&hs_cfg.operhosts,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_operhosts,	NULL,			( void* )0	},
 	{"VERBOSE",	&hs_cfg.verbose,	SET_TYPE_BOOLEAN,	0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_verbose,	NULL,			( void* )1	},
-	{"ADDLEVEL",	&hs_cfg.addlevel,	SET_TYPE_INT,		0, 0, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_addlevel,	NULL,			( void* )NS_ULEVEL_LOCOPER },
+	{"ADDLEVEL",	&hs_cfg.addlevel,	SET_TYPE_INT,		0, 200, 		NS_ULEVEL_ADMIN, NULL,	hs_help_set_addlevel,	NULL,			( void* )NS_ULEVEL_LOCOPER },
 	NS_SETTING_END()
 };
 
