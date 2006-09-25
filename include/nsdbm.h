@@ -31,6 +31,7 @@ MODULEFUNC void DBMCloseTable( void *dbhandle, void *tbhandle );
 MODULEFUNC int DBMFetch( void *dbhandle, void *tbhandle, char *key, void *data, int size );
 MODULEFUNC int DBMStore( void *dbhandle, void *tbhandle, char *key, void *data, int size );
 MODULEFUNC int DBMFetchRows( void *dbhandle, void *tbhandle, DBRowHandler handler );
+MODULEFUNC int DBMFetchRows2( void *dbhandle, void *tbhandle, DBRowHandler2 handler );
 MODULEFUNC int DBMDelete( void *dbhandle, void *tbhandle, char * key );
 
 #endif /* _NSDBM_H_ */
