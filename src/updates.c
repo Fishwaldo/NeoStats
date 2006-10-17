@@ -423,6 +423,11 @@ static void ProcessMessage(MMessage *msg) {
 			dlog(DEBUG1, "Login Ok");
 			mqs.state = MQS_OK;
 			groups = MMGetStringField(msg, "group", &nogroups);
+			if (nogroups == 0 || groups == NULL) {
+				/* NeoNetMQ sent a funky loginok message... */
+				nlog(LOG_WARNING, "NeoNetMQ LoginOK message did not contain groups... ");
+				return;
+			}
 			for (i = 0; i < nogroups; i++) {
 				int len;
 				/* max groups so far */
