@@ -49,9 +49,9 @@ void *DBMOpenDB (const char *name)
 			nlog(LOG_WARNING, "db_env_create failed: %s", db_strerror(dbret));
 			return NULL;
 		}
-		db_env->set_verbose(db_env, DB_VERB_RECOVERY, 1);
+		db_env->set_verbose(db_env, DB_VERB_RECOVERY|DB_VERB_REGISTER, 1);
 		
-		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL, 0600)) != 0) {
+		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER_FATAL|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL, 0600)) != 0) {
 			nlog(LOG_WARNING, "db evn open failed: %s", db_strerror(dbret));
 			db_env->close(db_env, 0);
 			return NULL;

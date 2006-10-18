@@ -40,6 +40,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
  - Fix logic error when using default service bots host (F)
  - Fix addlevel command in hostserv reported by Prince (F)
  - Fix a problem with NeoNet and No Groups being sent during Login (F)
+ - BDB - Make sure recovery is run when opening DB's (F)
 
 * NeoStats * Version 3.0.a3
  - LimitServ: join/part bot on adding/deleteing channels if JOIN enabled (D)
