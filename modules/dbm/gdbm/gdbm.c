@@ -26,8 +26,11 @@
 #include "gdbmerrno.h"
 #include "nsdbm.h"
 #include <sys/types.h>
+#ifndef WIN32
+/* Does not compile under Win32 and not actually used by Neostats so not needed */
 #include <dirent.h>
 #include <glob.h>
+#endif /* !WIN32 */
 #include <errno.h>
 
 extern const char *gdbm_strerror __P( ( gdbm_error ) );
@@ -39,6 +42,7 @@ char *dbnametmp;
 
 void *DBMOpenDB(const char *name) 
 {
+#ifndef WIN32 /* Workaround compiler error */
 	int i = 0;
 	glob_t g;
 	char search[MAXPATH];
@@ -64,8 +68,9 @@ void *DBMOpenDB(const char *name)
 			}
 		} else {
 			nlog(LOG_WARNING, "Glob Failed: %s", strerror(errno));
-		} 
-	}	
+		}
+	}
+#endif /* !WIN32 */
 	/* not required for GDBM */
 	return strndup(name, strlen(name));;
 }
@@ -278,6 +283,8 @@ int DBMDelete( void *unused, void *handle, char *key )
 	return NS_SUCCESS;
 }
 
+/* Does not compile under Win32 and not actually used by Neostats so not needed */
+#ifndef WIN32
 int file_select (struct dirent *entry) {
 	char *ptr;
 	if ((ircstrcasecmp(entry->d_name, ".")==0) || (ircstrcasecmp(entry->d_name, "..")==0)) 
@@ -354,3 +361,4 @@ char **DBMListTables(char *Database)
 	} 
 	return Tables;
 }
+#endif /* !WIN32 */
