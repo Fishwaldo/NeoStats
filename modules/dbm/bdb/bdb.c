@@ -39,6 +39,13 @@ static int dbopened = 0;
 void db_log_cb(const char *prefix, char *msg) {
 	dlog(DEBUG1, "%s", msg);
 }
+/* some older versions of BDB dun have this */
+#ifndef DB_VERB_REGISTER
+#define DB_VERB_REGISTER 0
+#endif
+#ifndef DB_REGISTER
+#define DB_REGISTER 0
+#endif
 
 void *DBMOpenDB (const char *name)
 {
