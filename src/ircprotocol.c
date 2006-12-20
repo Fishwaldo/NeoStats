@@ -346,7 +346,7 @@ int InitIrcd( void )
 	/* Open protocol module */
 	ircsnprintf( protocol_path, 255, "%s/%s%s", MOD_PATH, me.protocol,MOD_STDEXT );
 	nlog( LOG_NORMAL, "Using protocol module %s", protocol_path );
-	protocol_module_handle = ns_dlopen( protocol_path, RTLD_NOW || RTLD_GLOBAL );
+	protocol_module_handle = ns_dlopen( protocol_path, RTLD_NOW | RTLD_GLOBAL );
 	if( protocol_module_handle == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to load protocol module %s", protocol_path );
