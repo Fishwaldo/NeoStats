@@ -23,18 +23,16 @@
 
 #include <winsock2.h>
 #include <windows.h>
-#include <windowsx.h>
 #include <process.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <io.h>
-#include <shlwapi.h>
 
 #include "resource.h"
 
-#define	WM_USER_SHELLICON WM_USER + 1 
+#define	WM_USER_SHELLICON ( WM_USER + 1 )
 
-extern int neostats();
+extern int neostats( void );
 extern void read_loop();
 extern void do_exit( int exitcode, char *quitmsg );
 
@@ -76,13 +74,14 @@ static void FiniDebugConsole( void )
 }
 #endif
 
-static void ErrorMessageBox( char* error )
+static void ErrorMessageBox( const char *error )
 {
 	MessageBox( NULL, error, szNeoStatsErrorTitle, MB_ICONEXCLAMATION | MB_OK );
 }
 
 static INT_PTR CALLBACK AboutDialogProc(HWND hwndDlg, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	(void)lparam; //argsused
 	switch (msg)
 	{
 		case WM_INITDIALOG:
@@ -94,10 +93,14 @@ static INT_PTR CALLBACK AboutDialogProc(HWND hwndDlg, UINT msg, WPARAM wparam, L
 				case IDOK:
 					EndDialog(hwndDlg, TRUE);
 					return TRUE;
+				default:
+					break;
 			}
 			break;
 
-			case WM_DESTROY:
+		case WM_DESTROY:
+			break;
+		default:
 			break;
 	}
 
@@ -106,6 +109,7 @@ static INT_PTR CALLBACK AboutDialogProc(HWND hwndDlg, UINT msg, WPARAM wparam, L
 
 static INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
+	(void)lParam; //argsused
     switch( message )
     {
 		case WM_INITDIALOG:
@@ -137,6 +141,8 @@ static INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPAR
 					TrackPopupMenu( hTrayPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_BOTTOMALIGN, TrayPoint.x, TrayPoint.y, 0, hDialog, NULL);
 					SendMessage( hDialog, WM_NULL, 0, 0 );			
 					return TRUE; 
+				default:
+					break;
 			} 
 			break; 
 
@@ -168,6 +174,8 @@ static INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPAR
 					Shell_NotifyIcon( NIM_DELETE, &nsNotifyIconData );
 					DestroyWindow( hwnd );
 					break;
+				default:
+					break;
 			}
 
 			return TRUE;
@@ -197,16 +205,21 @@ static INT_PTR CALLBACK DialogProc( HWND hwnd, UINT message, WPARAM wParam, LPAR
 				return TRUE; 
 			}
 			break;
+		default:
+			break;
     }
     return FALSE;
 }
 
-int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char * cmdParam, int cmdShow )
+int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPrevInst, char *cmdParam, int cmdShow )
 {
     DWORD dwThreadId, dwThrdParam = 1; 
     char szMsg[80];
 	WSADATA WSAData;
     MSG msg;
+	(void)cmdParam; //argsused
+	(void)cmdShow; //argsused
+	(void)hPrevInst; //argsused
 	
 	//_fmode = _O_BINARY;
 	hInstance = hInst;

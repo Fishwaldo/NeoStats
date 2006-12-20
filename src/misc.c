@@ -95,9 +95,9 @@ void strip( char *line )
 {
 	char *c = line;
 
-	if( ( c = strchr( line, '\n' ) ) )
+	if( ( c = strchr( line, '\n' ) ) != NULL )
 		*c = '\0';
-	if( ( c = strchr( line, '\r' ) ) )
+	if( ( c = strchr( line, '\r' ) ) != NULL )
 		*c = '\0';
 }
 
@@ -137,7 +137,7 @@ char *ns_strlwr( char *s )
 	t = s;
 	while( *t != '\0' )
 	{
-		*t = tolower( *t );
+		*t = ( char ) tolower( *t );
 		t++;
 	}
 	return s;
@@ -418,7 +418,7 @@ char *sctime( time_t stuff )
 	char *s, *c;
 
 	s = ctime( &stuff );
-	if( ( c = strchr( s, '\n' ) ) )
+	if( ( c = strchr( s, '\n' ) ) != NULL )
 		*c = '\0';
 
 	return s;

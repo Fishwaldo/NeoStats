@@ -158,8 +158,8 @@ static void BuildModeCharMap( unsigned char *mode_char_map, unsigned char mode, 
 {
     int bitcount = 0;
 	
-	while( ( mask >>= 1 ) )
-		bitcount ++;
+	while( ( mask >>= 1 ) != 0 )
+		bitcount++;
 	if( bitcount < 31 )
 		mode_char_map[bitcount] = mode;
 }
@@ -249,7 +249,7 @@ int InitModeTables( const mode_init* chan_umodes, const mode_init* chan_modes, c
  *  @return string of modes represented by mask
  */
 
-static char *ModeMaskToString( const mode_data *mode_table, const unsigned int mask ) 
+static char *ModeMaskToString( const mode_data *mode_table, unsigned int mask ) 
 {
 	int i, j;
 
@@ -487,7 +487,7 @@ static unsigned char ModeMaskToChar( const unsigned char *mode_char_map, unsigne
 {
     int bitcount = 0;
 	
-	while( ( mask >>= 1 ) ) 
+	while( ( mask >>= 1 ) != 0 ) 
 		bitcount++;
     return mode_char_map[bitcount];
 }
@@ -618,7 +618,7 @@ unsigned char CmodeCharToPrefix( unsigned char mode )
  *  @return string describing mode
  */
 
-static const char *get_mode_desc( ModeDesc *desc, unsigned int mask )
+static const char *get_mode_desc( const ModeDesc *desc, unsigned int mask )
 {
 	while( desc->mask != 0 )
 	{
