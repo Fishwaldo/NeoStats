@@ -68,10 +68,6 @@ static RETSIGTYPE sigterm_handler( int signum )
 static RETSIGTYPE sighup_handler( int signum )
 {
 	irc_globops( NULL, _( "SIGHUP received, attempted to rehash" ) );
-	/* at the moment, the rehash just checks for a the SQL port is opened, if enabled */
-#ifdef SQLSRV
-	check_sql_sock();
-#endif
 }
 #endif /* SIGHUP */
 
@@ -108,9 +104,10 @@ static void do_backtrace( void )
 #endif
 }
 
-static int modules_loaded(Module *mod_ptr, void *sock) {
-	FILE *sf = (FILE *) sock;
-	os_fprintf(sf, "%s ", mod_ptr->info->name);
+static int modules_loaded( Module *mod_ptr, void *v )
+{
+	FILE *sf = (FILE *)v;
+	os_fprintf( sf, "%s ", mod_ptr->info->name );
 	return NS_FALSE;
 }
 

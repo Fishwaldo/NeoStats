@@ -62,7 +62,10 @@
 #define PID_FILENAME	"neostats.pid"
 #endif /* !WIN32 */
 
+#ifndef WIN32
 static void do_reconnect( void );
+#endif /* !WIN32 */
+
 static int in_do_exit = 0;
 
 #ifdef WIN32
