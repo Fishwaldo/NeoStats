@@ -149,18 +149,18 @@ size_t strlcat( char *dst, const char *src, size_t size )
 
 char *strndup( const char *src, size_t count )
 {
-	char *dup;
+	char *dst;
 	
 	/* validate inputs */
 	if ( ( src == NULL ) || ( count == 0 ) )
 		return NULL;
 	/* Allocate count plus one for trailing NULL */
-	dup = ( char * ) ns_malloc( count + 1 );
+	dst = ( char * ) ns_malloc( count + 1 );
 	/* Copy string into created buffer */
-	os_memcpy( dup, src, count );
-	dup[count] = 0;
+	os_memcpy( dst, src, count );
+	dst[count] = 0;
 	/* Return pointer to duplicated string */
-	return dup;
+	return dst;
 }
 #endif /* HAVE_STRNDUP */
 
@@ -176,17 +176,17 @@ char *strndup( const char *src, size_t count )
 
 char *strdup( const char *src )
 {
-	char *dup;
+	char *dst;
 	
 	/* validate inputs */
 	if ( src == NULL )
 		return NULL;
 	/* Allocate count plus one for trailing NULL */
-	dup = ( char * )ns_malloc( strlen( src ) + 1 );
+	dst = ( char * )ns_malloc( strlen( src ) + 1 );
 	/* Copy string into created buffer */
-	strlcpy( dup, src, strlen( src ) + 1 );
+	strlcpy( dst, src, strlen( src ) + 1 );
 	/* Return pointer to duplicated string */
-	return dup;
+	return dst;
 }
 #endif /* HAVE_STRDUP */
 
