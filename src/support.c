@@ -241,6 +241,9 @@ char *inet_ntop( int af, const unsigned char *src, char *dst, size_t size )
 	static const char *fmt = "%u.%u.%u.%u";
 	char tmp[ sizeof( "255.255.255.255" )];
 
+	/* only supports AF_INET at present */
+	if ( af != AF_INET )
+		return NULL;
 	if ( ( size_t ) sprintf( tmp, fmt, src[0], src[1], src[2], src[3] ) >= size )
 		return NULL;
 	strlcpy( dst, tmp, size );
@@ -249,7 +252,7 @@ char *inet_ntop( int af, const unsigned char *src, char *dst, size_t size )
 #endif /* HAVE_INET_NTOP */
 
 #ifndef HAVE_INET_ATON
-/** @brief inet_ntop
+/** @brief inet_nton
  *
  *  Convert from "a.b.c.d" IP address string into an in_addr structure.  
  *

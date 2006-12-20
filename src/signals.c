@@ -55,6 +55,7 @@ static RETSIGTYPE sigterm_handler( int signum )
 	do_exit( NS_EXIT_NORMAL, msg_sigterm );
 }
 
+#ifdef SIGHUP
 /** @brief SIGHUP handler
  *
  * Called by the signal handler if we get a SIGHUP
@@ -72,6 +73,7 @@ static RETSIGTYPE sighup_handler( int signum )
 	check_sql_sock();
 #endif
 }
+#endif /* SIGHUP */
 
 /** @brief SEGV handler
  *
@@ -221,8 +223,10 @@ void InitSignals( void )
 	( void ) sigaddset( &act.sa_mask, SIGSEGV );
 	( void ) sigaction( SIGSEGV, &act, NULL );
 
+#endif /* !WIN32 */
+#ifdef SIGHUP
 	( void ) signal( SIGHUP, sighup_handler );
-#endif
+#endif /* SIGHUP */
 	( void ) signal( SIGTERM, sigterm_handler );
 	( void ) signal( SIGSEGV, sigsegv_handler );
 	( void ) signal( SIGINT, sigterm_handler );
