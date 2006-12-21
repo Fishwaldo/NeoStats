@@ -300,7 +300,7 @@ static Module *load_stdmodule( const char *modfilename, Client * u )
 		load_module_error( u, modfilename, __( "module list is full", u ) );
 		return NULL;
 	} 
-	handle = ns_dlopen( modfilename, RTLD_NOW || RTLD_GLOBAL );
+	handle = ns_dlopen( modfilename, RTLD_NOW | RTLD_GLOBAL );
 	if( !handle ) {
 		load_module_error( u, modfilename, ns_dlerrormsg, modfilename );
 		return NULL;
