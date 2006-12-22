@@ -593,7 +593,7 @@ static int ss_cmd_server_stats( const CmdParams *cmdparams )
  *  Reports current statistics to requesting user
  *
  *  @param cmdparams
- *    cmdparams->av[0] = optionally LIST, DEL, COPY
+ *    cmdparams->av[0] = optionally LIST, DEL, RENAME
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
