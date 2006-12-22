@@ -24,7 +24,8 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
-typedef struct networkstat {
+typedef struct networkstat
+{
 	statistic servers;
 	statistic channels;
 	statistic users;

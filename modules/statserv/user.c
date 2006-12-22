@@ -80,6 +80,7 @@ static void DelUser( const Client *u )
 int ss_event_mode( const CmdParams *cmdparams )
 {
 	int add = 1;
+	int operadded = 0;
 	serverstat *ss;
 	char *modes = cmdparams->param;
 
@@ -94,32 +95,40 @@ int ss_event_mode( const CmdParams *cmdparams )
 	{
 		switch( *modes )
 		{
-		case '+':
-			add = 1;
-			break;
-		case '-':
-			add = 0;
-			break;
-		case 'O':
-		case 'o':
-			if( add )
-			{
-				dlog( DEBUG1, "Increasing OperCount for %s", ss->name );
-				AddNetworkOper();
-				AddServerOper( cmdparams->source );
-			}
-			else
-			{
-				if( IsOper( cmdparams->source ) )
+			case '+':
+				add = 1;
+				break;
+			case '-':
+				add = 0;
+				break;
+			case 'O':
+			case 'o':
+				if( add != 0 )
 				{
-					dlog( DEBUG1, "Decreasing OperCount for %s", ss->name );
-					DelNetworkOper();
-					DelServerOper( cmdparams->source );
+					/* only inc opercount if we have not already added during this parse */
+					if( operadded == 0 )
+					{
+						dlog( DEBUG1, "Increasing OperCount for %s", ss->name );
+						AddNetworkOper();
+						AddServerOper( cmdparams->source );
+						/* Flag oper added */
+						operadded = 1;
+					}
 				}
-			}
-			break;
-		default:
-			break;
+				else
+				{
+					if( IsOper( cmdparams->source ) )
+					{
+						dlog( DEBUG1, "Decreasing OperCount for %s", ss->name );
+						DelNetworkOper();
+						DelServerOper( cmdparams->source );
+						/* Clear oper added to support +o-o+o correctly */
+						operadded = 0;
+					}
+				}
+				break;
+			default:
+				break;
 		}
 		modes++;
 	}

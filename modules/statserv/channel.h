@@ -30,8 +30,8 @@ typedef enum CHANNEL_SORT
 	CHANNEL_SORT_MEMBERS,
 	CHANNEL_SORT_JOINS,
 	CHANNEL_SORT_KICKS,
-	CHANNEL_SORT_TOPICS,
-}CHANNEL_SORT;
+	CHANNEL_SORT_TOPICS
+} CHANNEL_SORT;
 
 typedef struct channelstat 
 {
@@ -44,7 +44,7 @@ typedef struct channelstat
 	statistic kicks;
 	statistic topics;
 	statistic joins;
-}channelstat;
+} channelstat;
 
 typedef void (*ChannelStatHandler)( channelstat *cs, const void *v );
 
