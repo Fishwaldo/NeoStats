@@ -58,9 +58,9 @@ int SetStatistic( statistic *stat, int current );
 void PreSaveStatistic( statistic *stat );
 void PostLoadStatistic( statistic *stat );
 
-int GetAllTimePercent( statistic *stat );
-int GetDailyPercent( statistic *stat );
-int GetWeeklyPercent( statistic *stat );
-int GetMonthlyPercent( statistic *stat );
+int GetAllTimePercent( const statistic *stat );
+int GetDailyPercent( const statistic *stat );
+int GetWeeklyPercent( const statistic *stat );
+int GetMonthlyPercent( const statistic *stat );
 
 #endif /* _STATS_H_ */

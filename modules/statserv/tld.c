@@ -266,7 +266,7 @@ int ss_event_nickip( const CmdParams *cmdparams )
 
 /** @brief SaveTLDStat
  *
- *  Save TLD stat
+ *  Save TLD statistic
  *
  *  @param none
  *

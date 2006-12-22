@@ -55,7 +55,7 @@ static int topcurrentversions( const void *key1, const void *key2 )
  *
  *  @param name ctcp version to search for
  *
- *  @return pointer to stat found or NULL if none
+ *  @return pointer to statistic found or NULL if none
  */
 
 static ss_ctcp_version *findctcpversion( const char *name )
@@ -64,15 +64,19 @@ static ss_ctcp_version *findctcpversion( const char *name )
 
 	cv = lnode_find( ctcp_version_list, name, comparef );
 	if( cv )
-		dlog( DEBUG2, "findctcpversion: found version: %s", name );
+	{
+		dlog( DEBUG7, "findctcpversion: found version: %s", name );
+	}
 	else
-		dlog( DEBUG2, "findctcpversion: %s not found", name );	
+	{
+		dlog( DEBUG7, "findctcpversion: %s not found", name );	
+	}
 	return cv;
 }
 
 /** @brief SaveClientVersion
  *
- *  Save client version stat
+ *  Save client version statistic
  *
  *  @param none
  *
@@ -80,13 +84,13 @@ static ss_ctcp_version *findctcpversion( const char *name )
  */
 static void SaveClientVersion( const ss_ctcp_version *cv, const void *v )
 {
-	DBAStore( CTCPVERSION_TABLE, cv->name, ( void *)cv, sizeof( ss_ctcp_version));
-	dlog( DEBUG2, "Save version %s", cv->name );
+	DBAStore( CTCPVERSION_TABLE, cv->name, ( void *)cv, sizeof( ss_ctcp_version) );
+	dlog( DEBUG7, "Save version %s", cv->name );
 }
 
 /** @brief SaveClientVersions
  *
- *  Save client version stats
+ *  Save client version statistics
  *
  *  @param none
  *
@@ -118,7 +122,7 @@ static int new_ctcpversion( void *data, int size )
 		return NS_FALSE;
 	}
 	cv = ns_calloc( sizeof( ss_ctcp_version ) );
-	os_memcpy( cv, data, sizeof( ss_ctcp_version ));
+	os_memcpy( cv, data, sizeof( ss_ctcp_version ) );
 	lnode_create_append( ctcp_version_list, cv );
 	return NS_FALSE;
 }
@@ -149,7 +153,7 @@ static void LoadVersionStats( void )
 
 static void ClientVersionReport( const ss_ctcp_version *cv, const void *v )
 {
-	irc_prefmsg( ss_bot, ( Client * ) v, "%d ->  %s", cv->users.current, cv->name );
+	irc_prefmsg( ss_bot, ( Client * ) v, "%d -> %s", cv->users.current, cv->name );
 }
 
 /** @brief GetClientStats
@@ -170,7 +174,9 @@ void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v 
 	int count = 0;
 	
 	if( !list_is_sorted( ctcp_version_list, topcurrentversions ) )
+	{
 		list_sort( ctcp_version_list, topcurrentversions );
+	}
 	cn = list_first( ctcp_version_list );
 	while( cn != NULL )
 	{
@@ -179,7 +185,9 @@ void GetClientStats( const CTCPVersionHandler handler, int limit, const void *v 
 		cn = list_next( ctcp_version_list, cn );
 		count++;
 		if( limit != -1 && count >= limit )
+		{
 			break;
+		}
 	}
 
 }
@@ -201,7 +209,9 @@ int ss_cmd_ctcpversion( const CmdParams *cmdparams )
 
 	limit = cmdparams->ac > 0 ? atoi( cmdparams->av[0] ) : 10;
 	if( limit < 10 )
+	{
 		limit = 10;
+	}
 	if( list_count( ctcp_version_list ) == 0 )
 	{
 		irc_prefmsg( ss_bot, cmdparams->source, "No Stats Available." );
@@ -230,16 +240,18 @@ int ss_event_ctcpversionbc( const CmdParams *cmdparams )
 
 	/* drop multiple replies and additional lines in multi line replies */
 	if( cmdparams->source->flags & CLIENT_FLAG_GOTVERSION )
+	{
 		return NS_SUCCESS;
+	}
 	strlcpy( nocols, cmdparams->param, BUFSIZE );
 	strip_mirc_codes( nocols );
 	cv = findctcpversion( nocols );
-	if( !cv )
+	if( cv == NULL )
 	{
 		cv = ns_calloc( sizeof( ss_ctcp_version ) );
 		strlcpy( cv->name, nocols, BUFSIZE );
 		lnode_create_append( ctcp_version_list, cv );
-		dlog( DEBUG2, "Added version: %s", cv->name );
+		dlog( DEBUG7, "Added version: %s", cv->name );
 	}
 	IncStatistic( &cv->users );
 	return NS_SUCCESS;
@@ -257,9 +269,9 @@ int ss_event_ctcpversionbc( const CmdParams *cmdparams )
 int InitVersionStats( void )
 {
 	ctcp_version_list = list_create( LISTCOUNT_T_MAX );
-	if( !ctcp_version_list )
+	if( ctcp_version_list == NULL )
 	{
-		nlog( LOG_CRITICAL, "Unable to create version stat list" );
+		nlog( LOG_CRITICAL, "Unable to create version statistic list" );
 		return NS_FAILURE;
 	}
 	DBAOpenTable( CTCPVERSION_TABLE );

@@ -440,7 +440,7 @@ int AverageStatisticsTimer( void *userptr )
  *  @return percent
  */
 
-int GetAllTimePercent( statistic *stat )
+int GetAllTimePercent( const statistic *stat )
 {
 	return( int )( ( ( float ) stat->current / ( float ) stat->alltime.max ) * 100 );
 }
@@ -454,7 +454,7 @@ int GetAllTimePercent( statistic *stat )
  *  @return percent
  */
 
-int GetDailyPercent( statistic *stat )
+int GetDailyPercent( const statistic *stat )
 {
 	return( int )( ( ( float ) stat->current / ( float ) stat->daily.max ) * 100 );
 }
@@ -468,7 +468,7 @@ int GetDailyPercent( statistic *stat )
  *  @return percent
  */
 
-int GetWeeklyPercent( statistic *stat )
+int GetWeeklyPercent( const statistic *stat )
 {
 	return( int )( ( ( float ) stat->current / ( float ) stat->weekly.max ) * 100 );
 }
@@ -482,7 +482,7 @@ int GetWeeklyPercent( statistic *stat )
  *  @return percent
  */
 
-int GetMonthlyPercent( statistic *stat )
+int GetMonthlyPercent( const statistic *stat )
 {
 	return( int )( ( ( float ) stat->current / ( float ) stat->monthly.max ) * 100 );
 }
