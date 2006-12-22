@@ -465,17 +465,19 @@ static int ss_server_del( const CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** @brief ss_server_copy
+/** @brief ss_server_rename
  *
- *  SERVER COPY command handler
- *  Reports current statistics to requesting user
+ *  SERVER RENAME command handler
+ *  Renames a server statistic entry
  *
  *  @param cmdparams
+ *    cmdparams->av[1] = old name
+ *    cmdparams->av[2] = new name
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-static int ss_server_copy( const CmdParams *cmdparams )
+static int ss_server_rename( const CmdParams *cmdparams )
 {
 	serverstat *dest;
 	serverstat *src;
@@ -501,11 +503,10 @@ static int ss_server_copy( const CmdParams *cmdparams )
 			cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
-	memcpy( dest, src, sizeof( serverstat ) );
 	strlcpy( dest->name, cmdparams->av[2], MAXHOST );
-	irc_prefmsg( ss_bot, cmdparams->source, "Copied database entry for %s to %s", 
+	irc_prefmsg( ss_bot, cmdparams->source, "Renamed database entry for %s to %s", 
 		cmdparams->av[1], cmdparams->av[2] );
-	nlog( LOG_NOTICE, "%s requested STATS COPY %s to %s", cmdparams->source->name, 
+	nlog( LOG_NOTICE, "%s requested STATS RENAME %s to %s", cmdparams->source->name, 
 		cmdparams->av[1], cmdparams->av[2] );
 	return NS_SUCCESS;
 }
@@ -604,8 +605,8 @@ int ss_cmd_server( const CmdParams *cmdparams )
 		return ss_cmd_server_list( cmdparams );
 	if( ircstrcasecmp( cmdparams->av[0], "DEL" ) == 0 )
 		return ss_server_del( cmdparams );
-	if( ircstrcasecmp( cmdparams->av[0], "COPY" ) == 0 )
-		return ss_server_copy( cmdparams );	
+	if( ircstrcasecmp( cmdparams->av[0], "RENAME" ) == 0 )
+		return ss_server_rename( cmdparams );	
 	return ss_cmd_server_stats( cmdparams );
 }
 

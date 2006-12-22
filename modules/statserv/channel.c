@@ -191,7 +191,7 @@ int toptopicrunningtotalchannel( const void *key1, const void *key2 )
  *  @return pointer to stat
  */
 
-static channelstat *LoadChannel( char *name ) 
+static channelstat *LoadChannel( const char *name ) 
 {
 	channelstat *cs;
 

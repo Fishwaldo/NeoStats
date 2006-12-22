@@ -5,6 +5,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - StatServ COPY command is now RENAME since that is what it does. (M)
+ - Fix segfault in StatServ COPY. (M)
  - Fix StatServ oper counts. (M)
  - Fix 4 year old bug in module loading.  (M)
  - Fix up neostats startup script etc for cron related issues - Thanks to

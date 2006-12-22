@@ -143,7 +143,7 @@ const char *ss_help_server[] = {
 	"Syntax: \2SERVER <server name>\2",
 	"        \2SERVER LIST\2",
 	"        \2SERVER DEL <servername>\2",
-	"        \2SERVER COPY <oldservername> <newservername>\2",
+	"        \2SERVER RENAME <oldservername> <newservername>\2",
 	"",
 	"Display server statistics for passed server name.",
 	"",
@@ -151,7 +151,7 @@ const char *ss_help_server[] = {
 	"",
 	"DEL removes an entry.",
 	"",
-	"COPY copies an entry.",
+	"RENAME renames an entry.",
 	NULL
 };
 
