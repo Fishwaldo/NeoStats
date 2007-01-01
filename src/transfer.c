@@ -27,6 +27,7 @@
 #include "neostats.h"
 #include "transfer.h"
 #include "curl.h"
+#include "event.h"
 
 #define MAXURL BUFSIZE	/* max URL size */
 #define MAX_TRANSFERS	10	/* number of curl transfers */
@@ -66,8 +67,8 @@ typedef struct neo_transfer {
 /* this is the curl multi handle we use */
 static CURLM *curlmultihandle;
 static list_t *activetransfers;
-
-#define CURL_TEST 1
+static int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp);
+#define CURL_TEST 0
 #ifdef CURL_TEST
 void CurlTest( void *data, int status, char *ver, int versize ) {
 	dlog(DEBUG1, "Download Ok: %d", status);
@@ -96,6 +97,12 @@ int InitCurl(void)
 		nlog(LOG_WARNING, "LibCurl Refused to initialize...  Could be problems");
 		return NS_FAILURE;
 	}
+#ifndef CURLHACK
+	if (curl_multi_setopt(curlmultihandle, CURLMOPT_SOCKETFUNCTION, curl_socket_event_callback)) {
+		nlog(LOG_WARNING, "Libcurl failed to initialize the multisock interface");
+		return NS_FAILURE;
+	}
+#endif
 	/* init the internal list to track downloads */
 	activetransfers = list_create(MAX_TRANSFERS);
 	if( !activetransfers )
@@ -336,12 +343,12 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		return NS_FAILURE;
 	}
 	/* we have to do this at least once to get things going */
-	while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curlmultihandle, &ret)) {
+	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket_all(curlmultihandle, &ret)) {
 	}
-
 	return NS_SUCCESS;
 }
 
+#ifdef CURLHACK
 static void transfer_status( void ) 
 {
 	CURLMsg *msg;
@@ -388,7 +395,6 @@ static void transfer_status( void )
 	}
 }
 
-#ifdef CURLHACK
 void CurlHackReadLoop( void )
 {
 	struct timeval TimeOut;
@@ -419,5 +425,53 @@ void CurlHackReadLoop( void )
              }
         }
 }
+#else 
+int curl_read(void *userp, void *data, int size) {
+	int ret;
+	curl_socket_t sock = (int)userp;
+	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket(curlmultihandle, sock, &ret))
+	{
+	}
+	return NS_SUCCESS;
+}
+int curl_write(int socket, void *userp) {
+	int ret;
+	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket(curlmultihandle, socket, &ret))
+	{
+	}
+	return NS_SUCCESS;
+}
+
+int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp) {
+	Sock *sock;
+	char buf[BUFSIZE];
+	/* if socketp is NULL, this is the first time we have seen this socket from CURL, so create it in our 
+	 * routines */
+	if (socketp == NULL) {
+		ircsnprintf(buf, BUFSIZE, "CURL-%d", s);
+		sock = AddSock(SOCK_NATIVE, buf, s, curl_read, curl_write, 0, (void *)s, NULL);
+		if (sock) curl_multi_assign(curlmultihandle, s, sock);
+	} else {
+		sock = socketp;
+	}
+	switch (action) {
+		case CURL_POLL_NONE:
+		case CURL_POLL_IN:
+			UpdateSock(sock, EV_READ|EV_PERSIST, 1, NULL);
+			break;
+		case CURL_POLL_OUT:
+			UpdateSock(sock, EV_WRITE|EV_PERSIST, 1, NULL);	
+			break;
+		case CURL_POLL_INOUT:
+			UpdateSock(sock, EV_READ|EV_WRITE|EV_PERSIST, 1, NULL);	
+			break;	
+		case CURL_POLL_REMOVE:
+			DelSock(sock);
+			break;
+	}
+
+	return 0;
+}
+
 #endif /* CURLHACK */
 

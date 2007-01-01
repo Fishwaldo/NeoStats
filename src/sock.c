@@ -399,29 +399,11 @@ static void socket_linemode_error(struct bufferevent *bufferevent, short what, v
 
 int InitSocks (void)
 {
-#if 0
-	struct hostent *hp;
-#endif
 	sockethash = hash_create (me.maxsocks, 0, 0);
 	if(!sockethash) {
 		nlog (LOG_CRITICAL, "Unable to create socks hash");
 		return NS_FAILURE;
 	}
-/* done in the confuse callback now */
-#if 0
-	me.dobind = 0;
-	/* bind to a local ip */
-	os_memset( &me.lsa, 0, sizeof( me.lsa ) );
-	if (me.local[0] != 0) {
-		if ((hp = gethostbyname (me.local)) == NULL) {
-			nlog (LOG_WARNING, "Couldn't bind to IP address %s", me.local);
-		} else {
-			os_memcpy( ( char * ) &me.lsa.sin_addr, hp->h_addr, hp->h_length );
-			me.lsa.sin_family = hp->h_addrtype;
-			me.dobind = 1;
-		}
-	}
-#endif
 	event_set_log_callback(libevent_log);
 	event_init();
 	return NS_SUCCESS;
@@ -693,13 +675,13 @@ static void read_sock_activity(int fd, short what, void *data)
 		sock->rmsgs++;
 		if (sock->socktype == SOCK_STANDARD) {
    			if (howmuch > 0) {
-    			p = os_malloc(howmuch);
-	    	}
-		    n = os_sock_read(sock->sock_no, p, howmuch);
+    				p = os_malloc(howmuch);
+	    		}
+		    	n = os_sock_read(sock->sock_no, p, howmuch);
    			if (n == -1 || n == 0) {
-    			dlog(DEBUG1, "sock_read: failed %s", sock->name);
-	    		sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
-		    	DelSock(sock);
+    				dlog(DEBUG1, "sock_read: failed %s", sock->name);
+	    			sock->sfunc.standmode.readfunc(sock->data, NULL, -1);
+		    		DelSock(sock);
 				return;
    			}
 			dlog(DEBUG1, "sock_read: Read %d bytes from fd %d (%s)", n, sock->sock_no, sock->name);

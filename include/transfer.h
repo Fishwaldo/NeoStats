@@ -24,7 +24,7 @@
 #ifndef _TRANSFER_H_
 #define _TRANSFER_H_
 
-#define CURLHACK 1
+#undef CURLHACK
 
 int InitCurl( void );
 void FiniCurl( void );
