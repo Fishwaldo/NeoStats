@@ -10,22 +10,22 @@
  * Copyright (c) 1998, 1999 Kungliga Tekniska Högskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
- * 
+ *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * 3. Neither the name of the Institute nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -46,7 +46,6 @@
 #define _MPRINTF_REPLACE /* we want curl-functions instead of native ones */
 #include "mprintf.h"
 
-#include "security.h"
 #include <stdlib.h>
 #include <string.h>
 #include <netdb.h>
@@ -55,18 +54,19 @@
 #include <unistd.h>
 #endif
 
+#include "urldata.h"
+#include "krb4.h"
 #include "base64.h"
 #include "sendf.h"
 #include "ftp.h"
+#include "memory.h"
 
 /* The last #include file should be: */
-#ifdef CURLDEBUG
 #include "memdebug.h"
-#endif
 
 #define min(a, b)   ((a) < (b) ? (a) : (b))
 
-static struct {
+static const struct {
     enum protection_level level;
     const char *name;
 } level_names[] = {
@@ -76,17 +76,17 @@ static struct {
     { prot_private, "private" }
 };
 
-static enum protection_level 
+static enum protection_level
 name_to_level(const char *name)
 {
   int i;
   for(i = 0; i < (int)sizeof(level_names)/(int)sizeof(level_names[0]); i++)
-    if(!strncasecmp(level_names[i].name, name, strlen(name)))
+    if(curl_strnequal(level_names[i].name, name, strlen(name)))
       return level_names[i].level;
   return (enum protection_level)-1;
 }
 
-static struct Curl_sec_client_mech *mechs[] = {
+static const struct Curl_sec_client_mech * const mechs[] = {
 #ifdef KRB5
   /* not supported */
 #endif
@@ -147,7 +147,7 @@ sec_get_data(struct connectdata *conn,
 {
   int len;
   int b;
-  
+
   b = block_read(fd, &len, sizeof(len));
   if (b == 0)
     return 0;
@@ -179,15 +179,15 @@ static size_t
 buffer_write(struct krb4buffer *buf, void *data, size_t len)
 {
     if(buf->index + len > buf->size) {
-	void *tmp;
-	if(buf->data == NULL)
-	    tmp = malloc(1024);
-	else
-	    tmp = realloc(buf->data, buf->index + len);
-	if(tmp == NULL)
-	    return -1;
-	buf->data = tmp;
-	buf->size = buf->index + len;
+        void *tmp;
+        if(buf->data == NULL)
+            tmp = malloc(1024);
+        else
+            tmp = realloc(buf->data, buf->index + len);
+        if(tmp == NULL)
+            return -1;
+        buf->data = tmp;
+        buf->size = buf->index + len;
     }
     memcpy((char*)buf->data + buf->index, data, len);
     buf->index += len;
@@ -207,12 +207,12 @@ Curl_sec_read(struct connectdata *conn, int fd, void *buffer, int length)
       conn->in_buffer.eof_flag = 0;
       return 0;
     }
-    
+
     len = buffer_read(&conn->in_buffer, buffer, length);
     length -= len;
     rx += len;
     buffer = (char*)buffer + len;
-    
+
     while(length) {
       if(sec_get_data(conn, fd, &conn->in_buffer) < 0)
         return -1;
@@ -262,7 +262,7 @@ Curl_sec_write(struct connectdata *conn, int fd, char *buffer, int length)
 {
   int len = conn->buffer_size;
   int tx = 0;
-      
+
   if(conn->data_prot == prot_clear)
     return write(fd, buffer, length);
 
@@ -284,7 +284,7 @@ Curl_sec_putc(struct connectdata *conn, int c, FILE *F)
   char ch = c;
   if(conn->data_prot == prot_clear)
     return putc(c, F);
-    
+
   buffer_write(&conn->out_buffer, &ch, 1);
   if(c == '\n' || conn->out_buffer.index >= 1024 /* XXX */) {
     Curl_sec_write(conn, fileno(F), conn->out_buffer.data,
@@ -297,36 +297,40 @@ Curl_sec_putc(struct connectdata *conn, int c, FILE *F)
 int
 Curl_sec_read_msg(struct connectdata *conn, char *s, int level)
 {
-    int len;
-    char *buf;
-    int code;
-    
-    buf = malloc(strlen(s));
-    len = Curl_base64_decode(s + 4, buf); /* XXX */
-    
-    len = (conn->mech->decode)(conn->app_data, buf, len, level, conn);
-    if(len < 0)
-	return -1;
-    
-    buf[len] = '\0';
+  int len;
+  unsigned char *buf;
+  int code;
 
-    if(buf[3] == '-')
-	code = 0;
-    else
-	sscanf(buf, "%d", &code);
-    if(buf[len-1] == '\n')
-	buf[len-1] = '\0';
-    strcpy(s, buf);
+  len = Curl_base64_decode(s + 4, &buf); /* XXX */
+  if(len > 0)
+    len = (conn->mech->decode)(conn->app_data, buf, len, level, conn);
+  else
+    return -1;
+
+  if(len < 0) {
     free(buf);
-    return code;
+    return -1;
+  }
+
+  buf[len] = '\0';
+
+  if(buf[3] == '-')
+    code = 0;
+  else
+    sscanf((char *)buf, "%d", &code);
+  if(buf[len-1] == '\n')
+    buf[len-1] = '\0';
+  strcpy(s, (char *)buf);
+  free(buf);
+  return code;
 }
 
 enum protection_level
 Curl_set_command_prot(struct connectdata *conn, enum protection_level level)
 {
-    enum protection_level old = conn->command_prot;
-    conn->command_prot = level;
-    return old;
+  enum protection_level old = conn->command_prot;
+  conn->command_prot = level;
+  return old;
 }
 
 static int
@@ -372,7 +376,7 @@ sec_prot_internal(struct connectdata *conn, int level)
     failf(conn->data, "Failed to set protection level.");
     return -1;
   }
-    
+
   conn->data_prot = (enum protection_level)level;
   return 0;
 }
@@ -399,7 +403,7 @@ int
 Curl_sec_login(struct connectdata *conn)
 {
   int ret;
-  struct Curl_sec_client_mech **m;
+  const struct Curl_sec_client_mech * const *m;
   ssize_t nread;
   struct SessionHandle *data=conn->data;
   int ftpcode;
@@ -413,7 +417,7 @@ Curl_sec_login(struct connectdata *conn)
       return -1;
     }
     conn->app_data = tmp;
-	    
+
     if((*m)->init && (*(*m)->init)(conn->app_data) != 0) {
       infof(data, "Skipping %s...\n", (*m)->name);
       continue;
@@ -447,7 +451,7 @@ Curl_sec_login(struct connectdata *conn)
     }
 
     ret = (*(*m)->auth)(conn->app_data, conn);
-	
+
     if(ret == AUTH_CONTINUE)
       continue;
     else if(ret != AUTH_OK){
@@ -459,7 +463,7 @@ Curl_sec_login(struct connectdata *conn)
     conn->command_prot = prot_safe;
     break;
   }
-    
+
   return *m == NULL;
 }
 

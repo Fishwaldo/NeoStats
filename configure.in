@@ -12,7 +12,7 @@ AC_CACHE_LOAD
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
-x_rev="a3"
+x_rev="a4"
 x_package='NeoStats'
 MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline"
 #dont edit anything after this line!
@@ -23,7 +23,7 @@ AM_MAINTAINER_MODE
 AC_DEFINE_UNQUOTED(MAJOR, $x_maj, "Major Version Number")
 AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
 AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
-AC_DEFINE_UNQUOTED(VERSION, $x_version, "Full Version")
+AC_DEFINE_UNQUOTED(VERSION, "$x_min.$x_rev", "Full Version")
 AC_MSG_HEADER([Configuring Core Now])
 
 AC_LIBTOOL_DLOPEN
@@ -54,7 +54,11 @@ case "$system" in
 	*)
 		RDYNAMIC_FLAG="-rdynamic"
 		;;
-esac		
+esac	
+AC_CANONICAL_HOST
+dnl Get system canonical name
+AC_DEFINE_UNQUOTED(OS, "${host}", [cpu-machine-OS])
+	
 # Checks for libraries.
 # AC_LIB_LTDL
 AC_CHECK_LIB(dl, dlopen)

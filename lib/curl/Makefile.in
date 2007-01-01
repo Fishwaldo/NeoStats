@@ -42,7 +42,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk COPYING \
-	depcomp install-sh missing mkinstalldirs
+	depcomp missing mkinstalldirs
 subdir = lib/curl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -70,13 +70,16 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libcurl_la_LIBADD =
 am_libcurl_la_OBJECTS = file.lo timeval.lo base64.lo hostip.lo \
 	progress.lo formdata.lo cookie.lo http.lo sendf.lo ftp.lo \
-	url.lo dict.lo if2ip.lo speedcheck.lo getdate.lo ldap.lo \
-	ssluse.lo version.lo getenv.lo escape.lo mprintf.lo telnet.lo \
-	netrc.lo getinfo.lo transfer.lo strequal.lo easy.lo \
-	security.lo krb4.lo memdebug.lo http_chunks.lo strtok.lo \
-	connect.lo llist.lo hash.lo multi.lo content_encoding.lo \
-	share.lo http_digest.lo md5.lo http_negotiate.lo http_ntlm.lo \
-	inet_pton.lo
+	url.lo dict.lo if2ip.lo speedcheck.lo ldap.lo ssluse.lo \
+	version.lo getenv.lo escape.lo mprintf.lo telnet.lo netrc.lo \
+	getinfo.lo transfer.lo strequal.lo easy.lo security.lo krb4.lo \
+	memdebug.lo http_chunks.lo strtok.lo connect.lo llist.lo \
+	hash.lo multi.lo content_encoding.lo share.lo http_digest.lo \
+	md5.lo http_negotiate.lo http_ntlm.lo inet_pton.lo \
+	strtoofft.lo strerror.lo hostares.lo hostasyn.lo hostip4.lo \
+	hostip6.lo hostsyn.lo hostthre.lo inet_ntop.lo parsedate.lo \
+	select.lo gtls.lo sslgen.lo tftp.lo splay.lo strdup.lo \
+	socks.lo
 libcurl_la_OBJECTS = $(am_libcurl_la_OBJECTS)
 DEFAULT_INCLUDES = 
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -138,6 +141,7 @@ EVNTLIBOBJS = @EVNTLIBOBJS@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
+GREP = @GREP@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
@@ -181,12 +185,10 @@ STRIP = @STRIP@
 USECCDV = @USECCDV@
 VERSION = -version-info 2:2:0
 YACC = @YACC@
-ac_ct_AR = @ac_ct_AR@
+YFLAGS = @YFLAGS@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_F77 = @ac_ct_F77@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__fastdepCXX_FALSE = @am__fastdepCXX_FALSE@
@@ -203,24 +205,31 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 datadir = $(prefix)/data
+datarootdir = @datarootdir@
+docdir = $(prefix)/doc
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
+htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 perlpath = @perlpath@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sedpath = @sedpath@
 sharedstatedir = @sharedstatedir@
@@ -276,27 +285,30 @@ INCLUDES = -I$(top_srcdir)/include
 #MIMPURE = -mimpure-text
 #endif
 libcurl_la_LDFLAGS = $(VERSION)
-libcurl_la_SOURCES = arpa_telnet.h file.c netrc.h timeval.c	\
-base64.c file.h hostip.c progress.c timeval.h base64.h formdata.c	\
-hostip.h progress.h cookie.c formdata.h http.c sendf.c cookie.h ftp.c	\
-http.h sendf.h url.c dict.c ftp.h if2ip.c speedcheck.c url.h dict.h	\
-getdate.c if2ip.h speedcheck.h urldata.h getdate.h ldap.c ssluse.c	\
-version.c getenv.c ldap.h ssluse.h escape.c mprintf.c telnet.c escape.h	\
-netrc.c telnet.h getinfo.c getinfo.h transfer.c strequal.c	\
-strequal.h easy.c security.h security.c krb4.c krb4.h memdebug.c	\
-memdebug.h inet_ntoa_r.h http_chunks.c http_chunks.h strtok.c strtok.h	\
-connect.c connect.h llist.c llist.h hash.c hash.h multi.c		\
-content_encoding.c content_encoding.h share.c share.h http_digest.c \
-md5.c md5.h http_digest.h http_negotiate.c http_negotiate.h \
-http_ntlm.c http_ntlm.h ca-bundle.h inet_pton.c inet_pton.h \
-urldata.h cookie.h mprintf.h curl.h types.h easy.h multi.h
+libcurl_la_SOURCES = file.c timeval.c base64.c hostip.c progress.c formdata.c	\
+  cookie.c http.c sendf.c ftp.c url.c dict.c if2ip.c speedcheck.c	\
+  ldap.c ssluse.c version.c getenv.c escape.c mprintf.c telnet.c	\
+  netrc.c getinfo.c transfer.c strequal.c easy.c security.c krb4.c	\
+  memdebug.c http_chunks.c strtok.c connect.c llist.c hash.c multi.c	\
+  content_encoding.c share.c http_digest.c md5.c http_negotiate.c	\
+  http_ntlm.c inet_pton.c strtoofft.c strerror.c hostares.c hostasyn.c	\
+  hostip4.c hostip6.c hostsyn.c hostthre.c inet_ntop.c parsedate.c	\
+  select.c gtls.c sslgen.c tftp.c splay.c strdup.c socks.c
 
-noinst_HEADERS = setup.h transfer.h
-BUILT_SOURCES = $(srcdir)/getdate.c $(srcdir)/ca-bundle.h
+noinst_HEADERS = arpa_telnet.h netrc.h file.h timeval.h base64.h hostip.h	\
+  progress.h formdata.h cookie.h http.h sendf.h ftp.h url.h dict.h	\
+  if2ip.h speedcheck.h urldata.h ldap.h ssluse.h escape.h telnet.h	\
+  getinfo.h strequal.h krb4.h memdebug.h inet_ntoa_r.h \
+  http_chunks.h strtok.h connect.h llist.h hash.h content_encoding.h	\
+  share.h md5.h http_digest.h http_negotiate.h http_ntlm.h ca-bundle.h	\
+  inet_pton.h strtoofft.h strerror.h inet_ntop.h curlx.h memory.h	\
+  setup.h transfer.h select.h easyif.h multiif.h parsedate.h sslgen.h   \
+  gtls.h tftp.h sockaddr.h splay.h strdup.h setup_once.h socks.h
+
+BUILT_SOURCES = $(srcdir)/ca-bundle.h
 LINK = $(LIBTOOL) --tag=CXX --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-docdir = $(prefix)/doc
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -367,17 +379,24 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/formdata.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ftp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getdate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getenv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtls.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hostares.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hostasyn.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hostip.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hostip4.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hostip6.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hostsyn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hostthre.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http_chunks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http_digest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http_negotiate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http_ntlm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/if2ip.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet_ntop.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet_pton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/krb4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ldap.Plo@am__quote@
@@ -387,15 +406,24 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mprintf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netrc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parsedate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/progress.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/security.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/select.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sendf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/share.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/speedcheck.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splay.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sslgen.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssluse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strdup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strequal.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strerror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strtok.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strtoofft.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/telnet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tftp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timeval.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transfer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/url.Plo@am__quote@
@@ -585,12 +613,6 @@ uninstall-am: uninstall-info-am uninstall-libLTLIBRARIES
 	tags uninstall uninstall-am uninstall-info-am \
 	uninstall-libLTLIBRARIES
 
-
-# Say $(srcdir), so GNU make does not report an ambiguity with the .y.c rule.
-$(srcdir)/getdate.c: getdate.y
-	cd $(srcdir) && \
-	  $(YACC) $(YFLAGS) getdate.y; \
-	  mv -f y.tab.c getdate.c
 
 $(srcdir)/ca-bundle.h: Makefile.in Makefile
 	@if test -f $@; then \

@@ -56,30 +56,27 @@ VERSION=-version-info 2:2:0
 
 libcurl_la_LDFLAGS = $(VERSION)
 
-libcurl_la_SOURCES = arpa_telnet.h file.c netrc.h timeval.c	\
-base64.c file.h hostip.c progress.c timeval.h base64.h formdata.c	\
-hostip.h progress.h cookie.c formdata.h http.c sendf.c cookie.h ftp.c	\
-http.h sendf.h url.c dict.c ftp.h if2ip.c speedcheck.c url.h dict.h	\
-getdate.c if2ip.h speedcheck.h urldata.h getdate.h ldap.c ssluse.c	\
-version.c getenv.c ldap.h ssluse.h escape.c mprintf.c telnet.c escape.h	\
-netrc.c telnet.h getinfo.c getinfo.h transfer.c strequal.c	\
-strequal.h easy.c security.h security.c krb4.c krb4.h memdebug.c	\
-memdebug.h inet_ntoa_r.h http_chunks.c http_chunks.h strtok.c strtok.h	\
-connect.c connect.h llist.c llist.h hash.c hash.h multi.c		\
-content_encoding.c content_encoding.h share.c share.h http_digest.c \
-md5.c md5.h http_digest.h http_negotiate.c http_negotiate.h \
-http_ntlm.c http_ntlm.h ca-bundle.h inet_pton.c inet_pton.h \
-urldata.h cookie.h mprintf.h curl.h types.h easy.h multi.h
+libcurl_la_SOURCES = file.c timeval.c base64.c hostip.c progress.c formdata.c	\
+  cookie.c http.c sendf.c ftp.c url.c dict.c if2ip.c speedcheck.c	\
+  ldap.c ssluse.c version.c getenv.c escape.c mprintf.c telnet.c	\
+  netrc.c getinfo.c transfer.c strequal.c easy.c security.c krb4.c	\
+  memdebug.c http_chunks.c strtok.c connect.c llist.c hash.c multi.c	\
+  content_encoding.c share.c http_digest.c md5.c http_negotiate.c	\
+  http_ntlm.c inet_pton.c strtoofft.c strerror.c hostares.c hostasyn.c	\
+  hostip4.c hostip6.c hostsyn.c hostthre.c inet_ntop.c parsedate.c	\
+  select.c gtls.c sslgen.c tftp.c splay.c strdup.c socks.c
 
-noinst_HEADERS = setup.h transfer.h
+noinst_HEADERS = arpa_telnet.h netrc.h file.h timeval.h base64.h hostip.h	\
+  progress.h formdata.h cookie.h http.h sendf.h ftp.h url.h dict.h	\
+  if2ip.h speedcheck.h urldata.h ldap.h ssluse.h escape.h telnet.h	\
+  getinfo.h strequal.h krb4.h memdebug.h inet_ntoa_r.h \
+  http_chunks.h strtok.h connect.h llist.h hash.h content_encoding.h	\
+  share.h md5.h http_digest.h http_negotiate.h http_ntlm.h ca-bundle.h	\
+  inet_pton.h strtoofft.h strerror.h inet_ntop.h curlx.h memory.h	\
+  setup.h transfer.h select.h easyif.h multiif.h parsedate.h sslgen.h   \
+  gtls.h tftp.h sockaddr.h splay.h strdup.h setup_once.h socks.h
 
-BUILT_SOURCES = $(srcdir)/getdate.c $(srcdir)/ca-bundle.h
-
-# Say $(srcdir), so GNU make does not report an ambiguity with the .y.c rule.
-$(srcdir)/getdate.c: getdate.y
-	cd $(srcdir) && \
-	  $(YACC) $(YFLAGS) getdate.y; \
-	  mv -f y.tab.c getdate.c
+BUILT_SOURCES = $(srcdir)/ca-bundle.h
 
 $(srcdir)/ca-bundle.h: Makefile.in Makefile
 	@if test -f $@; then \

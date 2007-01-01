@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___ 
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2003, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2005, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,12 +18,14 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: md5.c,v 1.3 2003/09/07 15:00:10 bagder Exp $
+ * $Id: md5.c,v 1.11 2005/05/02 14:33:07 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
 
-#ifndef USE_SSLEAY
+#ifndef CURL_DISABLE_CRYPTO_AUTH
+
+#if !defined(USE_SSLEAY) || !defined(USE_OPENSSL)
 /* This code segment is only used if OpenSSL is not provided, as if it is
    we use the MD5-function provided there instead. No good duplicating
    code! */
@@ -65,7 +67,7 @@ struct md5_ctx {
 typedef struct md5_ctx MD5_CTX;
 
 static void MD5_Init(struct md5_ctx *);
-static void MD5_Update(struct md5_ctx *, unsigned char *, unsigned int);
+static void MD5_Update(struct md5_ctx *, const unsigned char *, unsigned int);
 static void MD5_Final(unsigned char [16], struct md5_ctx *);
 
 /* Constants for MD5Transform routine.
@@ -88,14 +90,11 @@ static void MD5_Final(unsigned char [16], struct md5_ctx *);
 #define S43 15
 #define S44 21
 
-static void MD5Transform(UINT4 [4], unsigned char [64]);
+static void MD5Transform(UINT4 [4], const unsigned char [64]);
 static void Encode(unsigned char *, UINT4 *, unsigned int);
-static void Decode(UINT4 *, unsigned char *, unsigned int);
+static void Decode(UINT4 *, const unsigned char *, unsigned int);
 
-#define MD5_memcpy(dst,src,len) memcpy(dst,src,len)
-#define MD5_memset(dst,val,len) memset(dst,val,len)
-
-static unsigned char PADDING[64] = {
+static const unsigned char PADDING[64] = {
   0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -138,12 +137,10 @@ Rotation is separate from addition to prevent recomputation.
 
 /* MD5 initialization. Begins an MD5 operation, writing a new context.
  */
-static void MD5_Init (context)
-struct md5_ctx *context;                                        /* context */
+static void MD5_Init(struct md5_ctx *context)
 {
   context->count[0] = context->count[1] = 0;
-  /* Load magic initialization constants.
-*/
+  /* Load magic initialization constants. */
   context->state[0] = 0x67452301;
   context->state[1] = 0xefcdab89;
   context->state[2] = 0x98badcfe;
@@ -154,15 +151,14 @@ struct md5_ctx *context;                                        /* context */
   operation, processing another message block, and updating the
   context.
  */
-static void MD5_Update (context, input, inputLen)
-struct md5_ctx *context;                                        /* context */
-unsigned char *input;                                /* input block */
-unsigned int inputLen;                     /* length of input block */
+static void MD5_Update (struct md5_ctx *context,    /* context */
+                        const unsigned char *input, /* input block */
+                        unsigned int inputLen)      /* length of input block */
 {
-  unsigned int i, index, partLen;
+  unsigned int i, bufindex, partLen;
 
   /* Compute number of bytes mod 64 */
-  index = (unsigned int)((context->count[0] >> 3) & 0x3F);
+  bufindex = (unsigned int)((context->count[0] >> 3) & 0x3F);
 
   /* Update number of bits */
   if ((context->count[0] += ((UINT4)inputLen << 3))
@@ -170,42 +166,40 @@ unsigned int inputLen;                     /* length of input block */
     context->count[1]++;
   context->count[1] += ((UINT4)inputLen >> 29);
   
-  partLen = 64 - index;
+  partLen = 64 - bufindex;
 
   /* Transform as many times as possible. */
   if (inputLen >= partLen) {
-    MD5_memcpy((void *)&context->buffer[index], (void *)input, partLen);
+    memcpy((void *)&context->buffer[bufindex], (void *)input, partLen);
     MD5Transform(context->state, context->buffer);
     
     for (i = partLen; i + 63 < inputLen; i += 64)
       MD5Transform(context->state, &input[i]);
     
-    index = 0;
+    bufindex = 0;
   }
   else
     i = 0;
 
   /* Buffer remaining input */
-  MD5_memcpy((void *)&context->buffer[index], (void *)&input[i],
-             inputLen-i);
+  memcpy((void *)&context->buffer[bufindex], (void *)&input[i], inputLen-i);
 }
 
 /* MD5 finalization. Ends an MD5 message-digest operation, writing the
-  the message digest and zeroizing the context.
- */
-static void MD5_Final (digest, context)
-unsigned char digest[16];                         /* message digest */
-struct md5_ctx *context;                                       /* context */
+   the message digest and zeroizing the context.
+*/
+static void MD5_Final(unsigned char digest[16], /* message digest */
+                      struct md5_ctx *context) /* context */
 {
   unsigned char bits[8];
-  unsigned int index, padLen;
+  unsigned int count, padLen;
 
   /* Save number of bits */
   Encode (bits, context->count, 8);
 
   /* Pad out to 56 mod 64. */
-  index = (unsigned int)((context->count[0] >> 3) & 0x3f);
-  padLen = (index < 56) ? (56 - index) : (120 - index);
+  count = (unsigned int)((context->count[0] >> 3) & 0x3f);
+  padLen = (count < 56) ? (56 - count) : (120 - count);
   MD5_Update (context, PADDING, padLen);
 
   /* Append length (before padding) */
@@ -215,13 +209,12 @@ struct md5_ctx *context;                                       /* context */
   Encode (digest, context->state, 16);
 
   /* Zeroize sensitive information. */
-  MD5_memset ((void *)context, 0, sizeof (*context));
+  memset ((void *)context, 0, sizeof (*context));
 }
 
 /* MD5 basic transformation. Transforms state based on block. */
-static void MD5Transform (state, block)
-UINT4 state[4];
-unsigned char block[64];
+static void MD5Transform(UINT4 state[4],
+                         const unsigned char block[64])
 {
   UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 
@@ -305,7 +298,7 @@ unsigned char block[64];
   state[3] += d;
 
   /* Zeroize sensitive information. */
-  MD5_memset ((void *)x, 0, sizeof (x));
+  memset((void *)x, 0, sizeof (x));
 }
 
 /* Encodes input (UINT4) into output (unsigned char). Assumes len is
@@ -329,7 +322,7 @@ static void Encode (unsigned char *output,
    a multiple of 4.
 */
 static void Decode (UINT4 *output,
-                    unsigned char *input,
+                    const unsigned char *input,
                     unsigned int len)
 {
   unsigned int i, j;
@@ -345,12 +338,15 @@ static void Decode (UINT4 *output,
 #include <string.h>
 #endif
 
+#include "md5.h"
 
 void Curl_md5it(unsigned char *outbuffer, /* 16 bytes */
-                unsigned char *input)
+                const unsigned char *input)
 {
   MD5_CTX ctx;
   MD5_Init(&ctx);
-  MD5_Update(&ctx, input, strlen((char *)input));
+  MD5_Update(&ctx, input, (unsigned int)strlen((char *)input));
   MD5_Final(outbuffer, &ctx);
 }
+
+#endif

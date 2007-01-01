@@ -1,16 +1,16 @@
 /***************************************************************************
- *                                  _   _ ____  _     
- *  Project                     ___| | | |  _ \| |    
- *                             / __| | | | |_) | |    
- *                            | (__| |_| |  _ <| |___ 
+ *                                  _   _ ____  _
+ *  Project                     ___| | | |  _ \| |
+ *                             / __| | | | |_) | |
+ *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2003, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
  * are also available at http://curl.haxx.se/docs/copyright.html.
- * 
+ *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
  * furnished to do so, under the terms of the COPYING file.
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: http_negotiate.c,v 1.6 2003/11/27 09:52:44 bagder Exp $
+ * $Id: http_negotiate.c,v 1.17 2006-10-17 21:32:56 bagder Exp $
  ***************************************************************************/
 #include "setup.h"
 
@@ -28,27 +28,25 @@
 #endif
 
 #ifndef CURL_DISABLE_HTTP
-/* -- WIN32 approved -- */
+ /* -- WIN32 approved -- */
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <errno.h>
 
 #include "urldata.h"
 #include "sendf.h"
 #include "strequal.h"
 #include "base64.h"
 #include "http_negotiate.h"
+#include "memory.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
 #include "mprintf.h"
 
 /* The last #include file should be: */
-#ifdef CURLDEBUG
 #include "memdebug.h"
-#endif
 
 static int
 get_gss_name(struct connectdata *conn, gss_name_t *server)
@@ -65,16 +63,17 @@ get_gss_name(struct connectdata *conn, gss_name_t *server)
      Change following lines if you want to use GSI */
 
   /* IIS uses the <service>@<fqdn> form but uses 'http' as the service name */
-  
-  if (neg_ctx->gss) 
-    service = "khttp";
-  else
-    service = "http";
 
-  token.length = strlen(service) + 1 + strlen(conn->hostname) + 1;
+  if (neg_ctx->gss)
+    service = "KHTTP";
+  else
+    service = "HTTP";
+
+  token.length = strlen(service) + 1 + strlen(conn->host.name) + 1;
   if (token.length + 1 > sizeof(name))
     return EMSGSIZE;
-  sprintf(name, "%s@%s", service, conn->hostname);
+
+  snprintf(name, sizeof(name), "%s@%s", service, conn->host.name);
 
   token.value = (void *) name;
   major_status = gss_import_name(&minor_status,
@@ -103,18 +102,19 @@ log_gss_error(struct connectdata *conn, OM_uint32 error_status, char *prefix)
                                    GSS_C_NO_OID,
                                    &msg_ctx,
                                    &status_string);
-    if (sizeof(buf) > len + status_string.length + 1) {
-      sprintf(buf + len, ": %s", (char*) status_string.value);
+      if (sizeof(buf) > len + status_string.length + 1) {
+        snprintf(buf + len, sizeof(buf) - len,
+                 ": %s", (char*) status_string.value);
       len += status_string.length;
     }
     gss_release_buffer(&min_stat, &status_string);
   } while (!GSS_ERROR(maj_stat) && msg_ctx != 0);
 
-  infof(conn->data, buf);
+  infof(conn->data, "%s", buf);
 }
 
 int Curl_input_negotiate(struct connectdata *conn, char *header)
-{ 
+{
   struct negotiatedata *neg_ctx = &conn->data->state.negotiate;
   OM_uint32 major_status, minor_status, minor_status2;
   gss_buffer_desc input_token = GSS_C_EMPTY_BUFFER;
@@ -124,7 +124,7 @@ int Curl_input_negotiate(struct connectdata *conn, char *header)
   bool gss;
   const char* protocol;
 
-  while(*header && isspace((int)*header))
+  while(*header && ISSPACE(*header))
     header++;
   if(checkprefix("GSS-Negotiate", header)) {
     protocol = "GSS-Negotiate";
@@ -146,7 +146,7 @@ int Curl_input_negotiate(struct connectdata *conn, char *header)
     neg_ctx->protocol = protocol;
     neg_ctx->gss = gss;
   }
-    
+
   if (neg_ctx->context && neg_ctx->status == GSS_S_COMPLETE) {
     /* We finished succesfully our part of authentication, but server
      * rejected it (since we're again here). Exit with an error since we
@@ -160,17 +160,12 @@ int Curl_input_negotiate(struct connectdata *conn, char *header)
     return ret;
 
   header += strlen(neg_ctx->protocol);
-  while(*header && isspace((int)*header))
+  while(*header && ISSPACE(*header))
     header++;
 
   len = strlen(header);
   if (len > 0) {
-    int rawlen;
-    input_token.length = (len+3)/4 * 3;
-    input_token.value = malloc(input_token.length);
-    if (input_token.value == NULL)
-      return ENOMEM;
-    rawlen = Curl_base64_decode(header, input_token.value);
+    int rawlen = Curl_base64_decode(header, (unsigned char **)&input_token.value);
     if (rawlen < 0)
       return -1;
     input_token.length = rawlen;
@@ -210,7 +205,7 @@ int Curl_input_negotiate(struct connectdata *conn, char *header)
           input_token.length = mechTokenLength;
           free(mechToken);
           mechToken = NULL;
-          infof(conn->data, "Parse SPNEGO Target Token succeded\n");
+          infof(conn->data, "Parse SPNEGO Target Token succeeded\n");
         }
     }
 #endif
@@ -248,10 +243,10 @@ int Curl_input_negotiate(struct connectdata *conn, char *header)
 
   return 0;
 }
-   
+
 
 CURLcode Curl_output_negotiate(struct connectdata *conn)
-{ 
+{
   struct negotiatedata *neg_ctx = &conn->data->state.negotiate;
   OM_uint32 minor_status;
   char *encoded = NULL;
@@ -265,7 +260,7 @@ CURLcode Curl_output_negotiate(struct connectdata *conn)
     size_t          spnegoTokenLength = 0;
     unsigned char * responseToken       = NULL;
     size_t          responseTokenLength = 0;
-    
+
     responseToken = malloc(neg_ctx->output_token.length);
     if ( responseToken == NULL)
       return CURLE_OUT_OF_MEMORY;
@@ -291,7 +286,7 @@ CURLcode Curl_output_negotiate(struct connectdata *conn)
       neg_ctx->output_token.length = spnegoTokenLength;
       free(spnegoToken);
       spnegoToken = NULL;
-      infof(conn->data, "Make SPNEGO Initial Token succeded\n");
+      infof(conn->data, "Make SPNEGO Initial Token succeeded\n");
     }
   }
 #endif
@@ -310,7 +305,7 @@ CURLcode Curl_output_negotiate(struct connectdata *conn)
 }
 
 void Curl_cleanup_negotiate(struct SessionHandle *data)
-{ 
+{
   OM_uint32 minor_status;
   struct negotiatedata *neg_ctx = &data->state.negotiate;
 
@@ -322,7 +317,7 @@ void Curl_cleanup_negotiate(struct SessionHandle *data)
 
   if (neg_ctx->server_name != GSS_C_NO_NAME)
     gss_release_name(&minor_status, &neg_ctx->server_name);
-  
+
   memset(neg_ctx, 0, sizeof(*neg_ctx));
 }
 

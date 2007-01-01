@@ -830,7 +830,7 @@ event_queue_insert(struct event_base *base, struct event *ev, int queue)
 const char *
 event_get_version(void)
 {
-	return (VERSION);
+	return (0);
 }
 
 /* 

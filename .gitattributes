@@ -180,13 +180,13 @@ include/users.h eol=lf
 include/version.sh -text
 lib/Makefile.am -text
 lib/Makefile.in -text
+lib/curl/CHANGES -text
 lib/curl/COPYING -text
 lib/curl/Makefile.am -text
 lib/curl/Makefile.in -text
 lib/curl/README -text
 lib/curl/RELEASE-NOTES -text
 lib/curl/acinclude.m4 -text
-lib/curl/aclocal.m4 -text
 lib/curl/arpa_telnet.h -text
 lib/curl/base64.c -text
 lib/curl/base64.h -text
@@ -212,9 +212,6 @@ lib/curl/formdata.c -text
 lib/curl/formdata.h -text
 lib/curl/ftp.c -text
 lib/curl/ftp.h -text
-lib/curl/getdate.c -text
-lib/curl/getdate.h -text
-lib/curl/getdate.y -text
 lib/curl/getenv.c -text
 lib/curl/getinfo.c -text
 lib/curl/getinfo.h -text
@@ -237,7 +234,6 @@ lib/curl/if2ip.h -text
 lib/curl/inet_ntoa_r.h -text
 lib/curl/inet_pton.c -text
 lib/curl/inet_pton.h -text
-lib/curl/install-sh -text
 lib/curl/krb4.c -text
 lib/curl/krb4.h -text
 lib/curl/ldap.c -text
@@ -254,7 +250,6 @@ lib/curl/mprintf.c -text
 lib/curl/mprintf.h -text
 lib/curl/multi.c -text
 lib/curl/multi.h -text
-lib/curl/mycurl-config.in -text
 lib/curl/netrc.c -text
 lib/curl/netrc.h -text
 lib/curl/progress.c -text

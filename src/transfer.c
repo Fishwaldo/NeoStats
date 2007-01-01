@@ -67,6 +67,14 @@ typedef struct neo_transfer {
 static CURLM *curlmultihandle;
 static list_t *activetransfers;
 
+#define CURL_TEST 1
+#ifdef CURL_TEST
+void CurlTest( void *data, int status, char *ver, int versize ) {
+	dlog(DEBUG1, "Download Ok: %d", status);
+	return;
+}
+#endif
+
 int InitCurl(void) 
 {
 	/* global curl init */
@@ -96,6 +104,11 @@ int InitCurl(void)
 		return NS_FAILURE;
 	}
 	dlog(DEBUG1, "LibCurl Initialized successfully");
+#ifdef CURL_TEST
+	if(new_transfer( "http://dilbert.my-ho.st/Archive.zip", NULL, NS_FILE, "/tmp/test.txt", NULL, CurlTest ) == NS_FAILURE) {
+		dlog(DEBUG1, "Curl Test Failed");
+	}
+#endif
 	return NS_SUCCESS;
 }
 
@@ -317,7 +330,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}
 	
 	
-	if (!curl_multi_add_handle(curlmultihandle, newtrans->curleasyhandle)) {
+	if (curl_multi_add_handle(curlmultihandle, newtrans->curleasyhandle)) {
 		nlog(LOG_WARNING, "Curl Init Failed: %s", newtrans->curlerror);
 		ns_free(newtrans);
 		return NS_FAILURE;

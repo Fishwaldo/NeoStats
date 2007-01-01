@@ -50,7 +50,8 @@
 
 /* If we are in an environment where known assembly is available, make a note of that fact */
 #if defined(__GNUC__)
-# if (defined(__PPC__) || defined(__APPLE__))
+/*# if (defined(__PPC__) || defined(__APPLE__)) */
+# if (defined(__PPC__))
 #  define MUSCLE_USE_POWERPC_INLINE_ASSEMBLY 1
 # elif defined(__i386__)
 #  define MUSCLE_USE_X86_INLINE_ASSEMBLY 1

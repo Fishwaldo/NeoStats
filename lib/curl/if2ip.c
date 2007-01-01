@@ -1,16 +1,16 @@
 /***************************************************************************
- *                                  _   _ ____  _     
- *  Project                     ___| | | |  _ \| |    
- *                             / __| | | | |_) | |    
- *                            | (__| |_| |  _ <| |___ 
+ *                                  _   _ ____  _
+ *  Project                     ___| | | |  _ \| |
+ *                             / __| | | | |_) | |
+ *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2003, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
  * are also available at http://curl.haxx.se/docs/copyright.html.
- * 
+ *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
  * furnished to do so, under the terms of the COPYING file.
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: if2ip.c,v 1.26 2003/06/26 11:22:12 bagder Exp $
+ * $Id: if2ip.c,v 1.49 2006-10-25 07:19:45 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -27,13 +27,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#if ! defined(WIN32) && ! defined(__BEOS__) && !defined(__CYGWIN32__) && \
-    ! defined(__riscos__)
+#include "if2ip.h"
+
+/*
+ * This test can probably be simplified to #if defined(SIOCGIFADDR) and
+ * moved after the following includes.
+ */
+#if !defined(WIN32) && !defined(__BEOS__) && !defined(__CYGWIN__) && \
+    !defined(__riscos__) && !defined(__INTERIX) && !defined(NETWARE) && \
+    !defined(_AMIGASF) && !defined(__minix)
 
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -52,9 +58,10 @@
 #ifdef HAVE_NET_IF_H
 #include <net/if.h>
 #endif
+#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
+#endif
 
-/* -- if2ip() -- */
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
@@ -63,31 +70,23 @@
 #include <sys/sockio.h>
 #endif
 
-#if defined(HAVE_INET_NTOA_R) && !defined(HAVE_INET_NTOA_R_DECL) 
-#include "inet_ntoa_r.h"
-#endif
-
-#ifdef	VMS
-#define IOCTL_3_ARGS
+#ifdef VMS
 #include <inet.h>
 #endif
 
-/* The last #include file should be: */
-#ifdef CURLDEBUG
-#include "memdebug.h"
-#endif
+#include "inet_ntop.h"
+#include "memory.h"
 
-#ifdef DJGPP
-#define IOCTL_3_ARGS
-#endif
+/* The last #include file should be: */
+#include "memdebug.h"
 
 #define SYS_ERROR -1
 
-char *Curl_if2ip(char *interface, char *buf, int buf_size)
+char *Curl_if2ip(const char *interface, char *buf, int buf_size)
 {
   int dummy;
   char *ip=NULL;
-  
+
   if(!interface)
     return NULL;
 
@@ -97,10 +96,13 @@ char *Curl_if2ip(char *interface, char *buf, int buf_size)
   }
   else {
     struct ifreq req;
+    size_t len = strlen(interface);
     memset(&req, 0, sizeof(req));
-    strcpy(req.ifr_name, interface);
+    if(len >= sizeof(req.ifr_name))
+      return NULL; /* this can't be a fine interface name */
+    memcpy(req.ifr_name, interface, len+1);
     req.ifr_addr.sa_family = AF_INET;
-#ifdef	IOCTL_3_ARGS
+#ifdef IOCTL_3_ARGS
     if (SYS_ERROR == ioctl(dummy, SIOCGIFADDR, &req)) {
 #else
     if (SYS_ERROR == ioctl(dummy, SIOCGIFADDR, &req, sizeof(req))) {
@@ -112,13 +114,8 @@ char *Curl_if2ip(char *interface, char *buf, int buf_size)
       struct in_addr in;
 
       struct sockaddr_in *s = (struct sockaddr_in *)&req.ifr_dstaddr;
-      memcpy(&in, &(s->sin_addr.s_addr), sizeof(in));
-#if defined(HAVE_INET_NTOA_R)
-      ip = inet_ntoa_r(in,buf,buf_size);
-#else
-      ip = strncpy(buf,inet_ntoa(in),buf_size);
-      ip[buf_size - 1] = 0;
-#endif
+      memcpy(&in, &s->sin_addr, sizeof(in));
+      ip = (char *) Curl_inet_ntop(s->sin_family, &in, buf, buf_size);
     }
     sclose(dummy);
   }
@@ -127,5 +124,11 @@ char *Curl_if2ip(char *interface, char *buf, int buf_size)
 
 /* -- end of if2ip() -- */
 #else
-#define if2ip(x) NULL
+char *Curl_if2ip(const char *interf, char *buf, int buf_size)
+{
+    (void) interf;
+    (void) buf;
+    (void) buf_size;
+    return NULL;
+}
 #endif

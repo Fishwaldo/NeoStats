@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___ 
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2003, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2004, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,7 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: arpa_telnet.h,v 1.10 2003/03/12 08:40:45 bagder Exp $
+ * $Id: arpa_telnet.h,v 1.12 2004/12/20 18:23:43 danf Exp $
  ***************************************************************************/
 #ifndef CURL_DISABLE_TELNET
 /*
@@ -39,7 +39,7 @@
 /*
  * The telnet options represented as strings
  */
-static const char *telnetoptions[]=
+static const char * const telnetoptions[]=
 {
   "BINARY",      "ECHO",           "RCP",           "SUPPRESS GO AHEAD",
   "NAME",        "STATUS",         "TIMING MARK",   "RCTE",
@@ -78,7 +78,7 @@ static const char *telnetoptions[]=
 /*
  * Then those numbers represented as strings:
  */
-static const char *telnetcmds[]=
+static const char * const telnetcmds[]=
 {
   "EOF",  "SUSP",  "ABORT", "EOR",  "SE",
   "NOP",  "DMARK", "BRK",   "IP",   "AO",

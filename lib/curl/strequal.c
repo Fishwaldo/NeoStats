@@ -1,16 +1,16 @@
 /***************************************************************************
- *                                  _   _ ____  _     
- *  Project                     ___| | | |  _ \| |    
- *                             / __| | | | |_) | |    
- *                            | (__| |_| |  _ <| |___ 
+ *                                  _   _ ____  _
+ *  Project                     ___| | | |  _ \| |
+ *                             / __| | | | |_) | |
+ *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2003, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
  * are also available at http://curl.haxx.se/docs/copyright.html.
- * 
+ *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
  * furnished to do so, under the terms of the COPYING file.
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: strequal.c,v 1.23 2003/08/24 14:29:06 bagder Exp $
+ * $Id: strequal.c,v 1.29 2006-10-27 03:47:58 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -26,7 +26,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef HAVE_STRCASECMP
+#include "strequal.h"
+
+#if defined(HAVE_STRCASECMP) && defined(__STRICT_ANSI__)
 /* this is for "-ansi -Wall -pedantic" to stop complaining! */
 extern int (strcasecmp)(const char *s1, const char *s2);
 extern int (strncasecmp)(const char *s1, const char *s2, size_t n);
@@ -76,6 +78,25 @@ int curl_strnequal(const char *first, const char *second, size_t max)
 #endif
 }
 
+/*
+ * Curl_strcasestr() finds the first occurrence of the substring needle in the
+ * string haystack.  The terminating `\0' characters are not compared. The
+ * matching is done CASE INSENSITIVE, which thus is the difference between
+ * this and strstr().
+ */
+char *Curl_strcasestr(const char *haystack, const char *needle)
+{
+  size_t nlen = strlen(needle);
+  size_t hlen = strlen(haystack);
+
+  while(hlen-- >= nlen) {
+    if(curl_strnequal(haystack, needle, nlen))
+      return (char *)haystack;
+    haystack++;
+  }
+  return NULL;
+}
+
 #ifndef HAVE_STRLCAT
 /*
  * The strlcat() function appends the NUL-terminated string src to the end
@@ -88,7 +109,7 @@ int curl_strnequal(const char *first, const char *second, size_t max)
  * src. While this may seem somewhat confusing it was done to make trunca-
  * tion detection simple.
  *
- * 
+ *
  */
 size_t Curl_strlcat(char *dst, const char *src, size_t siz)
 {
@@ -114,6 +135,6 @@ size_t Curl_strlcat(char *dst, const char *src, size_t siz)
   }
   *d = '\0';
 
-  return(dlen + (s - src));	/* count does not include NUL */
+  return(dlen + (s - src));     /* count does not include NUL */
 }
 #endif

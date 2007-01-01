@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2003, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: content_encoding.c,v 1.7 2003/04/22 22:32:02 bagder Exp $
+ * $Id: content_encoding.c,v 1.23 2006-08-19 21:18:37 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -28,10 +28,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "curl.h"
 #include "urldata.h"
-#include "types.h"
+#include "curl.h"
 #include "sendf.h"
+#include "content_encoding.h"
+#include "memory.h"
+
+#include "memdebug.h"
+
+/* Comment this out if zlib is always going to be at least ver. 1.2.0.4
+   (doing so will reduce code size slightly). */
+#define OLD_ZLIB_SUPPORT 1
 
 #define DSIZ 0x10000             /* buffer size for decompressed data */
 
@@ -46,14 +53,23 @@
 #define COMMENT      0x10 /* bit 4 set: file comment present */
 #define RESERVED     0xE0 /* bits 5..7: reserved */
 
+enum zlibState {
+  ZLIB_UNINIT,          /* uninitialized */
+  ZLIB_INIT,            /* initialized */
+  ZLIB_GZIP_HEADER,     /* reading gzip header */
+  ZLIB_GZIP_INFLATING,  /* inflating gzip stream */
+  ZLIB_INIT_GZIP        /* initialized in transparent gzip mode */
+};
+
 static CURLcode
-process_zlib_error(struct SessionHandle *data, z_stream *z)
+process_zlib_error(struct connectdata *conn, z_stream *z)
 {
+  struct SessionHandle *data = conn->data;
   if (z->msg)
-    failf (data, "Error while processing content unencoding.\n%s",
+    failf (data, "Error while processing content unencoding: %s",
            z->msg);
   else
-    failf (data, "Error while processing content unencoding.\n"
+    failf (data, "Error while processing content unencoding: "
            "Unknown failure within decompression software.");
 
   return CURLE_BAD_CONTENT_ENCODING;
@@ -63,69 +79,113 @@ static CURLcode
 exit_zlib(z_stream *z, bool *zlib_init, CURLcode result)
 {
   inflateEnd(z);
-  *zlib_init = 0;
+  *zlib_init = ZLIB_UNINIT;
   return result;
 }
 
-CURLcode
-Curl_unencode_deflate_write(struct SessionHandle *data,
-                            struct Curl_transfer_keeper *k,
-                            ssize_t nread)
+static CURLcode
+inflate_stream(struct connectdata *conn,
+               struct Curl_transfer_keeper *k)
 {
-  int status;                   /* zlib status */
-  int result;                   /* Curl_client_write status */
-  char decomp[DSIZ];            /* Put the decompressed data here. */
+  int allow_restart = 1;
   z_stream *z = &k->z;          /* zlib state structure */
+  uInt nread = z->avail_in;
+  Bytef *orig_in = z->next_in;
+  int status;                   /* zlib status */
+  CURLcode result = CURLE_OK;   /* Curl_client_write status */
+  char *decomp;                 /* Put the decompressed data here. */
 
-  /* Initialize zlib? */
-  if (!k->zlib_init) {
-    z->zalloc = (alloc_func)Z_NULL;
-    z->zfree = (free_func)Z_NULL;
-    z->opaque = 0;              /* of dubious use 08/27/02 jhrg */
-    if (inflateInit(z) != Z_OK)
-      return process_zlib_error(data, z);
-    k->zlib_init = 1;
+  /* Dynamically allocate a buffer for decompression because it's uncommonly
+     large to hold on the stack */
+  decomp = (char*)malloc(DSIZ);
+  if (decomp == NULL) {
+    return exit_zlib(z, &k->zlib_init, CURLE_OUT_OF_MEMORY);
   }
 
-  /* Set the compressed input when this function is called */
-  z->next_in = (Bytef *)k->str;
-  z->avail_in = nread;
-
-  /* because the buffer size is fixed, iteratively decompress
-     and transfer to the client via client_write. */
+  /* because the buffer size is fixed, iteratively decompress and transfer to
+     the client via client_write. */
   for (;;) {
     /* (re)set buffer for decompressed output for every iteration */
-    z->next_out = (Bytef *)&decomp[0];
+    z->next_out = (Bytef *)decomp;
     z->avail_out = DSIZ;
 
     status = inflate(z, Z_SYNC_FLUSH);
     if (status == Z_OK || status == Z_STREAM_END) {
-      if (DSIZ - z->avail_out) {
-        result = Curl_client_write(data, CLIENTWRITE_BODY, decomp,
+      allow_restart = 0;
+      if(DSIZ - z->avail_out) {
+        result = Curl_client_write(conn, CLIENTWRITE_BODY, decomp,
                                    DSIZ - z->avail_out);
         /* if !CURLE_OK, clean up, return */
-        if (result)
+        if (result) {
+          free(decomp);
           return exit_zlib(z, &k->zlib_init, result);
+        }
       }
 
-      /* Done?; clean up, return */
+      /* Done? clean up, return */
       if (status == Z_STREAM_END) {
+        free(decomp);
         if (inflateEnd(z) == Z_OK)
           return exit_zlib(z, &k->zlib_init, result);
         else
-          return exit_zlib(z, &k->zlib_init, process_zlib_error(data, z));
+          return exit_zlib(z, &k->zlib_init, process_zlib_error(conn, z));
       }
 
       /* Done with these bytes, exit */
-      if (status == Z_OK && z->avail_in == 0 && z->avail_out > 0)
+      if (status == Z_OK && z->avail_in == 0) {
+        free(decomp);
         return result;
+      }
+    }
+    else if (allow_restart && status == Z_DATA_ERROR) {
+      /* some servers seem to not generate zlib headers, so this is an attempt
+         to fix and continue anyway */
+
+      inflateReset(z);
+      if (inflateInit2(z, -MAX_WBITS) != Z_OK) {
+        return process_zlib_error(conn, z);
+      }
+      z->next_in = orig_in;
+      z->avail_in = nread;
+      allow_restart = 0;
+      continue;
     }
     else {                      /* Error; exit loop, handle below */
-      return exit_zlib(z, &k->zlib_init, process_zlib_error(data, z));
+      free(decomp);
+      return exit_zlib(z, &k->zlib_init, process_zlib_error(conn, z));
     }
   }
+  /* Will never get here */
 }
 
+CURLcode
+Curl_unencode_deflate_write(struct connectdata *conn,
+                            struct Curl_transfer_keeper *k,
+                            ssize_t nread)
+{
+  z_stream *z = &k->z;          /* zlib state structure */
+
+  /* Initialize zlib? */
+  if (k->zlib_init == ZLIB_UNINIT) {
+    z->zalloc = (alloc_func)Z_NULL;
+    z->zfree = (free_func)Z_NULL;
+    z->opaque = 0;
+    z->next_in = NULL;
+    z->avail_in = 0;
+    if (inflateInit(z) != Z_OK)
+      return process_zlib_error(conn, z);
+    k->zlib_init = ZLIB_INIT;
+  }
+
+  /* Set the compressed input when this function is called */
+  z->next_in = (Bytef *)k->str;
+  z->avail_in = (uInt)nread;
+
+  /* Now uncompress the data */
+  return inflate_stream(conn, k);
+}
+
+#ifdef OLD_ZLIB_SUPPORT
 /* Skip over the gzip header */
 static enum {
   GZIP_OK,
@@ -167,6 +227,7 @@ static enum {
       return GZIP_UNDERFLOW;
 
     len -= (extra_len + 2);
+    data += (extra_len + 2);
   }
 
   if (flags & ORIG_NAME) {
@@ -208,69 +269,105 @@ static enum {
   *headerlen = totallen - len;
   return GZIP_OK;
 }
+#endif
 
 CURLcode
-Curl_unencode_gzip_write(struct SessionHandle *data,
+Curl_unencode_gzip_write(struct connectdata *conn,
                          struct Curl_transfer_keeper *k,
                          ssize_t nread)
 {
-  int status;                   /* zlib status */
-  int result;                   /* Curl_client_write status */
-  char decomp[DSIZ];            /* Put the decompressed data here. */
   z_stream *z = &k->z;          /* zlib state structure */
 
   /* Initialize zlib? */
-  if (!k->zlib_init) {
+  if (k->zlib_init == ZLIB_UNINIT) {
     z->zalloc = (alloc_func)Z_NULL;
     z->zfree = (free_func)Z_NULL;
-    z->opaque = 0;              /* of dubious use 08/27/02 jhrg */
-    if (inflateInit2(z, -MAX_WBITS) != Z_OK)
-      return process_zlib_error(data, z);
-    k->zlib_init = 1;   /* Initial call state */
+    z->opaque = 0;
+    z->next_in = NULL;
+    z->avail_in = 0;
+
+    if (strcmp(zlibVersion(), "1.2.0.4") >= 0) {
+        /* zlib ver. >= 1.2.0.4 supports transparent gzip decompressing */
+        if (inflateInit2(z, MAX_WBITS+32) != Z_OK) {
+          return process_zlib_error(conn, z);
+        }
+        k->zlib_init = ZLIB_INIT_GZIP; /* Transparent gzip decompress state */
+
+    } else {
+        /* we must parse the gzip header ourselves */
+        if (inflateInit2(z, -MAX_WBITS) != Z_OK) {
+          return process_zlib_error(conn, z);
+        }
+        k->zlib_init = ZLIB_INIT;   /* Initial call state */
+    }
   }
 
-  /* This next mess is to get around the potential case where there isn't
-  enough data passed in to skip over the gzip header.  If that happens,
-  we malloc a block and copy what we have then wait for the next call.  If
-  there still isn't enough (this is definitely a worst-case scenario), we
-  make the block bigger, copy the next part in and keep waiting. */
+  if (k->zlib_init == ZLIB_INIT_GZIP) {
+     /* Let zlib handle the gzip decompression entirely */
+     z->next_in = (Bytef *)k->str;
+     z->avail_in = (uInt)nread;
+     /* Now uncompress the data */
+     return inflate_stream(conn, k);
+  }
 
+#ifndef OLD_ZLIB_SUPPORT
+  /* Support for old zlib versions is compiled away and we are running with
+     an old version, so return an error. */
+  return exit_zlib(z, &k->zlib_init, CURLE_FUNCTION_NOT_FOUND);
+
+#else
+  /* This next mess is to get around the potential case where there isn't
+   * enough data passed in to skip over the gzip header.  If that happens, we
+   * malloc a block and copy what we have then wait for the next call.  If
+   * there still isn't enough (this is definitely a worst-case scenario), we
+   * make the block bigger, copy the next part in and keep waiting.
+   *
+   * This is only required with zlib versions < 1.2.0.4 as newer versions
+   * can handle the gzip header themselves.
+   */
+
+  switch (k->zlib_init) {
   /* Skip over gzip header? */
-  if (k->zlib_init == 1) {
+  case ZLIB_INIT:
+  {
     /* Initial call state */
     ssize_t hlen;
 
     switch (check_gzip_header((unsigned char *)k->str, nread, &hlen)) {
     case GZIP_OK:
       z->next_in = (Bytef *)k->str + hlen;
-      z->avail_in = nread - hlen;
-      k->zlib_init = 3; /* Inflating stream state */
+      z->avail_in = (uInt)(nread - hlen);
+      k->zlib_init = ZLIB_GZIP_INFLATING; /* Inflating stream state */
       break;
 
     case GZIP_UNDERFLOW:
-      /* We need more data so we can find the end of the gzip header.
-      It's possible that the memory block we malloc here will never be
-      freed if the transfer abruptly aborts after this point.  Since it's
-      unlikely that circumstances will be right for this code path to be
-      followed in the first place, and it's even more unlikely for a transfer
-      to fail immediately afterwards, it should seldom be a problem. */
-      z->avail_in = nread;
+      /* We need more data so we can find the end of the gzip header.  It's
+       * possible that the memory block we malloc here will never be freed if
+       * the transfer abruptly aborts after this point.  Since it's unlikely
+       * that circumstances will be right for this code path to be followed in
+       * the first place, and it's even more unlikely for a transfer to fail
+       * immediately afterwards, it should seldom be a problem.
+       */
+      z->avail_in = (uInt)nread;
       z->next_in = malloc(z->avail_in);
       if (z->next_in == NULL) {
         return exit_zlib(z, &k->zlib_init, CURLE_OUT_OF_MEMORY);
       }
       memcpy(z->next_in, k->str, z->avail_in);
-      k->zlib_init = 2;   /* Need more gzip header data state */
+      k->zlib_init = ZLIB_GZIP_HEADER;   /* Need more gzip header data state */
       /* We don't have any data to inflate yet */
       return CURLE_OK;
 
     case GZIP_BAD:
     default:
-      return exit_zlib(z, &k->zlib_init, process_zlib_error(data, z));
+      return exit_zlib(z, &k->zlib_init, process_zlib_error(conn, z));
     }
 
   }
-  else if (k->zlib_init == 2) {
+  break;
+
+  case ZLIB_GZIP_HEADER:
+  {
     /* Need more gzip header data state */
     ssize_t hlen;
     unsigned char *oldblock = z->next_in;
@@ -290,8 +387,8 @@ Curl_unencode_gzip_write(struct SessionHandle *data,
       free(z->next_in);
       /* Don't point into the malloced block since we just freed it */
       z->next_in = (Bytef *)k->str + hlen + nread - z->avail_in;
-      z->avail_in = z->avail_in - hlen;
-      k->zlib_init = 3;   /* Inflating stream state */
+      z->avail_in = (uInt)(z->avail_in - hlen);
+      k->zlib_init = ZLIB_GZIP_INFLATING;   /* Inflating stream state */
       break;
 
     case GZIP_UNDERFLOW:
@@ -301,14 +398,18 @@ Curl_unencode_gzip_write(struct SessionHandle *data,
     case GZIP_BAD:
     default:
       free(z->next_in);
-      return exit_zlib(z, &k->zlib_init, process_zlib_error(data, z));
+      return exit_zlib(z, &k->zlib_init, process_zlib_error(conn, z));
     }
 
   }
-  else {
+  break;
+
+  case ZLIB_GZIP_INFLATING:
+  default:
     /* Inflating stream state */
     z->next_in = (Bytef *)k->str;
-    z->avail_in = nread;
+    z->avail_in = (uInt)nread;
+    break;
   }
 
   if (z->avail_in == 0) {
@@ -316,39 +417,8 @@ Curl_unencode_gzip_write(struct SessionHandle *data,
     return CURLE_OK;
   }
 
-  /* because the buffer size is fixed, iteratively decompress
-     and transfer to the client via client_write. */
-  for (;;) {
-    /* (re)set buffer for decompressed output for every iteration */
-    z->next_out = (Bytef *)&decomp[0];
-    z->avail_out = DSIZ;
-
-    status = inflate(z, Z_SYNC_FLUSH);
-    if (status == Z_OK || status == Z_STREAM_END) {
-      if(DSIZ - z->avail_out) {
-        result = Curl_client_write(data, CLIENTWRITE_BODY, decomp,
-                                   DSIZ - z->avail_out);
-        /* if !CURLE_OK, clean up, return */
-        if (result)
-          return exit_zlib(z, &k->zlib_init, result);
-      }
-
-      /* Done?; clean up, return */
-      /* We should really check the gzip CRC here */
-      if (status == Z_STREAM_END) {
-        if (inflateEnd(z) == Z_OK)
-          return exit_zlib(z, &k->zlib_init, result);
-        else
-          return exit_zlib(z, &k->zlib_init, process_zlib_error(data, z));
-      }
-
-      /* Done with these bytes, exit */
-      if (status == Z_OK && z->avail_in == 0 && z->avail_out > 0)
-        return result;
-    }
-    else {                      /* Error; exit loop, handle below */
-      return exit_zlib(z, &k->zlib_init, process_zlib_error(data, z));
-    }
-  }
+  /* We've parsed the header, now uncompress the data */
+  return inflate_stream(conn, k);
+#endif
 }
 #endif /* HAVE_LIBZ */
