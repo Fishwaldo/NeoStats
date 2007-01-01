@@ -2519,7 +2519,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define VERSION "$x_min.$x_rev"
+#define VERSION "$x_version"
 _ACEOF
 
 

@@ -5,6 +5,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - Version Macro is fixed (F)
  - Curl now uses updated event based socket Code (F)
  - Fix up muscle code to run on Intel Mac's (F)
  - Update libcurl to 7.16.0 to take advantage of new event based socket

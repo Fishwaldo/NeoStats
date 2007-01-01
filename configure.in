@@ -23,7 +23,7 @@ AM_MAINTAINER_MODE
 AC_DEFINE_UNQUOTED(MAJOR, $x_maj, "Major Version Number")
 AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
 AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
-AC_DEFINE_UNQUOTED(VERSION, "$x_min.$x_rev", "Full Version")
+AC_DEFINE_UNQUOTED(VERSION, "$x_version", "Full Version")
 AC_MSG_HEADER([Configuring Core Now])
 
 AC_LIBTOOL_DLOPEN

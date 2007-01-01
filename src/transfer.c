@@ -68,7 +68,7 @@ typedef struct neo_transfer {
 static CURLM *curlmultihandle;
 static list_t *activetransfers;
 static int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp);
-#define CURL_TEST 0
+#undef CURL_TEST 
 #ifdef CURL_TEST
 void CurlTest( void *data, int status, char *ver, int versize ) {
 	dlog(DEBUG1, "Download Ok: %d", status);
