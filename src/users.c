@@ -63,7 +63,8 @@ nv_struct nv_client[] = {
 	{ "Umode", NV_INT, offsetof(User, Umode), NV_FLG_RO, offsetof(Client, user)},
 	{ "smodes", NV_STR, offsetof(User, smodes), NV_FLG_RO, offsetof(Client, user)},
 	{ "Smode", NV_INT, offsetof(User, Smode), NV_FLG_RO, offsetof(Client, user)},
-	{ "ulevel", NV_INT, offsetof(User, ulevel), 0, offsetof(Client, user)}
+	{ "ulevel", NV_INT, offsetof(User, ulevel), 0, offsetof(Client, user)},
+	NV_STRUCT_END()
 };
 
 

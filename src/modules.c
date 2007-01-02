@@ -64,6 +64,7 @@ nv_struct nv_modules[] = {
 	{ "type", NV_INT, offsetof(Module, type), NV_FLG_RO, -1},
 	{ "modnum", NV_INT, offsetof(Module, modnum), NV_FLG_RO, -1},
 	{ "status", NV_INT, offsetof(Module, status), NV_FLG_RO, -1},
+	NV_STRUCT_END()
 };
 
 

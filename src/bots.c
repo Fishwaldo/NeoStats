@@ -45,13 +45,14 @@ static hash_t *bothash;
 
 nv_struct nv_bots[] = {
 	{ "name", NV_STR, offsetof(Bot, name), NV_FLG_RO, -1},
-	{ "flags", NV_STR, offsetof(Bot, flags), NV_FLG_RO, -1},
-	{ "set_ulevel", NV_STR, offsetof(Bot, set_ulevel), NV_FLG_RO, -1},
-	{ "nick", NV_STR, offsetof(BotInfo, nick), NV_FLG_RO, offsetof(Bot, botinfo)},
-	{ "altnick", NV_STR, offsetof(BotInfo, altnick), NV_FLG_RO, offsetof(Bot, botinfo)},
+	{ "flags", NV_INT, offsetof(Bot, flags), NV_FLG_RO, -1},
+	{ "set_ulevel", NV_INT, offsetof(Bot, set_ulevel), NV_FLG_RO, -1},
+/*	{ "nick", NV_STR, offsetof(BotInfo, nick), NV_FLG_RO, offsetof(Bot, botinfo)},
+	{ "altnick", NV_STR, offsetof(BotInfo, altnick), NV_FLG_RO, offsetof(Bot, botinfo)}, 
 	{ "user", NV_STR, offsetof(BotInfo, user), NV_FLG_RO, offsetof(Bot, botinfo)},
 	{ "host", NV_STR, offsetof(BotInfo, host), NV_FLG_RO, offsetof(Bot, botinfo)},
-	{ "realname", NV_STR, offsetof(BotInfo, realname), NV_FLG_RO, offsetof(Bot, botinfo)}
+	{ "realname", NV_STR, offsetof(BotInfo, realname), NV_FLG_RO, offsetof(Bot, botinfo)}, */
+	NV_STRUCT_END()
 };
 
 

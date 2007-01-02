@@ -45,9 +45,23 @@ hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char
 	newitem->type = NV_TYPE_HASH;
 	newitem->flags = flags;
 	newitem->format = nvstruct;
+	newitem->mod = GET_CUR_MODULE();
 	newitem->data = (void *)hash_create(count, comp, fun);
 	hnode_create_insert(namedvars, newitem, newitem->name);
 	return (hash_t *) newitem->data;
+}
+
+list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags) {
+	nv_list *newitem;
+	newitem = ns_malloc(sizeof(nv_list));
+	newitem->name = strdup(name2);
+	newitem->type = NV_TYPE_LIST;
+	newitem->flags = flags;
+	newitem->format = nvstruct;
+	newitem->mod = GET_CUR_MODULE();
+	newitem->data = (void *)list_create(count);
+	hnode_create_insert(namedvars, newitem, newitem->name);
+	return (list_t *) newitem->data;
 }
 
 int dump_namedvars(char *name2) {
@@ -61,9 +75,10 @@ int dump_namedvars(char *name2) {
 	hash_scan_begin(&scan1, namedvars);
 	while ((node = hash_scan_next(&scan1)) != NULL ) {
 		item = hnode_get(node);
-		printf("%s Details: Type: %d Flags: %d \n", item->name, item->type, item->flags);
+		printf("%s Details: Type: %d Flags: %d Module: %s\n", item->name, item->type, item->flags, item->mod->info->name);
 		printf("Entries:\n");
 		printf("===================\n");
+/* XXX todo - Lists */
 		if (item->type == NV_TYPE_HASH) {
 			j = 0;
 			hash_scan_begin(&scan, (hash_t *)item->data);

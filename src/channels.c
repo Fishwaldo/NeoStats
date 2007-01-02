@@ -55,13 +55,14 @@ nv_struct nv_channels[] = {
 	{ "name64", NV_STR, offsetof(Channel, name64), NV_FLG_RO, -1},
 	{ "users", NV_INT, offsetof(Channel, users), NV_FLG_RO, -1},
 	{ "neousers", NV_INT, offsetof(Channel, neousers), NV_FLG_RO, -1},
-	{ "persistentusers", NV_STR, offsetof(Channel, persistentusers), NV_FLG_RO, -1},
+	{ "persistentusers", NV_INT, offsetof(Channel, persistentusers), NV_FLG_RO, -1},
 	{ "modes", NV_INT, offsetof(Channel, modes), NV_FLG_RO, -1},
 	{ "topic", NV_STR, offsetof(Channel, topic), NV_FLG_RO, -1},
 	{ "topicowner", NV_STR, offsetof(Channel, topicowner), NV_FLG_RO, -1},
 	{ "limit", NV_INT, offsetof(Channel, limit), NV_FLG_RO, -1},
 	{ "key", NV_STR, offsetof(Channel, key), NV_FLG_RO, -1},
 	{ "flags", NV_INT, offsetof(Channel, flags), NV_FLG_RO, -1},
+	NV_STRUCT_END()
 };
 
 

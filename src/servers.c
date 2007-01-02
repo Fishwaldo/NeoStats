@@ -54,7 +54,8 @@ nv_struct nv_server[] = {
 	{ "hops", NV_INT, offsetof(Server, hops), NV_FLG_RO, offsetof(Client, server)},
 	{ "numeric", NV_INT, offsetof(Server, numeric), NV_FLG_RO, offsetof(Client, server)},
 	{ "ping", NV_INT, offsetof(Server, ping), NV_FLG_RO, offsetof(Client, server)},
-	{ "uptime", NV_INT, offsetof(Server, uptime), NV_FLG_RO, offsetof(Client, server)}
+	{ "uptime", NV_INT, offsetof(Server, uptime), NV_FLG_RO, offsetof(Client, server)},
+	NV_STRUCT_END()
 };
 
 

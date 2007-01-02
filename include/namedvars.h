@@ -49,6 +49,8 @@ typedef struct nv_struct {
 	int fldoffset;
 } nv_struct;
 
+#define NV_STRUCT_END() { NULL, 0, 0, 0, -1}
+
 typedef enum {
 	NV_TYPE_LIST,
 	NV_TYPE_HASH
@@ -68,6 +70,8 @@ typedef struct nv_list {
 	nv_struct *format;
 	/* flags */
 	nv_flags flags;
+	/* module */
+	Module *mod;
 	/* ptr to the list */
 	void *data;
 } nv_list;
@@ -76,6 +80,7 @@ typedef struct nv_list {
 extern hash_t *namedvars;
 
 EXPORTFUNC hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name, nv_struct *nvstruct, nv_flags flags);
+EXPORTFUNC list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags);
 int nv_init();
 
 

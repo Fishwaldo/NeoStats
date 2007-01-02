@@ -25,6 +25,7 @@
 
 #include "neostats.h"
 #include "hostserv.h"
+#include "namedvars.h"
 
 #define PAGESIZE	20
 
@@ -57,6 +58,17 @@ static struct hs_cfg
 	int verbose;
 	int addlevel;
 } hs_cfg;
+
+nv_struct nv_hostserv[] = {
+	{ "nick", NV_STR, offsetof(vhostentry, nick), NV_FLG_RO, -1},
+	{ "host", NV_STR, offsetof(vhostentry, host), 0, -1},
+	{ "vhost", NV_STR, offsetof(vhostentry, vhost), 0, -1},
+	{ "passwd", NV_STR, offsetof(vhostentry, passwd), 0, -1},
+	{ "added", NV_STR, offsetof(vhostentry, added), NV_FLG_RO, -1},
+	{ "tslastused", NV_STR, offsetof(vhostentry, tslastused), NV_FLG_RO, -1},
+	NV_STRUCT_END()
+};
+
 
 /** prototypes */
 static int hs_event_signon( const CmdParams *cmdparams );
@@ -471,13 +483,13 @@ static int hs_event_umode( const CmdParams *cmdparams )
 int ModInit( void )
 {
 	SET_SEGV_LOCATION();
-	vhost_list = list_create( LISTCOUNT_T_MAX );
+	vhost_list = nv_list_create( LISTCOUNT_T_MAX, "HostServ", nv_hostserv, NV_FLAGS_RO );
 	if( !vhost_list )
 	{
 		nlog( LOG_CRITICAL, "Unable to create vhost list" );
 		return NS_FAILURE;
 	}
-	banhash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
+	banhash = hash_create( HASHCOUNT_T_MAX, 0, 0);
 	if( !banhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create ban hash" );
