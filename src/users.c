@@ -49,7 +49,21 @@ nv_struct nv_client[] = {
 	{ "info", NV_STR, offsetof(Client, info), NV_FLG_RO, -1},
 	{ "version", NV_STR, offsetof(Client, version), NV_FLG_RO, -1},
 	{ "flags", NV_INT, offsetof(Client, flags), NV_FLG_RO, -1},
-	{ "hostip", NV_STR, offsetof(Client, hostip), NV_FLG_RO, -1}
+	{ "hostip", NV_STR, offsetof(Client, hostip), NV_FLG_RO, -1},
+	{ "hostname", NV_STR, offsetof(User, hostname), NV_FLG_RO, offsetof(Client, user)},
+	{ "username", NV_STR, offsetof(User, username), NV_FLG_RO, offsetof(Client, user)},
+	{ "vhost", NV_STR, offsetof(User, vhost), NV_FLG_RO, offsetof(Client, user)},
+	{ "awaymsg", NV_STR, offsetof(User, awaymsg), NV_FLG_RO, offsetof(Client, user)},
+	{ "swhois", NV_STR, offsetof(User, swhois), NV_FLG_RO, offsetof(Client, user)},
+	{ "userhostmask", NV_STR, offsetof(User, userhostmask), NV_FLG_RO, offsetof(Client, user)},
+	{ "uservhostmask", NV_STR, offsetof(User, uservhostmask), NV_FLG_RO, offsetof(Client, user)},
+	{ "flood", NV_INT, offsetof(User, uservhostmask), NV_FLG_RO, offsetof(Client, user)},
+	{ "is_away", NV_INT, offsetof(User, is_away), NV_FLG_RO, offsetof(Client, user)},
+	{ "modes", NV_STR, offsetof(User, modes), NV_FLG_RO, offsetof(Client, user)},
+	{ "Umode", NV_INT, offsetof(User, Umode), NV_FLG_RO, offsetof(Client, user)},
+	{ "smodes", NV_STR, offsetof(User, smodes), NV_FLG_RO, offsetof(Client, user)},
+	{ "Smode", NV_INT, offsetof(User, Smode), NV_FLG_RO, offsetof(Client, user)},
+	{ "ulevel", NV_INT, offsetof(User, ulevel), 0, offsetof(Client, user)}
 };
 
 

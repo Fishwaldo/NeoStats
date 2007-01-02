@@ -48,7 +48,13 @@ nv_struct nv_server[] = {
 	{ "info", NV_STR, offsetof(Client, info), NV_FLG_RO, -1},
 	{ "version", NV_STR, offsetof(Client, version), NV_FLG_RO, -1},
 	{ "flags", NV_INT, offsetof(Client, flags), NV_FLG_RO, -1},
-	{ "hostip", NV_STR, offsetof(Client, hostip), NV_FLG_RO, -1}
+	{ "hostip", NV_STR, offsetof(Client, hostip), NV_FLG_RO, -1},
+	{ "users", NV_INT, offsetof(Server, users), NV_FLG_RO, offsetof(Client, server)},
+	{ "awaycount", NV_INT, offsetof(Server, awaycount), NV_FLG_RO, offsetof(Client, server)},
+	{ "hops", NV_INT, offsetof(Server, hops), NV_FLG_RO, offsetof(Client, server)},
+	{ "numeric", NV_INT, offsetof(Server, numeric), NV_FLG_RO, offsetof(Client, server)},
+	{ "ping", NV_INT, offsetof(Server, ping), NV_FLG_RO, offsetof(Client, server)},
+	{ "uptime", NV_INT, offsetof(Server, uptime), NV_FLG_RO, offsetof(Client, server)}
 };
 
 
