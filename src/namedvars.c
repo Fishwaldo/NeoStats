@@ -80,9 +80,12 @@ int dump_namedvars(char *name2) {
 							printf("Value: %s\n", (char *)output);
 							break;
 						case NV_INT:
+							output = data + item->format[i].offset;
+							printf("Value: %d\n", *((int *)output));
+							break;
 						case NV_LONG:
 							output = data + item->format[i].offset;
-							printf("Value: %d\n", (int)output);
+							printf("Value: %d\n", *((long *)output));
 							break;
 						case NV_VOID:
 							printf("Value: Complex!\n");
