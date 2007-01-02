@@ -741,7 +741,7 @@ Client *GetRandomChannelMember( const Channel *c, int uge )
 	while( ln != NULL ) 
 	{
 		cm = lnode_get(ln);
-		if( uge == NULL || !IsExcluded( cm->u ) )
+		if( uge == 0 || !IsExcluded( cm->u ) )
 		{
 			if( curno == randno )
 				return cm->u;
