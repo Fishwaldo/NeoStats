@@ -5,6 +5,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - We don't need g++ or c++ compilers, so tell libtool to shutup about those
+   compilers (F) 
  - Version Macro is fixed (F)
  - Curl now uses updated event based socket Code (F)
  - Fix up muscle code to run on Intel Mac's (F)
