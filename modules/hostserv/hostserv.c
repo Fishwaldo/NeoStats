@@ -65,7 +65,7 @@ nv_struct nv_hostserv[] = {
 	{ "vhost", NV_STR, offsetof(vhostentry, vhost), 0, -1},
 	{ "passwd", NV_STR, offsetof(vhostentry, passwd), 0, -1},
 	{ "added", NV_STR, offsetof(vhostentry, added), NV_FLG_RO, -1},
-	{ "tslastused", NV_STR, offsetof(vhostentry, tslastused), NV_FLG_RO, -1},
+	{ "tslastused", NV_INT, offsetof(vhostentry, tslastused), NV_FLG_RO, -1},
 	NV_STRUCT_END()
 };
 
