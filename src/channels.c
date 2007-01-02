@@ -34,6 +34,8 @@
 #include "exclude.h"
 #include "services.h"
 #include "nsevents.h"
+#include "namedvars.h"
+#include "namedvars-core.h"
 
 /* @brief hash and list sizes */
 #define CHANNEL_TABLE_SIZE	HASHCOUNT_T_MAX
@@ -47,6 +49,21 @@ static char quitreason[BUFSIZE];
 /* temp buffer to save kick info for IRCu */
 static char savekicker[MAXHOST];
 static char savekickreason[BUFSIZE];
+
+nv_struct nv_channels[] = {
+	{ "name", NV_STR, offsetof(Channel, name), NV_FLG_RO},
+	{ "name64", NV_STR, offsetof(Channel, name64), NV_FLG_RO},
+	{ "users", NV_INT, offsetof(Channel, users), NV_FLG_RO},
+	{ "neousers", NV_INT, offsetof(Channel, neousers), NV_FLG_RO},
+	{ "persistentusers", NV_STR, offsetof(Channel, persistentusers), NV_FLG_RO},
+	{ "modes", NV_INT, offsetof(Channel, modes), NV_FLG_RO},
+	{ "topic", NV_STR, offsetof(Channel, topic), NV_FLG_RO},
+	{ "topicowner", NV_STR, offsetof(Channel, topicowner), NV_FLG_RO},
+	{ "limit", NV_INT, offsetof(Channel, limit), NV_FLG_RO},
+	{ "key", NV_STR, offsetof(Channel, key), NV_FLG_RO},
+	{ "flags", NV_INT, offsetof(Channel, flags), NV_FLG_RO},
+};
+
 
 /** @brief comparechanmember
  *
@@ -665,7 +682,7 @@ int test_cumode( const Channel *c, const Client *u, unsigned int mode )
 
 int InitChannels( void )
 {
-	channelhash = hash_create( CHANNEL_TABLE_SIZE, 0, 0 );
+	channelhash = nv_hash_create( CHANNEL_TABLE_SIZE, 0, 0, "Channels", nv_channels, NV_FLAGS_RO);
 	if( channelhash == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to create channel hash" );

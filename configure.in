@@ -313,7 +313,8 @@ AX_PATH_LIB_CURL
 		AC_PATH_PROG(perlpath, perl)
 
 		AC_MSG_CHECKING(for Perl compile flags)
-		PERL_CFLAGS=`echo $PERL_CFLAGS |$sedpath 's/-Wdeclaration-after-statement //'`
+		PERL_CFLAGS=`$perlpath -MExtUtils::Embed -e ccopts 2>/dev/null`
+dnl		PERL_CFLAGS=`echo $PERL_CFLAGS |$sedpath 's/-Wdeclaration-after-statement //'`
 		if test "_$PERL_CFLAGS" = _ ; then
 			AC_MSG_RESULT([not found, building without perl.])
 			perl=no

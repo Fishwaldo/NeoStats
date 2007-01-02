@@ -5,6 +5,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.b1-dev
+ - Fixed up configure problem with Perl so perl could never be found (F)
+ - Started implementing NamedVars so perl can read from internal Hash's and
+   List's (F)
  - We don't need g++ or c++ compilers, so tell libtool to shutup about those
    compilers (F) 
  - Version Macro is fixed (F)

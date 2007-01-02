@@ -544,6 +544,13 @@ modules/textserv/textserv.vcproj -text
 src/Makefile.am -text
 src/Makefile.in -text
 src/NeoStats.pm -text
+src/Perl_NamedVars/Changes -text
+src/Perl_NamedVars/MANIFEST -text
+src/Perl_NamedVars/Makefile.PL -text
+src/Perl_NamedVars/NV.pm -text
+src/Perl_NamedVars/NV.xs -text
+src/Perl_NamedVars/README -text
+src/Perl_NamedVars/test.pl -text
 src/confuselexer.l -text
 src/neostats.pm.h -text
 src/neostats.vcproj -text

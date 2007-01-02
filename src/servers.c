@@ -34,10 +34,23 @@
 #include "servers.h"
 #include "services.h"
 #include "users.h"
+#include "namedvars.h"
+#include "namedvars-core.h"
 
 #define SERVER_TABLE_SIZE	HASHCOUNT_T_MAX
 
 static hash_t *serverhash;
+
+nv_struct nv_server[] = {
+	{ "name", NV_STR, offsetof(Client, name), NV_FLG_RO},
+	{ "name64", NV_STR, offsetof(Client, name64), NV_FLG_RO},
+	{ "uplinkname", NV_STR, offsetof(Client, uplinkname), NV_FLG_RO},
+	{ "info", NV_STR, offsetof(Client, info), NV_FLG_RO},
+	{ "version", NV_STR, offsetof(Client, version), NV_FLG_RO},
+	{ "flags", NV_INT, offsetof(Client, flags), NV_FLG_RO},
+	{ "hostip", NV_STR, offsetof(Client, hostip), NV_FLG_RO}
+};
+
 
 /** @brief new_server
  *
@@ -311,7 +324,7 @@ int ns_cmd_serverlist( const CmdParams *cmdparams )
 
 int InitServers( void )
 {
-	serverhash = hash_create( SERVER_TABLE_SIZE, 0, 0 );
+	serverhash = nv_hash_create( SERVER_TABLE_SIZE, 0, 0, "Servers", nv_server, NV_FLAGS_RO );
 	if( !serverhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create server hash" );

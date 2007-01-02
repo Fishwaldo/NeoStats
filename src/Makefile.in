@@ -68,8 +68,8 @@ am__neostats_SOURCES_DIST = auth.c bans.c bots.c channels.c commands.c \
 	base64.c numerics.c settings.c botinfo.c adnscheck.c \
 	adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c \
 	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
-	osfile.c updates.c MiniMessage.c MiniMessageGateway.c perl.c \
-	neostats.pm.h
+	osfile.c updates.c MiniMessage.c MiniMessageGateway.c \
+	namedvars.c perl.c neostats.pm.h
 @DO_PERL_TRUE@am__objects_1 = perl.$(OBJEXT)
 am__objects_2 =
 am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
@@ -90,7 +90,8 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	adnsreply.$(OBJEXT) adnssetup.$(OBJEXT) adnstransmit.$(OBJEXT) \
 	adnstypes.$(OBJEXT) oscalls.$(OBJEXT) ossocket.$(OBJEXT) \
 	osfile.$(OBJEXT) updates.$(OBJEXT) MiniMessage.$(OBJEXT) \
-	MiniMessageGateway.$(OBJEXT) $(am__objects_1) $(am__objects_2)
+	MiniMessageGateway.$(OBJEXT) namedvars.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
 neostats_DEPENDENCIES = $(top_srcdir)/lib/curl/libcurl.la \
 	$(top_srcdir)/lib/pcre/libpcre.la \
@@ -264,7 +265,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
 	adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c \
 	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
 	osfile.c updates.c MiniMessage.c MiniMessageGateway.c \
-	$(am__append_1) $(am__append_2)
+	namedvars.c $(am__append_1) $(am__append_2)
 AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml
 
@@ -374,6 +375,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modules.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/namedvars.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsdba.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsevents.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nsmemory.Po@am__quote@

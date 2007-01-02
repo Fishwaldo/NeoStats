@@ -57,6 +57,7 @@
 #include "nxml.h"
 #include "mrss.h"
 #endif
+#include "namedvars.h"
 
 #ifndef WIN32
 #define PID_FILENAME	"neostats.pid"
@@ -260,6 +261,9 @@ static int InitMe( void )
 
 static int InitCore( void )
 {
+	/* init named vars first */
+	if (nv_init() != NS_SUCCESS) 
+		return NS_FAILURE;
 	/* initialize Module subsystem */
 	if( InitSocks() != NS_SUCCESS )
 		return NS_FAILURE;

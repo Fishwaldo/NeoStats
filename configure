@@ -26323,7 +26323,7 @@ fi
 
 		{ echo "$as_me:$LINENO: checking for Perl compile flags" >&5
 echo $ECHO_N "checking for Perl compile flags... $ECHO_C" >&6; }
-		PERL_CFLAGS=`echo $PERL_CFLAGS |$sedpath 's/-Wdeclaration-after-statement //'`
+		PERL_CFLAGS=`$perlpath -MExtUtils::Embed -e ccopts 2>/dev/null`
 		if test "_$PERL_CFLAGS" = _ ; then
 			{ echo "$as_me:$LINENO: result: not found, building without perl." >&5
 echo "${ECHO_T}not found, building without perl." >&6; }
