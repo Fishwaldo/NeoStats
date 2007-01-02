@@ -28,7 +28,8 @@ typedef enum {
 	NV_PSTR,
 	NV_INT,
 	NV_LONG,
-	NV_VOID
+	NV_VOID,
+	NV_PSTRA
 } nv_struct_type;
 typedef enum {
 	NV_FLG_NONE,
@@ -44,6 +45,8 @@ typedef struct nv_struct {
 	int offset;
 	/* flags of the field */
 	nv_struct_flag flags;
+	/* if its a substructure, the offset of the actual field, otherwise -1 */
+	int fldoffset;
 } nv_struct;
 
 typedef enum {

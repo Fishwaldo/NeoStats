@@ -53,10 +53,11 @@ hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char
 int dump_namedvars(char *name2) {
 	hnode_t *node, *node2;
 	hscan_t scan, scan1;
-	void *data;
+	void *data, *data2;	
 	nv_list *item;
 	int i, j;
 	void *output;
+	Module *test;
 	hash_scan_begin(&scan1, namedvars);
 	while ((node = hash_scan_next(&scan1)) != NULL ) {
 		item = hnode_get(node);
@@ -69,26 +70,38 @@ int dump_namedvars(char *name2) {
 			while ((node2 = hash_scan_next(&scan)) != NULL) {
 				data = hnode_get(node2);
 				i = 0;
-				printf("Entry %d (%d)\n", j, hash_count((hash_t *)item->data));
+				printf("Entry %d (%d)\n", j, (int)hash_count((hash_t *)item->data));
 				j++;
 				while (item->format[i].fldname != NULL) {
 					printf("\tField: Name: %s, Type: %d, Flags: %d ", item->format[i].fldname, item->format[i].type, item->format[i].flags);
+					if (item->format[i].fldoffset != -1) {
+						data2 = data + item->format[i].fldoffset;
+						data2 = *((int *)data2);
+					} else {
+						data2 = data;
+					}		
 					switch (item->format[i].type) {
-						case NV_STR:
 						case NV_PSTR:
-							output = data + item->format[i].offset;
+							output = data2 + item->format[i].offset;
+							printf("Value: %s\n", *(int *)output);
+							break;
+						case NV_STR:
+							output = data2 + item->format[i].offset;
 							printf("Value: %s\n", (char *)output);
 							break;
 						case NV_INT:
-							output = data + item->format[i].offset;
+							output = data2 + item->format[i].offset;
 							printf("Value: %d\n", *((int *)output));
 							break;
 						case NV_LONG:
-							output = data + item->format[i].offset;
-							printf("Value: %d\n", *((long *)output));
+							output = data2 + item->format[i].offset;
+							printf("Value: %ld\n", *((long *)output));
 							break;
 						case NV_VOID:
 							printf("Value: Complex!\n");
+							break;
+						default:
+							printf("Value: Unhandled!\n");
 							break;
 					}
 					i++;
@@ -96,5 +109,6 @@ int dump_namedvars(char *name2) {
 			}
 		}
 	}
+	return NS_SUCCESS;
 }				
 				

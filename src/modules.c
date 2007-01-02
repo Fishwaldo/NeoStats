@@ -42,6 +42,8 @@
 #define PERLDEFINES
 #include "perlmod.h"
 #endif /* USE_PERL */
+#include "namedvars.h"
+#include "namedvars-core.h"
 
 /** @brief Module list */
 static Module *ModList[NUM_MODULES];
@@ -50,6 +52,20 @@ Module *RunModule[10];
 int RunLevel = 0;
 /* @brief Module hash list */
 static hash_t *modulehash;
+
+nv_struct nv_modules[] = {
+	{ "name", NV_PSTR, offsetof(ModuleInfo, name), NV_FLG_RO, offsetof(Module, info)},
+	{ "description", NV_PSTR, offsetof(ModuleInfo, description), NV_FLG_RO, offsetof(Module, info)},
+	{ "copyright", NV_PSTRA, offsetof(ModuleInfo, copyright), NV_FLG_RO, offsetof(Module, info)},
+	{ "about_text", NV_PSTRA, offsetof(ModuleInfo, about_text), NV_FLG_RO, offsetof(Module, info)},
+	{ "version", NV_PSTR, offsetof(ModuleInfo, version), NV_FLG_RO, offsetof(Module, info)},
+	{ "build_date", NV_PSTR, offsetof(ModuleInfo, build_date), NV_FLG_RO, offsetof(Module, info)},
+	{ "build_time", NV_PSTR, offsetof(ModuleInfo, build_time), NV_FLG_RO, offsetof(Module, info)},
+	{ "type", NV_INT, offsetof(Module, type), NV_FLG_RO, -1},
+	{ "modnum", NV_INT, offsetof(Module, modnum), NV_FLG_RO, -1},
+	{ "status", NV_INT, offsetof(Module, status), NV_FLG_RO, -1},
+};
+
 
 /* WIP */
 #if 0
@@ -129,7 +145,7 @@ int ProcessModuleList( const ModuleListHandler handler, void *v )
 int InitModules( void )
 {
 	SET_SEGV_LOCATION();
-	modulehash = hash_create( NUM_MODULES, 0, 0 );
+	modulehash = nv_hash_create( NUM_MODULES, 0, 0, "Modules", nv_modules, NV_FLAGS_RO );
 	if( !modulehash ) {
 		nlog( LOG_CRITICAL, "Unable to create module hash" );
 		return NS_FAILURE;

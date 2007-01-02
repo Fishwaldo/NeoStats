@@ -32,6 +32,8 @@
 #include "users.h"
 #include "ctcp.h"
 #include "exclude.h"
+#include "namedvars.h"
+#include "namedvars-core.h"
 
 #define IS_CTCP_MSG( msg ) ( msg[0] == '\1' )
 
@@ -40,6 +42,13 @@
 
 /* @brief Module Bot hash list */
 static hash_t *bothash;
+
+nv_struct nv_bots[] = {
+	{ "name", NV_STR, offsetof(Bot, name), NV_FLG_RO, -1},
+	{ "flags", NV_STR, offsetof(Bot, flags), NV_FLG_RO, -1},
+	{ "set_ulevel", NV_STR, offsetof(Bot, set_ulevel), NV_FLG_RO, -1}
+};
+
 
 /** @brief InitBots 
  *
@@ -53,7 +62,7 @@ static hash_t *bothash;
 
 int InitBots( void )
 {
-	bothash = hash_create( BOT_TABLE_SIZE, 0, 0 );
+	bothash = nv_hash_create( BOT_TABLE_SIZE, 0, 0, "Bots", nv_bots, NV_FLAGS_RO );
 	if( bothash == NULL )
 	{
 		nlog( LOG_CRITICAL, "Failed to create bot hash" );

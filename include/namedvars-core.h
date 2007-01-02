@@ -27,5 +27,7 @@
 extern nv_struct nv_client[];
 extern nv_struct nv_servers[];
 extern nv_struct nv_channels[];
+extern nv_struct nv_bots[];
+extern nv_struct nv_modules[];
 
 #endif /* _NAMEDVARS_CORE_H_ */

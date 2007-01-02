@@ -43,13 +43,13 @@
 static hash_t *userhash;
 
 nv_struct nv_client[] = {
-	{ "name", NV_STR, offsetof(Client, name), NV_FLG_RO},
-	{ "name64", NV_STR, offsetof(Client, name64), NV_FLG_RO},
-	{ "uplinkname", NV_STR, offsetof(Client, uplinkname), NV_FLG_RO},
-	{ "info", NV_STR, offsetof(Client, info), NV_FLG_RO},
-	{ "version", NV_STR, offsetof(Client, version), NV_FLG_RO},
-	{ "flags", NV_INT, offsetof(Client, flags), NV_FLG_RO},
-	{ "hostip", NV_STR, offsetof(Client, hostip), NV_FLG_RO}
+	{ "name", NV_STR, offsetof(Client, name), NV_FLG_RO, -1},
+	{ "name64", NV_STR, offsetof(Client, name64), NV_FLG_RO, -1},
+	{ "uplinkname", NV_STR, offsetof(Client, uplinkname), NV_FLG_RO, -1},
+	{ "info", NV_STR, offsetof(Client, info), NV_FLG_RO, -1},
+	{ "version", NV_STR, offsetof(Client, version), NV_FLG_RO, -1},
+	{ "flags", NV_INT, offsetof(Client, flags), NV_FLG_RO, -1},
+	{ "hostip", NV_STR, offsetof(Client, hostip), NV_FLG_RO, -1}
 };
 
 
