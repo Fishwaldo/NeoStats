@@ -69,9 +69,9 @@ int dump_namedvars(char *name2) {
 	hscan_t scan, scan1;
 	void *data, *data2;	
 	nv_list *item;
-	int i, j;
+	int i, j, k;
 	void *output;
-	Module *test;
+	char **outarry;
 	hash_scan_begin(&scan1, namedvars);
 	while ((node = hash_scan_next(&scan1)) != NULL ) {
 		item = hnode_get(node);
@@ -91,14 +91,14 @@ int dump_namedvars(char *name2) {
 					printf("\tField: Name: %s, Type: %d, Flags: %d ", item->format[i].fldname, item->format[i].type, item->format[i].flags);
 					if (item->format[i].fldoffset != -1) {
 						data2 = data + item->format[i].fldoffset;
-						data2 = *((int *)data2);
+						data2 = (void *)*((int *)data2);
 					} else {
 						data2 = data;
 					}		
 					switch (item->format[i].type) {
 						case NV_PSTR:
 							output = data2 + item->format[i].offset;
-							printf("Value: %s\n", *(int *)output);
+							printf("Value: %s\n", (char *)*(int *)output);
 							break;
 						case NV_STR:
 							output = data2 + item->format[i].offset;
@@ -115,6 +115,16 @@ int dump_namedvars(char *name2) {
 						case NV_VOID:
 							printf("Value: Complex!\n");
 							break;
+						case NV_PSTRA:
+							output = data2 + item->format[i].offset;
+							outarry = (char **)*(int *)output;
+							k = 0;
+							printf("\n");
+							while (outarry[k] != NULL) {
+								printf("\t\tValue [%d]: %s\n", k, outarry[k]);
+								k++;
+							}
+							break;			
 						default:
 							printf("Value: Unhandled!\n");
 							break;

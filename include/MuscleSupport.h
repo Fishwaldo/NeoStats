@@ -37,7 +37,9 @@
 #ifndef MuscleSupport_h
 #define MuscleSupport_h
 
-#define MUSCLE_VERSION_STRING "3.01"
+#define MUSCLE_VERSION_STRING "3.24"
+
+#include <string.h>  /* for memcpy() */
 
 /* Define this if the default FD_SETSIZE is too small for you (i.e. under Windows it's only 64) */
 #if defined(MUSCLE_FD_SETSIZE)
@@ -50,11 +52,10 @@
 
 /* If we are in an environment where known assembly is available, make a note of that fact */
 #if defined(__GNUC__)
-/*# if (defined(__PPC__) || defined(__APPLE__)) */
-# if (defined(__PPC__))
-#  define MUSCLE_USE_POWERPC_INLINE_ASSEMBLY 1
-# elif defined(__i386__)
+# if defined(__i386__)
 #  define MUSCLE_USE_X86_INLINE_ASSEMBLY 1
+# elif (defined(__PPC__) || defined(__APPLE__))
+#  define MUSCLE_USE_POWERPC_INLINE_ASSEMBLY 1
 # endif
 #endif
 
@@ -95,16 +96,18 @@ DECLARE_NAMESPACE(muscle);
 #endif
 
 /* Borland C++ builder also runs under Win32, but it doesn't set this flag So we'd better set it ourselves. */
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || defined(__WIN32__) || defined(_MSC_VER)
 # ifndef WIN32
 #  define WIN32 1
 # endif
 #endif
 
-/* VC++ can't handle this stuff, it's too lame */
+/* Win32 can't handle this stuff, it's too lame */
 #ifdef WIN32
 # define UNISTD_H_NOT_AVAILABLE
-# define NEW_H_NOT_AVAILABLE
+# ifndef _MSC_VER  /* 7/3/2006: Mika's patch allows VC++ to use newnothrow */
+#  define NEW_H_NOT_AVAILABLE
+# endif
 #endif
 
 #ifndef UNISTD_H_NOT_AVAILABLE
@@ -118,8 +121,15 @@ DECLARE_NAMESPACE(muscle);
 using std::bad_alloc;
 using std::nothrow_t;
 using std::nothrow;
+#   if (defined(_MSC_VER))
+// VC++ 6.0 and earlier lack this definition
+#    if (_MSC_VER <= 1200)
+inline void __cdecl operator delete(void *p, const std::nothrow_t&) _THROW0() {delete(p);}
+#    endif
+#   else
 using std::new_handler;
 using std::set_new_handler;
+#   endif
 #  endif
 # endif
 #else
@@ -410,7 +420,6 @@ template<typename T> inline int muscleSgn(const T & arg) {return (arg<0)?-1:((ar
 
 /*
  *      from nameser.h  8.1 (Berkeley) 6/2/93
- *      $Id$
  */
 
 #ifndef BYTE_ORDER
@@ -456,10 +465,11 @@ template<typename T> inline int muscleSgn(const T & arg) {return (arg<0)?-1:((ar
          * which will force your compiles to bomb until you fix
          * the above macros.
          */
-        error "Undefined or invalid BYTE_ORDER";
+#       error "Undefined or invalid BYTE_ORDER -- you will need to modify MuscleSupport.h to correct this";
 #endif
 
 /* End replacement code from Sun/University of California */
+
 # if defined(MUSCLE_USE_POWERPC_INLINE_ASSEMBLY)
 static inline uint16 MusclePowerPCSwapInt16(uint16 val)
 {
@@ -488,8 +498,13 @@ static inline uint64 MusclePowerPCSwapInt64(uint64 val)
 }
 static inline double MusclePowerPCSwapDouble(double val)
 {
-   uint64 v64 = MusclePowerPCSwapInt64(*((uint64 *)&val));
-   return *((double *)&v64);
+   union {
+      double _dv;
+      uint64 _iv;
+   } u;
+   u._dv = val;
+   u._iv = MusclePowerPCSwapInt64(u._iv);
+   return u._dv;
 }
 #  define B_SWAP_DOUBLE(arg)   MusclePowerPCSwapDouble((double)(arg))
 #  define B_SWAP_FLOAT(arg)    MusclePowerPCSwapFloat((float)(arg))
@@ -565,8 +580,13 @@ static inline double MuscleX86SwapDouble(double val)
    };
    return val;
 #else
-   uint64 v64 = MuscleX86SwapInt64(*((uint64 *)&val));
-   return *((double *)&v64);
+   union {
+      double _dv;
+      uint64 _iv;
+   } u;
+   u._dv = val;
+   u._iv = MuscleX86SwapInt64(u._iv);
+   return u._dv;
 #endif
 }
 #  define B_SWAP_DOUBLE(arg)   MuscleX86SwapDouble((double)(arg))
