@@ -52,7 +52,7 @@
 
 /* If we are in an environment where known assembly is available, make a note of that fact */
 #if defined(__GNUC__)
-# if defined(__i386__)
+# if defined(__i386__) || defined(__X86_64__)
 #  define MUSCLE_USE_X86_INLINE_ASSEMBLY 1
 # elif (defined(__PPC__) || defined(__APPLE__))
 #  define MUSCLE_USE_POWERPC_INLINE_ASSEMBLY 1
@@ -433,7 +433,7 @@ template<typename T> inline int muscleSgn(const T & arg) {return (arg<0)?-1:((ar
       #define BIG_ENDIAN      4321    /* most-significant byte first (IBM, net) */
 
       #if defined(vax) || defined(ns32000) || defined(sun386) || defined(i386) || \
-              defined(__i386) || defined(__ia64) || \
+              defined(__i386) || defined(__ia64) || defined(__x86_64__) \
               defined(MIPSEL) || defined(_MIPSEL) || defined(BIT_ZERO_ON_RIGHT) || \
               defined(__alpha__) || defined(__alpha) || defined(__CYGWIN__) || \
               defined(_M_IX86) || defined(__GNUWIN32__) || defined(__LITTLEENDIAN__) || \
