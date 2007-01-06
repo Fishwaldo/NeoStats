@@ -23,7 +23,7 @@
 ** $Id$
 */
 
-/* This file is Copyright 2006 Level Control Systems.  See the included LICENSE.txt file for details. */
+/* This file is Copyright 2007 Meyer Sound Laboratories Inc.  See the included LICENSE.txt file for details. */
 
 /******************************************************************************
 /
@@ -37,7 +37,7 @@
 #ifndef MuscleSupport_h
 #define MuscleSupport_h
 
-#define MUSCLE_VERSION_STRING "3.24"
+#define MUSCLE_VERSION_STRING "3.25b"
 
 #include <string.h>  /* for memcpy() */
 
@@ -51,16 +51,17 @@
 #endif
 
 /* If we are in an environment where known assembly is available, make a note of that fact */
-#if defined(__GNUC__)
-# if defined(__i386__) || defined(__X86_64__)
-#  define MUSCLE_USE_X86_INLINE_ASSEMBLY 1
-# elif (defined(__PPC__) || defined(__APPLE__))
-#  define MUSCLE_USE_POWERPC_INLINE_ASSEMBLY 1
+#ifndef MUSCLE_AVOID_INLINE_ASSEMBLY
+# if defined(__GNUC__)
+#  if defined(__i386__)
+#   define MUSCLE_USE_X86_INLINE_ASSEMBLY 1
+#  elif defined(__PPC__) || defined(__POWERPC__)
+#   define MUSCLE_USE_POWERPC_INLINE_ASSEMBLY 1
+#  endif
 # endif
-#endif
-
-#if defined(_MSC_VER) && defined(_X86_)
-# define MUSCLE_USE_X86_INLINE_ASSEMBLY 1
+# if defined(_MSC_VER) && defined(_X86_)
+#  define MUSCLE_USE_X86_INLINE_ASSEMBLY 1
+# endif
 #endif
 
 #ifndef __cplusplus
@@ -287,11 +288,13 @@ enum {
 /** A handy little method to swap the bytes of any int-style datatype around */
 template<typename T> inline T muscleSwapBytes(T swapMe)
 {
-   T retVal;
-   const uint8 * readFrom = (const uint8 *) &swapMe;
-   uint8 * writeTo  = ((uint8 *) &retVal)+sizeof(retVal);
-   for (uint32 i=0; i<sizeof(swapMe); i++) {*(--writeTo) = *(readFrom++);}
-   return retVal;
+   union {T _iWide; uint8 _i8[sizeof(T)];} u1, u2;
+   u1._iWide = swapMe; 
+
+   int i = 0;
+   int numBytes = sizeof(T);
+   while(numBytes>0) u2._i8[i++] = u1._i8[--numBytes];
+   return u2._iWide;
 }
 
 /* This template safely copies a value in from an untyped byte buffer to a typed value.
@@ -433,7 +436,7 @@ template<typename T> inline int muscleSgn(const T & arg) {return (arg<0)?-1:((ar
       #define BIG_ENDIAN      4321    /* most-significant byte first (IBM, net) */
 
       #if defined(vax) || defined(ns32000) || defined(sun386) || defined(i386) || \
-              defined(__i386) || defined(__ia64) || defined(__x86_64__) \
+              defined(__i386) || defined(__ia64) || \
               defined(MIPSEL) || defined(_MIPSEL) || defined(BIT_ZERO_ON_RIGHT) || \
               defined(__alpha__) || defined(__alpha) || defined(__CYGWIN__) || \
               defined(_M_IX86) || defined(__GNUWIN32__) || defined(__LITTLEENDIAN__) || \
@@ -595,11 +598,71 @@ static inline double MuscleX86SwapDouble(double val)
 #  define B_SWAP_INT32(arg)    MuscleX86SwapInt32((uint32)(arg))
 #  define B_SWAP_INT16(arg)    MuscleX86SwapInt16((uint16)(arg))
 # else
-#  define B_SWAP_DOUBLE(arg)   muscleSwapBytes((double)(arg))
-#  define B_SWAP_FLOAT(arg)    muscleSwapBytes((float)(arg))
-#  define B_SWAP_INT64(arg)    muscleSwapBytes((uint64)(arg))
-#  define B_SWAP_INT32(arg)    muscleSwapBytes((uint32)(arg))
-#  define B_SWAP_INT16(arg)    muscleSwapBytes((uint16)(arg))
+
+// No assembly language available... so we'll use inline C
+
+# if defined(__cplusplus)
+#  define MUSCLE_INLINE inline
+# else
+#  define MUSCLE_INLINE static inline
+# endif
+
+MUSCLE_INLINE int64 B_SWAP_INT64(int64 arg)
+{
+   union {int64 _i64; uint8 _i8[8];} u1, u2;
+   u1._i64   = arg; 
+   u2._i8[0] = u1._i8[7];
+   u2._i8[1] = u1._i8[6];
+   u2._i8[2] = u1._i8[5];
+   u2._i8[3] = u1._i8[4];
+   u2._i8[4] = u1._i8[3];
+   u2._i8[5] = u1._i8[2];
+   u2._i8[6] = u1._i8[1];
+   u2._i8[7] = u1._i8[0];
+   return u2._i64;
+}
+MUSCLE_INLINE int32 B_SWAP_INT32(int32 arg)
+{
+   union {int32 _i32; uint8 _i8[4];} u1, u2;
+   u1._i32   = arg; 
+   u2._i8[0] = u1._i8[3];
+   u2._i8[1] = u1._i8[2];
+   u2._i8[2] = u1._i8[1];
+   u2._i8[3] = u1._i8[0];
+   return u2._i32;
+}
+MUSCLE_INLINE int16 B_SWAP_INT16(int16 arg) 
+{
+   union {int16 _i16; uint8 _i8[2];} u1, u2;
+   u1._i16   = arg; 
+   u2._i8[0] = u1._i8[1];
+   u2._i8[1] = u1._i8[0];
+   return u2._i16;
+}
+MUSCLE_INLINE double B_SWAP_DOUBLE(double arg)
+{
+   union {double _f64; uint8 _i8[8];} u1, u2;
+   u1._f64   = arg; 
+   u2._i8[0] = u1._i8[7];
+   u2._i8[1] = u1._i8[6];
+   u2._i8[2] = u1._i8[5];
+   u2._i8[3] = u1._i8[4];
+   u2._i8[4] = u1._i8[3];
+   u2._i8[5] = u1._i8[2];
+   u2._i8[6] = u1._i8[1];
+   u2._i8[7] = u1._i8[0];
+   return u2._f64;
+}
+MUSCLE_INLINE float B_SWAP_FLOAT(float arg)    
+{
+   union {float _f32; uint8 _i8[4];} u1, u2;
+   u1._f32   = arg; 
+   u2._i8[0] = u1._i8[3];
+   u2._i8[1] = u1._i8[2];
+   u2._i8[2] = u1._i8[1];
+   u2._i8[3] = u1._i8[0];
+   return u2._f32;
+}
 # endif
 # if BYTE_ORDER == LITTLE_ENDIAN
 #  define B_HOST_IS_LENDIAN 1
