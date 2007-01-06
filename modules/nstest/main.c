@@ -37,7 +37,7 @@ const char *ns_about[] =
 /** Copyright info */
 const char *ns_copyright[] = 
 {
-	"Copyright (c) 1999-2006, NeoStats",
+	"Copyright (c) 1999-2007, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };

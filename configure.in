@@ -345,8 +345,8 @@ dnl		PERL_CFLAGS=`echo $PERL_CFLAGS |$sedpath 's/-Wdeclaration-after-statement /
 #include "XSUB.h"
 int main () { (void)&perl_construct; return 0; }
 EOF
-				$PERL_CC $PERL_CFLAGS -c testperl.c >testperl.err 2>&1 &&
-	   	 		$PERL_LD -o testperl testperl.o $PERL_LDFLAGS >testperl.err 2>&1 &&
+				$PERL_CC $PERL_CFLAGS -c testperl.c 2>&5 &&
+	   	 		$PERL_LD -o testperl testperl.o $PERL_LDFLAGS 2>&5 &&
 	    			test -x testperl &&
 	    			have_perl=yes
 				if test "$have_perl" = "yes"; then
@@ -357,6 +357,8 @@ EOF
 					PERL_CFLAGS=""
 					AC_MSG_RESULT([Failed. Perl Support Disabled. See the RELNOTES file])
 				fi
+				rm -f testperl$ac_exeext testperl.$ac_objext testperl.c testperl.err
+
 			else
 				AC_MSG_RESULT(no)
 				PERL_LDFLAGS=""

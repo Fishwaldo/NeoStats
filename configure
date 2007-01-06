@@ -26359,8 +26359,8 @@ echo $ECHO_N "checking Checking for perl compiler, linker, libraries and headers
 #include "XSUB.h"
 int main () { (void)&perl_construct; return 0; }
 EOF
-				$PERL_CC $PERL_CFLAGS -c testperl.c >testperl.err 2>&1 &&
-	   	 		$PERL_LD -o testperl testperl.o $PERL_LDFLAGS >testperl.err 2>&1 &&
+				$PERL_CC $PERL_CFLAGS -c testperl.c 2>&5 &&
+	   	 		$PERL_LD -o testperl testperl.o $PERL_LDFLAGS 2>&5 &&
 	    			test -x testperl &&
 	    			have_perl=yes
 				if test "$have_perl" = "yes"; then
@@ -26377,6 +26377,8 @@ _ACEOF
 					{ echo "$as_me:$LINENO: result: Failed. Perl Support Disabled. See the RELNOTES file" >&5
 echo "${ECHO_T}Failed. Perl Support Disabled. See the RELNOTES file" >&6; }
 				fi
+				rm -f testperl$ac_exeext testperl.$ac_objext testperl.c testperl.err
+
 			else
 				{ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
