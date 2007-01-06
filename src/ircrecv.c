@@ -1577,7 +1577,7 @@ void do_motd( const char *nick, const char *remoteserver )
 		return;
 	}
 	irc_numeric( RPL_MOTDSTART, nick, ":- %s Message of the Day -", me.name );
-	irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2006 The NeoStats Group", me.version );
+	irc_numeric( RPL_MOTD, nick, ":- %s. Copyright (c) 1999 - 2007 The NeoStats Group", me.version );
 	irc_numeric( RPL_MOTD, nick, ":-" );
 	while( fgets( buf, sizeof( buf ), fp ) != NULL )
 	{
@@ -1610,7 +1610,7 @@ void do_admin( const char *nick, const char *remoteserver )
 		return;
 	}
 	irc_numeric( RPL_ADMINME, nick, ":%s :Administrative info", me.name );
-	irc_numeric( RPL_ADMINLOC1, nick, ":%s.  Copyright (c) 1999 - 2006 The NeoStats Group", me.version );
+	irc_numeric( RPL_ADMINLOC1, nick, ":%s.  Copyright (c) 1999 - 2007 The NeoStats Group", me.version );
 	while( fgets( buf, sizeof( buf ), fp ) != NULL )
 	{
 		buf[strnlen( buf, BUFSIZE ) - 1] = 0;

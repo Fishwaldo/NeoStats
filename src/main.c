@@ -132,7 +132,7 @@ void update_time_now( void )
 static void print_copyright( void )
 {
 	printf( "-----------------------------------------------\n" );
-	printf( "Copyright: NeoStats Group. 2000-2006\n" );
+	printf( "Copyright: NeoStats Group. 2000-2007\n" );
 	printf( "Justin Hammond (fish@neostats.net)\n" );
 	printf( "Mark Hetherington (m@neostats.net)\n" );
 	printf( "-----------------------------------------------\n\n" );
