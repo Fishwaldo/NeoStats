@@ -27,6 +27,9 @@
 #define _NEOSTATS_H_
 
 #ifdef WIN32
+/* Disable some warnings on MSVC 2005 */
+#define _CRT_SECURE_NO_DEPRECATE 1
+#define _CRT_NONSTDC_NO_DEPRECATE 1
 #include "configwin32.h"
 #include <winsock2.h>
 #else /* WIN32 */

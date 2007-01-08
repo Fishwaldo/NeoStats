@@ -253,3 +253,7 @@
 
 /* ldap dynamic library file */
 #define DL_LDAP_FILE "wldap32.dll"
+
+/* Disable some warnings on MSVC 2005 */
+#define _CRT_SECURE_NO_DEPRECATE 1
+#define _CRT_NONSTDC_NO_DEPRECATE 1
