@@ -28,7 +28,7 @@
 
 /* Define this to 'int' if socklen_t is not an available typedefed type */
 #if !defined(ENABLE_IPV6) && ((_MSC_VER < 1300) || !defined(USE_SSLEAY))
-#define socklen_t int
+//#define socklen_t int
 #endif
 
 /* The size of a `curl_off_t', as computed by sizeof. */
@@ -220,6 +220,27 @@
 /* use ioctlsocket() for non-blocking sockets */
 #define HAVE_IOCTLSOCKET
 
+#define HAVE_RECV
+#define RECV_TYPE_ARG1 SOCKET
+#define RECV_TYPE_ARG2 char *
+#define RECV_TYPE_ARG3 int
+#define RECV_TYPE_ARG4 int
+#define RECV_TYPE_RETV int
+
+#define HAVE_SEND
+#define SEND_TYPE_ARG1 SOCKET
+#define SEND_QUAL_ARG2 
+#define SEND_TYPE_ARG2 const char *
+#define SEND_TYPE_ARG3 int
+#define SEND_TYPE_ARG4 int
+#define SEND_TYPE_RETV int
+
+#define HAVE_STRUCT_TIMEVAL
+
+#define HAVE_WINDOWS_H
+
+#define CURL_STATICLIB
+
 /*************************************************
  * This section is for compiler specific defines.*
  *************************************************/
@@ -229,3 +250,6 @@
 #define HAVE_UNISTD_H 1
 
 #endif
+
+/* ldap dynamic library file */
+#define DL_LDAP_FILE "wldap32.dll"

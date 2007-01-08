@@ -64,7 +64,9 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 	return (list_t *) newitem->data;
 }
 
-int dump_namedvars(char *name2) {
+#ifndef WIN32
+int dump_namedvars(char *name2)
+{
 	hnode_t *node, *node2;
 	hscan_t scan, scan1;
 	void *data, *data2;	
@@ -135,5 +137,5 @@ int dump_namedvars(char *name2) {
 		}
 	}
 	return NS_SUCCESS;
-}				
-				
+}
+#endif /* WIN32 */

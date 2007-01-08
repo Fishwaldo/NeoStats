@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="curl"
 	ProjectGUID="{F9973FED-1759-4B07-ACD0-B949A9F73F29}"
+	RootNamespace="curl"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -189,10 +190,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\getdate.c"
-				>
-			</File>
-			<File
 				RelativePath=".\getenv.c"
 				>
 			</File>
@@ -201,11 +198,39 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gtls.c"
+				>
+			</File>
+			<File
 				RelativePath=".\hash.c"
 				>
 			</File>
 			<File
+				RelativePath=".\hostares.c"
+				>
+			</File>
+			<File
+				RelativePath=".\hostasyn.c"
+				>
+			</File>
+			<File
 				RelativePath=".\hostip.c"
+				>
+			</File>
+			<File
+				RelativePath=".\hostip4.c"
+				>
+			</File>
+			<File
+				RelativePath=".\hostip6.c"
+				>
+			</File>
+			<File
+				RelativePath=".\hostsyn.c"
+				>
+			</File>
+			<File
+				RelativePath=".\hostthre.c"
 				>
 			</File>
 			<File
@@ -230,6 +255,10 @@
 			</File>
 			<File
 				RelativePath=".\if2ip.c"
+				>
+			</File>
+			<File
+				RelativePath=".\inet_ntop.c"
 				>
 			</File>
 			<File
@@ -269,11 +298,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\parsedate.c"
+				>
+			</File>
+			<File
 				RelativePath=".\progress.c"
 				>
 			</File>
 			<File
 				RelativePath=".\security.c"
+				>
+			</File>
+			<File
+				RelativePath=".\select.c"
 				>
 			</File>
 			<File
@@ -285,7 +322,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\socks.c"
+				>
+			</File>
+			<File
 				RelativePath=".\speedcheck.c"
+				>
+			</File>
+			<File
+				RelativePath=".\splay.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sslgen.c"
 				>
 			</File>
 			<File
@@ -293,7 +342,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\strdup.c"
+				>
+			</File>
+			<File
 				RelativePath=".\strequal.c"
+				>
+			</File>
+			<File
+				RelativePath=".\strerror.c"
 				>
 			</File>
 			<File
@@ -301,7 +358,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\strtoofft.c"
+				>
+			</File>
+			<File
 				RelativePath=".\telnet.c"
+				>
+			</File>
+			<File
+				RelativePath=".\tftp.c"
 				>
 			</File>
 			<File
@@ -355,11 +420,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\curlver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\curlx.h"
+				>
+			</File>
+			<File
 				RelativePath=".\dict.h"
 				>
 			</File>
 			<File
 				RelativePath=".\easy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\easyif.h"
 				>
 			</File>
 			<File
@@ -384,6 +461,10 @@
 			</File>
 			<File
 				RelativePath=".\getinfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\gtls.h"
 				>
 			</File>
 			<File
@@ -423,6 +504,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inet_ntop.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inet_pton.h"
 				>
 			</File>
@@ -447,6 +532,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\memory.h"
+				>
+			</File>
+			<File
 				RelativePath=".\mprintf.h"
 				>
 			</File>
@@ -455,7 +544,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\multiif.h"
+				>
+			</File>
+			<File
 				RelativePath=".\netrc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\parsedate.h"
 				>
 			</File>
 			<File
@@ -467,6 +564,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\select.h"
+				>
+			</File>
+			<File
 				RelativePath=".\sendf.h"
 				>
 			</File>
@@ -475,11 +576,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\setup_once.h"
+				>
+			</File>
+			<File
 				RelativePath=".\share.h"
 				>
 			</File>
 			<File
+				RelativePath=".\sockaddr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\socks.h"
+				>
+			</File>
+			<File
 				RelativePath=".\speedcheck.h"
+				>
+			</File>
+			<File
+				RelativePath=".\splay.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sslgen.h"
 				>
 			</File>
 			<File
@@ -491,7 +612,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\strdup.h"
+				>
+			</File>
+			<File
 				RelativePath=".\strequal.h"
+				>
+			</File>
+			<File
+				RelativePath=".\strerror.h"
 				>
 			</File>
 			<File
@@ -499,7 +628,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\strtoofft.h"
+				>
+			</File>
+			<File
 				RelativePath=".\telnet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\tftp.h"
 				>
 			</File>
 			<File

@@ -523,7 +523,9 @@ int ns_cmd_botlist( const CmdParams *cmdparams )
 		}
 	}
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "End of Module Bot List", cmdparams->source ) );
+#ifndef WIN32
 	dump_namedvars("");
+#endif /* WIN32 */
 	return NS_SUCCESS;
 }
 
