@@ -49,7 +49,7 @@ typedef struct nv_struct {
 	int fldoffset;
 } nv_struct;
 
-#define NV_STRUCT_END() { NULL, 0, 0, 0, -1}
+#define NV_STRUCT_END() { NULL, NV_STR, 0, NV_FLG_NONE, -1}
 
 typedef enum {
 	NV_TYPE_LIST,
