@@ -618,6 +618,9 @@
 /* "Installation Prefix" */
 #undef NEO_PREFIX
 
+/* "Full Version" */
+#undef NEO_VERSION
+
 /* "Operating System Host" */
 #undef NS_HOST
 
@@ -735,7 +738,7 @@
 /* if SSL is enabled */
 #undef USE_SSLEAY
 
-/* "Full Version" */
+/* Version number of package */
 #undef VERSION
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a

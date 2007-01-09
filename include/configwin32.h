@@ -465,7 +465,7 @@
 /* #undef USE_RAW */
 
 /* "Full Version" */
-#define VERSION "3.0.a3"
+#define NEO_VERSION "3.0.a4"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

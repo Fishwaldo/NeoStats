@@ -2493,7 +2493,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define VERSION "$x_version"
+#define NEO_VERSION "$x_version"
 _ACEOF
 
 
