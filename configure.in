@@ -8,13 +8,12 @@ AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADER([include/config.h])
 AC_PREFIX_DEFAULT(~/NeoStats3.0)
 AC_CACHE_LOAD
-
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
 x_rev="a4"
 x_package='NeoStats'
-MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline"
+MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline perltest templateauth template"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
@@ -457,6 +456,11 @@ AC_ARG_WITH(modules, [  --with-modules - Additional Modules to compile],
 MODULES="$MODULES $withval"
 AC_MSG_RESULT($withval),
 AC_MSG_RESULT("None"))
+
+AC_ARG_WITH(distversion, [    --with-distversion - Version Name to use for making distributions],
+[DISTDIRVERSION="$PACKAGE-$VERSION-$withval"],
+[DISTDIRVERSION="$PACKAGE-$VERSION"])
+AC_SUBST(DISTDIRVERSION)
 
 
 CFLAGS="$CFLAGS -fno-strict-aliasing"

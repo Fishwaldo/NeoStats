@@ -113,6 +113,7 @@ CURL_LIBS = @CURL_LIBS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTDIRVERSION = @DISTDIRVERSION@
 DO_BDB_FALSE = @DO_BDB_FALSE@
 DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
@@ -227,9 +228,9 @@ wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = textserv.la
 textserv_la_SOURCES = main.c textserv.h help.c
 textserv_la_LDFLAGS = -module -avoid-version
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@
 tsdbdir = $(datadir)/TSDB/
-dist_tsdb_DATA = data/*
+dist_tsdb_DATA = data/barmaid data/icecream data/loveserv data/moraleserv data/waitress
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 

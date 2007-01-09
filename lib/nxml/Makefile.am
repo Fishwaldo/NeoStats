@@ -3,7 +3,7 @@ libmrss_la_SOURCES	= nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_
        			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c mrss_download.c mrss_edit.c mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c
 include_HEADERS 	= nxml.h mrss.h
 noinst_HEADERS		= nxml_internal.h mrss_internal.h
-INCLUDES 		= -I../curl/
+INCLUDES 		= -I$(top_srcdir)/lib/curl/
 
 EXTRA_DIST = 
 

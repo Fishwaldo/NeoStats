@@ -245,7 +245,7 @@ define(ADNS_C_GETFUNC,[
 ])
 AC_DEFUN([AC_MSG_HEADER], [
 echo ""
-autotools/shtool echo -e "%B$1%b"
+$srcdir/autotools/shtool echo -e "%B$1%b"
 echo ""
 ])
 # Prevent libtool for checking how to run C++ compiler and check for other

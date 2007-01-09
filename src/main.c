@@ -36,6 +36,7 @@
 #include "servers.h"
 #include "channels.h"
 #include "dns.h"
+#include "curl.h"
 #include "transfer.h"
 #include "exclude.h"
 #include "bans.h"

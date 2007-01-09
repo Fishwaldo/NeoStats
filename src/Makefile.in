@@ -93,10 +93,10 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	MiniMessageGateway.$(OBJEXT) namedvars.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
-neostats_DEPENDENCIES = $(top_srcdir)/lib/curl/libcurl.la \
-	$(top_srcdir)/lib/pcre/libpcre.la \
-	$(top_srcdir)/lib/event/libevent.la \
-	$(top_srcdir)/lib/nxml/libmrss.la
+neostats_DEPENDENCIES = $(top_builddir)/lib/curl/libcurl.la \
+	$(top_builddir)/lib/pcre/libpcre.la \
+	$(top_builddir)/lib/event/libevent.la \
+	$(top_builddir)/lib/nxml/libmrss.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -144,6 +144,7 @@ CURL_LIBS = @CURL_LIBS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTDIRVERSION = @DISTDIRVERSION@
 DO_BDB_FALSE = @DO_BDB_FALSE@
 DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
@@ -266,11 +267,11 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
 	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
 	osfile.c updates.c MiniMessage.c MiniMessageGateway.c \
 	namedvars.c $(am__append_1) $(am__append_2)
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
-		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml
+AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
+		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml 
 
-neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_srcdir)/lib/curl/libcurl.la $(top_srcdir)/lib/pcre/libpcre.la \
-		$(top_srcdir)/lib/event/libevent.la $(top_srcdir)/lib/nxml/libmrss.la
+neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/curl/libcurl.la $(top_builddir)/lib/pcre/libpcre.la \
+		$(top_builddir)/lib/event/libevent.la $(top_builddir)/lib/nxml/libmrss.la
 
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 noinst_HEADERS = confuselexer.l NeoStats.pm

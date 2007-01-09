@@ -4,7 +4,6 @@
 
 AUTOMAKE_OPTIONS = foreign nostdinc
 
-EXTRA_DIST = getdate.y 
 
 lib_LTLIBRARIES = libcurl.la
 
@@ -75,6 +74,8 @@ noinst_HEADERS = arpa_telnet.h netrc.h file.h timeval.h base64.h hostip.h	\
   inet_pton.h strtoofft.h strerror.h inet_ntop.h curlx.h memory.h	\
   setup.h transfer.h select.h easyif.h multiif.h parsedate.h sslgen.h   \
   gtls.h tftp.h sockaddr.h splay.h strdup.h setup_once.h socks.h
+
+include_HEADERS = curl.h curlver.h easy.h multi.h mprintf.h
 
 BUILT_SOURCES = $(srcdir)/ca-bundle.h
 

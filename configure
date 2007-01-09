@@ -884,6 +884,7 @@ BDB_LDFLAGS
 BDB_LIBS
 DO_BDB_TRUE
 DO_BDB_FALSE
+DISTDIRVERSION
 PROTOCOL
 LIBTOOL_DEPS
 MODULES
@@ -1521,6 +1522,7 @@ Optional Packages:
   --with-rtsig		compile with support for real time signals (experimental)
   --with-bdb-dir=DIR      Berkeley DB installation directory
   --with-modules - Additional Modules to compile
+    --with-distversion - Version Name to use for making distributions
 
 Some influential environment variables:
   CC          C compiler command
@@ -2010,13 +2012,12 @@ echo "$as_me: creating cache $cache_file" >&6;}
   >$cache_file
 fi
 
-
 #Standard Defines for autoconf here
 x_maj=3
 x_min='0'
 x_rev="a4"
 x_package='NeoStats'
-MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline"
+MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline perltest templateauth template"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
@@ -2498,7 +2499,7 @@ _ACEOF
 
 
 echo ""
-autotools/shtool echo -e "%BConfiguring Core Now%b"
+$srcdir/autotools/shtool echo -e "%BConfiguring Core Now%b"
 echo ""
 
 
@@ -4478,7 +4479,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4481 "configure"' > conftest.$ac_ext
+  echo '#line 4482 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -6339,11 +6340,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6342: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6343: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6346: \$? = $ac_status" >&5
+   echo "$as_me:6347: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6607,11 +6608,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6610: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6611: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6614: \$? = $ac_status" >&5
+   echo "$as_me:6615: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6711,11 +6712,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6714: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6715: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6718: \$? = $ac_status" >&5
+   echo "$as_me:6719: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9163,7 +9164,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9166 "configure"
+#line 9167 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9263,7 +9264,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9266 "configure"
+#line 9267 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -16531,7 +16532,7 @@ fi
 
 
 echo ""
-autotools/shtool echo -e "%BConfiguring for libpcre now%b"
+$srcdir/autotools/shtool echo -e "%BConfiguring for libpcre now%b"
 echo ""
 
 NPCRE_MAJOR_VERSION=4
@@ -16591,7 +16592,7 @@ fi
 
 
 echo ""
-autotools/shtool echo -e "%BConfiguring for LibCurl Now%b"
+$srcdir/autotools/shtool echo -e "%BConfiguring for LibCurl Now%b"
 echo ""
 
 { echo "$as_me:$LINENO: checking How to build a local curl" >&5
@@ -26231,7 +26232,7 @@ fi
 	if test "$perl" = yes; then
 
 echo ""
-autotools/shtool echo -e "%BConfiguring for Perl Modules Now%b"
+$srcdir/autotools/shtool echo -e "%BConfiguring for Perl Modules Now%b"
 echo ""
 
 		# Extract the first word of "sed", so it can be a program name with args.
@@ -26414,7 +26415,7 @@ _ACEOF
 
 
 echo ""
-autotools/shtool echo -e "%BConfiguring CCDV Now%b"
+$srcdir/autotools/shtool echo -e "%BConfiguring CCDV Now%b"
 echo ""
 
 
@@ -26585,7 +26586,7 @@ fi
 
 
 echo ""
-autotools/shtool echo -e "%BConfiguring LibEvent Now%b"
+$srcdir/autotools/shtool echo -e "%BConfiguring LibEvent Now%b"
 echo ""
 
 
@@ -27785,7 +27786,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
 echo ""
-autotools/shtool echo -e "%BChecking for Berkeley Database%b"
+$srcdir/autotools/shtool echo -e "%BChecking for Berkeley Database%b"
 echo ""
 
 
@@ -31056,7 +31057,7 @@ fi
 
 
 echo ""
-autotools/shtool echo -e "%BNeoStats Configuration Summary:%b"
+$srcdir/autotools/shtool echo -e "%BNeoStats Configuration Summary:%b"
 echo ""
 
 
@@ -31181,6 +31182,16 @@ else
   { echo "$as_me:$LINENO: result: \"None\"" >&5
 echo "${ECHO_T}\"None\"" >&6; }
 fi
+
+
+
+# Check whether --with-distversion was given.
+if test "${with_distversion+set}" = set; then
+  withval=$with_distversion; DISTDIRVERSION="$PACKAGE-$VERSION-$withval"
+else
+  DISTDIRVERSION="$PACKAGE-$VERSION"
+fi
+
 
 
 
@@ -32156,6 +32167,7 @@ BDB_LDFLAGS!$BDB_LDFLAGS$ac_delim
 BDB_LIBS!$BDB_LIBS$ac_delim
 DO_BDB_TRUE!$DO_BDB_TRUE$ac_delim
 DO_BDB_FALSE!$DO_BDB_FALSE$ac_delim
+DISTDIRVERSION!$DISTDIRVERSION$ac_delim
 PROTOCOL!$PROTOCOL$ac_delim
 LIBTOOL_DEPS!$LIBTOOL_DEPS$ac_delim
 MODULES!$MODULES$ac_delim
@@ -32166,7 +32178,7 @@ RDYNAMIC_FLAG!$RDYNAMIC_FLAG$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 46; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 47; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
@@ -32759,7 +32771,7 @@ fi
 
 
 echo ""
-autotools/shtool echo -e "%BConfiguration complete.%b"
+$srcdir/autotools/shtool echo -e "%BConfiguration complete.%b"
 echo ""
 
 if test ! -f .hush; then \

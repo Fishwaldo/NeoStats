@@ -116,6 +116,7 @@ CURL_LIBS = @CURL_LIBS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTDIRVERSION = @DISTDIRVERSION@
 DO_BDB_FALSE = @DO_BDB_FALSE@
 DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
@@ -238,7 +239,7 @@ noinst_HEADERS = extern.h gdbmerrno.h systems.h gdbmconst.h getopt.h gdbmdefs.h 
 		  proto.h
 
 AM_LDFLAGS = -module -avoid-version
-AM_CFLAGS = -I$(top_srcdir)/lib/adns/ @PCRE_CFLAGS@ @CURL_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/lib/adns/ @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 

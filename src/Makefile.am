@@ -17,11 +17,11 @@ else
 neostats_SOURCES +=
 endif
 
-AM_CFLAGS = @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
-		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml
+AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
+		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml 
 		
-neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_srcdir)/lib/curl/libcurl.la $(top_srcdir)/lib/pcre/libpcre.la \
-		$(top_srcdir)/lib/event/libevent.la $(top_srcdir)/lib/nxml/libmrss.la
+neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/curl/libcurl.la $(top_builddir)/lib/pcre/libpcre.la \
+		$(top_builddir)/lib/event/libevent.la $(top_builddir)/lib/nxml/libmrss.la
 
 
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 

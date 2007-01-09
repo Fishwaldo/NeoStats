@@ -36,8 +36,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk
+DIST_COMMON = $(include_HEADERS) $(noinst_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/autotools/rules.mk
 subdir = lib/event
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -78,7 +79,7 @@ am__vpath_adj = case $$p in \
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(includedir)"
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
-HEADERS = $(include_HEADERS)
+HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -114,6 +115,7 @@ CURL_LIBS = @CURL_LIBS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTDIRVERSION = @DISTDIRVERSION@
 DO_BDB_FALSE = @DO_BDB_FALSE@
 DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
@@ -228,11 +230,11 @@ wi_PWD = @wi_PWD@
 noinst_LTLIBRARIES = libevent.la
 libevent_la_SOURCES = buffer.c devpoll.c epoll.c epoll_sub.c evbuffer.c event.c kqueue.c poll.c rtsig.c select.c signal.c log.c
 include_HEADERS = event.h
-INCLUDES = -Icompat
-EXTRA_DIST = err.c event.h event-internal.h evsignal.h \
-	kqueue.c epoll_sub.c epoll.c select.c rtsig.c poll.c signal.c \
-	devpoll.c log.c log.h\
-	compat/sys/queue.h compat/sys/tree.h compat/sys/_time.h \
+INCLUDES = -I$(top_srcdir)/lib/event/compat -I$(top_srcdir)/lib/event
+noinst_HEADERS = event-internal.h evsignal.h log.h compat/sys/_time.h \
+			compat/sys/queue.h compat/sys/tree.h
+
+EXTRA_DIST = err.c \
 	WIN32-Code/config.h WIN32-Code/misc.c \
 	WIN32-Code/win32.c WIN32-Code/misc.h \
 	WIN32-Prj/libevent.dsp \
