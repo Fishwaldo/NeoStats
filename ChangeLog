@@ -4,7 +4,7 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
-* NeoStats * Version 3.0.b1-dev
+* NeoStats * Version 3.0.a4-dev
  - Update "make dist" and almost fixed "make distcheck" (F)
  - Fix module version checking (We can't use VERSION define, as some modules
    might use it, so rename to NEO_VERSION) (F)
