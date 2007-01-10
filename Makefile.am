@@ -8,7 +8,8 @@ dist_data_DATA		= neostats.motd
 distdir			= @DISTDIRVERSION@
 #docdir			= @prefix@/doc
 dist_doc_DATA		= doc/FAQ doc/USERMAN
-
+neodir			= $(prefix)
+neo_SCRIPTS		= neostats
 DISTCLEANFILES		= autotools/ccdv
 
 EXTRA_DIST		= autotools/ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
@@ -27,15 +28,18 @@ all-local:
 		touch .message;\
 		fi;
 
-install-exec-hook:
-		$(CCDV) $(dist_binSCRIPT_INSTALL) "neostats" "@prefix@/neostats";
-		test -z "@prefix@/logs" || $(mkdir_p) "@prefix@/logs";
+#install-exec-hook:
+#		$(CCDV) $(dist_binSCRIPT_INSTALL) "neostats" "$(prefix)/neostats";
+#		test -z "$(prefix)/logs" || $(mkdir_p) "$(prefix)/logs";
+#
+#uninstall: 	uninstall-recursive 
+#		rm -f "$(prefix)/neostats"
 
 install-data-hook:
 		echo ""
 		$(top_srcdir)/autotools/shtool echo -e "%BInstallation complete.%b"
 		echo ""
-		echo "Change directory to '@prefix@' then run './neostats'"
+		echo "Change directory to '$(prefix)' then run './neostats'"
 		echo "If you require support, see the README file."
 		rm -f .message
 

@@ -808,6 +808,17 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
    	if test "x#" != "x@USECCDV@"; then echo "Installing $$f"; fi; \
 	  else :; fi; \
 	done
+
+install-neoSCRIPTS: $(neo_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(neodir)" || $(mkdir_p) "$(DESTDIR)$(neodir)"
+	@list='$(neo_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    $(CCDV) $(neoSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(neodir)/$$f"; \
+	  else :; fi; \
+	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

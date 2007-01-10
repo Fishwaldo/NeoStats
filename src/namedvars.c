@@ -33,6 +33,17 @@
 
 hash_t *namedvars;
 
+nv_list *FindNamedVars(char *name) {
+	hnode_t *node;
+	node = hnode_find(namedvars, name);
+	if (node) {
+		return hnode_get(node);
+	} else {
+		return NULL;
+	}
+}
+
+
 int nv_init() {
 	namedvars = hash_create(HASHCOUNT_T_MAX, 0, 0);
 	return NS_SUCCESS;
@@ -63,6 +74,7 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 	hnode_create_insert(namedvars, newitem, newitem->name);
 	return (list_t *) newitem->data;
 }
+
 
 #ifndef WIN32
 int dump_namedvars(char *name2)

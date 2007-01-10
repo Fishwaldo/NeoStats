@@ -5,6 +5,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - "make distcheck" now works so we can prepare snapshots easily. use
+   --with-distversion={rev} to append revision to the tarball. This will
+   also allow us to automatically generate snapshots via Pulse
+   (http://svn.neostats.net/build/) (F)
  - Update "make dist" and almost fixed "make distcheck" (F)
  - Fix module version checking (We can't use VERSION define, as some modules
    might use it, so rename to NEO_VERSION) (F)

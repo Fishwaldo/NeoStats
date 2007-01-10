@@ -81,6 +81,7 @@ extern hash_t *namedvars;
 
 EXPORTFUNC hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name, nv_struct *nvstruct, nv_flags flags);
 EXPORTFUNC list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags);
+EXPORTFUNC nv_list *FindNamedVars(char *name);
 int nv_init();
 
 

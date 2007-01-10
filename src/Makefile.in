@@ -37,7 +37,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = neostats$(EXEEXT)
-@DO_PERL_TRUE@am__append_1 = perl.c neostats.pm.h
+@DO_PERL_TRUE@am__append_1 = perl.c neostats.pm.h Perl_NamedVars/NV.c
 @DO_PERL_FALSE@am__append_2 = 
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/autotools/rules.mk
@@ -69,8 +69,8 @@ am__neostats_SOURCES_DIST = auth.c bans.c bots.c channels.c commands.c \
 	adnsevent.c adnsgeneral.c adnsparse.c adnsquery.c adnsreply.c \
 	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
 	osfile.c updates.c MiniMessage.c MiniMessageGateway.c \
-	namedvars.c perl.c neostats.pm.h
-@DO_PERL_TRUE@am__objects_1 = perl.$(OBJEXT)
+	namedvars.c perl.c neostats.pm.h Perl_NamedVars/NV.c
+@DO_PERL_TRUE@am__objects_1 = perl.$(OBJEXT) NV.$(OBJEXT)
 am__objects_2 =
 am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	channels.$(OBJEXT) commands.$(OBJEXT) confuse.$(OBJEXT) \
@@ -273,6 +273,7 @@ AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @
 neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/curl/libcurl.la $(top_builddir)/lib/pcre/libpcre.la \
 		$(top_builddir)/lib/event/libevent.la $(top_builddir)/lib/nxml/libmrss.la
 
+EXTRA_dist = typemap
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 noinst_HEADERS = confuselexer.l NeoStats.pm
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -281,7 +282,7 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .lo .o .obj .xs
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/autotools/rules.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -338,6 +339,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MiniMessage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MiniMessageGateway.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NV.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnscheck.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsevent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adnsgeneral.Po@am__quote@
@@ -395,6 +397,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transfer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/updates.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/users.Po@am__quote@
+
+NV.o: Perl_NamedVars/NV.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT NV.o -MD -MP -MF "$(DEPDIR)/NV.Tpo" -c -o NV.o `test -f 'Perl_NamedVars/NV.c' || echo '$(srcdir)/'`Perl_NamedVars/NV.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/NV.Tpo" "$(DEPDIR)/NV.Po"; else rm -f "$(DEPDIR)/NV.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Perl_NamedVars/NV.c' object='NV.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o NV.o `test -f 'Perl_NamedVars/NV.c' || echo '$(srcdir)/'`Perl_NamedVars/NV.c
+
+NV.obj: Perl_NamedVars/NV.c
+@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT NV.obj -MD -MP -MF "$(DEPDIR)/NV.Tpo" -c -o NV.obj `if test -f 'Perl_NamedVars/NV.c'; then $(CYGPATH_W) 'Perl_NamedVars/NV.c'; else $(CYGPATH_W) '$(srcdir)/Perl_NamedVars/NV.c'; fi`; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/NV.Tpo" "$(DEPDIR)/NV.Po"; else rm -f "$(DEPDIR)/NV.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Perl_NamedVars/NV.c' object='NV.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o NV.obj `if test -f 'Perl_NamedVars/NV.c'; then $(CYGPATH_W) 'Perl_NamedVars/NV.c'; else $(CYGPATH_W) '$(srcdir)/Perl_NamedVars/NV.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -579,6 +595,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 neostats.pm.h: NeoStats.pm 	 
 		$(top_builddir)/tools/generate_header
 
+.xs.c:
+	xsubpp -prototypes -typemap $(top_srcdir)/src/typemap $*.xs > $*.c
+
 .c.o:
 @USECCDV@		@echo "Building $@"
 @am__fastdepCC_TRUE@	@if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" \
@@ -702,6 +721,17 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	    f=$(am__strip_dir) \
 	    $(CCDV) $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
    	if test "x#" != "x@USECCDV@"; then echo "Installing $$f"; fi; \
+	  else :; fi; \
+	done
+
+install-neoSCRIPTS: $(neo_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(neodir)" || $(mkdir_p) "$(DESTDIR)$(neodir)"
+	@list='$(neo_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    $(CCDV) $(neoSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(neodir)/$$f"; \
 	  else :; fi; \
 	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

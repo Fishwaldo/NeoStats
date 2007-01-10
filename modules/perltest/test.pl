@@ -7,7 +7,8 @@
 
 # First thing that you must ensure happens (ie, first command) is to register this script
 # Using the following command:
-
+use Devel::Peek;
+import NeoStats::NV;
 my $bot;
 
 NeoStats::register( "Test", "1.0", "Test Script 1 description", "setupbot", "shutdownbot");
@@ -101,6 +102,10 @@ sub event_ping {
 sub event_pong {
 	my ($source) = @_;
 	NeoStats::ChanAlert($bot, "Pong $source");
+	my $testvar = new NeoStats::NV("Users");
+	Dump($testvar->{fishy});
+	NeoStats::debug($testvar->{fish}->{nick});
+	
 }
 
 sub event_signon {
@@ -335,9 +340,7 @@ sub setupbot {
 	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
 	NeoStats::debug("Added Second Bot $botinfo->{nick}");
 	NeoStats::DelBot($botinfo->{nick});
-
-
-#	add a command
+	#add a command
 	my @helptext = ('Test Perl Module Interface', 'This Command Tests the Perl Module Interface', 'By Executing several of the Perl API commands against you (but it wont kill you!)');
 	my $cmd = {
 		cmd => 'TESTAPI',

@@ -1,48 +1,61 @@
+#include "neostats.h"
+#include "namedvars.h"
+#undef _
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#include "neostats.h"
 
 
 MODULE = NeoStats::NV		PACKAGE = NeoStats::NV		
 
 void
-new(class,dev=NULL)
+new(class, varname)
+   char      *varname;
    char      *class;
-   char      *dev;
 PREINIT:
    SV        *ret;
    HV        *stash;
    HV        *hash;
    HV        *tie;
-   SV        *dsv;
+   SV        *nv_link;
    SV        *tieref;
    char      *p;
    char      *n;
    char      *t;
    char       errstr[1024];
    int        i, fd, ii, count;
+   nv_list   *nv;
 PPCODE:
-   hash   = newHV();
-   ret    = (SV*)newRV_noinc((SV*)hash);
+   nv = FindNamedVars(varname);
+   if (!nv) {
+	nlog(LOG_WARNING, "Perl NV: Can't find NamedVar list %s", varname);
+     	ret = &PL_sv_undef;
+   } else {
+	/* this returns a "empty" hash that is tied to the FETCH/STORE etc functions below */
+   	hash   = newHV();
+   	ret    = (SV*)newRV_noinc((SV*)hash);
+   	stash  = gv_stashpv(class ,TRUE);
+   	sv_bless(ret,stash);
 
-   stash  = gv_stashpv(class,TRUE);
-   sv_bless(ret,stash);
-
-   stash  = gv_stashpv(class,TRUE);
-   sv_bless(ret,stash);
-
-   tie = newHV();
-   tieref = newRV_noinc((SV*)tie);
-   sv_bless(tieref, gv_stashpv("NeoStats::NV::User", TRUE));
-   hv_magic(hash, (GV*)tieref, 'P'); 
-
-   dsv = newSViv((IV)i);
-   sv_magic(SvRV(tieref), dsv, '~', 0, 0);
-   SvREFCNT_dec(dsv);
-
+	/* tie the hash to the package (FETCH/STORE) below */
+   	tie = newHV();
+   	tieref = newRV_noinc((SV*)tie);
+   	sv_bless(tieref, gv_stashpv("NeoStats::NV::Vars", TRUE));
+   	hv_magic(hash, (GV*)tieref, 'P'); 
+	
+	/* this one allows us to store a "pointer" 
+         * at the moment, we are storing the name of the nv_list hash entry
+         * but we should move this to the actual hash entry
+         */
+   	nv_link = newSVpv(varname, strlen(varname));
+   	sv_magic(SvRV(tieref), nv_link, '~', 0, 0);
+   	SvREFCNT_dec(nv_link);
+   }
+   /* return the hash */
    EXTEND(SP,1);
    PUSHs(sv_2mortal(ret));
+
+# uknown when this is called at the moment
 
 void
 rAUTOLOAD(self,prop,...)
@@ -55,6 +68,7 @@ PREINIT:
    char         *pval;
    int           i;
 PPCODE:
+printf("AUTOLOAD\n");
    mg = mg_find(SvRV(self), 'P');
    if(!mg) { croak("lost P magic"); }
    ref = mg->mg_obj;
@@ -64,14 +78,20 @@ PPCODE:
       XPUSHs(ST(i));
    call_method(SvPV(prop,PL_na), G_SCALAR);
 
+#when we destroy the "hash" in perl, ie, it goes out of scope
+
 void
 DESTROY(self)
    SV           *self;
 CODE:
+printf("DESTROY\n");
 
-MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::User
+MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::Vars
 
-void
+#/* get a individual entry. self points to what we set with sv_magic in
+#* new function above */
+
+HV *
 FETCH(self, key)
    SV           *self;
    SV           *key;
@@ -84,15 +104,31 @@ PREINIT:
    SV          **val;
    char         *t;
    int           i;
+   Client 	*u;
 PPCODE:
+   /* find our magic */
    hash = (HV*)SvRV(self);
-   k    = SvPV(key, klen);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
-   croak("kernel variable %s does not exist", k);
-   EXTEND(SP,1);
-   PUSHs(sv_2mortal(ret));
-   
+   /* this is the nv_hash we are point at */
+   printf("%s\n", SvPV_nolen(mg->mg_obj));
+   /* get the "key" they want */
+   k    = SvPV(key, klen);
+
+   /* dummy code for now, lookup users */
+   u = FindUser(k);
+   if (!u) {
+      ret = &PL_sv_undef;
+   }  else {
+	   ret = (SV *)perl_encode_client(u);
+   }
+   /* return a HV that cast to a SV instead */
+   sv_2mortal(ret);
+   EXTEND(SP, 1);
+   PUSHs(newRV_noinc((SV *)ret));
+
+#/* store a update. should check if its RO or RW though */
+
 SV*
 STORE(self, key, value)
    SV         *self;
@@ -112,6 +148,8 @@ CODE:
 OUTPUT:
    RETVAL
 
+#/* delete a entry from the hash */
+
 void
 DESTROY(self)
    SV        *self;
@@ -123,6 +161,7 @@ PREINIT:
    char      *k;
    I32        klen;
 CODE:
+   printf("DESTROY ITEM\n");
    mg = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
 #   kp = (kvm_dev_t*)SvIVX(mg->mg_obj);
@@ -136,6 +175,8 @@ CODE:
    }
 
 
+# /* check if a entry is in the hash */
+
 bool
 EXISTS(self, key)
    SV   *self;
@@ -144,11 +185,14 @@ PREINIT:
    HV   *hash;
    char *k;
 CODE:
+printf("EXISTS\n");
    hash = (HV*)SvRV(self);
    k    = SvPV(key, PL_na);
    RETVAL = hv_exists_ent(hash, key, 0);
 OUTPUT:
    RETVAL
+
+#/* get the first entry from a hash */
 
 SV*
 FIRSTKEY(self)
@@ -157,12 +201,15 @@ PREINIT:
    HV *hash;
    HE *he;
 PPCODE:
+printf("FIRSTKEY\n");
    hash = (HV*)SvRV(self);
    hv_iterinit(hash);
    if (he = hv_iternext(hash)) {
       EXTEND(sp, 1);
       PUSHs(hv_iterkeysv(he));
    }
+
+#/* get the next entry from a cache */
 
 SV*
 NEXTKEY(self, lastkey)
@@ -172,11 +219,14 @@ PREINIT:
    HV *hash;
    HE *he;
 PPCODE:
+printf("NEXTKEY\n");
    hash = (HV*)SvRV(self);
    if (he = hv_iternext(hash)) {
       EXTEND(sp, 1);
       PUSHs(hv_iterkeysv(he));
    }
+
+#/* delete a entry */
 
 SV*
 DELETE(self, key)
@@ -186,10 +236,13 @@ PREINIT:
    HV *hash;
    HE *he;
 CODE:
+printf("DELETE\n");
    hash = (HV*)SvRV(self);
    croak("DELETE functions is not implemented");
 OUTPUT:
    RETVAL
+
+#/* clear the hash */
 
 void
 CLEAR(self)
@@ -197,18 +250,21 @@ CLEAR(self)
 PREINIT:
    HV *hash;
 CODE:
+printf("CLEAR\n");
    hash = (HV*)SvRV(self);
    croak("CLEAR function is not implemented");
+
+#/* latter */
 
 void
 _lookup(self,prop,...)
    SV     *self;
    SV     *prop;
 ALIAS:
-#   NeoStats::NV::User::size       = F_SIZE
-#   NeoStats::NV::User::bind       = F_BIND
-#   NeoStats::NV::User::type       = F_TYPE
-#   NeoStats::NV::User::visibility = F_VISB
+#   NeoStats::NV::Vars::size       = F_SIZE
+#   NeoStats::NV::Vars::bind       = F_BIND
+#   NeoStats::NV::Vars::type       = F_TYPE
+#   NeoStats::NV::Vars::visibility = F_VISB
 PREINIT:
    HV         *hash;
    SV        **var;

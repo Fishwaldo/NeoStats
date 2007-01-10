@@ -128,6 +128,17 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	  else :; fi; \
 	done
 
+install-neoSCRIPTS: $(neo_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(neodir)" || $(mkdir_p) "$(DESTDIR)$(neodir)"
+	@list='$(neo_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    $(CCDV) $(neoSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(neodir)/$$f"; \
+	  else :; fi; \
+	done
+
 pkglibdir = $(prefix)/modules
 datadir = $(prefix)/data
 docdir = $(prefix)/doc

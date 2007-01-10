@@ -1476,7 +1476,7 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::Rakill", XS_NeoStats_Rakill, __FILE__);
 	newXS ("NeoStats::Internal::AddTimer", XS_NeoStats_AddTimer, __FILE__);
 	newXS ("NeoStats::Internal::DelTimer", XS_NeoStats_DelTimer, __FILE__);
-
+boot_NeoStats__NV();
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);

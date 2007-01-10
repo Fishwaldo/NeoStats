@@ -61,10 +61,11 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES = neostats
-am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)" \
-	"$(DESTDIR)$(docdir)"
+am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(neodir)" \
+	"$(DESTDIR)$(datadir)" "$(DESTDIR)$(docdir)"
 dist_binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(dist_bin_SCRIPTS)
+neoSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+SCRIPTS = $(dist_bin_SCRIPTS) $(neo_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
@@ -249,6 +250,8 @@ dist_data_DATA = neostats.motd
 distdir = @DISTDIRVERSION@
 #docdir			= @prefix@/doc
 dist_doc_DATA = doc/FAQ doc/USERMAN
+neodir = $(prefix)
+neo_SCRIPTS = neostats
 DISTCLEANFILES = autotools/ccdv
 EXTRA_DIST = autotools/ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -300,6 +303,14 @@ uninstall-dist_binSCRIPTS:
 	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
+	done
+
+uninstall-neoSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(neo_SCRIPTS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	  echo " rm -f '$(DESTDIR)$(neodir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(neodir)/$$f"; \
 	done
 
 mostlyclean-libtool:
@@ -589,7 +600,7 @@ check: check-recursive
 all-am: Makefile $(SCRIPTS) $(DATA) all-local
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(datadir)" "$(DESTDIR)$(docdir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(neodir)" "$(DESTDIR)$(datadir)" "$(DESTDIR)$(docdir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -637,13 +648,12 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-dist_dataDATA install-dist_docDATA
+install-data-am: install-dist_dataDATA install-dist_docDATA \
+	install-neoSCRIPTS
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
 install-exec-am: install-dist_binSCRIPTS
-	@$(NORMAL_INSTALL)
-	$(MAKE) $(AM_MAKEFLAGS) install-exec-hook
 
 install-info: install-info-recursive
 
@@ -670,7 +680,7 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-dist_binSCRIPTS uninstall-dist_dataDATA \
-	uninstall-dist_docDATA uninstall-info-am
+	uninstall-dist_docDATA uninstall-info-am uninstall-neoSCRIPTS
 
 uninstall-info: uninstall-info-recursive
 
@@ -683,15 +693,15 @@ uninstall-info: uninstall-info-recursive
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-data-hook \
 	install-dist_binSCRIPTS install-dist_dataDATA \
-	install-dist_docDATA install-exec install-exec-am \
-	install-exec-hook install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
+	install-dist_docDATA install-exec install-exec-am install-info \
+	install-info-am install-man install-neoSCRIPTS install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic \
 	maintainer-clean-recursive mostlyclean mostlyclean-generic \
 	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am \
 	uninstall-dist_binSCRIPTS uninstall-dist_dataDATA \
-	uninstall-dist_docDATA uninstall-info-am
+	uninstall-dist_docDATA uninstall-info-am uninstall-neoSCRIPTS
 
 
 distcleancheck:
@@ -708,15 +718,18 @@ all-local:
 		touch .message;\
 		fi;
 
-install-exec-hook:
-		$(CCDV) $(dist_binSCRIPT_INSTALL) "neostats" "@prefix@/neostats";
-		test -z "@prefix@/logs" || $(mkdir_p) "@prefix@/logs";
+#install-exec-hook:
+#		$(CCDV) $(dist_binSCRIPT_INSTALL) "neostats" "$(prefix)/neostats";
+#		test -z "$(prefix)/logs" || $(mkdir_p) "$(prefix)/logs";
+#
+#uninstall: 	uninstall-recursive 
+#		rm -f "$(prefix)/neostats"
 
 install-data-hook:
 		echo ""
 		$(top_srcdir)/autotools/shtool echo -e "%BInstallation complete.%b"
 		echo ""
-		echo "Change directory to '@prefix@' then run './neostats'"
+		echo "Change directory to '$(prefix)' then run './neostats'"
 		echo "If you require support, see the README file."
 		rm -f .message
 
@@ -843,6 +856,17 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	    f=$(am__strip_dir) \
 	    $(CCDV) $(LIBTOOL) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
    	if test "x#" != "x@USECCDV@"; then echo "Installing $$f"; fi; \
+	  else :; fi; \
+	done
+
+install-neoSCRIPTS: $(neo_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(neodir)" || $(mkdir_p) "$(DESTDIR)$(neodir)"
+	@list='$(neo_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    $(CCDV) $(neoSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(neodir)/$$f"; \
 	  else :; fi; \
 	done
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
