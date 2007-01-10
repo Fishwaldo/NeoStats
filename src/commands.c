@@ -464,7 +464,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	int cmdlevel;
 	char **av;
 	unsigned int ac = 0;
-	int i;
+	unsigned int i;
 	int processed = 0;
 
 	SET_SEGV_LOCATION();
@@ -481,6 +481,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	{
 		msg_only_opers( cmdparams );
 		cmdret = NS_SUCCESS;
+		processed = 1;
 	} 
 	else if( ac && cmdparams->bot->botcmds ) 
 	{
