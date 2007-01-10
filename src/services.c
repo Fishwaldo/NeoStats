@@ -234,7 +234,6 @@ int init_services_bot( void )
 	strlcpy( ns_botinfo.nick, me.rootnick, MAXNICK );
 	ircsnprintf( ns_botinfo.altnick, MAXNICK, "%s1", me.rootnick );
 	ircsnprintf( ns_botinfo.realname, MAXREALNAME, "/msg %s \2HELP\2", ns_botinfo.nick );
-	nsconfig.onlyopers = 1;
 	if( nsconfig.onlyopers ) 
 		ns_botinfo.flags |= BOT_FLAG_ONLY_OPERS;
 	SetModuleInSynch( &ns_module );
