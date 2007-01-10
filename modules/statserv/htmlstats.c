@@ -745,7 +745,7 @@ int HTMLOutputTimer( void *userptr )
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
 
-int ss_cmd_forcehtml( CmdParams *cmdparams )
+int ss_cmd_forcehtml( const CmdParams *cmdparams )
 {
 	nlog( LOG_NOTICE, "%s!%s@%s forced an update of the HTML file.",
 		cmdparams->source->name, cmdparams->source->user->username, cmdparams->source->user->hostname );
