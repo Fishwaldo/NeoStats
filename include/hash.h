@@ -259,7 +259,7 @@ EXPORTFUNC 	extern void hnode_destroy (hnode_t *);
 #endif /* defined(HASH_IMPLEMENTATION) || !defined(KAZLIB_OPAQUE_DEBUG) */
 
 EXPORTFUNC 	void hnode_create_insert (hash_t *, void *, const void *);
-EXPORTFUNC 	hnode_t *hnode_find (const hash_t * hash, const void *key);
+EXPORTFUNC 	void *hnode_find (const hash_t * hash, const void *key);
 
 EXPORTFUNC 	extern void hash_delete_destroy_node( hash_t *, hnode_t * );
 EXPORTFUNC 	extern void hash_scan_delete_destroy_node( hash_t *hash, hnode_t *node );

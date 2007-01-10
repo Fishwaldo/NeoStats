@@ -902,7 +902,7 @@ void hnode_create_insert (hash_t *hash, void *data, const void *key)
 /*
  * Find hash entry and return data pointer
  */
-hnode_t *hnode_find (const hash_t * hash, const void *key)
+void *hnode_find (const hash_t * hash, const void *key)
 {
 	hnode_t *hn;
 
