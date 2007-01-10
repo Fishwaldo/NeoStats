@@ -13,6 +13,8 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 
 if DO_PERL
 neostats_SOURCES += perl.c neostats.pm.h Perl_NamedVars/NV.c
+BUILT_SOURCES = Perl_NamedVars/NV.c
+CLEANFILES = Perl_NamedVars/NV.c
 else
 neostats_SOURCES +=
 endif
@@ -32,6 +34,6 @@ neostats.pm.h: NeoStats.pm
 		$(top_builddir)/tools/generate_header
 
 .xs.c:
-	xsubpp -prototypes -typemap $(top_srcdir)/src/typemap $*.xs > $*.c
+	xsubpp -prototypes -typemap $(top_srcdir)/typemap $*.xs > $*.c
 
 include $(top_srcdir)/autotools/rules.mk 

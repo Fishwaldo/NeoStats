@@ -267,6 +267,8 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
 	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
 	osfile.c updates.c MiniMessage.c MiniMessageGateway.c \
 	namedvars.c $(am__append_1) $(am__append_2)
+@DO_PERL_TRUE@BUILT_SOURCES = Perl_NamedVars/NV.c
+@DO_PERL_TRUE@CLEANFILES = Perl_NamedVars/NV.c
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml 
 
@@ -279,7 +281,8 @@ noinst_HEADERS = confuselexer.l NeoStats.pm
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj .xs
@@ -499,13 +502,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -522,6 +527,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -529,6 +535,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -596,7 +603,7 @@ neostats.pm.h: NeoStats.pm
 		$(top_builddir)/tools/generate_header
 
 .xs.c:
-	xsubpp -prototypes -typemap $(top_srcdir)/src/typemap $*.xs > $*.c
+	xsubpp -prototypes -typemap $(top_srcdir)/typemap $*.xs > $*.c
 
 .c.o:
 @USECCDV@		@echo "Building $@"

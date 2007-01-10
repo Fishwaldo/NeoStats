@@ -2,6 +2,10 @@
 
 id=`svn info ..|grep 'Revision:'`
 id=`echo $id |sed 's/.* Revision: \(.*\) .* Exp .*/\1/'`
+if [ x"$PULSE_BUILD_REVISION" != "x" ]
+then
+	id=$PULSE_BUILD_REVISION
+fi
 
 if test -r version.h
 then
