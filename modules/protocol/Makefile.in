@@ -41,6 +41,7 @@ subdir = modules/protocol
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
 	$(top_srcdir)/autotools/ax_compare_version.m4 \
+	$(top_srcdir)/autotools/ax_distversion.m4 \
 	$(top_srcdir)/autotools/ax_maintainer_mode_auto_silent.m4 \
 	$(top_srcdir)/autotools/ax_path_bdb.m4 \
 	$(top_srcdir)/autotools/ax_path_lib_curl.m4 \
@@ -301,6 +302,7 @@ AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
+distdir = @DISTDIRVERSION@
 all: all-am
 
 .SUFFIXES:
@@ -719,6 +721,10 @@ install-neoSCRIPTS: $(neo_SCRIPTS)
 	    $(CCDV) $(neoSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(neodir)/$$f"; \
 	  else :; fi; \
 	done
+distcleancheck:
+		@:
+distuninstallcheck:
+		@:
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

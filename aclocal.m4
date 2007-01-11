@@ -7256,6 +7256,7 @@ AC_SUBST([am__untar])
 
 m4_include([autotools/acinclude.m4])
 m4_include([autotools/ax_compare_version.m4])
+m4_include([autotools/ax_distversion.m4])
 m4_include([autotools/ax_maintainer_mode_auto_silent.m4])
 m4_include([autotools/ax_path_bdb.m4])
 m4_include([autotools/ax_path_lib_curl.m4])

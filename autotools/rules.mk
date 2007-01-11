@@ -142,3 +142,9 @@ install-neoSCRIPTS: $(neo_SCRIPTS)
 pkglibdir = $(prefix)/modules
 datadir = $(prefix)/data
 docdir = $(prefix)/doc
+
+distdir			= @DISTDIRVERSION@
+distcleancheck:
+		@:
+distuninstallcheck:
+		@:

@@ -5,7 +5,6 @@ AM_MAKEFLAGS		= -s
 DISTCHECK_CONFIGURE_FLAGS = --cache-file=../config.cache
 dist_bin_SCRIPTS 	= makeconf
 dist_data_DATA		= neostats.motd
-distdir			= @DISTDIRVERSION@
 #docdir			= @prefix@/doc
 dist_doc_DATA		= doc/FAQ doc/USERMAN
 neodir			= $(prefix)
@@ -14,10 +13,6 @@ DISTCLEANFILES		= autotools/ccdv
 
 EXTRA_DIST		= autotools/ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
 
-distcleancheck:
-		@:
-distuninstallcheck:
-		@:
 all-local:
 		if test ! -f .message; then \
 		echo ""; \
@@ -28,12 +23,6 @@ all-local:
 		touch .message;\
 		fi;
 
-#install-exec-hook:
-#		$(CCDV) $(dist_binSCRIPT_INSTALL) "neostats" "$(prefix)/neostats";
-#		test -z "$(prefix)/logs" || $(mkdir_p) "$(prefix)/logs";
-#
-#uninstall: 	uninstall-recursive 
-#		rm -f "$(prefix)/neostats"
 
 install-data-hook:
 		echo ""

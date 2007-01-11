@@ -457,11 +457,7 @@ MODULES="$MODULES $withval"
 AC_MSG_RESULT($withval),
 AC_MSG_RESULT("None"))
 
-AC_ARG_WITH(distversion, [    --with-distversion - Version Name to use for making distributions],
-[DISTDIRVERSION="$PACKAGE-$VERSION-$withval"],
-[DISTDIRVERSION="$PACKAGE-$VERSION"])
-AC_SUBST(DISTDIRVERSION)
-
+AX_DISTVERSION
 
 CFLAGS="$CFLAGS -fno-strict-aliasing"
 
