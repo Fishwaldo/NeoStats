@@ -544,8 +544,8 @@ modules/textserv/textserv.vcproj -text
 /neostatslibs.sln -text
 src/Makefile.am -text
 src/Makefile.in -text
+src/NV.xs -text
 src/NeoStats.pm -text
-src/Perl_NamedVars/NV.xs -text
 src/confuselexer.l -text
 src/neostats.pm.h -text
 src/neostats.vcproj -text

@@ -12,9 +12,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 		oscalls.c ossocket.c osfile.c updates.c MiniMessage.c MiniMessageGateway.c namedvars.c 
 
 if DO_PERL
-neostats_SOURCES += perl.c neostats.pm.h Perl_NamedVars/NV.c
-BUILT_SOURCES = Perl_NamedVars/NV.c
-CLEANFILES = Perl_NamedVars/NV.c
+neostats_SOURCES += perl.c neostats.pm.h NV.c
 else
 neostats_SOURCES +=
 endif
@@ -25,7 +23,10 @@ AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @
 neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/curl/libcurl.la $(top_builddir)/lib/pcre/libpcre.la \
 		$(top_builddir)/lib/event/libevent.la $(top_builddir)/lib/nxml/libmrss.la
 
-EXTRA_dist	= typemap
+EXTRA_dist	= typemap NV.xs
+BUILT_SOURCES 	= NV.c
+CLEANFILES 	= NV.c
+
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 
 noinst_HEADERS          =       confuselexer.l NeoStats.pm
@@ -34,6 +35,6 @@ neostats.pm.h: NeoStats.pm
 		$(top_builddir)/tools/generate_header
 
 .xs.c:
-	xsubpp -prototypes -typemap $(top_srcdir)/typemap $*.xs > $*.c
+	xsubpp -prototypes -typemap $(srcdir)/typemap $*.xs > $*.c
 
 include $(top_srcdir)/autotools/rules.mk 
