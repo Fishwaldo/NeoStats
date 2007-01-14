@@ -248,6 +248,9 @@ void DelAuthModule( Module *mod_ptr )
 
 int InitAuthCommands( void )
 {
-	add_services_cmd_list( auth_command_list );
+	if( add_services_cmd_list( auth_command_list ) !=  NS_SUCCESS )
+	{
+		return NS_FAILURE;
+	}
 	return NS_SUCCESS;
 }

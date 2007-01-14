@@ -199,10 +199,10 @@ static int is_valid_target_chan( CmdParams *cmdparams, const char *target )
  *
  *  @param cmdparams pointer to command parameters
  *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ *  @return none
  */
 
-static int bot_chan_event( Event event, CmdParams *cmdparams )
+static void bot_chan_event( Event event, CmdParams *cmdparams )
 {
 	lnode_t *cm;
 	Bot *botptr;
@@ -251,7 +251,6 @@ static int bot_chan_event( Event event, CmdParams *cmdparams )
 			}
 		}
 	}
-	return NS_SUCCESS;
 }
 
 /** @brief bot_notice
