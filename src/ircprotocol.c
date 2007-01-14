@@ -147,7 +147,8 @@ static int parse( void *notused, void *rline, int len )
 		if( coreLine == NULL )
 			return NS_FAILURE;
 		*coreLine = 0;
-		while( isspace( *++coreLine ) );
+		while( isspace( *++coreLine ) )
+			;
 		strlcpy( origin, line + 1, sizeof( origin ) );
 		memmove( line, coreLine, strnlen( coreLine, BUFSIZE ) + 1 );
 		cmdptr = 1;
@@ -163,7 +164,8 @@ static int parse( void *notused, void *rline, int len )
 	if( coreLine )
 	{
 		*coreLine = 0;
-		while( isspace( *++coreLine ) );
+		while( isspace( *++coreLine ) )
+			;
 	}
 	else
 	{
@@ -211,7 +213,8 @@ static int parsep10( void *notused, void *rline, int len )
 	if( coreLine )
 	{
 		*coreLine = 0;
-		while( isspace( *++coreLine ) );
+		while( isspace( *++coreLine ) )
+			;
 	}
 	else
 	{
@@ -240,7 +243,8 @@ static int parsep10( void *notused, void *rline, int len )
 		if( line )
 		{
 			*line = 0;
-			while( isspace( *++line ) );
+			while( isspace( *++line ) )
+				;
 		} 
 		/*else
 		{

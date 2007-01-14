@@ -1577,7 +1577,7 @@ Init_Perl (void)
 	return NS_SUCCESS;
 }
 
-Module *load_perlfiles (const char *filename, Module *mod, perl_xs_init init_func) 
+static Module *load_perlfiles (const char *filename, Module *mod, perl_xs_init init_func) 
 {
 	char *perl_args[] = { "", "-e", "0", "-w" };
 

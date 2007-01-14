@@ -99,7 +99,9 @@ MODULEVAR extern mode_init user_smodes[];
 MODULEVAR extern ProtocolInfo protocol_info;
 #endif /* NEOSTATSCORE */
 #ifdef NEOSTATSCORE
-#ifndef MSGDEF
+#ifdef DECLARE_MSGDEF
+#define MSGDEF( msg ) char *msg;
+#else
 #define MSGDEF( msg ) extern char *msg;
 #endif /* MSGDEF */
 #else /* NEOSTATSCORE */

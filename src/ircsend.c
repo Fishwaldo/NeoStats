@@ -23,8 +23,8 @@
 
 #include "neostats.h"
 #include "ircprotocol.h"
-/* Override MSGDEF to make declarations */
-#define MSGDEF( msg ) char *msg;
+/* Declare MSGDEF */
+#define DECLARE_MSGDEF
 #include "protocol.h"
 #include "services.h"
 #include "dcc.h"
