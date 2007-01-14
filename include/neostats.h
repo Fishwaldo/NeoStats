@@ -1228,7 +1228,7 @@ typedef enum MQ_MSG_TYPE {
 
 
 /* load configuration associated with this bot_setting list */
-EXPORTFUNC int ModuleConfig( bot_setting *bot_settings );
+EXPORTFUNC void ModuleConfig( bot_setting *bot_settings );
 
 /* Add a new timer callback to NeoStats */
 EXPORTFUNC int AddTimer( TIMER_TYPE type, timer_handler handler, const char *name, int interval, void *userptr );

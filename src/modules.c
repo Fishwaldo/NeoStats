@@ -727,12 +727,12 @@ void unload_modules( void )
  *
  *  Load module configuration
  *
- *  @param set_ptr pointer to module settings
+ *  @param set_ptr pointer to list of module settings
  *
- *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ *  @return none
  */
 
-int ModuleConfig( bot_setting* set_ptr )
+void ModuleConfig( bot_setting* set_ptr )
 {
 	SET_SEGV_LOCATION();
 	DBAOpenTable( CONFIG_TABLE_NAME );
@@ -765,7 +765,7 @@ int ModuleConfig( bot_setting* set_ptr )
 			case SET_TYPE_HOST:
 			case SET_TYPE_REALNAME:
 			case SET_TYPE_IPV4:
-				if( 	DBAFetchConfigStr( set_ptr->option, set_ptr->varptr, set_ptr->max ) != NS_SUCCESS ) {
+				if( DBAFetchConfigStr( set_ptr->option, set_ptr->varptr, set_ptr->max ) != NS_SUCCESS ) {
 					if( set_ptr->defaultval ) {
 						strlcpy( set_ptr->varptr, set_ptr->defaultval, set_ptr->max );
 					}
@@ -788,5 +788,4 @@ int ModuleConfig( bot_setting* set_ptr )
 		set_ptr++;
 	}
 	DBACloseTable( CONFIG_TABLE_NAME );
-	return NS_SUCCESS;
 }
