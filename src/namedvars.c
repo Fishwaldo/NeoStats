@@ -33,6 +33,8 @@
 
 hash_t *namedvars;
 
+void nv_printstruct(void *data, nv_list *item);
+
 nv_list *FindNamedVars(char *name) {
 	hnode_t *node;
 	node = hnode_find(namedvars, name);
@@ -80,6 +82,7 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 int dump_namedvars(char *name2)
 {
 	hnode_t *node, *node2;
+	lnode_t *lnode;
 	hscan_t scan, scan1;
 	void *data, *data2;	
 	nv_list *item;
@@ -98,56 +101,76 @@ int dump_namedvars(char *name2)
 			hash_scan_begin(&scan, (hash_t *)item->data);
 			while ((node2 = hash_scan_next(&scan)) != NULL) {
 				data = hnode_get(node2);
-				i = 0;
 				printf("Entry %d (%d)\n", j, (int)hash_count((hash_t *)item->data));
+				nv_printstruct(data, item);
 				j++;
-				while (item->format[i].fldname != NULL) {
-					printf("\tField: Name: %s, Type: %d, Flags: %d ", item->format[i].fldname, item->format[i].type, item->format[i].flags);
-					if (item->format[i].fldoffset != -1) {
-						data2 = data + item->format[i].fldoffset;
-						data2 = (void *)*((int *)data2);
-					} else {
-						data2 = data;
-					}		
-					switch (item->format[i].type) {
-						case NV_PSTR:
-							output = data2 + item->format[i].offset;
-							printf("Value: %s\n", (char *)*(int *)output);
-							break;
-						case NV_STR:
-							output = data2 + item->format[i].offset;
-							printf("Value: %s\n", (char *)output);
-							break;
-						case NV_INT:
-							output = data2 + item->format[i].offset;
-							printf("Value: %d\n", *((int *)output));
-							break;
-						case NV_LONG:
-							output = data2 + item->format[i].offset;
-							printf("Value: %ld\n", *((long *)output));
-							break;
-						case NV_VOID:
-							printf("Value: Complex!\n");
-							break;
-						case NV_PSTRA:
-							output = data2 + item->format[i].offset;
-							outarry = (char **)*(int *)output;
-							k = 0;
-							printf("\n");
-							while (outarry[k] != NULL) {
-								printf("\t\tValue [%d]: %s\n", k, outarry[k]);
-								k++;
-							}
-							break;			
-						default:
-							printf("Value: Unhandled!\n");
-							break;
-					}
-					i++;
-				}
+			}
+		} else if (item->type == NV_TYPE_LIST) {
+			j = 0;
+			lnode = list_first((list_t *)item->data);
+			while (lnode) {
+				data = lnode_get(lnode);
+				printf("Entry %d (%d)\n", j, (int)list_count((list_t *)item->data));
+				nv_printstruct(data, item);
+				j++;
+				lnode = list_next((list_t *)item->data, lnode);
 			}
 		}
 	}
 	return NS_SUCCESS;
 }
+
+void nv_printstruct(void *data, nv_list *item) {
+	int i, k;
+	void *data2, *output;
+	char **outarry;
+	
+	i = 0;
+	while (item->format[i].fldname != NULL) {
+		printf("\tField: Name: %s, Type: %d, Flags: %d ", item->format[i].fldname, item->format[i].type, item->format[i].flags);
+		if (item->format[i].fldoffset != -1) {
+			data2 = data + item->format[i].fldoffset;
+			data2 = (void *)*((int *)data2);
+		} else {
+			data2 = data;
+		}		
+		switch (item->format[i].type) {
+			case NV_PSTR:
+				output = data2 + item->format[i].offset;
+				printf("Value: %s\n", (char *)*(int *)output);
+				break;
+			case NV_STR:
+				output = data2 + item->format[i].offset;
+				printf("Value: %s\n", (char *)output);
+				break;
+			case NV_INT:
+				output = data2 + item->format[i].offset;
+				printf("Value: %d\n", *((int *)output));
+				break;
+			case NV_LONG:
+				output = data2 + item->format[i].offset;
+				printf("Value: %ld\n", *((long *)output));
+				break;
+			case NV_VOID:
+				printf("Value: Complex!\n");
+				break;
+			case NV_PSTRA:
+				output = data2 + item->format[i].offset;
+				outarry = (char **)*(int *)output;
+				k = 0;
+				printf("\n");
+				while (outarry[k] != NULL) {
+					printf("\t\tValue [%d]: %s\n", k, outarry[k]);
+					k++;
+				}
+				break;			
+			default:
+				printf("Value: Unhandled!\n");
+				break;
+		}
+		i++;
+	}
+}
+
+
 #endif /* WIN32 */
