@@ -60,12 +60,12 @@ static struct hs_cfg
 } hs_cfg;
 
 nv_struct nv_hostserv[] = {
-	{ "nick", NV_STR, offsetof(vhostentry, nick), NV_FLG_RO, -1},
-	{ "host", NV_STR, offsetof(vhostentry, host), 0, -1},
-	{ "vhost", NV_STR, offsetof(vhostentry, vhost), 0, -1},
-	{ "passwd", NV_STR, offsetof(vhostentry, passwd), 0, -1},
-	{ "added", NV_STR, offsetof(vhostentry, added), NV_FLG_RO, -1},
-	{ "tslastused", NV_INT, offsetof(vhostentry, tslastused), NV_FLG_RO, -1},
+	{ "nick", NV_STR, offsetof(vhostentry, nick), NV_FLG_RO, -1, MAXNICK},
+	{ "host", NV_STR, offsetof(vhostentry, host), 0, -1, MAXHOST},
+	{ "vhost", NV_STR, offsetof(vhostentry, vhost), 0, -1, MAXHOST},
+	{ "passwd", NV_STR, offsetof(vhostentry, passwd), 0, -1, MAXPASS},
+	{ "added", NV_STR, offsetof(vhostentry, added), NV_FLG_RO, -1, MAXNICK},
+	{ "tslastused", NV_INT, offsetof(vhostentry, tslastused), NV_FLG_RO, -1, -1},
 	NV_STRUCT_END()
 };
 
