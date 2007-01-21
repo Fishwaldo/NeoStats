@@ -47,6 +47,8 @@ typedef struct nv_struct {
 	nv_struct_flag flags;
 	/* if its a substructure, the offset of the actual field, otherwise -1 */
 	int fldoffset;
+	/* if its a STRING, its length, -1 for other entries */
+	int len;
 } nv_struct;
 
 #define NV_STRUCT_END() { NULL, NV_STR, 0, NV_FLG_NONE, -1}

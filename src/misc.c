@@ -443,6 +443,26 @@ char *sftime( time_t stuff )
 	return fmtime;
 }
 
+/** @brief ValidateString
+ *  
+ *  Check that passed string is a valid string
+ *  
+ *  @param string to check
+ *  
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int ValidateString (const char *string)
+{
+	while ( *string != '\0' )
+	{
+		if (!isascii(*string) ) 
+			return NS_FAILURE;
+		string++;
+	}
+	return NS_SUCCESS;
+}
+
 /** @brief ValidateNick
  *  
  *  Check that passed string is a valid nick

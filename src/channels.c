@@ -51,17 +51,17 @@ static char savekicker[MAXHOST];
 static char savekickreason[BUFSIZE];
 
 nv_struct nv_channels[] = {
-	{ "name", NV_STR, offsetof(Channel, name), NV_FLG_RO, -1},
-	{ "name64", NV_STR, offsetof(Channel, name64), NV_FLG_RO, -1},
-	{ "users", NV_INT, offsetof(Channel, users), NV_FLG_RO, -1},
-	{ "neousers", NV_INT, offsetof(Channel, neousers), NV_FLG_RO, -1},
-	{ "persistentusers", NV_INT, offsetof(Channel, persistentusers), NV_FLG_RO, -1},
-	{ "modes", NV_INT, offsetof(Channel, modes), NV_FLG_RO, -1},
-	{ "topic", NV_STR, offsetof(Channel, topic), NV_FLG_RO, -1},
-	{ "topicowner", NV_STR, offsetof(Channel, topicowner), NV_FLG_RO, -1},
-	{ "limit", NV_INT, offsetof(Channel, limit), NV_FLG_RO, -1},
-	{ "key", NV_STR, offsetof(Channel, key), NV_FLG_RO, -1},
-	{ "flags", NV_INT, offsetof(Channel, flags), NV_FLG_RO, -1},
+	{ "name", NV_STR, offsetof(Channel, name), NV_FLG_RO, -1, MAXCHANLEN},
+	{ "name64", NV_STR, offsetof(Channel, name64), NV_FLG_RO, -1, B64SIZE},
+	{ "users", NV_INT, offsetof(Channel, users), NV_FLG_RO, -1, -1},
+	{ "neousers", NV_INT, offsetof(Channel, neousers), NV_FLG_RO, -1, -1},
+	{ "persistentusers", NV_INT, offsetof(Channel, persistentusers), NV_FLG_RO, -1, -1},
+	{ "modes", NV_INT, offsetof(Channel, modes), NV_FLG_RO, -1, -1},
+	{ "topic", NV_STR, offsetof(Channel, topic), NV_FLG_RO, -1, BUFSIZE},
+	{ "topicowner", NV_STR, offsetof(Channel, topicowner), NV_FLG_RO, -1, MAXHOST},
+	{ "limit", NV_INT, offsetof(Channel, limit), NV_FLG_RO, -1, -1},
+	{ "key", NV_STR, offsetof(Channel, key), NV_FLG_RO, -1, KEYLEN},
+	{ "flags", NV_INT, offsetof(Channel, flags), NV_FLG_RO, -1, -1},
 	NV_STRUCT_END()
 };
 

@@ -54,16 +54,16 @@ int RunLevel = 0;
 static hash_t *modulehash;
 
 nv_struct nv_modules[] = {
-	{ "name", NV_PSTR, offsetof(ModuleInfo, name), NV_FLG_RO, offsetof(Module, info)},
-	{ "description", NV_PSTR, offsetof(ModuleInfo, description), NV_FLG_RO, offsetof(Module, info)},
-	{ "copyright", NV_PSTRA, offsetof(ModuleInfo, copyright), NV_FLG_RO, offsetof(Module, info)},
-	{ "about_text", NV_PSTRA, offsetof(ModuleInfo, about_text), NV_FLG_RO, offsetof(Module, info)},
-	{ "version", NV_PSTR, offsetof(ModuleInfo, version), NV_FLG_RO, offsetof(Module, info)},
-	{ "build_date", NV_PSTR, offsetof(ModuleInfo, build_date), NV_FLG_RO, offsetof(Module, info)},
-	{ "build_time", NV_PSTR, offsetof(ModuleInfo, build_time), NV_FLG_RO, offsetof(Module, info)},
-	{ "type", NV_INT, offsetof(Module, type), NV_FLG_RO, -1},
-	{ "modnum", NV_INT, offsetof(Module, modnum), NV_FLG_RO, -1},
-	{ "status", NV_INT, offsetof(Module, status), NV_FLG_RO, -1},
+	{ "name", NV_PSTR, offsetof(ModuleInfo, name), NV_FLG_RO, offsetof(Module, info), -1 },
+	{ "description", NV_PSTR, offsetof(ModuleInfo, description), NV_FLG_RO, offsetof(Module, info), -1},
+	{ "copyright", NV_PSTRA, offsetof(ModuleInfo, copyright), NV_FLG_RO, offsetof(Module, info), -1},
+	{ "about_text", NV_PSTRA, offsetof(ModuleInfo, about_text), NV_FLG_RO, offsetof(Module, info), -1},
+	{ "version", NV_PSTR, offsetof(ModuleInfo, version), NV_FLG_RO, offsetof(Module, info), -1},
+	{ "build_date", NV_PSTR, offsetof(ModuleInfo, build_date), NV_FLG_RO, offsetof(Module, info), -1},
+	{ "build_time", NV_PSTR, offsetof(ModuleInfo, build_time), NV_FLG_RO, offsetof(Module, info), -1},
+	{ "type", NV_INT, offsetof(Module, type), NV_FLG_RO, -1, -1},
+	{ "modnum", NV_INT, offsetof(Module, modnum), NV_FLG_RO, -1, -1},
+	{ "status", NV_INT, offsetof(Module, status), NV_FLG_RO, -1, -1},
 	NV_STRUCT_END()
 };
 

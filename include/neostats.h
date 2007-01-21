@@ -1451,6 +1451,7 @@ EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileorme
 /* Is the client marked away? */
 #define IsAway( x ) ( ( x ) && ( x->user->is_away ) )
 
+EXPORTFUNC int ValidateString (const char *string);
 EXPORTFUNC int ValidateNick( const char *nick );
 EXPORTFUNC int ValidateNickWild( const char *nick );
 EXPORTFUNC int ValidateUser( const char *username );

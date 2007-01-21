@@ -35,6 +35,16 @@ hash_t *namedvars;
 
 void nv_printstruct(void *data, nv_list *item);
 
+
+char *fldtypes[] = {
+	"Pointer String",
+	"String",
+	"Integer",
+	"Long",
+	"Void",
+	"String Array"
+};
+
 nv_list *FindNamedVars(char *name) {
 	hnode_t *node;
 	node = hnode_find(namedvars, name);
@@ -84,18 +94,15 @@ int dump_namedvars(char *name2)
 	hnode_t *node, *node2;
 	lnode_t *lnode;
 	hscan_t scan, scan1;
-	void *data, *data2;	
+	void *data;	
 	nv_list *item;
-	int i, j, k;
-	void *output;
-	char **outarry;
+	int j;;
 	hash_scan_begin(&scan1, namedvars);
 	while ((node = hash_scan_next(&scan1)) != NULL ) {
 		item = hnode_get(node);
 		printf("%s Details: Type: %d Flags: %d Module: %s\n", item->name, item->type, item->flags, item->mod->info->name);
 		printf("Entries:\n");
 		printf("===================\n");
-/* XXX todo - Lists */
 		if (item->type == NV_TYPE_HASH) {
 			j = 0;
 			hash_scan_begin(&scan, (hash_t *)item->data);
@@ -120,14 +127,85 @@ int dump_namedvars(char *name2)
 	return NS_SUCCESS;
 }
 
+char *nv_gf_string(const void *data, const nv_list *item, const int field) {
+	char *output;
+	if (item->format[field].type == NV_PSTR) {
+		output = (char *)*(int *)(data + item->format[field].offset);
+	} else if (item->format[field].type == NV_STR) {
+		output = (char *)(data + item->format[field].offset);
+	} else {
+		nlog(LOG_WARNING, "nv_gf_string: Field is not a string %d", field);
+		return NULL;
+	}
+#ifdef DEBUG
+	if (!ValidateString(output)) {
+		nlog(LOG_WARNING, "nv_gf_string: Field is not string %d", field);
+		return NULL;
+	}
+#endif
+	return output;
+}
+
+int nv_gf_int(const void *data, const nv_list *item, const int field) {
+	int output;
+	if (item->format[field].type != NV_INT) {
+		nlog(LOG_WARNING, "nv_gf_int: field is not a int %d", field);
+		return 0;
+	}
+	output = *((int *)(data + item->format[field].offset));
+	return output;
+}
+
+long nv_gf_long(const void *data, const nv_list *item, const int field) {
+	long output;
+	if (item->format[field].type != NV_LONG) {
+		nlog(LOG_WARNING, "nv_gf_long: field is not a long %d", field);
+		return 0;
+	}
+	output = *((long *)(data + item->format[field].offset));
+	return output;
+}
+
+char **nv_gf_stringa(const void *data, const nv_list *item, const int field) {
+	char **output;
+	int k;
+	if (item->format[field].type != NV_PSTRA) {
+		nlog(LOG_WARNING, "nv_gf_long: field is not a string array %d", field);
+		return NULL;
+	}
+	output = (char **)*(int *)(data + item->format[field].offset);
+#ifdef DEBUG
+	k = 0;
+	while (output && output[k] != NULL) {
+		if (!ValidateString(output[k])) 
+			return NULL;
+		k++;
+	}
+#endif
+	return output;
+}
+
+void *nv_gf_complex(const void *data, const nv_list *item, const int field) {
+	void *output;
+#if 0
+	if (item->format[field].type != NV_COMPLEX) {
+		nlog(LOG_WARNING, nv_gf_complex: field is not complex %d", field);
+		return NULL;
+	}
+#endif;
+	output = (void *)data + item->format[field].offset;
+	return output;
+}
+
+
 void nv_printstruct(void *data, nv_list *item) {
 	int i, k;
-	void *data2, *output;
+	void *data2;
 	char **outarry;
 	
 	i = 0;
 	while (item->format[i].fldname != NULL) {
-		printf("\tField: Name: %s, Type: %d, Flags: %d ", item->format[i].fldname, item->format[i].type, item->format[i].flags);
+		printf("\tField: Name: %s, Type: %s, Flags: %d ", item->format[i].fldname, fldtypes[item->format[i].type], item->format[i].flags);
 		if (item->format[i].fldoffset != -1) {
 			data2 = data + item->format[i].fldoffset;
 			data2 = (void *)*((int *)data2);
@@ -136,30 +214,25 @@ void nv_printstruct(void *data, nv_list *item) {
 		}		
 		switch (item->format[i].type) {
 			case NV_PSTR:
-				output = data2 + item->format[i].offset;
-				printf("Value: %s\n", (char *)*(int *)output);
+				printf("Value: %s\n", nv_gf_string(data2, item, i));
 				break;
 			case NV_STR:
-				output = data2 + item->format[i].offset;
-				printf("Value: %s\n", (char *)output);
+				printf("Value: %s\n", nv_gf_string(data2, item, i));
 				break;
 			case NV_INT:
-				output = data2 + item->format[i].offset;
-				printf("Value: %d\n", *((int *)output));
+				printf("Value: %d\n", nv_gf_int(data2, item, i));
 				break;
 			case NV_LONG:
-				output = data2 + item->format[i].offset;
-				printf("Value: %ld\n", *((long *)output));
+				printf("Value: %ld\n", nv_gf_long(data2, item, i));
 				break;
 			case NV_VOID:
-				printf("Value: Complex!\n");
+				printf("Value: Complex (%p)!\n", nv_gf_complex(data2, item, i));
 				break;
 			case NV_PSTRA:
-				output = data2 + item->format[i].offset;
-				outarry = (char **)*(int *)output;
 				k = 0;
 				printf("\n");
-				while (outarry[k] != NULL) {
+				outarry = nv_gf_stringa(data2, item, i);
+				while (outarry && outarry[k] != NULL) {
 					printf("\t\tValue [%d]: %s\n", k, outarry[k]);
 					k++;
 				}
