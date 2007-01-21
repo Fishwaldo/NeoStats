@@ -81,10 +81,15 @@ typedef struct nv_list {
 
 extern hash_t *namedvars;
 
+int nv_init();
 EXPORTFUNC hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name, nv_struct *nvstruct, nv_flags flags);
 EXPORTFUNC list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags);
 EXPORTFUNC nv_list *FindNamedVars(char *name);
-int nv_init();
-
+EXPORTFUNC char *nv_gf_string(const void *, const nv_list *, const int);
+EXPORTFUNC int nv_gf_int(const void *, const nv_list *, const int);
+EXPORTFUNC long nv_gf_long(const void *, const nv_list *, const int);
+EXPORTFUNC char **nv_gf_stringa(const void *, const nv_list *, const int);
+EXPORTFUNC void *nv_gf_complex(const void *, const nv_list *, const int);
+EXPORTFUNC int nv_get_field(const nv_list *, const char *);
 
 #endif /* _NAMEDVARS_H_ */

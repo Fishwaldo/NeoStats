@@ -5,6 +5,49 @@
 #include "perl.h"
 #include "XSUB.h"
 
+HV *perl_encode_namedvars(nv_list *nv, void *data) {
+	HV *ret;
+	int i =0;
+	ret = newHV();
+	while (nv->format[i].fldname != NULL) {
+		switch(nv->format[i].type) {
+			case NV_PSTR:
+			case NV_STR:
+				hv_store(ret, nv->format[i].fldname, strlen(nv->format[i].fldname),
+					newSVpv(nv_gf_string(data, nv, i), strlen(nv_gf_string(data, nv, i))), 0);
+				break;
+			case NV_INT:
+			case NV_LONG:
+				hv_store(ret, nv->format[i].fldname, strlen(nv->format[i].fldname),
+					newSViv(nv_gf_int(data, nv, i)), 0);
+				break;
+			case NV_VOID:
+			case NV_PSTRA:
+				nlog(LOG_WARNING, "perl_encode_namedvars: void/string todo!");
+				break;
+		}
+	i++;
+	}
+	return ret;
+}
+
+void perl_store_namedvars(nv_list *nv, char *key, SV *values) {
+	/* XXX - TODO */
+	return;
+}
+
+int perl_candelete_namedvars(nv_list *nv, char *key) {
+	/* XXX - TODO */
+	return NS_FAILURE;
+}
+void perl_delete_namedvars(nv_list *nv, char *key) {
+	/* XXX - TODO */
+	return;
+}
+
+hscan_t hashiter;
+
+#define	RETURN_UNDEF_IF_FAIL { if ((int)RETVAL < 0) XSRETURN_UNDEF; }
 
 MODULE = NeoStats::NV		PACKAGE = NeoStats::NV		
 
@@ -19,11 +62,6 @@ PREINIT:
    HV        *tie;
    SV        *nv_link;
    SV        *tieref;
-   char      *p;
-   char      *n;
-   char      *t;
-   char       errstr[1024];
-   int        i, fd, ii, count;
    nv_list   *nv;
 PPCODE:
    nv = FindNamedVars(varname);
@@ -40,14 +78,12 @@ PPCODE:
 	/* tie the hash to the package (FETCH/STORE) below */
    	tie = newHV();
    	tieref = newRV_noinc((SV*)tie);
-   	sv_bless(tieref, gv_stashpv("NeoStats::NV::Vars", TRUE));
+   	sv_bless(tieref, gv_stashpv("NeoStats::NV::HashVars", TRUE));
    	hv_magic(hash, (GV*)tieref, 'P'); 
 	
 	/* this one allows us to store a "pointer" 
-         * at the moment, we are storing the name of the nv_list hash entry
-         * but we should move this to the actual hash entry
          */
-   	nv_link = newSVpv(varname, strlen(varname));
+   	nv_link = newSViv((int)nv);
    	sv_magic(SvRV(tieref), nv_link, '~', 0, 0);
    	SvREFCNT_dec(nv_link);
    }
@@ -55,38 +91,16 @@ PPCODE:
    EXTEND(SP,1);
    PUSHs(sv_2mortal(ret));
 
-# uknown when this is called at the moment
-
-void
-rAUTOLOAD(self,prop,...)
-   SV           *self;
-   SV           *prop;
-PREINIT:
-   MAGIC        *mg;
-   SV           *ref;
-   STRLEN        plen;
-   char         *pval;
-   int           i;
-PPCODE:
-printf("AUTOLOAD\n");
-   mg = mg_find(SvRV(self), 'P');
-   if(!mg) { croak("lost P magic"); }
-   ref = mg->mg_obj;
-   PUSHMARK(SP);
-   XPUSHs(ref);
-   for(i=2; i<items; i++)
-      XPUSHs(ST(i));
-   call_method(SvPV(prop,PL_na), G_SCALAR);
 
 #when we destroy the "hash" in perl, ie, it goes out of scope
 
-void
-DESTROY(self)
-   SV           *self;
-CODE:
-printf("DESTROY\n");
+#void
+#DESTROY(self)
+#   SV           *self 
+#CODE:
+#printf("DESTROY\n");
 
-MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::Vars
+MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::HashVars
 
 #/* get a individual entry. self points to what we set with sv_magic in
 #* new function above */
@@ -96,40 +110,43 @@ FETCH(self, key)
    SV           *self;
    SV           *key;
 PREINIT:
-   SV           *ret;
    HV           *hash;
    char         *k;
    STRLEN        klen;
    MAGIC        *mg;
-   SV          **val;
-   char         *t;
-   int           i;
-   Client 	*u;
-PPCODE:
+   nv_list	*nv;
+   void 	*data;
+CODE:
    /* find our magic */
    hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
    /* this is the nv_hash we are point at */
-   printf("%s\n", SvPV_nolen(mg->mg_obj));
-   /* get the "key" they want */
-   k    = SvPV(key, klen);
-
-   /* dummy code for now, lookup users */
-   u = FindUser(k);
-   if (!u) {
-      ret = &PL_sv_undef;
-   }  else {
-	   ret = (SV *)perl_encode_client(u);
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* make sure its a hash, not a list */
+   if (nv->type != NV_TYPE_HASH) {
+	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
+	RETVAL = (HV *)-1;
+   } else {
+	   /* get the "key" they want */
+	   k    = SvPV(key, klen);
+	   /* search for the key */
+	   data = hnode_find((hash_t *)nv->data, k);
+	   if (!data) {
+		RETVAL = (HV *)-1;
+	   } else {
+		RETVAL = (HV *)perl_encode_namedvars(nv, data);	   
+	   }
    }
-   /* return a HV that cast to a SV instead */
-   sv_2mortal(ret);
-   EXTEND(SP, 1);
-   PUSHs(newRV_noinc((SV *)ret));
+POSTCALL:
+	RETURN_UNDEF_IF_FAIL;
+OUTPUT:
+	RETVAL
+
 
 #/* store a update. should check if its RO or RW though */
 
-SV*
+void
 STORE(self, key, value)
    SV         *self;
    SV         *key;
@@ -137,42 +154,23 @@ STORE(self, key, value)
 PREINIT:
    HV         *hash;
    char       *k;
-   char       *v;
    STRLEN      klen;
-   STRLEN      vlen;
    MAGIC      *mg;
+   nv_list    *nv;
 CODE:
+   /* find our magic */
    hash = (HV*)SvRV(self);
-   k    = SvPV(key, klen);
-   croak("STORE function is not implemented %s", k);
-OUTPUT:
-   RETVAL
-
-#/* delete a entry from the hash */
-
-void
-DESTROY(self)
-   SV        *self;
-PREINIT:
-   MAGIC     *mg;
-   HV        *hash;
-   HE        *hent;
-   SV        *val;
-   char      *k;
-   I32        klen;
-CODE:
-   printf("DESTROY ITEM\n");
-   mg = mg_find(SvRV(self),'~');
+   mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
-#   kp = (kvm_dev_t*)SvIVX(mg->mg_obj);
-#   Safefree(kp);
-
-   hash = (HV*)SvRV(self);
-   hv_iterinit(hash);
-   while(hent = hv_iternext(hash)) {
-      k   = hv_iterkey(hent, &klen);
-      val = hv_delete(hash, k, klen, 0);
-   }
+   /* this is the nv_hash we are point at */
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* make sure its a hash, not a list */
+   if (nv->type != NV_TYPE_HASH) {
+	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
+   } else {
+	   k    = SvPV(key, klen);
+	   perl_store_namedvars(nv, k, value);
+   }	      
 
 
 # /* check if a entry is in the hash */
@@ -184,61 +182,140 @@ EXISTS(self, key)
 PREINIT:
    HV   *hash;
    char *k;
+   nv_list *nv;
+   MAGIC        *mg;
+   STRLEN        klen;
+   char 	*data;
 CODE:
-printf("EXISTS\n");
    hash = (HV*)SvRV(self);
+   mg   = mg_find(SvRV(self),'~');
+   if(!mg) { croak("lost ~ magic"); }
+   /* this is the nv_hash we are point at */
    k    = SvPV(key, PL_na);
-   RETVAL = hv_exists_ent(hash, key, 0);
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* make sure its a hash, not a list */
+   if (nv->type != NV_TYPE_HASH) {
+	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
+	RETVAL = 0;
+   } else {
+	   /* get the "key" they want */
+	   k    = SvPV(key, klen);
+	   /* search for the key */
+	   data = hnode_find((hash_t *)nv->data, k);
+	   if (!data) {
+		RETVAL = 0;
+	   } else {
+		RETVAL = 1;
+	   }
+   }
 OUTPUT:
    RETVAL
 
 #/* get the first entry from a hash */
 
-SV*
+HV*
 FIRSTKEY(self)
    SV *self;
 PREINIT:
    HV *hash;
-   HE *he;
-PPCODE:
-printf("FIRSTKEY\n");
+   MAGIC *mg;
+   nv_list *nv;
+   hnode_t *node;
+CODE:
    hash = (HV*)SvRV(self);
-   hv_iterinit(hash);
-   if (he = hv_iternext(hash)) {
-      EXTEND(sp, 1);
-      PUSHs(hv_iterkeysv(he));
+   mg   = mg_find(SvRV(self),'~');
+   if(!mg) { croak("lost ~ magic"); }
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* make sure its a hash, not a list */
+   if (nv->type != NV_TYPE_HASH) {
+	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
+	RETVAL = (HV *)-1;
+   } else {
+	hash_scan_begin( &hashiter, (hash_t *)nv->data);
+	node = hash_scan_next(&hashiter);
+	if (!node) {
+		RETVAL = (HV *)-1;
+	} else {
+		RETVAL = perl_encode_namedvars(nv, hnode_get(node));
+	}
    }
+POSTCALL:
+	RETURN_UNDEF_IF_FAIL;
+OUTPUT:
+	RETVAL
 
 #/* get the next entry from a cache */
 
-SV*
+HV*
 NEXTKEY(self, lastkey)
    SV *self;
-   SV *lastkey;
 PREINIT:
    HV *hash;
-   HE *he;
-PPCODE:
-printf("NEXTKEY\n");
+   MAGIC *mg;
+   hnode_t *node;
+   nv_list *nv;
+CODE:
    hash = (HV*)SvRV(self);
-   if (he = hv_iternext(hash)) {
-      EXTEND(sp, 1);
-      PUSHs(hv_iterkeysv(he));
+   mg   = mg_find(SvRV(self),'~');
+   if(!mg) { croak("lost ~ magic"); }
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* make sure its a hash, not a list */
+   if (nv->type != NV_TYPE_HASH) {
+	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
+	RETVAL = (HV *)-1;
+   } else {
+	node = hash_scan_next(&hashiter);
+	if (!node) {
+		RETVAL = (HV *)-1;
+	} else {
+		RETVAL = perl_encode_namedvars(nv, hnode_get(node));
+	}
    }
+POSTCALL:
+	RETURN_UNDEF_IF_FAIL;
+OUTPUT:
+	RETVAL
 
 #/* delete a entry */
 
-SV*
+HV*
 DELETE(self, key)
    SV        *self;
    SV        *key;
 PREINIT:
    HV *hash;
-   HE *he;
+   MAGIC *mg;
+   nv_list *nv;
+   void *data;
+   char *k;
+   STRLEN klen;
 CODE:
-printf("DELETE\n");
    hash = (HV*)SvRV(self);
-   croak("DELETE functions is not implemented");
+   mg   = mg_find(SvRV(self),'~');
+   if(!mg) { croak("lost ~ magic"); }
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* make sure its a hash, not a list */
+   if (nv->type != NV_TYPE_HASH) {
+	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
+	RETVAL = (HV *)-1;
+   } else {
+	   /* get the "key" they want */
+	   k    = SvPV(key, klen);
+	   /* search for the key */
+	   data = hnode_find((hash_t *)nv->data, k);
+	   if (!data) {
+		RETVAL = (HV *)-1;
+	   } else {
+		if (perl_candelete_namedvars(nv, k)) {
+			RETVAL = (HV *)perl_encode_namedvars(nv, data);	   
+			perl_delete_namedvars(nv, k);
+		} else {
+			RETVAL = (HV *)-1;
+		}
+	   }
+   }
+POSTCALL:
+	RETURN_UNDEF_IF_FAIL;
 OUTPUT:
    RETVAL
 
@@ -254,31 +331,3 @@ printf("CLEAR\n");
    hash = (HV*)SvRV(self);
    croak("CLEAR function is not implemented");
 
-#/* latter */
-
-void
-_lookup(self,prop,...)
-   SV     *self;
-   SV     *prop;
-ALIAS:
-#   NeoStats::NV::Vars::size       = F_SIZE
-#   NeoStats::NV::Vars::bind       = F_BIND
-#   NeoStats::NV::Vars::type       = F_TYPE
-#   NeoStats::NV::Vars::visibility = F_VISB
-PREINIT:
-   HV         *hash;
-   SV        **var;
-   SV         *ret;
-   char       *pval;
-   STRLEN      plen;
-   int i;
-PPCODE:
-   hash = (HV*)SvRV(self);
-   pval = SvPV(prop, plen);
-   var  = hv_fetch(hash, pval, plen, FALSE);
-
-   if(var) {
-      ret = &PL_sv_undef;
-   }
-   EXTEND(SP,1);
-   PUSHs(sv_2mortal(ret));

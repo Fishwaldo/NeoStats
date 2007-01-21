@@ -102,9 +102,20 @@ sub event_ping {
 sub event_pong {
 	my ($source) = @_;
 	NeoStats::ChanAlert($bot, "Pong $source");
-	my $testvar = new NeoStats::NV("Users");
-	Dump($testvar->{fishy});
+	my $testvar = new NeoStats::NV("users");
+	Dump($testvar->{fish});
 	NeoStats::debug($testvar->{fish}->{nick});
+	while ( my ($key, $value) = each(%$testvar)) {
+		NeoStats::debug("User Key => $value");
+	    	while ( my ($key1, $value1) = each(%$key)) {
+        		NeoStats::debug("$key: $key1 => $value1");
+    		}
+	}
+	NeoStats::debug "Found Fish" if exists $testvar->{fish};
+	my $hashtest = $testvar->{fish};
+	while ( my ($key, $value) = each(%$hashtest)) {
+		NeoStats::debug("$key => $value");
+	}
 	
 }
 

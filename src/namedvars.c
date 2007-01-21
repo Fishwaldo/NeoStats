@@ -46,11 +46,12 @@ char *fldtypes[] = {
 };
 
 nv_list *FindNamedVars(char *name) {
-	hnode_t *node;
-	node = hnode_find(namedvars, name);
-	if (node) {
-		return hnode_get(node);
+	nv_list *nv;
+	nv = hnode_find(namedvars, name);
+	if (nv) {
+		return nv;
 	} else {
+		nlog(LOG_WARNING, "FindNamedVars: Can't find NamedVar %s\n", name);
 		return NULL;
 	}
 }
@@ -63,28 +64,38 @@ int nv_init() {
 
 hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name2, nv_struct *nvstruct, nv_flags flags) {
 	nv_list *newitem;
-	newitem = ns_malloc(sizeof(nv_list));
-	newitem->name = strdup(name2);
-	newitem->type = NV_TYPE_HASH;
-	newitem->flags = flags;
-	newitem->format = nvstruct;
-	newitem->mod = GET_CUR_MODULE();
-	newitem->data = (void *)hash_create(count, comp, fun);
-	hnode_create_insert(namedvars, newitem, newitem->name);
-	return (hash_t *) newitem->data;
+	if (!FindNamedVars(name2)) {
+		newitem = ns_malloc(sizeof(nv_list));
+		newitem->name = strdup(name2);
+		newitem->type = NV_TYPE_HASH;
+		newitem->flags = flags;
+		newitem->format = nvstruct;
+		newitem->mod = GET_CUR_MODULE();
+		newitem->data = (void *)hash_create(count, comp, fun);
+		hnode_create_insert(namedvars, newitem, newitem->name);
+		return (hash_t *) newitem->data;
+	} else {
+		nlog(LOG_WARNING, "Can not create NamedVars Hash %s - Already Exists", name2);
+		return hash_create(count, comp, fun);
+	}
 }
 
 list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags) {
 	nv_list *newitem;
-	newitem = ns_malloc(sizeof(nv_list));
-	newitem->name = strdup(name2);
-	newitem->type = NV_TYPE_LIST;
-	newitem->flags = flags;
-	newitem->format = nvstruct;
-	newitem->mod = GET_CUR_MODULE();
-	newitem->data = (void *)list_create(count);
-	hnode_create_insert(namedvars, newitem, newitem->name);
-	return (list_t *) newitem->data;
+	if (!FindNamedVars(name2)) {
+		newitem = ns_malloc(sizeof(nv_list));
+		newitem->name = strdup(name2);
+		newitem->type = NV_TYPE_LIST;
+		newitem->flags = flags;
+		newitem->format = nvstruct;
+		newitem->mod = GET_CUR_MODULE();
+		newitem->data = (void *)list_create(count);
+		hnode_create_insert(namedvars, newitem, newitem->name);
+		return (list_t *) newitem->data;
+	} else {
+		nlog(LOG_WARNING, "Can not create NamedVars List %s - Already Exists", name2);
+		return list_create(count);
+	}
 }
 
 
@@ -100,7 +111,7 @@ int dump_namedvars(char *name2)
 	hash_scan_begin(&scan1, namedvars);
 	while ((node = hash_scan_next(&scan1)) != NULL ) {
 		item = hnode_get(node);
-		printf("%s Details: Type: %d Flags: %d Module: %s\n", item->name, item->type, item->flags, item->mod->info->name);
+		printf("%s (%p) Details: Type: %d Flags: %d Module: %s\n", item->name, item, item->type, item->flags, item->mod->info->name);
 		printf("Entries:\n");
 		printf("===================\n");
 		if (item->type == NV_TYPE_HASH) {
@@ -129,10 +140,24 @@ int dump_namedvars(char *name2)
 
 char *nv_gf_string(const void *data, const nv_list *item, const int field) {
 	char *output;
+	void *data2;
 	if (item->format[field].type == NV_PSTR) {
-		output = (char *)*(int *)(data + item->format[field].offset);
+		if (item->format[field].fldoffset != -1) {
+			data2 = (void *)data + item->format[field].fldoffset;
+			data2 = (void *)*((int *)data2);
+		} else {
+			data2 = (void *)data;
+		}		
+
+		output = (char *)*(int *)(data2 + item->format[field].offset);
 	} else if (item->format[field].type == NV_STR) {
-		output = (char *)(data + item->format[field].offset);
+		if (item->format[field].fldoffset != -1) {
+			data2 = (void *)data + item->format[field].fldoffset;
+			data2 = (void *)*((int *)data2);
+		} else {
+			data2 = (void *)data;
+		}		
+		output = (char *)(data2 + item->format[field].offset);
 	} else {
 		nlog(LOG_WARNING, "nv_gf_string: Field is not a string %d", field);
 		return NULL;
@@ -148,32 +173,53 @@ char *nv_gf_string(const void *data, const nv_list *item, const int field) {
 
 int nv_gf_int(const void *data, const nv_list *item, const int field) {
 	int output;
+	void *data2;
 	if (item->format[field].type != NV_INT) {
 		nlog(LOG_WARNING, "nv_gf_int: field is not a int %d", field);
 		return 0;
 	}
-	output = *((int *)(data + item->format[field].offset));
+	if (item->format[field].fldoffset != -1) {
+		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)*((int *)data2);
+	} else {
+		data2 = (void *)data;
+	}		
+	output = *((int *)(data2 + item->format[field].offset));
 	return output;
 }
 
 long nv_gf_long(const void *data, const nv_list *item, const int field) {
 	long output;
+	void *data2;
 	if (item->format[field].type != NV_LONG) {
 		nlog(LOG_WARNING, "nv_gf_long: field is not a long %d", field);
 		return 0;
 	}
-	output = *((long *)(data + item->format[field].offset));
+	if (item->format[field].fldoffset != -1) {
+		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)*((int *)data2);
+	} else {
+		data2 = (void *)data;
+	}		
+	output = *((long *)(data2 + item->format[field].offset));
 	return output;
 }
 
 char **nv_gf_stringa(const void *data, const nv_list *item, const int field) {
 	char **output;
+	void *data2;
 	int k;
 	if (item->format[field].type != NV_PSTRA) {
 		nlog(LOG_WARNING, "nv_gf_long: field is not a string array %d", field);
 		return NULL;
 	}
-	output = (char **)*(int *)(data + item->format[field].offset);
+	if (item->format[field].fldoffset != -1) {
+		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)*((int *)data2);
+	} else {
+		data2 = (void *)data;
+	}		
+	output = (char **)*(int *)(data2 + item->format[field].offset);
 #ifdef DEBUG
 	k = 0;
 	while (output && output[k] != NULL) {
@@ -186,52 +232,60 @@ char **nv_gf_stringa(const void *data, const nv_list *item, const int field) {
 }
 
 void *nv_gf_complex(const void *data, const nv_list *item, const int field) {
-	void *output;
+	void *output, *data2;
 #if 0
 	if (item->format[field].type != NV_COMPLEX) {
 		nlog(LOG_WARNING, nv_gf_complex: field is not complex %d", field);
 		return NULL;
 	}
 #endif;
-	output = (void *)data + item->format[field].offset;
+	if (item->format[field].fldoffset != -1) {
+		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)*((int *)data2);
+	} else {
+		data2 = (void *)data;
+	}		
+	output = (void *)data2 + item->format[field].offset;
 	return output;
 }
 
+int nv_get_field(const nv_list *item, const char *name) {
+	int i = 0;
+	while (item->format[i].fldname != NULL) {
+		if (!ircstrcasecmp(item->format[i].fldname, name)) 
+			return i;
+		i++;
+	}
+	return -1;
+}
 
 void nv_printstruct(void *data, nv_list *item) {
 	int i, k;
-	void *data2;
 	char **outarry;
 	
 	i = 0;
 	while (item->format[i].fldname != NULL) {
 		printf("\tField: Name: %s, Type: %s, Flags: %d ", item->format[i].fldname, fldtypes[item->format[i].type], item->format[i].flags);
-		if (item->format[i].fldoffset != -1) {
-			data2 = data + item->format[i].fldoffset;
-			data2 = (void *)*((int *)data2);
-		} else {
-			data2 = data;
-		}		
 		switch (item->format[i].type) {
 			case NV_PSTR:
-				printf("Value: %s\n", nv_gf_string(data2, item, i));
+				printf("Value: %s\n", nv_gf_string(data, item, i));
 				break;
 			case NV_STR:
-				printf("Value: %s\n", nv_gf_string(data2, item, i));
+				printf("Value: %s\n", nv_gf_string(data, item, i));
 				break;
 			case NV_INT:
-				printf("Value: %d\n", nv_gf_int(data2, item, i));
+				printf("Value: %d\n", nv_gf_int(data, item, i));
 				break;
 			case NV_LONG:
-				printf("Value: %ld\n", nv_gf_long(data2, item, i));
+				printf("Value: %ld\n", nv_gf_long(data, item, i));
 				break;
 			case NV_VOID:
-				printf("Value: Complex (%p)!\n", nv_gf_complex(data2, item, i));
+				printf("Value: Complex (%p)!\n", nv_gf_complex(data, item, i));
 				break;
 			case NV_PSTRA:
 				k = 0;
 				printf("\n");
-				outarry = nv_gf_stringa(data2, item, i);
+				outarry = nv_gf_stringa(data, item, i);
 				while (outarry && outarry[k] != NULL) {
 					printf("\t\tValue [%d]: %s\n", k, outarry[k]);
 					k++;
