@@ -51,7 +51,7 @@ nv_list *FindNamedVars(char *name) {
 	if (nv) {
 		return nv;
 	} else {
-		nlog(LOG_WARNING, "FindNamedVars: Can't find NamedVar %s\n", name);
+		nlog(LOG_WARNING, "FindNamedVars: Can't find NamedVar %s", name);
 		return NULL;
 	}
 }

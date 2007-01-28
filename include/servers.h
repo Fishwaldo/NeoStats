@@ -33,5 +33,6 @@ void FiniServers( void );
 Client *find_server_base64( const char *num );
 void RequestServerUptimes( void );
 void CleanupServerModdata( void );
+void SyncServer( const char *name);
 
 #endif /* _SERVER_H_ */

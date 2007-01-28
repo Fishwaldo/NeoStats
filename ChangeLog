@@ -4,8 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
- 
- - Fix bug 261 - wrong Syntax Error message in oper only mode
+ - Start work on EOB support which should also address bug Neo-381 (F) 
+ - Fix bug 261 - wrong Syntax Error message in oper only mode (M)
  - "make distcheck" now works so we can prepare snapshots easily. use
    --with-distversion={rev} to append revision to the tarball. This will
    also allow us to automatically generate snapshots via Pulse

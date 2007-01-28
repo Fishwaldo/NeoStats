@@ -480,7 +480,7 @@ static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 		return CFG_PARSE_ERROR;
 	}
 	os_memset(&me.lsa, 0, sizeof(me.lsa));
-    os_memcpy( ( char * )&me.lsa.sin_addr, hp->h_addr, hp->h_length );
+    	os_memcpy( ( char * )&me.lsa.sin_addr, hp->h_addr, hp->h_length );
 	me.lsa.sin_family = hp->h_addrtype;
 	if( os_sock_bind( s, ( struct sockaddr * ) &me.lsa, sizeof( me.lsa ) ) == SOCKET_ERROR )
 	{

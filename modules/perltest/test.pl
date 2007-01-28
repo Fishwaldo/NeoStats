@@ -116,7 +116,14 @@ sub event_pong {
 	while ( my ($key, $value) = each(%$hashtest)) {
 		NeoStats::debug("$key => $value");
 	}
-	
+	my @hostserv = new NeoStats::NV("HostServ");
+	NeoStats::debug("Debug:".@hostserv."Ok");
+#	Dump(@hostserv);
+
+	@hostserv[1] = "100asdf";
+	NeoStats::debug("Var:".$hostserv[0]."Fin");
+	NeoStats::debug(@hostserv);
+	Dump(@hostserv);
 }
 
 sub event_signon {

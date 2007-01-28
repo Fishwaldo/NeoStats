@@ -204,8 +204,6 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 	else if( !( ircd_srv.protocol&PROTOCOL_NICKIP ) && me.want_nickip == 1 )
 		ipaddress = process_ip( u->name, host );
 	u->tsconnect = TS ? strtol( TS, NULL, 10 ) : me.now;
-	if( ( time( NULL ) - u->tsconnect ) > nsconfig.splittime )
-		u->flags |= NS_FLAGS_NETJOIN;
 	strlcpy( u->user->hostname, host, MAXHOST );
 	strlcpy( u->user->vhost, host, MAXHOST );
 	ircsnprintf( u->user->userhostmask, USERHOSTLEN, "%s!%s@%s", nick, user, host );
@@ -215,6 +213,19 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 	u->user->ulevel = -1;
 	u->uplink = FindServer( server );
 	u->uplink->server->users++;
+	if ((ircd_srv.protocol&PROTOCOL_EOB)) {
+		/* supports EOB */
+		if (!IsSynched(u->uplink)) {
+			dlog(DEBUG3, "Client %s is riding a NetJoin", u->name);
+			u->flags |= NS_FLAGS_NETJOIN;
+		}
+	} else {
+		/* doesn't support EOB */
+		if( ( time( NULL ) - u->tsconnect ) > nsconfig.splittime ) {
+			dlog(DEBUG3, "Client %s ts is in the past Maybe riding a NetJoin?", u->name);
+			u->flags |= NS_FLAGS_NETJOIN;
+		}
+	}
 	u->user->tslastmsg = me.now;
 	u->user->chans = list_create( MAXJOINCHANS );
 	u->ip.s_addr = htonl( ipaddress );
@@ -1090,4 +1101,20 @@ void CleanupUserModdata( void )
 		ProcessServerList( CleanupUserModdataHandler, NULL );
 	}
 	GET_CUR_MODULE()->userdatacnt = 0;
+}
+
+void SyncServerClients(Client *s) 
+{
+	hscan_t scan2;
+	hnode_t *node2;
+	Client *u;
+			hash_scan_begin(&scan2, userhash);
+			while ( ( node2 = hash_scan_next(&scan2) ) != NULL) 
+			{
+				u = hnode_get(node2);
+				if (u->uplink == s) {
+					dlog(DEBUG1, "SyncServerClients: User %s (Server %s) is Synced", u->name, u->uplink->name);
+					ClearNetSplit(u);
+				}
+			}	
 }

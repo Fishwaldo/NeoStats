@@ -204,7 +204,7 @@ char *LANGgettext( const char *string, int mylang );
 #define PROTOCOL_NICKIP		0x00010000  /* NICK passes IP address */
 #define PROTOCOL_KICKPART	0x00020000  /* KICK also generates PART */
 #define PROTOCOL_P10		0x00040000  /* Protocol is IRCu P10 based */
-
+#define PROTOCOL_EOB		0x00080000  /* Protocol supports End Of Burst Info */
 #define PROTOCOL_CLIENTMODE	0x80000000  /* Client mode */
 
 #define FEATURE_SWHOIS		0x00000001	/* SWHOIS */
@@ -486,6 +486,7 @@ typedef enum NS_ERR {
 #define IsServicesChannel( x ) ( ( x )->flags & CHANNEL_FLAG_ME )
 
 #define IsNetSplit( x ) ( ( x )->flags & NS_FLAGS_NETJOIN )
+#define ClearNetSplit( x ) ( ( x )->flags &= ~NS_FLAGS_NETJOIN )
 
 /* NeoStats levels */
 #define NS_ULEVEL_ROOT		200
@@ -1443,7 +1444,10 @@ EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileorme
 #define IsSynched( x ) ( ( x ) && ( ( x )->flags & CLIENT_FLAG_SYNCHED ) )
 
 /* Mark server as synched */
-#define SynchServer( x ) ( ( ( x )->flags |= CLIENT_FLAG_SYNCHED ) )
+#define SetServerSynched( x ) ( ( ( x )->flags |= CLIENT_FLAG_SYNCHED ) )
+
+/* Mark Server as Unsynced */
+#define SetSynching(x) ( ( x ) && ( ( x )->flags &= ~CLIENT_FLAG_SYNCHED ) )
 
 /* Has NeoStats issued a SETHOST for this user? */
 #define IsUserSetHosted( x )  ( ( x ) && ( ( x )->flags & CLIENT_FLAG_SETHOST ) )

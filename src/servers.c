@@ -127,6 +127,10 @@ Client *AddServer( const char *name, const char *uplink, const char *hops, const
 		s->flags |= CLIENT_FLAG_ME;
 	/* check exclusions */
 	ns_do_exclude_server( s );
+	/* if protocol supports EOB */
+	if ((ircd_srv.protocol&PROTOCOL_EOB) == 1) 
+		SetSynching( s );
+		
 	/* run the module event for a new server. */
 	cmdparams = ( CmdParams * ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->source = s;
@@ -677,4 +681,59 @@ void CleanupServerModdata( void )
 		ProcessServerList( CleanupServerModdataHandler, NULL );
 	}
 	GET_CUR_MODULE()->serverdatacnt = 0;
+}
+
+/** @brief sync_server_leafs
+ *
+ *  Mark all the servers as Synced 
+ *  NeoStats core use only.
+ *
+ *  @param u pointer to server to sync
+ *
+ *  @return none
+ */
+
+static void sync_server_leaf( Client * Server )
+{
+	Client *s;
+	hscan_t scan;
+	hnode_t *node;
+
+	dlog( DEBUG1, "sync_server_leaf: %s", Server->name );
+	hash_scan_begin( &scan, serverhash );
+	while( ( node = hash_scan_next( &scan ) ) != NULL )
+	{
+		s = hnode_get( node );
+		if( ircstrcasecmp( Server->name, s->uplinkname ) == 0 )
+		{
+			dlog( DEBUG1, "sync_server_leaf: server %s (%s) is Synced", s->name, s->uplinkname);
+			SetServerSynched(s);
+			SyncServerClients(s);
+			sync_server_leaf(s);
+		}
+	}
+}
+
+/** @brief SycnServer
+ *
+ *  Sync's a server and its leafs
+ *  NeoStats core use only.
+ *
+ *  @param name of server to remove
+ *  @param reason
+ *
+ *  @return none
+ */
+
+void SyncServer( const char *name)
+{
+	Client *s;
+
+	dlog( DEBUG1, "SyncServer: %s", name );
+	s = FindServer(name);
+	if (s) {
+		SetServerSynched(s);
+		SyncServerClients(s);
+		sync_server_leaf(s);
+	}
 }

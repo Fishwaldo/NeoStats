@@ -1081,8 +1081,19 @@ void _m_svinfo( char *origin, char **argv, int argc, int srv )
 
 void _m_eob( char *origin, char **argv, int argc, int srv )
 {
-	irc_eob( me.name );
-	do_synch_neostats();
+	Client *s;
+	if (ircd_srv.protocol & PROTOCOL_EOB) {
+		/* IRCd server supports per server EOB messages */
+		s = FindClient(origin);
+		if (!IsSynched(s)) {
+			/* need to run through this server, and its clients + uplinked servers and clear the Netjoin */
+			SyncServer(s->name);
+		}
+	}
+	if (!IsNeoStatsSynched()) {
+		irc_eob( me.name );
+		do_synch_neostats();
+	}
 }
 
 /** @brief _m_sqline
@@ -2292,7 +2303,7 @@ void do_eos( const char *name )
 		nlog( LOG_WARNING, "do_eos: server %s not found", name );
 		return;
 	}
-	SynchServer( s );
+	SyncServer( s->name );
 	dlog( DEBUG1, "do_eos: server %s is now synched", name );
 }
 

@@ -86,7 +86,7 @@ static void m_sjoin( char *origin, char **argv, int argc, int srv );
 ProtocolInfo protocol_info = 
 {
 	/* Protocol options required by this IRCd */
-	PROTOCOL_SJOIN,
+	PROTOCOL_SJOIN|PROTOCOL_EOB,
 	/* Protocol options negotiated at link by this IRCd */
 	PROTOCOL_UNKLN,
 	/* Features supported by this IRCd */

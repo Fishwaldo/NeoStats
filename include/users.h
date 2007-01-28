@@ -42,5 +42,6 @@ void QuitServerUsers( Client *s );
 EXPORTFUNC void AddFakeUser( const char *mask );
 EXPORTFUNC void DelFakeUser( const char *mask );
 void CleanupUserModdata( void );
+void SyncServerClients(Client *s);
 
 #endif /* _USERS_H_ */

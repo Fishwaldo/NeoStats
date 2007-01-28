@@ -5,6 +5,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/* XXX TODO: implement svREADONLY */
+
 HV *perl_encode_namedvars(nv_list *nv, void *data) {
 	HV *ret;
 	int i =0;
@@ -62,6 +64,8 @@ PREINIT:
    HV        *tie;
    SV        *nv_link;
    SV        *tieref;
+   AV	     *av;
+   IV	     dummy;
    nv_list   *nv;
 PPCODE:
    nv = FindNamedVars(varname);
@@ -70,17 +74,30 @@ PPCODE:
      	ret = &PL_sv_undef;
    } else {
 	/* this returns a "empty" hash that is tied to the FETCH/STORE etc functions below */
-   	hash   = newHV();
-   	ret    = (SV*)newRV_noinc((SV*)hash);
-   	stash  = gv_stashpv(class ,TRUE);
-   	sv_bless(ret,stash);
+	if (nv->type == NV_TYPE_HASH) {
+	   	hash   = newHV();
+   		ret    = (SV*)newRV_noinc((SV*)hash);
+	   	stash  = gv_stashpv(class ,TRUE);
+   		sv_bless(ret,stash);
 
-	/* tie the hash to the package (FETCH/STORE) below */
-   	tie = newHV();
-   	tieref = newRV_noinc((SV*)tie);
-   	sv_bless(tieref, gv_stashpv("NeoStats::NV::HashVars", TRUE));
-   	hv_magic(hash, (GV*)tieref, 'P'); 
-	
+		/* tie the hash to the package (FETCH/STORE) below */
+   		tie = newHV();
+	   	tieref = newRV_noinc((SV*)tie);
+   		sv_bless(tieref, gv_stashpv("NeoStats::NV::HashVars", TRUE));
+	   	hv_magic(hash, (GV*)tieref, 'P'); 
+	} else {
+	   	av   = newAV();
+		ret = newRV_noinc((SV *)av);
+		sv_bless(ret, gv_stashpv(class, TRUE));
+
+#   		dummy = newAV();
+		tieref = newRV_noinc((SV*)dummy);
+		sv_bless(tieref, gv_stashpv("NeoStats::NV::ListVars", TRUE));
+		sv_magic(av, (GV*)tieref, 'P', 0, 0);
+		sv_magic(tieref, (GV*)tieref, 'p', 0, 0);
+//		hv_magic(av, (GV*)tieref, 'P');
+
+	}		
 	/* this one allows us to store a "pointer" 
          */
    	nv_link = newSViv((int)nv);
@@ -94,11 +111,17 @@ PPCODE:
 
 #when we destroy the "hash" in perl, ie, it goes out of scope
 
-#void
-#DESTROY(self)
-#   SV           *self 
-#CODE:
-#printf("DESTROY\n");
+void
+DESTROY(self)
+   SV           *self 
+CODE:
+printf("DESTROY\n");
+
+void
+FETCH(self)
+  SV	*self;
+CODE:
+printf("FETCH\n");
 
 MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::HashVars
 
@@ -331,3 +354,64 @@ printf("CLEAR\n");
    hash = (HV*)SvRV(self);
    croak("CLEAR function is not implemented");
 
+MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::ListVars
+
+void 
+CLEAR(self)
+   SV *self;
+PREINIT:
+CODE:
+	printf("Called Clear\n");
+
+void
+DESTROY(self)
+   SV *self;
+PREINIT:
+CODE:
+	printf("Called Destroy\n");
+
+void
+EXTEND(self, count)
+  SV *self;
+  IV count;
+PREINIT:
+CODE:
+	printf("Called extend\n");
+
+IV
+FETCH(self, index)
+  SV *self;
+  IV index;
+PREINIT:
+CODE:
+	printf("Called fetch %d\n", index);
+	RETVAL = "34232";;
+OUTPUT:
+	RETVAL
+
+IV
+FETCHSIZE(self)
+  SV *self;
+PREINIT:
+CODE:
+	printf("Called fetchsize\n");
+	RETVAL = 10;
+OUTPUT:
+	RETVAL
+
+void
+PUSH(self, index)
+  SV *self;
+  IV index;
+PREINIT:
+CODE:
+	printf("Called push\n");
+
+void
+STORE(self, index, value)
+  SV *self;
+  IV index;
+  HV *value;
+PREINIT:
+CODE:
+	printf("Called Store\n");
