@@ -327,7 +327,7 @@ static void nlog_write( const char *time, const char *level, const char *line )
 		logentry->logfile = os_fopen( logentry->logname, "at" );
 	if( !logentry->logfile ) {
 #ifdef DEBUG
-		printf( "%s\n", strerror( errno ) );
+		printf( "LogFile Error: %s: %s\n", logentry->logname, strerror( errno ) );
 #endif
 		/* if the log file can't be opened now, there is something seriously wrong. straight Exit required, otherwise we might end up in recursive hell:
 		** http://www.neostats.net/boards/viewtopic.php?t=2352&start=15 */
