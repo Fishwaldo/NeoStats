@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - If we can't write to a logfile, bail out by calling exit, rather than
+   do_exit() otherwise we end up in recursive hell (F)
  - Start work on EOB support which should also address bug Neo-381 (F) 
  - Fix bug 261 - wrong Syntax Error message in oper only mode (M)
  - "make distcheck" now works so we can prepare snapshots easily. use

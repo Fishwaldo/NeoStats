@@ -329,7 +329,9 @@ static void nlog_write( const char *time, const char *level, const char *line )
 #ifdef DEBUG
 		printf( "%s\n", strerror( errno ) );
 #endif
-		do_exit( NS_EXIT_NORMAL, NULL );
+		/* if the log file can't be opened now, there is something seriously wrong. straight Exit required, otherwise we might end up in recursive hell:
+		** http://www.neostats.net/boards/viewtopic.php?t=2352&start=15 */
+		exit(-1);
 	}
 	os_fprintf( logentry->logfile, "(%s) %s %s - %s\n", time, level, GET_CUR_MODNAME(), line );
 	logentry->flush = 1;
