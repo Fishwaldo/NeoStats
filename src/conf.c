@@ -52,6 +52,7 @@ static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_file( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt );
+static int cb_verify_nick( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_noload( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_host( cfg_t *cfg, cfg_opt_t *opt );
 static int cb_verify_neohost( cfg_t *cfg, cfg_opt_t *opt );
@@ -136,7 +137,7 @@ static validate_args arg_validate[] = {
 	{"Options|ServerSettime", cb_verify_settime},
 	{"Options|DataBaseType", cb_verify_file},
 	{"Options|LogFileNameFormat", cb_verify_log},
-	{"Options|RootNick", cb_verify_mask},
+	{"Options|RootNick", cb_verify_nick},
 	{"Options|NOLOAD", cb_noload},
 	{"Options|MaxSockets", cb_verify_numsocks},
 	{"Servers|IpAddress", cb_verify_host},
@@ -561,9 +562,31 @@ static int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt )
 static int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt )
 {
 	char *value = opt->values[0]->string;
-	if( strstr( value, "!" ) && !strstr( value, "@" ) )
+printf("veryify %s\n", strstr(value, "!"));
+	if( !strstr( value, "!" ) | !strstr( value, "@" ) )
 	{
 		cfg_error( cfg, "Invalid hostmask %s for %s", value, opt->name );
+		return CFG_PARSE_ERROR;
+	}
+	return CFG_SUCCESS;
+}
+
+/** @brief cb_verify_nick
+ *
+ *  Verify nickconfiguration value
+ *
+ *  @param cfg pointer to config structure
+ *  @param opt pointer to option
+ *
+ *  @return none
+ */
+
+static int cb_verify_nick( cfg_t *cfg, cfg_opt_t *opt )
+{
+	char *value = opt->values[0]->string;
+	if( !ValidateNick(value) ) 
+	{
+		cfg_error( cfg, "Invalid Nickname %s for %s", value, opt->name );
 		return CFG_PARSE_ERROR;
 	}
 	return CFG_SUCCESS;

@@ -442,13 +442,14 @@ unsigned long lookupaddress (const char *host) {
 	struct hostent * phe = &phe2;
 	char *buf = NULL;
 	int buflength = 16384;
+#if 0
 	int herr = 0;
+#endif
 	int result = 0;
 	buf = malloc(buflength);
 	if (addr == INADDR_NONE) {
-#ifdef WIN32
 		phe = gethostbyname(host);
-#else
+#if 0
 		while (1) {
 			/* we use gethostbyname_r here because it is thread-safe and gethostbyname is not */
 			result = gethostbyname_r(host,&phe2,buf,buflength,&phe,&herr);
