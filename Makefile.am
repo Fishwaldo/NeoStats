@@ -25,6 +25,7 @@ all-local:
 
 
 install-data-hook:
+		test -z "$(prefix)/logs" || $(CCDV) $(mkdir_p) "$(prefix)/logs";
 		echo ""
 		$(top_srcdir)/autotools/shtool echo -e "%BInstallation complete.%b"
 		echo ""
