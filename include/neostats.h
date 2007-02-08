@@ -1447,7 +1447,7 @@ EXPORTFUNC int new_transfer( char *url, char *params, NS_TRANSFER savetofileorme
 #define SetServerSynched( x ) ( ( ( x )->flags |= CLIENT_FLAG_SYNCHED ) )
 
 /* Mark Server as Unsynced */
-#define SetSynching(x) ( ( x ) && ( ( x )->flags &= ~CLIENT_FLAG_SYNCHED ) )
+#define SetSynching(x) ( ( ( x )->flags &= ~CLIENT_FLAG_SYNCHED ) )
 
 /* Has NeoStats issued a SETHOST for this user? */
 #define IsUserSetHosted( x )  ( ( x ) && ( ( x )->flags & CLIENT_FLAG_SETHOST ) )
