@@ -235,10 +235,10 @@ void *nv_gf_complex(const void *data, const nv_list *item, const int field) {
 	void *output, *data2;
 #if 0
 	if (item->format[field].type != NV_COMPLEX) {
-		nlog(LOG_WARNING, nv_gf_complex: field is not complex %d", field);
+		nlog(LOG_WARNING, "nv_gf_complex: field is not complex %d", field);
 		return NULL;
 	}
-#endif;
+#endif
 	if (item->format[field].fldoffset != -1) {
 		data2 = (void *)data + item->format[field].fldoffset;
 		data2 = (void *)*((int *)data2);
