@@ -216,7 +216,7 @@ int InitDns (void)
 		return NS_FAILURE;
 	}
 
-	dnstimeout = os_malloc(sizeof(struct event));
+	dnstimeout = ns_malloc(sizeof(struct event));
 	timerclear(&tv);
 	tv.tv_sec = 1;
 	event_set(dnstimeout, 0, EV_TIMEOUT|EV_PERSIST, do_dns, NULL);

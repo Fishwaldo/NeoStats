@@ -61,7 +61,7 @@ int InitTimers( void )
 		nlog( LOG_CRITICAL, "Unable to create timer hash" );
 		return NS_FAILURE;
 	}
-	timers = os_malloc( sizeof( struct event ) );
+	timers = ns_malloc( sizeof( struct event ) );
 	timerclear( &tv );
 	tv.tv_sec = 1;
 	event_set( timers, 0, EV_TIMEOUT|EV_PERSIST, CheckTimers_cb, NULL );

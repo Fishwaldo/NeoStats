@@ -501,7 +501,7 @@ add_linemode_socket(const char *sock_name, OS_SOCKET socknum, sockfunccb readcb,
 
 	sock = add_buffered_socket(sock_name, socknum, linemode_read, socket_linemode_write_done, socket_linemode_error, arg);
 	if (sock) {
-		sock->sfunc.linemode.readbuf = os_malloc(nsconfig.recvq);
+		sock->sfunc.linemode.readbuf = ns_malloc(nsconfig.recvq);
 		sock->sfunc.linemode.recvq = nsconfig.recvq;
 		sock->sfunc.linemode.funccb = readcb;
 		sock->sfunc.linemode.errcb = errcb;
@@ -639,7 +639,7 @@ add_listen_sock(const char *sock_name, const int port, int type, sockcb acceptcb
 	sock->data = data;
 	sock->sfunc.listenmode.port = port;
 	sock->sfunc.listenmode.funccb = acceptcb;
-	sock->event.event = os_malloc(sizeof(struct event));	
+	sock->event.event = ns_malloc(sizeof(struct event));	
 	event_set(sock->event.event, sock->sock_no, EV_READ, listen_accept_sock, (void*) sock);
 	event_add(sock->event.event, NULL);	
 	return sock;
@@ -675,7 +675,7 @@ static void read_sock_activity(int fd, short what, void *data)
 		sock->rmsgs++;
 		if (sock->socktype == SOCK_STANDARD) {
    			if (howmuch > 0) {
-    				p = os_malloc(howmuch);
+    				p = ns_malloc(howmuch);
 	    		}
 		    	n = os_sock_read(sock->sock_no, p, howmuch);
    			if (n == -1 || n == 0) {
@@ -787,7 +787,7 @@ Sock *AddSock( SOCK_TYPE type, const char *sock_name, int socknum, sockfunccb re
 	sock->data = data;
 	sock->sfunc.standmode.readfunc = readfunc;
 	sock->sfunc.standmode.writefunc = writefunc;
-	sock->event.event = os_malloc(sizeof(struct event));
+	sock->event.event = ns_malloc(sizeof(struct event));
 	event_set(sock->event.event, sock->sock_no, what, read_sock_activity, (void*) sock);
 	event_add(sock->event.event, tv);
 	dlog(DEBUG2, "AddSock: Registered Module %s with Standard Socket functions %s", GET_CUR_MODNAME(), sock->name);
