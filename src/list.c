@@ -257,7 +257,7 @@ list_process (list_t * list, void *context, void (*function) (list_t * list, lno
 lnode_t *
 lnode_create (void *data)
 {
-	lnode_t *newnode = ns_malloc (sizeof *newnode);
+	lnode_t *newnode = ns_malloc (sizeof(lnode_t));
 	if (newnode) {
 		newnode->data = data;
 		newnode->next = NULL;
