@@ -88,6 +88,11 @@ static Ban *new_ban( const char *mask )
 		nlog( LOG_CRITICAL, "new_ban: bans hash is full" );
 		return NULL;
 	}
+	/* since Bans are simple at the moment, do a check for the mask in our Ban list */
+	if (hash_lookup(banhash, mask)) {
+		dlog( DEBUG2, "new_ban: Found Existing Mask %s in Ban List", mask);
+		return NULL;
+	}
 	/* Allocate memory for ban and add to hash table */
 	dlog( DEBUG2, "new_ban: %s", mask );
 	ban = ns_calloc( sizeof( Ban ) );

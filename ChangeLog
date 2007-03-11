@@ -5,6 +5,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Fix NEO-363 (F)
  - Maybe a Fix for NEO-364 (F)
  - Implement Timeouts for CURL (NEO-380) (F)
  - StatServ GeoIP was using gethostbyname_r which isn't needed (F)
