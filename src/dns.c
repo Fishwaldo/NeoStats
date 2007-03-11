@@ -328,6 +328,8 @@ void canx_dns(Module *modptr)
 			list_delete_destroy_node( dnslist, dnsnode );
 			dnsnode = lnode2;
 		}
+		if (dnsnode == NULL) 
+			continue;
 		dnsnode = list_next(dnslist, dnsnode);
 	}
 	dnsnode = list_first(dnsqueue);
