@@ -60,6 +60,8 @@ char *make_safe_filename( char *name )
 {
 	char *ptr;
 
+	if( name == NULL )
+		return NULL;
 	ptr = name;
 	while( *ptr != '\0' )
 	{
@@ -94,6 +96,8 @@ char *make_safe_filename( char *name )
 void strip( char *line )
 {
 	char *c = line;
+	if( line == NULL )
+		return;
 
 	if( ( c = strchr( line, '\n' ) ) != NULL )
 		*c = '\0';
@@ -112,9 +116,14 @@ void strip( char *line )
 
 char *sstrdup( const char *s )
 {
-	char *t = ns_malloc( strlen( s )+1 );
-	strlcpy( t, s, strlen( s )+1 );
-	if( !t ) {
+	char *t;
+	
+	if( s == NULL )
+		return NULL;
+	t = ns_malloc( strlen( s ) + 1 );
+	strlcpy( t, s, strlen( s ) + 1 );
+	if( t == NULL )
+	{
 		nlog( LOG_CRITICAL, "sstrdup(): out of memory." );
 		do_exit( NS_EXIT_ERROR, "Out of memory" );
 	}
@@ -134,6 +143,8 @@ char *ns_strlwr( char *s )
 {
 	char *t;
 	
+	if( s == NULL )
+		return NULL;
 	t = s;
 	while( *t != '\0' )
 	{
@@ -162,6 +173,8 @@ unsigned int ircsplitbuf( char *buf, char ***argv, int colon_special )
 	int colcount = 0;
 	
 	SET_SEGV_LOCATION();
+	if( buf == NULL )
+		return 0;
 	*argv = ns_calloc( sizeof( char * ) * argvsize );
 	argc = 0;
 	/*if( *buf == ':' )
@@ -214,6 +227,8 @@ unsigned int split_buf( char *buf, char ***argv )
 	int colcount = 0;
 
 	SET_SEGV_LOCATION();
+	if( buf == NULL )
+		return 0;
 	*argv = ns_calloc( sizeof( char * ) * argvsize );
 	argc = 0;
 	if( *buf == ':' )
@@ -452,8 +467,10 @@ char *sftime( time_t stuff )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int ValidateString (const char *string)
+int ValidateString( const char *string )
 {
+	if( string == NULL )
+		return NS_FAILURE;
 	while ( *string != '\0' )
 	{
 		if (!isascii(*string) ) 
@@ -474,6 +491,8 @@ int ValidateString (const char *string)
 
 int ValidateNick( const char *nick )
 {
+	if( nick == NULL )
+		return NS_FAILURE;
 	while( *nick != '\0' )
 	{
 		if( !IsNickChar( *nick ) )
@@ -495,6 +514,8 @@ int ValidateNick( const char *nick )
 
 int ValidateNickWild( const char *nick )
 {
+	if( nick == NULL )
+		return NS_FAILURE;
 	while( *nick != '\0' )
 	{
 		if( !IsNickChar( *nick ) && !IsWildChar( *nick ) )
@@ -515,6 +536,8 @@ int ValidateNickWild( const char *nick )
 
 int ValidateUser( const char *username )
 {
+	if( username == NULL )
+		return NS_FAILURE;
 	while( *username != '\0' )
 	{
 		if( !IsUserChar( *username ) )
@@ -536,6 +559,8 @@ int ValidateUser( const char *username )
 
 int ValidateUserWild( const char *username )
 {
+	if( username == NULL )
+		return NS_FAILURE;
 	while( *username != '\0' )
 	{
 		if( !IsUserChar( *username ) && !IsWildChar( *username ) )
@@ -557,6 +582,8 @@ int ValidateUserWild( const char *username )
 
 int ValidateHost( const char *hostname )
 {
+	if( hostname == NULL )
+		return NS_FAILURE;
 	if( !strchr( hostname, '.' ) )
 		return NS_FAILURE;
 	while( *hostname != '\0' )
@@ -580,6 +607,8 @@ int ValidateHost( const char *hostname )
 
 int ValidateHostWild( const char *hostname )
 {
+	if( hostname == NULL )
+		return NS_FAILURE;
 	while( *hostname != '\0' )
 	{
 		if( !IsHostChar( *hostname ) && !IsWildChar( *hostname ) )
@@ -603,6 +632,8 @@ int ValidateUserHost( const char *userhost )
 	static char localuserhost[USERHOSTLEN];
 	char *nick, *user , *host;
 
+	if( userhost == NULL )
+		return NS_FAILURE;
 	if( !strchr( userhost, '!' ) || !strchr( userhost, '@' ) )
 		return NS_FAILURE;
 
@@ -635,6 +666,8 @@ int ValidateUserHostWild( const char *userhost )
 	static char localuserhost[USERHOSTLEN];
 	char *nick, *user , *host;
 
+	if( userhost == NULL )
+		return NS_FAILURE;
 	if( !strchr( userhost, '!' ) || !strchr( userhost, '@' ) )
 		return NS_FAILURE;
 
@@ -663,6 +696,8 @@ int ValidateUserHostWild( const char *userhost )
 
 int ValidateURL( const char *url )
 {
+	if( url == NULL )
+		return NS_FAILURE;
 	/* URL must begin with http:// */
 	if( ircstrncasecmp( url, "http://", 7 ) != 0 )
 		return NS_FAILURE;
@@ -688,6 +723,8 @@ int ValidateURL( const char *url )
 
 int ValidateChannel( const char *channel_name )
 {
+	if( channel_name == NULL )
+		return NS_FAILURE;
 	/* Channel name must start with channel prefix */
 	if( !IsChanPrefix( *channel_name ) )
 		return NS_FAILURE;
@@ -713,6 +750,8 @@ int ValidateChannel( const char *channel_name )
 
 int ValidateChannelWild( const char *channel_name )
 {
+	if( channel_name == NULL )
+		return NS_FAILURE;
 	/* Channel name must start with channel prefix */
 	if( !IsChanPrefix( *channel_name ) )
 		return NS_FAILURE;
@@ -737,6 +776,8 @@ int ValidateChannelWild( const char *channel_name )
 
 int ValidateChannelKey( const char *key )
 {
+	if( key == NULL )
+		return NS_FAILURE;
 	while( *key != '\0' )
 	{
 		if( !IsChanKeyChar( *key ) )
@@ -763,6 +804,8 @@ int IsJustWildcard( const char *mask, int ishostmask )
 	size_t len;
 	size_t spanlen;
 
+	if( mask == NULL )
+		return NS_FAILURE;
 	if( ircstrcasecmp( mask, "*" ) == 0 )
 		return NS_TRUE;
 	len = strlen( mask );
@@ -789,7 +832,9 @@ Client *FindClient( const char *name )
 {
 	Client *c;
 
-	/* Check for server name first since the will generally
+	if( name == NULL )
+		return NULL;
+	/* Check for server name first since there will generally
 	 * be far fewer servers than users.
 	 */
 	c = ( Client * )FindServer( name );
