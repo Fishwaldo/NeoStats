@@ -70,7 +70,7 @@ static list_t *activetransfers;
 static int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp);
 static int curltimercallback(void *);
 #undef CURL_TEST 
-#define CURL_TEST 1
+/* #define CURL_TEST 1 */
 #ifdef CURL_TEST
 void CurlTest( void *data, int status, char *ver, int versize ) {
 	dlog(DEBUG1, "Download Ok: %d", status);
