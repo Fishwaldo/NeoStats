@@ -464,7 +464,7 @@ static void readconfiggeneric(adns_state ads, const char *filename,
 		if (!ccip->name) {
 			adns__diag(ads, -1, 0,
 				   "%s:%d: unknown configuration directive `%.*s'",
-				   filename, lno, q - p, p);
+				   filename, (int)lno, q - p, p);
 			continue;
 		}
 		while (ctype_whitespace(*q))
