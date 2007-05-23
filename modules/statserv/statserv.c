@@ -134,7 +134,7 @@ static BotInfo ss_botinfo =
 	"SS", 
 	BOT_COMMON_HOST, 
 	"Statistics service", 
-	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	BOT_FLAG_ONLY_OPERS|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
 	ss_commands, 
 	ss_settings,
 };
