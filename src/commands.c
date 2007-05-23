@@ -531,7 +531,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 			}
 		}
 	} 
-	if( ac && !processed ) 
+	if( ac && processed != 1) 
 	{
 		cmdret = run_intrinsic_cmds( av[0], cmdparams );
 		if( cmdret != NS_SUCCESS ) 
