@@ -623,10 +623,10 @@ MODULENAME = {
 #	"operlog",
 
 # IRCdauth, authenticate users based on their user modes.
-#	"ircdauth"
+#	"ircdauth",
 
 # Extauth, authenticate users based on nick!user@host access lists
-#	"extauth"
+#	"extauth",
 
 # QuoteServ, Quote Message Service
 #	"quoteserv",
