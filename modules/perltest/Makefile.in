@@ -63,8 +63,10 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 pkglibLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 perlexttest_la_LIBADD =
-am_perlexttest_la_OBJECTS = main.lo
+am__perlexttest_la_SOURCES_DIST = main.c
+@DO_PERL_TRUE@am_perlexttest_la_OBJECTS = main.lo
 perlexttest_la_OBJECTS = $(am_perlexttest_la_OBJECTS)
+@DO_PERL_TRUE@am_perlexttest_la_rpath = -rpath $(pkglibdir)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -75,7 +77,7 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 	$(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 SOURCES = $(perlexttest_la_SOURCES)
-DIST_SOURCES = $(perlexttest_la_SOURCES)
+DIST_SOURCES = $(am__perlexttest_la_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -223,9 +225,9 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-pkglib_LTLIBRARIES = perlexttest.la
-perlexttest_la_SOURCES = main.c 
-perlexttest_la_LDFLAGS = -module -avoid-version
+@DO_PERL_TRUE@pkglib_LTLIBRARIES = perlexttest.la
+@DO_PERL_TRUE@perlexttest_la_SOURCES = main.c 
+@DO_PERL_TRUE@perlexttest_la_LDFLAGS = -module -avoid-version
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ @PERL_CFLAGS@
 extra_DIST = extension.ple test.pl
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -283,7 +285,7 @@ clean-pkglibLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 perlexttest.la: $(perlexttest_la_OBJECTS) $(perlexttest_la_DEPENDENCIES) 
-	$(LINK) -rpath $(pkglibdir) $(perlexttest_la_LDFLAGS) $(perlexttest_la_OBJECTS) $(perlexttest_la_LIBADD) $(LIBS)
+	$(LINK) $(am_perlexttest_la_rpath) $(perlexttest_la_LDFLAGS) $(perlexttest_la_OBJECTS) $(perlexttest_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
