@@ -483,7 +483,7 @@ static int hs_event_umode( const CmdParams *cmdparams )
 int ModInit( void )
 {
 	SET_SEGV_LOCATION();
-	vhost_list = nv_list_create( LISTCOUNT_T_MAX, "HostServ", nv_hostserv, NV_FLAGS_RO );
+	vhost_list = nv_list_create( LISTCOUNT_T_MAX, "HostServ", nv_hostserv, NV_FLAGS_RO, NULL);
 	if( !vhost_list )
 	{
 		nlog( LOG_CRITICAL, "Unable to create vhost list" );

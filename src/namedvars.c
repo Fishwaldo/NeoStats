@@ -62,7 +62,7 @@ int nv_init() {
 	return NS_SUCCESS;
 }
 
-hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name2, nv_struct *nvstruct, nv_flags flags) {
+hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler (*set_handler)(const nv_item *item, nv_write_action action )) {
 	nv_list *newitem;
 	if (!FindNamedVars(name2)) {
 		newitem = ns_malloc(sizeof(nv_list));
@@ -72,6 +72,7 @@ hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char
 		newitem->format = nvstruct;
 		newitem->mod = GET_CUR_MODULE();
 		newitem->data = (void *)hash_create(count, comp, fun);
+		newitem->updatehandler = set_handler;
 		hnode_create_insert(namedvars, newitem, newitem->name);
 		return (hash_t *) newitem->data;
 	} else {
@@ -80,7 +81,7 @@ hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char
 	}
 }
 
-list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags) {
+list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler (*set_handler)(const nv_item *item, nv_write_action action )) {
 	nv_list *newitem;
 	if (!FindNamedVars(name2)) {
 		newitem = ns_malloc(sizeof(nv_list));
@@ -90,6 +91,7 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 		newitem->format = nvstruct;
 		newitem->mod = GET_CUR_MODULE();
 		newitem->data = (void *)list_create(count);
+		newitem->updatehandler = set_handler;
 		hnode_create_insert(namedvars, newitem, newitem->name);
 		return (list_t *) newitem->data;
 	} else {
@@ -300,4 +302,29 @@ void nv_printstruct(void *data, nv_list *item) {
 }
 
 
+int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
+	int i, j;
+	/* first, determine if the structure allows updates */
+	if (data->flags & NV_FLAGS_RO) {
+		nlog(LOG_WARNING, "Attempt to update read only structure %s", data->name);
+		return NS_FAILURE;
+	}
+	/* second, check the fields are not RO if doing a modify */
+	if (action == NV_ACTION_MOD) {
+		i = 0;
+		while (data->format[i].fldname != NULL) {
+			for (j = 0; j > item->no_fields; j++) {
+				if (!strcasecmp(data->format[i].fldname, item->fields[j]->name)) {
+					if (data->format[i].flags & NV_FLG_RO) {
+						nlog(LOG_WARNING, "Attempt to update a read only field %s in structure %s", data->format[i].fldname, data->name);
+						return NS_FAILURE;
+					}
+				}
+			}
+	        	i++;
+		}
+	}
+	/* if we get to hear, pass to the function to do the verification and actions */
+	return data->updatehandler(item, action);
+}
 #endif /* WIN32 */

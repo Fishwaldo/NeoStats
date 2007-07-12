@@ -335,7 +335,7 @@ int ns_cmd_serverlist( const CmdParams *cmdparams )
 
 int InitServers( void )
 {
-	serverhash = nv_hash_create( SERVER_TABLE_SIZE, 0, 0, "Servers", nv_server, NV_FLAGS_RO );
+	serverhash = nv_hash_create( SERVER_TABLE_SIZE, 0, 0, "Servers", nv_server, NV_FLAGS_RO, NULL);
 	if( !serverhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create server hash" );

@@ -146,7 +146,7 @@ int ProcessModuleList( const ModuleListHandler handler, void *v )
 int InitModules( void )
 {
 	SET_SEGV_LOCATION();
-	modulehash = nv_hash_create( NUM_MODULES, 0, 0, "Modules", nv_modules, NV_FLAGS_RO );
+	modulehash = nv_hash_create( NUM_MODULES, 0, 0, "Modules", nv_modules, NV_FLAGS_RO, NULL);
 	if( !modulehash ) {
 		nlog( LOG_CRITICAL, "Unable to create module hash" );
 		return NS_FAILURE;

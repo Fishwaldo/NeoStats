@@ -68,7 +68,7 @@ nv_struct nv_bots[] = {
 
 int InitBots( void )
 {
-	bothash = nv_hash_create( BOT_TABLE_SIZE, 0, 0, "Bots", nv_bots, NV_FLAGS_RO );
+	bothash = nv_hash_create( BOT_TABLE_SIZE, 0, 0, "Bots", nv_bots, NV_FLAGS_RO, NULL);
 	if( bothash == NULL )
 	{
 		nlog( LOG_CRITICAL, "Failed to create bot hash" );

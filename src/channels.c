@@ -683,7 +683,7 @@ int test_cumode( const Channel *c, const Client *u, unsigned int mode )
 
 int InitChannels( void )
 {
-	channelhash = nv_hash_create( CHANNEL_TABLE_SIZE, 0, 0, "Channels", nv_channels, NV_FLAGS_RO);
+	channelhash = nv_hash_create( CHANNEL_TABLE_SIZE, 0, 0, "Channels", nv_channels, NV_FLAGS_RO, NULL);
 	if( channelhash == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to create channel hash" );

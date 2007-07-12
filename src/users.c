@@ -571,7 +571,7 @@ Client *FindUser( const char *nick )
 
 int InitUsers( void )
 {
-	userhash = nv_hash_create( USER_TABLE_SIZE, 0, 0, "users", nv_client, NV_FLAGS_RO );
+	userhash = nv_hash_create( USER_TABLE_SIZE, 0, 0, "users", nv_client, NV_FLAGS_RO, NULL);
 	if( !userhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create user hash" );

@@ -54,6 +54,31 @@ typedef struct nv_struct {
 #define NV_STRUCT_END() { NULL, NV_STR, 0, NV_FLG_NONE, -1}
 
 typedef enum {
+	NV_ACTION_ADD,
+	NV_ACTION_MOD,
+	NV_ACTION_DEL
+} nv_write_action;
+
+typedef struct nv_fields { 
+	char *name;
+	union {
+		char *v_char;
+		int v_int;
+		long  v_long;
+		void *v_void;
+		char **v_chara;
+		int n_chara;
+	} values;
+} nv_fields;
+
+typedef struct nv_item {
+	char *key;
+	int no_fields;
+	nv_fields *fields[];
+} nv_item;
+
+
+typedef enum {
 	NV_TYPE_LIST,
 	NV_TYPE_HASH
 } nv_type;
@@ -62,6 +87,9 @@ typedef enum {
 	NV_FLAGS_NONE,
 	NV_FLAGS_RO
 } nv_flags;
+
+
+typedef int (*nv_set_handler) (const nv_item *item, nv_write_action action );
 
 typedef struct nv_list {
 	/* name of the list/hash */
@@ -76,18 +104,20 @@ typedef struct nv_list {
 	Module *mod;
 	/* ptr to the list */
 	void *data;
+	/* ptr to function to handle updates to the list */
+	nv_set_handler (*updatehandler)(const nv_item *item, nv_write_action action );
 	union {
 		struct hscan_t hscan;
 		struct lnode_t *node;
 	} iter;
 } nv_list;
 
-
 extern hash_t *namedvars;
 
+
 int nv_init();
-EXPORTFUNC hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name, nv_struct *nvstruct, nv_flags flags);
-EXPORTFUNC list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags);
+EXPORTFUNC hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name, nv_struct *nvstruct, nv_flags flags, nv_set_handler (*set_handler)(const nv_item *item, nv_write_action action ));
+EXPORTFUNC list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler (*set_handler)(const nv_item *item, nv_write_action action ));
 EXPORTFUNC nv_list *FindNamedVars(char *name);
 EXPORTFUNC char *nv_gf_string(const void *, const nv_list *, const int);
 EXPORTFUNC int nv_gf_int(const void *, const nv_list *, const int);
