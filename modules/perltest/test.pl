@@ -102,28 +102,35 @@ sub event_ping {
 sub event_pong {
 	my ($source) = @_;
 	NeoStats::ChanAlert($bot, "Pong $source");
-	my $testvar = new NeoStats::NV("users");
-	Dump($testvar->{fish});
-	NeoStats::debug($testvar->{fish}->{nick});
-	while ( my ($key, $value) = each(%$testvar)) {
-		NeoStats::debug("User Key => $value");
+#	my $testvar = new NeoStats::NV("users");
+#	Dump($testvar->{fish});
+#	NeoStats::debug($testvar->{fish}->{nick});
+#	while ( my ($key, $value) = each(%$testvar)) {
+#		NeoStats::debug("User Key => $value");
+#	    	while ( my ($key1, $value1) = each(%$key)) {
+#        		NeoStats::debug("$key: $key1 => $value1");
+#    		}
+#	}
+#	NeoStats::debug "Found Fish" if exists $testvar->{fish};
+#	my $hashtest = $testvar->{fish};
+#	while ( my ($key, $value) = each(%$hashtest)) {
+#		NeoStats::debug("$key => $value");
+#	}
+#
+	my $hostserv = new NeoStats::NV("HostServ");
+	my $hashtest = $hostserv->{0};
+	Dump($hostserv);
+	while ( my ($key, $value) = each(%$hostserv)) {
+		NeoStats::debug("Hostserv Key => $value");
 	    	while ( my ($key1, $value1) = each(%$key)) {
-        		NeoStats::debug("$key: $key1 => $value1");
+        		NeoStats::debug("HS: $key: $key1 => $value1");
     		}
 	}
-	NeoStats::debug "Found Fish" if exists $testvar->{fish};
-	my $hashtest = $testvar->{fish};
-	while ( my ($key, $value) = each(%$hashtest)) {
-		NeoStats::debug("$key => $value");
-	}
-	my @hostserv = new NeoStats::NV("HostServ");
-	NeoStats::debug("Debug:".@hostserv."Ok");
-#	Dump(@hostserv);
+	NeoStats::debug("HS Nick: ".$hashtest->{nick});
+#	NeoStats::debug("Debug HostServ: ".$hostserv." Ok");
+#	Dump($hostserv);
+#	NeoStats::debug("Var: HostServ".$hostserv->{0}."Fin");
 
-	@hostserv[1] = "100asdf";
-	NeoStats::debug("Var:".$hostserv[0]."Fin");
-	NeoStats::debug(@hostserv);
-	Dump(@hostserv);
 }
 
 sub event_signon {

@@ -76,6 +76,10 @@ typedef struct nv_list {
 	Module *mod;
 	/* ptr to the list */
 	void *data;
+	union {
+		struct hscan_t hscan;
+		struct lnode_t *node;
+	} iter;
 } nv_list;
 
 
