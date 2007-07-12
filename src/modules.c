@@ -630,7 +630,7 @@ int unload_module( const char *modname, Client * u )
 
 #ifdef USE_PERL
 	/* unload any extensions first */
-	if ((mod_ptr->pm) && (mod_ptr->pm->type = TYPE_EXTENSION)) {
+	if ((mod_ptr->pm) && (mod_ptr->pm->type == TYPE_EXTENSION)) {
 		PerlExtensionFini(mod_ptr);
 		unload_perlextension(mod_ptr);
 	}
