@@ -47,7 +47,6 @@ void perl_delete_namedvars(nv_list *nv, char *key) {
 	return;
 }
 
-hscan_t hashiter;
 
 #define	RETURN_UNDEF_IF_FAIL { if ((int)RETVAL < 0) XSRETURN_UNDEF; }
 
@@ -64,8 +63,6 @@ PREINIT:
    HV        *tie;
    SV        *nv_link;
    SV        *tieref;
-   AV	     *av;
-   IV	     dummy;
    nv_list   *nv;
 PPCODE:
    nv = FindNamedVars(varname);
@@ -74,30 +71,16 @@ PPCODE:
      	ret = &PL_sv_undef;
    } else {
 	/* this returns a "empty" hash that is tied to the FETCH/STORE etc functions below */
-	if (nv->type == NV_TYPE_HASH) {
-	   	hash   = newHV();
-   		ret    = (SV*)newRV_noinc((SV*)hash);
-	   	stash  = gv_stashpv(class ,TRUE);
-   		sv_bless(ret,stash);
+   	hash   = newHV();
+  	ret    = (SV*)newRV_noinc((SV*)hash);
+	stash  = gv_stashpv(class ,TRUE);
+   	sv_bless(ret,stash);
 
-		/* tie the hash to the package (FETCH/STORE) below */
-   		tie = newHV();
-	   	tieref = newRV_noinc((SV*)tie);
-   		sv_bless(tieref, gv_stashpv("NeoStats::NV::HashVars", TRUE));
-	   	hv_magic(hash, (GV*)tieref, 'P'); 
-	} else {
-	   	av   = newAV();
-		ret = newRV_noinc((SV *)av);
-		sv_bless(ret, gv_stashpv(class, TRUE));
-
-#   		dummy = newAV();
-		tieref = newRV_noinc((SV*)dummy);
-		sv_bless(tieref, gv_stashpv("NeoStats::NV::ListVars", TRUE));
-		sv_magic(av, (GV*)tieref, 'P', 0, 0);
-		sv_magic(tieref, (GV*)tieref, 'p', 0, 0);
-//		hv_magic(av, (GV*)tieref, 'P');
-
-	}		
+	/* tie the hash to the package (FETCH/STORE) below */
+   	tie = newHV();
+	tieref = newRV_noinc((SV*)tie);
+   	sv_bless(tieref, gv_stashpv("NeoStats::NV::HashVars", TRUE));
+	hv_magic(hash, (GV*)tieref, 'P'); 
 	/* this one allows us to store a "pointer" 
          */
    	nv_link = newSViv((int)nv);
@@ -139,7 +122,10 @@ PREINIT:
    MAGIC        *mg;
    nv_list	*nv;
    void 	*data;
+   int		pos, i;
+   lnode_t 	*lnode;
 CODE:
+   RETVAL = (HV *)-1;
    /* find our magic */
    hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
@@ -147,10 +133,7 @@ CODE:
    /* this is the nv_hash we are point at */
    nv = (nv_list *)SvIV(mg->mg_obj);
    /* make sure its a hash, not a list */
-   if (nv->type != NV_TYPE_HASH) {
-	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
-	RETVAL = (HV *)-1;
-   } else {
+   if (nv->type == NV_TYPE_HASH) {
 	   /* get the "key" they want */
 	   k    = SvPV(key, klen);
 	   /* search for the key */
@@ -160,6 +143,21 @@ CODE:
 	   } else {
 		RETVAL = (HV *)perl_encode_namedvars(nv, data);	   
 	   }
+   } else if (nv->type == NV_TYPE_LIST) {
+	   /* get the position */
+	   pos = SvIV(key);
+	   lnode = NULL;
+	   for (i = 0; i == pos; i++) {
+		if (!lnode) 
+			lnode = list_first((list_t *)nv->data);
+		else 
+			lnode = list_next((list_t *)nv->data, lnode);
+	   }
+	   if (lnode) {
+		   RETVAL = perl_encode_namedvars(nv, lnode_get(lnode));
+	   } else
+		   RETVAL = (HV *)-1;
+
    }
 POSTCALL:
 	RETURN_UNDEF_IF_FAIL;
@@ -209,7 +207,9 @@ PREINIT:
    MAGIC        *mg;
    STRLEN        klen;
    char 	*data;
+   int 		pos;
 CODE:
+   RETVAL = 0;
    hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
@@ -217,10 +217,7 @@ CODE:
    k    = SvPV(key, PL_na);
    nv = (nv_list *)SvIV(mg->mg_obj);
    /* make sure its a hash, not a list */
-   if (nv->type != NV_TYPE_HASH) {
-	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
-	RETVAL = 0;
-   } else {
+   if (nv->type == NV_TYPE_HASH) {
 	   /* get the "key" they want */
 	   k    = SvPV(key, klen);
 	   /* search for the key */
@@ -230,6 +227,12 @@ CODE:
 	   } else {
 		RETVAL = 1;
 	   }
+   } else if (nv->type == NV_TYPE_LIST) {
+	   pos = SvIV(key);
+	   if (pos > list_count((list_t *)nv->data)) 
+		RETVAL = 0;
+	   else
+		RETVAL = 1;
    }
 OUTPUT:
    RETVAL
@@ -245,22 +248,23 @@ PREINIT:
    nv_list *nv;
    hnode_t *node;
 CODE:
+   RETVAL = (HV *)-1;
    hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
    nv = (nv_list *)SvIV(mg->mg_obj);
    /* make sure its a hash, not a list */
-   if (nv->type != NV_TYPE_HASH) {
-	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
-	RETVAL = (HV *)-1;
-   } else {
-	hash_scan_begin( &hashiter, (hash_t *)nv->data);
-	node = hash_scan_next(&hashiter);
+   if (nv->type == NV_TYPE_HASH) {
+	hash_scan_begin( &nv->iter.hscan, (hash_t *)nv->data);
+	node = hash_scan_next(&nv->iter.hscan);
 	if (!node) {
 		RETVAL = (HV *)-1;
 	} else {
 		RETVAL = perl_encode_namedvars(nv, hnode_get(node));
 	}
+   } else if (nv->type == NV_TYPE_LIST) {
+	nv->iter.node = list_first((list_t *)nv->data);
+	RETVAL = perl_encode_namedvars(nv, lnode_get(nv->iter.node));
    }
 POSTCALL:
 	RETURN_UNDEF_IF_FAIL;
@@ -278,21 +282,29 @@ PREINIT:
    hnode_t *node;
    nv_list *nv;
 CODE:
+   RETVAL = (HV *)-1;
    hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
    nv = (nv_list *)SvIV(mg->mg_obj);
    /* make sure its a hash, not a list */
-   if (nv->type != NV_TYPE_HASH) {
-	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
-	RETVAL = (HV *)-1;
-   } else {
-	node = hash_scan_next(&hashiter);
+   if (nv->type == NV_TYPE_HASH) {
+	node = hash_scan_next(&nv->iter.hscan);
 	if (!node) {
 		RETVAL = (HV *)-1;
 	} else {
 		RETVAL = perl_encode_namedvars(nv, hnode_get(node));
 	}
+   } else if (nv->type == NV_TYPE_LIST) {
+	if (nv->iter.node) {
+		nv->iter.node = list_next((list_t *)nv->data, nv->iter.node);
+		if (nv->iter.node)
+			RETVAL = perl_encode_namedvars(nv, lnode_get(nv->iter.node));
+		else
+			RETVAL = (HV *)-1;
+	} else {
+		RETVAL = (HV *)-1;
+        }
    }
 POSTCALL:
 	RETURN_UNDEF_IF_FAIL;
@@ -319,7 +331,7 @@ CODE:
    nv = (nv_list *)SvIV(mg->mg_obj);
    /* make sure its a hash, not a list */
    if (nv->type != NV_TYPE_HASH) {
-	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
+	nlog(LOG_WARNING, "Del: NamedVars is not a hash?!?!");
 	RETVAL = (HV *)-1;
    } else {
 	   /* get the "key" they want */
@@ -354,64 +366,3 @@ printf("CLEAR\n");
    hash = (HV*)SvRV(self);
    croak("CLEAR function is not implemented");
 
-MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::ListVars
-
-void 
-CLEAR(self)
-   SV *self;
-PREINIT:
-CODE:
-	printf("Called Clear\n");
-
-void
-DESTROY(self)
-   SV *self;
-PREINIT:
-CODE:
-	printf("Called Destroy\n");
-
-void
-EXTEND(self, count)
-  SV *self;
-  IV count;
-PREINIT:
-CODE:
-	printf("Called extend\n");
-
-IV
-FETCH(self, index)
-  SV *self;
-  IV index;
-PREINIT:
-CODE:
-	printf("Called fetch %d\n", index);
-	RETVAL = "34232";;
-OUTPUT:
-	RETVAL
-
-IV
-FETCHSIZE(self)
-  SV *self;
-PREINIT:
-CODE:
-	printf("Called fetchsize\n");
-	RETVAL = 10;
-OUTPUT:
-	RETVAL
-
-void
-PUSH(self, index)
-  SV *self;
-  IV index;
-PREINIT:
-CODE:
-	printf("Called push\n");
-
-void
-STORE(self, index, value)
-  SV *self;
-  IV index;
-  HV *value;
-PREINIT:
-CODE:
-	printf("Called Store\n");
