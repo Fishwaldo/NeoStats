@@ -33,8 +33,33 @@ HV *perl_encode_namedvars(nv_list *nv, void *data) {
 	return ret;
 }
 
-void perl_store_namedvars(nv_list *nv, char *key, SV *values) {
-	/* XXX - TODO */
+void perl_store_namedvars(nv_list *nv, char *key, HV *values) {
+	char *fldname;
+	SV *value;
+	I32 *keylen;
+	int i;
+	dump_hash(values);
+	i = 0;
+	while (nv->format[i].fldname != NULL) {
+		printf("fld: %s %d\n", nv->format[i].fldname, i);
+		if (hv_exists(values, nv->format[i].fldname, strlen(nv->format[i].fldname))) {
+			value = *hv_fetch(values, nv->format[i].fldname, strlen(nv->format[i].fldname), FALSE);
+		} else {
+			i++;
+			continue;
+		}
+		switch (nv->format[i].type) {
+			case NV_PSTR:
+			case NV_STR:
+				printf("Value: %s\n", SvPV_nolen(value));
+				break;
+			default:
+				printf("Value: Unhandled!\n");
+				break;
+		}
+		i++;
+	}
+
 	return;
 }
 
@@ -146,13 +171,12 @@ CODE:
    } else if (nv->type == NV_TYPE_LIST) {
 	   /* get the position */
 	   pos = SvIV(key);
-	   lnode = NULL;
+	   lnode = list_first((list_t *)nv->data);;
 	   for (i = 0; i == pos; i++) {
-		if (!lnode) 
-			lnode = list_first((list_t *)nv->data);
-		else 
 			lnode = list_next((list_t *)nv->data, lnode);
+printf("iter\n");
 	   }
+printf("%d %d\n", i, pos);
 	   if (lnode) {
 		   RETVAL = perl_encode_namedvars(nv, lnode_get(lnode));
 	   } else
@@ -171,7 +195,7 @@ void
 STORE(self, key, value)
    SV         *self;
    SV         *key;
-   SV         *value;
+   HV         *value;
 PREINIT:
    HV         *hash;
    char       *k;
@@ -186,7 +210,7 @@ CODE:
    /* this is the nv_hash we are point at */
    nv = (nv_list *)SvIV(mg->mg_obj);
    /* make sure its a hash, not a list */
-   if (nv->type != NV_TYPE_HASH) {
+   if (nv->type == NV_TYPE_HASH) {
 	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
    } else {
 	   k    = SvPV(key, klen);

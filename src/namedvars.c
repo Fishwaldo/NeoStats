@@ -62,7 +62,7 @@ int nv_init() {
 	return NS_SUCCESS;
 }
 
-hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler (*set_handler)(const nv_item *item, nv_write_action action )) {
+hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler set_handler) {
 	nv_list *newitem;
 	if (!FindNamedVars(name2)) {
 		newitem = ns_malloc(sizeof(nv_list));
@@ -81,7 +81,7 @@ hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char
 	}
 }
 
-list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler (*set_handler)(const nv_item *item, nv_write_action action )) {
+list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler set_handler) {
 	nv_list *newitem;
 	if (!FindNamedVars(name2)) {
 		newitem = ns_malloc(sizeof(nv_list));
@@ -319,12 +319,32 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 						nlog(LOG_WARNING, "Attempt to update a read only field %s in structure %s", data->format[i].fldname, data->name);
 						return NS_FAILURE;
 					}
+					/* also check string length, if applicable */
+					if (data->format[i].type == NV_STR) {
+						if (strlen(item->fields[j]->values.v_char) > data->format[i].len) {
+							nlog(LOG_WARNING, "Attempt to use too large a string in field %s in structure %s", data->format[i].fldname, data->name);
+							return NS_FAILURE;
+						}
+					}
 				}
 			}
 	        	i++;
 		}
 	}
 	/* if we get to hear, pass to the function to do the verification and actions */
-	return data->updatehandler(item, action);
+	return (int)data->updatehandler(item, action);
 }
+
+int nv_get_field_item(nv_item *item, char *fldname) {
+	int i = 0;
+	while (item->fields[i]->name != NULL) {
+		if (!ircstrcasecmp(item->fields[i]->name, fldname)) 
+			return i;
+		i++;
+	}
+	nlog(LOG_WARNING, "Attempt to get a unknown field in nv_get_field_item");
+	return -1;
+}
+
+
 #endif /* WIN32 */

@@ -88,5 +88,4 @@ int perl_sync_module(Module *mod);
 int perl_event_cb(const Event evt, const CmdParams *cmdparams, const Module *mod_ptr);
 
 
-
 #endif /* _PERLMOD_H_ */

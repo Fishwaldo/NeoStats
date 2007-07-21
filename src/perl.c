@@ -38,14 +38,14 @@
 
 
 extern void boot_DynaLoader (pTHX_ CV * cv);
-static void dump_hash(HV *rethash);
+void dump_hash(HV *rethash);
 
 XSINIT_t extn_init;
 
 
 
 
-static void
+void
 dump_hash(HV *rethash) {
 	char *key;
 	SV *value;

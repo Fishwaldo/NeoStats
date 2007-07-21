@@ -82,6 +82,7 @@ static int hs_cmd_list( const CmdParams *cmdparams );
 static int hs_cmd_listwild( const CmdParams *cmdparams );
 static int hs_cmd_view( const CmdParams *cmdparams );
 static int hs_cmd_del( const CmdParams *cmdparams );
+static int hs_check_vhost( const CmdParams *cmdparams, const vhostentry *vhe);
 
 static int hs_set_regnick_cb( const CmdParams* cmdparams, SET_REASON reason );
 static int hs_set_expire_cb( const CmdParams* cmdparams, SET_REASON reason );
@@ -471,6 +472,66 @@ static int hs_event_umode( const CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
+/* XXX Still more work todo */
+
+int hs_nv_check(nv_item *item, nv_write_action action) {
+	vhostentry *vhe, *vhe1;
+	lnode_t *hn;
+	if (action == NV_ACTION_DEL) {
+		hn = list_find( vhost_list, item->key, findnick );
+		if( !hn )
+		{
+			return NS_FAILURE;
+		}
+		vhe = ( vhostentry * ) lnode_get( hn );
+		CommandReport( hs_bot, "Removed vhost %s for %s",
+			vhe->vhost, vhe->nick );
+		DelVhost( vhe );
+		list_delete_destroy_node( vhost_list, hn );
+		return NS_SUCCESS;
+	} else if (action == NV_ACTION_ADD) {
+		vhe = ns_malloc(sizeof(vhostentry));
+		strlcpy(vhe->nick, item->fields[nv_get_field_item(item, "nick")]->values.v_char, MAXNICK);
+		strlcpy(vhe->host, item->fields[nv_get_field_item(item, "host")]->values.v_char, MAXHOST);
+		strlcpy(vhe->vhost, item->fields[nv_get_field_item(item, "vhost")]->values.v_char, MAXHOST);
+		strlcpy(vhe->passwd, item->fields[nv_get_field_item(item, "passwd")]->values.v_char, MAXPASS);
+		strlcpy(vhe->added, item->fields[nv_get_field_item(item, "added")]->values.v_char, MAXNICK);
+		if (hs_check_vhost(NULL, vhe) == NS_FAILURE) {
+			ns_free(vhe);
+			return NS_FAILURE;
+		}
+		lnode_create_append( vhost_list, vhe );
+		SaveVhost( vhe );
+	} else if (action == NV_ACTION_MOD) {
+        	hn = list_find( vhost_list, item->key, findnick );
+                if( !hn ) {
+			nlog(LOG_WARNING, "hs_nv_check: Can't find Vhost Entry %s", item->key);
+			return NS_FAILURE;
+		}
+		vhe = lnode_get(hn);	
+		/* copy the vhost entry incase we have to fall back */
+		memcpy(vhe, vhe1, sizeof(vhostentry));
+		strlcpy(vhe1->nick, item->fields[nv_get_field_item(item, "nick")]->values.v_char, MAXNICK);
+		strlcpy(vhe1->host, item->fields[nv_get_field_item(item, "host")]->values.v_char, MAXHOST);
+		strlcpy(vhe1->vhost, item->fields[nv_get_field_item(item, "vhost")]->values.v_char, MAXHOST);
+		strlcpy(vhe1->passwd, item->fields[nv_get_field_item(item, "passwd")]->values.v_char, MAXPASS);
+		strlcpy(vhe1->added, item->fields[nv_get_field_item(item, "added")]->values.v_char, MAXNICK);
+		vhe1->tslastused = item->fields[nv_get_field_item(item, "tslastused")]->values.v_int;
+		if (hs_check_vhost(NULL, vhe1) == NS_FAILURE) {
+			ns_free(vhe1);
+			return NS_FAILURE;
+		}
+		/* if its here, its ok. Remove the old entry and insert the new one */
+		DelVhost( vhe );
+		list_delete_destroy_node( vhost_list, hn );
+		lnode_create_append( vhost_list, vhe1 );
+		SaveVhost( vhe1 );
+		return NS_SUCCESS;
+	}		
+
+	return NS_SUCCESS;
+}
+
 /** @brief ModInit
  *
  *  Init handler
@@ -483,7 +544,7 @@ static int hs_event_umode( const CmdParams *cmdparams )
 int ModInit( void )
 {
 	SET_SEGV_LOCATION();
-	vhost_list = nv_list_create( LISTCOUNT_T_MAX, "HostServ", nv_hostserv, NV_FLAGS_RO, NULL);
+	vhost_list = nv_list_create( LISTCOUNT_T_MAX, "HostServ", nv_hostserv, NV_FLAGS_NONE, hs_nv_check);
 	if( !vhost_list )
 	{
 		nlog( LOG_CRITICAL, "Unable to create vhost list" );
@@ -550,33 +611,6 @@ int ModFini( void )
 	hash_destroy( banhash );
 	list_destroy_auto( vhost_list );
 	return NS_SUCCESS;
-}
-
-/** @brief new_vhost
- *
- *  Allocate new vhost
- *
- *  @param nick
- *  @param host
- *  @param vhost
- *  @param pass
- *  @param who set it
- *
- *  @return none
- */
-
-static void new_vhost( const char *nick, const char *host, const char *vhost, const char *pass, const char *who )
-{
-	vhostentry *vhe;
-
-	vhe = ns_calloc( sizeof( vhostentry ) );
-	strlcpy( vhe->nick, nick, MAXNICK );
-	strlcpy( vhe->host, host, MAXHOST );
-	strlcpy( vhe->vhost, vhost, MAXHOST );
-	strlcpy( vhe->passwd, pass, MAXPASS );
-	strlcpy( vhe->added, who, MAXNICK );
-	lnode_create_append( vhost_list, vhe );
-	SaveVhost( vhe );
 }
 
 /** @brief hs_cmd_bans_list
@@ -790,6 +824,70 @@ static int hs_cmd_chpass( const CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
+/** @brief hs_check_vhost
+ *
+ *  Check the proposed vhost is valid 
+ *
+ *  @param cmdparams
+ *    cmdparams = if the request came from a user, this is it, otherwise NULL
+ *    vhe = the requested vhost
+ *
+ *  @return NS_SUCCESS if succeeds, else NS_FAILURE
+ */
+
+
+static int hs_check_vhost( const CmdParams *cmdparams, const vhostentry *vhe)
+{
+	banentry *ban;
+	ban = FindBan( vhe->vhost);
+	if( ban )
+	{
+		if (cmdparams) {
+			irc_prefmsg( hs_bot, cmdparams->source, 
+				"%s has been matched against the vhost ban %s",
+				vhe->vhost, ban->host );
+			CommandReport( hs_bot, "%s tried to add a banned vhost %s",
+			  	cmdparams->source->name, vhe->vhost);
+			return NS_FAILURE;
+		} else {
+			CommandReport(hs_bot, "Attempt to add a banned vhost %s", vhe->vhost);
+			return NS_FAILURE;
+		}
+	}
+	if( IsJustWildcard( vhe->host, 1 ) == NS_TRUE )
+	{
+		if (cmdparams) 
+			irc_prefmsg( hs_bot, cmdparams->source, "%s is too general a wildcard for realhost", vhe->host);
+		else 
+			CommandReport( hs_bot, "%s is too general a wildcard for realhost", vhe->host);
+			
+		return NS_FAILURE;
+	}
+	if( ValidateHostWild( vhe->vhost ) == NS_FAILURE )
+	{
+		if (cmdparams) 
+			irc_prefmsg( hs_bot, cmdparams->source, 
+				"%s is an invalid host", vhe->vhost );
+		else 
+			CommandReport( hs_bot, "%s is a invalid host", vhe->vhost);
+			
+		return NS_FAILURE;
+		
+	}
+	if( list_find( vhost_list, vhe->nick, findnick ) )
+	{
+		if (cmdparams) 
+			irc_prefmsg( hs_bot, cmdparams->source, 
+				"%s already has a vhost entry", vhe->nick);
+		else 
+			CommandReport(hs_bot, "%s already has a vhost entry", vhe->nick);
+		return NS_FAILURE;
+		
+	}
+	return NS_SUCCESS;
+}
+
+
 /** @brief hs_cmd_add
  *
  *  Command handler for ADD
@@ -802,46 +900,29 @@ static int hs_cmd_chpass( const CmdParams *cmdparams )
  *
  *  @return NS_SUCCESS if succeeds, else NS_FAILURE
  */
-
 static int hs_cmd_add( const CmdParams *cmdparams )
 {
-	banentry *ban;
 	Client *u;
-
+	vhostentry *vhe;
+	
 	SET_SEGV_LOCATION();
 	if (cmdparams->source->user->ulevel < hs_cfg.addlevel && ircstrcasecmp(cmdparams->source->name, cmdparams->av[0]))
 	{
 		irc_prefmsg( hs_bot, cmdparams->source, "VHOST may be added for current nick only (%s)", cmdparams->source->name );
 		return NS_SUCCESS;
 	}
-	ban = FindBan( cmdparams->av[2] );
-	if( ban )
-	{
-		irc_prefmsg( hs_bot, cmdparams->source, 
-			"%s has been matched against the vhost ban %s",
-			cmdparams->av[2], ban->host );
-		CommandReport( hs_bot, "%s tried to add a banned vhost %s",
-			  cmdparams->source->name, cmdparams->av[2] );
-		return NS_SUCCESS;
+	vhe = ns_malloc(sizeof(vhostentry));
+	strlcpy(vhe->nick, cmdparams->av[0], MAXNICK);
+	strlcpy(vhe->host, cmdparams->av[1], MAXHOST);
+	strlcpy(vhe->vhost, cmdparams->av[2], MAXHOST);
+	strlcpy(vhe->passwd, cmdparams->av[3], MAXPASS);
+	strlcpy(vhe->added, cmdparams->source->name, MAXNICK);
+	if (hs_check_vhost(cmdparams, vhe) == NS_FAILURE) {
+		ns_free(vhe);
+		return NS_FAILURE;
 	}
-	if( IsJustWildcard( cmdparams->av[1], 1 ) == NS_TRUE )
-	{
-		irc_prefmsg( hs_bot, cmdparams->source, "%s is too general a wildcard for realhost", cmdparams->av[1] );
-		return NS_SUCCESS;
-	}
-	if( ValidateHostWild( cmdparams->av[2] ) == NS_FAILURE )
-	{
-		irc_prefmsg( hs_bot, cmdparams->source, 
-			"%s is an invalid host", cmdparams->av[2] );
-		return NS_SUCCESS;
-	}
-	if( list_find( vhost_list, cmdparams->av[0], findnick ) )
-	{
-		irc_prefmsg( hs_bot, cmdparams->source, 
-			"%s already has a vhost entry", cmdparams->av[0] );
-		return NS_SUCCESS;
-	}
-	new_vhost( cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3], cmdparams->source->name );
+	lnode_create_append( vhost_list, vhe );
+	SaveVhost( vhe );
 	irc_prefmsg( hs_bot, cmdparams->source, 
 		"%s has successfully been registered under realhost: %s vhost: %s and password: %s",
 		cmdparams->av[0], cmdparams->av[1], cmdparams->av[2], cmdparams->av[3] );
