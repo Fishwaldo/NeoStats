@@ -39,6 +39,7 @@
 
 extern void boot_DynaLoader (pTHX_ CV * cv);
 void dump_hash(HV *rethash);
+void boot_NeoStats__NV();
 
 XSINIT_t extn_init;
 
@@ -50,7 +51,7 @@ dump_hash(HV *rethash) {
 	char *key;
 	SV *value;
 	int keycount;
-	I32 *keylen;
+	I32 keylen;
 
 	keycount = hv_iterinit(rethash);
 	printf("%d items in call\n",keycount);
@@ -108,7 +109,7 @@ execute_perl (const Module *mod, SV * function, int numargs, ...)
 
 	sv = GvSV (gv_fetchpv ("@", TRUE, SVt_PV));
 	if (SvTRUE (sv)) {
-		nlog(LOG_WARNING, "Perl error: %s", SvPV(sv, count)); 
+		nlog(LOG_WARNING, "Perl error: %s", SvPVX(sv)); 
 		POPs;							  /* remove undef from the top of the stack */
 	} else if (count != 1) {
 		nlog(LOG_WARNING, "Perl error: expected 1 value from %s, "
@@ -478,6 +479,7 @@ XS (XS_NeoStats_debug)
 		nlog(LOG_WARNING, "Usage: NeoStats::Internal::debug(text)");
 	} else {
 		text = SvPV_nolen (ST (0));
+		strip(text);
 		nlog(LOG_WARNING, "%s", text);
 	}
 	XSRETURN_EMPTY;
@@ -765,7 +767,7 @@ XS (XS_NeoStats_AddCommand)
 				 * then make a copy (malloc'ed) of it (strdup)
 				 * and put it on the end of the array of helptext strings (AddStringToList)!
 				 */
-				 AddStringToList(&bc->helptext, strdup(SvPV_nolen(*av_fetch(helptext, i, FALSE))), &j);
+				 AddStringToList((char ***)&bc->helptext, strdup(SvPV_nolen(*av_fetch(helptext, i, FALSE))), &j);
 			}
 			value = *hv_fetch(rethash, "flags", strlen("flags"), FALSE);
 			bc->flags = SvIV(value);
@@ -1678,6 +1680,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 		if (!mod->pm->registered) {
 			load_module_error(u, filename, __("Perl Module didn't register.", u));
 			unload_perlmod(mod);
+			RESET_RUN_LEVEL();
 			free(mod);
 			return NULL;
 		}		
@@ -1685,6 +1688,7 @@ Module *load_perlmodule (const char *filename, Client *u)
 	} else {
 		load_module_error(u, filename, __("Errors in Perl Module", u));
 		unload_perlmod(mod);
+		RESET_RUN_LEVEL();
 		free(mod);
 		return NULL;	
 	}

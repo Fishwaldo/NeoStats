@@ -34,11 +34,8 @@ HV *perl_encode_namedvars(nv_list *nv, void *data) {
 }
 
 void perl_store_namedvars(nv_list *nv, char *key, HV *values) {
-	char *fldname;
 	SV *value;
-	I32 *keylen;
 	int i;
-	dump_hash(values);
 	i = 0;
 	while (nv->format[i].fldname != NULL) {
 		printf("fld: %s %d\n", nv->format[i].fldname, i);
@@ -119,17 +116,17 @@ PPCODE:
 
 #when we destroy the "hash" in perl, ie, it goes out of scope
 
-void
-DESTROY(self)
-   SV           *self 
-CODE:
-printf("DESTROY\n");
+#void
+#DESTROY(self)
+#   SV           *self 
+#CODE:
+#printf("DESTROY\n");
 
-void
-FETCH(self)
-  SV	*self;
-CODE:
-printf("FETCH\n");
+#void
+#FETCH(self)
+#  SV	*self;
+#CODE:
+#printf("FETCH\n");
 
 MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::HashVars
 

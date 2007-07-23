@@ -460,6 +460,9 @@ Module *ns_load_module( const char *modfilename, Client * u )
 	if( stat( path, &buf ) != -1 ) {
 		Module *mod;
 		mod = load_perlmodule( path, u );
+		if (!mod) {
+			return NULL;
+		}
 		mod->info->build_date = ns_malloc( 10 );
 		strftime( ( char * )mod->info->build_date, 9, "%d/%m/%y", gmtime( &buf.st_mtime ) );
 		mod->info->build_time = ns_malloc( 11 );

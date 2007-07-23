@@ -38,6 +38,8 @@ typedef int (*perl_xs_init) (void);
 #include <perl.h>
 #include <XSUB.h>
 
+void dump_hash(HV *rethash);
+
 
 /* to get around perl 5.8.0 issues */
 #ifndef XST_mUV
@@ -86,6 +88,5 @@ Module *load_perlmodule(const char *filename, Client *u);
 int load_perlextension(const char *filename, perl_xs_init init_func, Client *u);
 int perl_sync_module(Module *mod);
 int perl_event_cb(const Event evt, const CmdParams *cmdparams, const Module *mod_ptr);
-
 
 #endif /* _PERLMOD_H_ */
