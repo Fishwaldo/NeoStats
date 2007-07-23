@@ -174,9 +174,7 @@ CODE:
 	   lnode = list_first((list_t *)nv->data);;
 	   for (i = 0; i == pos; i++) {
 			lnode = list_next((list_t *)nv->data, lnode);
-printf("iter\n");
 	   }
-printf("%d %d\n", i, pos);
 	   if (lnode) {
 		   RETVAL = perl_encode_namedvars(nv, lnode_get(lnode));
 	   } else
@@ -212,7 +210,7 @@ CODE:
    /* make sure its a hash, not a list */
    if (nv->type == NV_TYPE_HASH) {
 	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
-   } else {
+   } else if (nv->type == NV_TYPE_LIST) {
 	   k    = SvPV(key, klen);
 	   perl_store_namedvars(nv, k, value);
    }	      
@@ -263,7 +261,7 @@ OUTPUT:
 
 #/* get the first entry from a hash */
 
-HV*
+SV*
 FIRSTKEY(self)
    SV *self;
 PREINIT:
@@ -272,7 +270,7 @@ PREINIT:
    nv_list *nv;
    hnode_t *node;
 CODE:
-   RETVAL = (HV *)-1;
+   RETVAL = &PL_sv_undef;
    hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
@@ -281,14 +279,16 @@ CODE:
    if (nv->type == NV_TYPE_HASH) {
 	hash_scan_begin( &nv->iter.hscan, (hash_t *)nv->data);
 	node = hash_scan_next(&nv->iter.hscan);
+	nv->itercount = 0;
 	if (!node) {
-		RETVAL = (HV *)-1;
+		RETVAL = &PL_sv_undef;
 	} else {
-		RETVAL = perl_encode_namedvars(nv, hnode_get(node));
+		RETVAL = newSVpv(hnode_getkey(node), 0);
 	}
    } else if (nv->type == NV_TYPE_LIST) {
 	nv->iter.node = list_first((list_t *)nv->data);
-	RETVAL = perl_encode_namedvars(nv, lnode_get(nv->iter.node));
+	nv->itercount = 0;
+	RETVAL = newSVpv("0", 0);
    }
 POSTCALL:
 	RETURN_UNDEF_IF_FAIL;
@@ -297,7 +297,7 @@ OUTPUT:
 
 #/* get the next entry from a cache */
 
-HV*
+SV*
 NEXTKEY(self, lastkey)
    SV *self;
 PREINIT:
@@ -305,8 +305,9 @@ PREINIT:
    MAGIC *mg;
    hnode_t *node;
    nv_list *nv;
+   char tmpstr[BUFSIZE];
 CODE:
-   RETVAL = (HV *)-1;
+   RETVAL = &PL_sv_undef;
    hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
@@ -314,21 +315,20 @@ CODE:
    /* make sure its a hash, not a list */
    if (nv->type == NV_TYPE_HASH) {
 	node = hash_scan_next(&nv->iter.hscan);
+	nv->itercount++;
 	if (!node) {
-		RETVAL = (HV *)-1;
+		RETVAL = &PL_sv_undef;
 	} else {
-		RETVAL = perl_encode_namedvars(nv, hnode_get(node));
+		RETVAL = newSVpv(hnode_getkey(node), 0);
 	}
    } else if (nv->type == NV_TYPE_LIST) {
-	if (nv->iter.node) {
-		nv->iter.node = list_next((list_t *)nv->data, nv->iter.node);
-		if (nv->iter.node)
-			RETVAL = perl_encode_namedvars(nv, lnode_get(nv->iter.node));
-		else
-			RETVAL = (HV *)-1;
+	nv->itercount++;
+	if (nv->itercount >= list_count((list_t *)nv->data)) {
+		RETVAL = &PL_sv_undef;
 	} else {
-		RETVAL = (HV *)-1;
-        }
+		ircsnprintf(tmpstr, BUFSIZE, "%d", nv->itercount);
+		RETVAL =newSVpv(tmpstr,0);
+	}
    }
 POSTCALL:
 	RETURN_UNDEF_IF_FAIL;

@@ -110,6 +110,7 @@ typedef struct nv_list {
 		struct hscan_t hscan;
 		struct lnode_t *node;
 	} iter;
+	int itercount;
 } nv_list;
 
 extern hash_t *namedvars;

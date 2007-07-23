@@ -301,7 +301,6 @@ void nv_printstruct(void *data, nv_list *item) {
 	}
 }
 
-
 int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 	int i, j;
 	/* first, determine if the structure allows updates */

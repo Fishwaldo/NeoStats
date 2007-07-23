@@ -117,15 +117,23 @@ sub event_pong {
 #		NeoStats::debug("$key => $value");
 #	}
 #
-	my $hostserv = new NeoStats::NV("HostServ");
-#	my $hashtest = $hostserv->{1};
-#	Dump($hostserv);
-	while ( my ($key, $value) = each(%$hostserv)) {
-		NeoStats::debug("Hostserv Key => $value");
-	    	while ( my ($key1, $value1) = each(%$key)) {
+	my $servers = new NeoStats::NV("Servers");
+	while ( my ($key, $value) = each(%$servers)) {
+		NeoStats::debug("Hostserv Key => $value, $key");
+	    	while ( my ($key1, $value1) = each(%$value)) {
         		NeoStats::debug("HS: $key: $key1 => $value1");
     		}
 	}
+
+	my $hostserv = new NeoStats::NV("HostServ");
+#	my $hashtest = $hostserv->{1};
+	while ( my ($key, $value) = each(%$hostserv)) {
+		NeoStats::debug("Hostserv Key => $value, $key");
+	    	while ( my ($key1, $value1) = each(%$value)) {
+        		NeoStats::debug("HS: $key: $key1 => $value1");
+    		}
+	}
+#	Dump($hostserv);
 #	NeoStats::debug("Debug HostServ: ".$hostserv." Ok");
 #	Dump($hostserv);
 #	NeoStats::debug("Var: HostServ".$hostserv->{0}."Fin");
