@@ -133,6 +133,7 @@ void FiniCurl(void)
 {
 	DelTimer("CurlTimeOut");
 	curl_multi_cleanup(curlmultihandle);
+	curl_global_cleanup();
 	list_destroy_auto (activetransfers);
 }
 
