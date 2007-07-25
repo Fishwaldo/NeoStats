@@ -390,23 +390,25 @@ static int event_join( const CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
+/* simple function right? Don't ask how long I spent on this. DNB also tried and ended up going to bed
+ * and in the end, Rothgar got it right! Cheers!
+ */
+
 static void do_limit_set(ls_channel *ls_chan, Channel *c)
 {
 	static char limitsize[10];
- 	unsigned int limit;
-	unsigned int uppergrace;
-	unsigned int lowergrace;
-   
-   	if( c->users != ( c->limit - lsbuffer ) )
-     	{
+      	unsigned int limit;
+        unsigned int grace;
+            
+        if( c->users != ( c->limit - lsbuffer ) )
+        {
         	limit = ( c->users + lsbuffer );
-           	/* if the limit is within the grace, don't change anything */
-              	lowergrace = ( c->limit - lsbuffer - lsgrace );
-                uppergrace = ( c->limit - lsbuffer + lsgrace );
-                if ( c->users >= lowergrace && c->users <= uppergrace ) {
+                /* if the limit is within the grace, don't change anything */
+                grace = abs( limit - c->limit );
+           	if ( grace < lsgrace) {
                 	return;
                 }
-                ircsnprintf( limitsize, 10, "%d", limit );
+                ircsnprintf( limitsize, 10, "%d", limit );    
                 irc_cmode( ls_bot, ls_chan->name, "+l", limitsize );
 	}
 }
