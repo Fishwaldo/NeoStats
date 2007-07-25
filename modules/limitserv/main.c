@@ -283,7 +283,7 @@ static int cmd_add( const CmdParams *cmdparams )
 	CommandReport( ls_bot, "%s added %s to the channel list",
 		cmdparams->source->name, cmdparams->av[0] );
 	if( lsjoin )
-		if( IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
+		if(!IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
 			irc_join( ls_bot, ls_chan->name, NULL);
 	return NS_SUCCESS;
 }
