@@ -114,7 +114,7 @@ static BotInfo ls_botinfo =
 ModuleEvent module_events[] = 
 {
 	{EVENT_JOIN, event_join, 0},
-	{EVENT_CMODE, event_cmode, 0},
+	{EVENT_CMODE, event_cmode, EVENT_FLAG_EXCLUDE_ME},
 	NS_EVENT_END()
 };
 
@@ -490,7 +490,7 @@ static int set_grace_cb( const CmdParams *cmdparams, SET_REASON reason)
 {
 	if (reason == SET_VALIDATE)
 	{
-		if (lsgrace >= lsbuffer) {
+		if (atoi(cmdparams->av[1]) >= lsbuffer) {
 			irc_prefmsg( ls_bot, cmdparams->source, "Grace Setting can not be equal or bigger than Buffer Setting");
 			return NS_FAILURE;
 		}
