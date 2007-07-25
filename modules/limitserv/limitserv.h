@@ -30,3 +30,4 @@ extern const char *help_list[];
 extern const char *help_set_join[];
 extern const char *help_set_buffer[];
 extern const char *help_set_timer[];
+extern const char *help_set_grace[];

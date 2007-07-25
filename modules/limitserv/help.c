@@ -71,3 +71,9 @@ const char *help_set_timer[] = {
 	"Sets the number of seconds between user limit updates",
 	NULL
 };
+const char *help_set_grace[] = {
+	"\2GRACE <number>\2",
+	"Only Changes the Limit Setting when the users increase or decrease by this ammount.",
+	"It can't be equal or bigger than the BUFFER setting",
+	NULL
+};	

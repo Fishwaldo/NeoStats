@@ -5,6 +5,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Lots of Changes to LimitServ (F)
  - Fix a crash on shutdown with Perl Modules Loaded (F)
  - Make sure Perl Modules are not built when perl is disabled. (F)
  - Fix NEO-363, DNS Problem when shutting down (F)

@@ -31,6 +31,7 @@ typedef struct ls_channel {
 static unsigned int lsjoin = 0;
 static unsigned int lsbuffer = 1;
 static unsigned int lstimer = 10;
+static unsigned int lsgrace = 0;
 
 /** Bot command function prototypes */
 static int cmd_add( const CmdParams *cmdparams );
@@ -39,6 +40,7 @@ static int cmd_del( const CmdParams *cmdparams );
 
 /** Event function prototypes */
 static int event_join( const CmdParams *cmdparams );
+static int event_cmode( const CmdParams *cmdparams );
 
 /** Timer function prototypes */
 int limitservtimer(void *userptr);
@@ -46,6 +48,7 @@ int limitservtimer(void *userptr);
 /** Setting callback prototypes */
 static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason );
 static int set_timer_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int set_grace_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 /** hash to store ls_channel and bot info */
 static hash_t *qshash;
@@ -88,8 +91,9 @@ static bot_cmd ls_commands[]=
 static bot_setting ls_settings[]=
 {
 	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0,	NS_ULEVEL_ADMIN, NULL,	help_set_join,		set_join_cb,	(void *)0	},
-	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,		0, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_buffer,	NULL,		(void *)1	},
+	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,		0, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_buffer,	set_grace_cb,	(void *)1	},
 	{"TIMER", 	&lstimer,	SET_TYPE_INT,		1, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_timer,		set_timer_cb,	(void *)10	},
+	{"GRACE",	&lsgrace,	SET_TYPE_INT,		0, 100, NS_ULEVEL_ADMIN, NULL,  help_set_grace, 	set_grace_cb,		(void *)0	},
 	NS_SETTING_END()
 };
 
@@ -110,6 +114,7 @@ static BotInfo ls_botinfo =
 ModuleEvent module_events[] = 
 {
 	{EVENT_JOIN, event_join, 0},
+	{EVENT_CMODE, event_cmode, 0},
 	NS_EVENT_END()
 };
 
@@ -128,6 +133,8 @@ static void JoinChannels( void )
 	hnode_t *node;
 	hscan_t scan;
 
+	if (!lsjoin) 
+		return;
 	hash_scan_begin( &scan, qshash );
 	while( ( node = hash_scan_next( &scan ) ) != NULL ) 
 	{
@@ -136,10 +143,8 @@ static void JoinChannels( void )
 		ls_chan = ( ( ls_channel * )hnode_get( node ) );
 		c = FindChannel( ls_chan->name );
 		if( c )
-		{
-			if( lsjoin )
+			if(!IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
 				irc_join( ls_bot, ls_chan->name, me.servicescmode );
-		}
 	}
 }
 
@@ -385,6 +390,58 @@ static int event_join( const CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
+static void do_limit_set(ls_channel *ls_chan, Channel *c)
+{
+	static char limitsize[10];
+	unsigned int limit;
+	if( c->users != ( c->limit - lsbuffer ) )
+	{
+		limit = ( c->users + lsbuffer );
+		/* if the limit is within the grace, don't change anything */
+		if (c->limit < limit) {
+			/* its a increase in users */
+			if ((limit - c->limit) > lsgrace) {
+				 return;
+			}
+		} else if (c->limit > limit) {
+			/* its a decrease in users */
+			if ((c->limit - limit) > lsgrace) {
+				return; 
+			}
+		}
+		ircsnprintf( limitsize, 10, "%d", limit );	
+		irc_cmode( ls_bot, ls_chan->name, "+l", limitsize );
+	}
+}
+
+/** @brief event_cmode
+ *
+ *  channel mode  event handler
+ *  check that no one removes the l mode on a channel 
+ *
+ *  @params cmdparams pointer to commands param struct
+ *
+ *  @return NS_SUCCESS if suceeds else NS_FAILURE
+ */
+
+static int event_cmode( const CmdParams *cmdparams )
+{
+	ls_channel *ls_chan;
+
+	SET_SEGV_LOCATION();
+	ls_chan = (ls_channel *)hnode_find( qshash, cmdparams->channel->name );
+	if( ls_chan )
+	{
+		/* ok, its a monitored channel, check if our Limit is still set *
+		 * which is easy. Just look at c->limit variable. if its 0, then no 
+		 * limit is set, which is baaaad */
+		if (cmdparams->channel->limit == 0)
+			do_limit_set(ls_chan, cmdparams->channel);
+	}
+	return NS_SUCCESS;
+}
+
+
 /** @brief limitservtimer
  *
  *  update channel user limit
@@ -395,8 +452,6 @@ static int event_join( const CmdParams *cmdparams )
  */
 int limitservtimer(void *userptr) 
 {
-	static char limitsize[10];
-	unsigned int limit;
 	ls_channel *ls_chan;
 	hnode_t *node;
 	hscan_t scan;
@@ -409,14 +464,7 @@ int limitservtimer(void *userptr)
 		ls_chan = ( ( ls_channel * )hnode_get( node ) );
 		c = FindChannel(ls_chan->name);
 		if( c != NULL )
-		{
-			if( c->users != ( c->limit - lsbuffer ) )
-			{
-				limit = ( c->users + lsbuffer );
-				ircsnprintf( limitsize, 10, "%d", limit );	
-				irc_cmode( ls_bot, ls_chan->name, "+l", limitsize );
-			}
-		}		
+			do_limit_set(ls_chan, c);
 	}
 	return NS_SUCCESS;
 }
@@ -439,6 +487,18 @@ static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason )
 			JoinChannels();
 		else
 			PartChannels();
+	}
+	return NS_SUCCESS;
+}
+
+static int set_grace_cb( const CmdParams *cmdparams, SET_REASON reason)
+{
+	if (reason == SET_VALIDATE)
+	{
+		if (lsgrace >= lsbuffer) {
+			irc_prefmsg( ls_bot, cmdparams->source, "Grace Setting can not be equal or bigger than Buffer Setting");
+			return NS_FAILURE;
+		}
 	}
 	return NS_SUCCESS;
 }

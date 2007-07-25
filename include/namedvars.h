@@ -74,7 +74,7 @@ typedef struct nv_fields {
 typedef struct nv_item {
 	char *key;
 	int no_fields;
-	nv_fields *fields[];
+	nv_fields **fields;
 } nv_item;
 
 

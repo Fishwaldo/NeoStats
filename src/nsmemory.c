@@ -122,9 +122,25 @@ void *ns_realloc( void *ptr, size_t size )
 
 void _ns_free( void **ptr )
 {
+#ifdef HAVE_BACKTRACE
+	void *array[MAXBACKTRACESIZE];
+	size_t size;
+	char **strings;
+	size_t i;
+#endif
 	if( !*ptr )
 	{
 		dlog( DEBUG2, "ns_free: illegal attempt to free NULL pointer" );
+#ifdef DEBUG
+#ifdef HAVE_BACKTRACE
+		size = backtrace( array, MAXBACKTRACESIZE );
+		strings = backtrace_symbols( array, size );
+		for( i = 1; i < size; i++ ) {
+			printf("BackTrace (%d) : %s", (int) i - 1, strings[i] );
+		}
+#endif /* HAVE_BACKTRACE */
+		printf("Location: %s\n", segv_location );
+#endif
 		return;
 	}
 	free( *ptr );
