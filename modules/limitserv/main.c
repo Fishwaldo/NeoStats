@@ -400,12 +400,12 @@ static void do_limit_set(ls_channel *ls_chan, Channel *c)
 		/* if the limit is within the grace, don't change anything */
 		if (c->limit < limit) {
 			/* its a increase in users */
-			if ((limit - c->limit) > lsgrace) {
+			if ((limit - c->limit) < lsgrace) {
 				 return;
 			}
 		} else if (c->limit > limit) {
 			/* its a decrease in users */
-			if ((c->limit - limit) > lsgrace) {
+			if ((c->limit - limit) < lsgrace) {
 				return; 
 			}
 		}
