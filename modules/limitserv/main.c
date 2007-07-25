@@ -393,19 +393,21 @@ static int event_join( const CmdParams *cmdparams )
 static void do_limit_set(ls_channel *ls_chan, Channel *c)
 {
 	static char limitsize[10];
-	unsigned int limit;
-	unsigned int grace;
-	
-	if( c->users != ( c->limit - lsbuffer ) )
-	{
-		limit = ( c->users + lsbuffer );
-		/* if the limit is within the grace, don't change anything */
-		grace = ( limit - c->limit );
-   		if ( grace < lsgrace) {
-          		return;
-             	}
-		ircsnprintf( limitsize, 10, "%d", limit );	
-		irc_cmode( ls_bot, ls_chan->name, "+l", limitsize );
+ 	unsigned int limit;
+	unsigned int uppergrace;
+	unsigned int lowergrace;
+   
+   	if( c->users != ( c->limit - lsbuffer ) )
+     	{
+        	limit = ( c->users + lsbuffer );
+           	/* if the limit is within the grace, don't change anything */
+              	lowergrace = ( c->limit - lsbuffer - lsgrace );
+                uppergrace = ( c->limit - lsbuffer + lsgrace );
+                if ( c->users >= lowergrace && c->users =< uppergrace ) {
+                	return;
+                }
+                ircsnprintf( limitsize, 10, "%d", limit );
+                irc_cmode( ls_bot, ls_chan->name, "+l", limitsize );
 	}
 }
 
