@@ -394,21 +394,16 @@ static void do_limit_set(ls_channel *ls_chan, Channel *c)
 {
 	static char limitsize[10];
 	unsigned int limit;
+	unsigned int grace;
+	
 	if( c->users != ( c->limit - lsbuffer ) )
 	{
 		limit = ( c->users + lsbuffer );
 		/* if the limit is within the grace, don't change anything */
-		if (c->limit < limit) {
-			/* its a increase in users */
-			if ((limit - c->limit) < lsgrace) {
-				 return;
-			}
-		} else if (c->limit > limit) {
-			/* its a decrease in users */
-			if ((c->limit - limit) < lsgrace) {
-				return; 
-			}
-		}
+		grace = ( limit - c->limit );
+   		if ( grace < lsgrace) {
+          		return;
+             	}
 		ircsnprintf( limitsize, 10, "%d", limit );	
 		irc_cmode( ls_bot, ls_chan->name, "+l", limitsize );
 	}
