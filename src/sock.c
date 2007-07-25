@@ -167,7 +167,7 @@ void Connect( void )
 	SET_SEGV_LOCATION();
 	nlog (LOG_NOTICE, "Connecting to %s:%d", me.uplink, me.port);
 	mysock = ConnectTo (me.uplink, me.port);
-	if (mysock <= 0) {
+	if (mysock == INVALID_SOCKET) {
 		nlog (LOG_WARNING, "Unable to connect to %s", me.uplink);
 	} else {
 		me.servsock=add_linemode_socket("IRCd", mysock, irc_parse, irc_sock_error, NULL);
