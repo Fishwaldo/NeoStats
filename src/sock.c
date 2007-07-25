@@ -461,6 +461,7 @@ static Sock *new_sock(const char *sock_name)
 	strlcpy( sock->name, sock_name, MAX_MOD_NAME );
 	sock->moduleptr = GET_CUR_MODULE();
 	hnode_create_insert( sockethash, sock, sock->name );
+	me.cursocks++;
 	return sock;
 }
 
@@ -785,6 +786,8 @@ Sock *AddSock( SOCK_TYPE type, const char *sock_name, int socknum, sockfunccb re
 		return NULL;
 	}
 	sock = new_sock (sock_name);
+	if (!sock)
+		return NULL;
 	sock->socktype = type;
 	sock->sock_no = socknum;
 	sock->data = data;
@@ -853,6 +856,7 @@ int DelSock( Sock *sock )
 		hash_delete_destroy_node( sockethash, sn );
 		ns_free( sock );
 		sock = NULL;
+		me.cursocks--;
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
