@@ -101,7 +101,7 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 }
 
 
-#ifndef WIN32
+
 int dump_namedvars(char *name2)
 {
 	hnode_t *node, *node2;
@@ -145,21 +145,21 @@ char *nv_gf_string(const void *data, const nv_list *item, const int field) {
 	void *data2;
 	if (item->format[field].type == NV_PSTR) {
 		if (item->format[field].fldoffset != -1) {
-			data2 = (void *)data + item->format[field].fldoffset;
+			data2 = (void *)((int)data + item->format[field].fldoffset);
 			data2 = (void *)*((int *)data2);
 		} else {
 			data2 = (void *)data;
 		}		
 
-		output = (char *)*(int *)(data2 + item->format[field].offset);
+		output = (char *)*(int *)((int)data2 + item->format[field].offset);
 	} else if (item->format[field].type == NV_STR) {
 		if (item->format[field].fldoffset != -1) {
-			data2 = (void *)data + item->format[field].fldoffset;
+			data2 = (void *)((int)data + item->format[field].fldoffset);
 			data2 = (void *)*((int *)data2);
 		} else {
 			data2 = (void *)data;
 		}		
-		output = (char *)(data2 + item->format[field].offset);
+		output = (char *)((int)data2 + item->format[field].offset);
 	} else {
 		nlog(LOG_WARNING, "nv_gf_string: Field is not a string %d", field);
 		return NULL;
@@ -181,12 +181,12 @@ int nv_gf_int(const void *data, const nv_list *item, const int field) {
 		return 0;
 	}
 	if (item->format[field].fldoffset != -1) {
-		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)((int)data + item->format[field].fldoffset);
 		data2 = (void *)*((int *)data2);
 	} else {
 		data2 = (void *)data;
 	}		
-	output = *((int *)(data2 + item->format[field].offset));
+	output = *((int *)((int)data2 + item->format[field].offset));
 	return output;
 }
 
@@ -198,12 +198,12 @@ long nv_gf_long(const void *data, const nv_list *item, const int field) {
 		return 0;
 	}
 	if (item->format[field].fldoffset != -1) {
-		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)((int)data + item->format[field].fldoffset);
 		data2 = (void *)*((int *)data2);
 	} else {
 		data2 = (void *)data;
 	}		
-	output = *((long *)(data2 + item->format[field].offset));
+	output = *((long *)((int)data2 + item->format[field].offset));
 	return output;
 }
 
@@ -216,12 +216,12 @@ char **nv_gf_stringa(const void *data, const nv_list *item, const int field) {
 		return NULL;
 	}
 	if (item->format[field].fldoffset != -1) {
-		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)((int)data + item->format[field].fldoffset);
 		data2 = (void *)*((int *)data2);
 	} else {
 		data2 = (void *)data;
 	}		
-	output = (char **)*(int *)(data2 + item->format[field].offset);
+	output = (char **)*(int *)((int)data2 + item->format[field].offset);
 #ifdef DEBUG
 	k = 0;
 	while (output && output[k] != NULL) {
@@ -242,12 +242,12 @@ void *nv_gf_complex(const void *data, const nv_list *item, const int field) {
 	}
 #endif
 	if (item->format[field].fldoffset != -1) {
-		data2 = (void *)data + item->format[field].fldoffset;
+		data2 = (void *)((int)data + item->format[field].fldoffset);
 		data2 = (void *)*((int *)data2);
 	} else {
 		data2 = (void *)data;
 	}		
-	output = (void *)data2 + item->format[field].offset;
+	output = (void *)((int)data2 + item->format[field].offset);
 	return output;
 }
 
@@ -313,7 +313,7 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 		i = 0;
 		while (data->format[i].fldname != NULL) {
 			for (j = 0; j > item->no_fields; j++) {
-				if (!strcasecmp(data->format[i].fldname, item->fields[j]->name)) {
+				if (!ircstrcasecmp(data->format[i].fldname, item->fields[j]->name)) {
 					if (data->format[i].flags & NV_FLG_RO) {
 						nlog(LOG_WARNING, "Attempt to update a read only field %s in structure %s", data->format[i].fldname, data->name);
 						return NS_FAILURE;
@@ -344,6 +344,3 @@ int nv_get_field_item(nv_item *item, char *fldname) {
 	nlog(LOG_WARNING, "Attempt to get a unknown field in nv_get_field_item");
 	return -1;
 }
-
-
-#endif /* WIN32 */
