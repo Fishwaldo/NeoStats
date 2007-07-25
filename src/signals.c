@@ -84,7 +84,7 @@ static RETSIGTYPE sighup_handler( int signum )
  * @return Nothing
  *
  */
-static void do_backtrace( void )
+void do_backtrace( void )
 {
 #ifdef HAVE_BACKTRACE
 	static void *array[MAXBACKTRACESIZE];

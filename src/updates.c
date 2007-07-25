@@ -512,7 +512,7 @@ static int mqsread(void *data, void *notused, int len) {
 		/* timeout */
 		nlog(LOG_WARNING, "Timeout Connecting to MQ Server");
 		ResetMQ();
-		return NS_FAILURE;
+		return NS_SUCCESS;
 	}
 	if (len <= 0) {
 		/* EOF etc */

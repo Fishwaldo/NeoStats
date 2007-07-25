@@ -41,6 +41,9 @@ static hash_t *sockethash;
 
 char recbuf[BUFSIZE];
 
+/* temp till we figure out our DelSock Issues */
+void do_backtrace();
+
 /** @brief Event Subsystem Callback
  */
 static void libevent_log(int severity, const char *msg) 
@@ -837,12 +840,19 @@ int DelSock( Sock *sock )
 	hnode_t *sn;
 
 	SET_SEGV_LOCATION();
+	if (sock == NULL) {
+		/* its a double Del! Oh Oh. Print a BackTrace! */
+		nlog(LOG_WARNING, "DelSock: Double Delete?");
+		do_backtrace();
+		return NS_SUCCESS;
+	}
 	CloseSock( sock );
 	if( ( sn = hash_lookup( sockethash, sock->name ) ) != NULL ) {
 		sock = hnode_get( sn );
 		dlog( DEBUG2, "DelSock: deleting socket %s from module %s", sock->name, sock->moduleptr->info->name );
 		hash_delete_destroy_node( sockethash, sn );
 		ns_free( sock );
+		sock = NULL;
 		return NS_SUCCESS;
 	}
 	return NS_FAILURE;
