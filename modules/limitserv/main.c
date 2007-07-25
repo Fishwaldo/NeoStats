@@ -138,7 +138,7 @@ static void JoinChannels( void )
 		if( c )
 		{
 			if( lsjoin )
-				irc_join( ls_bot, ls_chan->name, "+o" );
+				irc_join( ls_bot, ls_chan->name, me.servicescmode );
 		}
 	}
 }
@@ -284,7 +284,7 @@ static int cmd_add( const CmdParams *cmdparams )
 		cmdparams->source->name, cmdparams->av[0] );
 	if( lsjoin )
 		if(!IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
-			irc_join( ls_bot, ls_chan->name, NULL);
+			irc_join( ls_bot, ls_chan->name, me.servicescmode);
 	return NS_SUCCESS;
 }
 
@@ -380,7 +380,7 @@ static int event_join( const CmdParams *cmdparams )
 	{
 		/* Join channel if we are not a member */
 		if( lsjoin && !IsChannelMember( cmdparams->channel, ls_bot->u ) )
-			irc_join( ls_bot, ls_chan->name, "+o" );
+			irc_join( ls_bot, ls_chan->name, me.servicescmode );
 	}
 	return NS_SUCCESS;
 }
