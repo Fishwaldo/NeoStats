@@ -403,7 +403,7 @@ static void do_limit_set(ls_channel *ls_chan, Channel *c)
            	/* if the limit is within the grace, don't change anything */
               	lowergrace = ( c->limit - lsbuffer - lsgrace );
                 uppergrace = ( c->limit - lsbuffer + lsgrace );
-                if ( c->users >= lowergrace && c->users =< uppergrace ) {
+                if ( c->users >= lowergrace && c->users <= uppergrace ) {
                 	return;
                 }
                 ircsnprintf( limitsize, 10, "%d", limit );
