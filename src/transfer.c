@@ -69,6 +69,7 @@ static CURLM *curlmultihandle;
 static list_t *activetransfers;
 static int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp);
 static int curltimercallback(void *);
+static void transfer_status( void );
 #undef CURL_TEST 
 /* #define CURL_TEST 1 */
 #ifdef CURL_TEST
@@ -173,6 +174,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 			writesize = -1;
 			break;
 	}
+	transfer_status();
 	return writesize;
 }
 
@@ -356,11 +358,11 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}
 	/* we have to do this at least once to get things going */
 	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket_all(curlmultihandle, &ret)) {
+		transfer_status();
 	}
 	return NS_SUCCESS;
 }
 
-#ifdef CURLHACK
 static void transfer_status( void ) 
 {
 	CURLMsg *msg;
@@ -406,6 +408,7 @@ static void transfer_status( void )
 		}
 	}
 }
+#ifdef CURLHACK
 
 void CurlHackReadLoop( void )
 {
@@ -444,6 +447,7 @@ int curl_read(void *userp, void *data, int size) {
 	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket(curlmultihandle, sock, &ret))
 	{
 	}
+	transfer_status();
 	return NS_SUCCESS;
 }
 int curl_write(int socket, void *userp) {
@@ -451,6 +455,7 @@ int curl_write(int socket, void *userp) {
 	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket(curlmultihandle, socket, &ret))
 	{
 	}
+	transfer_status();
 	return NS_SUCCESS;
 }
 static void update_timeout(CURLM *multi_handle)
@@ -477,7 +482,9 @@ static int curltimercallback(void *userp)
         do {
         	rc = curl_multi_socket(multi_handle, CURL_SOCKET_TIMEOUT,
         		&running_handles);
+
         } while (rc == CURLM_CALL_MULTI_PERFORM);
+	transfer_status();
         if(running_handles)
         	/* Get the current timeout value from libcurl and set a new timeout */
         	update_timeout(multi_handle);
