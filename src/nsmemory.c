@@ -25,6 +25,9 @@
 
 #include "neostats.h"
 #include "main.h"
+#ifdef HAVE_BACKTRACE
+#include <execinfo.h>
+#endif
 
 /** @brief ns_malloc
  *

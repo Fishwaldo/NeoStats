@@ -841,6 +841,7 @@ void ChanModeHandler( Channel *c, const char *modes, int avindex, char **av, int
 				if( mask == CMODE_LIMIT )
 				{
 					c->limit = 0;
+
 				}
 				else if( mask == CMODE_KEY )
 				{
@@ -900,10 +901,11 @@ void ChanMode( char *origin, char **av, int ac )
 	{
 		AddStringToList( &cmdparams->av, av[i], &cmdparams->ac );	
 	}
+	/* update internal lists before we send out the event */
+	ChanModeHandler( c, av[1], 2, av, ac );
 	SendAllModuleEvent( EVENT_CMODE, cmdparams );
 	ns_free( cmdparams->av );
 	ns_free( cmdparams );	
-	ChanModeHandler( c, av[1], 2, av, ac );
 }
 
 /** @brief
