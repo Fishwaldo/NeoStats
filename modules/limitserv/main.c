@@ -39,7 +39,7 @@ static int cmd_list( const CmdParams *cmdparams );
 static int cmd_del( const CmdParams *cmdparams );
 
 /** Event function prototypes */
-static int event_join( const CmdParams *cmdparams );
+static int event_join_part_kick( const CmdParams *cmdparams );
 static int event_cmode( const CmdParams *cmdparams );
 
 /** Timer function prototypes */
@@ -113,7 +113,9 @@ static BotInfo ls_botinfo =
 /** Module Events */
 ModuleEvent module_events[] = 
 {
-	{EVENT_JOIN, event_join, 0},
+	{EVENT_JOIN, event_join_part_kick, 0},
+	{EVENT_PART, event_join_part_kick, 0},
+	{EVENT_KICK, event_join_part_kick, 0},
 	{EVENT_CMODE, event_cmode, EVENT_FLAG_EXCLUDE_ME},
 	NS_EVENT_END()
 };
@@ -365,7 +367,7 @@ static int cmd_del( const CmdParams *cmdparams )
 	return NS_SUCCESS;
 }
 
-/** @brief event_join
+/** @brief event_join_part_kick
  *
  *  join event handler
  *  join channels if we need to and manage limit on channels
@@ -375,7 +377,7 @@ static int cmd_del( const CmdParams *cmdparams )
  *  @return NS_SUCCESS if suceeds else NS_FAILURE
  */
 
-static int event_join( const CmdParams *cmdparams )
+static int event_join_part_kick( const CmdParams *cmdparams )
 {
 	ls_channel *ls_chan;
 
