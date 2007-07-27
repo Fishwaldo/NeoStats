@@ -33,6 +33,9 @@ static unsigned int lsbuffer = 1;
 static unsigned int lstimer = 10;
 static unsigned int lsgrace = 0;
 
+/** Limit function prototypes */
+static void do_limit_set(ls_channel *ls_chan, Channel *c);
+
 /** Bot command function prototypes */
 static int cmd_add( const CmdParams *cmdparams );
 static int cmd_list( const CmdParams *cmdparams );
@@ -135,8 +138,6 @@ static void JoinChannels( void )
 	hnode_t *node;
 	hscan_t scan;
 
-	if (!lsjoin) 
-		return;
 	hash_scan_begin( &scan, qshash );
 	while( ( node = hash_scan_next( &scan ) ) != NULL ) 
 	{
@@ -145,8 +146,14 @@ static void JoinChannels( void )
 		ls_chan = ( ( ls_channel * )hnode_get( node ) );
 		c = FindChannel( ls_chan->name );
 		if( c )
-			if(!IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
-				irc_join( ls_bot, ls_chan->name, me.servicescmode );
+		{
+			do_limit_set(ls_chan, c);
+			if (lsjoin) 
+			{
+				if(!IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
+					irc_join( ls_bot, ls_chan->name, me.servicescmode );
+			}
+		}
 	}
 }
 
@@ -275,6 +282,7 @@ int ModFini( void )
 static int cmd_add( const CmdParams *cmdparams )
 {
 	ls_channel *ls_chan;
+	Channel *c;
 
 	SET_SEGV_LOCATION();
 	if( hash_lookup( qshash, cmdparams->av[0] ) != NULL ) 
@@ -289,9 +297,11 @@ static int cmd_add( const CmdParams *cmdparams )
 	DBAStore( "channels", ls_chan->name, ( void * )ls_chan->name, MAXCHANLEN );
 	CommandReport( ls_bot, "%s added %s to the channel list",
 		cmdparams->source->name, cmdparams->av[0] );
+	c = FindChannel( ls_chan->name );
 	if( lsjoin )
 		if(!IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
 			irc_join( ls_bot, ls_chan->name, me.servicescmode);
+	do_limit_set(ls_chan, c);
 	return NS_SUCCESS;
 }
 

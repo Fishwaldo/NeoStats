@@ -76,4 +76,4 @@ const char *help_set_grace[] = {
 	"Only Changes the Limit Setting when the users increase or decrease by this ammount.",
 	"It can't be equal or bigger than the BUFFER setting",
 	NULL
-};	
+};
