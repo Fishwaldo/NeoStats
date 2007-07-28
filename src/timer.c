@@ -461,6 +461,24 @@ int ns_cmd_timerlist( const CmdParams *cmdparams )
 		timer = hnode_get( tn );
 		irc_prefmsg( ns_botptr, cmdparams->source, "%s:", timer->moduleptr->info->name );
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Timer: %s", cmdparams->source ), timer->name );
+		switch( timer->type )
+		{
+			case TIMER_TYPE_DAILY:
+				irc_prefmsg( ns_botptr, cmdparams->source, "Timer Type: Daily");
+				break;
+			case TIMER_TYPE_WEEKLY:
+				irc_prefmsg( ns_botptr, cmdparams->source, "Timer Type: Weekly");
+				break;
+			case TIMER_TYPE_MONTHLY:
+				irc_prefmsg( ns_botptr, cmdparams->source, "Timer Type: Monthly");
+				break;
+			case TIMER_TYPE_INTERVAL:
+				irc_prefmsg( ns_botptr, cmdparams->source, "Timer Type: Interval");
+				break;
+			case TIMER_TYPE_COUNTDOWN:
+				irc_prefmsg( ns_botptr, cmdparams->source, "Timer Type: Countdown");
+				break;
+		}
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Interval: %ld", cmdparams->source ), ( long )timer->interval );
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Next run in: %ld", cmdparams->source ), ( long )( timer->interval -( me.now - timer->lastrun ) ) );
 	}
