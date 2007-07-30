@@ -69,7 +69,6 @@ struct epollop {
 	struct epoll_event *events;
 	int nevents;
 	int epfd;
-	sigset_t evsigmask;
 };
 
 void *epoll_init	(void);
@@ -77,6 +76,7 @@ int epoll_add	(void *, struct event *);
 int epoll_del	(void *, struct event *);
 int epoll_recalc	(struct event_base *, void *, int);
 int epoll_dispatch	(struct event_base *, void *, struct timeval *);
+void epoll_dealloc	(void *);
 
 struct eventop epollops = {
 	"epoll",
@@ -84,7 +84,8 @@ struct eventop epollops = {
 	epoll_add,
 	epoll_del,
 	epoll_recalc,
-	epoll_dispatch
+	epoll_dispatch,
+	epoll_dealloc
 };
 
 #ifdef HAVE_SETFD
@@ -110,8 +111,14 @@ epoll_init(void)
 		return (NULL);
 
 	if (getrlimit(RLIMIT_NOFILE, &rl) == 0 &&
-	    rl.rlim_cur != RLIM_INFINITY)
-		nfiles = rl.rlim_cur;
+	    rl.rlim_cur != RLIM_INFINITY) {
+		/*
+		 * Solaris is somewhat retarded - it's important to drop
+		 * backwards compatibility when making changes.  So, don't
+		 * dare to put rl.rlim_cur here.
+		 */
+		nfiles = rl.rlim_cur - 1;
+	}
 
 	/* Initalize the kernel queue */
 
@@ -143,7 +150,7 @@ epoll_init(void)
 	}
 	epollop->nfds = nfiles;
 
-	evsignal_init(&epollop->evsigmask);
+	evsignal_init();
 
 	return (epollop);
 }
@@ -172,7 +179,7 @@ epoll_recalc(struct event_base *base, void *arg, int max)
 		epollop->nfds = nfds;
 	}
 
-	return (evsignal_recalc(&epollop->evsigmask));
+	return (0);
 }
 
 int
@@ -183,14 +190,8 @@ epoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	struct evepoll *evep;
 	int i, res, timeout;
 
-	if (evsignal_deliver(&epollop->evsigmask) == -1)
-		return (-1);
-
 	timeout = tv->tv_sec * 1000 + (tv->tv_usec + 999) / 1000;
 	res = epoll_wait(epollop->epfd, events, epollop->nevents, timeout);
-
-	if (evsignal_recalc(&epollop->evsigmask) == -1)
-		return (-1);
 
 	if (res == -1) {
 		if (errno != EINTR) {
@@ -255,7 +256,7 @@ epoll_add(void *arg, struct event *ev)
 	int fd, op, events;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_add(&epollop->evsigmask, ev));
+		return (evsignal_add(ev));
 
 	fd = ev->ev_fd;
 	if (fd >= epollop->nfds) {
@@ -304,7 +305,7 @@ epoll_del(void *arg, struct event *ev)
 	int needwritedelete = 1, needreaddelete = 1;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_del(&epollop->evsigmask, ev));
+		return (evsignal_del(ev));
 
 	fd = ev->ev_fd;
 	if (fd >= epollop->nfds)
@@ -343,5 +344,21 @@ epoll_del(void *arg, struct event *ev)
 		return (-1);
 
 	return (0);
+}
+
+void
+epoll_dealloc(void *arg)
+{
+	struct epollop *epollop = arg;
+
+	if (epollop->fds)
+		free(epollop->fds);
+	if (epollop->events)
+		free(epollop->events);
+	if (epollop->epfd >= 0)
+		close(epollop->epfd);
+
+	memset(epollop, 0, sizeof(struct epollop));
+	free(epollop);
 }
 #endif

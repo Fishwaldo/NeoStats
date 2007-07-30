@@ -64,8 +64,8 @@ int InitTimers( void )
 	timers = ns_malloc( sizeof( struct event ) );
 	timerclear( &tv );
 	tv.tv_sec = 1;
-	event_set( timers, 0, EV_TIMEOUT|EV_PERSIST, CheckTimers_cb, NULL );
-	event_add( timers, &tv );
+	evtimer_set( timers, CheckTimers_cb, NULL );
+	evtimer_add( timers, &tv );
 	return NS_SUCCESS;
 }
 
@@ -83,7 +83,7 @@ void FiniTimers( void )
 {
 	hscan_t tscan;
 	hnode_t *tn;
-	event_del( timers );
+	evtimer_del( timers );
 	os_free( timers );
 
 	if (hash_count(timerhash) > 0) {
@@ -224,6 +224,7 @@ void CheckTimers_cb( int notused, short event, void *arg )
 	struct timeval tv;
 
 	SET_SEGV_LOCATION();
+	update_time_now();
 	timerclear( &tv );
 	tv.tv_sec = 1;
 	if( ( me.now - me.tslastping ) > nsconfig.pingtime )
@@ -239,7 +240,6 @@ void CheckTimers_cb( int notused, short event, void *arg )
 		{
 			/* The above check does not need to be exact, but 
 			   setting times ought to be so reset me.now */
-			update_time_now();
 			irc_svstime( ns_botptr, NULL, me.now );
 			lastservertimesync = me.now;
 		}

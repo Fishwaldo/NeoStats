@@ -77,6 +77,7 @@ int kq_del	(void *, struct event *);
 int kq_recalc	(struct event_base *, void *, int);
 int kq_dispatch	(struct event_base *, void *, struct timeval *);
 int kq_insert	(struct kqop *, struct kevent *);
+void kq_dealloc (void *);
 
 const struct eventop kqops = {
 	"kqueue",
@@ -84,7 +85,8 @@ const struct eventop kqops = {
 	kq_add,
 	kq_del,
 	kq_recalc,
-	kq_dispatch
+	kq_dispatch,
+	kq_dealloc
 };
 
 void *
@@ -268,10 +270,8 @@ kq_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 		if (!which)
 			continue;
 
-		if (!(ev->ev_events & EV_PERSIST)) {
-			ev->ev_flags &= ~EVLIST_X_KQINKERNEL;
+		if (!(ev->ev_events & EV_PERSIST))
 			event_del(ev);
-		}
 
 		event_active(ev, which,
 		    ev->ev_events & EV_SIGNAL ? events[i].data : 1);
@@ -358,7 +358,7 @@ kq_del(void *arg, struct event *ev)
 		int nsignal = EVENT_SIGNAL(ev);
 
  		memset(&kev, 0, sizeof(kev));
-		kev.ident = (int)signal;
+		kev.ident = nsignal;
 		kev.filter = EVFILT_SIGNAL;
 		kev.flags = EV_DELETE;
 		
@@ -397,5 +397,20 @@ kq_del(void *arg, struct event *ev)
 	}
 
 	return (0);
+}
+
+void
+kq_dealloc(void *arg)
+{
+	struct kqop *kqop = arg;
+
+	if (kqop->changes)
+		free(kqop->changes);
+	if (kqop->events)
+		free(kqop->events);
+	if (kqop->kq)
+		close(kqop->kq);
+	memset(kqop, 0, sizeof(struct kqop));
+	free(kqop);
 }
 #endif

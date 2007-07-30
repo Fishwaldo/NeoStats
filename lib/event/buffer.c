@@ -120,45 +120,64 @@ evbuffer_add_buffer(struct evbuffer *outbuf, struct evbuffer *inbuf)
 	}
 
 	res = evbuffer_add(outbuf, inbuf->buffer, inbuf->off);
-	if (res == 0)
+	if (res == 0) {
+		/* We drain the input buffer on success */
 		evbuffer_drain(inbuf, inbuf->off);
+	}
 
 	return (res);
 }
 
 int
-evbuffer_add_printf(struct evbuffer *buf, char *fmt, ...)
+evbuffer_add_vprintf(struct evbuffer *buf, const char *fmt, va_list ap)
+{
+	char *buffer;
+	size_t space;
+	size_t oldoff = buf->off;
+	int sz;
+	va_list aq;
+
+	for (;;) {
+		buffer = (char *)buf->buffer + buf->off;
+		space = buf->totallen - buf->misalign - buf->off;
+
+#ifndef va_copy
+#define	va_copy(dst, src)	memcpy(&(dst), &(src), sizeof(va_list))
+#endif
+		va_copy(aq, ap);
+
+#ifdef WIN32
+		sz = vsnprintf(buffer, space - 1, fmt, aq);
+		buffer[space - 1] = '\0';
+#else
+		sz = vsnprintf(buffer, space, fmt, aq);
+#endif
+
+		va_end(aq);
+
+		if (sz == -1)
+			return (-1);
+		if (sz < space) {
+			buf->off += sz;
+			if (buf->cb != NULL)
+				(*buf->cb)(buf, oldoff, buf->off, buf->cbarg);
+			return (sz);
+		}
+		if (evbuffer_expand(buf, sz + 1) == -1)
+			return (-1);
+
+	}
+	/* NOTREACHED */
+}
+
+int
+evbuffer_add_printf(struct evbuffer *buf, const char *fmt, ...)
 {
 	int res = -1;
-	char *msg;
-#ifndef HAVE_VASPRINTF
-	static char buffer[4096];
-#endif
 	va_list ap;
 
 	va_start(ap, fmt);
-
-#ifdef HAVE_VASPRINTF
-	if (vasprintf(&msg, fmt, ap) == -1)
-		goto end;
-#else
-#  ifdef WIN32
-	_vsnprintf(buffer, sizeof(buffer) - 1, fmt, ap);
-	buffer[sizeof(buffer)-1] = '\0';
-#  else /* ! WIN32 */
-	vsnprintf(buffer, sizeof(buffer), fmt, ap);
-#  endif
-	msg = buffer;
-#endif
-	
-	res = strlen(msg);
-	if (evbuffer_add(buf, msg, res) == -1)
-		res = -1;
-#ifdef HAVE_VASPRINTF
-	free(msg);
-
-end:
-#endif
+	res = evbuffer_add_vprintf(buf, fmt, ap);
 	va_end(ap);
 
 	return (res);
@@ -187,16 +206,16 @@ evbuffer_remove(struct evbuffer *buf, void *data, size_t datlen)
 char *
 evbuffer_readline(struct evbuffer *buffer)
 {
-	char *data = (char *)EVBUFFER_DATA(buffer);
+	u_char *data = EVBUFFER_DATA(buffer);
 	size_t len = EVBUFFER_LENGTH(buffer);
 	char *line;
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < len; i++) {
 		if (data[i] == '\r' || data[i] == '\n')
 			break;
 	}
-	
+
 	if (i == len)
 		return (NULL);
 
@@ -275,7 +294,7 @@ evbuffer_expand(struct evbuffer *buf, size_t datlen)
 }
 
 int
-evbuffer_add(struct evbuffer *buf, void *data, size_t datlen)
+evbuffer_add(struct evbuffer *buf, const void *data, size_t datlen)
 {
 	size_t need = buf->misalign + buf->off + datlen;
 	size_t oldoff = buf->off;
@@ -330,10 +349,26 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	u_char *p;
 	size_t oldoff = buf->off;
 	int n = EVBUFFER_MAX_READ;
+#ifdef WIN32
+	DWORD dwBytesRead;
+#endif
 
-#ifndef WIN32
-	if (ioctl(fd, FIONREAD, &n) == -1 || n == 0)
+#ifdef FIONREAD
+	if (ioctl(fd, FIONREAD, &n) == -1 || n == 0) {
 		n = EVBUFFER_MAX_READ;
+	} else if (n > EVBUFFER_MAX_READ && n > howmuch) {
+		/*
+		 * It's possible that a lot of data is available for
+		 * reading.  We do not want to exhaust resources
+		 * before the reader has a chance to do something
+		 * about it.  If the reader does not tell us how much
+		 * data we should read, we artifically limit it.
+		 */
+		if (n > buf->totallen << 2)
+			n = buf->totallen << 2;
+		if (n < EVBUFFER_MAX_READ)
+			n = EVBUFFER_MAX_READ;
+	}
 #endif	
 	if (howmuch < 0 || howmuch > n)
 		howmuch = n;
@@ -352,12 +387,12 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	if (n == 0)
 		return (0);
 #else
-	n = recv( fd, p, howmuch, 0 ); 
-	errno = GetLastError();
-	if (n == -1)
-		return (-1);
+	n = ReadFile((HANDLE)fd, p, howmuch, &dwBytesRead, NULL);
 	if (n == 0)
+		return (-1);
+	if (dwBytesRead == 0)
 		return (0);
+	n = dwBytesRead;
 #endif
 
 	buf->off += n;
@@ -373,7 +408,10 @@ int
 evbuffer_write(struct evbuffer *buffer, int fd)
 {
 	int n;
-	
+#ifdef WIN32
+	DWORD dwBytesWritten;
+#endif
+
 #ifndef WIN32
 	n = write(fd, buffer->buffer, buffer->off);
 	if (n == -1)
@@ -381,31 +419,32 @@ evbuffer_write(struct evbuffer *buffer, int fd)
 	if (n == 0)
 		return (0);
 #else
-	n = send( fd, buffer->buffer, buffer->off, 0 );
-	if (n == -1)
-		return (-1);
+	n = WriteFile((HANDLE)fd, buffer->buffer, buffer->off, &dwBytesWritten, NULL);
 	if (n == 0)
+		return (-1);
+	if (dwBytesWritten == 0)
 		return (0);
+	n = dwBytesWritten;
 #endif
-
 	evbuffer_drain(buffer, n);
 
 	return (n);
 }
 
 u_char *
-evbuffer_find(struct evbuffer *buffer, u_char *what, size_t len)
+evbuffer_find(struct evbuffer *buffer, const u_char *what, size_t len)
 {
 	size_t remain = buffer->off;
 	u_char *search = buffer->buffer;
 	u_char *p;
 
-	while ((p = memchr(search, *what, remain)) != NULL && remain >= len) {
+	while ((p = memchr(search, *what, remain)) != NULL) {
+		remain = buffer->off - (size_t)(search - buffer->buffer);
+		if (remain < len)
+			break;
 		if (memcmp(p, what, len) == 0)
 			return (p);
-
 		search = p + 1;
-		remain = buffer->off - (size_t)(search - buffer->buffer);
 	}
 
 	return (NULL);

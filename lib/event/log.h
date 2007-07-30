@@ -33,11 +33,11 @@ void event_errx(int eval, const char *fmt, ...);
 void event_warnx(const char *fmt, ...);
 void event_msgx(const char *fmt, ...);
 void _event_debugx(const char *fmt, ...);
-#undef USE_DEBUG
+
 #ifdef USE_DEBUG
 #define event_debug(x) _event_debugx x
 #else
-#define event_debug(x)
+#define event_debug(x) do {;} while (0)
 #endif
 
 #endif

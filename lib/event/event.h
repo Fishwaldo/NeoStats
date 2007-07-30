@@ -31,11 +31,14 @@
 extern "C" {
 #endif
 
+#include <stdarg.h>
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
 typedef unsigned char u_char;
+typedef unsigned short u_short;
 #endif
 
 #define EVLIST_TIMEOUT	0x01
@@ -103,14 +106,28 @@ struct event {
 	int ev_flags;
 };
 
-#define EVENT_SIGNAL(ev)	(int)ev->ev_fd
-#define EVENT_FD(ev)		(int)ev->ev_fd
+#define EVENT_SIGNAL(ev)	(int)(ev)->ev_fd
+#define EVENT_FD(ev)		(int)(ev)->ev_fd
+
+/*
+ * Key-Value pairs.  Can be used for HTTP headers but also for
+ * query argument parsing.
+ */
+struct evkeyval {
+	TAILQ_ENTRY(evkeyval) next;
+
+	char *key;
+	char *value;
+};
 
 #ifdef _EVENT_DEFINED_TQENTRY
 #undef TAILQ_ENTRY
+struct event_list;
+struct evkeyvalq;
 #undef _EVENT_DEFINED_TQENTRY
 #else
 TAILQ_HEAD (event_list, event);
+TAILQ_HEAD (evkeyvalq, evkeyval);
 #endif /* _EVENT_DEFINED_TQENTRY */
 #ifdef _EVENT_DEFINED_RBENTRY
 #undef RB_ENTRY
@@ -124,15 +141,15 @@ struct eventop {
 	int (*del)(void *, struct event *);
 	int (*recalc)(struct event_base *, void *, int);
 	int (*dispatch)(struct event_base *, void *, struct timeval *);
+	void (*dealloc)(void *);
 };
 
 #define TIMEOUT_DEFAULT	{5, 0}
 
 void *event_init(void);
-int event_fini(void);
-
 int event_dispatch(void);
 int event_base_dispatch(struct event_base *);
+void event_base_free(struct event_base *);
 
 #define _EVENT_LOG_DEBUG 0
 #define _EVENT_LOG_MSG   1
@@ -180,7 +197,7 @@ void event_active(struct event *, int, short);
 int event_pending(struct event *, short, struct timeval *);
 
 #ifdef WIN32
-#define event_initialized(ev)		((ev)->ev_flags & EVLIST_INIT && (ev)->ev_fd != INVALID_HANDLE_VALUE)
+#define event_initialized(ev)		((ev)->ev_flags & EVLIST_INIT && (ev)->ev_fd != (int)INVALID_HANDLE_VALUE)
 #else
 #define event_initialized(ev)		((ev)->ev_flags & EVLIST_INIT)
 #endif
@@ -192,9 +209,7 @@ const char *event_get_method(void);
 /* These functions deal with event priorities */
 
 int	event_priority_init(int);
-int	event_priority_fini(int);
 int	event_base_priority_init(struct event_base *, int);
-int	event_base_priority_fini(struct event_base *, int);
 int	event_priority_set(struct event *, int);
 
 /* These functions deal with buffering input and output */
@@ -250,6 +265,7 @@ struct bufferevent {
 
 struct bufferevent *bufferevent_new(int fd,
     evbuffercb readcb, evbuffercb writecb, everrorcb errorcb, void *cbarg);
+int bufferevent_base_set(struct event_base *base, struct bufferevent *bufev);
 int bufferevent_priority_set(struct bufferevent *bufev, int pri);
 void bufferevent_free(struct bufferevent *bufev);
 int bufferevent_write(struct bufferevent *bufev, void *data, size_t size);
@@ -261,7 +277,6 @@ void bufferevent_settimeout(struct bufferevent *bufev,
     int timeout_read, int timeout_write);
 void bufferevent_setwatermark(struct bufferevent *bufev, 
     short events, size_t lowmark, size_t highmark);
-
 #define EVBUFFER_LENGTH(x)	(x)->off
 #define EVBUFFER_DATA(x)	(x)->buffer
 #define EVBUFFER_INPUT(x)	(x)->input
@@ -270,16 +285,60 @@ void bufferevent_setwatermark(struct bufferevent *bufev,
 struct evbuffer *evbuffer_new(void);
 void evbuffer_free(struct evbuffer *);
 int evbuffer_expand(struct evbuffer *, size_t);
-int evbuffer_add(struct evbuffer *, void *, size_t);
+int evbuffer_add(struct evbuffer *, const void *, size_t);
 int evbuffer_remove(struct evbuffer *, void *, size_t);
 char *evbuffer_readline(struct evbuffer *);
 int evbuffer_add_buffer(struct evbuffer *, struct evbuffer *);
-int evbuffer_add_printf(struct evbuffer *, char *fmt, ...);
+int evbuffer_add_printf(struct evbuffer *, const char *fmt, ...);
+int evbuffer_add_vprintf(struct evbuffer *, const char *fmt, va_list ap);
 void evbuffer_drain(struct evbuffer *, size_t);
 int evbuffer_write(struct evbuffer *, int);
 int evbuffer_read(struct evbuffer *, int, int);
-u_char *evbuffer_find(struct evbuffer *, u_char *, size_t);
+u_char *evbuffer_find(struct evbuffer *, const u_char *, size_t);
 void evbuffer_setcb(struct evbuffer *, void (*)(struct evbuffer *, size_t, size_t, void *), void *);
+
+/* 
+ * Marshaling tagged data - We assume that all tags are inserted in their
+ * numeric order - so that unknown tags will always be higher than the
+ * known ones - and we can just ignore the end of an event buffer.
+ */
+
+void evtag_init(void);
+
+void evtag_marshal(struct evbuffer *evbuf, u_int8_t tag, const void *data,
+    u_int32_t len);
+
+void encode_int(struct evbuffer *evbuf, u_int32_t number);
+
+void evtag_marshal_int(struct evbuffer *evbuf, u_int8_t tag,
+    u_int32_t integer);
+
+void evtag_marshal_string(struct evbuffer *buf, u_int8_t tag,
+    const char *string);
+
+void evtag_marshal_timeval(struct evbuffer *evbuf, u_int8_t tag,
+    struct timeval *tv);
+
+void evtag_test(void);
+
+int evtag_unmarshal(struct evbuffer *src, u_int8_t *ptag,
+    struct evbuffer *dst);
+int evtag_peek(struct evbuffer *evbuf, u_int8_t *ptag);
+int evtag_peek_length(struct evbuffer *evbuf, u_int32_t *plength);
+int evtag_payload_length(struct evbuffer *evbuf, u_int32_t *plength);
+int evtag_consume(struct evbuffer *evbuf);
+
+int evtag_unmarshal_int(struct evbuffer *evbuf, u_int8_t need_tag,
+    u_int32_t *pinteger);
+
+int evtag_unmarshal_fixed(struct evbuffer *src, u_int8_t need_tag, void *data,
+    size_t len);
+
+int evtag_unmarshal_string(struct evbuffer *evbuf, u_int8_t need_tag,
+    char **pstring);
+
+int evtag_unmarshal_timeval(struct evbuffer *evbuf, u_int8_t need_tag,
+    struct timeval *ptv);
 
 #ifdef __cplusplus
 }

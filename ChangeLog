@@ -5,6 +5,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Update Libevent to latest version (F)
+ - Fix Timers because we were not updating the current time often enough(F)
  - Fix HTTP transfers when saving to memory (such as SecureServ) (F)
  - Currently, SERVICECMODE only supports a single mode. Make sure we check
    for that in the set handler (F)

@@ -70,7 +70,6 @@ struct selectop {
 	fd_set *event_writeset_out;
 	struct event **event_r_by_fd;
 	struct event **event_w_by_fd;
-	sigset_t evsigmask;
 };
 
 void *select_init	(void);
@@ -78,6 +77,7 @@ int select_add		(void *, struct event *);
 int select_del		(void *, struct event *);
 int select_recalc	(struct event_base *, void *, int);
 int select_dispatch	(struct event_base *, void *, struct timeval *);
+void select_dealloc     (void *);
 
 const struct eventop selectops = {
 	"select",
@@ -85,7 +85,8 @@ const struct eventop selectops = {
 	select_add,
 	select_del,
 	select_recalc,
-	select_dispatch
+	select_dispatch,
+	select_dealloc
 };
 
 static int select_resize(struct selectop *sop, int fdsz);
@@ -95,7 +96,7 @@ select_init(void)
 {
 	struct selectop *sop;
 
-	/* Disable kqueue when this environment variable is set */
+	/* Disable select when this environment variable is set */
 	if (getenv("EVENT_NOSELECT"))
 		return (NULL);
 
@@ -104,7 +105,7 @@ select_init(void)
 
 	select_resize(sop, howmany(32 + 1, NFDBITS)*sizeof(fd_mask));
 
-	evsignal_init(&sop->evsigmask);
+	evsignal_init();
 
 	return (sop);
 }
@@ -133,7 +134,7 @@ check_selectop(struct selectop *sop)
 
 }
 #else
-#define check_selectop(sop)
+#define check_selectop(sop) do { (void) sop; } while (0)
 #endif
 
 /*
@@ -148,7 +149,7 @@ select_recalc(struct event_base *base, void *arg, int max)
 
 	check_selectop(sop);
 
-	return (evsignal_recalc(&sop->evsigmask));
+	return (0);
 }
 
 int
@@ -164,15 +165,10 @@ select_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	memcpy(sop->event_writeset_out, sop->event_writeset_in,
 	       sop->event_fdsz);
 
-	if (evsignal_deliver(&sop->evsigmask) == -1)
-		return (-1);
-
 	res = select(sop->event_fds + 1, sop->event_readset_out,
 	    sop->event_writeset_out, NULL, tv);
 
 	check_selectop(sop);
-	if (evsignal_recalc(&sop->evsigmask) == -1)
-		return (-1);
 
 	if (res == -1) {
 		if (errno != EINTR) {
@@ -281,7 +277,7 @@ select_add(void *arg, struct event *ev)
 	struct selectop *sop = arg;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_add(&sop->evsigmask, ev));
+		return (evsignal_add(ev));
 
 	check_selectop(sop);
 	/*
@@ -332,7 +328,7 @@ select_del(void *arg, struct event *ev)
 
 	check_selectop(sop);
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_del(&sop->evsigmask, ev));
+		return (evsignal_del(ev));
 
 	if (sop->event_fds < ev->ev_fd) {
 		check_selectop(sop);
@@ -352,4 +348,26 @@ select_del(void *arg, struct event *ev)
 	check_selectop(sop);
 	return (0);
 }
-#endif	
+
+void
+select_dealloc(void *arg)
+{
+	struct selectop *sop = arg;
+
+	if (sop->event_readset_in)
+		free(sop->event_readset_in);
+	if (sop->event_writeset_in)
+		free(sop->event_writeset_in);
+	if (sop->event_readset_out)
+		free(sop->event_readset_out);
+	if (sop->event_writeset_out)
+		free(sop->event_writeset_out);
+	if (sop->event_r_by_fd)
+		free(sop->event_r_by_fd);
+	if (sop->event_w_by_fd)
+		free(sop->event_w_by_fd);
+
+	memset(sop, 0, sizeof(struct selectop));
+	free(sop);
+}
+#endif
