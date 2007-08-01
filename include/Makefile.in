@@ -230,7 +230,7 @@ noinst_HEADERS = commands.h dns.h servers.h users.h conf.h \
 				adnsdlist.h adnsinternal.h adnstvarith.h namedvars-core.h
 
 extra_DIST = version.h
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

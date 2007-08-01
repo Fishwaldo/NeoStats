@@ -228,7 +228,7 @@ bdb_la_SOURCES = bdb.c
 bdb_la_LIBADD = @BDB_LIBS@
 AM_LDFLAGS = -module -avoid-version @BDB_LDFLAGS@ 
 AM_CFLAGS = -I$(top_srcdir)/include @BDB_CPPFLAGS@ @PCRE_CFLAGS@ @CURL_CFLAGS@
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

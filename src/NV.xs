@@ -122,12 +122,6 @@ PPCODE:
 #CODE:
 #printf("DESTROY\n");
 
-#void
-#FETCH(self)
-#  SV	*self;
-#CODE:
-#printf("FETCH\n");
-
 MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::HashVars
 
 #/* get a individual entry. self points to what we set with sv_magic in
@@ -182,35 +176,6 @@ POSTCALL:
 	RETURN_UNDEF_IF_FAIL;
 OUTPUT:
 	RETVAL
-
-
-#/* store a update. should check if its RO or RW though */
-
-void
-STORE(self, key, value)
-   SV         *self;
-   SV         *key;
-   HV         *value;
-PREINIT:
-   HV         *hash;
-   char       *k;
-   STRLEN      klen;
-   MAGIC      *mg;
-   nv_list    *nv;
-CODE:
-   /* find our magic */
-   hash = (HV*)SvRV(self);
-   mg   = mg_find(SvRV(self),'~');
-   if(!mg) { croak("lost ~ magic"); }
-   /* this is the nv_hash we are point at */
-   nv = (nv_list *)SvIV(mg->mg_obj);
-   /* make sure its a hash, not a list */
-   if (nv->type == NV_TYPE_HASH) {
-	nlog(LOG_WARNING, "NamedVars is not a hash?!?!");
-   } else if (nv->type == NV_TYPE_LIST) {
-	   k    = SvPV(key, klen);
-	   perl_store_namedvars(nv, k, value);
-   }	      
 
 
 # /* check if a entry is in the hash */
@@ -333,57 +298,4 @@ OUTPUT:
 	RETVAL
 
 #/* delete a entry */
-
-HV*
-DELETE(self, key)
-   SV        *self;
-   SV        *key;
-PREINIT:
-   HV *hash;
-   MAGIC *mg;
-   nv_list *nv;
-   void *data;
-   char *k;
-   STRLEN klen;
-CODE:
-   hash = (HV*)SvRV(self);
-   mg   = mg_find(SvRV(self),'~');
-   if(!mg) { croak("lost ~ magic"); }
-   nv = (nv_list *)SvIV(mg->mg_obj);
-   /* make sure its a hash, not a list */
-   if (nv->type != NV_TYPE_HASH) {
-	nlog(LOG_WARNING, "Del: NamedVars is not a hash?!?!");
-	RETVAL = (HV *)-1;
-   } else {
-	   /* get the "key" they want */
-	   k    = SvPV(key, klen);
-	   /* search for the key */
-	   data = hnode_find((hash_t *)nv->data, k);
-	   if (!data) {
-		RETVAL = (HV *)-1;
-	   } else {
-		if (perl_candelete_namedvars(nv, k)) {
-			RETVAL = (HV *)perl_encode_namedvars(nv, data);	   
-			perl_delete_namedvars(nv, k);
-		} else {
-			RETVAL = (HV *)-1;
-		}
-	   }
-   }
-POSTCALL:
-	RETURN_UNDEF_IF_FAIL;
-OUTPUT:
-   RETVAL
-
-#/* clear the hash */
-
-void
-CLEAR(self)
-   SV *self;
-PREINIT:
-   HV *hash;
-CODE:
-printf("CLEAR\n");
-   hash = (HV*)SvRV(self);
-   croak("CLEAR function is not implemented");
 

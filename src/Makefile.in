@@ -279,7 +279,7 @@ BUILT_SOURCES = NV.c
 CLEANFILES = NV.c
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 noinst_HEADERS = confuselexer.l NeoStats.pm
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

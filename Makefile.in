@@ -254,7 +254,7 @@ neodir = $(prefix)
 neo_SCRIPTS = neostats
 DISTCLEANFILES = autotools/ccdv
 EXTRA_DIST = autotools/ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

@@ -240,7 +240,7 @@ dftables_DEPENDENCES = maketables.c
 noinst_HEADERS = maketables.c
 include_HEADERS = pcre.h
 AM_CFLAGS = @PCRE_CFLAGS@
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

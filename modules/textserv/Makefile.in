@@ -232,7 +232,7 @@ textserv_la_LDFLAGS = -module -avoid-version
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@
 tsdbdir = $(datadir)/TSDB/
 dist_tsdb_DATA = data/barmaid data/icecream data/loveserv data/moraleserv data/waitress
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

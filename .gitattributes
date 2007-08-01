@@ -553,6 +553,7 @@ src/nsevents.c -text
 src/typemap -text
 src/win32/icon1.ico -text
 src/win32/neostats.bmp -text
+src/win32/neostats.conf -text
 src/win32/neostats.rc -text
 src/win32/resource.h -text
 src/win32/winmain.c -text

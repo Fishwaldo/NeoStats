@@ -210,7 +210,7 @@ unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 SUBDIRS = dbm protocol @MODULES@
 EXTRA_DIST = modules.txt
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

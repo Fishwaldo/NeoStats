@@ -312,7 +312,7 @@ noinst_HEADERS = arpa_telnet.h netrc.h file.h timeval.h base64.h hostip.h	\
 
 include_HEADERS = curl.h curlver.h easy.h multi.h mprintf.h
 BUILT_SOURCES = $(srcdir)/ca-bundle.h
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

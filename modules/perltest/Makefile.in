@@ -230,7 +230,7 @@ wi_PWD = @wi_PWD@
 @DO_PERL_TRUE@perlexttest_la_LDFLAGS = -module -avoid-version
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ @PERL_CFLAGS@
 extra_DIST = extension.ple test.pl
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

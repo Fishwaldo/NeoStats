@@ -240,7 +240,7 @@ include_HEADERS = nxml.h mrss.h
 noinst_HEADERS = nxml_internal.h mrss_internal.h
 INCLUDES = -I$(top_srcdir)/lib/curl/
 EXTRA_DIST = 
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@

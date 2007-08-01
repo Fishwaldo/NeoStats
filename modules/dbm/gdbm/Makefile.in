@@ -241,7 +241,7 @@ noinst_HEADERS = extern.h gdbmerrno.h systems.h gdbmconst.h getopt.h gdbmdefs.h 
 
 AM_LDFLAGS = -module -avoid-version
 AM_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/lib/adns/ @PCRE_CFLAGS@ @CURL_CFLAGS@
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 distdir = @DISTDIRVERSION@
