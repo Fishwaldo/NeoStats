@@ -14,5 +14,7 @@ mkdir modules
 @copy ..\COPYING .
 @copy ..\src\win32\neostats.conf .
 cd ..
-c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\MSBuild.exe neostatslibs.sln /p:Configuration=Release /t:Cleanrem 
+c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\MSBuild.exe neostatslibs.sln /p:Configuration=Release /t:Clean 
 c:\WINDOWS\Microsoft.NET\Framework\v2.0.50727\MSBuild.exe neostats.sln /p:Configuration=Release /t:Clean
+"C:\Program Files\Pantaray\QSetup\Composer.exe" tools\NeoStats.qsp /Compile /Exit
+rem NeoStats-Setup.exe should now be in tools directory.
