@@ -25,7 +25,7 @@
 #include "nsdbm.h"
 
 #ifdef HAVE_DB_H
-#include <db.h>
+#include DB_HEADER
 #include <sys/types.h>
 #include <dirent.h>
           

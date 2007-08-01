@@ -24,9 +24,9 @@ autotools/aclocal.m4 -text
 autotools/ax_compare_version.m4 -text
 autotools/ax_distversion.m4 -text
 autotools/ax_maintainer_mode_auto_silent.m4 -text
-autotools/ax_path_bdb.m4 -text
 autotools/ax_path_lib_curl.m4 -text
 autotools/ax_path_lib_pcre.m4 -text
+autotools/berkeley_db.m4 -text
 autotools/ccdv.c -text
 autotools/ccdv.m4 -text
 autotools/compile -text

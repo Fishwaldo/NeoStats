@@ -23,6 +23,7 @@ AC_DEFINE_UNQUOTED(MAJOR, $x_maj, "Major Version Number")
 AC_DEFINE_UNQUOTED(MINOR, $x_min, "Minor Version Number")
 AC_DEFINE_UNQUOTED(REV, $x_rev, "Revision Version Number")
 AC_DEFINE_UNQUOTED(NEO_VERSION, "$x_version", "Full Version")
+
 AC_MSG_HEADER([Configuring Core Now])
 
 AC_LIBTOOL_DLOPEN
@@ -383,14 +384,10 @@ wi_PROG_CCDV
 AC_MSG_HEADER([Configuring LibEvent Now])
 CHK_LIBEVNT
 AC_MSG_HEADER([Checking for Berkeley Database])
-AX_PATH_BDB([4.1], 
-[AC_SUBST(BDB_CPPFLAGS)
-AC_SUBST(BDB_LDFLAGS)
-AC_SUBST(BDB_LIBS)
-AM_CONDITIONAL(DO_BDB, true)],
+AX_BERKELEY_DB([4.1], 
+[AM_CONDITIONAL(DO_BDB, true)],
 [AM_CONDITIONAL(DO_BDB, false)]
 )
-
 
 AC_MSG_HEADER([NeoStats Configuration Summary:])
 
