@@ -298,10 +298,13 @@ static int cmd_add( const CmdParams *cmdparams )
 	CommandReport( ls_bot, "%s added %s to the channel list",
 		cmdparams->source->name, cmdparams->av[0] );
 	c = FindChannel( ls_chan->name );
-	if( lsjoin )
-		if(!IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
-			irc_join( ls_bot, ls_chan->name, me.servicescmode);
-	do_limit_set(ls_chan, c);
+	if( c )
+	{
+		if( lsjoin )
+			if( !IsChannelMember( c, ls_bot->u ) )
+				irc_join( ls_bot, ls_chan->name, me.servicescmode);
+		do_limit_set(ls_chan, c);
+	}
 	return NS_SUCCESS;
 }
 
