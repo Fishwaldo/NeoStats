@@ -21,7 +21,7 @@
 
 #include "nxml.h"
 
-#ifndef int64_t
+#ifdef WIN32
 #define int64_t __int64
 #endif
 
