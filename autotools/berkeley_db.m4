@@ -108,7 +108,7 @@ AC_DEFUN([AX_BERKELEY_DB],
 		    if test "x$with_bdb_dir" != "x" ; then
 	                    AC_MSG_RESULT([directory $ax_path_bdb_INC, header $db_hdr, library $db_lib])
 			    DB_CPPFLAGS="-I$ax_path_bdb_INC"
-			    DB_LDFLAGS="-L$ac_path_bdb_LIB"
+			    DB_LDFLAGS="-L$ax_path_bdb_LIB"
 			    CPPFLAGS="$ax_path_bdb_save_CPPFLAGS"
 			    LDFLAGS="$ax_path_bdb_save_LDFLAGS"
 		    else

@@ -25335,7 +25335,7 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 	                    { echo "$as_me:$LINENO: result: directory $ax_path_bdb_INC, header $db_hdr, library $db_lib" >&5
 echo "${ECHO_T}directory $ax_path_bdb_INC, header $db_hdr, library $db_lib" >&6; }
 			    DB_CPPFLAGS="-I$ax_path_bdb_INC"
-			    DB_LDFLAGS="-L$ac_path_bdb_LIB"
+			    DB_LDFLAGS="-L$ax_path_bdb_LIB"
 			    CPPFLAGS="$ax_path_bdb_save_CPPFLAGS"
 			    LDFLAGS="$ax_path_bdb_save_LDFLAGS"
 		    else
