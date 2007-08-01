@@ -1,0 +1,331 @@
+[General]
+FileVersion=1.1
+FileType=QSetupIniFile
+ComposerVersion=8.5.0.4
+OperatingSystem=WinXP  5.1  2600 (Service Pack 2)
+ProcessorNameString=Intel(R) Xeon(TM) CPU 2.40GHz
+ComputerRAM=1534 MB
+ProjectDrive=C:\  (9.99 GB Free)
+DateTime=01-AUG-2007  21:17:19
+OutputType=EXE
+Language=ENGLISH
+License=PRO
+
+[Project]
+ProjectName=NeoStats
+ProjectDirectory=C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\tools\
+NonSFXDirectory=C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\tools\\NonSFX
+MediaFileName=NeoStats-Setup
+CopyMediaToFName=\\tsclient\Fish\Users\justin\Documents\downloads\NeoStats-Setup.exe
+ProgramDescriptiveName=NeoStats IRC Services
+ProgramVersion=3.0.3.0
+CompanyName=NeoStats
+ProgVerLiveUpdate=1
+RegisterAsApp=1
+LanguageFlag=1
+LanguageNames=|
+UseNonSFXDir=0
+ClrNonSFXDir=0
+BuildNonSFXTree=0
+CompressNonSFXFiles=0
+ForceCopyNonSFXFiles=0
+CompressionLevel=0
+SetupWillExpire=0
+ExpireByDate=0
+ExpireByDays=1
+ExpireDate=2007-08-01
+ExpireDays=90
+SpanCDs=0
+SpanCDsSize=650
+DebugWindow=0
+DebugOnThisPC=1
+DebugOnEveryPC=0
+
+[Language]
+
+[LanguageShortcut]
+
+[LanguageCustomDLG]
+
+[Display]
+AddSetupBackground=1
+SetupBackground3D=1
+TopLabel=1
+TopLabelVer=1
+TopLabel2=0
+BottomLabel=1
+TopLabelText="NeoStats IRC Services"
+TopLabel2Text=""
+BottomLabelText="Copyright © 2007"
+BackgroundDesign=Light Source (Left)
+TopBackgroundColor=16758613
+BottomBackgroundColor=11613445
+AddBottomColor=1
+DlgBmp3DFrame=1
+DialogStyle=Modern
+AddDialogBitmap=0
+DialogBitmapFileName=
+AddBackgroundBitmap=0
+BackgroundBitmapFileName=
+BackgroundBitmapLocation=|Top/Left|0|0|
+AddBackgroundWave=0
+BgBmpTransparent=0
+BackgroundWaveFileName=
+BackgroundWaveLocation=|Center|300|0|
+BackgroundWaveLoop=1
+BackgroundWaveDelay=0
+AddBackgroundWaveSlider=1
+BackgroundWaveSliderType=Fixed
+TopLabelSide=Left
+TopLabel2Side=Left
+BottomLabelSide=Left
+DialogLocation=|Center|0|0|
+TopLabelFont=|Tahoma|32|16777215|1|0|1|0|
+TopLabel2Font=|Tahoma|16|16777215|1|0|1|0|
+BottomLabelFont=|Tahoma|10|16777215|1|0|1|0|
+CompanyUrl=http://www.neostats.net/
+
+[TargetExe]
+TargetDirectory=<ProgramFilesDir>NeoStats
+CommonDirectory=<CommonFilesDir>NeoStats
+AuxDirectory=<RunTimeDir_1>Modules
+TargetExeName=<Application Folder>\neostats.exe
+
+[Dialogs]
+SelectedDialogs=*Welcome,*License,Readme,User Information,Setup Type,*Custom,*Destination,Associate,*Shortcuts,*Confirm Setup,*Copy Files,*Complete
+LicenseTextFile=C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\COPYING
+ReadmeTextFile=
+ReadmeTextFile2=C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\README
+UseNotepad=0
+SpaceReqOnDriveCheckBox=0
+SpaceReqOnDrive=
+RequestUserName=1
+RequestCompanyName=1
+RequestSerialNumberAlso=0
+MandatoryUserName=1
+MandatoryCompanyName=1
+MandatorySerialNumber=1
+FromPcUserName=0
+FromPcCompanyName=0
+RequestSerialCheckDLL=0
+SerialCheckDll=
+RequestPredefinedSerial=0
+CaseSensitiveSerial=0
+RequestTokenizedSerial=0
+CDSetup=0
+ShowCompactSetupAlso=1
+ForcePartialSetup=0
+ShowProgBar2=1
+SilentSetup=0
+EnableCancelButton=1
+HiddenSetup=0
+ProposeReadme=1
+ProposeLaunch=1
+ProposeRestart=0
+ProposeReadmeChecked=1
+ProposeLaunchChecked=0
+ForceRestart=0
+ShowCloseRecommendation=0
+ShowAdwareDisclaimer=0
+ShowCopyrightWarning=1
+
+[Shortcuts]
+AddMainShortCut=1
+ForceRemoveShortcutFolder=0
+ProgramLinkFolder=NeoStats IRC Services
+ProgramLinkName=Neostats
+ProgramLinkParam=
+ProgramLinkWorkDir=<Application Folder>
+ProgramLinkRun=Normal Window
+ProgramLinkIconFile=
+ProgramLinkIconNum=0
+StartMenuLinkName=NeoStats IRC Services
+DesktopLinkName=NeoStats IRC Services
+SendToLinkName=NeoStats IRC Services
+StartUpLinkName=NeoStats IRC Services
+QuickLaunchLinkName=NeoStats IRC Services
+StartMenuCheckBox=0
+DesktopCheckBox=0
+SendToCheckBox=0
+StartUpCheckBox=1
+QuickLaunchCheckBox=0
+StartMenuChecked=1
+DesktopChecked=1
+SendToChecked=1
+StartUpChecked=1
+QuickLaunchChecked=1
+SetAllUsers=1
+SelectedByEndUser=1
+AddUninstallShortcut=1
+UnInstallSubFolder=0
+UnInstallSubFolderText=
+
+[Billboard]
+AddBillboard=1
+Item-000=|1|0|0|1|0|Center|0|0|8388608|16711680|Verdana|14|16777215|1|0|360|360|0|1|0|1|
+
+[SplitSetup]
+SplitSetup=0
+ForceDownload=1
+DownloadURL_SPLIT=http://
+ConfirmSplitDownload=0
+
+[AutoUpdate]
+AutoUpdate=0
+CheckAUSetupEnd=0
+RunAutoUpdate=1
+AddAutoUpdateShortcut=1
+AutoUpdateLog=0
+AutoUpdateSubFolder=0
+AutoUpdateSubFolderText=
+ReqConfirmDownload=1
+ReqConfirmInstall=1
+ShutDownMethod=Issue a Message Box
+BackgroundUpdate=0
+RestartProcess=1
+InformFinish=1
+UpdateProjectFName=NeoStats Version Check
+DownloadURL_UPDATE=http://www.neostats.net/update
+NameOfUpdateFile=
+RunningProcess=<Application Folder>\neostats.exe
+VersionOriginal=1
+ValidVersions=
+VersionNew=1
+ReAskDays=0
+AutoUpdateProbeSpin=1
+AutoUpdateProbeText=Only at Agent Start
+SelectInformFile=1
+DownloadUrlInform=1
+DownloadURL_INFORM=http://
+NameOfInformFile=
+UpdateSetupPageIndex=0
+AutoInformW=360
+AutoInformH=360
+
+[Switches]
+OperatingSystems=2000,XP,2003,Vista
+OverwriteFlag=1
+CreateLogFile=0
+ConfirmExtract=0
+ShowActivityBar=0
+TestAdminRights=1
+TestAdminRightsUnInstall=1
+SetAllowFullAccess=1
+TestDotNetFramework=0
+InstallDotNetFx=0
+InstallDotNetFxText=
+InstallDotNetFxUrl=0
+InstallDotNetFxUrlText=http://
+DotNetFrameworkReqVer=1.0,1.1,2.0
+TestExeBeforeInstall=0
+TestExeBeforeUnInstall=1
+AutorunCreateInfFile=0
+AutorunTest=0
+AutorunStartApp=0
+AddAppToRunOnce=0
+AddAppToRun=0
+IfPreviousInstallationFound=0
+PreviousInstallationOp=UnInstall before Setup start
+UnInstallPreviousMode=Silent
+CreateUnInstall=1
+ScrambleUnInstallData=0
+SilentUnInstall=0
+HiddenUnInstall=0
+HideErrMsgUnInstall=0
+HideLogBtnUnInstall=0
+AddRemoveProgramsUnInstall=1
+AddChangeButtonUnInstall=0
+UnInstallExeStampSwitch=0
+UnInstallExeStamp=
+UnInstallExeDirSwitch=0
+UnInstallExeDir=
+
+[UnInstall]
+UnInstallDisplayName=NeoStats IRC Services
+UnInstallDisplayIcon=
+UnInstallDisplayIconNum=
+UnInstallHelpLink=
+UnInstallInfoAboutURL=
+
+[Registry]
+
+[IniFile]
+
+[Environment]
+
+[Association]
+OpenWith=0
+OpenWithName=
+OpenWithMenuText=Open with
+OpenWithExtensions=
+
+[VerInfo]
+CopyFromExe=1
+DefineManually=0
+Item-001=|Comments||
+Item-002=|CompanyName|NeoStats|
+Item-003=|FileDescription|NeoStats IRC Services|
+Item-004=|FileVersion|3,0,b3,0|
+Item-005=|InternalName|neostats.exe|
+Item-006=|LegalCopyright||
+Item-007=|LegalTrademarks||
+Item-008=|OriginalFilename|neostats.exe|
+Item-009=|ProductName|NeoStats IRC Services|
+Item-010=|ProductVersion|3,0,b3,0|
+CopyIconFromTargetExe=1
+CopyIconFromOtherApp=0
+OtherIconAppFileName=
+Spin1=0
+Spin2=0
+
+[Execute]
+ExecuteDllCheckBox=0
+ExecutionDllFileName=
+
+[MSI]
+Version=1
+AddMergeModule=0
+Msm2MsiData=|MSM2MSI_NeoStats-Setup.msi|1|1|1|0|
+
+[GroupNames]
+Group-000=Main Group
+
+[Group-000]
+TypicalCompactData=15
+Description=This is the main group of files
+SizeInKB=0
+Item-000=Fol*<Application Folder>
+Item-001=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\neostats.conf
+Item-002=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\neostats.exe
+Item-003=Dir*<Application Folder>\data
+Item-004=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\data\tlds.nfo
+Item-005=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\data\niconfig.db
+Item-006=Dir*<Application Folder>\logs
+Item-007=Dir*<Application Folder>\modules
+Item-008=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\unreal32.dll
+Item-009=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\unreal31.dll
+Item-010=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\ultimate3.dll
+Item-011=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\ultimate2.dll
+Item-012=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\textserv.dll
+Item-013=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\templateauth.dll
+Item-014=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\template.dll
+Item-015=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\statserv.dll
+Item-016=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\quoteserv.dll
+Item-017=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\plexus.dll
+Item-018=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\operlog.dll
+Item-019=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\nefarious.dll
+Item-020=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\limitserv.dll
+Item-021=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\ircup10.dll
+Item-022=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\ircdauth.dll
+Item-023=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\hybrid7.dll
+Item-024=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\hybrid6.dll
+Item-025=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\hostserv.dll
+Item-026=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\gdbm.dll
+Item-027=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\extauth.dll
+Item-028=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\dccpartyline.dll
+Item-029=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\connectserv.dll
+Item-030=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\client.dll
+Item-031=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\bahamut18.dll
+Item-032=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\bahamut14.dll
+Item-033=Fil*C:\Documents and Settings\Justin\My Documents\NeoStats\Neo30\NeoStats3.0\modules\asuka.dll
+

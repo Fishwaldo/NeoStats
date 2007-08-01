@@ -26,6 +26,10 @@
 #include <string.h>
 #include <errno.h>
 
+#ifndef int64_t
+#define int64_t __int64
+#endif
+
 typedef struct __mrss_download_t__ __mrss_download_t;
 
 /**

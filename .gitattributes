@@ -325,6 +325,7 @@ lib/nxml/mrss_internal.h -text
 lib/nxml/mrss_parser.c -text
 lib/nxml/mrss_write.c -text
 lib/nxml/nxml.h -text
+lib/nxml/nxml.vcproj -text
 lib/nxml/nxml_download.c -text
 lib/nxml/nxml_dtd.c -text
 lib/nxml/nxml_easy.c -text
@@ -557,6 +558,8 @@ src/win32/neostats.conf -text
 src/win32/neostats.rc -text
 src/win32/resource.h -text
 src/win32/winmain.c -text
+tools/NeoStats.qsp -text
+tools/buildwin32snap.bat -text
 tools/generate_header -text
 tools/neostats.suppression -text
 tools/runvalgrind.sh -text

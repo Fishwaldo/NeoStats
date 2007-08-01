@@ -296,7 +296,7 @@ int evbuffer_write(struct evbuffer *, int);
 int evbuffer_read(struct evbuffer *, int, int);
 u_char *evbuffer_find(struct evbuffer *, const u_char *, size_t);
 void evbuffer_setcb(struct evbuffer *, void (*)(struct evbuffer *, size_t, size_t, void *), void *);
-
+#ifndef WIN32
 /* 
  * Marshaling tagged data - We assume that all tags are inserted in their
  * numeric order - so that unknown tags will always be higher than the
@@ -339,7 +339,7 @@ int evtag_unmarshal_string(struct evbuffer *evbuf, u_int8_t need_tag,
 
 int evtag_unmarshal_timeval(struct evbuffer *evbuf, u_int8_t need_tag,
     struct timeval *ptv);
-
+#endif
 #ifdef __cplusplus
 }
 #endif

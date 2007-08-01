@@ -21,6 +21,10 @@
 
 #include "nxml.h"
 
+#ifndef int64_t
+#define int64_t __int64
+#endif
+
 /* Rule [4] */
 #define __NXML_NAMESTARTCHARS \
 	  ((ch=__NXML_U8()) == ':' \

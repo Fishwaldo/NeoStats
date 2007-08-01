@@ -19,7 +19,9 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #else
+#ifndef WIN32
 # error Use configure; make; make install
+#endif
 #endif
 
 #include "nxml_internal.h"
@@ -1055,7 +1057,9 @@ __nxml_parse_buffer (nxml_t * nxml, char *r_buffer, size_t r_size)
 
       return NXML_ERR_PARSER;
     }
-
+#ifndef PACKAGE
+#define PACKAGE "nxml"
+#endif
   if (!strcmp (attr->value, "1.0"))
     nxml->version = NXML_VERSION_1_0;
 

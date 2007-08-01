@@ -56,13 +56,15 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_VC80_UPGRADE=0x0710;_DEBUG=1;NEOSTATSCORE=1"
+				Culture="3081"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib shlwapi.lib Iphlpapi.lib curld.lib pcred.lib libevent.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib shlwapi.lib Iphlpapi.lib curld.lib pcred.lib libevent.lib nxml.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Debug"
@@ -135,13 +137,16 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_VC80_UPGRADE=0x0710;NEOSTATSCORE=1"
+				Culture="3081"
+				AdditionalIncludeDirectories="../include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib shlwapi.lib curl.lib pcre.lib libevent.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib shlwapi.lib curl.lib pcre.lib libevent.lib nxml.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Release"
@@ -879,6 +884,10 @@
 			</File>
 			<File
 				RelativePath=".\win32\neostats.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\win32\neostatsversion.rc"
 				>
 			</File>
 		</Filter>

@@ -23,7 +23,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>

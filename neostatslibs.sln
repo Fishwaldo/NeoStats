@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+# Visual C++ Express 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "curl", "lib\curl\curl.vcproj", "{F9973FED-1759-4B07-ACD0-B949A9F73F29}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "lib\pcre\pcre.vcproj", "{934FCDE5-D077-4619-B79C-A62580EA1E4A}"
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libevent", "lib\event\WIN32-Prj\libevent.vcproj", "{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcredftables", "lib\pcre\pcredftables.vcproj", "{310EA68C-162C-4C51-803D-32F800E6F311}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nxml", "lib\nxml\nxml.vcproj", "{708A9144-E032-4734-B2F2-F04D83DECEF9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{310EA68C-162C-4C51-803D-32F800E6F311}.Debug|Win32.Build.0 = Debug|Win32
 		{310EA68C-162C-4C51-803D-32F800E6F311}.Release|Win32.ActiveCfg = Release|Win32
 		{310EA68C-162C-4C51-803D-32F800E6F311}.Release|Win32.Build.0 = Release|Win32
+		{708A9144-E032-4734-B2F2-F04D83DECEF9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{708A9144-E032-4734-B2F2-F04D83DECEF9}.Debug|Win32.Build.0 = Debug|Win32
+		{708A9144-E032-4734-B2F2-F04D83DECEF9}.Release|Win32.ActiveCfg = Release|Win32
+		{708A9144-E032-4734-B2F2-F04D83DECEF9}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

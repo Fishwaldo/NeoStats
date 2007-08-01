@@ -19,7 +19,9 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #else
+#ifndef WIN32
 # error Use configure; make; make install
+#endif
 #endif
 
 #include "mrss.h"

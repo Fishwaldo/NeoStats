@@ -353,7 +353,7 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	DWORD dwBytesRead;
 #endif
 
-#ifdef FIONREAD
+#ifndef WIN32
 	if (ioctl(fd, FIONREAD, &n) == -1 || n == 0) {
 		n = EVBUFFER_MAX_READ;
 	} else if (n > EVBUFFER_MAX_READ && n > howmuch) {
