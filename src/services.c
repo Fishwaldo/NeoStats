@@ -380,13 +380,15 @@ static int ns_cmd_status( const CmdParams *cmdparams )
  *
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
+/* forward decleration */
+void send_cmd( const char *fmt, ... );
 
 static int ns_cmd_raw( const CmdParams *cmdparams )
 {
 	char *message;
 
 	SET_SEGV_LOCATION();
-	message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
+	message = joinbuf( cmdparams->av, cmdparams->ac, 0 );
 	irc_chanalert( ns_botptr, _( "\2RAW COMMAND\2 \2%s\2 issued a raw command! (%s)" ), cmdparams->source->name, message );
 	nlog( LOG_NORMAL, "RAW COMMAND %s issued a raw command! (%s)", cmdparams->source->name, message );
 	send_cmd( "%s", message );
