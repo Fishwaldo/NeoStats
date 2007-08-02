@@ -12,3 +12,4 @@ mkdir modules
 @copy ..\src\win32\neostats.conf .
 cd ..
 "C:\Program Files\Pantaray\QSetup\Composer.exe" tools\NeoStats.qsp /Compile /Exit
+move tools\NeoStats-Setup.exe tools\NeoStats-Setup-3-0-a3-%1.exe
