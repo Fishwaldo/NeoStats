@@ -61,6 +61,7 @@ static void DelUser( const Client *u )
 	if( IsOper( u ) )
 	{
 		dlog( DEBUG2, "Decreasing OperCount on %s due to signoff", u->uplink->name );
+		DelNetworkOper();
 		DelServerOper( u );
 	}
 	DelServerUser( u );
