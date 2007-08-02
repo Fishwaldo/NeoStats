@@ -335,7 +335,7 @@ char **DBMListTables(char *Database)
 		nlog(LOG_WARNING, "dbcpp->close failed: %s\n", db_strerror(dbret));
 	}	
 	dbp->close(dbp, 0); 
-
+	AddStringToList(&Tables, '\0', &tl);
 	return Tables;
 
 }

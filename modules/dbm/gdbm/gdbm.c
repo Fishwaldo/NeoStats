@@ -359,7 +359,8 @@ char **DBMListTables(char *Database)
 		}
 	} else {
 		nlog(LOG_WARNING, "Glob Failed: %s", strerror(errno));
-	} 
+	}
+	AddStringToList(&Tables, '\0', &tl); 
 	return Tables;
 }
 #endif /* !WIN32 */
