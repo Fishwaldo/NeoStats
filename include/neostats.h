@@ -796,6 +796,13 @@ struct bot_cmd
  */
 #define BOT_FLAG_CTCPVERSIONMASTER	0x00000040
 
+/* Bot does not require SET support etc. Usefull for TextServ bots where 
+ * we must process commands (so we can't say BOT_FLAG_SERVICEBOT above 
+ * but we dont want it to process our intrisic commands or SET commands
+ * eg TextServ bots
+ */
+#define BOT_FLAG_NOINTRINSICSET		0x00000080
+
 /* This defines a "NULL" string for the purpose of BotInfo structures that 
  * want to inherit the main host used by NeoStats and still make the info
  * readable

@@ -5,6 +5,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Add a new BOT flag to not load up the intrinisic set commands (F)
  - Fixed up a bug with ConvertDB (F)
  - Better detection of Berkeley DB (F)
  - Update Libevent to latest version (F)

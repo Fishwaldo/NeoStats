@@ -751,10 +751,16 @@ Bot *AddBot( BotInfo *botinfo )
 	if( botptr->flags & BOT_FLAG_SERVICEBOT )
 	{
 		add_bot_cmd_list( botptr, botinfo->bot_cmd_list );
-		add_bot_setting_list( botptr, botinfo->bot_setting_list );
-		/* Do not add set botinfo options for root bot */
-		if( !( botptr->flags & 0x80000000 ) )
-			add_bot_info_settings( botptr, botinfo );
+		if (!(botptr->flags & BOT_FLAG_NOINTRINSICSET))
+			add_bot_setting_list( botptr, botinfo->bot_setting_list );
+		/* Do not add set botinfo options for root bot 
+		 * or bots that don't need intrinic commands */
+		if( !( botptr->flags & 0x80000000 )) {
+			if (!(botptr->flags & BOT_FLAG_NOINTRINSICSET) ) {
+				add_bot_info_settings( botptr, botinfo );
+			}
+		}
+
 		/* Create module exclusion command handlers if needed */
 		if( botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES )
 			AddBotExcludeCommands( botptr );
