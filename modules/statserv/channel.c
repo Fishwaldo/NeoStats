@@ -236,6 +236,7 @@ static channelstat *LoadChannel( const char *name )
 
 static void SaveChannel( channelstat *cs ) 
 {
+
 	PreSaveStatistic( &cs->joins );
 	PreSaveStatistic( &cs->kicks );
 	PreSaveStatistic( &cs->topics );
@@ -538,8 +539,8 @@ int ss_cmd_channel( const CmdParams *cmdparams )
 			cs->users.alltime.runningtotal );
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Joins today: %d (Max %d on %s)",
 			cs->joins.daily.runningtotal, cs->joins.alltime.max, sftime( cs->joins.alltime.ts_max ) );
-		irc_prefmsg( ss_bot,cmdparams->source, "Total Topic Changes %d (Today %d)", 
-			cs->topics.day, cs->topics.daily.runningtotal );
+		irc_prefmsg( ss_bot,cmdparams->source, "Total Topic Changes Today: %d (Total %d)", 
+			cs->topics.daily.runningtotal, cs->topics.alltime.runningtotal );
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks: %d", cs->kicks.alltime.runningtotal );
 		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks today %d (Max %d on %s)",
 			cs->kicks.daily.max, cs->kicks.alltime.max, sftime( cs->kicks.alltime.ts_max ) );
