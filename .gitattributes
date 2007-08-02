@@ -140,7 +140,6 @@ include/channels.h eol=lf
 include/commands.h -text
 include/conf.h eol=lf
 include/config.h.in -text
-include/configwin32.h -text
 include/confuse.h -text
 include/ctcp.h -text
 include/dcc.h -text
