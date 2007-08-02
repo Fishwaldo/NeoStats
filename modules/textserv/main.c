@@ -492,12 +492,12 @@ static void JoinBot( dbbot *db )
 	db->botptr = AddBot( &db->botinfo );
 	SetBotModValue( db->botptr, (void *) db );
 	if( *db->tsbot.channel )
-		irc_join( db->botptr, db->tsbot.channel, "+o" );
+		irc_join( db->botptr, db->tsbot.channel, me.servicescmode );
 	hash_scan_begin( &hs, db->chanhash );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL )
 	{
 		channame = ( ( char * )hnode_get( hn ) );
-		irc_join( db->botptr, channame, "+o" );
+		irc_join( db->botptr, channame, me.servicescmode );
 	}
 }
 
@@ -951,7 +951,7 @@ static int ts_cmd_add_chan( const CmdParams *cmdparams )
 	strlcpy( bce->namechan, db->tsbot.botname, MAXNICK+MAXCHANLEN );
 	strlcat( bce->namechan, channame, MAXNICK+MAXCHANLEN );
 	DBAStore( "BotChans", bce->namechan, ( void * )bce, sizeof( botchanentry ) );
-	irc_join( db->botptr, channame, "+o" );
+	irc_join( db->botptr, channame, me.servicescmode );
 	ns_free( bce );
 	return NS_SUCCESS;
 }
