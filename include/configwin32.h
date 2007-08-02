@@ -552,3 +552,5 @@ struct pollfd { int fd; short events; short revents; };
 #define POLLPRI 2
 #define POLLOUT 4
 #define POLLERR 8
+
+#define _CRT_SECURE_NO_WARNINGS
