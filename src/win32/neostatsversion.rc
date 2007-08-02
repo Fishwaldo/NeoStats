@@ -1,0 +1,28 @@
+#include "configwin32.h"
+1 VERSIONINFO
+	FILEVERSION NEO_WIN32VERN
+	PRODUCTVERSION NEO_WIN32VERN
+	FILEFLAGSMASK 0x3fL
+	FILEFLAGS 0x1L	FILEOS 0x4L
+	FILETYPE 0x1L
+	FILESUBTYPE 0x0L
+	BEGIN
+		BLOCK "StringFileInfo"
+		BEGIN
+			BLOCK "040704e4"
+	        BEGIN
+		        VALUE "CompanyName", "NeoStats"
+			    VALUE "Copyright (C) 2007", "Copyright (c) 1999-2007 Adam Rutter, Justin Hammond, Mark Hetherington"
+				VALUE "FileDescription", "NeoStats IRC Services"
+	            VALUE "FileVersion", NEO_WIN32VER
+		        VALUE "InternalName", "neostats.exe"
+			    VALUE "OriginalFilename", "neostats.exe"
+	            VALUE "ProductName", "NeoStats IRC Services"
+		        VALUE "ProductVersion", NEO_WIN32VER
+	        END
+	    END
+	    BLOCK "VarFileInfo"
+		BEGIN
+			VALUE "Translation", 0x407, 1252
+	    END
+	END
