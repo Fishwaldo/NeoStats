@@ -56,7 +56,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				AdditionalIncludeDirectories="../../include"
+				AdditionalIncludeDirectories="../../../include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"

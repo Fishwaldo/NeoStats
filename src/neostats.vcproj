@@ -58,13 +58,14 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_VC80_UPGRADE=0x0710;_DEBUG=1;NEOSTATSCORE=1"
 				Culture="3081"
+				AdditionalIncludeDirectories="../include"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib shlwapi.lib Iphlpapi.lib curld.lib pcred.lib libevent.lib nxml.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib shlwapi.lib Iphlpapi.lib curld.lib pcred.lib libevent.lib nxmld.lib"
 				OutputFile="$(OutDir)/neostats.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Debug"
@@ -821,11 +822,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win32\resource.h"
+				RelativePath="..\..\src\win32\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\resource.h"
+				RelativePath=".\win32\resource.h"
 				>
 			</File>
 			<File
