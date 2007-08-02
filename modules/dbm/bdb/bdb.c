@@ -57,15 +57,18 @@ void *DBMOpenDB (const char *name)
 			return NULL;
 		}
 		db_env->set_verbose(db_env, DB_VERB_RECOVERY|DB_VERB_REGISTER, 1);
-		
-		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER_FATAL|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL, 0600)) != 0) {
+#ifdef DEBUG
+		db_env->set_errfile(db_env, stderr);
+		db_env->set_msgfile(db_env, stderr);		
+#endif
+		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL, 0600)) != 0) {
 			nlog(LOG_WARNING, "db evn open failed: %s", db_strerror(dbret));
 			db_env->close(db_env, 0);
 			return NULL;
 		}
-		db_env->set_errcall(db_env, db_log_cb);
 #if 0
-		db_env->set_msgcall(db_env, db_log_cb)
+		db_env->set_errcall(db_env, db_log_cb);
+		db_env->set_msgcall(db_env, db_log_cb);
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 #endif
 	}
@@ -276,6 +279,7 @@ char **DBMListDB()
 		strlcpy(filename, files[i-1]->d_name, strlen(files[i-1]->d_name) - 3);
 		AddStringToList(&DBList, filename, &sl);
 	}
+	AddStringToList(&DBList, '\0', &sl);
 	return DBList;;
 }
 

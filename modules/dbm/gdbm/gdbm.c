@@ -330,6 +330,7 @@ char **DBMListDB()
 			}
 		}
 	}
+	AddStringToList(&DBList, '\0', &sl);
 	return DBList;
 }
 
