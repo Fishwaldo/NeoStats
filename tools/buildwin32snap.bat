@@ -1,5 +1,5 @@
 @echo off
-IF NOT EXIST NeoStats-Setup*.exe del NeoStats-Setup*.exe
+IF EXIST tools\NeoStats-Setup*.exe del tools\NeoStats-Setup*.exe
 IF NOT EXIST NeoStats3.0 mkdir NeoStats3.0
 cd NeoStats3.0
 IF NOT EXIST logs mkdir logs
