@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="templateauth"
 	ProjectGUID="{03D7791F-FBC5-43ED-AAAE-B196013C37C3}"
+	RootNamespace="templateauth"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="neostatsd.lib"
 				OutputFile="../templateauthd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\Debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/templateauth.pdb"
 				SubSystem="2"
@@ -145,7 +146,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../templateauth.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -229,7 +230,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../templateauthd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\$(IntDir)"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/templateauth.pdb"
 				SubSystem="2"
@@ -309,7 +310,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../templateauth.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="asuka"
 	ProjectGUID="{F8E06228-0FB7-4E71-94A8-1D0B3A4546D8}"
+	RootNamespace="asuka"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -61,10 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib neostats.lib"
+				AdditionalDependencies="Ws2_32.lib neostatsd.lib"
 				OutputFile="../../modules/asukad.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/asuka.pdb"
 				SubSystem="2"
@@ -144,7 +145,7 @@
 				AdditionalDependencies="Ws2_32.lib neostats.lib"
 				OutputFile="../../modules/asuka.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src/release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -227,7 +228,7 @@
 				AdditionalDependencies="Ws2_32.lib neostats.lib"
 				OutputFile="../../modules/asukad.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\src\$(IntDir)&quot;"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/asuka.pdb"
 				SubSystem="2"
@@ -306,7 +307,7 @@
 				AdditionalDependencies="Ws2_32.lib neostats.lib"
 				OutputFile="../../modules/asuka.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src/release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

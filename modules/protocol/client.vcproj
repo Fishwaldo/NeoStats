@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="client"
 	ProjectGUID="{B6701C0A-27E3-468D-8473-FBE671989E33}"
+	RootNamespace="client"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="neostatsd.lib"
 				OutputFile="../../modules/clientd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/client.pdb"
 				SubSystem="2"
@@ -145,7 +146,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../../modules/client.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src/release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -229,7 +230,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../../modules/clientd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\src\$(IntDir)&quot;"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/client.pdb"
 				SubSystem="2"
@@ -309,7 +310,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../../modules/client.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src/release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

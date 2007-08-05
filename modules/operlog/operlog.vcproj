@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="operlog"
 	ProjectGUID="{B14C1233-1DA0-4DBF-9ECB-7B17C934D833}"
+	RootNamespace="operlog"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="neostatsd.lib"
 				OutputFile="../operlogd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\Debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/operlog.pdb"
 				SubSystem="2"
@@ -146,7 +147,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../operlog.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -230,7 +231,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../operlogd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\$(IntDir)"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/operlog.pdb"
 				SubSystem="2"
@@ -311,7 +312,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../operlog.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

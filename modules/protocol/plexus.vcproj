@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="plexus"
 	ProjectGUID="{F5EFCE67-6E5D-40D7-BA24-CCF512DFBE26}"
+	RootNamespace="plexus"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="neostatsd.lib"
 				OutputFile="../../modules/plexusd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/plexus.pdb"
 				SubSystem="2"
@@ -145,7 +146,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../../modules/plexus.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src/release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -229,7 +230,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../../modules/plexusd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\$(IntDir)"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/plexus.pdb"
 				SubSystem="2"
@@ -309,7 +310,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../../modules/plexus.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src/release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

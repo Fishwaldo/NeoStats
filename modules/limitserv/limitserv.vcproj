@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="limitserv"
 	ProjectGUID="{83B3909C-59BE-401E-92D8-8A358C590E53}"
+	RootNamespace="limitserv"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="neostatsd.lib"
 				OutputFile="../limitservd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\Debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/limitserv.pdb"
 				SubSystem="2"
@@ -145,7 +146,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../limitserv.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -229,7 +230,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../limitservd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\$(IntDir)"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/limitserv.pdb"
 				SubSystem="2"
@@ -309,7 +310,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../limitserv.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

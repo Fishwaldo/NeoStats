@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="connectserv"
 	ProjectGUID="{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}"
+	RootNamespace="connectserv"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="neostatsd.lib"
 				OutputFile="../connectservd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\Debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/connectserv.pdb"
 				SubSystem="2"
@@ -146,7 +147,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../connectserv.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -230,7 +231,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../connectservd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\src\$(IntDir)&quot;"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/connectserv.pdb"
 				SubSystem="2"
@@ -311,7 +312,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../connectserv.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

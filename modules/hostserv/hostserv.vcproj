@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="hostserv"
 	ProjectGUID="{7EA316E9-629A-47BC-8BE8-EA7167FEE441}"
+	RootNamespace="hostserv"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +63,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="neostats.lib"
+				AdditionalDependencies="neostatsd.lib"
 				OutputFile="../hostservd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\src\Debug"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/hostserv.pdb"
 				SubSystem="2"
@@ -145,7 +146,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../hostserv.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -229,7 +230,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../hostservd.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\src\$(IntDir)&quot;"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/hostserv.pdb"
 				SubSystem="2"
@@ -309,7 +310,7 @@
 				AdditionalDependencies="neostats.lib"
 				OutputFile="../hostserv.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\src\Release"
+				AdditionalLibraryDirectories="..\.."
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
