@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="libevent"
 	ProjectGUID="{387B391F-49E3-4DBF-AC32-C97D8ADE78C7}"
+	RootNamespace="libevent"
 	>
 	<Platforms>
 		<Platform
@@ -68,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile=".\Debug\libevent.lib"
+				OutputFile="..\..\libeventd.lib"
 				SuppressStartupBanner="true"
 			/>
 			<Tool
@@ -143,7 +144,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile=".\Release\libevent.lib"
+				OutputFile="..\..\libevent.lib"
 				SuppressStartupBanner="true"
 			/>
 			<Tool
