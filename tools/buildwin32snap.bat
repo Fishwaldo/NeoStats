@@ -5,7 +5,7 @@ cd NeoStats3.0
 IF NOT EXIST logs mkdir logs
 IF NOT EXIST data mkdir data
 IF NOT EXIST modules mkdir modules
-@copy ..\src\Release\NeoStats.exe .
+@copy ..\NeoStats.exe .
 @copy ..\modules\*.dll modules
 @copy ..\data\*.* data
 @copy ..\README .

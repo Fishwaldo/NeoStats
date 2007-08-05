@@ -65,10 +65,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib shlwapi.lib Iphlpapi.lib curld.lib pcred.lib libevent.lib nxmld.lib"
-				OutputFile="$(OutDir)/neostats.exe"
+				AdditionalDependencies="Ws2_32.lib winmm.lib shlwapi.lib Iphlpapi.lib curld.lib pcred.lib libeventd.lib nxmld.lib"
+				OutputFile="../neostatsd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Debug"
+				AdditionalLibraryDirectories="..\lib"
 				IgnoreDefaultLibraryNames="LIBCMT;LIBCD"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/neostats.pdb"
@@ -98,6 +98,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -148,9 +149,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib shlwapi.lib curl.lib pcre.lib libevent.lib nxml.lib"
-				OutputFile="$(OutDir)/neostats.exe"
+				OutputFile="../neostats.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Release"
+				AdditionalLibraryDirectories="..\lib"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -231,10 +232,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curld.lib pcred.lib libevent.lib perl58.lib"
-				OutputFile="$(OutDir)/neostats.exe"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curld.lib pcred.lib libeventd.lib perl58.lib"
+				OutputFile="../neostatsd.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\lib;&quot;..\lib\event\WIN32-Prj\Debug&quot;;c:\perl\lib\core"
+				AdditionalLibraryDirectories="..\lib;c:\perl\lib\core"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/neostats.pdb"
@@ -311,9 +312,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib curl.lib pcre.lib libevent.lib perl58.lib"
-				OutputFile="$(OutDir)/neostats.exe"
+				OutputFile="../neostats.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\lib;..\lib\event\WIN32-Prj\Release;c:\perl\lib\core"
+				AdditionalLibraryDirectories="..\lib;c:\perl\lib\core"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -822,11 +823,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\resource.h"
+				RelativePath=".\win32\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\win32\resource.h"
+				RelativePath="..\..\src\win32\resource.h"
 				>
 			</File>
 			<File
