@@ -349,9 +349,6 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	u_char *p;
 	size_t oldoff = buf->off;
 	int n = EVBUFFER_MAX_READ;
-#ifdef WIN32
-	DWORD dwBytesRead;
-#endif
 
 #ifndef WIN32
 	if (ioctl(fd, FIONREAD, &n) == -1 || n == 0) {
@@ -387,12 +384,12 @@ evbuffer_read(struct evbuffer *buf, int fd, int howmuch)
 	if (n == 0)
 		return (0);
 #else
-	n = ReadFile((HANDLE)fd, p, howmuch, &dwBytesRead, NULL);
-	if (n == 0)
+	n = recv( fd, p, howmuch, 0 ); 
+	errno = GetLastError();
+	if (n == -1)
 		return (-1);
-	if (dwBytesRead == 0)
+	if (n == 0)
 		return (0);
-	n = dwBytesRead;
 #endif
 
 	buf->off += n;
@@ -408,9 +405,6 @@ int
 evbuffer_write(struct evbuffer *buffer, int fd)
 {
 	int n;
-#ifdef WIN32
-	DWORD dwBytesWritten;
-#endif
 
 #ifndef WIN32
 	n = write(fd, buffer->buffer, buffer->off);
@@ -419,12 +413,11 @@ evbuffer_write(struct evbuffer *buffer, int fd)
 	if (n == 0)
 		return (0);
 #else
-	n = WriteFile((HANDLE)fd, buffer->buffer, buffer->off, &dwBytesWritten, NULL);
-	if (n == 0)
+	n = send( fd, buffer->buffer, buffer->off, 0 );
+	if (n == -1)
 		return (-1);
-	if (dwBytesWritten == 0)
+	if (n == 0)
 		return (0);
-	n = dwBytesWritten;
 #endif
 	evbuffer_drain(buffer, n);
 
