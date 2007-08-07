@@ -363,6 +363,7 @@ static int cmd_del( const CmdParams *cmdparams )
 		ls_chan = ( ls_channel * )hnode_get( node );
 		if( ircstrcasecmp( ls_chan->name, cmdparams->av[0] ) == 0 )
 		{
+	                irc_cmode( ls_bot, ls_chan->name, "-l", NULL );
 			if( lsjoin )
 				if( IsChannelMember( FindChannel( ls_chan->name ), ls_bot->u ) )
 					irc_part( ls_bot, ls_chan->name, NULL);
