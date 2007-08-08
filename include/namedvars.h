@@ -69,19 +69,28 @@ typedef struct nv_fields {
 		char **v_chara;
 		int n_chara;
 	} values;
+	nv_struct_type type;
 } nv_fields;
-
-typedef struct nv_item {
-	char *key;
-	int no_fields;
-	nv_fields **fields;
-} nv_item;
-
-
 typedef enum {
 	NV_TYPE_LIST,
 	NV_TYPE_HASH
 } nv_type;
+
+typedef struct nv_item {
+	union {
+		char *key;
+		int pos;
+	} index;
+	nv_type type;
+	int no_fields;
+	nv_fields **fields;
+	union {
+		lnode_t *lnode;
+		hnode_t *hnode;
+	} node;
+} nv_item;
+
+
 
 typedef enum {
 	NV_FLAGS_NONE,
@@ -127,4 +136,8 @@ EXPORTFUNC char **nv_gf_stringa(const void *, const nv_list *, const int);
 EXPORTFUNC void *nv_gf_complex(const void *, const nv_list *, const int);
 EXPORTFUNC int nv_get_field(const nv_list *, const char *);
 EXPORTFUNC int nv_get_field_item(nv_item *item, char *fldname);
+EXPORTFUNC int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action);
+EXPORTFUNC int nv_sf_string(nv_item *item, char *fldname, char *value);
+EXPORTFUNC int nv_sf_int(nv_item *item, char *fldname, int value);
+EXPORTFUNC int nv_sf_long(nv_item *item, char *fldname, long value);
 #endif /* _NAMEDVARS_H_ */

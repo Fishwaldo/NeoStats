@@ -33,12 +33,14 @@ HV *perl_encode_namedvars(nv_list *nv, void *data) {
 	return ret;
 }
 
-void perl_store_namedvars(nv_list *nv, char *key, HV *values) {
+nv_item *perl_store_namedvars(nv_list *nv, HV *values) {
 	SV *value;
-	int i;
+	int i, j;
 	i = 0;
+	j = 0;
+        nv_item *item;
+	item = ns_malloc(sizeof(nv_item));
 	while (nv->format[i].fldname != NULL) {
-		printf("fld: %s %d\n", nv->format[i].fldname, i);
 		if (hv_exists(values, nv->format[i].fldname, strlen(nv->format[i].fldname))) {
 			value = *hv_fetch(values, nv->format[i].fldname, strlen(nv->format[i].fldname), FALSE);
 		} else {
@@ -48,8 +50,15 @@ void perl_store_namedvars(nv_list *nv, char *key, HV *values) {
 		switch (nv->format[i].type) {
 			case NV_PSTR:
 			case NV_STR:
-				printf("Value: %s\n", SvPV_nolen(value));
+				nv_sf_string(item, nv->format[i].fldname, SvPV_nolen(value));
 				break;
+			case NV_INT:
+				nv_sf_int(item, nv->format[i].fldname, SvIV(value));
+				break;
+			case NV_LONG:
+				nv_sf_long(item, nv->format[i].fldname, SvIV(value));
+				break;
+			case NV_VOID:
 			default:
 				printf("Value: Unhandled!\n");
 				break;
@@ -57,17 +66,9 @@ void perl_store_namedvars(nv_list *nv, char *key, HV *values) {
 		i++;
 	}
 
-	return;
+	return item;
 }
 
-int perl_candelete_namedvars(nv_list *nv, char *key) {
-	/* XXX - TODO */
-	return NS_FAILURE;
-}
-void perl_delete_namedvars(nv_list *nv, char *key) {
-	/* XXX - TODO */
-	return;
-}
 
 
 #define	RETURN_UNDEF_IF_FAIL { if ((int)RETVAL < 0) XSRETURN_UNDEF; }
@@ -114,13 +115,79 @@ PPCODE:
    PUSHs(sv_2mortal(ret));
 
 
-#when we destroy the "hash" in perl, ie, it goes out of scope
+IV
+DeleteNode(self, key)
+   HV		*self;
+   SV		*key;
+PREINIT:
+   STRLEN        klen;
+   MAGIC        *mg;
+   nv_list	*nv;
+   nv_item	*item;
+CODE:
+   RETVAL = (IV)-1;
+   /* find our magic */
+   mg   = mg_find(SvRV(self),'~');
+   if(!mg) { croak("lost ~ magic"); }
+   /* this is the nv_hash we are point at */
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   item = ns_malloc(sizeof(nv_item));
+   /* make sure its a hash, not a list */
+   if (nv->type == NV_TYPE_HASH) {
+	/* get the "key" they want */
+	item->index.key    = SvPV(key, klen);
+	/* search for the key */
+	item->type = nv->type;
+   } else if (nv->type == NV_TYPE_LIST) {
+	/* get the position */ 
+	item->index.pos = SvIV(key);
+	item->type = nv->type;
+   }
+   RETVAL = (IV)nv_update_structure(nv, item, NV_ACTION_DEL);
+POSTCALL:
+	RETURN_UNDEF_IF_FAIL;
+OUTPUT:
+	RETVAL
 
-#void
-#DESTROY(self)
-#   SV           *self 
-#CODE:
-#printf("DESTROY\n");
+IV
+AddNode(self, key, data)
+   HV		*self;
+   SV		*key;
+   HV		*data
+PREINIT:
+   STRLEN        klen;
+   MAGIC        *mg;
+   nv_list	*nv;
+   nv_item	*item;
+CODE:
+   RETVAL = (IV)-1;
+   /* find our magic */
+   mg   = mg_find(SvRV(self),'~');
+   if(!mg) { croak("lost ~ magic"); }
+   /* this is the nv_hash we are point at */
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* encode the data into item */
+   item = perl_store_namedvars(nv, data);
+   if (item) {
+	   /* make sure its a hash, not a list */
+	   if (nv->type == NV_TYPE_HASH) {
+		/* get the "key" they want */
+		item->index.key    = SvPV(key, klen);
+		item->type = nv->type;
+	   } else if (nv->type == NV_TYPE_LIST) {
+		/* add on a list, pos will always be -1, so ignore key */
+		item->index.pos = -1;
+		item->type = nv->type;
+	   }
+   }
+   RETVAL = (IV)nv_update_structure(nv, item, NV_ACTION_ADD);
+POSTCALL:
+	RETURN_UNDEF_IF_FAIL;
+OUTPUT:
+	RETVAL
+
+
+
 
 MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::HashVars
 
@@ -132,7 +199,6 @@ FETCH(self, key)
    SV           *self;
    SV           *key;
 PREINIT:
-   HV           *hash;
    char         *k;
    STRLEN        klen;
    MAGIC        *mg;
@@ -143,7 +209,6 @@ PREINIT:
 CODE:
    RETVAL = (HV *)-1;
    /* find our magic */
-   hash = (HV*)SvRV(self);
    mg   = mg_find(SvRV(self),'~');
    if(!mg) { croak("lost ~ magic"); }
    /* this is the nv_hash we are point at */

@@ -1644,7 +1644,7 @@ void do_credits( const char *nick, const char *remoteserver )
 {
 	SET_SEGV_LOCATION();
 	irc_numeric( RPL_INFO, nick, ":- NeoStats %s Credits ", me.version );
-	irc_numeric( RPL_INFO, nick, ":- Now Maintained by Fish (fish@dynam.ac) and Mark (mark@ctcp.net)" );
+	irc_numeric( RPL_INFO, nick, ":- Now Maintained by Fish (fish@dynam.ac) and Mark (mark@ctcp.net) and DNB (dnb@majestic-liasons.com)" );
 	irc_numeric( RPL_INFO, nick, ":- Previous Authors: Shmad (shmad@neostats.net) and ^Enigma^ (enigma@neostats.net)" );
 	irc_numeric( RPL_INFO, nick, ":- For Support, you can find us at" );
 	irc_numeric( RPL_INFO, nick, ":- irc.irc-chat.net #NeoStats" );
@@ -1669,6 +1669,9 @@ void do_credits( const char *nick, const char *remoteserver )
 	irc_numeric( RPL_INFO, nick, ":- Reed Loden - Contributions to IRCu support" );
 	irc_numeric( RPL_INFO, nick, ":- Adam Rutter (Shmad) - Developer from the 1.0 days to 2.0 Days");
 	irc_numeric( RPL_INFO, nick, ":- DeadNotBuried - early testing of 3.0, providing patches and feedback and his NeoStats modules" );
+	irc_numeric( RPL_INFO, nick, ":- Rothgar - Lots of testing in the 3.0 series");
+	irc_numeric( RPL_INFO, nick, ":- The users of irc-chat.net for putting up with our testing");
+	irc_numeric( RPL_INFO, nick, ":- The Authors of all the code that has become part of NeoStats");
 	irc_numeric( RPL_ENDOFINFO, nick, ":End of /CREDITS." );
 }
 

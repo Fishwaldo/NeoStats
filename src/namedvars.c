@@ -300,14 +300,80 @@ void nv_printstruct(void *data, nv_list *item) {
 		i++;
 	}
 }
+void nv_free_item(nv_item *item) {
+	int i;
+	for (i = 0; i == item->no_fields; i++) {
+		ns_free(item->fields[i]->name);
+		if (item->fields[i]->type == NV_PSTR)
+			ns_free(item->fields[i]->values.v_char);
+	}
+}		
 
 int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 	int i, j;
 	/* first, determine if the structure allows updates */
 	if (data->flags & NV_FLAGS_RO) {
 		nlog(LOG_WARNING, "Attempt to update read only structure %s", data->name);
+		nv_free_item(item);
 		return NS_FAILURE;
 	}
+	/* make sure index and node are filled in */
+	if (item->type != data->type) {
+		nlog(LOG_WARNING, "Type Field Differs in nv_update_structure");
+		nv_free_item(item);
+		return NS_FAILURE;
+	}
+	switch (item->type) {
+		case NV_TYPE_LIST:
+			if (item->index.pos) {
+				/* find the lnode */
+                                item->node.lnode = list_first((list_t *)data->data);;
+				if ((action == NV_ACTION_ADD) && (item->index.pos != -1)) {
+					nlog(LOG_WARNING, "Attempt to add a item to the list %s with position set to %d", data->name, item->index.pos);
+					nv_free_item(item);
+					return NS_FAILURE;
+				}
+                                for (i = 0; i == item->index.pos; i++) {
+                                	item->node.lnode = list_next((list_t *)data->data, item->node.lnode);
+				}
+				if (item->node.lnode == NULL) {
+					nlog(LOG_WARNING, "can't find postition %d in list %s", item->index.pos, data->name);
+					nv_free_item(item);
+					return NS_FAILURE;
+				} 
+			} else {
+				nlog(LOG_WARNING, "Invalid Index position");
+				nv_free_item(item);
+				return NS_FAILURE;
+			}
+			break;
+		case NV_TYPE_HASH:
+			if (item->index.key) {
+				item->node.hnode = hnode_find((hash_t *)data->data, item->index.key);
+				if (item->node.hnode == NULL) {
+					nlog(LOG_WARNING, "Can't find Key %s in hash %s", item->index.key, data->name);
+					nv_free_item(item);
+					return NS_FAILURE;
+				}
+			} else {
+				nlog(LOG_WARNING, "Invalid Key Name");
+				nv_free_item(item);
+				return NS_FAILURE;
+			}
+			break;
+	}	
+	/* if its a add, make sure the index values dun exist */
+	if (action == NV_ACTION_ADD) {
+		if ((item->type == NV_TYPE_LIST) && (item->node.lnode != NULL)) {
+			nlog(LOG_WARNING, "Attempt to a new Node to list %s with a existing entry already %d in place. Use Modify instead", data->name, item->index.pos);
+			nv_free_item(item);
+			return NS_FAILURE;
+		} else if ((item->type == NV_TYPE_HASH) && (item->node.hnode != NULL)) {
+			nlog(LOG_WARNING, "Attempt to a new Node to hash %s with a existing entry already %s in place. Use Modify instead", data->name, item->index.key);
+			nv_free_item(item);
+			return NS_FAILURE;
+		}			
+	}	
 	/* second, check the fields are not RO if doing a modify */
 	if (action == NV_ACTION_MOD) {
 		i = 0;
@@ -316,12 +382,14 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 				if (!ircstrcasecmp(data->format[i].fldname, item->fields[j]->name)) {
 					if (data->format[i].flags & NV_FLG_RO) {
 						nlog(LOG_WARNING, "Attempt to update a read only field %s in structure %s", data->format[i].fldname, data->name);
+						nv_free_item(item);
 						return NS_FAILURE;
 					}
 					/* also check string length, if applicable */
 					if (data->format[i].type == NV_STR) {
 						if (strlen(item->fields[j]->values.v_char) > data->format[i].len) {
 							nlog(LOG_WARNING, "Attempt to use too large a string in field %s in structure %s", data->format[i].fldname, data->name);
+							nv_free_item(item);
 							return NS_FAILURE;
 						}
 					}
@@ -331,7 +399,10 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 		}
 	}
 	/* if we get to hear, pass to the function to do the verification and actions */
-	return (int)data->updatehandler(item, action);
+	i = (int)data->updatehandler(item, action);
+	/* free the item structure */
+	nv_free_item(item);
+	return i;;
 }
 
 int nv_get_field_item(nv_item *item, char *fldname) {
@@ -344,3 +415,38 @@ int nv_get_field_item(nv_item *item, char *fldname) {
 	nlog(LOG_WARNING, "Attempt to get a unknown field in nv_get_field_item");
 	return -1;
 }
+
+int nv_sf_string(nv_item *item, char *fldname, char *value) {
+	int i;
+	i = nv_get_field_item(item, fldname);
+	if (i == -1) {
+		i = item->no_fields++;
+		item->fields[i]->name = strdup(fldname);
+		ns_free(item->fields[i]->values.v_char);
+	}
+	item->fields[i]->values.v_char = strdup(fldname);
+	item->fields[i]->type = NV_PSTR;
+	return NS_SUCCESS;
+}
+int nv_sf_int(nv_item *item, char *fldname, int value) {
+	int i;
+	i = nv_get_field_item(item, fldname);
+	if (i == -1) {
+		i = item->no_fields++;
+		item->fields[i]->name = strdup(fldname);
+	}
+	item->fields[i]->values.v_int = value;
+	item->fields[i]->type = NV_INT;
+	return NS_SUCCESS;
+}
+int nv_sf_long(nv_item *item, char *fldname, long value) {
+	int i;
+	i = nv_get_field_item(item, fldname);
+	if (i == -1) {
+		i = item->no_fields++;
+		item->fields[i]->name = strdup(fldname);
+	}
+	item->fields[i]->values.v_int = value;
+	item->fields[i]->type = NV_LONG;
+	return NS_SUCCESS;
+}	
