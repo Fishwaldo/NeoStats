@@ -985,8 +985,19 @@ int irc_join( const Bot *botptr, const char *chan, const char *mode )
 		} 
 		else 
 		{
-			if (strlen(mode) > 2) nlog(LOG_WARNING, "Warning, irc_join only supports single modes currently");
-			ircsnprintf( ircd_buf, BUFSIZE, "%c%s", CmodeCharToPrefix( mode[1] ), botptr->u->name );
+			unsigned int i;
+			int prefixlen = 0;
+			char prefix[MODESIZE] = "";
+			for( i = 1; i < strlen( mode ); i++ )
+			{
+				if( CmodeCharToPrefix( mode[i] ) )
+				{
+					prefix[ prefixlen ] = CmodeCharToPrefix( mode[i] );
+					prefixlen++;
+				}
+			}
+			prefix[ prefixlen ] = 0;
+			ircsnprintf( ircd_buf, BUFSIZE, "%s%s", prefix, botptr->u->name );
 			irc_send_sjoin( me.name, ircd_buf, chan, ( unsigned long )ts );
 			JoinChannel( botptr->u->name, chan );
 			ChanUserMode( chan, botptr->u->name, 1, CmodeStringToMask( mode ) );
