@@ -473,8 +473,8 @@ static int hs_event_umode( const CmdParams *cmdparams )
 }
 
 /* XXX Still more work todo */
-
 int hs_nv_check(nv_item *item, nv_write_action action) {
+#if 0 
 	vhostentry *vhe, *vhe1;
 	lnode_t *hn;
 	if (action == NV_ACTION_DEL) {
@@ -528,7 +528,7 @@ int hs_nv_check(nv_item *item, nv_write_action action) {
 		SaveVhost( vhe1 );
 		return NS_SUCCESS;
 	}		
-
+#endif
 	return NS_SUCCESS;
 }
 
