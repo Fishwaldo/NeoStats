@@ -438,8 +438,8 @@ static int ns_set_servicecmode_cb( const CmdParams *cmdparams, SET_REASON reason
 {
 	if( reason == SET_VALIDATE )
 	{
-		if (strlen(cmdparams->av[1]) > 2) {
-			irc_prefmsg(ns_botptr, cmdparams->source, "SERVICECMODE only supports one mode currently");
+		if (strlen(cmdparams->av[1]) > (MODESIZE-1)) {
+			irc_prefmsg(ns_botptr, cmdparams->source, "SERVICECMODE only supports %d modes", (MODESIZE-1));
 			return NS_FAILURE;
 		} else if (cmdparams->av[1][0] != '+') {
 			irc_prefmsg(ns_botptr, cmdparams->source, "SERVICECMODE must start with a +");
