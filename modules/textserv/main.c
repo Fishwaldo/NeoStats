@@ -36,7 +36,7 @@ typedef struct botentry {
 	char bothost[MAXHOST];
 	char dbname[MAXNICK];
 	char channel[MAXCHANLEN];
-	int public;
+	int ispublic;
 } botentry;
 
 typedef struct dbbot {
@@ -442,7 +442,7 @@ static void ts_read_database( dbbot *db )
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateabout, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatecredits, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateversion, sizeof( bot_cmd ) );
-	if( db->tsbot.public == 1 )
+	if( db->tsbot.ispublic == 1 )
 	{
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanpublic, sizeof( bot_cmd ) );
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanpublic, sizeof( bot_cmd ) );
@@ -471,7 +471,7 @@ static void BuildBot( dbbot *db )
 	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
 	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
 	db->botinfo.flags = 0;
-	if( db->tsbot.public > 1 )
+	if( db->tsbot.ispublic > 1 )
 	{
 		db->botinfo.flags = BOT_FLAG_PERSIST;
 	}
@@ -733,7 +733,7 @@ static int ts_cmd_add( const CmdParams *cmdparams )
 	strlcpy( db->tsbot.channel, cmdparams->av[2], MAXCHANLEN );
 	if( cmdparams->ac > 3 )
 		if( ircstrcasecmp( cmdparams->av[3], "public" ) == 0 )
-			db->tsbot.public = 1;
+			db->tsbot.ispublic = 1;
 	if( cmdparams->ac > 4 )
 		if( ValidateUser( cmdparams->av[4] ) == NS_SUCCESS )
 			strlcpy( db->tsbot.botuser, cmdparams->av[4], MAXUSER );
@@ -778,7 +778,7 @@ static int ts_cmd_list( const CmdParams *cmdparams )
 	irc_prefmsg( ts_bot, cmdparams->source, "Bots" );
 	while( ( hn = hash_scan_next( &hs ) ) != NULL ) {
 		db = ( ( dbbot * )hnode_get( hn ) );
-		irc_prefmsg( ts_bot, cmdparams->source, "%s (%s@%s), %s, %s, %s", db->tsbot.botname, db->tsbot.botuser, db->tsbot.bothost, db->tsbot.public ? "Public" : "Private", db->tsbot.dbname, db->tsbot.channel );
+		irc_prefmsg( ts_bot, cmdparams->source, "%s (%s@%s), %s, %s, %s", db->tsbot.botname, db->tsbot.botuser, db->tsbot.bothost, db->tsbot.ispublic ? "Public" : "Private", db->tsbot.dbname, db->tsbot.channel );
 	}
 	irc_prefmsg( ts_bot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
@@ -937,9 +937,9 @@ static int ts_cmd_add_chan( const CmdParams *cmdparams )
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "invalid channel name specified - %s ", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	if ((db->tsbot.public == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.ispublic == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
-	if ((db->tsbot.public == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.ispublic == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
 	if( hash_lookup( db->chanhash, cmdparams->av[0] ) != NULL )
 	{
@@ -983,9 +983,9 @@ static int ts_cmd_del_chan( const CmdParams *cmdparams )
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "invalid channel name specified - %s ", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	if ((db->tsbot.public == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.ispublic == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
-	if ((db->tsbot.public == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.ispublic == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
 		return NS_FAILURE;
 	hn = hash_lookup( db->chanhash, cmdparams->av[0] );
 	if( hn == NULL )
