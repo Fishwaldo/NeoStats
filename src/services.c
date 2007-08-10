@@ -178,7 +178,7 @@ static BotInfo ns_botinfo =
 	BOT_COMMON_HOST,
 	"/msg NeoStats \2HELP\2",
 	/* 0x80000000 is a "hidden" flag to identify the core bot */
-	0x80000000|BOT_FLAG_ONLY_OPERS|BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF,
+	0x80000000|BOT_FLAG_ONLY_OPERS|BOT_FLAG_ROOT|BOT_FLAG_DEAF,
 	ns_commands, 
 	ns_settings,
 };

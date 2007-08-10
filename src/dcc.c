@@ -170,7 +170,7 @@ static int dcc_parse( void *arg, void *rline, int len )
 				dcc_write( dcc, "Use .<botname> to send a command to a NeoStats bot" );
 				return NS_SUCCESS;
 			}
-			if( cmdparams->bot->flags & BOT_FLAG_SERVICEBOT ) 
+			if( cmdparams->bot->flags & BOT_FLAG_ROOT ) 
 			{
 				cmdparams->param = cmd;
 				run_bot_cmd( cmdparams, 0 );

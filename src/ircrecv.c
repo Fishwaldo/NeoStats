@@ -2504,7 +2504,7 @@ void do_whois( const char *origin, const char *server, const char *target )
 		{
 			irc_numeric( RPL_WHOISSERVER, origin, "%s %s :%s", t->name, t->uplink->name, t->uplink->info );
 		}
-		else if( t->user->bot->flags & BOT_FLAG_SERVICEBOT )
+		else if( t->user->bot->flags & BOT_FLAG_ROOT )
 		{
 			irc_numeric( RPL_WHOISOPERATOR, origin, "%s :is an IRC operator", t->name );
 		}

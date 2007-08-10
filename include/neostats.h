@@ -774,12 +774,13 @@ struct bot_cmd
  * E.g. Connectserv
  */
 #define BOT_FLAG_DEAF	0x00000004
-/* Mark bot as a service bot that can receive commands
- * If not set, private messages will not be scanned for commands
- * and all messages received will be passed directly to the module
+/* Mark bot as a root bot that will manage commands and settings 
+ * for the module. Limited to one per module.
  * E.g. Connectserv
  */
-#define BOT_FLAG_SERVICEBOT	0x00000008
+#define BOT_FLAG_ROOT	0x00000008
+/* Temp while flag is deprecated across modules */
+#define BOT_FLAG_SERVICEBOT	BOT_FLAG_ROOT
 /* Mark bot as persistent even when no users are left in a channel
  * If not set, and there are no bots with this flag set, when all
  * users leave a channel, the bot will automatically leave aswell.
@@ -787,21 +788,10 @@ struct bot_cmd
  * are created. 
  */
 #define BOT_FLAG_PERSIST	0x00000010
-/* Prevent addition of LEVELS command to a service bot
- * E.g. TextServ db bots
- */
-#define BOT_FLAG_NOINTRINSICLEVELS	0x00000020
 /* Bot becomes CTCP master for version requests and replies
  * E.g. SecureServ issuing CTCP VERSION rather than NeoStats
  */
-#define BOT_FLAG_CTCPVERSIONMASTER	0x00000040
-
-/* Bot does not require SET support etc. Usefull for TextServ bots where 
- * we must process commands (so we can't say BOT_FLAG_SERVICEBOT above 
- * but we dont want it to process our intrisic commands or SET commands
- * eg TextServ bots
- */
-#define BOT_FLAG_NOINTRINSICSET		0x00000080
+#define BOT_FLAG_CTCPVERSIONMASTER	0x00000020
 
 /* This defines a "NULL" string for the purpose of BotInfo structures that 
  * want to inherit the main host used by NeoStats and still make the info
@@ -973,6 +963,7 @@ struct PerlModInfo;
 #define MODULE_STATUS_SYNCHED	0x00000001
 #define MODULE_STATUS_INSYNCH	0x00000002
 #define MODULE_STATUS_ERROR		0x00000004
+#define MODULE_STATUS_ROOTBOT	0x00000008
 
 /** @brief Module structure
  * 
@@ -1012,10 +1003,12 @@ struct Module {
 #define SetModuleSynched( m ) ( ( m )->status |= MODULE_STATUS_SYNCHED )
 #define SetModuleInSynch( m ) ( ( m )->status |= MODULE_STATUS_INSYNCH )
 #define SetModuleError( m ) ( ( m )->status |= MODULE_STATUS_ERROR )
+#define SetModuleRootBot( m ) ( ( m )->status |= MODULE_STATUS_ROOTBOT )
 /* Test module status */
 #define IsModuleSynched( m ) ( ( m )->status & MODULE_STATUS_SYNCHED )
 #define IsModuleInSynch( m ) ( ( m )->status & MODULE_STATUS_INSYNCH )
 #define IsModuleError( m ) ( ( m )->status & MODULE_STATUS_ERROR )
+#define IsModuleRootBot( m ) ( ( m )->status & MODULE_STATUS_ROOTBOT )
 
 #define ModuleSynched()	( GET_CUR_MODULE()->status & MODULE_STATUS_SYNCHED )
 

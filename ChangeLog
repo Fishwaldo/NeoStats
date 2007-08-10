@@ -4,6 +4,14 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Rename BOT_FLAG_SERVICEBOT to BOT_FLAG_ROOT to better reflect purpose (M)
+ - Remove BOT_FLAG_NOINTRINSICLEVELS, intrinisc levels are now only applied to
+   module root bots. (M)
+ - Remove BOT_FLAG_NOINTRINSICSET since it is redundant due to the way bots are
+   created. (M)
+ - Open up command processor to secondary bots. (M)
+ - Limit modules to a single root bot. (M)
+ - Fix botinfo loading. (M)
  - With M's fix below, SERVICECMODE can now support multiple modes.
    Re-adjust the SET function to allow this. (F)
  - Allow multiple sjoin modes (M)

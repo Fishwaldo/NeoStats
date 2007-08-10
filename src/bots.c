@@ -236,7 +236,7 @@ static void bot_chan_event( Event event, CmdParams *cmdparams )
 				cmdparams->bot = botptr;
 				if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 )
 				{
-					if( cmdflag == 0 || !( botptr->flags & BOT_FLAG_SERVICEBOT ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS )
+					if( cmdflag == 0 || ( botptr->botcmds == NULL ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS )
 					{
 						/* Reset message if we have stripped cmdchar */
 						if( cmdflag != 0 )
@@ -354,7 +354,7 @@ void bot_private( const char *origin, char *const *av, int ac )
 			}
 			else
 			{
-				if( !( cmdparams->bot->flags & BOT_FLAG_SERVICEBOT ) ||
+				if( ( cmdparams->bot->botcmds == NULL ) ||
 					run_bot_cmd( cmdparams, 0 ) == NS_FAILURE )
 				{
 					SendModuleEvent( EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr );
@@ -692,7 +692,7 @@ static int GetBotNick( const BotInfo *botinfo, char *nickbuf )
 
 static void ConnectBot( const Bot *botptr )
 {
-	if( botptr->flags & BOT_FLAG_SERVICEBOT )
+	if( botptr->flags & BOT_FLAG_ROOT )
 	{
 		irc_nick( botptr->name, botptr->u->user->username, botptr->u->user->hostname, botptr->u->info, me.servicesumode );
 		UserMode( botptr->name, me.servicesumode );
@@ -735,6 +735,14 @@ Bot *AddBot( BotInfo *botinfo )
 		SetModuleError( modptr );
 		return NULL;
 	}
+	/* Only one root bot allowed per module so prevent modules trying to add multiple roots */
+	if( botinfo->flags & BOT_FLAG_ROOT && IsModuleRootBot( modptr ) )
+	{
+		/* Warn user of multiple root condition */
+		nlog( LOG_WARNING, "Module %s attempted to init root bot %s but root bot already present", modptr->info->name, botinfo->nick );
+		/* Clear flag and continue as if flag not set */
+		botinfo->flags &= ~BOT_FLAG_ROOT;
+	}
 	/* In single bot mode, just add all commands and settings to main bot */
 	if( nsconfig.singlebotmode && ns_botptr != NULL )
 	{
@@ -746,38 +754,60 @@ Bot *AddBot( BotInfo *botinfo )
 	botptr = new_bot( botinfo->nick );
 	if( botptr == NULL )
 		return NULL;
+	/* Copy flags from bot definition */
 	botptr->flags = botinfo->flags;
-	/* Only add commands and settings for service bots */
-	if( botptr->flags & BOT_FLAG_SERVICEBOT )
+	/* Add commands if defined by bot */
+	if ( botinfo->bot_cmd_list != NULL )
 	{
 		add_bot_cmd_list( botptr, botinfo->bot_cmd_list );
-		if (!(botptr->flags & BOT_FLAG_NOINTRINSICSET))
-			add_bot_setting_list( botptr, botinfo->bot_setting_list );
-		/* Do not add set botinfo options for root bot 
-		 * or bots that don't need intrinic commands */
-		if( !( botptr->flags & 0x80000000 )) {
-			if (!(botptr->flags & BOT_FLAG_NOINTRINSICSET) ) {
-				add_bot_info_settings( botptr, botinfo );
-			}
-		}
+	}
+	/* Add settings if defined by bot */
+	if ( botinfo->bot_setting_list != NULL )
+	{		
+		add_bot_setting_list( botptr, botinfo->bot_setting_list );
+	}
+	if( botptr->flags & BOT_FLAG_ROOT )
+	{
+		SetModuleRootBot( modptr );
 
+		/* Do not add set botinfo options for root bot */
+		if( !( botptr->flags & 0x80000000 ) )
+		{
+			add_bot_info_settings( botptr, botinfo );
+		}
 		/* Create module exclusion command handlers if needed */
 		if( botptr->moduleptr->info->flags & MODULE_FLAG_LOCAL_EXCLUDES )
+		{
 			AddBotExcludeCommands( botptr );
+		}
 	}
 	if( botptr->flags & BOT_FLAG_CTCPVERSIONMASTER )
+	{
 		SetCTCPVersionMaster( botptr );
+	}
 	/* ok, now botinfo should be loaded from the DB, get the nickname */
 	if( GetBotNick( botinfo, nick ) == NS_FAILURE )
 	{
 		nlog( LOG_WARNING, "Failed to find free nick for bot %s", botinfo->nick );
 		return NULL;
 	}
-	if (ircstrcasecmp(nick, botptr->name)) {
-		/* if the generated nick doesn't match what we created this bot as, rename it */
+	/* if the generated nick doesn't match what we created this bot as, rename it */
+	if ( ircstrcasecmp( nick, botptr->name ) )
+	{
 		BotNickChange(botptr, nick);
 	}
-	botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.servicehost : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
+	if( botptr->flags & BOT_FLAG_ROOT && !( botptr->flags & 0x80000000 ) )
+	{
+		botptr->u = AddUser( botptr->name, 
+			botptr->bot_info_settings[2].varptr, //user
+			botptr->bot_info_settings[3].varptr, //host
+			botptr->bot_info_settings[4].varptr, //realname
+			me.name, NULL, NULL, NULL );
+	}
+	else
+	{
+		botptr->u = AddUser( botptr->name, botinfo->user, ( (*botinfo->host ) == 0 ? me.servicehost : botinfo->host ), botinfo->realname, me.name, NULL, NULL, NULL );
+	}
 	/* For more efficient transversal of bot/user lists, link 
 	 * associated user struct to bot and link bot into user struct */
 	botptr->u->user->bot = botptr;

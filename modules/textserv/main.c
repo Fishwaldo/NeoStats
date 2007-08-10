@@ -470,11 +470,10 @@ static void BuildBot( dbbot *db )
 	strlcat( db->botinfo.realname, db->tsbot.dbname, MAXREALNAME );
 	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
 	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
+	db->botinfo.flags = 0;
 	if( db->tsbot.public > 1 )
 	{
-		db->botinfo.flags = BOT_FLAG_SERVICEBOT|BOT_FLAG_NOINTRINSICSET|BOT_FLAG_NOINTRINSICLEVELS|BOT_FLAG_PERSIST;
-	} else {
-		db->botinfo.flags = BOT_FLAG_SERVICEBOT|BOT_FLAG_NOINTRINSICSET|BOT_FLAG_NOINTRINSICLEVELS;
+		db->botinfo.flags = BOT_FLAG_PERSIST;
 	}
 	ts_read_database( db );
 }

@@ -421,7 +421,7 @@ static int run_intrinsic_cmds( const char *cmd, const CmdParams *cmdparams )
 	}
 	/* Handle intrinsic commands */
 	cmd_ptr = intrinsic_commands;
-	if( ircstrcasecmp( cmd, "LEVELS" ) == 0 && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS ) 
+	if( ircstrcasecmp( cmd, "LEVELS" ) == 0 && !( cmdparams->bot->flags & BOT_FLAG_ROOT ) ) 
 		return NS_FAILURE;
 	while( cmd_ptr->cmd != NULL )
 	{
@@ -627,12 +627,13 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 		cmd_ptr = intrinsic_commands;
 		while( cmd_ptr->cmd != NULL )
 		{
-			/* Check for module override */	
-			if( ircstrcasecmp( cmd_ptr->cmd, "LEVELS" ) == 0 && cmdparams->bot->flags & BOT_FLAG_NOINTRINSICLEVELS )
+			/* Levels are only intrinsic for root module bot */
+			if( ircstrcasecmp( cmd_ptr->cmd, "LEVELS" ) == 0 && !( cmdparams->bot->flags & BOT_FLAG_ROOT ) )
 			{
 				cmd_ptr++;
 				continue;
 			}
+			/* Check for module override */	
 			if( !cmdparams->bot->botcmds || !hash_lookup( cmdparams->bot->botcmds, cmd_ptr->cmd ) )
 			{
 				irc_prefmsg( cmdparams->bot, cmdparams->source, "    %-20s %s", cmd_ptr->cmd, cmd_ptr->helptext[0] );
