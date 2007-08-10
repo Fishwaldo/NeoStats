@@ -110,7 +110,7 @@ static BotInfo qs_botinfo =
 	"QS", 
 	BOT_COMMON_HOST, 
 	"Quote service",
-	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	BOT_FLAG_ROOT|BOT_FLAG_DEAF, 
 	qs_commands, 
 	qs_settings,
 };

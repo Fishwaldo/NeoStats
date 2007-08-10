@@ -153,7 +153,7 @@ static BotInfo hs_botinfo =
 	"HS", 
 	BOT_COMMON_HOST, 
 	"Network virtual host service",
-	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	BOT_FLAG_ROOT|BOT_FLAG_DEAF, 
 	hs_commands, 
 	hs_settings,
 };

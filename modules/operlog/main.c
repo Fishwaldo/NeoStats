@@ -74,7 +74,7 @@ static BotInfo operlog_botinfo =
 	"operlog", 
 	BOT_COMMON_HOST, 
 	"Operator command logging service",
-	BOT_FLAG_SERVICEBOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
+	BOT_FLAG_ROOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
 	NULL, 
 	operlog_settings,
 };

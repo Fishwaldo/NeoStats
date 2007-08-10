@@ -211,7 +211,7 @@ static BotInfo ts_botinfo =
 	"TS", 
 	BOT_COMMON_HOST, 
 	"Network text message service",
-	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	BOT_FLAG_ROOT|BOT_FLAG_DEAF, 
 	ts_commands, 
 	NULL,
 };

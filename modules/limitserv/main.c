@@ -108,7 +108,7 @@ static BotInfo ls_botinfo =
 	"TS", 
 	BOT_COMMON_HOST, 
 	"Limit service",
-	BOT_FLAG_SERVICEBOT|BOT_FLAG_DEAF, 
+	BOT_FLAG_ROOT|BOT_FLAG_DEAF, 
 	ls_commands, 
 	ls_settings,
 };

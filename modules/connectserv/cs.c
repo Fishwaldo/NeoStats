@@ -196,7 +196,7 @@ static BotInfo cs_botinfo =
 	"CS", 
 	BOT_COMMON_HOST, 
 	"Connection monitoring service", 	
-	BOT_FLAG_SERVICEBOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
+	BOT_FLAG_ROOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
 	NULL, 
 	cs_settings,
 };
