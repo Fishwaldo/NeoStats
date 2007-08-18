@@ -180,7 +180,7 @@ static void run_mod_timers( int ismidnight )
 			}
 			if( setjmp( sigvbuf ) == 0 )
 			{
-				dlog( DEBUG3, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name );
+				dlog( DEBUG10, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name );
 				SET_RUN_LEVEL( timer->moduleptr );
 				if( timer->handler( timer->userptr ) < 0 )
 				{
