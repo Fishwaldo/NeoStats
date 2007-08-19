@@ -562,7 +562,6 @@ static int cb_verify_log( cfg_t *cfg, cfg_opt_t *opt )
 static int cb_verify_mask( cfg_t *cfg, cfg_opt_t *opt )
 {
 	char *value = opt->values[0]->string;
-printf("veryify %s\n", strstr(value, "!"));
 	if( !strstr( value, "!" ) | !strstr( value, "@" ) )
 	{
 		cfg_error( cfg, "Invalid hostmask %s for %s", value, opt->name );

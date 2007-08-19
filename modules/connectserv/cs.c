@@ -290,9 +290,11 @@ static void cs_report( const char *fmt, ... )
 	ircvsnprintf( buf, BUFSIZE, fmt, ap );
 	va_end( ap );
 	irc_chanalert( cs_bot, "%s", buf );
-	if( cs_cfg.logging ) 
-		nlog( LOG_NORMAL, "%s", buf );
-}
+	if( cs_cfg.logging ) {
+		if (cs_cfg.colour == 1)
+			strip_mirc_codes(buf);
+		nlog( LOG_NORMAL, "%s", buf);
+}	}
 
 /** @brief cs_event_signon
  *

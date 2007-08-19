@@ -207,7 +207,6 @@ static int dcc_error( int sock_no, void *name )
 		DelDCCClient( sock->data );
 	else
 		nlog( LOG_WARNING, "Problem, Sock->data is NULL, therefore we can't delete DCCClient!" );
-	DelSock( sock );
 	return NS_SUCCESS;
 }
 

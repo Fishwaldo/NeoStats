@@ -4,6 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Correctly check error returns from LibEvent (F)
+ - If colour is enabled and logging is enabled in connectserv, strip the
+   message before writting the logfile (F)
  - Rename BOT_FLAG_SERVICEBOT to BOT_FLAG_ROOT to better reflect purpose (M)
  - Remove BOT_FLAG_NOINTRINSICLEVELS, intrinisc levels are now only applied to
    module root bots. (M)

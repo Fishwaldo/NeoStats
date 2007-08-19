@@ -117,13 +117,13 @@ sub event_pong {
 #		NeoStats::debug("$key => $value");
 #	}
 #
-	my $servers = new NeoStats::NV("Servers");
-	while ( my ($key, $value) = each(%$servers)) {
-		NeoStats::debug("Hostserv Key => $value, $key");
-	    	while ( my ($key1, $value1) = each(%$value)) {
-        		NeoStats::debug("HS: $key: $key1 => $value1");
-    		}
-	}
+#	my $servers = new NeoStats::NV("Servers");
+#	while ( my ($key, $value) = each(%$servers)) {
+#		NeoStats::debug("Hostserv Key => $value, $key");
+#	    	while ( my ($key1, $value1) = each(%$value)) {
+#        		NeoStats::debug("HS: $key: $key1 => $value1");
+#    		}
+#	}
 
 	my $hostserv = new NeoStats::NV("HostServ");
 #	my $hashtest = $hostserv->{1};
@@ -138,14 +138,15 @@ sub event_pong {
 #	Dump($hostserv);
 #	NeoStats::debug("Var: HostServ".$hostserv->{0}."Fin");
 #	$hashtest->{nick} = "ghaha";
-	$hostserv->{0}->{nick} = "haha";
+#	$hostserv->{0}->{nick} = "haha";
 #	NeoStats::debug("HS Nick: ".$hashtest->{nick});
 	my $blah;
 	$blah->{nick} = "Gheheh";
 	$blah->{host} = "w00p.com";
 	$blah->{vhost} = "goog.com";
 	$blah->{passwd} = "pass";
-	$hostserv->{-1} = $blah;
+	NeoStats::NV:AddNode($hostserv, "-1", $blah);
+#	$hostserv->{-1} = $blah;
 }
 
 sub event_signon {

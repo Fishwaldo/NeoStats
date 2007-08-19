@@ -376,18 +376,16 @@ static void socket_linemode_write_done (struct bufferevent *bufferevent, void *a
 static void socket_linemode_error(struct bufferevent *bufferevent, short what, void *arg)
 {
 	Sock *sock = (Sock*)arg;
-	switch (what) {
-		case EVBUFFER_READ:
-		case EVBUFFER_WRITE:
-		case EVBUFFER_EOF:
-		case EVBUFFER_ERROR:
-		case EVBUFFER_TIMEOUT:
-			nlog(LOG_ERROR, "LinemodeSock Error: %d (%s)", what, strerror(errno));
-			break;
-		default:
-			nlog(LOG_ERROR, "Unknown Error from Socket: %d (%s)", what, strerror(errno));
-			break;
-	}
+	if (what & EVBUFFER_READ) 
+		what &= ~EVBUFFER_READ;
+	if (what & EVBUFFER_WRITE)
+		what &= ~EVBUFFER_WRITE;
+	
+	if ((what & EVBUFFER_EOF) || (what & EVBUFFER_ERROR) || (what & EVBUFFER_TIMEOUT)) {
+		nlog(LOG_ERROR, "LinemodeSock Error: %d (%s)", what, strerror(errno));
+	} else {
+		nlog(LOG_ERROR, "Unknown Error from Socket: %d (%s)", what, strerror(errno));
+	}	
 	sock->sfunc.linemode.errcb(what, sock->data);	
 	DelSock(sock);
 }
