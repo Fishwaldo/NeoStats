@@ -29,6 +29,7 @@
 
 #include "neostats.h"
 #include "textserv.h"
+#include "confuse.h"
 
 typedef struct botentry {
 	char botname[MAXNICK];
@@ -39,6 +40,12 @@ typedef struct botentry {
 	int ispublic;
 } botentry;
 
+
+typedef struct output {
+	char **outputstring;
+	int action;
+} output;
+
 typedef struct dbbot {
 	botentry tsbot;
 	BotInfo botinfo;
@@ -46,9 +53,7 @@ typedef struct dbbot {
 	char *abouttext;
 	char *creditstext;
 	char *versiontext;
-	char **stringlist;
-	int stringcount;
-	int helpcount;
+	output **outstr;
 	int commandcount;
 	hash_t *chanhash;
 }dbbot;
@@ -216,6 +221,28 @@ static BotInfo ts_botinfo =
 	NULL,
 };
 
+/** database file format for confuse */
+static cfg_opt_t tsdb_info[] = {
+	CFG_STR ("about", NULL, CFGF_NODEFAULT),
+	CFG_STR ("credits", NULL, CFGF_NODEFAULT),
+	CFG_STR ("version", NULL, CFGF_NODEFAULT),
+	CFG_END()
+};
+
+static cfg_opt_t tsdb_cmd[] = {
+	CFG_STR ("helpstring", NULL, CFGF_NODEFAULT | CFGF_LIST),
+	CFG_STR ("output", NULL, CFGF_NODEFAULT | CFGF_LIST),
+	CFG_BOOL ("action", 0, CFGF_NONE),
+	CFG_END()
+};
+
+static cfg_opt_t tsdb[] = {
+	CFG_SEC ("description", tsdb_info, CFGF_NONE),
+	CFG_SEC ("command", tsdb_cmd, CFGF_MULTI | CFGF_TITLE),
+	CFG_END()
+};
+
+
 /** @brief tsprintf
  *
  *  printf style message function 
@@ -227,15 +254,14 @@ static BotInfo ts_botinfo =
  *  @return number of characters written excluding terminating null
  */
 
-static int tsprintf( char *botname, char *from, char *target, char *buf, const size_t size, const char *fmt, ... )
+static int tsprintf( const CmdParams *cmdparams, char *target, char *buf, const size_t size, const char *fmt)
 {
 	static char nullstring[] = "(null)";
 	size_t len = 0;
-    char *str;
-    char c;
-    va_list args;
-
-	va_start( args, fmt );
+    	char *str;
+    	char c;
+    	char pn;
+    	int ac;
 	while( ( c = *fmt++ ) != 0 && ( len < size ) )
 	{
 		/* Is it a format string character? */
@@ -245,7 +271,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 			{
 				/* handle %B (botname) */
 				case 'B': 
-					str = botname;
+					str = cmdparams->bot->u->name;
 					/* If NULL string point to our null output string */
 					if( str == NULL ) {
 						str = nullstring;
@@ -259,7 +285,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 					break;
 				/* handle %F (from) */
 				case 'F': 
-					str = from;
+					str = cmdparams->source->name;
 					/* If NULL string point to our null output string */
 					if( str == NULL ) {
 						str = nullstring;
@@ -285,9 +311,23 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 					/* next char... */
 					fmt++;
 					break;
-				/* handle %M (message) */
-				case 'M': 
-					str = va_arg( args, char * );
+				/* handle %P (params) */
+				case 'P': 
+					*fmt++;
+					if (isdigit(*fmt)) {
+						/* if its a digit, he wants the thats param value */
+						ac = atoi(fmt++);
+						if (ac > cmdparams->ac) {
+							str = NULL;
+						} else {
+							str = cmdparams->av[ac];
+						}
+					} else if (isspace(*fmt)) {
+						/* he wants all the param */
+						str = joinbuf(cmdparams->av, cmdparams->ac, 1);
+					} else {
+						str = NULL;
+					}
 					/* If NULL string point to our null output string */
 					if( str == NULL ) {
 						str = nullstring;
@@ -297,7 +337,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 						buf[len++] = *str++;
 					}
 					/* next char... */
-					fmt++;
+					/* fmt++; */
 					break;
 				default:
 					buf[len++] = c;
@@ -316,73 +356,7 @@ static int tsprintf( char *botname, char *from, char *target, char *buf, const s
 	else
 		buf[size -1] = 0;
 	/* return count chars written */
-    va_end( args );
-    return len;
-}
-
-/** @brief parse_line
- *
- *  parse line of database file
- *
- *  @param none
- *
- *  @return none
- */
-static void parse_line( dbbot *db, char *buf, int *commandreadcount )
-{
-	int readcount = 0;
-	char *ptr;
-	char *ptr2;
-
-	/* Get command text */
-	ptr = strtok( buf, "|" );
-	if( !ptr )
-		return;
-	if( ircstrcasecmp( ptr, "ABOUT" ) == 0 )
-	{
-		ptr = strtok( NULL, "|" );
-		if( !ptr )
-			return;
-		dlog( DEBUG1, "about %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) + 1 );
-		strcpy( ptr2, ptr );
-		db->abouttext = ptr2;
-		return;		
-	}
-	if( ircstrcasecmp( ptr, "CREDITS" ) == 0 )
-	{
-		ptr = strtok( NULL, "|" );
-		if( !ptr )
-			return;
-		dlog( DEBUG1, "credits %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) + 1 );
-		strcpy( ptr2, ptr );
-		db->creditstext = ptr2;
-		return;		
-	}
-	if( ircstrcasecmp( ptr, "VERSION" ) == 0 )
-	{
-		ptr = strtok( NULL, "|" );
-		if( !ptr )
-			return;
-		dlog( DEBUG1, "credits %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) + 1 );
-		strcpy( ptr2, ptr );
-		db->versiontext = ptr2;
-		return;		
-	}
-	while( ptr != NULL )
-	{
-		readcount++;
-		dlog( DEBUG1, "read %s", ptr );
-		ptr2 = ns_malloc( strlen( ptr ) + 1 );
-		strcpy( ptr2, ptr );
-		AddStringToList( &db->stringlist, ptr2, &db->helpcount );
-		ptr = strtok( NULL, "|" );
-	}
-	if( readcount != 4 )
-		return;
-	(*commandreadcount)++;
+    	return len;
 }
 
 /** @brief ts_read_database
@@ -396,52 +370,61 @@ static void parse_line( dbbot *db, char *buf, int *commandreadcount )
 
 static void ts_read_database( dbbot *db )
 {
-	static char filename[MAXPATH];
-	static char buf[BUFSIZE*4];
-	static char helpbuf[128];
-	FILE *fp;
+	char filename[MAXPATH];
 	int commandreadcount = 0;
-	int i;
+	int i, j;
+	cfg_t *cfg;
+	cfg_t *cmd;
+	int ret;
 
 	strlcpy( filename, "data/TSDB/", MAXPATH );
 	strlcat( filename, db->tsbot.dbname, MAXPATH );
-	fp = os_fopen( filename, "rt" );
-	if( !fp )
+	cfg = cfg_init(tsdb, CFGF_NOCASE);
+	if (!cfg) 
 		return;
-	while( os_fgets( buf, BUFSIZE*4, fp ) != NULL )
-	{
-		/* comment char */
-		if( buf[0] == '#' )
-			continue;
-		parse_line( db, buf, &commandreadcount );
-	}	
-	os_fclose( fp );
-	db->commandcount = commandreadcount;
-	/* Allocate command structure */
-	db->botinfo.bot_cmd_list = ns_calloc( ( commandreadcount + 6 ) * sizeof( bot_cmd ) );
-	for( i = 0; i < commandreadcount; i ++ )
-	{		
-		char *ptr;
-
-		/* Fill in command structure defaults */
+	if ( ( ret = cfg_parse(cfg, filename) ) != 0 ) {
+		/* error */
+exit(-1);
+		return;
+	}
+	/* count the number of commands */
+	commandreadcount = cfg_size(cfg, "command");
+	/* first, do the description section */
+	db->botinfo.bot_cmd_list = ns_calloc( ( commandreadcount + 4) * sizeof( bot_cmd ) );
+	db->abouttext = cfg_getstr(cfg, "description|about");
+	db->creditstext = cfg_getstr(cfg, "description|credits");
+	db->versiontext = cfg_getstr(cfg, "description|version");
+	db->outstr = ns_calloc(commandreadcount * sizeof(output));
+	for (i = 0; i < commandreadcount; i++) {
+		cmd = cfg_getnsec(cfg, "command", i);
 		os_memcpy( &db->botinfo.bot_cmd_list[i], &ts_commandtemplate, sizeof( bot_cmd ) );
-		/* Assign command */
-		db->botinfo.bot_cmd_list[i].cmd = db->stringlist[( i * 4 ) + 0];
-		/* Allocate and build help text structures */
-		db->botinfo.bot_cmd_list[i].helptext = ns_malloc( 5 * sizeof( char * ) );
-		db->botinfo.bot_cmd_list[i].helptext[0] = db->stringlist[( i * 4 ) + 2];
-		ptr = ns_malloc( ircsnprintf( helpbuf, 128, "Syntax: \2%s\2", db->stringlist[( i * 4 ) + 0] ) + 1 );
-		strcpy( ptr, helpbuf );
-		db->botinfo.bot_cmd_list[i].helptext[1] = ptr;
-		db->botinfo.bot_cmd_list[i].helptext[2] = emptyline ;
-		db->botinfo.bot_cmd_list[i].helptext[3] = db->stringlist[( i * 4 ) + 2];
-		db->botinfo.bot_cmd_list[i].helptext[4] = NULL;
-		/* Pointer to output format string */
-		db->botinfo.bot_cmd_list[i].moddata = ( void * )db->stringlist[( i * 4 ) + 3];
+		db->botinfo.bot_cmd_list[i].cmd = ns_malloc(strlen(cfg_title(cmd)+1));
+		strlcpy((char *)db->botinfo.bot_cmd_list[i].cmd, cfg_title(cmd), strlen(cfg_title(cmd))+1);
+
+		db->botinfo.bot_cmd_list[i].helptext = ns_calloc( cfg_size(cmd, "helpstring") * sizeof(char *));
+		for (j = 0; j < cfg_size(cmd, "helpstring"); j++) {		
+			db->botinfo.bot_cmd_list[i].helptext[j] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", j)+1));
+			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[j], cfg_getnstr(cmd, "helpstring", j), strlen(cfg_getnstr(cmd, "helpstring", j))+1);
+		}
+		/* make sure the last helpstring is null */
+		db->botinfo.bot_cmd_list[i].helptext[j++] = NULL;
+
+		db->outstr[i] = ns_calloc(sizeof(output));
+		db->outstr[i]->outputstring = ns_calloc(cfg_size(cmd, "output") * sizeof(char *));
+		for (j = 0; j < cfg_size(cmd, "output"); j++) {		
+			db->outstr[i]->outputstring[j] = ns_malloc(strlen(cfg_getnstr(cmd, "output", j))+1);
+			strlcpy(db->outstr[i]->outputstring[j], cfg_getnstr(cmd, "output", j), strlen(cfg_getnstr(cmd, "output", j))+1);
+		}
+		db->outstr[i]->action = cfg_getbool(cmd, "action");
+		/* make sure the last output string is null */
+		db->outstr[i]->outputstring[j++] = NULL;
+		db->botinfo.bot_cmd_list[i].moddata = db->outstr[i];
 	}
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateabout, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatecredits, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateversion, sizeof( bot_cmd ) );
+#if 0
+/* broke at the moment. */
 	if( db->tsbot.ispublic == 1 )
 	{
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanpublic, sizeof( bot_cmd ) );
@@ -449,6 +432,15 @@ static void ts_read_database( dbbot *db )
 	} else {
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanprivate, sizeof( bot_cmd ) );
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanprivate, sizeof( bot_cmd ) );
+	}
+#endif
+	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplate, sizeof( bot_cmd ) );
+	output *blah;
+	for (i = 0; i < commandreadcount; i++) {
+		printf("cmd: %s\n", db->botinfo.bot_cmd_list[i].cmd);
+		printf("help: %s\n", db->botinfo.bot_cmd_list[i].helptext[0]);
+		blah = db->botinfo.bot_cmd_list[i].moddata;
+		printf("output %s\n", blah->outputstring[0]);
 	}
 }
 
@@ -519,7 +511,7 @@ static void PartBot( dbbot *db )
 	hnode_t *hn;
 	hscan_t hs;
 	char *channame;
-	int i;
+	int i, j;
 
 	if( db->botptr )
 	{
@@ -538,14 +530,18 @@ static void PartBot( dbbot *db )
 	}
 	for( i = 0; i < db->commandcount; i++ )
 	{
-		ns_free( db->botinfo.bot_cmd_list[i].helptext[1] );
-		ns_free( db->botinfo.bot_cmd_list[i].helptext );
+		j = 0;
+		while (db->botinfo.bot_cmd_list[i].helptext[j] != NULL) {
+			ns_free( db->botinfo.bot_cmd_list[i].helptext[j] );
+			j++;
+		}
+		j = 0;
+		while (db->outstr[i]->outputstring[j] != NULL) {
+			ns_free(db->outstr[i]->outputstring[j]);
+			j++;
+		};
+		ns_free( db->botinfo.bot_cmd_list[i].cmd);
 	}
-	for( i = 0; i < db->stringcount; i++ )
-	{
-		ns_free( db->stringlist[i] );
-	}
-	ns_free( db->stringlist );
 	ns_free( db->abouttext );
 	ns_free( db->creditstext );	
 	ns_free( db->versiontext );	
@@ -846,10 +842,10 @@ static int ts_cmd_del( const CmdParams *cmdparams )
 static int ts_cmd_msg( const CmdParams* cmdparams )
 {
 	static char buf[BUFSIZE];
-	char *fmt;
+	output *fmt;
 	dbbot *db;
 	Client *target;
-	int isaction = 0;
+	int i = 0;
 
 	SET_SEGV_LOCATION();
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
@@ -859,28 +855,15 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 		return NS_FAILURE;
 	}
 	irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, target->name );
-	fmt = ( char * ) cmdparams->cmd_ptr->moddata;
-	if( ircstrncasecmp( fmt, "ACTION ", 7 ) == 0 )
-	{
-		isaction = 1;
-		fmt += 7;
+	fmt = cmdparams->cmd_ptr->moddata;
+	while (fmt->outputstring[i] != NULL) {
+		tsprintf(cmdparams, target->name, buf, BUFSIZE, fmt->outputstring[i]);
+		if (fmt->action == 1)
+			irc_ctcp_action_req_channel( cmdparams->bot, cmdparams->channel, buf );
+		else
+			irc_chanprivmsg( cmdparams->bot, cmdparams->channel->name, buf );
+		i++;
 	}
-	if( cmdparams->ac > 1)
-	{
-		char *message;
-		
-		message = joinbuf( cmdparams->av, cmdparams->ac, 1 );
-		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, fmt, message );
-		ns_free( message );
-	}
-	else
-	{
-		tsprintf( cmdparams->bot->u->name, cmdparams->source->name, target->name, buf, BUFSIZE, fmt );
-	}
-	if( isaction )
-		irc_ctcp_action_req_channel( cmdparams->bot, cmdparams->channel, buf );
-	else
-		irc_chanprivmsg( cmdparams->bot, cmdparams->channel->name, buf );
 	return NS_SUCCESS;
 }
 

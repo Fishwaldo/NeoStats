@@ -3,7 +3,7 @@ CLEANFILES = version.h
 
 include_HEADERS		=	neostats.h config.h version.h \
 				list.h hash.h support.h events.h numeric.h \
-				adns.h protocol.h perlmod.h \
+				adns.h protocol.h perlmod.h confuse.h\
 				updates.h MiniMessage.h MiniMessageGateway.h MuscleSupport.h NeoNet.h namedvars.h
 
 
@@ -14,7 +14,7 @@ noinst_HEADERS		=	commands.h dns.h servers.h users.h conf.h \
 				ircprotocol.h ircsend.h ircrecv.h \
 				bots.h dcc.h ircstring.h numeric.h timer.h \
 				channels.h dl.h lang.h transfer.h nsdbm.h \
-				nsdba.h main.h numerics.h settings.h botinfo.h confuse.h \
+				nsdba.h main.h numerics.h settings.h botinfo.h \
 				adnsdlist.h adnsinternal.h adnstvarith.h namedvars-core.h
 
 extra_DIST		=	version.h
