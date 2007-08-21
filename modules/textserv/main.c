@@ -435,6 +435,7 @@ exit(-1);
 	}
 #endif
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplate, sizeof( bot_cmd ) );
+#if 0
 	output *blah;
 	for (i = 0; i < commandreadcount; i++) {
 		printf("cmd: %s\n", db->botinfo.bot_cmd_list[i].cmd);
@@ -442,6 +443,7 @@ exit(-1);
 		blah = db->botinfo.bot_cmd_list[i].moddata;
 		printf("output %s\n", blah->outputstring[0]);
 	}
+#endif
 }
 
 /** @brief BuildBot
