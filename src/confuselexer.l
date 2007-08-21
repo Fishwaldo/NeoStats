@@ -24,6 +24,8 @@
 # include <config.h>
 #endif
 
+#include "neostats.h"
+
 #include <assert.h>
 
 #ifdef HAVE_STRING_H

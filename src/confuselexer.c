@@ -473,7 +473,7 @@ char *yytext;
 # include <config.h>
 #endif
 #endif /* WIN32 */
-
+#include "neostats.h"
 #include <assert.h>
 
 #ifdef HAVE_STRING_H
@@ -482,6 +482,8 @@ char *yytext;
 #include "confuse.h"
 
 #include <errno.h>
+
+#undef _(str)
 
 #if defined(ENABLE_NLS) && defined(HAVE_GETTEXT)
 # include <libintl.h>
