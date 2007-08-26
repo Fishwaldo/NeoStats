@@ -51,6 +51,7 @@ int limitservtimer(void *userptr);
 /** Setting callback prototypes */
 static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason );
 static int set_timer_cb( const CmdParams *cmdparams, SET_REASON reason );
+static int set_buffer_cb( const CmdParams *cmdparams, SET_REASON reason );
 static int set_grace_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 /** hash to store ls_channel and bot info */
@@ -94,9 +95,9 @@ static bot_cmd ls_commands[]=
 static bot_setting ls_settings[]=
 {
 	{"JOIN",	&lsjoin,	SET_TYPE_BOOLEAN,	0, 0,	NS_ULEVEL_ADMIN, NULL,	help_set_join,		set_join_cb,	(void *)0	},
-	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,		0, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_buffer,	set_grace_cb,	(void *)1	},
+	{"BUFFER", 	&lsbuffer,	SET_TYPE_INT,		0, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_buffer,	set_buffer_cb,	(void *)1	},
 	{"TIMER", 	&lstimer,	SET_TYPE_INT,		1, 100,	NS_ULEVEL_ADMIN, NULL,	help_set_timer,		set_timer_cb,	(void *)10	},
-	{"GRACE",	&lsgrace,	SET_TYPE_INT,		0, 100, NS_ULEVEL_ADMIN, NULL,  help_set_grace, 	set_grace_cb,		(void *)0	},
+	{"GRACE",	&lsgrace,	SET_TYPE_INT,		0, 99,	NS_ULEVEL_ADMIN, NULL,  help_set_grace, 	set_grace_cb,	(void *)0	},
 	NS_SETTING_END()
 };
 
@@ -506,12 +507,24 @@ static int set_join_cb( const CmdParams *cmdparams, SET_REASON reason )
 	return NS_SUCCESS;
 }
 
+static int set_buffer_cb( const CmdParams *cmdparams, SET_REASON reason)
+{
+	if (reason == SET_VALIDATE)
+	{
+		if (atoi(cmdparams->av[1]) <= lsgrace) {
+			irc_prefmsg( ls_bot, cmdparams->source, "Buffer setting cannot be equal to or lower than Grace setting");
+			return NS_FAILURE;
+		}
+	}
+	return NS_SUCCESS;
+}
+
 static int set_grace_cb( const CmdParams *cmdparams, SET_REASON reason)
 {
 	if (reason == SET_VALIDATE)
 	{
 		if (atoi(cmdparams->av[1]) >= lsbuffer) {
-			irc_prefmsg( ls_bot, cmdparams->source, "Grace Setting can not be equal or bigger than Buffer Setting");
+			irc_prefmsg( ls_bot, cmdparams->source, "Grace setting can not be equal to or larger than Buffer setting");
 			return NS_FAILURE;
 		}
 	}
