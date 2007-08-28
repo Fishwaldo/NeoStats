@@ -120,6 +120,7 @@ typedef struct nv_list {
 		struct lnode_t *node;
 	} iter;
 	int itercount;
+	int no_flds;
 } nv_list;
 
 extern hash_t *namedvars;
@@ -140,4 +141,6 @@ EXPORTFUNC int nv_update_structure (nv_list *data, nv_item *item, nv_write_actio
 EXPORTFUNC int nv_sf_string(nv_item *item, char *fldname, char *value);
 EXPORTFUNC int nv_sf_int(nv_item *item, char *fldname, int value);
 EXPORTFUNC int nv_sf_long(nv_item *item, char *fldname, long value);
+EXPORTFUNC nv_item *nv_new_item(nv_list *data);
+
 #endif /* _NAMEDVARS_H_ */

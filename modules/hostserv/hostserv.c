@@ -493,12 +493,12 @@ int hs_nv_check(nv_item *item, nv_write_action action) {
 			ns_free(vhe);
 			return NS_FAILURE;
 		}
-		lnode_create_append( vhost_list, vhe );
+		lnode_create_prepend( vhost_list, vhe );
 		SaveVhost( vhe );
 	} else if (action == NV_ACTION_MOD) {
 		vhe = lnode_get(item->node.lnode);	
 		/* copy the vhost entry incase we have to fall back */
-		memcpy(vhe, vhe1, sizeof(vhostentry));
+		memcpy(vhe1, vhe, sizeof(vhostentry));
 		strlcpy(vhe1->nick, item->fields[nv_get_field_item(item, "nick")]->values.v_char, MAXNICK);
 		strlcpy(vhe1->host, item->fields[nv_get_field_item(item, "host")]->values.v_char, MAXHOST);
 		strlcpy(vhe1->vhost, item->fields[nv_get_field_item(item, "vhost")]->values.v_char, MAXHOST);

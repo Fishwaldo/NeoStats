@@ -148,7 +148,16 @@ sub event_pong {
 	$blah->{added} = "Fish";
 	$blah->{tslastused} = "0";
 #	Dump($hostserv);
-	$hostserv->AddNode("-2", $blah);
+	$hostserv->AddNode(-2, $blah);
+	while ( my ($key, $value) = each(%$hostserv)) {
+		NeoStats::debug("Hostserv Key => $value, $key");
+	    	while ( my ($key1, $value1) = each(%$value)) {
+        		NeoStats::debug("HS: $key: $key1 => $value1");
+    		}
+	}
+	$blah->{host} = "Woop.net";
+	$hostserv->ModNode(0, $blah);
+	$hostserv->DeleteNode(4);
 }
 
 sub event_signon {
