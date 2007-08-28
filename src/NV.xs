@@ -279,7 +279,7 @@ CODE:
 	   if (!lnode) {
 		RETVAL = (HV *)-1;
 	   } else {
-		   for (i = 0; i == pos; i++) {
+		   for (i = 0; i < pos; i++) {
 				lnode = list_next((list_t *)nv->data, lnode);
 		   }
 		   if (lnode) {
