@@ -63,9 +63,9 @@ nv_struct nv_hostserv[] = {
 	{ "nick", NV_STR, offsetof(vhostentry, nick), NV_FLG_RO, -1, MAXNICK},
 	{ "host", NV_STR, offsetof(vhostentry, host), 0, -1, MAXHOST},
 	{ "vhost", NV_STR, offsetof(vhostentry, vhost), 0, -1, MAXHOST},
-	{ "passwd", NV_STR, offsetof(vhostentry, passwd), 0, -1, MAXPASS},
-	{ "added", NV_STR, offsetof(vhostentry, added), NV_FLG_RO, -1, MAXNICK},
 	{ "tslastused", NV_INT, offsetof(vhostentry, tslastused), NV_FLG_RO, -1, -1},
+	{ "passwd", NV_STR, offsetof(vhostentry, passwd), 0, -1, MAXPASS},
+	{ "added", NV_STR, offsetof(vhostentry, added), NV_FLG_RO, -1, MAXNICK}, 
 	NV_STRUCT_END()
 };
 
@@ -474,20 +474,13 @@ static int hs_event_umode( const CmdParams *cmdparams )
 
 /* XXX Still more work todo */
 int hs_nv_check(nv_item *item, nv_write_action action) {
-#if 0 
 	vhostentry *vhe, *vhe1;
-	lnode_t *hn;
 	if (action == NV_ACTION_DEL) {
-		hn = list_find( vhost_list, item->key, findnick );
-		if( !hn )
-		{
-			return NS_FAILURE;
-		}
-		vhe = ( vhostentry * ) lnode_get( hn );
+		vhe = ( vhostentry * ) lnode_get( item->node.lnode);
 		CommandReport( hs_bot, "Removed vhost %s for %s",
 			vhe->vhost, vhe->nick );
 		DelVhost( vhe );
-		list_delete_destroy_node( vhost_list, hn );
+		list_delete_destroy_node( vhost_list, item->node.lnode );
 		return NS_SUCCESS;
 	} else if (action == NV_ACTION_ADD) {
 		vhe = ns_malloc(sizeof(vhostentry));
@@ -503,12 +496,7 @@ int hs_nv_check(nv_item *item, nv_write_action action) {
 		lnode_create_append( vhost_list, vhe );
 		SaveVhost( vhe );
 	} else if (action == NV_ACTION_MOD) {
-        	hn = list_find( vhost_list, item->key, findnick );
-                if( !hn ) {
-			nlog(LOG_WARNING, "hs_nv_check: Can't find Vhost Entry %s", item->key);
-			return NS_FAILURE;
-		}
-		vhe = lnode_get(hn);	
+		vhe = lnode_get(item->node.lnode);	
 		/* copy the vhost entry incase we have to fall back */
 		memcpy(vhe, vhe1, sizeof(vhostentry));
 		strlcpy(vhe1->nick, item->fields[nv_get_field_item(item, "nick")]->values.v_char, MAXNICK);
@@ -523,12 +511,11 @@ int hs_nv_check(nv_item *item, nv_write_action action) {
 		}
 		/* if its here, its ok. Remove the old entry and insert the new one */
 		DelVhost( vhe );
-		list_delete_destroy_node( vhost_list, hn );
+		list_delete_destroy_node( vhost_list, item->node.lnode );
 		lnode_create_append( vhost_list, vhe1 );
 		SaveVhost( vhe1 );
 		return NS_SUCCESS;
 	}		
-#endif
 	return NS_SUCCESS;
 }
 

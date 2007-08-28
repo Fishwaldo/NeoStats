@@ -479,7 +479,9 @@ XS (XS_NeoStats_debug)
 		nlog(LOG_WARNING, "Usage: NeoStats::Internal::debug(text)");
 	} else {
 		text = SvPV_nolen (ST (0));
+#if 0
 		strip(text);
+#endif
 		nlog(LOG_WARNING, "%s", text);
 	}
 	XSRETURN_EMPTY;

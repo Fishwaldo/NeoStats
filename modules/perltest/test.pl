@@ -145,8 +145,10 @@ sub event_pong {
 	$blah->{host} = "w00p.com";
 	$blah->{vhost} = "goog.com";
 	$blah->{passwd} = "pass";
-	NeoStats::NV:AddNode($hostserv, "-1", $blah);
-#	$hostserv->{-1} = $blah;
+	$blah->{added} = "Fish";
+	$blah->{tslastused} = "0";
+#	Dump($hostserv);
+	$hostserv->AddNode("-2", $blah);
 }
 
 sub event_signon {
@@ -376,9 +378,9 @@ sub setupbot {
 	$botinfo->{ident} = "fish";
 	$botinfo->{host} = "Host.com";
 	$botinfo->{gecos} = "My Gecos";
-	$bot = NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
+	$bot = NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_ROOT);
 	$botinfo->{nick} = "fishy2";
-	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_SERVICEBOT);
+	NeoStats::AddBot($botinfo, NeoStats::BOT_FLAG_ROOT);
 	NeoStats::debug("Added Second Bot $botinfo->{nick}");
 	NeoStats::DelBot($botinfo->{nick});
 	#add a command

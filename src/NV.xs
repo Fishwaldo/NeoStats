@@ -34,15 +34,15 @@ HV *perl_encode_namedvars(nv_list *nv, void *data) {
 }
 
 nv_item *perl_store_namedvars(nv_list *nv, HV *values) {
-	SV *value;
+	SV **value;
 	int i, j;
 	i = 0;
 	j = 0;
         nv_item *item;
-	item = ns_malloc(sizeof(nv_item));
+	item = ns_calloc(sizeof(nv_item));
 	while (nv->format[i].fldname != NULL) {
 		if (hv_exists(values, nv->format[i].fldname, strlen(nv->format[i].fldname))) {
-			value = *hv_fetch(values, nv->format[i].fldname, strlen(nv->format[i].fldname), FALSE);
+			value = hv_fetch(values, nv->format[i].fldname, strlen(nv->format[i].fldname), FALSE);
 		} else {
 			i++;
 			continue;
@@ -50,13 +50,13 @@ nv_item *perl_store_namedvars(nv_list *nv, HV *values) {
 		switch (nv->format[i].type) {
 			case NV_PSTR:
 			case NV_STR:
-				nv_sf_string(item, nv->format[i].fldname, SvPV_nolen(value));
+				nv_sf_string(item, nv->format[i].fldname, SvPV_nolen(*value));
 				break;
 			case NV_INT:
-				nv_sf_int(item, nv->format[i].fldname, SvIV(value));
+				nv_sf_int(item, nv->format[i].fldname, SvIV(*value));
 				break;
 			case NV_LONG:
-				nv_sf_long(item, nv->format[i].fldname, SvIV(value));
+				nv_sf_long(item, nv->format[i].fldname, SvIV(*value));
 				break;
 			case NV_VOID:
 			default:
@@ -65,7 +65,6 @@ nv_item *perl_store_namedvars(nv_list *nv, HV *values) {
 		}
 		i++;
 	}
-
 	return item;
 }
 
@@ -80,30 +79,21 @@ new(class, varname)
    char      *varname;
    char      *class;
 PREINIT:
-   SV        *ret;
-   HV        *stash;
-   HV        *hash;
    HV        *tie;
    SV        *nv_link;
-   SV        *tieref;
+   HV        *tieref;
    nv_list   *nv;
 PPCODE:
    nv = FindNamedVars(varname);
    if (!nv) {
-	nlog(LOG_WARNING, "Perl NV: Can't find NamedVar list %s", varname);
-     	ret = &PL_sv_undef;
+	nlog(LOG_WARNING, "Perl NV: Can't find NamedVar list %s %s", varname, class);
+     	tieref = (HV *)&PL_sv_undef;
    } else {
-	/* this returns a "empty" hash that is tied to the FETCH/STORE etc functions below */
-   	hash   = newHV();
-  	ret    = (SV*)newRV_noinc((SV*)hash);
-	stash  = gv_stashpv(class ,TRUE);
-   	sv_bless(ret,stash);
-
 	/* tie the hash to the package (FETCH/STORE) below */
    	tie = newHV();
-	tieref = newRV_noinc((SV*)tie);
-   	sv_bless(tieref, gv_stashpv("NeoStats::NV::HashVars", TRUE));
-	hv_magic(hash, (GV*)tieref, 'P'); 
+	tieref = (HV *)newRV_noinc((SV*)tie);
+   	sv_bless((SV *)tieref, gv_stashpv("NeoStats::NV::HashVars", TRUE));
+	hv_magic(tie, (GV*)tieref, 'P'); 
 	/* this one allows us to store a "pointer" 
          */
    	nv_link = newSViv((int)nv);
@@ -112,12 +102,14 @@ PPCODE:
    }
    /* return the hash */
    EXTEND(SP,1);
-   PUSHs(sv_2mortal(ret));
+   PUSHs(sv_2mortal((SV *)tieref));
+
+MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::HashVars
 
 
 IV
 DeleteNode(self, key)
-   HV		*self;
+   SV		*self;
    SV		*key;
 PREINIT:
    STRLEN        klen;
@@ -151,7 +143,7 @@ OUTPUT:
 
 IV
 AddNode(self, key, data)
-   HV		*self;
+   SV		*self;
    SV		*key;
    HV		*data
 PREINIT:
@@ -163,7 +155,7 @@ CODE:
    RETVAL = (IV)-1;
    /* find our magic */
    mg   = mg_find(SvRV(self),'~');
-   if(!mg) { croak("lost ~ magic"); }
+   if(!mg) { croak("AddNode: lost ~ magic"); }
    /* this is the nv_hash we are point at */
    nv = (nv_list *)SvIV(mg->mg_obj);
    /* encode the data into item */
@@ -189,7 +181,6 @@ OUTPUT:
 
 
 
-MODULE = NeoStats::NV		PACKAGE = NeoStats::NV::HashVars
 
 #/* get a individual entry. self points to what we set with sv_magic in
 #* new function above */

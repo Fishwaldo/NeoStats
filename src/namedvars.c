@@ -306,7 +306,9 @@ void nv_free_item(nv_item *item) {
 		ns_free(item->fields[i]->name);
 		if (item->fields[i]->type == NV_PSTR)
 			ns_free(item->fields[i]->values.v_char);
+		ns_free(item->fields);
 	}
+	ns_free(item);
 }		
 
 int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
@@ -325,14 +327,11 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 	}
 	switch (item->type) {
 		case NV_TYPE_LIST:
-			if (item->index.pos) {
+			if ((action == NV_ACTION_ADD) && (item->index.pos == -1)) {
+				item->node.lnode = NULL;
+			} else if (item->index.pos > -1) {
 				/* find the lnode */
                                 item->node.lnode = list_first((list_t *)data->data);;
-				if ((action == NV_ACTION_ADD) && (item->index.pos != -1)) {
-					nlog(LOG_WARNING, "Attempt to add a item to the list %s with position set to %d", data->name, item->index.pos);
-					nv_free_item(item);
-					return NS_FAILURE;
-				}
                                 for (i = 0; i == item->index.pos; i++) {
                                 	item->node.lnode = list_next((list_t *)data->data, item->node.lnode);
 				}
@@ -362,8 +361,8 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 			}
 			break;
 	}	
-	/* if its a add, make sure the index values dun exist */
 	if (action == NV_ACTION_ADD) {
+		/* if its a add, make sure the index values dun exist */
 		if ((item->type == NV_TYPE_LIST) && (item->node.lnode != NULL)) {
 			nlog(LOG_WARNING, "Attempt to a new Node to list %s with a existing entry already %d in place. Use Modify instead", data->name, item->index.pos);
 			nv_free_item(item);
@@ -373,6 +372,16 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 			nv_free_item(item);
 			return NS_FAILURE;
 		}			
+		/* make sure all fields are present */
+		i = 0;
+		while (data->format[i].fldname != NULL) {
+			if (nv_get_field_item(item, data->format[i].fldname) == -1) {
+				nlog(LOG_WARNING, "Field %s is missing for AddOption for %s", data->format[i].fldname, data->name);
+				nv_free_item(item);
+				return NS_FAILURE;
+			}
+			i++;
+		}
 	}	
 	/* second, check the fields are not RO if doing a modify */
 	if (action == NV_ACTION_MOD) {
@@ -407,12 +416,11 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 
 int nv_get_field_item(nv_item *item, char *fldname) {
 	int i = 0;
-	while (item->fields[i]->name != NULL) {
+	while (item->no_fields > i) {
 		if (!ircstrcasecmp(item->fields[i]->name, fldname)) 
 			return i;
 		i++;
 	}
-	nlog(LOG_WARNING, "Attempt to get a unknown field in nv_get_field_item");
 	return -1;
 }
 
@@ -421,21 +429,27 @@ int nv_sf_string(nv_item *item, char *fldname, char *value) {
 	i = nv_get_field_item(item, fldname);
 	if (i == -1) {
 		i = item->no_fields++;
+		if (i == 0) 
+			item->fields = ns_calloc(sizeof(nv_fields));
+		item->fields[i] = ns_calloc(sizeof(nv_fields));
 		item->fields[i]->name = strdup(fldname);
-		ns_free(item->fields[i]->values.v_char);
 	}
-	item->fields[i]->values.v_char = strdup(fldname);
+	item->fields[i]->values.v_char = strdup(value);
 	item->fields[i]->type = NV_PSTR;
 	return NS_SUCCESS;
 }
 int nv_sf_int(nv_item *item, char *fldname, int value) {
 	int i;
+
 	i = nv_get_field_item(item, fldname);
 	if (i == -1) {
 		i = item->no_fields++;
-		item->fields[i]->name = strdup(fldname);
+		if (i == 0) 
+			item->fields = ns_malloc(sizeof(nv_fields));
+		item->fields[i] = ns_malloc(sizeof(nv_fields));
+		item->fields[i]->name = strdup(fldname); 
 	}
-	item->fields[i]->values.v_int = value;
+	item->fields[i]->values.v_int = value;  
 	item->fields[i]->type = NV_INT;
 	return NS_SUCCESS;
 }
@@ -444,9 +458,12 @@ int nv_sf_long(nv_item *item, char *fldname, long value) {
 	i = nv_get_field_item(item, fldname);
 	if (i == -1) {
 		i = item->no_fields++;
+		if (i == 0) 
+			item->fields = ns_malloc(sizeof(nv_fields));
+		item->fields[i] = ns_malloc(sizeof(nv_fields));
 		item->fields[i]->name = strdup(fldname);
 	}
 	item->fields[i]->values.v_int = value;
 	item->fields[i]->type = NV_LONG;
 	return NS_SUCCESS;
-}	
+}
