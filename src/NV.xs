@@ -143,7 +143,7 @@ CODE:
    if(!mg) { croak("lost ~ magic"); }
    /* this is the nv_hash we are point at */
    nv = (nv_list *)SvIV(mg->mg_obj);
-   item = ns_malloc(sizeof(nv_item));
+   item = nv_new_item(nv);
    /* make sure its a hash, not a list */
    if (nv->type == NV_TYPE_HASH) {
 	/* get the "key" they want */

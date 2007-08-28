@@ -493,12 +493,19 @@ int hs_nv_check(nv_item *item, nv_write_action action) {
 			ns_free(vhe);
 			return NS_FAILURE;
 		}
+		if( list_find( vhost_list, vhe->nick, findnick ) )
+		{
+			CommandReport( hs_bot, "%s already has a vhost entry", vhe->nick);
+			ns_free(vhe);
+			return NS_FAILURE;
+		}	
 		lnode_create_prepend( vhost_list, vhe );
 		SaveVhost( vhe );
 	} else if (action == NV_ACTION_MOD) {
 		vhe = lnode_get(item->node.lnode);	
 		/* copy the vhost entry incase we have to fall back */
-		memcpy(vhe1, vhe, sizeof(vhostentry));
+		vhe1 = ns_malloc(sizeof(vhostentry));
+		os_memcpy(vhe1, vhe, sizeof(vhostentry));
 		strlcpy(vhe1->nick, item->fields[nv_get_field_item(item, "nick")]->values.v_char, MAXNICK);
 		strlcpy(vhe1->host, item->fields[nv_get_field_item(item, "host")]->values.v_char, MAXHOST);
 		strlcpy(vhe1->vhost, item->fields[nv_get_field_item(item, "vhost")]->values.v_char, MAXHOST);
@@ -861,16 +868,6 @@ static int hs_check_vhost( const CmdParams *cmdparams, const vhostentry *vhe)
 		return NS_FAILURE;
 		
 	}
-	if( list_find( vhost_list, vhe->nick, findnick ) )
-	{
-		if (cmdparams) 
-			irc_prefmsg( hs_bot, cmdparams->source, 
-				"%s already has a vhost entry", vhe->nick);
-		else 
-			CommandReport(hs_bot, "%s already has a vhost entry", vhe->nick);
-		return NS_FAILURE;
-		
-	}
 	return NS_SUCCESS;
 }
 
@@ -908,6 +905,14 @@ static int hs_cmd_add( const CmdParams *cmdparams )
 		ns_free(vhe);
 		return NS_FAILURE;
 	}
+	if( list_find( vhost_list, vhe->nick, findnick ) )
+	{
+		irc_prefmsg( hs_bot, cmdparams->source, "%s already has a vhost entry", vhe->nick);
+		ns_free(vhe);
+		return NS_FAILURE;
+		
+	}
+
 	lnode_create_append( vhost_list, vhe );
 	SaveVhost( vhe );
 	irc_prefmsg( hs_bot, cmdparams->source, 

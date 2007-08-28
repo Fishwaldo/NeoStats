@@ -316,10 +316,11 @@ nv_item *nv_new_item(nv_list *data) {
 
 void nv_free_item(nv_item *item) {
 	int i;
-	for (i = 0; i == item->no_fields; i++) {
+	for (i = 0; i < item->no_fields; i++) {
 		ns_free(item->fields[i]->name);
 		if (item->fields[i]->type == NV_PSTR)
 			ns_free(item->fields[i]->values.v_char);
+		ns_free(item->fields[i]);
 	}
 	ns_free(item->fields);
 	ns_free(item);
@@ -351,7 +352,7 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 					return NS_FAILURE;
 				}
                                 item->node.lnode = list_first((list_t *)data->data);;
-                                for (i = 0; i == item->index.pos; i++) {
+                                for (i = 0; i < item->index.pos; i++) {
                                 	item->node.lnode = list_next((list_t *)data->data, item->node.lnode);
 				}
 				if (item->node.lnode == NULL) {
