@@ -39,11 +39,10 @@
 
 extern void boot_DynaLoader (pTHX_ CV * cv);
 void dump_hash(HV *rethash);
-void boot_NeoStats__NV();
+/* this is defined in NV.xs to init our namedvar support for perl */
+void Init_Perl_NV();
 
 XSINIT_t extn_init;
-
-
 
 
 void
@@ -1481,7 +1480,6 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::AddTimer", XS_NeoStats_AddTimer, __FILE__);
 	newXS ("NeoStats::Internal::DelTimer", XS_NeoStats_DelTimer, __FILE__);
 	
-	boot_NeoStats__NV();
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
 		exit (1);
@@ -1572,6 +1570,8 @@ xs_init (pTHX)
 		newXS ("NeoStats::Internal::registerextension", XS_NeoStats_registerextension, __FILE__);
 		mod->pm->extninit();
 	}
+	Init_Perl_NV();
+
 }
 
 int
@@ -1584,7 +1584,6 @@ Init_Perl (void)
 static Module *load_perlfiles (const char *filename, Module *mod, perl_xs_init init_func) 
 {
 	char *perl_args[] = { "", "-e", "0", "-w" };
-
 	const char perl_definitions[] = {
 #include "neostats.pm.h" 
 	};

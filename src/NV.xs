@@ -5,6 +5,25 @@
 #include "perl.h"
 #include "XSUB.h"
 
+XS(XS_NeoStats__NV_new); /* prototype to pass -Wmissing-prototypes */
+XS(XS_NeoStats__NV__HashVars_DeleteNode); /* prototype to pass -Wmissing-prototypes */
+XS(XS_NeoStats__NV__HashVars_AddNode); /* prototype to pass -Wmissing-prototypes */
+XS(XS_NeoStats__NV__HashVars_FETCH); /* prototype to pass -Wmissing-prototypes */
+XS(XS_NeoStats__NV__HashVars_EXISTS); /* prototype to pass -Wmissing-prototypes */
+XS(XS_NeoStats__NV__HashVars_FIRSTKEY); /* prototype to pass -Wmissing-prototypes */
+XS(XS_NeoStats__NV__HashVars_NEXTKEY); /* prototype to pass -Wmissing-prototypes */
+
+void Init_Perl_NV() {
+
+        newXSproto("NeoStats::NV::new", XS_NeoStats__NV_new, __FILE__, "$$");
+        newXSproto("NeoStats::NV::HashVars::DeleteNode", XS_NeoStats__NV__HashVars_DeleteNode, __FILE__, "$$");
+        newXSproto("NeoStats::NV::HashVars::AddNode", XS_NeoStats__NV__HashVars_AddNode, __FILE__, "$$$");
+        newXSproto("NeoStats::NV::HashVars::FETCH", XS_NeoStats__NV__HashVars_FETCH, __FILE__, "$$");
+        newXSproto("NeoStats::NV::HashVars::EXISTS", XS_NeoStats__NV__HashVars_EXISTS, __FILE__, "$$");
+        newXSproto("NeoStats::NV::HashVars::FIRSTKEY", XS_NeoStats__NV__HashVars_FIRSTKEY, __FILE__, "$");
+        newXSproto("NeoStats::NV::HashVars::NEXTKEY", XS_NeoStats__NV__HashVars_NEXTKEY, __FILE__, "$$");
+}
+
 /* XXX TODO: implement svREADONLY */
 
 HV *perl_encode_namedvars(nv_list *nv, void *data) {
@@ -219,14 +238,17 @@ CODE:
 	   /* get the position */
 	   pos = SvIV(key);
 	   lnode = list_first((list_t *)nv->data);;
-	   for (i = 0; i == pos; i++) {
-			lnode = list_next((list_t *)nv->data, lnode);
-	   }
-	   if (lnode) {
-		   RETVAL = perl_encode_namedvars(nv, lnode_get(lnode));
-	   } else
-		   RETVAL = (HV *)-1;
-
+	   if (!lnode) {
+		RETVAL = (HV *)-1;
+	   } else {
+		   for (i = 0; i == pos; i++) {
+				lnode = list_next((list_t *)nv->data, lnode);
+		   }
+		   if (lnode) {
+			   RETVAL = perl_encode_namedvars(nv, lnode_get(lnode));
+		   } else
+			   RETVAL = (HV *)-1;
+	  }
    }
 POSTCALL:
 	RETURN_UNDEF_IF_FAIL;
