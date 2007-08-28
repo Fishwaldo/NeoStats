@@ -73,6 +73,10 @@ hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char
 		newitem->mod = GET_CUR_MODULE();
 		newitem->data = (void *)hash_create(count, comp, fun);
 		newitem->updatehandler = set_handler;
+		newitem->no_flds = 0;
+		while (newitem->format[newitem->no_flds].fldname != NULL) {
+			newitem->no_flds++;
+		}
 		hnode_create_insert(namedvars, newitem, newitem->name);
 		return (hash_t *) newitem->data;
 	} else {
@@ -92,6 +96,9 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 		newitem->mod = GET_CUR_MODULE();
 		newitem->data = (void *)list_create(count);
 		newitem->updatehandler = set_handler;
+		while (newitem->format[newitem->no_flds].fldname != NULL) {
+			newitem->no_flds++;
+		}
 		hnode_create_insert(namedvars, newitem, newitem->name);
 		return (list_t *) newitem->data;
 	} else {
@@ -300,14 +307,21 @@ void nv_printstruct(void *data, nv_list *item) {
 		i++;
 	}
 }
+nv_item *nv_new_item(nv_list *data) {
+	nv_item *newitem;
+	newitem = ns_calloc(sizeof(nv_item));
+	newitem->fields = ns_calloc(data->no_flds * sizeof(nv_fields));
+	return newitem;
+}
+
 void nv_free_item(nv_item *item) {
 	int i;
 	for (i = 0; i == item->no_fields; i++) {
 		ns_free(item->fields[i]->name);
 		if (item->fields[i]->type == NV_PSTR)
 			ns_free(item->fields[i]->values.v_char);
-		ns_free(item->fields);
 	}
+	ns_free(item->fields);
 	ns_free(item);
 }		
 
@@ -331,6 +345,11 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 				item->node.lnode = NULL;
 			} else if (item->index.pos > -1) {
 				/* find the lnode */
+				if (item->index.pos > list_count((list_t *)data->data)) {
+					nlog(LOG_WARNING, "Can't find position %d in list %s", item->index.pos, data->name);
+					nv_free_item(item);
+					return NS_FAILURE;
+				}
                                 item->node.lnode = list_first((list_t *)data->data);;
                                 for (i = 0; i == item->index.pos; i++) {
                                 	item->node.lnode = list_next((list_t *)data->data, item->node.lnode);
@@ -372,6 +391,8 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 			nv_free_item(item);
 			return NS_FAILURE;
 		}			
+	}
+	if (action == NV_ACTION_ADD || action == NV_ACTION_MOD) {
 		/* make sure all fields are present */
 		i = 0;
 		while (data->format[i].fldname != NULL) {
@@ -408,11 +429,14 @@ int nv_update_structure (nv_list *data, nv_item *item, nv_write_action action) {
 		}
 	}
 	/* if we get to hear, pass to the function to do the verification and actions */
+	SET_RUN_LEVEL(data->mod);
 	i = (int)data->updatehandler(item, action);
+	RESET_RUN_LEVEL();
 	/* free the item structure */
 	nv_free_item(item);
 	return i;;
 }
+
 
 int nv_get_field_item(nv_item *item, char *fldname) {
 	int i = 0;
@@ -429,8 +453,6 @@ int nv_sf_string(nv_item *item, char *fldname, char *value) {
 	i = nv_get_field_item(item, fldname);
 	if (i == -1) {
 		i = item->no_fields++;
-		if (i == 0) 
-			item->fields = ns_calloc(sizeof(nv_fields));
 		item->fields[i] = ns_calloc(sizeof(nv_fields));
 		item->fields[i]->name = strdup(fldname);
 	}
@@ -444,8 +466,6 @@ int nv_sf_int(nv_item *item, char *fldname, int value) {
 	i = nv_get_field_item(item, fldname);
 	if (i == -1) {
 		i = item->no_fields++;
-		if (i == 0) 
-			item->fields = ns_malloc(sizeof(nv_fields));
 		item->fields[i] = ns_malloc(sizeof(nv_fields));
 		item->fields[i]->name = strdup(fldname); 
 	}
@@ -458,8 +478,6 @@ int nv_sf_long(nv_item *item, char *fldname, long value) {
 	i = nv_get_field_item(item, fldname);
 	if (i == -1) {
 		i = item->no_fields++;
-		if (i == 0) 
-			item->fields = ns_malloc(sizeof(nv_fields));
 		item->fields[i] = ns_malloc(sizeof(nv_fields));
 		item->fields[i]->name = strdup(fldname);
 	}

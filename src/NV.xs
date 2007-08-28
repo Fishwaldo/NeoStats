@@ -12,12 +12,13 @@ XS(XS_NeoStats__NV__HashVars_FETCH); /* prototype to pass -Wmissing-prototypes *
 XS(XS_NeoStats__NV__HashVars_EXISTS); /* prototype to pass -Wmissing-prototypes */
 XS(XS_NeoStats__NV__HashVars_FIRSTKEY); /* prototype to pass -Wmissing-prototypes */
 XS(XS_NeoStats__NV__HashVars_NEXTKEY); /* prototype to pass -Wmissing-prototypes */
-
+XS(XS_NeoStats__NV__HashVars_ModNode); /* prototype to pass -Wmissing-prototypes */
 void Init_Perl_NV() {
 
         newXSproto("NeoStats::NV::new", XS_NeoStats__NV_new, __FILE__, "$$");
         newXSproto("NeoStats::NV::HashVars::DeleteNode", XS_NeoStats__NV__HashVars_DeleteNode, __FILE__, "$$");
         newXSproto("NeoStats::NV::HashVars::AddNode", XS_NeoStats__NV__HashVars_AddNode, __FILE__, "$$$");
+        newXSproto("NeoStats::NV::HashVars::ModNode", XS_NeoStats__NV__HashVars_ModNode, __FILE__, "$$$");
         newXSproto("NeoStats::NV::HashVars::FETCH", XS_NeoStats__NV__HashVars_FETCH, __FILE__, "$$");
         newXSproto("NeoStats::NV::HashVars::EXISTS", XS_NeoStats__NV__HashVars_EXISTS, __FILE__, "$$");
         newXSproto("NeoStats::NV::HashVars::FIRSTKEY", XS_NeoStats__NV__HashVars_FIRSTKEY, __FILE__, "$");
@@ -58,7 +59,7 @@ nv_item *perl_store_namedvars(nv_list *nv, HV *values) {
 	i = 0;
 	j = 0;
         nv_item *item;
-	item = ns_calloc(sizeof(nv_item));
+	item = nv_new_item(nv);
 	while (nv->format[i].fldname != NULL) {
 		if (hv_exists(values, nv->format[i].fldname, strlen(nv->format[i].fldname))) {
 			value = hv_fetch(values, nv->format[i].fldname, strlen(nv->format[i].fldname), FALSE);
@@ -192,6 +193,43 @@ CODE:
 	   }
    }
    RETVAL = (IV)nv_update_structure(nv, item, NV_ACTION_ADD);
+POSTCALL:
+	RETURN_UNDEF_IF_FAIL;
+OUTPUT:
+	RETVAL
+
+IV
+ModNode(self, key, data)
+   SV		*self;
+   SV		*key;
+   HV		*data
+PREINIT:
+   STRLEN        klen;
+   MAGIC        *mg;
+   nv_list	*nv;
+   nv_item	*item;
+CODE:
+   RETVAL = (IV)-1;
+   /* find our magic */
+   mg   = mg_find(SvRV(self),'~');
+   if(!mg) { croak("AddNode: lost ~ magic"); }
+   /* this is the nv_hash we are point at */
+   nv = (nv_list *)SvIV(mg->mg_obj);
+   /* encode the data into item */
+   item = perl_store_namedvars(nv, data);
+   if (item) {
+	   /* make sure its a hash, not a list */
+	   if (nv->type == NV_TYPE_HASH) {
+		/* get the "key" they want */
+		item->index.key    = SvPV(key, klen);
+		item->type = nv->type;
+	   } else if (nv->type == NV_TYPE_LIST) {
+		/* add on a list, pos will always be -1, so ignore key */
+		item->index.pos = SvIV(key);
+		item->type = nv->type;
+	   }
+   }
+   RETVAL = (IV)nv_update_structure(nv, item, NV_ACTION_MOD);
 POSTCALL:
 	RETURN_UNDEF_IF_FAIL;
 OUTPUT:
