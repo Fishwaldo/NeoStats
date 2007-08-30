@@ -44,6 +44,7 @@ typedef struct botentry {
 typedef struct output {
 	char **outputstring;
 	int action;
+	int target;
 } output;
 
 typedef struct dbbot {
@@ -233,6 +234,10 @@ static cfg_opt_t tsdb_cmd[] = {
 	CFG_STR ("helpstring", NULL, CFGF_NODEFAULT | CFGF_LIST),
 	CFG_STR ("output", NULL, CFGF_NODEFAULT | CFGF_LIST),
 	CFG_BOOL ("action", 0, CFGF_NONE),
+	CFG_INT ("params", 0, CFGF_NONE),
+	CFG_STR ("paramlist", NULL, CFGF_NONE | CFGF_LIST),
+	CFG_INT ("triggertype", 1, CFGF_NONE),
+	CFG_INT ("sendtosource", 0, CFGF_NONE),
 	CFG_END()
 };
 
@@ -241,6 +246,15 @@ static cfg_opt_t tsdb[] = {
 	CFG_SEC ("command", tsdb_cmd, CFGF_MULTI | CFGF_TITLE),
 	CFG_END()
 };
+
+int ispunch(char x) {
+	if ((x >= 33 && x <= 47) || (x >= 58 && x <= 64) || (x >= 91 && x <= 96) || (x >= 123 && x <= 126)) {
+		return 1;
+	} else {
+		return -1;
+	}
+}
+
 
 
 /** @brief tsprintf
@@ -254,14 +268,17 @@ static cfg_opt_t tsdb[] = {
  *  @return number of characters written excluding terminating null
  */
 
-static int tsprintf( const CmdParams *cmdparams, char *target, char *buf, const size_t size, const char *fmt)
+static int tsprintf( const CmdParams *cmdparams, int targettype, char *buf, const size_t size, const char *fmt)
 {
 	static char nullstring[] = "(null)";
 	size_t len = 0;
     	char *str;
     	char c;
-    	char pn;
     	int ac;
+    	int add = 0;
+    	if ((targettype == 2) || (targettype == 3))
+    		add = 1;
+	
 	while( ( c = *fmt++ ) != 0 && ( len < size ) )
 	{
 		/* Is it a format string character? */
@@ -297,20 +314,6 @@ static int tsprintf( const CmdParams *cmdparams, char *target, char *buf, const 
 					/* next char... */
 					fmt++;
 					break;
-				/* handle %T (target) */
-				case 'T': 
-					str = target;
-					/* If NULL string point to our null output string */
-					if( str == NULL ) {
-						str = nullstring;
-					}
-					/* copy string to output observing limit */
-					while( *str != '\0' && len < size ) {
-						buf[len++] = *str++;
-					}
-					/* next char... */
-					fmt++;
-					break;
 				/* handle %P (params) */
 				case 'P': 
 					*fmt++;
@@ -320,11 +323,11 @@ static int tsprintf( const CmdParams *cmdparams, char *target, char *buf, const 
 						if (ac > cmdparams->ac) {
 							str = NULL;
 						} else {
-							str = cmdparams->av[ac];
+							str = cmdparams->av[ac+add];
 						}
-					} else if (isspace(*fmt)) {
+					} else if (isspace(*fmt) || isalpha(*fmt) || ispunch(*fmt) || (*fmt == '\0')) {
 						/* he wants all the param */
-						str = joinbuf(cmdparams->av, cmdparams->ac, 1);
+						str = joinbuf(cmdparams->av, cmdparams->ac, 1+add);
 					} else {
 						str = NULL;
 					}
@@ -359,6 +362,15 @@ static int tsprintf( const CmdParams *cmdparams, char *target, char *buf, const 
     	return len;
 }
 
+/** @brief Confuse Error Reporter
+ */
+void ts_db_error(cfg_t *cfg, const char *fmt, va_list ap) {
+	char buf[BUFSIZE];
+	ircvsnprintf(buf, BUFSIZE, fmt, ap);
+	CommandReport(ts_bot, "TextServ DB Error: %s", buf);
+	nlog(LOG_WARNING, "TextServ DB Error: %s", buf);
+}
+
 /** @brief ts_read_database
  *
  *  Read a database file
@@ -372,7 +384,7 @@ static void ts_read_database( dbbot *db )
 {
 	char filename[MAXPATH];
 	int commandreadcount = 0;
-	int i, j;
+	int i, j, k;
 	cfg_t *cfg;
 	cfg_t *cmd;
 	int ret;
@@ -382,9 +394,12 @@ static void ts_read_database( dbbot *db )
 	cfg = cfg_init(tsdb, CFGF_NOCASE);
 	if (!cfg) 
 		return;
+	cfg_set_error_function(cfg, ts_db_error);
 	if ( ( ret = cfg_parse(cfg, filename) ) != 0 ) {
 		/* error */
-exit(-1);
+		CommandReport(ts_bot, "Parsing TextServ DB %s Failed with error: %s", db->tsbot.dbname, ret == CFG_FILE_ERROR ? "File Not Found" : ret == CFG_PARSE_ERROR ? "TextServ DB Corrupt" : "Unknown Error");
+		nlog(LOG_WARNING, "Parsing TextServ DB %s Failed with error: %s", db->tsbot.dbname, ret == CFG_FILE_ERROR ? "File Not Found" : ret == CFG_PARSE_ERROR ? "TextServ DB Corrupt" : "Unknown Error");			
+		cfg_free(cfg);
 		return;
 	}
 	/* count the number of commands */
@@ -398,19 +413,34 @@ exit(-1);
 	for (i = 0; i < commandreadcount; i++) {
 		cmd = cfg_getnsec(cfg, "command", i);
 		os_memcpy( &db->botinfo.bot_cmd_list[i], &ts_commandtemplate, sizeof( bot_cmd ) );
+		/* get min no of commands */
+		db->botinfo.bot_cmd_list[i].minparams = cfg_size(cmd, "paramlist");
+		/* get message type (!chan trigger or PM to bot (default is chan trigger)) */
+		if (cfg_getint(cmd, "triggertype") == 0) 
+			db->botinfo.bot_cmd_list[i].flags = 0;
 		db->botinfo.bot_cmd_list[i].cmd = ns_malloc(strlen(cfg_title(cmd)+1));
 		strlcpy((char *)db->botinfo.bot_cmd_list[i].cmd, cfg_title(cmd), strlen(cfg_title(cmd))+1);
 
 		db->botinfo.bot_cmd_list[i].helptext = ns_calloc( cfg_size(cmd, "helpstring") * sizeof(char *));
-		for (j = 0; j < cfg_size(cmd, "helpstring"); j++) {		
-			db->botinfo.bot_cmd_list[i].helptext[j] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", j)+1));
-			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[j], cfg_getnstr(cmd, "helpstring", j), strlen(cfg_getnstr(cmd, "helpstring", j))+1);
+		/* first item is generic help string */
+		db->botinfo.bot_cmd_list[i].helptext[0] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", 0)));
+		strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[0], cfg_getnstr(cmd, "helpstring", 0), strlen(cfg_getnstr(cmd, "helpstring", 0))+1);
+		for (k = 0; k < cfg_size(cmd, "paramlist"); k++) {
+			db->botinfo.bot_cmd_list[i].helptext[k+1] = ns_malloc(strlen(cfg_getnstr(cmd, "paramlist", k)+1));
+			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[k+1], cfg_getnstr(cmd, "paramlist", k), strlen(cfg_getnstr(cmd, "paramlist", k))+1);
+		}			
+		for (j = 1; j < cfg_size(cmd, "helpstring"); j++) {		
+			db->botinfo.bot_cmd_list[i].helptext[j+k] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", j)+1));
+			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[j+k], cfg_getnstr(cmd, "helpstring", j), strlen(cfg_getnstr(cmd, "helpstring", j))+1);
 		}
 		/* make sure the last helpstring is null */
 		db->botinfo.bot_cmd_list[i].helptext[j++] = NULL;
 
 		db->outstr[i] = ns_calloc(sizeof(output));
 		db->outstr[i]->outputstring = ns_calloc(cfg_size(cmd, "output") * sizeof(char *));
+		if (cfg_getint(cmd, "sendtosource") == 1)
+			db->outstr[i]->target = 1;
+			
 		for (j = 0; j < cfg_size(cmd, "output"); j++) {		
 			db->outstr[i]->outputstring[j] = ns_malloc(strlen(cfg_getnstr(cmd, "output", j))+1);
 			strlcpy(db->outstr[i]->outputstring[j], cfg_getnstr(cmd, "output", j), strlen(cfg_getnstr(cmd, "output", j))+1);
@@ -843,29 +873,113 @@ static int ts_cmd_del( const CmdParams *cmdparams )
 
 static int ts_cmd_msg( const CmdParams* cmdparams )
 {
-	static char buf[BUFSIZE];
+	char buf[BUFSIZE];
 	output *fmt;
 	dbbot *db;
-	Client *target;
+	Client *target = NULL;
+	Channel *targetc = NULL;
+	lnode_t *chans;
 	int i = 0;
+	int validt = 0;	
+	/* targettype 0 is channel, targettype 1 is requestor, targettype 2 is nickname, targettype 3 is channel specified */
+	int targettype = 0;
 
 	SET_SEGV_LOCATION();
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
-	target = FindValidUser( cmdparams->bot, cmdparams->source, cmdparams->av[0] );
-	if( !target ) 
-	{
-		return NS_FAILURE;
-	}
-	irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, target->name );
 	fmt = cmdparams->cmd_ptr->moddata;
+	
+	/* logic here:
+	 *   (1) if command executed in a channel, we dont require a destination for the message 
+	 *       (2) the command can specify to be sent to the requestor
+	 *       (2a) or the source channel 
+	 *   (3) if the command is executed via PM, we require a destination for the message
+	 *       (4) the command can specify to be sent to the requester
+	 *       (5) or a channel
+	 *       (6) or a channel member
+         */	 
+
+         /* this is (1) above */
+         if (cmdparams->chanmsg == 1) {
+         	/* (2) if target is 1, then its sent to the requestor */
+		if (fmt->target == 1) {
+			targettype = 1;         
+			target = cmdparams->source;
+		/* (2a) send to the source channel */
+		} else {
+			targettype = 0;
+			targetc = cmdparams->channel;
+		}
+	/* (3) now it gets complicated */
+	 } else {
+	 	/* (4) send to the requestor */
+	 	if (fmt->target == 1) {
+	 		targettype = 1;
+			target = cmdparams->source;
+		/* (5) send to a channel */
+	 	} else if (cmdparams->av[0][0] == '#') {
+	 		targettype = 3;
+			targetc = FindChannel(cmdparams->av[0]);
+			if (!targetc) {
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "%s is not a valid Channel", cmdparams->av[0]);
+				return NS_FAILURE;
+			} else {
+				/* check if I am on this channel */
+				chans = list_first(cmdparams->bot->u->user->chans);
+				while (chans) {
+					if (IsChannelMember(FindChannel(lnode_get(chans)), cmdparams->bot->u)) {
+						validt = 1;
+					}
+					chans = list_next(cmdparams->bot->u->user->chans, chans);
+				}
+				if (validt == 0) {
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "I am not on %s channel. Message Not Sent", targetc->name);
+					return NS_FAILURE;
+				}
+			}
+		/* (6) send to channel member */
+	 	} else {
+	 		targettype = 2;   
+			target = FindValidUser( cmdparams->bot, cmdparams->source, cmdparams->av[0] );
+			if( !target ) 
+			{
+				/* FindValidUser already send a error to the user */
+				return NS_FAILURE;
+			} else {
+				chans = list_first(cmdparams->bot->u->user->chans);
+				while (chans) {
+					if (IsChannelMember(FindChannel(lnode_get(chans)), target)) {
+						validt = 1;
+					}
+					chans = list_next(cmdparams->bot->u->user->chans, chans);
+				}		
+				if (validt == 0) {
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "%s is not on any channels I am on. Command Not Sent", target->name);
+					return NS_FAILURE;
+				} 
+			}
+		}
+	}
 	while (fmt->outputstring[i] != NULL) {
-		tsprintf(cmdparams, target->name, buf, BUFSIZE, fmt->outputstring[i]);
-		if (fmt->action == 1)
-			irc_ctcp_action_req_channel( cmdparams->bot, cmdparams->channel, buf );
-		else
-			irc_chanprivmsg( cmdparams->bot, cmdparams->channel->name, buf );
+		tsprintf(cmdparams, targettype, buf, BUFSIZE, fmt->outputstring[i]);
+		/* its a trigger message to the channel */
+		if ((targettype == 0) || (targettype == 3)) {
+			if (fmt->action == 1)
+				irc_ctcp_action_req_channel( cmdparams->bot, targetc, buf );
+			else
+				irc_chanprivmsg( cmdparams->bot, targetc->name, buf );
+		/* its a message to a user */
+		} else {
+			if (fmt->action == 1) 
+				irc_ctcp_action_req(cmdparams->bot, target, buf);
+			else
+				irc_privmsg(cmdparams->bot, target, buf);
+		}
 		i++;
 	}
+	if ((targettype == 0) || (targettype == 3)) 
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, targetc->name );
+	else 
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, target->name );
 	return NS_SUCCESS;
 }
 

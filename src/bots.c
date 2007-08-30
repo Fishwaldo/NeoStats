@@ -348,6 +348,7 @@ void bot_private( const char *origin, char *const *av, int ac )
 		if( is_valid_target( cmdparams, av[0] ) )
 		{
 			cmdparams->param = av[ac - 1];
+			cmdparams->chanmsg = 0;
 			if( IS_CTCP_MSG( cmdparams->param ) )
 			{
 				ctcp_private( cmdparams );
@@ -388,6 +389,7 @@ void bot_chan_private( const char *origin, char *const *av, int ac )
 		if( is_valid_target_chan( cmdparams, av[0] ) )
 		{
 			cmdparams->param = av[ac - 1];
+			cmdparams->chanmsg = 1;
 			if( IS_CTCP_MSG( cmdparams->param ) )
 			{
 				ctcp_cprivate( cmdparams );

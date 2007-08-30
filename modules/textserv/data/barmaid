@@ -7,16 +7,19 @@ command beer {
 	helpstring = {"Nice cold beer of your choice"}
 	output = {"pours some %P from the tap and slides it to %F"}
 	action = true
+	paramlist = {"<Type> - Type of Beer"}
 }
 command shot {
 	helpstring = {"Have a shot of hard liquor"}
 	output = {"pours a %P into a shotglass and hands it to %F"}
 	action = true
+	paramlist = {"<Type> - Type of Shot"}	
 }
 command mixed {
 	helpstring = {"Mixed drink of your choice"}
 	output = {"mixes a %P for %F and sticks an umbrella in it"}
 	action = true
+	paramlist = {"<Type> - Type of Mixed Drink"}
 }
 command SELTZER {
 	helpstring = {"Be a wuss and have a seltzer"}
@@ -27,6 +30,7 @@ command SODA {
 	helpstring = {"Be a wuss and have a soda"}
 	output = {"thinks %F is a wuss, but pours a %P anyway"}
 	action = true
+	paramlist = {"<Type> - Type of Soda"}
 }
 command COFFEE {
 	helpstring = {"addicted to caffine ?"}
@@ -40,8 +44,9 @@ command COKE {
 }
 command COKETO {
 	helpstring = {"gives a coke to <nick>"}
-	output = {"opens up a fresh can of coke and sets it in front of %T, compliments of %F"}
+	output = {"opens up a fresh can of coke and sets it in front of %P1, compliments of %F"}
 	action = true
+	paramlist = {"<Nick> - Who to give the coke to"}
 }
 command PEPSI {
 	helpstring = {"Have a pepsi"}
@@ -50,8 +55,9 @@ command PEPSI {
 }
 command PEPSITO {
 	helpstring = {"gives a pepsi to <nick>"}
-	output = {"opens up a fresh can of pepsi and sets it in front of %T, compliments of %F"}
+	output = {"opens up a fresh can of pepsi and sets it in front of %P1, compliments of %F"}
 	action = true
+	paramlist = {"<Nick> - Who to give the Pepsi to"}
 }
 command PRETZELS {
 	helpstring = {"Get a basket of salted pretzels"}
@@ -62,6 +68,7 @@ command CIG {
 	helpstring = {"Buy a pack of smokes, any brand"}
 	output = {"pulls a pack of %P cigarettes from under the counter and hands them to %F"}
 	action = true
+	paramlist = {"<Type> - The type of Cigarettes"}
 }
 command MATCHES {
 	helpstring = {"Need a light? I'ts on the house"}
@@ -72,11 +79,14 @@ command ORDER {
 	helpstring = {"Order anything you like"}
 	output = {"gives %F a %P"}
 	action = true
+	paramlist = {"<Item> - Any Item you like"}
 }
 command ORDERFOR {
 	helpstring = {"Order anything you like for <nick>"}
-	output = {"gives %T a %P, compliments of %F."}
+	output = {"gives %P1 a %P2, compliments of %F."}
 	action = true
+	paramlist = {"<Nick> - Who to order for",
+		     "<Item> - The Item to order"}
 }
 command LATTE {
 	helpstring = {"LATTE"}
@@ -100,24 +110,36 @@ command POT {
 }
 command POTFOR {
 	helpstring = {"POTFOR"}
-	output = {"passes the coffee pot to %F."}
+	output = {"passes the coffee pot to %P."}
 	action = true
+	paramlist = {"<Nick> - Who to give the coffee pot to"}
 }
 command ESPRESSO {
 	helpstring ={"ESPRESSO"}
 	output = {"fires up Espresso"}
 	action = true
 }
-#Think I'm getting one for you %F? I ain't your wife!
-#GROUNDS|<NONE>|GROUNDS|Are you sucking on those coffee grounds %F?
-#ACTION watches %F suck on the used filter
-#MOCHA|<NONE>|MOCHA|ACTION fires up Espresso
-#Did you want some foam and cinnamon on that %F?
-#DECAF|<NONE>|DECAF|Decaf ? WTF ? Why don't you just drink hot water ?
-#ACTION pours %F a cup of decaf
-#TIME|<NONE>|TIME|Guess what time it is guys ?
-#It's Maxwell House Time !!
-#This round's on me...it's good to the last drop!
-#And you say bots are useless...
-
-
+command GROUNDS {
+	helpstring={"GROUNDS"}
+	output = {"Are you sucking on those coffee grounds %F?"}
+	action = false
+}
+command MOCHA {
+	helpstring={"MOCHA"}
+	output = {"ok, I'll fire up the Espresso machine",
+		  "Did you want some foam and cinnamon on that %F?"}
+	action = false
+}
+command DECAF {
+	helpstring = {"DECAF"}
+        output = {"Decaf ? WTF ? Why don't you just drink hot water ?"}
+	action = false
+}
+command TIME {
+	helpstring ={"TIME"}
+	output = {"Guess what time it is guys ?",
+	          "It's Maxwell House Time !!",
+		  "This round's on me...it's good to the last drop!",
+		  "And you say bots are useless..."}
+	action = false
+}

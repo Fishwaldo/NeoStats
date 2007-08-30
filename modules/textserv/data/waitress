@@ -1,16 +1,81 @@
-VERSION|3.0.a3
-ABOUT|Restaurant Service.
-CREDITS|Copyright (c) 1999-2005, NeoStats. http://www.neostats.net/
-BURGER|<TYPE>|Order a burger & fries|ACTION fixes up a %M burger and fries, and brings it to %F
-FRIES|<NONE>|Basket of our famous seasoned fries|ACTION fills a basket of our famous seasoned french fries, and brings it to %F's table
-PIZZA|<TYPE>|Hot pizza of your choice|ACTION bakes a %M pizza and brings it over to %F.
-BREAD|<TYPE>|Hot breadsticks of your choice|ACTION bakes some %M breadsticks and puts them in a basket. Then brings them over to %F.
-NACHOS|<NONE>|Big plate of nachos with melted cheese|ACTION prepares a heaping plate of nachos for %F, with melted cheese, beef, beans, sour cream and quacomole
-POTATO|<NONE>|Big plate of potato skins|ACTION brings out a large plate of potato skins and sour cream for %F, Careful its hot.
-WINGS|<TEMP>|Wings as spicy as you want|ACTION cooks a dozen wings %M and brings them over to %F!
-SALAD|<TYPE>|Fresh tossed salad|ACTION tosses a fresh %M salad for %F.
-BUYPIZZA|<NICK><PIZZA>|Buy someone a pizza|ACTION gives %T a %M pizza, Compliments of %F.
-DELIVER|<WHO><ITEMS>|Deliver items to someone|ACTION delivers %M to %T. Compliments of %F.
-TIP|<AMOUNT>|Give me a tip|ACTION takes the %M, 'Thanks %F!'", rest, nickfrom);
-PAY|<AMOUNT>|Pay your bill|ACTION accepts payment of %M from %F and rips up the bill, That about covers it!
-PIZZACHAN|<NONE>|Buy pizza for the entire channel|ACTION hands out pizza to the entire channel, Compliments of %F.
+description {
+	version = "3.0.a3"
+	about = "Restaurant Service."
+	credits = "Copyright (c) 1999-2007, NeoStats. http://www.neostats.net/"
+}
+command BURGER {
+	helpstring = {"Order a burger & fries"}
+	output = {"fixes up a %P burger and fries, and brings it to %F"}
+	action = true
+	paramlist = {"<Type> - Type of Burger to order"}
+}
+command FRIES {
+	helpstring = {"Basket of our famous seasoned fries"}
+	output = {"fills a basket of our famous seasoned french fries, and brings it to %F's table"}
+	action = true
+}
+command PIZZA {
+	helpstring = {"Hot pizza of your choice"}
+	output = {"bakes a %P pizza and brings it over to %F."}
+	action = true
+	paramlist = {"<Type> - Type of Pizza to order"}
+}
+command BREAD {
+	helpstring = {"Hot breadsticks of your choice"}
+	output = {"bakes some %P breadsticks and puts them in a basket. Then brings them over to %F."}
+	action = true
+	paramlist = {"<Type> - Type of Breadsticks to order"}
+}
+command NACHOS {
+	helpstring = {"Big plate of nachos with melted cheese"}
+	output = {"prepares a heaping plate of nachos for %F, with melted cheese, beef, beans, sour cream and quacomole"}
+	action = true
+}
+command POTATO {
+	helpstring = {"Big plate of potato skins"}
+	output = {"brings out a large plate of potato skins and sour cream for %F, Careful its hot."}
+	action = true
+}
+command WINGS {
+	helpstring = {"Wings as spicy as you want"}
+	output = {"cooks a dozen wings %P and brings them over to %F!"}
+	action = true
+	paramlist = {"<Temp> - how spicy you want your wings"}
+}
+command SALAD {
+	helpstring = {"Fresh tossed salad"}
+	output = {"ACTION tosses a fresh %P salad for %F"}
+	action = true
+	paramlist = {"<Type> - Type of Salad"}
+}
+command BUYPIZZA {
+	helpstring = {"Buy someone a pizza"}
+	output = {"gives %P1 a %P2 pizza, Compliments of %F."}
+	action = true
+	paramlist = {"<Nick/Channel> - Who to buy a pizza for",
+		     "<Type> - Type of Pizza"}
+}
+command DELIVER {
+	helpstring = {"Deliver items to someone"}
+	output = {"delivers %P2 to %P1. Compliments of %F."}
+	action = true
+	paramlist = {"<Nick/Channel> - Who to deliver the item to",
+		     "<Item> - What item to deliver"}
+}
+command TIP {
+	helpstring = {"Give me a tip"}
+	output = {"takes the %P, 'Thanks %F!'"}
+	action = true
+	paramlist = {"<Ammount> - Amount to Tip"}
+}
+command PAY {
+	helpstring = {"Pay your bill"}
+	output = {"accepts payment of %P from %F and rips up the bill, That about covers it!"}
+	action = true
+	paramlist = {"<Ammount> - Amount to Pay"}
+}
+command PIZZACHAN {
+	helpstring = {"Buy pizza for the entire channel"}
+	output = {"hands out pizza to the entire channel, Compliments of %F."}
+	action = true
+}

@@ -435,6 +435,9 @@ XS (XS_NeoStats_register)
 			nlog(LOG_WARNING, "Current Mod Stack for Perl Mods is screwed");
 			XSRETURN_EMPTY;
 		}
+		/* because this is currently a temp holding "NeoStats" */
+		ns_free(mod->info->name);
+		
 		mod->info->name = strndup(SvPV_nolen (ST (0)), sv_len(ST (0)));
 		mod->info->version = strndup(SvPV_nolen (ST (1)), sv_len(ST (1)));
 		mod->info->description = strndup(SvPV_nolen (ST (2)), sv_len(ST(2)));
@@ -1609,7 +1612,7 @@ static Module *load_perlfiles (const char *filename, Module *mod, perl_xs_init i
 	strlcpy(mod->pm->filename, filename, MAXPATH);
 
 
-	PL_perl_destruct_level = 1;
+/*	PL_perl_destruct_level = 1; */
 	mod->pm->my_perl = perl_alloc ();
 	PL_perl_destruct_level = 1;
 	PERL_SET_CONTEXT((PMI *)mod->pm->my_perl);
