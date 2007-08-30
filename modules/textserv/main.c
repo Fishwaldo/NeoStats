@@ -899,7 +899,7 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
          */	 
 
          /* this is (1) above */
-         if (cmdparams->chanmsg == 1) {
+         if (cmdparams->channel != NULL) {
          	/* (2) if target is 1, then its sent to the requestor */
 		if (fmt->target == 1) {
 			targettype = 1;         

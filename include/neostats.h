@@ -709,7 +709,6 @@ typedef struct CmdParams {
 	Channel *channel;	/* pointer to channel struct where appropriate */
 	char **av;			/* command parameter list */
 	int ac;				/* count of command parameter list */
-	int chanmsg;
 } CmdParams; 
 
 /* Comand list handling */
