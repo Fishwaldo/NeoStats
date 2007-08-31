@@ -32,6 +32,7 @@
 #include "stats.h"
 #include "network.h"
 #include "tld.h"
+#include "namedvars.h"
 #include "GeoIP.h"
 #include "GeoIPCity.h"
 
@@ -43,6 +44,32 @@
 /** TLD list */
 static list_t *tldstatlist;
 static GeoIP *gi;
+
+nv_struct nv_ss_tld[] = {
+	{"tld", NV_STR, offsetof(TLD, tld), NV_FLG_RO, -1, -1},
+	{"country", NV_STR, offsetof(TLD, tld), NV_FLG_RO, -1, -1},
+	{"user-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"user-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"user-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(TLD,users), -1},
+	{"users-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(TLD,users), -1},
+	{"users-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(TLD,users), -1},
+	{"users-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(TLD,users), -1},
+	{"users-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(TLD, users), -1},
+	{"users-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(TLD, users), -1},
+	NV_STRUCT_END()
+};	
 
 /** @brief ResetTLDStatistics
  *
@@ -346,7 +373,7 @@ int InitTLDStatistics( void )
 	TLD *t;
 
 	SET_SEGV_LOCATION();
-	tldstatlist = list_create( LISTCOUNT_T_MAX );
+	tldstatlist = nv_list_create( LISTCOUNT_T_MAX, "StatServ-TLD", nv_ss_tld, NV_FLAGS_RO, NULL );
 	if( !tldstatlist )
 	{
 		nlog( LOG_CRITICAL, "Unable to create TLD list" );

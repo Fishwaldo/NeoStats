@@ -26,12 +26,125 @@
 #include "stats.h"
 #include "network.h"
 #include "server.h"
+#include "namedvars.h"
 
 /** Server table name */
 #define SERVER_TABLE	"Server"
 
 /** Server hash */
 static hash_t *serverstathash;
+
+
+nv_struct nv_ss_servers[] = {
+	{"name", NV_STR, offsetof(serverstat, name), NV_FLG_RO, -1, MAXHOST},
+	{"ts_start", NV_INT, offsetof(serverstat, ts_start), NV_FLG_RO, -1, -1},
+	{"ts_lastseen", NV_INT, offsetof(serverstat, ts_lastseen), NV_FLG_RO, -1, -1},
+	{"users-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(serverstat,users), -1},
+	{"users-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(serverstat,users), -1},
+	{"users-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(serverstat,users), -1},
+	{"users-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(serverstat,users), -1},
+	{"users-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"users-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(serverstat, users), -1},
+	{"opers-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(serverstat,opers), -1},
+	{"opers-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(serverstat,opers), -1},
+	{"opers-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(serverstat,opers), -1},
+	{"opers-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(serverstat,opers), -1},
+	{"opers-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"opers-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(serverstat, opers), -1},
+	{"operkills-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(serverstat,operkills), -1},
+	{"operkills-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(serverstat,operkills), -1},
+	{"operkills-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(serverstat,operkills), -1},
+	{"operkills-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(serverstat,operkills), -1},
+	{"operkills-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"operkills-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(serverstat, operkills), -1},
+	{"serverkills-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(serverstat,serverkills), -1},
+	{"serverkills-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(serverstat,serverkills), -1},
+	{"serverkills-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(serverstat,serverkills), -1},
+	{"serverkills-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(serverstat,serverkills), -1},
+	{"serverkills-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"serverkills-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(serverstat, serverkills), -1},
+	{"splits-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(serverstat,splits), -1},
+	{"splits-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(serverstat,splits), -1},
+	{"splits-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(serverstat,splits), -1},
+	{"splits-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(serverstat,splits), -1},
+	{"splits-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"splits-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(serverstat, splits), -1},
+	{"lowest_ping", NV_INT, offsetof(serverstat, lowest_ping), NV_FLG_RO, -1, -1},
+	{"ts_lowest_ping", NV_INT, offsetof(serverstat, ts_lowest_ping), NV_FLG_RO, -1, -1},
+	{"highest_ping", NV_INT, offsetof(serverstat, highest_ping), NV_FLG_RO, -1, -1},
+	{"ts_highest_ping", NV_INT, offsetof(serverstat, ts_highest_ping), NV_FLG_RO, -1, -1},
+	NV_STRUCT_END()
+};	
 
 /** @brief AverageServerStatistics
  *
@@ -721,7 +834,7 @@ void GetServerStats( const ServerStatHandler handler, const void *v )
 
 int InitServerStats( void )
 {
-	serverstathash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
+	serverstathash = nv_hash_create( HASHCOUNT_T_MAX, 0, 0, "StatServ-Servers", nv_ss_servers, NV_FLAGS_RO, NULL);
 	if( !serverstathash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create server hash list" );

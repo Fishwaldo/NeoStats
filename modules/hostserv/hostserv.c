@@ -69,6 +69,12 @@ nv_struct nv_hostserv[] = {
 	NV_STRUCT_END()
 };
 
+nv_struct nv_hostservban[] = {
+	{"host", NV_STR, offsetof(banentry, host), 0, -1, MAXHOST},
+	{"who", NV_STR, offsetof(banentry, who), 0, -1, MAXNICK},
+	{"reason", NV_STR, offsetof(banentry, reason), 0, -1, MAXREASON},
+	NV_STRUCT_END()
+};
 
 /** prototypes */
 static int hs_event_signon( const CmdParams *cmdparams );
@@ -544,7 +550,8 @@ int ModInit( void )
 		nlog( LOG_CRITICAL, "Unable to create vhost list" );
 		return NS_FAILURE;
 	}
-	banhash = hash_create( HASHCOUNT_T_MAX, 0, 0);
+	/* XXX TODO: RO for now */
+	banhash = nv_hash_create( HASHCOUNT_T_MAX, 0, 0, "HostServ-Bans", nv_hostservban, NV_FLAGS_RO, NULL);
 	if( !banhash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create ban hash" );

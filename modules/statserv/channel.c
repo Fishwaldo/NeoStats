@@ -26,12 +26,101 @@
 #include "stats.h"
 #include "network.h"
 #include "channel.h"
+#include "namedvars.h"
 
 /** Channel table name */
 #define CHANNEL_TABLE	"Channel"
 
 /** Channel list */
 static list_t *channelstatlist;
+
+nv_struct nv_ss_chans[] = {
+	{"name", NV_STR, offsetof(channelstat, name), NV_FLG_RO, -1, MAXCHANLEN},
+	{"ts_start", NV_INT, offsetof(channelstat, ts_start), NV_FLG_RO, -1, -1},
+	{"ts_lastseen", NV_INT, offsetof(channelstat, ts_lastseen), NV_FLG_RO, -1, -1},
+	{"user-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(channelstat,users), -1},
+	{"user-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(channelstat,users), -1},
+	{"user-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(channelstat,users), -1},
+	{"user-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(channelstat,users), -1},
+	{"user-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"user-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(channelstat, users), -1},
+	{"kicks-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(channelstat,kicks), -1},
+	{"kicks-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(channelstat,kicks), -1},
+	{"kicks-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(channelstat,kicks), -1},
+	{"kicks-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(channelstat,kicks), -1},
+	{"kicks-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"kicks-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(channelstat, kicks), -1},
+	{"topics-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(channelstat,topics), -1},
+	{"topics-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(channelstat,topics), -1},
+	{"topics-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(channelstat,topics), -1},
+	{"topics-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(channelstat,topics), -1},
+	{"topics-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"topics-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(channelstat, topics), -1},
+	{"joins-day", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-week", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(channelstat,joins), -1},
+	{"joins-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(channelstat,joins), -1},
+	{"joins-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(channelstat,joins), -1},
+	{"joins-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(channelstat,joins), -1},
+	{"joins-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	{"joins-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(channelstat, joins), -1},
+	NV_STRUCT_END()
+};	
+
 
 /** @brief AverageChannelStatistic
  *
@@ -729,7 +818,7 @@ void GetChannelStats( const ChannelStatHandler handler, CHANNEL_SORT sortstyle, 
 
 int InitChannelStats( void )
 {
-	channelstatlist = list_create( LISTCOUNT_T_MAX );
+	channelstatlist = nv_list_create( LISTCOUNT_T_MAX, "StatServ-Chans", nv_ss_chans, NV_FLAGS_RO, NULL );
 	if( channelstatlist == NULL  )
 	{
 		nlog( LOG_CRITICAL, "Unable to create channel stat list" );

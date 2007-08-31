@@ -22,6 +22,7 @@
 */
 
 #include "neostats.h"
+#include "namedvars.h"
 
 /** ExtAuth Module
  *
@@ -37,6 +38,14 @@ typedef struct AccessEntry
 	char mask[USERHOSTLEN];
 	int level;
 }AccessEntry;
+
+nv_struct nv_extauth[] = {
+	{"nick", NV_STR, offsetof(AccessEntry, nick), NV_FLG_RO, -1, MAXNICK},
+	{"mask", NV_STR, offsetof(AccessEntry, mask), NV_FLG_RO, -1, USERHOSTLEN},
+	{"level", NV_INT, offsetof(AccessEntry, level), NV_FLG_RO, -1, -1},
+	NV_STRUCT_END()
+};
+
 
 /** Copyright info */
 static const char *extauth_copyright[] = 
@@ -126,7 +135,7 @@ static int LoadAccessListEntry( void *data, int size )
 
 static int LoadAccessList( void )
 {
-	accesshash = hash_create( HASHCOUNT_T_MAX, 0, 0 );
+	accesshash = nv_hash_create( HASHCOUNT_T_MAX, 0, 0, "ExtAuth", nv_extauth, NV_FLAGS_RO, NULL);
 	if( !accesshash )
 	{
 		nlog( LOG_CRITICAL, "Unable to create accesslist hash" );

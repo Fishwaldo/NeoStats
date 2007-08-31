@@ -35,6 +35,14 @@ hash_t *namedvars;
 
 void nv_printstruct(void *data, nv_list *item);
 
+nv_struct nv_nvlist[] = {
+	{"name", NV_PSTR, offsetof(nv_list, name), NV_FLAGS_RO, -1, -1},
+	{"type", NV_INT, offsetof(nv_list, type), NV_FLAGS_RO, -1, -1},
+	{"flags", NV_INT, offsetof(nv_list, flags), NV_FLAGS_RO, -1, -1},
+	{"noflds", NV_INT, offsetof(nv_list, no_flds), NV_FLAGS_RO, -1, -1},
+	NV_STRUCT_END()
+};
+
 
 char *fldtypes[] = {
 	"Pointer String",
@@ -56,9 +64,8 @@ nv_list *FindNamedVars(char *name) {
 	}
 }
 
-
 int nv_init() {
-	namedvars = hash_create(HASHCOUNT_T_MAX, 0, 0);
+	namedvars = nv_hash_create(HASHCOUNT_T_MAX, 0, 0, "NamedVars", nv_nvlist, NV_FLG_RO, NULL);
 	return NS_SUCCESS;
 }
 

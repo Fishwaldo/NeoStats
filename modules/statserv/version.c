@@ -25,12 +25,40 @@
 #include "statserv.h"
 #include "stats.h"
 #include "version.h"
+#include "namedvars.h"
 
 /** CTCP version table name */
 #define CTCPVERSION_TABLE "CTCPVERSION"
 
 /** Client version list */
 static list_t *ctcp_version_list;
+
+/** namedvars for version list */
+nv_struct nv_ss_version[] = {
+	{"name", NV_STR, offsetof(ss_ctcp_version, name), NV_FLG_RO, -1, BUFSIZE},
+	{"users-daily", NV_INT, offsetof(statistic, day), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-weekly", NV_INT, offsetof(statistic, week), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-month", NV_INT, offsetof(statistic, month), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-current", NV_INT, offsetof(statistic, current), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-alltime-runningtotal", NV_INT, offsetof(statistic, alltime.runningtotal), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-alltime-average", NV_INT, offsetof(statistic, alltime.average), NV_FLG_RO, offsetof(ss_ctcp_version,users), -1},
+	{"users-alltime-max", NV_INT, offsetof(statistic, alltime.max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-alltime-ts_max", NV_INT, offsetof(statistic, alltime.ts_max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-daily-runningtotal", NV_INT, offsetof(statistic, daily.runningtotal), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-daily-average", NV_INT, offsetof(statistic, daily.average), NV_FLG_RO, offsetof(ss_ctcp_version,users), -1},
+	{"users-daily-max", NV_INT, offsetof(statistic, daily.max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-daily-ts_max", NV_INT, offsetof(statistic, daily.ts_max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-weekly-runningtotal", NV_INT, offsetof(statistic, weekly.runningtotal), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-weekly-average", NV_INT, offsetof(statistic, weekly.average), NV_FLG_RO, offsetof(ss_ctcp_version,users), -1},
+	{"users-weekly-max", NV_INT, offsetof(statistic, weekly.max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-weekly-ts_max", NV_INT, offsetof(statistic, weekly.ts_max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-monthly-runningtotal", NV_INT, offsetof(statistic, monthly.runningtotal), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-monthly-average", NV_INT, offsetof(statistic, monthly.average), NV_FLG_RO, offsetof(ss_ctcp_version,users), -1},
+	{"users-monthly-max", NV_INT, offsetof(statistic, monthly.max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	{"users-monthly-ts_max", NV_INT, offsetof(statistic, monthly.ts_max), NV_FLG_RO, offsetof(ss_ctcp_version, users), -1},
+	NV_STRUCT_END()
+};
+
 
 /** @brief topcurrentversions
  *
@@ -268,7 +296,7 @@ int ss_event_ctcpversionbc( const CmdParams *cmdparams )
 
 int InitVersionStats( void )
 {
-	ctcp_version_list = list_create( LISTCOUNT_T_MAX );
+	ctcp_version_list = nv_list_create( LISTCOUNT_T_MAX, "StatServ-Version", nv_ss_version, NV_FLAGS_RO, NULL );
 	if( ctcp_version_list == NULL )
 	{
 		nlog( LOG_CRITICAL, "Unable to create version statistic list" );
