@@ -77,8 +77,6 @@ static int ts_cmd_version( const CmdParams* cmdparams );
 static int ts_cmd_add_chan( const CmdParams *cmdparams );
 static int ts_cmd_del_chan( const CmdParams *cmdparams );
 
-static char emptyline[] = "";
-
 /** hash to store database and bot info */
 static hash_t *tshash;
 
@@ -203,11 +201,6 @@ static bot_cmd ts_commandtemplatedelchanprivate =
 	"DEL",	ts_cmd_del_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_delchan, 0, NULL, NULL
 };
 
-/** Sub bot setting table template */
-static bot_setting ts_settingstemplate[]=
-{
-	NS_SETTING_END()
-};
 
 /** TextServ BotInfo */
 static BotInfo ts_botinfo = 
@@ -323,11 +316,12 @@ static int tsprintf( const CmdParams *cmdparams, int targettype, char *buf, cons
 						if (ac > cmdparams->ac) {
 							str = NULL;
 						} else {
-							str = cmdparams->av[ac+add];
+							/* -1 because we start at 0 in our array */
+							str = cmdparams->av[ac-1+add];
 						}
 					} else if (isspace(*fmt) || isalpha(*fmt) || ispunch(*fmt) || (*fmt == '\0')) {
 						/* he wants all the param */
-						str = joinbuf(cmdparams->av, cmdparams->ac, 1+add);
+						str = joinbuf(cmdparams->av, cmdparams->ac, 0+add);
 					} else {
 						str = NULL;
 					}
@@ -367,8 +361,8 @@ static int tsprintf( const CmdParams *cmdparams, int targettype, char *buf, cons
 void ts_db_error(cfg_t *cfg, const char *fmt, va_list ap) {
 	char buf[BUFSIZE];
 	ircvsnprintf(buf, BUFSIZE, fmt, ap);
-	CommandReport(ts_bot, "TextServ DB Error: %s", buf);
-	nlog(LOG_WARNING, "TextServ DB Error: %s", buf);
+	CommandReport(ts_bot, "TextServ DB Error: %s (%d)", buf, cfg->line);
+	nlog(LOG_WARNING, "TextServ DB Error: %s (%d)", buf, cfg->line);
 }
 
 /** @brief ts_read_database
@@ -418,29 +412,31 @@ static void ts_read_database( dbbot *db )
 		/* get message type (!chan trigger or PM to bot (default is chan trigger)) */
 		if (cfg_getint(cmd, "triggertype") == 0) 
 			db->botinfo.bot_cmd_list[i].flags = 0;
+		else if (cfg_getint(cmd, "triggertype") == 2)
+			db->botinfo.bot_cmd_list[i].flags = CMD_FLAG_PRIVMSGONLY;
+		
 		db->botinfo.bot_cmd_list[i].cmd = ns_malloc(strlen(cfg_title(cmd)+1));
 		strlcpy((char *)db->botinfo.bot_cmd_list[i].cmd, cfg_title(cmd), strlen(cfg_title(cmd))+1);
-
-		db->botinfo.bot_cmd_list[i].helptext = ns_calloc( cfg_size(cmd, "helpstring") * sizeof(char *));
+		db->botinfo.bot_cmd_list[i].helptext = ns_calloc( (cfg_size(cmd, "helpstring")+cfg_size(cmd, "paramlist")+2) * sizeof(char *));
 		/* first item is generic help string */
 		db->botinfo.bot_cmd_list[i].helptext[0] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", 0)));
 		strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[0], cfg_getnstr(cmd, "helpstring", 0), strlen(cfg_getnstr(cmd, "helpstring", 0))+1);
+		db->botinfo.bot_cmd_list[i].helptext[1] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", 0)));
+		strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[1], cfg_getnstr(cmd, "helpstring", 0), strlen(cfg_getnstr(cmd, "helpstring", 0))+1);
 		for (k = 0; k < cfg_size(cmd, "paramlist"); k++) {
-			db->botinfo.bot_cmd_list[i].helptext[k+1] = ns_malloc(strlen(cfg_getnstr(cmd, "paramlist", k)+1));
-			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[k+1], cfg_getnstr(cmd, "paramlist", k), strlen(cfg_getnstr(cmd, "paramlist", k))+1);
+			db->botinfo.bot_cmd_list[i].helptext[k+2] = ns_malloc(strlen(cfg_getnstr(cmd, "paramlist", k)+1));
+			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[k+2], cfg_getnstr(cmd, "paramlist", k), strlen(cfg_getnstr(cmd, "paramlist", k))+1);
 		}			
 		for (j = 1; j < cfg_size(cmd, "helpstring"); j++) {		
-			db->botinfo.bot_cmd_list[i].helptext[j+k] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", j)+1));
-			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[j+k], cfg_getnstr(cmd, "helpstring", j), strlen(cfg_getnstr(cmd, "helpstring", j))+1);
+			db->botinfo.bot_cmd_list[i].helptext[j+k+1] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", j)+1));
+			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[j+k+1], cfg_getnstr(cmd, "helpstring", j), strlen(cfg_getnstr(cmd, "helpstring", j))+1);
 		}
 		/* make sure the last helpstring is null */
-		db->botinfo.bot_cmd_list[i].helptext[j++] = NULL;
-
+		db->botinfo.bot_cmd_list[i].helptext[j+k+1] = NULL;
 		db->outstr[i] = ns_calloc(sizeof(output));
 		db->outstr[i]->outputstring = ns_calloc(cfg_size(cmd, "output") * sizeof(char *));
 		if (cfg_getint(cmd, "sendtosource") == 1)
 			db->outstr[i]->target = 1;
-			
 		for (j = 0; j < cfg_size(cmd, "output"); j++) {		
 			db->outstr[i]->outputstring[j] = ns_malloc(strlen(cfg_getnstr(cmd, "output", j))+1);
 			strlcpy(db->outstr[i]->outputstring[j], cfg_getnstr(cmd, "output", j), strlen(cfg_getnstr(cmd, "output", j))+1);
@@ -453,8 +449,6 @@ static void ts_read_database( dbbot *db )
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateabout, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatecredits, sizeof( bot_cmd ) );
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateversion, sizeof( bot_cmd ) );
-#if 0
-/* broke at the moment. */
 	if( db->tsbot.ispublic == 1 )
 	{
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanpublic, sizeof( bot_cmd ) );
@@ -463,7 +457,6 @@ static void ts_read_database( dbbot *db )
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanprivate, sizeof( bot_cmd ) );
 		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanprivate, sizeof( bot_cmd ) );
 	}
-#endif
 	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplate, sizeof( bot_cmd ) );
 #if 0
 	output *blah;
@@ -492,8 +485,11 @@ static void BuildBot( dbbot *db )
 	strlcpy( db->botinfo.user, (db->tsbot.botuser[0] != '\0') ? db->tsbot.botuser : "ts", MAXUSER );
 	strlcpy( db->botinfo.host, db->tsbot.bothost, MAXHOST );
 	strlcat( db->botinfo.realname, db->tsbot.dbname, MAXREALNAME );
+#if 0
 	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
 	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
+#endif
+	db->botinfo.bot_setting_list = NULL;
 	db->botinfo.flags = 0;
 	if( db->tsbot.ispublic > 1 )
 	{

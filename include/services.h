@@ -61,6 +61,8 @@ typedef struct config {
 	unsigned int cmdreport;
 	unsigned int unauthreport;
 	unsigned char cmdchar[2];
+	unsigned int sendhelp;
+	unsigned int allhelp;
 	size_t recvq;
 } config;
 

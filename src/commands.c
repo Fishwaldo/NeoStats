@@ -39,6 +39,7 @@ static int bot_cmd_about( const CmdParams *cmdparams );
 static int bot_cmd_version( const CmdParams *cmdparams );
 static int bot_cmd_credits( const CmdParams *cmdparams );
 static int bot_cmd_levels( const CmdParams *cmdparams );
+static int bot_cmd_help_set( const CmdParams *cmdparams, int userlevel );
 
 /* help title strings for different user levels */
 static char *help_level_title[]=
@@ -138,25 +139,78 @@ void msg_permission_denied( const CmdParams *cmdparams, const char *subcommand )
 		cmdparams->source->name, cmdparams->param, subcommand );
 }
 
+void msg_send_help( const CmdParams *cmdparams) 
+{
+	bot_cmd *cmd_ptr;
+	int userlevel;
+	int cmdlevel;
+
+	/* space out message */
+	irc_prefmsg(cmdparams->bot, cmdparams->source, " ");
+	userlevel = getuserlevel( cmdparams );
+	/* Process command list */
+	if( cmdparams->bot->botcmds )
+	{
+		cmd_ptr = ( bot_cmd* )hnode_find( cmdparams->bot->botcmds, cmdparams->cmd );
+		if( cmd_ptr )
+		{
+			cmdlevel = calc_cmd_ulevel( cmd_ptr );
+			if( userlevel < cmdlevel )
+			{
+				msg_permission_denied( cmdparams, NULL );
+				return;
+			}		
+			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext + 1 );
+			return;;
+		}
+	}
+
+	/* Handle intrinsic commands */
+	cmd_ptr = intrinsic_commands;
+	while( cmd_ptr->cmd != NULL )
+	{
+		if( ircstrcasecmp( cmdparams->cmd, cmd_ptr->cmd ) == 0 )
+		{
+			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmd_ptr->helptext + 1 );
+			return;
+		}
+		cmd_ptr++;
+	}
+	/* Handle SET if we have it */	
+	if( cmdparams->bot->botsettings && userlevel >= cmdparams->bot->set_ulevel && ircstrcasecmp( cmdparams->cmd, "SET" ) == 0 )
+	{
+		bot_cmd_help_set( cmdparams, userlevel );		
+		return;
+	}
+}
 void msg_error_need_more_params( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Insufficient parameters", cmdparams->source ) );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
-		cmdparams->bot->name, cmdparams->cmd );
+	if (nsconfig.sendhelp) 
+		msg_send_help(cmdparams);
+	else
+		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
+			cmdparams->bot->name, cmdparams->cmd );
 }
 
 void msg_error_param_out_of_range( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Parameter out of range.", cmdparams->source ) );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
-		cmdparams->bot->name, cmdparams->cmd );
+	if (nsconfig.sendhelp) 
+		msg_send_help(cmdparams);
+	else
+		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
+			cmdparams->bot->name, cmdparams->cmd );
 }
 
 void msg_syntax_error( const CmdParams *cmdparams )
 {
 	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "Syntax error", cmdparams->source ) );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
-		cmdparams->bot->name, cmdparams->cmd );
+	if (nsconfig.sendhelp)
+		msg_send_help(cmdparams);
+	else
+		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "/msg %s HELP %s for more information", cmdparams->source ), 
+			cmdparams->bot->name, cmdparams->cmd );
 }
 
 void msg_unknown_command( const CmdParams *cmdparams )
@@ -587,14 +641,28 @@ static int bot_cmd_help_set( const CmdParams *cmdparams, int userlevel )
  *
  *  @return none
  */
-static void bot_cmd_help_on_help( const CmdParams *cmdparams )
+static void bot_cmd_help_on_help( const CmdParams *cmdparams, int helptype, int othercmds )
 {
 	/* Generate help on help footer text */
-	irc_prefmsg( cmdparams->bot, cmdparams->source, " " );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "To execute a command:", cmdparams->source ) );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, "    \2/msg %s command\2", cmdparams->bot->name );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, __( "For help on a command:", cmdparams->source ) );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, "    \2/msg %s HELP command\2", cmdparams->bot->name );
+		irc_prefmsg( cmdparams->bot, cmdparams->source, " " );
+		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "To execute a command:", cmdparams->source ) );
+		if (helptype == 0) 
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "    \2/msg %s command\2", cmdparams->bot->name);
+		else 
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "    \2!command\2 (in the channel)");
+		irc_prefmsg( cmdparams->bot, cmdparams->source, __( "For help on a command:", cmdparams->source ) );
+		if (helptype == 0)
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "    \2/msg %s HELP command\2", cmdparams->bot->name);
+		else
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "    \2!HELP command\2 (in the channel)");
+		if (othercmds) {
+			irc_prefmsg( cmdparams->bot, cmdparams->source, " ");
+			irc_prefmsg( cmdparams->bot, cmdparams->source, "Other Commands are available.");
+			if (helptype == 0) 
+				irc_prefmsg( cmdparams->bot, cmdparams->source, "Type \2!help\2 in the same channel as me for a list of those commands");
+			else 
+				irc_prefmsg( cmdparams->bot, cmdparams->source, "Type \2/msg %s help\2 for a list of those commands", cmdparams->bot->name);	
+		}
 }
 
 /** @brief bot_cmd_help process bot help command
@@ -610,6 +678,8 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 	hscan_t hs;
 	int userlevel;
 	int cmdlevel;
+	int helptype = 0;
+	int othercmds = 0;;
 
 	userlevel = getuserlevel( cmdparams );
 
@@ -650,12 +720,25 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 			for(;;)
 			{
 				hnode_t* cmdnode;
+				if (cmdparams->channel)
+					helptype = 1;
 
 				hash_scan_begin( &hs, cmdparams->bot->botcmds );
 				while( ( cmdnode = hash_scan_next( &hs ) ) != NULL )
 				{
 					cmd_ptr = hnode_get( cmdnode );
 					cmdlevel = calc_cmd_ulevel( cmd_ptr );
+					/* display relevent help */
+					if (nsconfig.allhelp == 0) {
+						if ((!cmdparams->channel) && (cmd_ptr->flags & CMD_FLAG_CHANONLY)) {
+							othercmds = 1;
+							continue;
+						}
+						if ((cmdparams->channel) && (cmd_ptr->flags & CMD_FLAG_PRIVMSGONLY)) {
+							othercmds = 1;
+							continue;  
+						}
+					}
 					if( ( cmdlevel < curlevel ) && ( cmdlevel >= lowlevel ) )
 					{
 						if( curlevelmsg && !donemsg )
@@ -706,7 +789,7 @@ static int bot_cmd_help( const CmdParams *cmdparams )
 					break;
 			}
 		}
-		bot_cmd_help_on_help( cmdparams );
+		bot_cmd_help_on_help( cmdparams, helptype, othercmds);
 		return NS_SUCCESS;
 	}
 	if( nsconfig.cmdreport )

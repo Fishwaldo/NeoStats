@@ -417,3 +417,18 @@ const char *cmd_help_set[] = {
 	"",
 	NULL
 };
+const char *ns_help_set_sendhelp[] = {
+	"Syntax: \2SET SENDHELP <on/off>\2",
+	"",
+	"Should we send full helptext for commands with invalid syntax's etc"
+	"",
+	NULL
+};
+const char *ns_help_set_allhelp[] = {
+	"Syntax: \2SET ALLHELP <on/off>\2"
+	"",
+	"Should we send all available help to users (regardless if its channel or PM only help)"
+	"or only send context sensitive help"
+	"",
+	NULL
+};

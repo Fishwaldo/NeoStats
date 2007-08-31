@@ -66,13 +66,13 @@ command WONDERFUL {
 command ODE {
 	helpstring = {"Send an ode about someone"}
 	output =  {"*recites*",
-		   "How I wish to be a %T,",
-		   "a %T I would like to be.",
+		   "How I wish to be a %P,",
+		   "a %P I would like to be.",
 		   "For if I was a %P,",
 		   "I'd watch the network hail thee.",
 		   "*bows*"}
 	action = false
-	paramlist = {"<Nick/Channel> - Who to sing a Ode About"
+	paramlist = {"<Nick/Channel> - Who to sing a Ode About"}
 }
 command LAPDANCE {
 	helpstring ={"Send a lapdance to someone"}

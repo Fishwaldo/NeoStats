@@ -150,7 +150,9 @@ static bot_setting ns_settings[] =
 	{"CMDREPORT",		&nsconfig.cmdreport,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdreport, NULL, ( void* )1 },
 	{"LOGLEVEL",		&nsconfig.loglevel,			SET_TYPE_INT,		1, 6, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_loglevel, NULL, ( void* )5 },
 	{"RECVQ",			&nsconfig.recvq,			SET_TYPE_INT,		1024,10240000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_recvq, NULL, ( void*)2048}, 
-	{"DEBUGCHAN",		nsconfig.debugchan,			SET_TYPE_STRING,	0, MAXCHANLEN, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugchan, NULL, ( void* )"#debug" },
+	{"DEBUGCHAN",		nsconfig.debugchan,			SET_TYPE_STRING,	0, 	MAXCHANLEN, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_debugchan, NULL, ( void* )"#debug" },
+	{"SENDHELP",		&nsconfig.sendhelp,			SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN, NULL,  ns_help_set_sendhelp, NULL, (void *)1},
+	{"ALLHELP",		&nsconfig.allhelp,			SET_TYPE_BOOLEAN,	0,	0,		NS_ULEVEL_ADMIN, NULL,  ns_help_set_allhelp, NULL, (void *)0},
 	NS_SETTING_END()
 };
 
