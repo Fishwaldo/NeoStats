@@ -65,7 +65,21 @@ nv_list *FindNamedVars(char *name) {
 }
 
 int nv_init() {
-	namedvars = nv_hash_create(HASHCOUNT_T_MAX, 0, 0, "NamedVars", nv_nvlist, NV_FLG_RO, NULL);
+	nv_list *newitem;
+	namedvars = hash_create(HASHCOUNT_T_MAX, 0, 0);
+	newitem = ns_malloc(sizeof(nv_list));
+	newitem->name = strdup("NamedVars");
+	newitem->type = NV_TYPE_HASH;
+	newitem->flags = NV_FLG_RO;
+	newitem->format = nv_nvlist;
+	newitem->mod = GET_CUR_MODULE();
+	newitem->data = namedvars;
+	newitem->updatehandler = NULL;
+	newitem->no_flds = 0;
+	while (newitem->format[newitem->no_flds].fldname != NULL) {
+		newitem->no_flds++;
+	}
+	hnode_create_insert(namedvars, newitem, newitem->name);
 	return NS_SUCCESS;
 }
 
