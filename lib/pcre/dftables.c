@@ -69,6 +69,10 @@ printf(
   "This file is #included in the compilation of pcre.c to build the default\n"
   "character tables which are used when no tables are passed to the compile\n"
   "function. */\n\n"
+  "/* If we're not using GNU C, elide __attribute__ */\n"
+  "#ifndef __GNUC__\n"
+  "#define __attribute__( x )  /* NOTHING */\n"
+  "#endif /* __GNUC__ */\n"
   "static unsigned char pcre_default_tables[]  __attribute__((__unused__)) = {\n\n"
   "/* This table is a lower casing table. */\n\n");
 
