@@ -122,7 +122,7 @@ static void SendEvent( const ModuleEvent *eventptr, Event event, const CmdParams
 {
 	if( !eventptr )
 	{
-		dlog( DEBUG5, "SendModuleEvent: %s has no event handler for %s", module_ptr->info->name, EventStrings[event] );
+		dlog( DEBUG5, "SendEvent: %s has no event handler for %s", module_ptr->info->name, EventStrings[event] );
 		return;
 	}
 	/* If we are not yet synched, check that the module supports 
@@ -174,7 +174,7 @@ static void SendEvent( const ModuleEvent *eventptr, Event event, const CmdParams
 	}
 	else
 	{
-		nlog( LOG_CRITICAL, "SendModuleEvent: setjmp() failed, not calling module %s", module_ptr->info->name );
+		nlog( LOG_CRITICAL, "SendEvent: setjmp() failed, not calling module %s", module_ptr->info->name );
 	}
 }
 

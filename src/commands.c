@@ -590,10 +590,17 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 		cmdret = run_intrinsic_cmds( av[0], cmdparams );
 		if( cmdret != NS_SUCCESS ) 
 		{
-			/* We have run out of commands so report failure */
-			if( !ischancmd )
+			/* We have run out of commands so report failure only if the module does not have 
+			 * a EVENT_PRIVATE event handler otherwise we assume the event handler will handle the unknown command 
+			 * also, don't report anything if its a channel message */
+			 */
+			if( !ischancmd  && (cmdparams->bot->moduleptr->event_list[EVENT_PRIVATE] == NULL) ) {
 				msg_unknown_command( cmdparams );
-			cmdret = NS_FAILURE;
+				cmdret = NS_SUCCESS;
+			} else {
+				/* else return it for processing by event procesor */
+				cmdret = NS_FAILURE;
+			}
 		}
 	}
 	if( ac == 0)
