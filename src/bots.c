@@ -354,8 +354,7 @@ void bot_private( const char *origin, char *const *av, int ac )
 			}
 			else
 			{
-				if( ( cmdparams->bot->botcmds == NULL ) ||
-					run_bot_cmd( cmdparams, 0 ) == NS_FAILURE )
+				if( run_bot_cmd( cmdparams, 0 ) == NS_FAILURE )
 				{
 					SendModuleEvent( EVENT_PRIVATE, cmdparams, cmdparams->bot->moduleptr );
 				}
