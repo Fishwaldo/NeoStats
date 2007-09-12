@@ -398,7 +398,7 @@ AC_ARG_ENABLE(debug,
 [ case "$enableval" in
   yes)
 	AC_DEFINE(DEBUG, 1, 'Enable Debugging')
-	CFLAGS="$CFLAGS -ggdb -Wall -DCURLDEBUG"
+	CFLAGS="$CFLAGS -ggdb -Wall"
 	AC_MSG_RESULT(yes - Watch your Log Files)
 	;;
   *)

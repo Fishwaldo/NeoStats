@@ -383,8 +383,7 @@ static void ts_read_database( dbbot *db )
 	cfg_t *cmd;
 	int ret;
 
-	strlcpy( filename, "data/TSDB/", MAXPATH );
-	strlcat( filename, db->tsbot.dbname, MAXPATH );
+	ircsnprintf(filename, MAXPATH, "data/%s.tsdb", db->tsbot.dbname);
 	cfg = cfg_init(tsdb, CFGF_NOCASE);
 	if (!cfg) 
 		return;

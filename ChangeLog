@@ -4,6 +4,8 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Rename TextServ databases with extension tsdb and move into the Data
+   Directory, rather than data/TSDB (F)
  - Context Sensitive Help is now in place (eg, !help versus /msg bot help) (F)
  - report command syntax in case of syntax errors (configurable)
  - TextServ uses confuse file format for databases (a bit more flexibility
