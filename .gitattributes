@@ -48,6 +48,7 @@ doc/FAQ -text
 doc/README.dev -text
 doc/README.french -text
 doc/USERMAN -text
+doc/USERMAN.html -text
 doc/USERMAN.xml -text
 doc/old/ChangeLog.connectserv.old -text
 doc/old/ChangeLog.hostserv.old -text

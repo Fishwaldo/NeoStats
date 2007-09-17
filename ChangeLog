@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - StatServ should default to Enabled for Global Exclusions Setting (F)
  - Rename TextServ databases with extension tsdb and move into the Data
    Directory, rather than data/TSDB (F)
  - Context Sensitive Help is now in place (eg, !help versus /msg bot help) (F)

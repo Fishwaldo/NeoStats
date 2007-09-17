@@ -121,7 +121,7 @@ static bot_setting ss_settings[]=
 	{"LAGTIME",		&StatServ.lagtime,		SET_TYPE_INT,		1, 256,			NS_ULEVEL_ADMIN, "seconds",	ss_help_set_lagtime, NULL, ( void * )30},
 	{"LAGALERT",	&StatServ.lagalert,		SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_lagalert, NULL, ( void * )1},
 	{"RECORDALERT", &StatServ.recordalert,	SET_TYPE_INT,		0, 3, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_recordalert, NULL, ( void * )1},
-	{"EXCLUSIONS",	&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_exclusions, ss_set_exclusions_cb, ( void * )0},
+	{"EXCLUSIONS",	&StatServ.exclusions,	SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_exclusions, ss_set_exclusions_cb, ( void * )1},
 	{"FLATMAP",		&StatServ.flatmap,		SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,		ss_help_set_flatmap, NULL, ( void * )0},
 	NS_SETTING_END()
 };

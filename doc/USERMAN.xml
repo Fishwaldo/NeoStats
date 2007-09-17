@@ -2,23 +2,38 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <book>
-  <title>User Manual for NeoStats</title>
+  <title>Manual for NeoStats</title>
 
   <chapter>
-    <title>Introduction</title>
+    <title>Introduction To NeoStats</title>
+
+    <para></para>
+  </chapter>
+
+  <chapter>
+    <title>QuickStart Guide</title>
+
+    <para></para>
+  </chapter>
+
+  <chapter>
+    <title>Installing NeoStats</title>
+
+    <para></para>
+  </chapter>
+
+  <chapter>
+    <title>Using NeoStats &amp; Supplied Modules</title>
 
     <sect1>
       <title>Purpose</title>
 
-      <para>This document explains how to use NeoStats and the commands
-      available for the various components. If you are looking for help
-      configuring or installing NeoStats or for support information please
-      refer to the README file.</para>
+      <para>The rest of this document explains how to use NeoStats and the
+      commands available for the various components. </para>
 
       <para>For help on downloaded modules, refer to the documentation that
       comes with the module. Typically, after installation, the documentation
-      for the downloaded modules in named
-      &#34;README.&#60;modulename&#62;&#34;</para>
+      for the downloaded modules in named "README.&lt;modulename&gt;"</para>
 
       <para>Most NeoStats components include online help so you can find out
       how to use a command while on IRC. To access general online help for the
@@ -35,38 +50,37 @@
 
       <para>To send a command to a NeoStats module or bot you will always use
       the following from an IRC Client: <screen>/msg botname command [options]</screen>
-      e.g. <screen>/msg NeoStats MAP
-</screen>If you change the default name of a bot, you will need to change the
-      command. If you decided to change the name of StatServ to StatBot, then
-      you must use this name when entering commands: e.g. <screen>/msg StatBot MAP</screen>Commands
-      are listed here in upper case to make reading this document easier. IRC
-      is not case sensitive. This means that:</para>
+      e.g. <screen>/msg NeoStats SET</screen>If you change the default name of
+      a bot, you will need to change the command. If you decided to change the
+      name of StatServ to StatBot, then you must use this name when entering
+      commands: e.g. <screen>/msg StatBot MAP</screen>Commands are listed here
+      in upper case to make reading this document easier. IRC is not case
+      sensitive. This means that:</para>
 
       <para><screen>/msg StatServ MAP
 /msg StatServ map
-/msg statserv Map
-</screen>will all perform the same task. Some commands of NeoStats and
-      StatServ are available to all users as well as opers unless you specify
-      ONLY_OPERS in neostats.cfg. Refer to README and neostats.cfg for more
-      information on the ONLY_OPERS option. Command help in this document is
-      broken into three sections:</para>
+/msg statserv Map</screen>will all perform the same task. Some commands of
+      NeoStats and StatServ are available to all users as well as opers unless
+      you specify ONLY_OPERS in neostats.cfg. Refer to README and neostats.cfg
+      for more information on the ONLY_OPERS option. Command help in this
+      document is broken into three sections:</para>
 
       <para><emphasis role="bold">Syntax:</emphasis> The syntax used for a
       command</para>
 
       <para><emphasis role="bold">Description:</emphasis> Description of the
-      command and it&#39;s options</para>
+      command and it's options</para>
 
       <para><emphasis role="bold">Example:</emphasis> Example of how to use
       the command</para>
 
       <para>Optional parameters are presented between [] e.g. [reason]</para>
 
-      <para>Required parameters are presented between &#60;&#62; e.g.
-      &#60;reason&#62; The | character indicates that only one of the option
+      <para>Required parameters are presented between &lt;&gt; e.g.
+      &lt;reason&gt; The | character indicates that only one of the option
       list can be used at any one time. e.g. option1|option2</para>
 
-      <para>When using the command, do not use the [],&#60;&#62; or | from the
+      <para>When using the command, do not use the [],&lt;&gt; or | from the
       syntax.</para>
     </sect1>
   </chapter>
@@ -85,13 +99,14 @@
       of privilege levels to users. It can be considered much the same as what
       OperServ does for most services packages. It controls the actual
       software, but does not provide any functions to the users. Its intended
-      to be used by the network administration only. </para>
+      to be used by the network administration only.</para>
     </sect1>
 
     <sect1>
       <title>Command Reference</title>
 
-      <para>The Following are detailed Descriptions of the available commands:</para>
+      <para>The Following are detailed Descriptions of the available
+      commands:</para>
 
       <sect2>
         <title>HELP</title>
@@ -112,42 +127,91 @@
       </sect2>
 
       <sect2>
-        <title>INFO</title>
+        <title>VERSION</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats INFO</screen><emphasis
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg NeoStats version</screen><emphasis
         role="bold">Description: </emphasis></para>
 
-        <para>Shows the current NeoStats uptime and other info.</para>
+        <para>Displays the current core version of NeoStats</para>
 
-        <para>Available to users if ONLY_OPERS not set in the configurationf
-        file</para>
-
-        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats INFO</screen></para>
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats VERSION</screen></para>
       </sect2>
 
       <sect2>
-        <title>VERSION</title>
+        <title>ABOUT</title>
 
-        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg NeoStats VERSION</screen><emphasis
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats ABOUT</screen><emphasis
         role="bold">Description: </emphasis></para>
 
-        <para>Shows the current NeoStats version.</para>
+        <para>Shows a descriptive text about NeoStats</para>
 
-        <para>Available to users if ONLY_OPERS not set in the configuration
-        file</para>
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats ABOUT</screen></para>
+      </sect2>
 
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats VERSION</screen></para>
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        NeoStats</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg NeoStats LEVELS LIST
+/msg NeoStats LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in NeoStats are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg NeoStats LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
       </sect2>
 
       <sect2>
         <title>LEVEL</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg NeoStats LEVEL</screen><emphasis
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg NeoStats LEVEL &lt;nick&gt;</screen><emphasis
         role="bold">Description: </emphasis></para>
 
         <para>Allows you to see your permissions level with regards NeoStats.
-        0 is lowest, 200 is highest, you could be anywhere in between!
-        Available to users if ONLY_OPERS not set in the configuration file</para>
+        0 is lowest, 200 is highest, you could be anywhere in between! If you
+        specify a nickname, it allows you to check that users level as far as
+        NeoStats is concerned.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats LEVEL</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>STATUS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg NeoStats status</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Allows you to check NeoStats's status, with information such as
+        Uptime, NeoNet connection status, and user/server/channel/socket data,
+        as well as brief Network Statistics.</para>
 
         <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats LEVEL</screen></para>
       </sect2>
@@ -155,11 +219,11 @@
       <sect2>
         <title>SHUTDOWN</title>
 
-        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg NeoStats SHUTDOWN [reason]
-</screen><emphasis role="bold">Description: </emphasis></para>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg NeoStats SHUTDOWN &lt;reason&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
 
         <para>Force NeoStats to exit immediately. This command should be used
-        wisely. reason is optional.</para>
+        wisely. </para>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats SHUTDOWN upgrade</screen></para>
       </sect2>
@@ -167,14 +231,17 @@
       <sect2>
         <title>RELOAD</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats RELOAD [reason]</screen><emphasis
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats RELOAD &lt;reason&gt;</screen><emphasis
         role="bold">Description: </emphasis></para>
 
         <para>Force NeoStats to reload. This command will cause StatServ to
         split from the network, reload data files and connect. This command
         SHOULD be used wisely.</para>
 
-        <para>reason is optional.</para>
+        <note>
+          <para>This command is not available on Windows Builds of
+          NeoStats</para>
+        </note>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats RELOAD Lagged</screen></para>
       </sect2>
@@ -182,7 +249,7 @@
       <sect2>
         <title>LOAD</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats LOAD &#60;module&#62;</screen><emphasis
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats LOAD &lt;module&gt;</screen><emphasis
         role="bold">Description: </emphasis></para>
 
         <para>Allows you to load a module while NeoStats is running. Some
@@ -194,11 +261,12 @@
       <sect2>
         <title>UNLOAD</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats UNLOAD &#60;module&#62;</screen><emphasis
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats UNLOAD &lt;module&gt;</screen><emphasis
         role="bold">Description:</emphasis></para>
 
         <para>Allows you to unload a module while NeoStats is running. Some
-        modules can not be unloaded at runtime, and will return an error</para>
+        modules can not be unloaded at runtime, and will return an
+        error</para>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats UNLOAD statserv</screen></para>
       </sect2>
@@ -212,22 +280,6 @@
         <para>Display module names and descriptions of loaded modules</para>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats MODLIST</screen></para>
-      </sect2>
-
-      <sect2>
-        <title>LOGS</title>
-
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats LOGS
-</screen><emphasis role="bold">Description: </emphasis></para>
-
-        <para>Sends today&#39;s log file via PRIVMSG/NOTICE.</para>
-
-        <warning>
-          <para>Warning. The sending is not throttled. If you have large log
-          files, you may be flooded of IRC</para>
-        </warning>
-
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats LOGS</screen></para>
       </sect2>
 
       <sect2>
@@ -246,6 +298,13 @@
           <para>Problems with RAW are NOT SUPPORTED.</para>
         </warning>
 
+        <note>
+          <para>RAW is not enabled by Default in NeoStats. The availability of
+          this command depends upon the installation. Please consult the
+          installation guide for more info about enabling the Raw
+          command.</para>
+        </note>
+
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats RAW COMMAND</screen></para>
       </sect2>
 
@@ -261,23 +320,46 @@
       </sect2>
 
       <sect2>
-        <title>DEBUG</title>
+        <title>EXCLUDE</title>
 
-        <para><emphasis role="bold">Syntax:</emphasis><screen>/msg NeoStats DEBUG</screen></para>
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats EXCLUDE LIST
+/msg NeoStats EXCLUDE ADD &lt;HOST/SERVER/CHANNEL/USERHOST&gt; &lt;pattern&gt; &lt;reason&gt;
+</screen><emphasis role="bold">Description: </emphasis></para>
 
-        <para><emphasis role="bold">Description: </emphasis></para>
+        <para>Exclusion Lists allow you to stop NeoStats acting on certian
+        users, channels, servers, or hostname masks. This for example, allows
+        you to stop NeoStats from interacting with your Services Server
+        (NickServ etc) which is often advisable. </para>
 
-        <para>This toggles the debug command, On a large network, this command
-        should be used considered dangerous as a large amount of information
-        may be sent to you and may flood you off the network.</para>
+        <para>In NeoStats, there are two types of Exclusion Lists. One is a
+        Global Exclusion List that applies to all Bots/Services loaded on
+        NeoStats. The other type is a "Per Module" exclusion list that only
+        applies to individual modules. </para>
 
-        <para><emphasis role="bold"> Example:</emphasis><screen>/msg NeoStats DEBUG</screen></para>
+        <para>This Exclusion command maintains the global exclusion list here.
+        Ideally, the only entries in this exclusion list should be for your
+        Services Server, Bots that may not play nicely with NeoStats, or
+        Abusive Users. If any user matches this exclusion list, they can not
+        interact at all with NeoStats, or any of its modules. </para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats EXCLUDE LIST
+
+/msg NeoStats EXCLUDE ADD HOST *.microsoft.com Microsoft Employes are not welcome here!
+
+/msg NeoStats EXCLUDE DEL *.microsoft.com</screen></para>
       </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Debugging Command Reference</title>
+
+      <para>The following Commands can assist you or developers to Debug
+      NeoStats</para>
 
       <sect2>
-        <title>USERDUMP</title>
+        <title>USERLIST</title>
 
-        <para><emphasis role="bold"> Syntax:</emphasis><screen>/msg NeoStats USERDUMP [nick]</screen><emphasis
+        <para><emphasis role="bold"> Syntax:</emphasis><screen>/msg NeoStats USERLIST [nick]</screen><emphasis
         role="bold"> Description:</emphasis></para>
 
         <para>When in debug mode, Neostats will echo its user table to the
@@ -286,25 +368,13 @@
         <para>If nick is passed, only the information of that nick is
         returned, otherwise the entire user list is dumped.</para>
 
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats USERDUMP</screen></para>
+        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats USERLIST</screen></para>
       </sect2>
 
       <sect2>
-        <title>SERVERDUMP</title>
+        <title>CHANNELLIST</title>
 
-        <para><emphasis role="bold">Syntax:</emphasis><screen>/msg NeoStats SERVERDUMP</screen><emphasis
-        role="bold">Description: </emphasis></para>
-
-        <para>When in debug mode, Neostats will echo its server table to the
-        services channel. Only useful for debugging Neostats</para>
-
-        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats SERVERDUMP</screen></para>
-      </sect2>
-
-      <sect2>
-        <title>CHANDUMP</title>
-
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats CHANDUMP [channel]
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats CHANNELLIST [channel]
 </screen><emphasis role="bold">Description: </emphasis></para>
 
         <para>When in debug mode, Neostats will echo its channel table to the
@@ -312,55 +382,365 @@
         passed, only the information of that channel is returned, otherwise
         the entire channel list is dumped.</para>
 
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats CHANDUMP</screen></para>
+        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats CHANNELLIST</screen></para>
       </sect2>
 
       <sect2>
-        <title>MODBOTLIST</title>
+        <title>SERVERLIST</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats MODBOTLIST
-</screen><emphasis role="bold">Description: </emphasis> NeoStats will send you
-        by notice a list of the current bots being used on the network for
-        each module.</para>
+        <para><emphasis role="bold">Syntax:</emphasis><screen>/msg NeoStats SERVERLIST</screen><emphasis
+        role="bold">Description: </emphasis></para>
 
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats MODBOTLIST</screen></para>
+        <para>When in debug mode, Neostats will echo its server table to the
+        services channel. Only useful for debugging Neostats</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats SERVERLIST</screen></para>
       </sect2>
 
       <sect2>
-        <title>MODSOCKLIST</title>
+        <title>BANLIST</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg NeoStats MODSOCKLIST</screen></para>
+        <para><emphasis role="bold">Syntax:</emphasis><screen>/msg NeoStats BANLIST</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>When in debug mode, Neostats will echo its network wide Ban List
+        (AKILLS, GLINES etc) to the services channel. Only useful for
+        debugging Neostats</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats BANLIST</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>BOTLIST</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats BOTLIST</screen><emphasis
+        role="bold">Description: </emphasis> NeoStats will send you by notice
+        a list of the current bots being used on the network for each
+        module.</para>
+
+        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats BOTLIST</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>SOCKLIST</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg NeoStats SOCKLIST</screen></para>
 
         <para><emphasis role="bold">Description</emphasis></para>
 
         <para>NeoStats will send you by notice a list of the current sockets
-        being used on the network for each module.</para>
+        being used on neostats for each module.</para>
 
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats MODSOCKLIST</screen></para>
+        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats SOCKLIST</screen></para>
       </sect2>
 
       <sect2>
-        <title>MODTIMERLIST</title>
+        <title>TIMERLIST</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats MODTIMERLIST</screen></para>
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats TIMERLIST</screen></para>
 
         <para><emphasis role="bold">Description: </emphasis> NeoStats will
         send you by notice a list of the current timer functions being used on
         the network by each module.</para>
 
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats MODTIMERLIST</screen></para>
+        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats TIMERLIST</screen></para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with NeoStats. They
+      help you customize NeoStats and its configuration to suit your network.
+      Some settings affect all of NeoStats, while others only affect the
+      NeoStats Root Bot ("NeoStats"). The following section define the
+      settings. To view or modify the settings the following commands are
+      available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg NeoStats SET LIST
+
+/msg NeoStats SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in NeoStats:</para>
+
+      <screen>CMDCHAR
+MSGTHRESHOLD
+MSGSAMPLETIME
+DEBUGCHAN
+ALLHELP
+RECVQ
+CMDREPORT
+SERVICEUMODE
+SENDHELP
+SPLITTIME
+LOGLEVEL
+SERVICECMODE
+JOINSERVICESCHAN
+PINGTIME</screen>
+
+      <sect2>
+        <title>CMDCHAR Setting </title>
+
+        <para>This setting is to customize what charactor will be used for
+        commands that are activated via Channel Messages. By default, it is
+        set to "!" which means to trigger a command in a channel, a user must
+        type !&lt;command&gt;</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to !</para>
       </sect2>
 
       <sect2>
-        <title>MODBOTCHANLIST</title>
+        <title>MSGTHRESHOLD Setting</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg NeoStats MODBOTCHANLIST</screen></para>
+        <para>NeoStats has inbuilt flood protection. This setting defines how
+        many messages NeoStats will allow in MSGSAMPLETIME (see below) before
+        ignoring or killing a user. </para>
 
-        <para><emphasis role="bold">Description: </emphasis> NeoStats will
-        send you by notice a list of the current bots and the channels they
-        are using for each module.</para>
+        <note>
+          <para>Operators are exempt from FloodProtection</para>
+        </note>
 
-        <para><emphasis role="bold">Example:</emphasis> <screen>/msg NeoStats MODBOTCHANLIST</screen></para>
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to 5 messages (in 30 Seconds, by default
+        for MSGSAMPLETIME)</para>
+      </sect2>
+
+      <sect2>
+        <title>MSGSAMPLETIME Setting</title>
+
+        <para>This setting defines how long NeoStats will calculate if a user
+        is flooding NeoStats (or its bots). If NeoStats recieves MSGTHRESHOLD
+        messages in MSGSAMPLETIME, the user will be killed or ignored.</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to 30 seconds</para>
+      </sect2>
+
+      <sect2>
+        <title>DEBUGCHAN Setting</title>
+
+        <para>NeoStats can send debugging information to a channel if it has
+        been built with Debugging Enabled. This option sets which channel to
+        output that debuging information. See the other DEBUG options listed
+        below for information on how to customize the Debugging
+        Information.</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to #DEBUG</para>
+      </sect2>
+
+      <sect2>
+        <title>ALLHELP Setting</title>
+
+        <para>Some NeoStats bots might have different commands that are
+        triggered via either Channel Messages or Private Messages. For bots
+        that use both Channel Messages or Private Messages, this option allows
+        you to configure the help messages sent to a user. If the User
+        triggers help via a Channel Message, and this setting is Off, then
+        only commands that can be triggered via Channel Messages will be
+        displayed in Help. If the help command is used via a Private Message
+        and this setting is off, then only commands that are available via
+        Private Message are displayed. If you enable this setting then
+        regardless of how a user requests help, then all commands are
+        shown.</para>
+
+        <para>This setting defaults to disabled.</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+      </sect2>
+
+      <sect2>
+        <title>REVCQ Setting</title>
+
+        <para>Some NeoStats Modules connect to various Network resources (eg,
+        DCC, NeoNet). This option specifies how big a buffer is made in the
+        network code for this communication. If the amount of incomming
+        traffic exceeds this amount, the network connection is disconnected.
+        </para>
+
+        <note>
+          <para>Not all network communications are affected by this setting.
+          Consult the developers if you wish to know which modules might use
+          this settting.</para>
+        </note>
+
+        <warning>
+          <para>Changing this setting is not recommended unless you know what
+          you are doing!</para>
+        </warning>
+
+        <para>This setting defaults to 2048 Bytes. </para>
+      </sect2>
+
+      <sect2>
+        <title>CMDREPORT Setting</title>
+
+        <para>NeoStats can optionally echo commands used by users on all bots
+        to the Services Channel. This allows members of the services channel
+        to see what commands are being used by Users.</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to Enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>SERVICEUMODE Setting</title>
+
+        <para>This is the default User Mode assigned to all NeoStats bots. It
+        allows you to customize how the NeoStats Bots appear to end users.
+        </para>
+
+        <note>
+          <para>This setting affects most NeoStats Bots. Some Bots do not use
+          this setting and may use a "per module" setting instead. </para>
+        </note>
+
+        <para>This setting defaults are dependant on the IRCd you connect
+        to.</para>
+      </sect2>
+
+      <sect2>
+        <title>SENDHELP Setting</title>
+
+        <para>This setting controls if NeoStats should send the helptext
+        associated with a command if the user specifies a invalid syntax or
+        not. With this option disabled, Users only get a "Invalid Syntax
+        Message", and with it enabled, they get the "Invalid Syntax" Message,
+        plus the help associated with that command.</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to enabled</para>
+      </sect2>
+
+      <sect2>
+        <title>SPLITTIME Setting</title>
+
+        <para>This setting controls determs the threshold that is used when
+        calculating if a user is part of a NetJoin (when two servers link to
+        the network) or if they are a brand new user. If they are considered
+        to be "riding a netjoin", then certian actions may be ignored for a
+        user (such as OPSB scanning these users for Open Proxies). SPLITTIME
+        requires that all clocks on the Network Servers are closely in sync.
+        Its not advised to Change this setting unless you know what you are
+        doing. </para>
+
+        <para>A user is considered NetRiding if their Network Join Time is
+        older than the current time minus the SPLITTIME seconds. </para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <note>
+          <para>This option might be ignored on some IRCd's that support
+          network wide "End Of Burst" messages. Consult the IRCd specific
+          information for details of which IRCd's support that
+          currently.</para>
+        </note>
+
+        <para>This setting defaults to 300 Seconds</para>
+      </sect2>
+
+      <sect2>
+        <title>LOGLEVEL Setting</title>
+
+        <para>This setting controls how much debugging information is written
+        to the LogFiles. Valid range is from 1 to 10. Debug Logging is only
+        activated if debug mode is activated.</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to 5 Seconds</para>
+      </sect2>
+
+      <sect2>
+        <title>SERVICECMODE Setting</title>
+
+        <para>This setting determines what channel modes NeoStats Bots will
+        get when joining channels. </para>
+
+        <note>
+          <para>This setting affects most NeoStats Bots. Those modules that
+          don't use this setting will have individual settings.</para>
+        </note>
+
+        <para>This setting is dependant on the IRCd being used.</para>
+      </sect2>
+
+      <sect2>
+        <title>JOINSERVICESCHAN Setting</title>
+
+        <para>This setting determins if all NeoStats Bots should automatically
+        join the Services Channel.</para>
+
+        <note>
+          <para>This setting affects all NeoStats Bots</para>
+        </note>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>PINGTIME Setting</title>
+
+        <para>This setting determins how often NeoStats should ping the Uplink
+        Server. This helps avoid "Ping Timeout" disconnections on small
+        networks. It should be set less than the PingTime configuration on the
+        IRCd you are connecting to.</para>
+
+        <para>This setting defaults to 120 seconds.</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Debugging Settings Reference</title>
+
+      <para>The following settings can assist you or developers to Debug
+      NeoStats</para>
+
+      <sect2>
+        <title>DEBUGTOCHAN Setting</title>
+
+        <para>This setting determines if Debugging information should be
+        output to the Debug Channel Specified in teh DEBUGCHAN setting as well
+        as outputing to the Log Files.</para>
+      </sect2>
+
+      <sect2>
+        <title>DEBUGMODULE Setting</title>
+
+        <para>Filter the messages output to the debug channel by module. Eg,
+        you can specify that you only want debug messages for
+        SecureServ.</para>
+      </sect2>
+
+      <sect2>
+        <title>DEBUGLEVEL Setting</title>
+
+        <para>What level of Debugging should be used.</para>
       </sect2>
     </sect1>
   </chapter>
@@ -375,113 +755,136 @@
     <sect1>
       <title>Command Reference</title>
 
-      <para>The following Commands may be used with StatServ. Some commands
-      require privledged access (O lines or Service Roots)</para>
+      <para>The following Commands may be used with StatServ.</para>
 
       <sect2>
         <title>HELP</title>
 
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg StatServ HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg StatServ HELP 
+/msg StatServ HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg StatServ version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of StatServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg StatServ VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg StatServ ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about StatServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg StatServ ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg StatServ CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        StatServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg StatServ CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg StatServ LEVELS LIST
+/msg StatServ LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in StatServ are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg StatServ LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg StatServ LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+
+      <sect2>
+        <title>CTCPVERSION</title>
+
         <para><emphasis role="bold">Syntax:</emphasis></para>
 
-        <para><screen>/msg StatServ HELP [command]</screen></para>
+        <para><screen>/msg StatServ CTCPVERSION &lt;limit&gt; </screen></para>
 
-        <para><emphasis role="bold">Description:</emphasis> </para>
+        <para><emphasis role="bold">Description:</emphasis></para>
 
-        <para>HELP on it&#39;s own display available commands. </para>
+        <para>Provides Statistics on the Client Versions found</para>
 
-        <para>HELP COMMAND will display help for that command. </para>
+        <para>&lt;limit&gt; Specifies how many results to show. Results are
+        sorted by Most Popular to Least Popular</para>
 
         <para><emphasis role="bold">Example:</emphasis></para>
 
-        <para><screen>/msg StatServ HELP /msg StatServ HELP STATS</screen></para>
+        <para><screen>/msg StatServ CTCPVERSION</screen></para>
       </sect2>
 
       <sect2>
-        <title>CLIENTVERSIONS</title>
+        <title>CHANNEL</title>
 
         <para><emphasis role="bold">Syntax:</emphasis></para>
 
-        <para><screen>/msg StatServ CLIENTVERSIONS &#60;limit&#62; </screen></para>
+        <para><screen>/msg StatServ CHANNEL &lt;POP/KICKS/TOPICS/&lt;Channame&gt;&gt;</screen><emphasis
+        role="bold">Description:</emphasis></para>
 
-        <para><emphasis role="bold">Description:</emphasis> </para>
-
-        <para>Provides Statistics on the Client Versions found The list will
-        only be active if you have SecureServ installed and Active
-        &#60;limit&#62; Specifies how many results to show. Results are sorted
-        by Most Popular to Least Popular </para>
-
-        <para><emphasis role="bold">Example:</emphasis></para>
-
-        <para><screen>/msg StatServ CLIENTVERSIONS</screen></para>
-      </sect2>
-
-      <sect2>
-        <title>SET</title>
-
-        <para><emphasis role="bold">Syntax:</emphasis></para>
-
-        <para><screen>/msg StatServ Set &#60;option&#62; [&#60;value&#62;]</screen><emphasis
-        role="bold">Description:</emphasis> </para>
-
-        <para>Available Options are: </para>
-
-        <para><emphasis>HTMLPATH &#60;path&#62;</emphasis> </para>
-
-        <para>Set the Pathname (including filename) to write HTML statistics
-        to if HTML Statistics are enabled HTML Toggle HTML Statistics
-        Generation on/off </para>
-
-        <para><emphasis>MSGTHROTTLE [&#60;seconds&#62;/off]</emphasis> </para>
-
-        <para>if &#60;seconds&#62; is greater than 0, then set 5 Wallops per
-        &#60;seconds&#62; throttle if &#60;seconds&#62; is equal to 0, then
-        disable Wallop Throttling if off then all Wallops are disabled </para>
-
-        <para><emphasis>LAGWALLOP &#60;seconds&#62;</emphasis> </para>
-
-        <para>if &#60;seconds&#62; is greater than 0, then when servers are
-        lagged by this many seconds, issue a warning if &#60;seconds&#62; is
-        equal to 0, then disable Lag Monitoring </para>
-
-        <para>If you specify SET without any options, the current settings are
-        displayed </para>
-
-        <para><emphasis role="bold">Example:</emphasis> </para>
-
-        <para><screen>/msg statserv set msgthrottle off</screen></para>
-      </sect2>
-
-      <sect2>
-        <title>CHAN</title>
-
-        <para><emphasis role="bold">Syntax:</emphasis> </para>
-
-        <para><screen>/msg StatServ CHAN &#60;POP/KICKS/TOPICS/&#60;Channame&#62;&#62;</screen><emphasis
-        role="bold">Description:</emphasis> </para>
-
-        <para>Provides Statistics on Channels on the network </para>
+        <para>Provides Statistics on Channels on the network</para>
 
         <para><emphasis>CHAN </emphasis></para>
 
         <para>By itself provides a list of the top10 Channels based on the
-        current number of members </para>
+        current number of members</para>
 
         <para><emphasis>CHAN POP </emphasis></para>
 
         <para>gives you information on the most popular channels on the
-        network based on the number of joins </para>
+        network based on the number of joins</para>
 
-        <para><emphasis>CHAN KICKS</emphasis> </para>
+        <para><emphasis>CHAN KICKS</emphasis></para>
 
-        <para>Gives you the top 10 kicking channels </para>
+        <para>Gives you the top 10 kicking channels</para>
 
-        <para><emphasis>CHAN TOPICS</emphasis> </para>
+        <para><emphasis>CHAN TOPICS</emphasis></para>
 
-        <para>Gives you the top10 Topic Changing Channels </para>
+        <para>Gives you the top10 Topic Changing Channels</para>
 
-        <para><emphasis>CHAN &#60;name&#62;</emphasis> </para>
+        <para><emphasis>CHAN &lt;name&gt;</emphasis></para>
 
-        <para>Gives you specific information on a channel </para>
+        <para>Gives you specific information on a channel</para>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg statserv chan #neostats</screen></para>
       </sect2>
@@ -489,14 +892,32 @@
       <sect2>
         <title>SERVER</title>
 
-        <para><emphasis role="bold">Syntax:</emphasis> </para>
+        <para><emphasis role="bold">Syntax:</emphasis></para>
 
-        <para><screen>/msg StatServ SERVER [server name]</screen><emphasis
-        role="bold">Description:</emphasis> </para>
+        <para><screen>/msg StatServ SERVER &lt;&lt;server name&gt;/LIST/DEL/RENAME&gt; &lt;oldserver&gt; &lt;newserver&gt;</screen><emphasis
+        role="bold">Description:</emphasis></para>
 
-        <para>Provides you with statistics on a specific server. </para>
+        <para>Allows you to view and modify server statistics. </para>
 
-        <para><emphasis role="bold">Example:</emphasis> </para>
+        <para><emphasis>SERVER &lt;servername&gt;</emphasis></para>
+
+        <para>Allows you to view statistics about a particular server</para>
+
+        <para><emphasis>SERVER LIST</emphasis></para>
+
+        <para>Shows all the server entries stored in StatServ's
+        Database.</para>
+
+        <para><emphasis>SERVER DEL</emphasis></para>
+
+        <para>Delete a server entry stored in StatServ's Database.</para>
+
+        <para><emphasis>SERVER RENAME &lt;oldserver&gt;
+        &lt;newserver&gt;</emphasis></para>
+
+        <para>Rename a server entry stored in StatServ's Database.</para>
+
+        <para><emphasis role="bold">Example:</emphasis></para>
 
         <para><screen>/msg statserv server rollergirl.sg.as.irc-chat.net</screen></para>
       </sect2>
@@ -508,7 +929,7 @@
 
         <para><emphasis role="bold">Description: </emphasis></para>
 
-        <para>Provides a server listing with minimal statistics. </para>
+        <para>Provides a server listing with minimal statistics.</para>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg StatServ MAP</screen></para>
       </sect2>
@@ -519,8 +940,8 @@
         <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg StatServ NETSTATS</screen><emphasis
         role="bold"> Description</emphasis></para>
 
-        <para> Provides information about the performance of the network.
-        </para>
+        <para>Provides information about the performance of the
+        network.</para>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg StatServ NETSTATS</screen></para>
       </sect2>
@@ -529,27 +950,12 @@
         <title>DAILY</title>
 
         <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg StatServ DAILY </screen><emphasis
-        role="bold">Description:</emphasis> </para>
+        role="bold">Description:</emphasis></para>
 
-        <para>Provides information about records that have been set today.
-        </para>
+        <para>Provides information about records that have been set
+        today.</para>
 
         <para><emphasis role="bold">Example:</emphasis> <screen>/msg StatServ DAILY</screen></para>
-      </sect2>
-
-      <sect2>
-        <title>TLD</title>
-
-        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg StatServ TLD top_level_domain </screen></para>
-
-        <para><emphasis role="bold">Description:</emphasis></para>
-
-        <para>Provides the country-name for a specific TLD. An example of a
-        TLD is .NET </para>
-
-        <para><emphasis role="bold">Example: </emphasis></para>
-
-        <para><screen>/msg StatServ TLD NET</screen></para>
       </sect2>
 
       <sect2>
@@ -559,7 +965,7 @@
 
         <para><emphasis role="bold">Description: </emphasis></para>
 
-        <para>Shows the network map in relation to top level domains. </para>
+        <para>Shows the network map in relation to top level domains.</para>
 
         <para><emphasis role="bold">Example: </emphasis></para>
 
@@ -569,26 +975,26 @@
       <sect2>
         <title>OPERLIST</title>
 
-        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg StatServ OPERLIST (options|server_name) </screen><emphasis
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg StatServ OPERLIST &lt;NOAWAY/&lt;server_name&gt;&gt; </screen><emphasis
         role="bold">Description: </emphasis></para>
 
-        <para>Shows a listing of IRCops. </para>
+        <para>Shows a listing of IRCops.</para>
 
-        <para>Flags: </para>
+        <para>Flags:</para>
 
-        <para><emphasis>NOAWAY</emphasis> </para>
+        <para><emphasis>NOAWAY</emphasis></para>
 
-        <para>Don&#39;t show opers that are set away. </para>
+        <para>Don't show opers that are set away.</para>
 
-        <para><emphasis>SERVER</emphasis> </para>
+        <para><emphasis>SERVER</emphasis></para>
 
-        <para>Only show opers on that server. </para>
+        <para>Only show opers on that server.</para>
 
         <para><emphasis role="bold">Example: </emphasis></para>
 
         <para><screen>/msg statserv operlist 
 /msg statserv operlist noaway 
-/msg statserv operlist &#60;server&#62;</screen></para>
+/msg statserv operlist &lt;server&gt;</screen></para>
       </sect2>
 
       <sect2>
@@ -598,43 +1004,9 @@
         role="bold">Description: </emphasis></para>
 
         <para>Shows all current bots on the network. (umode +B users if your
-        IRCD supports Umode +B) </para>
+        IRCD supports Umode +B)</para>
 
         <para><emphasis role="bold">Example: </emphasis><screen>/msg StatServ BOTLIST</screen></para>
-      </sect2>
-
-      <sect2>
-        <title>VERSION</title>
-
-        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg StatServ VERSION</screen></para>
-
-        <para><emphasis role="bold">Description: </emphasis></para>
-
-        <para>Shows the current StatServ Version. </para>
-
-        <para><emphasis role="bold">Example: </emphasis><screen>/msg StatServ VERSION</screen></para>
-      </sect2>
-
-      <sect2>
-        <title>STATS</title>
-
-        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg StatServ STATS [DEL|LIST|COPY] </screen></para>
-
-        <para><emphasis role="bold">Description: </emphasis></para>
-
-        <para><emphasis>LIST </emphasis></para>
-
-        <para>List all database entries. </para>
-
-        <para><emphasis>DEL </emphasis><emphasis>name</emphasis> </para>
-
-        <para>Remove an entry. </para>
-
-        <para><emphasis>COPY name newname </emphasis></para>
-
-        <para>Copy an entry. </para>
-
-        <para><emphasis role="bold">Example: </emphasis><screen>/msg StatServ STATS LIST</screen></para>
       </sect2>
 
       <sect2>
@@ -645,9 +1017,209 @@
         <para><emphasis role="bold">Description: </emphasis></para>
 
         <para>Forces an update of the HTML data file with the most current
-        network statistics. </para>
+        network statistics.</para>
 
         <para><emphasis role="bold">Example: </emphasis><screen>/msg StatServ FORCEHTML</screen></para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with StatServ. They
+      help you customize StatServ and its configuration to suit your network.
+      The following section define the settings. To view or modify the
+      settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg StatServ SET LIST
+
+/msg StatServ SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in StatServ:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+RECORDALERT
+HTMLPATH
+HTMLTIME
+HTML 
+CHANNELTIME
+MSGLIMIT
+MSGINTERVAL
+FLATMAP
+LAGTIME
+LAGALERT</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the StatServ module
+        uses for the Bot. </para>
+
+        <para>This setting defaults to "StatServ"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the StatServ module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "StatServ1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the StatServ bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that StatServ will use when
+        signon to the network. If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that StatServ will use with
+        it signs on to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if StatServ should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>RECORDALERT Setting</title>
+
+        <para>This setting determines if StatServ should broadcast new records
+        on the network (such as Max no of users etc). The options are:</para>
+
+        <para>0 - Never</para>
+
+        <para>1 - Announce in services channel </para>
+
+        <para>2 - Announce by globops </para>
+
+        <para>3 - Announce by wallops</para>
+
+        <para>This setting defaults to 1 - Announce in services channel</para>
+      </sect2>
+
+      <sect2>
+        <title>HTMLPATH Setting</title>
+
+        <para>For StatServ to produce a HTML page with various statistics
+        about your network, it needs to write a file. This setting specifies
+        where to write the file to. </para>
+
+        <warning>
+          <para>You must ensure that the user that NeoStats runs as has
+          permissions to write to the path you specify. The path should also
+          include the filename. eg:</para>
+
+          <para>/home/fish/public_html/networkstats.html</para>
+        </warning>
+      </sect2>
+
+      <sect2>
+        <title>HTMLTIME Setting</title>
+
+        <para>How often StatServ should update the HTML file specified in
+        HTMLPATH if HTML is enabled (See HTML setting)</para>
+
+        <para>This defaults to 3600 seconds</para>
+      </sect2>
+
+      <sect2>
+        <title>HTML Setting</title>
+
+        <para>Should StatServ automatically update the HTML file.</para>
+
+        <para>This defaults to Disabled</para>
+      </sect2>
+
+      <sect2>
+        <title>CHANNELTIME Setting</title>
+
+        <para>The amount of time that StatServ keeps statistics for unused
+        channels in its Database. If a channel has not be active on the
+        network for longer than this period, StatServ deletes it from the
+        database.</para>
+
+        <para>This setting defaults to 604800 Seconds</para>
+      </sect2>
+
+      <sect2>
+        <title>MSGLIMIT Setting</title>
+
+        <para>This setting in conjuction with the below setting (MSGINTERVAL)
+        helps StatServ avoid flooding the network with record annoucements.
+        This option specifies how many messages to broadcast in MSGINTERVAL
+        time below. </para>
+
+        <para>This setting defaults to 5</para>
+      </sect2>
+
+      <sect2>
+        <title>MSGINTERVAL Setting</title>
+
+        <para>This setting in conjunction with the above setting (MSGLIMIT)
+        helps StatServ avoid flooding the network with record announcements.
+        This option specifies how much time must elapse during before the
+        MSGLIMIT counter is reset.</para>
+
+        <para>This setting defaults to 60 Seconds</para>
+      </sect2>
+
+      <sect2>
+        <title>FLATMAP Setting</title>
+
+        <para>This option causes the MAP command to become flat, thus not
+        showing the real structure of your IRC network to users.</para>
+
+        <para>This setting defaults to disabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>LAGTIME Setting</title>
+
+        <para>This settting determines how lagged a server should be for
+        StatServ to consider that server lagged out. </para>
+      </sect2>
+
+      <sect2>
+        <title>LAG Setting</title>
+
+        <para>This setting determins if StatServ should broadcast a message
+        when a servers pingtime exceeds the LAGTIME specified above.</para>
+
+        <para>Options are: </para>
+
+        <para>0 - Never </para>
+
+        <para>1 - Announce in services channel </para>
+
+        <para>2 - Announce by globops </para>
+
+        <para>3 - Announce by wallops</para>
+
+        <para>This setting defaults to 1 - Announce in services channel</para>
       </sect2>
     </sect1>
 
@@ -657,70 +1229,70 @@
       <para>By Default, StatServ uses a file called index.tpl in your data
       directory as the template for your output. Currently, the template
       system is very basic, and will output tables containing the information
-      requested. All Template variables are enclosed by ! </para>
+      requested. All Template variables are enclosed by !</para>
 
-      <para>The available template variables are: </para>
+      <para>The available template variables are:</para>
 
-      <para><emphasis role="bold">!MAP!</emphasis> -Outputs a network </para>
+      <para><emphasis role="bold">!MAP!</emphasis> -Outputs a network</para>
 
-      <para>Map similar to /msg statserv map in a table format </para>
+      <para>Map similar to /msg statserv map in a table format</para>
 
       <para><emphasis role="bold">!SRVLIST! </emphasis>-Outputs a complete
       list of servers that StatServ has ever seen, which are linked to
       detailed server information provided by the template variable
-      !SRVLISTDET! </para>
+      !SRVLISTDET!</para>
 
       <para><emphasis role="bold">!SRVLISTDET! </emphasis>-Outputs detailed
-      server information </para>
+      server information</para>
 
-      <para>see also !SRVLIST! </para>
+      <para>see also !SRVLIST!</para>
 
       <para><emphasis role="bold">!NETSTATS! </emphasis>-Outputs Network
-      Statistics </para>
+      Statistics</para>
 
-      <para>similar to /msg statserv netstats </para>
+      <para>similar to /msg statserv netstats</para>
 
       <para><emphasis role="bold">!DAILYSTATS! </emphasis>-Outputs the Daily
-      Statistics </para>
+      Statistics</para>
 
-      <para>similar to /msg statserv daily </para>
+      <para>similar to /msg statserv daily</para>
 
       <para><emphasis role="bold">!DAILYTOPCHAN! </emphasis>-Outputs the top10
-      channels based on number of members </para>
+      channels based on number of members</para>
 
       <para><emphasis role="bold">!TOP10CHAN! </emphasis>-Outputs the top10
-      channels ever based on number of joins </para>
+      channels ever based on number of joins</para>
 
       <para><emphasis role="bold">!TOP10KICKS! </emphasis>-Outputs the top10
-      kicking channels </para>
+      kicking channels</para>
 
       <para><emphasis role="bold">!TOP10TOPICS! </emphasis>-Outputs the top10
-      topic changing channels </para>
+      topic changing channels</para>
 
-      <para><emphasis role="bold">!TLDMAP! </emphasis>-Outputs the TLD map
-      </para>
+      <para><emphasis role="bold">!TLDMAP! </emphasis>-Outputs the TLD
+      map</para>
 
-      <para>similar to /msg statserv tldmap </para>
+      <para>similar to /msg statserv tldmap</para>
 
       <para><emphasis role="bold">!VERSION! </emphasis>-Outputs the version of
-      NeoStats </para>
+      NeoStats</para>
 
       <para><emphasis role="bold">!TITLE! </emphasis>-Outputs title in the
-      form: &#34;Network Statistics for YourNetName&#34; </para>
+      form: "Network Statistics for YourNetName"</para>
 
       <para><emphasis role="bold">!CLIENTSTATS! </emphasis>-Outputs Top 10
       clients used on the network. (Requires SecureServ module with version
-      checks enabled). </para>
+      checks enabled).</para>
 
       <para>StatServ also puts out some information on when the page was
       created, and what software created it by default at the end of your HTML
       page. This option can not be disabled. (Sorry, but its our little
       advertisement for all the hard work we have done to create NeoStats for
-      you to use!) </para>
+      you to use!)</para>
 
-      <para>An example template is provided for you so you don&#39;t have to
-      waste time getting your own template ready. If you wish to create your
-      own template, replace the index.tpl file in the data directory with your
+      <para>An example template is provided for you so you don't have to waste
+      time getting your own template ready. If you wish to create your own
+      template, replace the index.tpl file in the data directory with your
       version.</para>
     </sect1>
   </chapter>
@@ -736,43 +1308,239 @@
     <sect1>
       <title>Command Reference</title>
 
-      <para>The following commands are aviable for ConnectServ. All these
-      commands require Privledged access</para>
+      <para>The following Commands may be used with ConnectServ.</para>
 
       <sect2>
         <title>HELP</title>
 
-        <para>Syntax: /msg ConnectServ HELP [command] Description: HELP on
-        it&#39;s own display available commands. HELP COMMAND will display
-        help for that command. Example: /msg ConnectServ HELP /msg ConnectServ
-        HELP STATUS</para>
-      </sect2>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg ConnectServ HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
 
-      <sect2>
-        <title>ABOUT</title>
+        <para>HELP displays available commands</para>
 
-        <para>Syntax: /msg ConnectServ ABOUT Description: The ABOUT command
-        will return a description of ConnectServ. Example: /msg ConnectServ
-        ABOUT</para>
-      </sect2>
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
 
-      <sect2>
-        <title>SET</title>
-
-        <para>Syntax: /msg ConnectServ SET &#60;option&#62; [&#60;value&#62;]
-        Description: Available Options are: LIST This will tell you the
-        current status of the settings. e.g.: MODEWATCH is enabled. SIGNWATCH
-        &#60;ON|OFF&#62; echo signon/signoff events. KILLWATCH
-        &#60;ON|OFF&#62; echo kill events. MODEWATCH &#60;ON|OFF&#62; echo
-        operator mode changes. NICKWATCH &#60;ON|OFF&#62; echo nickname
-        changes. Example: /msg ConnectServ SET NICKWATCH ON</para>
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ConnectServ HELP 
+/msg ConnectServ HELP INFO</screen></para>
       </sect2>
 
       <sect2>
         <title>VERSION</title>
 
-        <para>Syntax: /msg ConnectServ VERSION Description: Shows the current
-        ConnectServ version. Example: /msg ConnectServ VERSION</para>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg ConnectServ version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of ConnectServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ConnectServ VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg ConnectServ ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about ConnectServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ConnectServ ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg ConnectServ CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        ConnectServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ConnectServ CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg ConnectServ LEVELS LIST
+/msg ConnectServ LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in ConnectServ are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg ConnectServ LEVELS LIST shows the current levels each
+        command is assigned. If you wish to alter a command with a new level
+        use the LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for
+        a example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ConnectServ LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with ConnectServ.
+      They help you customize ConnectServ and its configuration to suit your
+      network. The following section define the settings. To view or modify
+      the settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg ConnectServ SET LIST
+
+/msg ConnectServ SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in ConnectServ:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+LOGGING
+KILLWATCH
+SERVWATCH
+NICKWATCH
+SIGNWATCH
+MODEWATCH
+AWAYWATCH
+COLOUR
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the ConnectServ
+        module uses for the Bot.</para>
+
+        <para>This setting defaults to "ConnectServ"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the ConnectServ
+        module uses for the Bot if the Primary Nickname is not
+        available</para>
+
+        <para>This setting defaults to "ConnectServ1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the ConnectServ bot will signon to the network
+        as (Ident). If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that ConnectServ will use
+        when signon to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that ConnectServ will use
+        with it signs on to the network. If not specified, uses the same as
+        the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if ConnectServ should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>LOGGING Setting</title>
+
+        <para>This setting determins if ConnectServ should also log all
+        notices to the LogFile in addition to the services channel.</para>
+
+        <para>This setting defaults to Enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>KILLWATCH Setting</title>
+
+        <para>Should ConnnectServ broadcast out Global Kills on the
+        network.</para>
+
+        <para>This setting defaults to Enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>SERVWATCH Setting</title>
+
+        <para>Should ConnectServ broadcast out Server Joins and Splits on the
+        network</para>
+
+        <para>This defaults to Enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>NICKWATCH Setting</title>
+
+        <para>Should ConnectServ broadcast out Nickname Changes on the
+        network</para>
+
+        <para>This defaults to Enabled</para>
+      </sect2>
+
+      <sect2>
+        <title>SIGNWATCH Setting</title>
+
+        <para>Should ConnectServ broadcast out Users connecting and
+        disconnnecting on the network</para>
+
+        <para>This setting defaults to Enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>MODEWATCH Setting</title>
+
+        <para>Should ConnectServ broadcast out User Mode Changes on the
+        network</para>
+
+        <para>This setting defaults to Enabled</para>
+      </sect2>
+
+      <sect2>
+        <title>AWAYWATCH Setting</title>
+
+        <para>Should ConnectServ broadcast out Users going away and comming
+        back on the network</para>
+
+        <para>This setting defaults to Enabled</para>
+      </sect2>
+
+      <sect2>
+        <title>COLOUR Setting</title>
+
+        <para>Should the messages logged to the channel be in colour or
+        standard.</para>
+
+        <para>This setting defaults to disabled.</para>
       </sect2>
     </sect1>
   </chapter>
@@ -788,353 +1556,1624 @@
     <sect1>
       <title>Command Reference</title>
 
-      <para>The Following commands are available for Hostserv. By Default,
-      users with level 185 or higher access can modify the levels required to
-      use some of the privledged commands.</para>
+      <para>The following Commands may be used with HostServ.</para>
 
       <sect2>
         <title>HELP</title>
 
-        <para>Syntax: /msg HostServ HELP [command] Description: HELP on
-        it&#39;s own display available commands. HELP COMMAND will display
-        help for that command. Example: /msg HostServ HELP /msg HostServ HELP
-        ADD</para>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg HostServ HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ HELP 
+/msg HostServ HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg HostServ version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of HostServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ VERSION</screen></para>
       </sect2>
 
       <sect2>
         <title>ABOUT</title>
 
-        <para>Syntax: /msg HostServ ABOUT Description: The ABOUT command will
-        return a description of HostServ. Example: /msg HostServ ABOUT</para>
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about HostServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ ABOUT</screen></para>
       </sect2>
 
       <sect2>
-        <title>ADD</title>
+        <title>CREDITS</title>
 
-        <para>Syntax: /msg HostServ ADD &#60;NICK&#62; &#60;HOST NAME&#62;
-        &#60;VIRTUAL HOST NAME&#62; &#60;PASSWORD&#62; Description: Register a
-        host name to be set. e.g.: my-host.com DO NOT INCLUDE AN @. The
-        &#60;HOST NAME&#62; must be where the user is connecting from WITHOUT
-        THE @. HostServ supports wildcards such as *.myhost.com in the
-        &#60;HOST NAME&#62; setting The &#60;PASSWORD&#62; field is new. If a
-        user connects with a different host They can now /msg HostServ LOGIN
-        nick password Example: /msg HostServ ADD neo aol.com coolhost.com
-        mypassword</para>
-      </sect2>
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
 
-      <sect2>
-        <title>DEL</title>
+        <para>Shows details about the Authors and Contributors of
+        HostServ</para>
 
-        <para>Syntax: /msg HostServ DEL &#60;ACCESS LIST #&#62; Description:
-        The information needed for this is in the LIST command. To delete
-        Number 3 use DEL 3 ... its that easy! Example: /msg HostServ DEL 1</para>
-      </sect2>
-
-      <sect2>
-        <title>VIEW</title>
-
-        <para>Syntax: /msg HostServ VIEW &#60;ACCESS LIST #&#62; Description:
-        View Detailed information about the user on the access list # you
-        selected Example: /msg HostServ VIEW 1</para>
-      </sect2>
-
-      <sect2>
-        <title>LIST</title>
-
-        <para>Syntax: /msg HostServ LIST &#60;start&#62; Description: Lists
-        the people and vhosts in the Database. Only lists a maxium of 20
-        entries For more descriptive info on a SINGLE vhost see HELP VIEW if
-        &#60;start&#62; is specified, start the listing at number
-        &#60;start&#62;</para>
-
-        <para>Example: /msg HostServ LIST</para>
-      </sect2>
-
-      <sect2>
-        <title>LOGIN</title>
-
-        <para>Syntax: /msg HostServ LOGIN &#60;NICK&#62; &#60;PASSWORD&#62;
-        Description: Login to HostServ with your NICK and PASSWORD and your
-        vhost will be assigned to your nick on successful login. Example: /msg
-        HostServ LOGIN Angel Password</para>
-      </sect2>
-
-      <sect2>
-        <title>CHPASS</title>
-
-        <para>Syntax: /msg HostServ CHPASS &#60;NICK&#62; &#60;OLDPASS&#62;
-        &#60;NEWPASS&#62; Description: Use this command to change the password
-        assigned to your Vhost Account. You must supply your current password
-        and a valid account for it to be successful Example: /msg HostServ
-        CHPASS Angel oldpass newpass</para>
-      </sect2>
-
-      <sect2>
-        <title>BANS</title>
-
-        <para>Syntax: /msg HostServ BANS [[add/del] &#60;option&#62;]
-        Description: Controls the vhost banned list entries: BANS lists
-        current vhosts that are banned by network administration. The
-        following options are only available to Network Administration: BANS
-        add &#60;wildcard&#62; Add a banned vhost to the list Wildcards, like
-        *fbi* are permitted. BANS del # Delete a banned vhost with ID number #
-        You may figure out the ID number by using BANS by itself Example: /msg
-        HostServ BANS add microsoft.com</para>
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ CREDITS</screen></para>
       </sect2>
 
       <sect2>
         <title>LEVELS</title>
 
-        <para>Syntax: /msg HostServ LEVELS &#60;[add/view/list/del]
-        &#60;level&#62;&#62; Description: This lists the levels required to
-        perform certain functions with HostServ. The Following Options are
-        only available to Network Administration: LEVELS [add/view/list/del]
-        &#60;level&#62; Change the User Levels required to perform
-        administration functions. Level must be between 1 and 200 Example:</para>
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg HostServ LEVELS LIST
+/msg HostServ LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in HostServ are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg HostServ LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
       </sect2>
 
       <sect2>
-        <title>SET</title>
+        <title>ADD</title>
 
-        <para>TODO</para>
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ ADD &lt;NICK&gt; &lt;HOST NAME&gt; &lt;VIRTUAL HOST NAME&gt; &lt;PASSWORD&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Adds a entry to the HostServ Database for a specified User.
+        </para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ ADD neo aol.com coolhost.com mypassword</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>DEL</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ DEL &lt;ACCESS LIST #&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Deletes a VHOST entry from the HostServ Database. &lt;ACCESS
+        LIST #&gt; can be obtained by using the LIST command.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ DEL 1</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LIST</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ LIST &lt;start&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Lists the people and vhosts in the Database. Only lists a maxium
+        of 20 entries if &lt;start&gt; is specified, start the listing at
+        number &lt;start&gt;</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ LIST</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VIEW</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ VIEW &lt;ACCESS LIST #&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>View Detailed information about the vhost on the list # you
+        selected</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ VIEW 1</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LOGIN</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ LOGIN &lt;NICK&gt; &lt;PASSWORD&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Login to HostServ with your NICK and PASSWORD and your vhost
+        will be assigned to your nick on successful login.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ LOGIN Angel Password</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>BANS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg HostServ BANS [[add/del] &lt;option&gt;]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Controls the vhost banned list entries: </para>
+
+        <para>BANS lists current vhosts that are banned by network
+        administration. </para>
+
+        <para>The following options are only available to Network
+        Administration: </para>
+
+        <para>BANS add &lt;wildcard&gt; Add a banned vhost to the list
+        Wildcards, like *fbi* are permitted. </para>
+
+        <para>BANS del # Delete a banned vhost with ID number # </para>
+
+        <para>You may figure out the ID number by using BANS by itself</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ BANS add microsoft.com</screen></para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with HostServ. They
+      help you customize HostServ and its configuration to suit your network.
+      The following section define the settings. To view or modify the
+      settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg HostServ SET LIST
+
+/msg HostServ SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in HostServ:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+VERBOSE
+HIDDENHOST
+HOSTNAME
+OPERHOSTS
+ADDLEVEL 
+EXPIRE</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the HostServ module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "HostServ"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the HostServ module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "HostServ1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the HostServ bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that HostServ will use when
+        signon to the network. If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that HostServ will use with
+        it signs on to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if HostServ should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>VERBOSE Setting</title>
+
+        <para>This setting determins if HostServ should broadcast all actions
+        that HostServ performs, such as setting users VHOSTS etc.</para>
+
+        <para>This setting defaults to Enabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>HIDDENHOST Setting</title>
+
+        <para>Should HostServ set a Undernet style hidden hosts for all users
+        when they authenticate to NickServ (Recieve Umode +r). Undernet style
+        hidden hosts are of the form &lt;user&gt;.user.HOSTNAME</para>
+
+        <para>This setting defaults to Disabled.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOSTNAME Setting</title>
+
+        <para>Determines the Domain Name to use when setting users Hosts or
+        Opers Hosts if HiddenHost or OperHost is enabled. </para>
+
+        <para>This has no default</para>
+      </sect2>
+
+      <sect2>
+        <title>OPERHOST Setting</title>
+
+        <para>Should HostServ set a Undernet style hidden hosts for all
+        Operators when they authenticate to NickServ (Recieve Umode +r).
+        Undernet style hidden hosts are of the form
+        &lt;user&gt;.oper.HOSTNAME</para>
+
+        <para>This defaults to Disabled</para>
+      </sect2>
+
+      <sect2>
+        <title>ADDLEVEL Setting</title>
+
+        <para>The Level that is required to use the Add Command to create new
+        VHOSTS for other users.</para>
+
+        <para>This setting defaults to 40</para>
+      </sect2>
+
+      <sect2>
+        <title>EXPIRE Setting</title>
+
+        <para>Should HostServ expire un-used entries after a period of time.
+        Setting is specified as Days. if 0 is specified, makes all VHOSTS
+        permanent</para>
+
+        <para>This setting defaults to 60 Days</para>
       </sect2>
     </sect1>
   </chapter>
 
   <chapter>
-    <title>LoveServ</title>
+    <title>LimitServ</title>
 
-    <para>LoveServ is a fun module to send presents and messages to loved ones
-    on IRC.</para>
+    <para>LimitServ is designed to ....</para>
 
     <sect1>
       <title>Command Reference</title>
 
-      <para>The following commands may be used by users to send messages of
-      love to other IRC users</para>
+      <para>The following Commands may be used with LimitServ.</para>
 
       <sect2>
         <title>HELP</title>
 
-        <para>Syntax: /msg LoveServ HELP [command] Description: HELP on
-        it&#39;s own display available commands. HELP COMMAND will display
-        help for that command. Example: /msg LoveServ HELP /msg LoveServ HELP
-        ROSE</para>
-      </sect2>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg LimitServ HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
 
-      <sect2>
-        <title>ROSE</title>
+        <para>HELP displays available commands</para>
 
-        <para>Syntax: /msg LoveServ ROSE &#60;nick&#62; Description: Send a
-        rose to a loved one on IRC. Example: /msg LoveServ ROSE Angel</para>
-      </sect2>
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
 
-      <sect2>
-        <title>KISS</title>
-
-        <para>Syntax: /msg LoveServ KISS &#60;nick&#62; Description: Send a
-        kiss to that special someone on IRC. Example: /msg LoveServ KISS Angel</para>
-      </sect2>
-
-      <sect2>
-        <title>TONSIL</title>
-
-        <para>Syntax: /msg LoveServ TONSIL &#60;nick&#62; Description: Send a
-        deep tonsil penetrating kiss to someone on IRC. Example: /msg LoveServ
-        TONSIL Angel</para>
-      </sect2>
-
-      <sect2>
-        <title>HUG</title>
-
-        <para>Syntax: /msg LoveServ HUG &#60;nick&#62; Description: Send a hug
-        to someone on IRC. Example: /msg LoveServ HUG Angel</para>
-      </sect2>
-
-      <sect2>
-        <title>ADMIRER</title>
-
-        <para>Syntax: /msg LoveServ ADMIRER &#60;nick&#62; Description: Tell
-        someone on IRC they have a SECRET Admirer! Example: /msg LoveServ
-        ADMIRER Angel</para>
-      </sect2>
-
-      <sect2>
-        <title>CHOCOLATE</title>
-
-        <para>Syntax: /msg LoveServ CHOCOLATE &#60;nick&#62; Description: Send
-        a big yummy box of candy to someone on IRC. Example: /msg LoveServ
-        CHOCOLATE Angel</para>
-      </sect2>
-
-      <sect2>
-        <title>CANDY</title>
-
-        <para>Syntax: /msg LoveServ CANDY NICK Description: Send someone a box
-        of yummy heart shaped candies Example: /msg LoveServ CANDY Angel</para>
-      </sect2>
-
-      <sect2>
-        <title>LOVENOTE</title>
-
-        <para>Syntax: /msg LoveServ LOVENOTE NICK &#60;message&#62;
-        Description: Send that special someone a love note. Example: /msg
-        LoveServ LOVENOTE Angel I love you dearly.</para>
-      </sect2>
-
-      <sect2>
-        <title>APOLOGY</title>
-
-        <para>Syntax: /msg LoveServ APOLOGY NICK &#60;message&#62;
-        Description: Send an Apology to someone Example: /msg LoveServ APOLOGY
-        Angel deleting all those songs</para>
-      </sect2>
-
-      <sect2>
-        <title>THANKYOU</title>
-
-        <para>Syntax: /msg LoveServ THANKYOU NICK &#60;message&#62;
-        Description: Send a THANKYOU message to someone Example: /msg LoveServ
-        THANKYOU Angel uploading those songs</para>
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg LimitServ HELP 
+/msg LimitServ HELP INFO</screen></para>
       </sect2>
 
       <sect2>
         <title>VERSION</title>
 
-        <para>Syntax: /msg LoveServ VERSION Description: Show LoveServ&#39;s
-        current version Example: /msg LoveServ VERSION</para>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg LimitServ version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of LimitServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg LimitServ VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg LimitServ ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about LimitServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg LimitServ ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg LimitServ CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        LimitServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg LimitServ CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg LimitServ LEVELS LIST
+/msg LimitServ LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in LimitServ are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg LimitServ LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg LimitServ LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with LimitServ.
+      They help you customize LimitServ and its configuration to suit your
+      network. The following section define the settings. To view or modify
+      the settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg LimitServ SET LIST
+
+/msg LimitServ SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in LimitServ:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the LimitServ module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "LimitServ"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the LimitServ module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "LimitServ1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the LimitServ bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that LimitServ will use
+        when signon to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that LimitServ will use
+        with it signs on to the network. If not specified, uses the same as
+        the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if LimitServ should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
       </sect2>
     </sect1>
   </chapter>
 
   <chapter>
-    <title>MoraleServ</title>
+    <title>OperLog</title>
 
-    <para>MoraleServ is a fun module to send cheery messages to friends on
-    IRC.</para>
+    <para>OperLog is designed to ....</para>
 
     <sect1>
       <title>Command Reference</title>
 
-      <para>The Following commands may be used by any IRC user to cheer up
-      another user</para>
+      <para>The following Commands may be used with OperLog.</para>
 
       <sect2>
         <title>HELP</title>
 
-        <para>Syntax: /msg MoraleServ HELP [command] Description: HELP on
-        it&#39;s own display available commands. HELP COMMAND will display
-        help for that command. Example: /msg MoraleServ HELP /msg MoraleServ
-        HELP HAIL</para>
-      </sect2>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg OperLog HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
 
-      <sect2>
-        <title>HAIL</title>
+        <para>HELP displays available commands</para>
 
-        <para>Syntax: /msg MoraleServ HAIL &#60;hail nick&#62; &#60;send to
-        nick&#62; Description: Send a HAIL song greeting to a loved one on
-        IRC. Example: /msg MoraleServ HAIL Angel Devil</para>
-      </sect2>
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
 
-      <sect2>
-        <title>ODE</title>
-
-        <para>Syntax: /msg MoraleServ ODE &#60;about nick&#62; &#60;send to
-        nick&#62; Description: Send an ode about a user to a loved one on IRC.
-        Example: /msg MoraleServ ODE Angel Devil</para>
-      </sect2>
-
-      <sect2>
-        <title>POEM</title>
-
-        <para>Syntax: /msg MoraleServ POEM &#60;about nick&#62; &#60;send to
-        nick&#62; Description: Send a poem about a user to a loved one on IRC.
-        Example: /msg MoraleServ POEM Angel Devil</para>
-      </sect2>
-
-      <sect2>
-        <title>LAPDANCE</title>
-
-        <para>Syntax: /msg MoraleServ LAPDANCE &#60;NICK&#62; Description:
-        Send a lap dance to a loved one on IRC... sure to cheer any person up
-        Example: /msg MoraleServ LAPDANCE YoungGuy</para>
-      </sect2>
-
-      <sect2>
-        <title>REDNECK</title>
-
-        <para>Syntax: /msg MoraleServ REDNECK &#60;NICK&#62; Description: Send
-        a redneck dubbing to a loved one on IRC. Example: /msg MoraleServ
-        REDNECK Yankee</para>
-      </sect2>
-
-      <sect2>
-        <title>CHEERUP</title>
-
-        <para>Syntax: /msg MoraleServ CHEERUP &#60;NICK&#62; Description: Send
-        a cheer up message to a loved one on IRC to cheer them up. Example:
-        /msg MoraleServ CHEERUP Morbid</para>
-      </sect2>
-
-      <sect2>
-        <title>BEHAPPY</title>
-
-        <para>Syntax: /msg MoraleServ BEHAPPY &#60;NICK&#62; Description: Send
-        a be happy song to a loved one on IRC to cheer them up. This function
-        sends a number of messages that may ping the target nick out if they
-        do not have a fast connection. DO NOT USE unless you are sure.
-        Example: /msg MoraleServ BEHAPPY SadUser</para>
-      </sect2>
-
-      <sect2>
-        <title>WONDERFUL</title>
-
-        <para>Syntax: /msg MoraleServ WONDERFUL &#60;NICK&#62; Description:
-        Send an &#34;I hope you don&#39;t mind, that I put down in
-        words...&#34; song to a loved one on IRC to cheer them up. This
-        function will send the lyrics with the target nick in them to the
-        target nick Example: /msg MoraleServ WONDERFUL Angel</para>
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg OperLog HELP 
+/msg OperLog HELP INFO</screen></para>
       </sect2>
 
       <sect2>
         <title>VERSION</title>
 
-        <para>Syntax: /msg MoraleServ VERSION Description: Prints current
-        version information via PRIVMSG/NOTICE Example: /msg MoraleServ
-        VERSION</para>
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg OperLog version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of OperLog</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg OperLog VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg OperLog ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about OperLog</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg OperLog ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg OperLog CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        OperLog</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg OperLog CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg OperLog LEVELS LIST
+/msg OperLog LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in OperLog are controlled via UserLevels. A User can
+        have levels ranging from 0 to 200 and their access to commands can be
+        controled via the Levels Command.</para>
+
+        <para>/msg OperLog LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg OperLog LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with OperLog. They
+      help you customize OperLog and its configuration to suit your network.
+      The following section define the settings. To view or modify the
+      settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg OperLog SET LIST
+
+/msg OperLog SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in OperLog:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the OperLog module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "OperLog"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the OperLog module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "OperLog1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the OperLog bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that OperLog will use when
+        signon to the network. If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that OperLog will use with
+        it signs on to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if OperLog should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
       </sect2>
     </sect1>
   </chapter>
 
   <chapter>
-    <title>Spam</title>
+    <title>QuoteServ</title>
 
-    <para>Spam provides a bot to try and catch spammers and mass messagers. It
-    will sit on the network and echo to the services channel and by wallops
-    when someone sends it a message and what message they sent. Currently the
-    spam bot has a fixed name of &#34;sumyungguy&#34;. Send it a message, and
-    watch what happens.</para>
+    <para>QuoteServ is designed to ....</para>
+
+    <sect1>
+      <title>Command Reference</title>
+
+      <para>The following Commands may be used with QuoteServ.</para>
+
+      <sect2>
+        <title>HELP</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg QuoteServ HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg QuoteServ HELP 
+/msg QuoteServ HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg QuoteServ version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of QuoteServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg QuoteServ VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg QuoteServ ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about QuoteServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg QuoteServ ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg QuoteServ CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        QuoteServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg QuoteServ CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg QuoteServ LEVELS LIST
+/msg QuoteServ LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in QuoteServ are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg QuoteServ LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg QuoteServ LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with QuoteServ.
+      They help you customize QuoteServ and its configuration to suit your
+      network. The following section define the settings. To view or modify
+      the settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg QuoteServ SET LIST
+
+/msg QuoteServ SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in QuoteServ:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the QuoteServ module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "QuoteServ"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the QuoteServ module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "QuoteServ1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the QuoteServ bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that QuoteServ will use
+        when signon to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that QuoteServ will use
+        with it signs on to the network. If not specified, uses the same as
+        the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if QuoteServ should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>TextServ</title>
+
+    <para>TextServ is designed to ....</para>
+
+    <sect1>
+      <title>Command Reference</title>
+
+      <para>The following Commands may be used with TextServ.</para>
+
+      <sect2>
+        <title>HELP</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg TextServ HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg TextServ HELP 
+/msg TextServ HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg TextServ version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of TextServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg TextServ VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg TextServ ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about TextServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg TextServ ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg TextServ CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        TextServ</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg TextServ CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg TextServ LEVELS LIST
+/msg TextServ LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in TextServ are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg TextServ LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg TextServ LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with TextServ. They
+      help you customize TextServ and its configuration to suit your network.
+      The following section define the settings. To view or modify the
+      settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg TextServ SET LIST
+
+/msg TextServ SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in TextServ:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the TextServ module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "TextServ"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the TextServ module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "TextServ1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the TextServ bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that TextServ will use when
+        signon to the network. If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that TextServ will use with
+        it signs on to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if TextServ should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+    </sect1>
   </chapter>
 
   <chapter>
     <title>ExtAuth</title>
 
-    <para>ExtAuth may be listed as a loaded module, but its not a true module
-    as described above. It allows you to provide an alternative Authentication
-    /level scheme that is not based on Umodes. You should consult the README
-    file for neostats for more detailed information regarding its
-    configuration.</para>
+    <para>ExtAuth is designed to ....</para>
+
+    <sect1>
+      <title>Command Reference</title>
+
+      <para>The following Commands may be used with ExtAuth.</para>
+
+      <sect2>
+        <title>HELP</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg ExtAuth HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ExtAuth HELP 
+/msg ExtAuth HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg ExtAuth version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of ExtAuth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ExtAuth VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg ExtAuth ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about ExtAuth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ExtAuth ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg ExtAuth CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        ExtAuth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ExtAuth CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg ExtAuth LEVELS LIST
+/msg ExtAuth LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in ExtAuth are controlled via UserLevels. A User can
+        have levels ranging from 0 to 200 and their access to commands can be
+        controled via the Levels Command.</para>
+
+        <para>/msg ExtAuth LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          ExtAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg ExtAuth LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with ExtAuth. They
+      help you customize ExtAuth and its configuration to suit your network.
+      The following section define the settings. To view or modify the
+      settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg ExtAuth SET LIST
+
+/msg ExtAuth SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in ExtAuth:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the ExtAuth module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "ExtAuth"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the ExtAuth module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "ExtAuth1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the ExtAuth bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that ExtAuth will use when
+        signon to the network. If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that ExtAuth will use with
+        it signs on to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if ExtAuth should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+    </sect1>
   </chapter>
 
   <chapter>
-    <title>Other Modules</title>
+    <title>IRCDAuth</title>
 
-    <para>So if you are wondering where the other modules are, like
-    SecureServ, or StupidServ, these modules are not included in the base
-    distribution of NeoStats. You must download and compile these modules
-    seperatly from the main neostats distribution.</para>
+    <para>IRCDAuth is designed to ....</para>
 
-    <para>More information about how to use these modules can be found in the
-    Modules README file, or on our website.</para>
+    <sect1>
+      <title>Command Reference</title>
+
+      <para>The following Commands may be used with IRCDAuth.</para>
+
+      <sect2>
+        <title>HELP</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg IRCDAuth HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg IRCDAuth HELP 
+/msg IRCDAuth HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg IRCDAuth version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of IRCDAuth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg IRCDAuth VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg IRCDAuth ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about IRCDAuth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg IRCDAuth ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg IRCDAuth CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        IRCDAuth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg IRCDAuth CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg IRCDAuth LEVELS LIST
+/msg IRCDAuth LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in IRCDAuth are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg IRCDAuth LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          IRCDAuth and IrcdAuth Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg IRCDAuth LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with IRCDAuth. They
+      help you customize IRCDAuth and its configuration to suit your network.
+      The following section define the settings. To view or modify the
+      settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg IRCDAuth SET LIST
+
+/msg IRCDAuth SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in IRCDAuth:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the IRCDAuth module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "IRCDAuth"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the IRCDAuth module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "IRCDAuth1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the IRCDAuth bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that IRCDAuth will use when
+        signon to the network. If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that IRCDAuth will use with
+        it signs on to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if IRCDAuth should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Writting Modules</title>
+
+    <para>...</para>
+  </chapter>
+
+  <chapter>
+    <title>Wirring Perl Modules</title>
+
+    <para>...</para>
+  </chapter>
+
+  <chapter>
+    <title>Writting C Modules: template</title>
+
+    <para>template is designed to ....</para>
+
+    <sect1>
+      <title>Command Reference</title>
+
+      <para>The following Commands may be used with template.</para>
+
+      <sect2>
+        <title>HELP</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg template HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg template HELP 
+/msg template HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg template version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of template</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg template VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg template ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about template</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg template ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg template CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        template</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg template CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg template LEVELS LIST
+/msg template LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in template are controlled via UserLevels. A User
+        can have levels ranging from 0 to 200 and their access to commands can
+        be controled via the Levels Command.</para>
+
+        <para>/msg template LEVELS LIST shows the current levels each command
+        is assigned. If you wish to alter a command with a new level use the
+        LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for a
+        example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          template and template Module configuration Sections for more info on
+          how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg template LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with template. They
+      help you customize template and its configuration to suit your network.
+      The following section define the settings. To view or modify the
+      settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg template SET LIST
+
+/msg template SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in template:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the template module
+        uses for the Bot.</para>
+
+        <para>This setting defaults to "template"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the template module
+        uses for the Bot if the Primary Nickname is not available</para>
+
+        <para>This setting defaults to "template1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the template bot will signon to the network as
+        (Ident). If not specified, uses the same as the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that template will use when
+        signon to the network. If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that template will use with
+        it signs on to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if template should use the Global Exclusion List
+        maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Writting Authentication Modules: templateauth</title>
+
+    <para>templateauth is designed to ....</para>
+
+    <sect1>
+      <title>Command Reference</title>
+
+      <para>The following Commands may be used with templateauth.</para>
+
+      <sect2>
+        <title>HELP</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg templateauth HELP [command]</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>HELP displays available commands</para>
+
+        <para>HELP COMMAND will display help for that command and the syntax
+        you should use.</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg templateauth HELP 
+/msg templateauth HELP INFO</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>VERSION</title>
+
+        <para><emphasis role="bold">Syntax:</emphasis> <screen>/msg templateauth version</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Displays the current version of templateauth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg templateauth VERSION</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>ABOUT</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg templateauth ABOUT</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows a descriptive text about templateauth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg templateauth ABOUT</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>CREDITS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis> <screen>/msg templateauth CREDITS</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Shows details about the Authors and Contributors of
+        templateauth</para>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg templateauth CREDITS</screen></para>
+      </sect2>
+
+      <sect2>
+        <title>LEVELS</title>
+
+        <para><emphasis role="bold">Syntax: </emphasis><screen>/msg templateauth LEVELS LIST
+/msg templateauth LEVELS &lt;command&gt; &lt;newlevel&gt;</screen><emphasis
+        role="bold">Description: </emphasis></para>
+
+        <para>Permissions in templateauth are controlled via UserLevels. A
+        User can have levels ranging from 0 to 200 and their access to
+        commands can be controled via the Levels Command.</para>
+
+        <para>/msg templateauth LEVELS LIST shows the current levels each
+        command is assigned. If you wish to alter a command with a new level
+        use the LEVELS &lt;command&gt; &lt;newlevel&gt; syntax. See below for
+        a example</para>
+
+        <note>
+          <para>The Actual Levels that are assigned to users depends upon the
+          Authentication Libary loaded into NeoStats. Currently, 2
+          Authentication Libaries are shipped with NeoStats. Consult the
+          templateauth and templateauth Module configuration Sections for more
+          info on how these modules calculate a users level.</para>
+        </note>
+
+        <para><emphasis role="bold">Example:</emphasis><screen>/msg templateauth LEVELS HELP 200</screen>This
+        sets the help command to only be available to users with Level 200 or
+        above (not very usefull though!)</para>
+      </sect2>
+    </sect1>
+
+    <sect1>
+      <title>Settings Reference</title>
+
+      <para>The Following Settings are configurable online with templateauth.
+      They help you customize templateauth and its configuration to suit your
+      network. The following section define the settings. To view or modify
+      the settings the following commands are available:</para>
+
+      <para><emphasis role="bold">Example:</emphasis><screen>/msg templateauth SET LIST
+
+/msg templateauth SET &lt;option&gt; &lt;paramater&gt;</screen></para>
+
+      <para>The Following Settings are available in templateauth:</para>
+
+      <screen>NICK
+ALTNICK
+USER
+HOST
+REALNAME
+EXCLUSIONS
+</screen>
+
+      <sect2>
+        <title>NICK Setting</title>
+
+        <para>This setting is to change the nickname that the templateauth
+        module uses for the Bot.</para>
+
+        <para>This setting defaults to "templateauth"</para>
+      </sect2>
+
+      <sect2>
+        <title>ALTNICK Setting</title>
+
+        <para>This setting is to change the nickname that the templateauth
+        module uses for the Bot if the Primary Nickname is not
+        available</para>
+
+        <para>This setting defaults to "templateauth1"</para>
+      </sect2>
+
+      <sect2>
+        <title>USER Setting</title>
+
+        <para>The "User" that the templateauth bot will signon to the network
+        as (Ident). If not specified, uses the same as the NeoStats
+        Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>HOST Setting</title>
+
+        <para>This setting determines the hostname that templateauth will use
+        when signon to the network. If not specified, uses the same as the
+        NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>REALNAME Setting</title>
+
+        <para>This setting determines the Realname that templateauth will use
+        with it signs on to the network. If not specified, uses the same as
+        the NeoStats Bot.</para>
+      </sect2>
+
+      <sect2>
+        <title>EXCLUSIONS Setting</title>
+
+        <para>This setting if templateauth should use the Global Exclusion
+        List maintained by the Main NeoStats Bot.</para>
+
+        <para>This setting defaults to enabled.</para>
+      </sect2>
+    </sect1>
   </chapter>
 </book>

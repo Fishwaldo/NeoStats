@@ -594,7 +594,7 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 			 * a EVENT_PRIVATE event handler otherwise we assume the event handler will handle the unknown command 
 			 * also, don't report anything if its a channel message
 			 */
-			if( !ischancmd  && (cmdparams->bot->moduleptr->event_list[EVENT_PRIVATE] == NULL) ) {
+			if( !ischancmd  && ((cmdparams->bot->moduleptr->event_list == NULL) || (cmdparams->bot->moduleptr->event_list[EVENT_PRIVATE] == NULL)) ) {
 				msg_unknown_command( cmdparams );
 				cmdret = NS_SUCCESS;
 			} else {
