@@ -93,10 +93,8 @@ am_neostats_OBJECTS = auth.$(OBJEXT) bans.$(OBJEXT) bots.$(OBJEXT) \
 	MiniMessageGateway.$(OBJEXT) namedvars.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2)
 neostats_OBJECTS = $(am_neostats_OBJECTS)
-neostats_DEPENDENCIES = $(top_builddir)/lib/curl/libcurl.la \
-	$(top_builddir)/lib/pcre/libpcre.la \
-	$(top_builddir)/lib/event/libevent.la \
-	$(top_builddir)/lib/nxml/libmrss.la
+neostats_DEPENDENCIES = $(top_builddir)/lib/libneostats.la \
+	$(top_builddir)/lib/event/libevent.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -270,9 +268,7 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml 
 
-neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/curl/libcurl.la $(top_builddir)/lib/pcre/libpcre.la \
-		$(top_builddir)/lib/event/libevent.la $(top_builddir)/lib/nxml/libmrss.la
-
+neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/libneostats.la $(top_builddir)/lib/event/libevent.la 
 EXTRA_dist = typemap NV.xs
 BUILT_SOURCES = NV.c
 CLEANFILES = NV.c

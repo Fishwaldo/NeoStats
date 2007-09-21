@@ -650,7 +650,7 @@ dnl argument in GETNAMEINFO_QUAL_ARG1.
 
 AC_DEFUN([CURL_CHECK_FUNC_GETNAMEINFO], [
   AC_REQUIRE([CURL_CHECK_TYPE_SOCKLEN_T])dnl
-  AC_CHECK_HEADERS(sys/types.h sys/socket.h netdb.h)
+  AC_CHECK_HEADERS(netdb.h)
   #
   AC_MSG_CHECKING([for getnameinfo])
   AC_LINK_IFELSE([
@@ -878,8 +878,6 @@ dnl Check for working NI_WITHSCOPEID in getnameinfo()
 AC_DEFUN([CURL_CHECK_NI_WITHSCOPEID], [
   AC_REQUIRE([CURL_CHECK_FUNC_GETNAMEINFO])dnl
   AC_REQUIRE([TYPE_SOCKADDR_STORAGE])dnl
-  AC_CHECK_HEADERS(stdio.h sys/types.h sys/socket.h \
-                   netdb.h netinet/in.h arpa/inet.h)
   #
   AC_CACHE_CHECK([for working NI_WITHSCOPEID], 
     [ac_cv_working_ni_withscopeid], [
@@ -979,7 +977,6 @@ dnl and RECV_TYPE_ARG4, defining the type of the function
 dnl return value in RECV_TYPE_RETV.
 
 AC_DEFUN([CURL_CHECK_FUNC_RECV], [
-  AC_CHECK_HEADERS(sys/types.h sys/socket.h)
   #
   AC_MSG_CHECKING([for recv])
   AC_TRY_LINK([
@@ -1107,7 +1104,6 @@ dnl return value in SEND_TYPE_RETV, and also defining the
 dnl type qualifier of second argument in SEND_QUAL_ARG2.
 
 AC_DEFUN([CURL_CHECK_FUNC_SEND], [
-  AC_CHECK_HEADERS(sys/types.h sys/socket.h)
   #
   AC_MSG_CHECKING([for send])
   AC_TRY_LINK([
@@ -1261,7 +1257,6 @@ dnl -------------------------------------------------
 dnl Check for MSG_NOSIGNAL
 
 AC_DEFUN([CURL_CHECK_MSG_NOSIGNAL], [
-  AC_CHECK_HEADERS(sys/types.h sys/socket.h)
   AC_CACHE_CHECK([for MSG_NOSIGNAL], [ac_cv_msg_nosignal], [
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM([
@@ -1310,7 +1305,6 @@ dnl Check for timeval struct
 
 AC_DEFUN([CURL_CHECK_STRUCT_TIMEVAL], [
   AC_REQUIRE([AC_HEADER_TIME])dnl
-  AC_CHECK_HEADERS(sys/types.h sys/time.h time.h)
   AC_CACHE_CHECK([for struct timeval], [ac_cv_struct_timeval], [
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM([

@@ -59,15 +59,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(SHELL) $(top_srcdir)/autotools/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
-libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
+LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcurl_la_LIBADD =
 am_libcurl_la_OBJECTS = file.lo timeval.lo base64.lo hostip.lo \
 	progress.lo formdata.lo cookie.lo http.lo sendf.lo ftp.lo \
@@ -93,6 +85,13 @@ LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 SOURCES = $(libcurl_la_SOURCES)
 DIST_SOURCES = $(libcurl_la_SOURCES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(includedir)"
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS) $(noinst_HEADERS)
 ETAGS = etags
@@ -192,7 +191,7 @@ STRIP = @STRIP@
 USECCDV = @USECCDV@
 USE_GNUTLS = @USE_GNUTLS@
 USE_SSLEAY = @USE_SSLEAY@
-VERSION = -version-info 2:2:0
+VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
 ac_ct_CC = @ac_ct_CC@
@@ -243,51 +242,12 @@ target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 AUTOMAKE_OPTIONS = foreign nostdinc
-lib_LTLIBRARIES = libcurl.la
+noinst_LTLIBRARIES = libcurl.la
 
 # we use srcdir/include for the static global include files
 # we use builddir/lib for the generated lib/config.h file to get found
 # we use srcdir/lib for the lib-private header files
 INCLUDES = -I$(top_srcdir)/include 
-
-# This flag accepts an argument of the form current[:revision[:age]]. So,
-# passing -version-info 3:12:1 sets current to 3, revision to 12, and age to
-# 1.
-#
-# If either revision or age are omitted, they default to 0. Also note that age
-# must be less than or equal to the current interface number.
-#
-# Here are a set of rules to help you update your library version information: 
-#
-# 1.Start with version information of 0:0:0 for each libtool library.
-#
-# 2.Update the version information only immediately before a public release of
-# your software. More frequent updates are unnecessary, and only guarantee
-# that the current interface number gets larger faster.
-#
-# 3.If the library source code has changed at all since the last update, then
-# increment revision (c:r:a becomes c:r+1:a).
-#
-# 4.If any interfaces have been added, removed, or changed since the last
-# update, increment current, and set revision to 0.
-#
-# 5.If any interfaces have been added since the last public release, then
-# increment age.
-#
-# 6.If any interfaces have been removed since the last public release, then
-# set age to 0.
-#
-
-#if NO_UNDEFINED
-# The -no-undefined flag is CRUCIAL for this to build fine on Cygwin.
-#UNDEF = -no-undefined
-#endif
-
-#if MIMPURE
-# This is for gcc on Solaris (8+ ?) to avoid "relocations remain against
-# allocatable but non-writable sections" problems.
-#MIMPURE = -mimpure-text
-#endif
 libcurl_la_LDFLAGS = $(VERSION)
 libcurl_la_SOURCES = file.c timeval.c base64.c hostip.c progress.c formdata.c	\
   cookie.c http.c sendf.c ftp.c url.c dict.c if2ip.c speedcheck.c	\
@@ -350,24 +310,16 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
-uninstall-libLTLIBRARIES:
-	@$(NORMAL_UNINSTALL)
-	@set -x; list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
-	  $(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
-	done
-
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
 libcurl.la: $(libcurl_la_OBJECTS) $(libcurl_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libcurl_la_LDFLAGS) $(libcurl_la_OBJECTS) $(libcurl_la_LIBADD) $(LIBS)
+	$(LINK)  $(libcurl_la_LDFLAGS) $(libcurl_la_OBJECTS) $(libcurl_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -534,7 +486,7 @@ check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: $(BUILT_SOURCES)
@@ -565,7 +517,7 @@ maintainer-clean-generic:
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
-clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -586,7 +538,7 @@ info-am:
 
 install-data-am: install-includeHEADERS
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am:
 
 install-info: install-info-am
 
@@ -612,22 +564,20 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+uninstall-am: uninstall-includeHEADERS uninstall-info-am
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool ctags distclean \
+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-libtool \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
 	install-exec-am install-includeHEADERS install-info \
-	install-info-am install-libLTLIBRARIES install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-includeHEADERS \
+	uninstall-info-am
 
 
 $(srcdir)/ca-bundle.h: Makefile.in Makefile
