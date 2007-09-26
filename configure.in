@@ -223,9 +223,18 @@ AC_CHECK_FUNCS(strnlen strlcpy strlcat strndup)
 
 dnl backtrace is used for segv reporting
 AC_CHECK_FUNC(backtrace, 
-[AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
+[LIBS="-g $LIBS"],
+[BLD_LIBEXEC="execinfo"
+LNK_LIBEXEC="execinfo/libexecinfo.la"
+CFLAGS="$CFLAGS -I`pwd`/lib/execinfo/"
 LIBS="-g $LIBS"]
 )
+AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
+AC_SUBST([BLD_LIBEXEC])
+AC_SUBST([LNK_LIBEXEC])
+dnl this is needed so function names can be resolved 
+dnl LDFLAGS="-Wl,--export-dynamic $LDFLAGS"
+
 
 dnl **** Check for underscore on external symbols ****
 
@@ -457,6 +466,7 @@ AC_CONFIG_FILES([Makefile
 		lib/pcre/Makefile 
 		lib/event/Makefile
 		lib/nxml/Makefile
+		lib/execinfo/Makefile
 		modules/Makefile 
 		modules/connectserv/Makefile
 		modules/extauth/Makefile

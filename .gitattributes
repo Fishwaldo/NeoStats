@@ -314,6 +314,10 @@ lib/event/poll.c -text
 lib/event/rtsig.c -text
 lib/event/select.c -text
 lib/event/signal.c -text
+lib/execinfo/Makefile.am -text
+lib/execinfo/Makefile.in -text
+lib/execinfo/README -text
+lib/execinfo/gen.py -text
 lib/nxml/Makefile.am -text
 lib/nxml/Makefile.in -text
 lib/nxml/mrss.h -text

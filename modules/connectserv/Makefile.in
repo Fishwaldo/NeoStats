@@ -88,6 +88,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BLD_LIBEXEC = @BLD_LIBEXEC@
 BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
 BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
 BUILD_PCRE_FALSE = @BUILD_PCRE_FALSE@
@@ -140,6 +141,7 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
+LNK_LIBEXEC = @LNK_LIBEXEC@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
@@ -224,7 +226,7 @@ unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 pkglib_LTLIBRARIES = connectserv.la
 connectserv_la_SOURCES = cs.c cs.h cs_help.c
-connectserv_la_LDFLAGS = -module -avoid-version
+connectserv_la_LDFLAGS = -module -avoid-version --export-dynamic
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
