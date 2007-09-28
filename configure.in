@@ -226,7 +226,7 @@ AC_CHECK_FUNC(backtrace,
 [LIBS="-g $LIBS"],
 [BLD_LIBEXEC="execinfo"
 LNK_LIBEXEC="execinfo/libexecinfo.la"
-CFLAGS="$CFLAGS -I`pwd`/lib/execinfo/"
+CFLAGS="$CFLAGS "'-I$(top_srcdir)/lib/execinfo/'
 LIBS="-g $LIBS"]
 )
 AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
@@ -372,9 +372,9 @@ wi_PROG_CCDV
 AC_MSG_HEADER([Configuring LibEvent Now])
 CHK_LIBEVNT
 AC_MSG_HEADER([Checking for Berkeley Database])
-AX_BERKELEY_DB([4.1], 
-[AM_CONDITIONAL(DO_BDB, true)],
-[AM_CONDITIONAL(DO_BDB, false)]
+AX_BERKELEY_DB([4.1],
+[BLD_BDB=bdb
+AC_SUBST(BLD_BDB)]
 )
 
 AC_MSG_HEADER([NeoStats Configuration Summary:])

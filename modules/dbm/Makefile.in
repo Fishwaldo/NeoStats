@@ -60,7 +60,7 @@ am_convertdb_OBJECTS = convertdb.$(OBJEXT) dl.$(OBJEXT) hash.$(OBJEXT) \
 	list.$(OBJEXT) ircstring.$(OBJEXT) nsmemory.$(OBJEXT) \
 	osfile.$(OBJEXT) support.$(OBJEXT)
 convertdb_OBJECTS = $(am_convertdb_OBJECTS)
-convertdb_LDADD = $(LDADD)
+convertdb_DEPENDENCIES = $(top_builddir)/lib/libneostats.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
 am__depfiles_maybe = depfiles
@@ -80,7 +80,6 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 pkglibdir = $(prefix)/modules
 ACLOCAL = @ACLOCAL@
@@ -92,6 +91,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BLD_BDB = @BLD_BDB@
 BLD_LIBEXEC = @BLD_LIBEXEC@
 BUILD_CURL_FALSE = @BUILD_CURL_FALSE@
 BUILD_CURL_TRUE = @BUILD_CURL_TRUE@
@@ -116,8 +116,6 @@ DB_LIBS = @DB_LIBS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DISTDIRVERSION = @DISTDIRVERSION@
-DO_BDB_FALSE = @DO_BDB_FALSE@
-DO_BDB_TRUE = @DO_BDB_TRUE@
 DO_PERL_FALSE = @DO_PERL_FALSE@
 DO_PERL_TRUE = @DO_PERL_TRUE@
 ECHO = @ECHO@
@@ -228,9 +226,11 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
-SUBDIRS = bdb gdbm
+SUBDIRS = gdbm $(BLD_BDB)
+DIST_SUBDIRS = gdbm bdb
 convertdb_SOURCES = convertdb.c ../../src/dl.c ../../src/hash.c ../../src/list.c ../../src/ircstring.c ../../src/nsmemory.c ../../src/osfile.c ../../src/support.c
 convertdb_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@
+convertdb_LDADD = $(top_builddir)/lib/libneostats.la
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@
 LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@

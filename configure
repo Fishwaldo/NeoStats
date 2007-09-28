@@ -881,11 +881,10 @@ DO_PERL_TRUE
 DO_PERL_FALSE
 wi_PWD
 USECCDV
-DO_BDB_TRUE
-DO_BDB_FALSE
 DB_LIBS
 DB_CPPFLAGS
 DB_LDFLAGS
+BLD_BDB
 DISTDIRVERSION
 PROTOCOL
 LIBTOOL_DEPS
@@ -4482,7 +4481,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4485 "configure"' > conftest.$ac_ext
+  echo '#line 4484 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -6343,11 +6342,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6346: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6345: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6350: \$? = $ac_status" >&5
+   echo "$as_me:6349: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6611,11 +6610,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6614: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6613: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6618: \$? = $ac_status" >&5
+   echo "$as_me:6617: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -6715,11 +6714,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6718: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6717: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6722: \$? = $ac_status" >&5
+   echo "$as_me:6721: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9167,7 +9166,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9170 "configure"
+#line 9169 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9267,7 +9266,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9270 "configure"
+#line 9269 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15493,7 +15492,7 @@ if test $ac_cv_func_backtrace = yes; then
 else
   BLD_LIBEXEC="execinfo"
 LNK_LIBEXEC="execinfo/libexecinfo.la"
-CFLAGS="$CFLAGS -I`pwd`/lib/execinfo/"
+CFLAGS="$CFLAGS "'-I$(top_srcdir)/lib/execinfo/'
 LIBS="-g $LIBS"
 
 fi
@@ -26341,17 +26340,7 @@ rm -f core conftest.err conftest.$ac_objext \
   if test -z $DB_HEADER ; then
     { echo "$as_me:$LINENO: result: not found" >&5
 echo "${ECHO_T}not found" >&6; }
-
-
-if false; then
-  DO_BDB_TRUE=
-  DO_BDB_FALSE='#'
-else
-  DO_BDB_TRUE='#'
-  DO_BDB_FALSE=
-fi
-
-
+    :
   else
     cat >>confdefs.h <<_ACEOF
 #define DB_HEADER "$DB_HEADER"
@@ -26360,15 +26349,8 @@ _ACEOF
 
 
 
+    BLD_BDB=bdb
 
-
-if true; then
-  DO_BDB_TRUE=
-  DO_BDB_FALSE='#'
-else
-  DO_BDB_TRUE='#'
-  DO_BDB_FALSE=
-fi
 
   fi
 
@@ -26749,20 +26731,6 @@ if test -z "${DO_PERL_TRUE}" && test -z "${DO_PERL_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"DO_PERL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"DO_PERL\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${DO_BDB_TRUE}" && test -z "${DO_BDB_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"DO_BDB\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"DO_BDB\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${DO_BDB_TRUE}" && test -z "${DO_BDB_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"DO_BDB\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"DO_BDB\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -27484,11 +27452,10 @@ DO_PERL_TRUE!$DO_PERL_TRUE$ac_delim
 DO_PERL_FALSE!$DO_PERL_FALSE$ac_delim
 wi_PWD!$wi_PWD$ac_delim
 USECCDV!$USECCDV$ac_delim
-DO_BDB_TRUE!$DO_BDB_TRUE$ac_delim
-DO_BDB_FALSE!$DO_BDB_FALSE$ac_delim
 DB_LIBS!$DB_LIBS$ac_delim
 DB_CPPFLAGS!$DB_CPPFLAGS$ac_delim
 DB_LDFLAGS!$DB_LDFLAGS$ac_delim
+BLD_BDB!$BLD_BDB$ac_delim
 DISTDIRVERSION!$DISTDIRVERSION$ac_delim
 PROTOCOL!$PROTOCOL$ac_delim
 LIBTOOL_DEPS!$LIBTOOL_DEPS$ac_delim
@@ -27500,7 +27467,7 @@ RDYNAMIC_FLAG!$RDYNAMIC_FLAG$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 49; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 48; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
