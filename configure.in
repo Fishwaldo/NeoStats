@@ -62,6 +62,7 @@ AC_DEFINE_UNQUOTED(OS, "${host}", [cpu-machine-OS])
 # AC_LIB_LTDL
 # bah AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(m, log10)
 AC_REPLACE_FUNCS(getopt)
 AC_CHECK_MEMBERS([struct stat.st_blksize])
 
