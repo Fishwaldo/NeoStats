@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
 
 /*
  * UTF-8
@@ -491,8 +490,8 @@ __nxml_int_charset (int ch, unsigned char *str, char *charset)
     {
       /* 16bits:  1110xxxx 10xxxxxx 10xxxxxx */
       str[0] = (ch >> 12) | 0xe0;
-      str[1] = ((ch >> 6) & 0x2f) | 0x80;
-      str[2] = (ch & 0x2f) | 0x80;
+      str[1] = ((ch >> 6) & 0x3f) | 0x80;
+      str[2] = (ch & 0x3f) | 0x80;
       return 3;
     }
 
@@ -504,9 +503,9 @@ __nxml_int_charset (int ch, unsigned char *str, char *charset)
     {
       /* 21bits:  11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
       str[0] = (ch >> 18) | 0xf0;
-      str[1] = ((ch >> 12) & 0x2f);
-      str[2] = ((ch >> 6) & 0x2f);
-      str[3] = (ch & 0x2f);
+      str[1] = ((ch >> 12) & 0x3f);
+      str[2] = ((ch >> 6) & 0x3f);
+      str[3] = (ch & 0x3f);
       return 4;
     }
 
@@ -518,10 +517,10 @@ __nxml_int_charset (int ch, unsigned char *str, char *charset)
     {
       /* 21bits:  111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
       str[0] = (ch >> 24) | 0xf8;
-      str[1] = ((ch >> 18) & 0x2f);
-      str[2] = ((ch >> 12) & 0x2f);
-      str[3] = ((ch >> 6) & 0x2f);
-      str[4] = (ch & 0x2f);
+      str[1] = ((ch >> 18) & 0x3f);
+      str[2] = ((ch >> 12) & 0x3f);
+      str[3] = ((ch >> 6) & 0x3f);
+      str[4] = (ch & 0x3f);
       return 5;
     }
 

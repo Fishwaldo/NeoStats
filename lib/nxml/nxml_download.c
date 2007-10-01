@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,14 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
+
+typedef struct __nxml_download_t__ __nxml_download_t;
+
+struct __nxml_download_t__
+{
+  char *mm;
+  size_t size;
+};
 
 static size_t
 __nxml_memorize_file (void *ptr, size_t size, size_t nmemb, void *data)
@@ -51,14 +58,18 @@ __nxml_memorize_file (void *ptr, size_t size, size_t nmemb, void *data)
   return realsize;
 }
 
-__nxml_download_t *
-__nxml_download_file (nxml_t * nxml, char *fl)
+nxml_error_t
+nxml_download_file (nxml_t * nxml, char *fl, char **buffer, size_t * size)
 {
   __nxml_download_t *chunk;
   CURL *curl;
+  CURLcode ret;
+
+  if (!fl || !buffer || !nxml)
+    return NXML_ERR_DATA;
 
   if (!(chunk = (__nxml_download_t *) malloc (sizeof (__nxml_download_t))))
-    return NULL;
+    return NXML_ERR_POSIX;
 
   chunk->mm = NULL;
   chunk->size = 0;
@@ -67,7 +78,7 @@ __nxml_download_file (nxml_t * nxml, char *fl)
   if (!(curl = curl_easy_init ()))
     {
       free (chunk);
-      return NULL;
+      return NXML_ERR_POSIX;
     }
 
   curl_easy_setopt (curl, CURLOPT_URL, fl);
@@ -78,19 +89,57 @@ __nxml_download_file (nxml_t * nxml, char *fl)
   if (nxml->priv.timeout)
     curl_easy_setopt (curl, CURLOPT_TIMEOUT, nxml->priv.timeout);
 
-  if (curl_easy_perform (curl))
+  curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, !nxml->priv.verifypeer);
+
+  if (nxml->priv.certfile)
+    {
+      curl_easy_setopt (curl, CURLOPT_SSLCERT, nxml->priv.certfile);
+
+      if (nxml->priv.password)
+	curl_easy_setopt (curl, CURLOPT_SSLCERTPASSWD, nxml->priv.password);
+
+      if (nxml->priv.cacert)
+	curl_easy_setopt (curl, CURLOPT_CAINFO, nxml->priv.cacert);
+    }
+
+  if (nxml->priv.authentication)
+    curl_easy_setopt (curl, CURLOPT_USERPWD, nxml->priv.authentication);
+
+  if (nxml->priv.proxy)
+    {
+      curl_easy_setopt (curl, CURLOPT_PROXY, nxml->priv.proxy);
+
+      if (nxml->priv.proxy_authentication)
+	curl_easy_setopt (curl, CURLOPT_PROXYUSERPWD,
+			  nxml->priv.proxy_authentication);
+    }
+
+  if (nxml->priv.user_agent)
+    curl_easy_setopt (curl, CURLOPT_USERAGENT, nxml->priv.user_agent);
+
+  if ((ret = curl_easy_perform (curl)))
     {
       if (chunk->mm)
 	free (chunk->mm);
 
       free (chunk);
 
+      nxml->priv.curl_error = ret;
+
       curl_easy_cleanup (curl);
-      return NULL;
+      return NXML_ERR_DOWNLOAD;
     }
 
   curl_easy_cleanup (curl);
-  return chunk;
+
+  *buffer = chunk->mm;
+
+  if (size)
+    *size = chunk->size;
+
+  free (chunk);
+
+  return NXML_OK;
 }
 
 /* EOF */

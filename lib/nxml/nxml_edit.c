@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
 
 nxml_error_t
 nxml_root_element (nxml_t * nxml, nxml_data_t ** data)

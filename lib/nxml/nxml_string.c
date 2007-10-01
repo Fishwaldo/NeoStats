@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
 
 char *
 __nxml_string_no_space (char *str)
@@ -74,10 +73,9 @@ __nxml_string_new (void)
 {
   __nxml_string_t *st;
 
-  if (!(st = (__nxml_string_t *) malloc (sizeof (__nxml_string_t))))
+  if (!(st = (__nxml_string_t *) calloc (1, sizeof (__nxml_string_t))))
     return NULL;
 
-  memset (st, 0, sizeof (__nxml_string_t));
   return st;
 }
 

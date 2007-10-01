@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,9 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
+
+static void __nxml_private_free (__nxml_private_t * priv);
+static void __nxml_entity_free (__nxml_private_t * priv);
 
 nxml_error_t
 nxml_free_data (nxml_data_t * data)
@@ -117,8 +119,6 @@ nxml_free_doctype (nxml_doctype_t * doctype)
 
   while (doctype)
     {
-      nxml_empty_doctype (doctype);
-
       if (doctype->value)
 	free (doctype->value);
 
@@ -135,38 +135,14 @@ nxml_free_doctype (nxml_doctype_t * doctype)
 }
 
 nxml_error_t
-nxml_empty_doctype (nxml_doctype_t * doctype)
-{
-  if (!doctype)
-    return NXML_ERR_DATA;
-
-  while (doctype)
-    {
-      if (doctype->system_literal)
-	{
-	  free (doctype->system_literal);
-	  doctype->system_literal = NULL;
-	}
-
-      if (doctype->pubid_literal)
-	{
-	  free (doctype->pubid_literal);
-	  doctype->pubid_literal = NULL;
-	}
-
-      doctype = doctype->next;
-    }
-
-  return NXML_OK;
-}
-
-nxml_error_t
 nxml_free (nxml_t * data)
 {
   if (!data)
     return NXML_ERR_DATA;
 
   nxml_empty (data);
+
+  __nxml_private_free (&data->priv);
 
   free (data);
 
@@ -200,11 +176,66 @@ nxml_empty (nxml_t * data)
       nxml_free_data (old);
     }
 
+  __nxml_entity_free (&data->priv);
+
   memcpy (&priv, &data->priv, sizeof (__nxml_private_t));
   memset (data, 0, sizeof (nxml_t));
   memcpy (&data->priv, &priv, sizeof (__nxml_private_t));
 
   return NXML_OK;
+}
+
+static void
+__nxml_entity_free (__nxml_private_t * priv)
+{
+  __nxml_entity_t *entity;
+
+  if (!priv)
+    return;
+
+  while (priv->entities)
+    {
+      entity = priv->entities;
+      priv->entities = priv->entities->next;
+
+      if (entity->entity)
+	free (entity->entity);
+
+      if (entity->name)
+	free (entity->name);
+
+      free (entity);
+    }
+}
+
+static void
+__nxml_private_free (__nxml_private_t * priv)
+{
+  if (!priv)
+    return;
+
+  if (priv->proxy)
+    free (priv->proxy);
+
+  if (priv->proxy_authentication)
+    free (priv->proxy_authentication);
+
+  if (priv->certfile)
+    free (priv->certfile);
+
+  if (priv->password)
+    free (priv->password);
+
+  if (priv->cacert)
+    free (priv->cacert);
+
+  if (priv->authentication)
+    free (priv->authentication);
+
+  if (priv->user_agent)
+    free (priv->user_agent);
+
+  __nxml_entity_free (priv);
 }
 
 /* EOF */

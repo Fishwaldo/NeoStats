@@ -1,31 +1,45 @@
-/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* mRss - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
- * This source code is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Public License as published 
- * by the Free Software Foundation; either version 2 of the License,
- * or (at your option) any later version.
- *
- * This source code is distributed in the hope that it will be useful,
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * Please refer to the GNU Public License for more details.
- *
- * You should have received a copy of the GNU Public License along with
- * this source code; if not, write to:
- * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef __M_RSS_H__
 #define __M_RSS_H__
 
 #include <sys/types.h>
+#include <curl.h>
+
+#define LIBMRSS_VERSION_STRING  "0.18.0"
+
+#define LIBMRSS_MAJOR_VERSION   0
+#define LIBMRSS_MINOR_VERSION   18
+#define LIBMRSS_MICRO_VERSION   0
+
+#ifdef  __cplusplus
+extern "C" {
+#endif
 
 typedef struct mrss_t mrss_t;
+typedef struct mrss_options_t mrss_options_t;
 typedef struct mrss_item_t mrss_item_t;
 typedef struct mrss_category_t mrss_category_t;
 typedef struct mrss_hour_t mrss_hour_t;
 typedef struct mrss_day_t mrss_day_t;
+typedef struct mrss_tag_t mrss_tag_t;
+typedef struct mrss_attribute_t mrss_attribute_t;
 typedef void * mrss_generic_t;
 
 /** This enum describes the error type of libmrss */
@@ -33,6 +47,7 @@ typedef enum {
   MRSS_OK = 0,			/**< No error */
   MRSS_ERR_POSIX,		/**< For the correct error, use errno */
   MRSS_ERR_PARSER,		/**< Parser error */
+  MRSS_ERR_DOWNLOAD,		/**< Download error */
   MRSS_ERR_VERSION,		/**< The RSS has a no compatible VERSION */
   MRSS_ERR_DATA			/**< The parameters are incorrect */
 } mrss_error_t;
@@ -42,6 +57,8 @@ typedef enum {
   MRSS_VERSION_0_92,		/**< 0.92 RSS version */
   MRSS_VERSION_1_0,		/**< 1.0 RSS version */
   MRSS_VERSION_2_0,		/**< 2.0 RSS version */
+  MRSS_VERSION_ATOM_0_3,	/**< 0.3 Atom version */
+  MRSS_VERSION_ATOM_1_0		/**< 1.0 Atom version */
 } mrss_version_t;
 
 /** Flag list for mrss_set and mrss_get functions */
@@ -57,6 +74,8 @@ typedef enum {
   MRSS_FLAG_DESCRIPTION,
   /** Set the link to a mrss_t element - the value is a string */
   MRSS_FLAG_LINK,
+  /** Set the id to a mrss_t element - the value is a string */
+  MRSS_FLAG_ID,
   /** Set the language to a mrss_t element - the value is a string */
   MRSS_FLAG_LANGUAGE,
   /** Set the rating to a mrss_t element - the value is a string */
@@ -71,14 +90,34 @@ typedef enum {
   MRSS_FLAG_DOCS,
   /** Set the managingeditor to a mrss_t element - the value is a string */
   MRSS_FLAG_MANAGINGEDITOR,
+  /** Set the managingeditor's email to a mrss_t element - the value is a string */
+  MRSS_FLAG_MANAGINGEDITOR_EMAIL,
+  /** Set the managingeditor's uri to a mrss_t element - the value is a string */
+  MRSS_FLAG_MANAGINGEDITOR_URI,
   /** Set the webMaster to a mrss_t element - the value is a string */
   MRSS_FLAG_WEBMASTER,
   /** Set the generator to a mrss_t element - the value is a string */
-  MRSS_FLAG_GENERATOR,
-  /** Set the ttl to a mrss_t element - the value is a integer */
   MRSS_FLAG_TTL,
   /** Set the about to a mrss_t element - the value is a string */
   MRSS_FLAG_ABOUT,
+
+  /* Contributor */
+
+  /** Set the contributor to a mrss_t element - the value is a string */
+  MRSS_FLAG_CONTRIBUTOR,
+  /** Set the contributor's email to a mrss_t element - the value is a string */
+  MRSS_FLAG_CONTRIBUTOR_EMAIL,
+  /** Set the contributor's uri to a mrss_t element - the value is a string */
+  MRSS_FLAG_CONTRIBUTOR_URI,
+
+  /* Generator */
+
+  /** Set the generator to a mrss_t element - the value is a string */
+  MRSS_FLAG_GENERATOR,
+  /** Set the generator's email to a mrss_t element - the value is a string */
+  MRSS_FLAG_GENERATOR_URI,
+  /** Set the generator's uri to a mrss_t element - the value is a string */
+  MRSS_FLAG_GENERATOR_VERSION,
 
   /* Image */
 
@@ -86,6 +125,8 @@ typedef enum {
   MRSS_FLAG_IMAGE_TITLE,
   /** Set the image_url to a mrss_t element - the value is a string */
   MRSS_FLAG_IMAGE_URL,
+  /** Set the image_logo to a mrss_t element - the value is a string */
+  MRSS_FLAG_IMAGE_LOGO,
   /** Set the image_link to a mrss_t element - the value is a string */
   MRSS_FLAG_IMAGE_LINK,
   /** Set the image_width to a mrss_t element - the value is a integer */
@@ -138,6 +179,8 @@ typedef enum {
   MRSS_FLAG_CATEGORY,
   /** Set the domain to a mrss_category_t element - the value is a string */
   MRSS_FLAG_CATEGORY_DOMAIN,
+  /** Set the label to a mrss_category_t element - the value is a string */
+  MRSS_FLAG_CATEGORY_LABEL,
 
   /* Item */
 
@@ -147,8 +190,23 @@ typedef enum {
   MRSS_FLAG_ITEM_LINK,
   /** Set the description to a mrss_item_t element - the value is a string */
   MRSS_FLAG_ITEM_DESCRIPTION,
+  /** Set the copyright to a mrss_item_t element - the value is a string */
+  MRSS_FLAG_ITEM_COPYRIGHT,
+
   /** Set the author to a mrss_item_t element - the value is a string */
   MRSS_FLAG_ITEM_AUTHOR,
+  /** Set the author's uri to a mrss_item_t element - the value is a string */
+  MRSS_FLAG_ITEM_AUTHOR_URI,
+  /** Set the author's email to a mrss_item_t element - the value is a string */
+  MRSS_FLAG_ITEM_AUTHOR_EMAIL,
+
+  /** Set the contributor to a mrss_item_t element - the value is a string */
+  MRSS_FLAG_ITEM_CONTRIBUTOR,
+  /** Set the contributor's uri to a mrss_item_t element - the value is a string */
+  MRSS_FLAG_ITEM_CONTRIBUTOR_URI,
+  /** Set the contributor's email to a mrss_item_t element - the value is a string */
+  MRSS_FLAG_ITEM_CONTRIBUTOR_EMAIL,
+
   /** Set the comments to a mrss_item_t element - the value is a string */
   MRSS_FLAG_ITEM_COMMENTS,
   /** Set the pubDate to a mrss_item_t element - the value is a string */
@@ -172,6 +230,26 @@ typedef enum {
   /** Set the enclosure_type to a mrss_item_t element - the value is a string */
   MRSS_FLAG_ITEM_ENCLOSURE_TYPE,
 
+  /* Item */
+
+  /** Set the name to a mrss_tag_t element - the value is a string */
+  MRSS_FLAG_TAG_NAME,
+
+  /** Set the value to a mrss_tag_t element - the value is a string */
+  MRSS_FLAG_TAG_VALUE,
+
+  /** Set the namespace to a mrss_tag_t element - the value is a string */
+  MRSS_FLAG_TAG_NS,
+
+  /** Set the name to a mrss_attribute_t element - the value is a string */
+  MRSS_FLAG_ATTRIBUTE_NAME,
+
+  /** Set the value to a mrss_attribute_t element - the value is a string */
+  MRSS_FLAG_ATTRIBUTE_VALUE,
+
+  /** Set the namespace to a mrss_attribute_t element - the value is a string */
+  MRSS_FLAG_ATTRIBUTE_NS,
+
   /** Set the terminetor flag */
   MRSS_FLAG_END = 0
 
@@ -188,7 +266,11 @@ typedef enum {
   /** The data struct is a mrss_day_t */
   MRSS_ELEMENT_SKIPDAYS,
   /** The data struct is a mrss_category_t */
-  MRSS_ELEMENT_CATEGORY
+  MRSS_ELEMENT_CATEGORY,
+  /** The data struct is a mrss_tag_t */
+  MRSS_ELEMENT_TAG,
+  /** The data struct is a mrss_attribute_t */
+  MRSS_ELEMENT_ATTRIBUTE
 } mrss_element_t;
 
 /** Data struct for any items of RSS. It contains a pointer to the list
@@ -204,26 +286,36 @@ struct mrss_item_t {
 
   /* Data: */
 
-  				/*	0.91	0.92	1.0	2.0	*/
-  char *title;			/*	R	O	O	O	*/
-  char *link;			/*	R	O	O	O	*/
-  char *description;		/*	R	O	-	O	*/
+  				/* 0.91	0.92	1.0	2.0	ATOM	*/
+  char *title;			/* R	O	O	O	R	*/
+  char *link;			/* R	O	O	O	O	*/
+  char *description;		/* R	O	-	O	O	*/
+  char *copyright;		/* -	-	-	-	O	*/
+  
+  char *author;			/* -	-	-	O	O	*/
+  char *author_uri;		/* -	-	-	-	O	*/
+  char *author_email;		/* -	-	-	-	O	*/
 
-  char *author;			/*	-	-	-	O	*/
-  char *comments;		/*	-	-	-	O	*/
-  char *pubDate;		/*	-	-	-	O	*/
-  char *guid;			/*	-	-	-	O	*/
-  int guid_isPermaLink;		/*	-	-	-	O	*/
+  char *contributor;		/* -	-	-	-	O	*/
+  char *contributor_uri;	/* -	-	-	-	O	*/
+  char *contributor_email;	/* -	-	-	-	O	*/
 
-  char *source;			/*	-	O	-	O	*/
-  char *source_url;		/*	-	R	-	R	*/
+  char *comments;		/* -	-	-	O	-	*/
+  char *pubDate;		/* -	-	-	O	O	*/
+  char *guid;			/* -	-	-	O	O	*/
+  int guid_isPermaLink;		/* -	-	-	O	-	*/
 
-  char *enclosure;		/*	-	O	-	O	*/
-  char *enclosure_url;		/*	-	R	-	R	*/
-  int enclosure_length;		/*	-	R	-	R	*/
-  char *enclosure_type;		/*	-	R	-	R	*/
+  char *source;			/* -	O	-	O	-	*/
+  char *source_url;		/* -	R	-	R	-	*/
 
-  mrss_category_t *category;	/*	-	O	-	O	*/
+  char *enclosure;		/* -	O	-	O	-	*/
+  char *enclosure_url;		/* -	R	-	R	-	*/
+  int enclosure_length;		/* -	R	-	R	-	*/
+  char *enclosure_type;		/* -	R	-	R	-	*/
+
+  mrss_category_t *category;	/* -	O	-	O	O	*/
+
+  mrss_tag_t *other_tags;
 
   mrss_item_t *next;
 };
@@ -238,8 +330,8 @@ struct mrss_hour_t {
   int allocated;
 
   /* Data: */
-  				/*	0.91	0.92	1.0	2.0	*/
-  char *hour;			/*	R	R	-	R	*/
+  				/* 0.91	0.92	1.0	2.0	ATOM	*/
+  char *hour;			/* R	R	-	R	-	*/
   mrss_hour_t *next;
 };
 
@@ -253,8 +345,8 @@ struct mrss_day_t {
   int allocated;
 
   /* Data: */
-  				/*	0.91	0.92	1.0	2.0	*/
-  char *day;			/*	R	R	-	R	*/
+  				/* 0.91	0.92	1.0	2.0	ATOM	*/
+  char *day;			/* R	R	-	R	-	*/
   mrss_day_t *next;
 };
 
@@ -268,9 +360,10 @@ struct mrss_category_t {
   int allocated;
 
   /* Data: */
-  				/*	0.91	0.92	1.0	2.0	*/
-  char *category;		/*	-	R	-	R	*/
-  char *domain;			/*	-	O	-	O	*/
+  				/* 0.91	0.92	1.0	2.0	ATOM	*/
+  char *category;		/* -	R	-	R	R	*/
+  char *domain;			/* -	O	-	O	O	*/
+  char *label;			/* -	-	-	-	O	*/
   mrss_category_t *next;
 };
 
@@ -282,6 +375,7 @@ struct mrss_t {
   /** For internal use only: */
   mrss_element_t element;
   int allocated;
+  int curl_error;
 
   /* Data: */
 
@@ -289,51 +383,137 @@ struct mrss_t {
   size_t size;
   char *encoding;
 
-  mrss_version_t version;	/*	0.91	0.92	1.0	2.0	*/
+  mrss_version_t version;	/* 0.91	0.92	1.0	2.0	ATOM	*/
 
-  char *title;			/*	R	R	R	R	*/
-  char *description;		/*	R	R	R	R	*/
-  char *link;			/*	R	R	R	R	*/
-  char *language;		/*	R	O	-	O	*/
-  char *rating;			/*	O	O	-	O	*/
-  char *copyright;		/*	O	O	-	O	*/
-  char *pubDate;		/*	O	O	-	O	*/
-  char *lastBuildDate;		/*	O	O	-	O	*/
-  char *docs;			/*	O	O	-	O	*/
-  char *managingeditor;		/*	O	O	-	O	*/
-  char *webMaster;		/*	O	O	-	O	*/
-  char *generator;		/*	-	-	-	O	*/
-  int ttl;			/*	-	-	-	O	*/
-  char *about;			/*	-	-	R	-	*/
+  char *title;			/* R	R	R	R	R	*/
+  char *description;		/* R	R	R	R	R	*/
+  char *link;			/* R	R	R	R	O	*/
+  char *id;			/* 	-	-	-	-	O	*/
+  char *language;		/* R	O	-	O	O	*/
+  char *rating;			/* O	O	-	O	-	*/
+  char *copyright;		/* O	O	-	O	O	*/
+  char *pubDate;		/* O	O	-	O	-	*/
+  char *lastBuildDate;		/* O	O	-	O	O	*/
+  char *docs;			/* O	O	-	O	-	*/
+  char *managingeditor;		/* O	O	-	O	O	*/
+  char *managingeditor_email;	/* O	O	-	O	O	*/
+  char *managingeditor_uri;	/* O	O	-	O	O	*/
+  char *webMaster;		/* O	O	-	O	-	*/
+  int ttl;			/* -	-	-	O	-	*/
+  char *about;			/* -	-	R	-	-	*/
   
-  /* Tag Image: */		/*	O	O	O	O	*/
-  char *image_title;		/*	R	R	R	R	*/
-  char *image_url;		/*	R	R	R	R	*/
-  char *image_link;		/*	R	R	R	R	*/
-  unsigned int image_width;	/*	O	O	-	O	*/
-  unsigned int image_height;	/*	O	O	-	O	*/
-  char *image_description;	/*	O	O	-	O	*/
+  /* Contributor */		/* -	-	-	-	O	*/
+  char *contributor;		/* -	-	-	-	R	*/
+  char *contributor_email;	/* -	-	-	-	O	*/
+  char *contributor_uri;	/* -	-	-	-	O	*/
 
-  /* TextInput: */		/*	O	O	O	O	*/
-  char *textinput_title;	/*	R	R	R	R	*/
-  char *textinput_description;	/*	R	R	R	R	*/
-  char *textinput_name;		/*	R	R	R	R	*/
-  char *textinput_link;		/*	R	R	R	R	*/
+  /* Generator */
+  char *generator;		/* -	-	-	O	O	*/
+  char *generator_uri;		/* -	-	-	-	O	*/
+  char *generator_version;	/* -	-	-	-	O	*/
+
+  /* Tag Image: */		/* O	O	O	O	-	*/
+  char *image_title;		/* R	R	R	R	-	*/
+  char *image_url;		/* R	R	R	R	O	*/
+  char *image_logo;		/* -	-	-	-	O	*/
+  char *image_link;		/* R	R	R	R	-	*/
+  unsigned int image_width;	/* O	O	-	O	-	*/
+  unsigned int image_height;	/* O	O	-	O	-	*/
+  char *image_description;	/* O	O	-	O	-	*/
+
+  /* TextInput: */		/* O	O	O	O	-	*/
+  char *textinput_title;	/* R	R	R	R	-	*/
+  char *textinput_description;	/* R	R	R	R	-	*/
+  char *textinput_name;		/* R	R	R	R	-	*/
+  char *textinput_link;		/* R	R	R	R	-	*/
 
   /* Cloud */
-  char *cloud;			/*	-	O	-	O	*/
-  char *cloud_domain;		/*	-	R	-	R	*/
-  int cloud_port;		/*	-	R	-	R	*/
-  char *cloud_path;		/*	-	R	-	R	*/
-  char *cloud_registerProcedure;/*	-	R	-	R	*/
-  char *cloud_protocol;		/*	-	R	-	R	*/
+  char *cloud;			/* -	O	-	O	-	*/
+  char *cloud_domain;		/* -	R	-	R	-	*/
+  int cloud_port;		/* -	R	-	R	-	*/
+  char *cloud_path;		/* -	R	-	R	-	*/
+  char *cloud_registerProcedure;/* -	R	-	R	-	*/
+  char *cloud_protocol;		/* -	R	-	R	-	*/
 
-  mrss_hour_t *skipHours;	/*	O	O	-	O	*/
-  mrss_day_t *skipDays;		/*	O	O	-	O	*/
+  mrss_hour_t *skipHours;	/* O	O	-	O	-	*/
+  mrss_day_t *skipDays;		/* O	O	-	O	-	*/
 
-  mrss_category_t *category;	/*	-	O	-	O	*/
+  mrss_category_t *category;	/* -	O	-	O	O	*/
 
-  mrss_item_t *item;		/*	R	R	R	R	*/
+  mrss_item_t *item;		/* R	R	R	R	R	*/
+
+  mrss_tag_t *other_tags;
+
+#ifdef USE_LOCALE
+  void *c_locale;
+#endif
+
+};
+
+/** Data struct for any other tag out of the RSS namespace.
+ *
+ * \brief 
+ * Struct data for external tags */
+struct mrss_tag_t {
+  /** For internal use only: */
+  mrss_element_t element;
+  int allocated;
+
+  /*name of the tag */
+  char *name;
+
+  /* value */
+  char *value;
+
+  /* namespace */
+  char *ns;
+
+  /* list of attributes: */
+  mrss_attribute_t *attributes;
+
+  /* Sub tags: */
+  mrss_tag_t *children;
+
+  /* the next tag: */
+  mrss_tag_t *next;
+};
+
+/** Data struct for the attributes of the tag
+ *
+ * \brief 
+ * Struct data for external attribute */
+struct mrss_attribute_t {
+  /** For internal use only: */
+  mrss_element_t element;
+  int allocated;
+
+  /* name of the tag */
+  char *name;
+
+  /* value */
+  char *value;
+
+  /* namespace */
+  char *ns;
+  
+  /* The next attribute: */
+  mrss_attribute_t *next;
+};
+
+/** Options data struct. It contains some user preferences.
+ *
+ * \brief 
+ * Options data struct. It contains some user preferences. */
+struct mrss_options_t {
+  int timeout;
+  char *proxy;
+  char *proxy_authentication;
+  char *certfile;
+  char *cacert;
+  char *password;
+  int verifypeer;
+  char *authentication;
+  char *user_agent;
 };
 
 /** PARSE FUNCTIONS *********************************************************/
@@ -347,6 +527,32 @@ struct mrss_t {
  */
 mrss_error_t	mrss_parse_url		(char *		url,
 					 mrss_t **	mrss);
+
+/**
+ * Like the previous function but with a options struct.
+ * \param url The url to be parsed
+ * \param mrss the pointer to your data struct
+ * \param options a pointer to a options data struct
+ * \return the error code
+ */
+mrss_error_t	mrss_parse_url_with_options
+					(char *		url,
+					 mrss_t **	mrss,
+					 mrss_options_t	* options);
+
+/**
+ * Like the previous function but with CURLcode error
+ * \param url The url to be parsed
+ * \param mrss the pointer to your data struct
+ * \param options a pointer to a options data struct. It can be NULL
+ * \param curlcode the error code from libcurl
+ * \return the error code
+ */
+mrss_error_t	mrss_parse_url_with_options_and_error
+					(char *		url,
+					 mrss_t **	mrss,
+					 mrss_options_t	* options,
+					 CURLcode *	curlcode);
 
 /** 
  * Parses a file and creates the data struct of the feed RSS url
@@ -425,6 +631,13 @@ mrss_error_t	mrss_free		(mrss_generic_t	element);
  */
 char *		mrss_strerror		(mrss_error_t	err);
 
+/** 
+ * This function returns a static string with the description of curl code
+ * \param err the error code that you need as string
+ * \return a string. Don't free this string!
+ */
+char *		mrss_curl_strerror	(CURLcode	err);
+
 /**
  * This function returns the mrss_element_t of a mrss data struct.
  * \param element it is the element that you want check
@@ -433,24 +646,6 @@ char *		mrss_strerror		(mrss_error_t	err);
  */
 mrss_error_t	mrss_element		(mrss_generic_t	element,
 					 mrss_element_t *ret);
-
-/**
- * This function set the timeout for the download of URI.
- *
- * \param timeout if timeout is 0 libmrss doesn't use timeout. If timeout is
- * -1, the timeout will be set to 10 seconds, else timeout will be set to
- *  the value of this variable.
- * \return the error code
- */
-mrss_error_t	mrss_set_timeout	(int		timeout);
-
-/**
- * This function gets the timeout for the download of URI.
- *
- * \param timeout pointer to a int.
- * \return the error code
- */
-mrss_error_t	mrss_get_timeout	(int *		timeout);
 
 /**
  * This function returns the number of seconds sinze Jennuary 1st 1970 in the
@@ -463,6 +658,35 @@ mrss_error_t	mrss_get_timeout	(int *		timeout);
  */
 mrss_error_t	mrss_get_last_modified	(char *		urlstring,
 					 time_t *	lastmodified);
+
+/**
+ * Like the previous function but with a options struct.
+ *
+ * \param urlstring the url
+ * \param lastmodified is a pointer to a time_t struct. The return value can
+ * be 0 if the HEAD request does not return a Last-Modified value.
+ * \param options a pointer to a options struct
+ * \return the error code
+ */
+mrss_error_t	mrss_get_last_modified_with_options
+					(char *		urlstring,
+					 time_t *	lastmodified,
+					 mrss_options_t * options);
+/**
+ * Like the previous function but with a CURLcode pointer.
+ *
+ * \param urlstring the url
+ * \param lastmodified is a pointer to a time_t struct. The return value can
+ * be 0 if the HEAD request does not return a Last-Modified value.
+ * \param options a pointer to a options struct
+ * \param curl_code it will contain the error code of libcurl
+ * \return the error code
+ */
+mrss_error_t	mrss_get_last_modified_with_options_and_error
+					(char *		urlstring,
+					 time_t *	lastmodified,
+					 mrss_options_t * options,
+					 CURLcode *	curl_code);
 
 /** EDIT FUNCTIONS **********************************************************/
 
@@ -560,7 +784,7 @@ mrss_error_t	mrss_new_subdata	(mrss_generic_t	element,
 					 mrss_generic_t	subdata);
 
 /**
- * This function remove a subdata element. As first argoment you must specify
+ * This function removes a subdata element. As first argoment you must specify
  * the parent, and second argoment the child.
  * \code
  * mrss_remove_subdata(mrss, item);
@@ -573,6 +797,72 @@ mrss_error_t	mrss_new_subdata	(mrss_generic_t	element,
  */
 mrss_error_t	mrss_remove_subdata	(mrss_generic_t	element,
 					 mrss_generic_t	subdata);
+
+/* TAGS FUNCTIONS **********************************************************/
+
+/**
+ * This function search a tag in a mrss_t, a mrss_item_t or a mrss_tag_t from
+ *  name and a namespace.
+ * \param element it is the parent node (mrss_t or mrss_item_t)
+ * \param name the name of the element
+ * \param ns the namespace. It can be null if the tag has a null namespace
+ * \param tag the return pointer
+ * \return the error code
+ */
+mrss_error_t	mrss_search_tag		(mrss_generic_t	element,
+					 char *		name,
+					 char *		ns,
+					 mrss_tag_t **	tag);
+
+/**
+ * This function search an attribute from a mrss_tag_t, a name and a namespace
+ * \param element it is the mrss_tag_t
+ * \param name the name of the element
+ * \param ns the namespace. It can be null if the tag has a null namespace
+ * \param attribute the return pointer
+ * \return the error code
+ */
+mrss_error_t	mrss_search_attribute	(mrss_generic_t	element,
+					 char *		name,
+					 char *		ns,
+					 mrss_attribute_t ** attribute);
+
+/* OPTIONS FUNCTIONS *******************************************************/
+
+/**
+ * This function creates a options struct.
+ * 
+ * \param timeout timeout for the download procedure
+ * \param proxy a proxy server. can be NULL
+ * \param proxy_authentication a proxy authentication (user:pwd). can be NULL
+ * \param certfile a certificate for ssl autentication connection
+ * \param password the password of certfile
+ * \param cacert CA certificate to verify peer against. can be NULL
+ * \param verifypeer active/deactive the peer check
+ * \param authentication an authentication login (user:pwd). can be NULL
+ * \param user_agent a user_agent. can be NULL
+ * \return a pointer to a new allocated mrss_options_t struct 
+ */
+mrss_options_t *
+		mrss_options_new	(int timeout,
+					 char *proxy,
+					 char *proxy_authentication,
+					 char *certfile,
+					 char *password,
+					 char *cacert,
+					 int verifypeer,
+					 char *authentication,
+					 char *user_agent);
+
+/**
+ * This function destroys a options struct.
+ * \param options a pointer to a options struct
+ */
+void		mrss_options_free	(mrss_options_t *options);
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif
 

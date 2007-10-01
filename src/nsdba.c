@@ -152,12 +152,12 @@ void FiniDBA( void )
 	while( ( node = hash_scan_next( &ds ) ) != NULL )
 	{
 		dbe = ( dbentry * ) hnode_get( node );
-		dlog( DEBUG5, "Closing Database %s", dbe->name );
+		dlog( DEBUG10, "Closing Database %s", dbe->name );
 		hash_scan_begin( &ts, dbe->tablehash );
 		while( ( tnode = hash_scan_next( &ts ) ) != NULL )
 		{
 			tbe = (tableentry *) hnode_get( tnode );
-			dlog( DEBUG5, "Closing Table %s", tbe->name );
+			dlog( DEBUG10, "Closing Table %s", tbe->name );
 			DBMCloseTable( dbe->handle, tbe->handle );
 			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
@@ -184,7 +184,7 @@ int DBAOpenDatabase( void )
 {
 	dbentry *dbe;
 
-	dlog( DEBUG5, "DBAOpenDatabase %s", GET_CUR_MODNAME() );
+	dlog( DEBUG10, "DBAOpenDatabase %s", GET_CUR_MODNAME() );
 	if( hash_isfull( dbhash ) )
 	{
 		nlog (LOG_CRITICAL, "DBAOpenDatabase: db hash is full");
@@ -227,17 +227,17 @@ int DBACloseDatabase( void )
 	hnode_t *tnode;
 	hscan_t ts;
 
-	dlog( DEBUG5, "DBACloseDatabase %s", GET_CUR_MODNAME() );
+	dlog( DEBUG10, "DBACloseDatabase %s", GET_CUR_MODNAME() );
 	node = hash_lookup( dbhash, GET_CUR_MODNAME() );
 	if (node)
 	{
 		dbe = ( dbentry * ) hnode_get( node );
-		dlog( DEBUG5, "Closing Database %s", dbe->name );
+		dlog( DEBUG10, "Closing Database %s", dbe->name );
 		hash_scan_begin( &ts, dbe->tablehash );
 		while( ( tnode = hash_scan_next( &ts ) ) != NULL )
 		{
 			tbe = (tableentry *) hnode_get( tnode );
-			dlog( DEBUG5, "Closing Table %s", tbe->name );
+			dlog( DEBUG10, "Closing Table %s", tbe->name );
 			DBMCloseTable( dbe->handle, tbe->handle );
 			hash_scan_delete_destroy_node( dbe->tablehash, tnode );
 			ns_free( tbe );
@@ -264,7 +264,7 @@ int DBAOpenTable( const char *table )
 	dbentry *dbe;
 	tableentry *tbe;
 
-	dlog( DEBUG5, "DBAOpenTable %s", table );
+	dlog( DEBUG10, "DBAOpenTable %s", table );
 	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
 	if( !dbe )
 	{
@@ -275,7 +275,7 @@ int DBAOpenTable( const char *table )
 	ircsnprintf( tbe->name, MAXPATH, "%s", table);
 	if( hnode_find( dbe->tablehash, tbe->name ) )
 	{
-		dlog( DEBUG5, "DBAOpenTable %s already open", table );
+		dlog( DEBUG10, "DBAOpenTable %s already open", table );
 		ns_free (tbe);
 		return NS_SUCCESS;
 	}
@@ -299,7 +299,7 @@ static dbentry *DBAFetchDBEntry()
 {
 	dbentry *dbe;
 
-	dlog( DEBUG5, "DBAFetchDBEntry %s", GET_CUR_MODNAME() );
+	dlog( DEBUG10, "DBAFetchDBEntry %s", GET_CUR_MODNAME() );
 	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
 	if( !dbe )
 	{
@@ -323,7 +323,7 @@ static tableentry *DBAFetchTableEntry( const char *table, int *islocalopen )
 	dbentry *dbe;
 	tableentry *tbe;
 
-	dlog( DEBUG5, "DBAFetchTableEntry %s", table );
+	dlog( DEBUG10, "DBAFetchTableEntry %s", table );
 	dbe = DBAFetchDBEntry();
 	if( !dbe )
 	{
@@ -355,7 +355,7 @@ int DBACloseTable( const char *table )
 	tableentry *tbe;
 	hnode_t *node;
 
-	dlog( DEBUG5, "DBACloseTable %s", table );
+	dlog( DEBUG10, "DBACloseTable %s", table );
 	dbe = (dbentry *)hnode_find( dbhash, GET_CUR_MODNAME() );
 	if( !dbe )
 	{
@@ -392,7 +392,7 @@ int DBAFetch( const char *table, const char *key, void *data, int size )
 	tableentry *tbe;
 	dbentry *dbe = DBAFetchDBEntry();
 
-	dlog( DEBUG5, "DBAFetch %s %s", table, key );
+	dlog( DEBUG10, "DBAFetch %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if (!dbe ) {
 		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
@@ -427,7 +427,7 @@ int DBAStore( const char *table, const char *key, void *data, int size )
 	tableentry *tbe;
 	dbentry *dbe = DBAFetchDBEntry();
 
-	dlog( DEBUG5, "DBAStore %s %s", table, key );
+	dlog( DEBUG10, "DBAStore %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if (!dbe ) {
 		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
@@ -460,7 +460,7 @@ int DBAFetchRows( const char *table, DBRowHandler handler )
 	tableentry *tbe;
 	dbentry *dbe = DBAFetchDBEntry();
 
-	dlog( DEBUG5, "DBAFetchRows %s", table );
+	dlog( DEBUG10, "DBAFetchRows %s", table );
 	if (!dbe) {
 		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
 		return ret;
@@ -494,7 +494,7 @@ int DBAFetchRows2( const char *table, DBRowHandler2 handler )
 	tableentry *tbe;
 	dbentry *dbe = DBAFetchDBEntry();
 
-	dlog( DEBUG5, "DBAFetchRows %s", table );
+	dlog( DEBUG10, "DBAFetchRows %s", table );
 	if (!dbe) {
 		nlog(LOG_WARNING, "No Such Database %s", dbe->name);
 		return ret;
@@ -528,7 +528,7 @@ int DBADelete( const char *table, const char *key )
 	dbentry *dbe = DBAFetchDBEntry();
 	
 
-	dlog( DEBUG5, "DBADelete %s %s", table, key );
+	dlog( DEBUG10, "DBADelete %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if( !tbe )
 		return NS_FAILURE;

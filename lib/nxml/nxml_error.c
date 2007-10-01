@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,10 +25,9 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
 
 char *
-nxml_strerror (nxml_error_t err)
+nxml_strerror (nxml_t * nxml, nxml_error_t err)
 {
   switch (err)
     {
@@ -38,12 +37,27 @@ nxml_strerror (nxml_error_t err)
     case NXML_ERR_PARSER:
       return "Parser error";
 
+    case NXML_ERR_DOWNLOAD:
+      return nxml
+	&& nxml->priv.curl_error ? (char *) curl_easy_strerror (nxml->priv.
+								curl_error) :
+	"Download error";
+
     case NXML_ERR_DATA:
       return "No correct paramenter in the function";
 
     default:
       return strerror (errno);
     }
+}
+
+CURLcode
+nxml_curl_error (nxml_t * nxml, nxml_error_t err)
+{
+  if (!nxml || err != NXML_ERR_DOWNLOAD)
+    return CURLE_OK;
+
+  return nxml->priv.curl_error;
 }
 
 nxml_error_t

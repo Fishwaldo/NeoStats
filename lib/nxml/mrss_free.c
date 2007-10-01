@@ -1,4 +1,4 @@
-/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* mRss - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -32,6 +32,8 @@ static void __mrss_free_category (mrss_category_t * category);
 static void __mrss_free_hour (mrss_hour_t * hour);
 static void __mrss_free_day (mrss_day_t * day);
 static void __mrss_free_item (mrss_item_t * item);
+static void __mrss_free_tag (mrss_tag_t * tag);
+static void __mrss_free_attribute (mrss_attribute_t * attribute);
 
 static void
 __mrss_free_channel (mrss_t * mrss)
@@ -40,6 +42,7 @@ __mrss_free_channel (mrss_t * mrss)
   mrss_day_t *day;
   mrss_category_t *category;
   mrss_item_t *item;
+  mrss_tag_t *tag;
   void *old;
 
   if (!mrss)
@@ -59,6 +62,9 @@ __mrss_free_channel (mrss_t * mrss)
 
   if (mrss->link)
     free (mrss->link);
+
+  if (mrss->id)
+    free (mrss->id);
 
   if (mrss->language)
     free (mrss->language);
@@ -81,17 +87,44 @@ __mrss_free_channel (mrss_t * mrss)
   if (mrss->managingeditor)
     free (mrss->managingeditor);
 
+  if (mrss->managingeditor_email)
+    free (mrss->managingeditor_email);
+
+  if (mrss->managingeditor_uri)
+    free (mrss->managingeditor_uri);
+
   if (mrss->webMaster)
     free (mrss->webMaster);
 
   if (mrss->about)
     free (mrss->about);
 
+  if (mrss->contributor)
+    free (mrss->contributor);
+
+  if (mrss->contributor_email)
+    free (mrss->contributor_email);
+
+  if (mrss->contributor_uri)
+    free (mrss->contributor_uri);
+
+  if (mrss->generator)
+    free (mrss->generator);
+
+  if (mrss->generator_uri)
+    free (mrss->generator_uri);
+
+  if (mrss->generator_version)
+    free (mrss->generator_version);
+
   if (mrss->image_title)
     free (mrss->image_title);
 
   if (mrss->image_url)
     free (mrss->image_url);
+
+  if (mrss->image_logo)
+    free (mrss->image_logo);
 
   if (mrss->image_link)
     free (mrss->image_link);
@@ -110,9 +143,6 @@ __mrss_free_channel (mrss_t * mrss)
 
   if (mrss->textinput_link)
     free (mrss->textinput_link);
-
-  if (mrss->generator)
-    free (mrss->generator);
 
   if (mrss->cloud)
     free (mrss->cloud);
@@ -136,6 +166,15 @@ __mrss_free_channel (mrss_t * mrss)
       category = category->next;
 
       __mrss_free_category ((mrss_category_t *) old);
+    }
+
+  tag = mrss->other_tags;
+  while (tag)
+    {
+      old = tag;
+      tag = tag->next;
+
+      __mrss_free_tag ((mrss_tag_t *) old);
     }
 
   hour = mrss->skipHours;
@@ -165,8 +204,73 @@ __mrss_free_channel (mrss_t * mrss)
       __mrss_free_item ((mrss_item_t *) old);
     }
 
+#ifdef USE_LOCALE
+  if (mrss->c_locale)
+    freelocale (mrss->c_locale);
+#endif
+
   if (mrss->allocated)
     free (mrss);
+}
+
+static void
+__mrss_free_tag (mrss_tag_t * tag)
+{
+  mrss_attribute_t *attribute;
+  mrss_tag_t *child;
+  void *old;
+
+  if (!tag)
+    return;
+
+  if (tag->name)
+    free (tag->name);
+
+  if (tag->value)
+    free (tag->value);
+
+  if (tag->ns)
+    free (tag->ns);
+
+  attribute = tag->attributes;
+  while (attribute)
+    {
+      old = attribute;
+      attribute = attribute->next;
+
+      __mrss_free_attribute ((mrss_attribute_t *) old);
+    }
+
+  child = tag->children;
+  while (child)
+    {
+      old = child;
+      child = child->next;
+
+      __mrss_free_tag ((mrss_tag_t *) old);
+    }
+
+  if (tag->allocated)
+    free (tag);
+}
+
+static void
+__mrss_free_attribute (mrss_attribute_t * attribute)
+{
+  if (!attribute)
+    return;
+
+  if (attribute->name)
+    free (attribute->name);
+
+  if (attribute->value)
+    free (attribute->value);
+
+  if (attribute->ns)
+    free (attribute->ns);
+
+  if (attribute->allocated)
+    free (attribute);
 }
 
 static void
@@ -180,6 +284,9 @@ __mrss_free_category (mrss_category_t * category)
 
   if (category->domain)
     free (category->domain);
+
+  if (category->label)
+    free (category->label);
 
   if (category->allocated)
     free (category);
@@ -214,7 +321,9 @@ __mrss_free_day (mrss_day_t * day)
 static void
 __mrss_free_item (mrss_item_t * item)
 {
-  mrss_category_t *category, *old;
+  mrss_category_t *category;
+  mrss_tag_t *tag;
+  void *old;
 
   if (!item)
     return;
@@ -228,8 +337,26 @@ __mrss_free_item (mrss_item_t * item)
   if (item->description)
     free (item->description);
 
+  if (item->copyright)
+    free (item->copyright);
+
   if (item->author)
     free (item->author);
+
+  if (item->author_email)
+    free (item->author_email);
+
+  if (item->author_uri)
+    free (item->author_uri);
+
+  if (item->contributor)
+    free (item->contributor);
+
+  if (item->contributor_email)
+    free (item->contributor_email);
+
+  if (item->contributor_uri)
+    free (item->contributor_uri);
 
   if (item->comments)
     free (item->comments);
@@ -261,7 +388,16 @@ __mrss_free_item (mrss_item_t * item)
       old = category;
       category = category->next;
 
-      __mrss_free_category (old);
+      __mrss_free_category ((mrss_category_t *) old);
+    }
+
+  tag = item->other_tags;
+  while (tag)
+    {
+      old = tag;
+      tag = tag->next;
+
+      __mrss_free_tag ((mrss_tag_t *) old);
     }
 
   if (item->allocated)
@@ -276,6 +412,9 @@ mrss_free (mrss_generic_t element)
   mrss_t *tmp;
 
   tmp = (mrss_t *) element;
+
+  if (!tmp)
+    return MRSS_OK;
 
   switch (tmp->element)
     {
@@ -297,6 +436,14 @@ mrss_free (mrss_generic_t element)
 
     case MRSS_ELEMENT_CATEGORY:
       __mrss_free_category ((mrss_category_t *) element);
+      break;
+
+    case MRSS_ELEMENT_TAG:
+      __mrss_free_tag ((mrss_tag_t *) element);
+      break;
+
+    case MRSS_ELEMENT_ATTRIBUTE:
+      __mrss_free_attribute ((mrss_attribute_t *) element);
       break;
 
     default:

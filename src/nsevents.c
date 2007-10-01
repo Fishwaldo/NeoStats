@@ -122,40 +122,40 @@ static void SendEvent( const ModuleEvent *eventptr, Event event, const CmdParams
 {
 	if( !eventptr )
 	{
-		dlog( DEBUG5, "SendEvent: %s has no event handler for %s", module_ptr->info->name, EventStrings[event] );
+		dlog( DEBUG9, "SendEvent: %s has no event handler for %s", module_ptr->info->name, EventStrings[event] );
 		return;
 	}
 	/* If we are not yet synched, check that the module supports 
 	 * the event before we are synched. */
 	if( !IsModuleSynched( module_ptr ) && !( eventptr->flags & EVENT_FLAG_IGNORE_SYNCH ) )
 	{
-		dlog( DEBUG5, "Skipping module %s for %s since module is not yet synched", module_ptr->info->name, EventStrings[event] );
+		dlog( DEBUG9, "Skipping module %s for %s since module is not yet synched", module_ptr->info->name, EventStrings[event] );
 		return;
 	}
 	if( ( eventptr->flags & EVENT_FLAG_DISABLED ) )
 	{
-		dlog( DEBUG5, "Skipping module %s for %s since it is disabled", module_ptr->info->name, EventStrings[event] );
+		dlog( DEBUG9, "Skipping module %s for %s since it is disabled", module_ptr->info->name, EventStrings[event] );
 		return;
 	}
 	if( ( eventptr->flags & EVENT_FLAG_EXCLUDE_ME ) && IsMe( cmdparams->source ) )
 	{
-		dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a NeoStats client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
+		dlog( DEBUG9, "Skipping module %s for %s since %s is excluded as a NeoStats client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
 		return;
 	}
 	if( eventptr->flags & EVENT_FLAG_EXCLUDE_MODME )
 	{
 		if( cmdparams->source && cmdparams->source->user && cmdparams->source->user->bot && cmdparams->source->user->bot->moduleptr == module_ptr )
 		{
-			dlog( DEBUG5, "Skipping module %s for %s since %s is excluded as a Module client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
+			dlog( DEBUG9, "Skipping module %s for %s since %s is excluded as a Module client", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
 			return;
 		}
 	}			
 	if( ( eventptr->flags & EVENT_FLAG_USE_EXCLUDE ) && IsExcluded( cmdparams->source ) )
 	{
-		dlog( DEBUG5, "Skipping module %s for %s since %s is excluded", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
+		dlog( DEBUG9, "Skipping module %s for %s since %s is excluded", module_ptr->info->name, EventStrings[event], cmdparams->source->name );
 		return;
 	}			
-	dlog( DEBUG1, "Running module %s with %s", module_ptr->info->name, EventStrings[event] );
+	dlog( DEBUG9, "Running module %s with %s", module_ptr->info->name, EventStrings[event] );
 	SET_SEGV_LOCATION();
 #ifdef USE_PERL
 	if( ( eventptr->flags & EVENT_FLAG_PERLCALL ) )
@@ -193,7 +193,7 @@ static void SendEvent( const ModuleEvent *eventptr, Event event, const CmdParams
 void SendModuleEvent( Event event, const CmdParams *cmdparams, Module *module_ptr )
 {
 	SET_SEGV_LOCATION();
-	dlog( DEBUG5, "SendModuleEvent: %s to module %s", EventStrings[event], module_ptr->info->name );
+	dlog( DEBUG9, "SendModuleEvent: %s to module %s", EventStrings[event], module_ptr->info->name );
 
 	if( module_ptr->event_list )
 		SendEvent( module_ptr->event_list[event], event, cmdparams, module_ptr );
@@ -238,7 +238,7 @@ void SendAllModuleEvent( Event event, CmdParams *cmdparams )
 	ModuleAllEvent mae;
 
 	SET_SEGV_LOCATION();
-	dlog( DEBUG5, "SendAllModuleEvent: %s to all modules", EventStrings[event] );
+	dlog( DEBUG9, "SendAllModuleEvent: %s to all modules", EventStrings[event] );
 	mae.event = event;
 	mae.cmdparams = cmdparams;
 	ProcessModuleList( SendAllModuleEventHandler, (void *)&mae );
@@ -264,7 +264,7 @@ void AddEvent( ModuleEvent *eventptr )
 		return;
 	}
 	mod_ptr = GET_CUR_MODULE();
-	dlog( DEBUG5, "AddEvent: adding %s to %s", EventStrings[eventptr->event], mod_ptr->info->name );
+	dlog( DEBUG9, "AddEvent: adding %s to %s", EventStrings[eventptr->event], mod_ptr->info->name );
 #ifdef USE_PERL
 	if( ( eventptr->flags & EVENT_FLAG_PERLCALL ) )
 	{
@@ -329,12 +329,12 @@ void DeleteEvent( Event event )
 	mod_ptr = GET_CUR_MODULE();
 	if( !mod_ptr->event_list )
 	{
-		dlog( DEBUG5, "DeleteEvent: module %s has no events", mod_ptr->info->name );
+		dlog( DEBUG9, "DeleteEvent: module %s has no events", mod_ptr->info->name );
 		return;
 	}
 	if( mod_ptr->event_list )
 		mod_ptr->event_list[event] = NULL;
-	dlog( DEBUG5, "DeleteEvent: deleting %s from %s", EventStrings[event], mod_ptr->info->name );
+	dlog( DEBUG9, "DeleteEvent: deleting %s from %s", EventStrings[event], mod_ptr->info->name );
 }
 
 /** @brief DeleteEventList

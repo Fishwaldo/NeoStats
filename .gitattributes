@@ -543,6 +543,10 @@ modules/textserv/moraleserv.tsdb -text
 modules/textserv/textserv.h -text
 modules/textserv/textserv.vcproj -text
 modules/textserv/waitress.tsdb -text
+modules/update/.indent.pro -text
+modules/update/Makefile.am -text
+modules/update/Makefile.in -text
+modules/update/update.vcproj -text
 /neostats.in -text
 /neostats.motd -text
 /neostats.sln -text

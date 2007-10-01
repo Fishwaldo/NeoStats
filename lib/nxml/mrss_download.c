@@ -1,4 +1,4 @@
-/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* mRss - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -27,76 +27,32 @@
 #include "mrss.h"
 #include "mrss_internal.h"
 
-static size_t
-__mrss_memorize_file (void *ptr, size_t size, size_t nmemb, void *data)
+char *
+__mrss_download_file (nxml_t * nxml, char *fl, size_t * size,
+		      mrss_error_t * error, CURLcode * code)
 {
-  register int realsize = size * nmemb;
-  __mrss_download_t *mem = (__mrss_download_t *) data;
+  char *buffer;
 
-  if (!mem->mm)
+  if(code)
+    *code = CURLE_OK;
+
+  switch (nxml_download_file (nxml, fl, &buffer, size))
     {
-      if (!(mem->mm = (char *) malloc (realsize + 1)))
-	return -1;
-    }
-  else
-    {
-      if (!(mem->mm = (char *) realloc (mem->mm, mem->size + realsize + 1)))
-	return -1;
-    }
+    case NXML_OK:
+      return buffer;
 
-  memcpy (&(mem->mm[mem->size]), ptr, realsize);
-  mem->size += realsize;
-  mem->mm[mem->size] = 0;
+    case NXML_ERR_DOWNLOAD:
 
-  return realsize;
-}
+      if(code)
+        *code = nxml_curl_error (nxml, NXML_ERR_DOWNLOAD);
+      
+      *error = MRSS_ERR_DOWNLOAD;
+      return NULL;
 
-__mrss_download_t *
-__mrss_download_file (char *fl, int timeout)
-{
-  __mrss_download_t *chunk;
-  CURL *curl;
-
-  if (!(chunk = (__mrss_download_t *) malloc (sizeof (__mrss_download_t))))
-    return NULL;
-
-  chunk->mm = NULL;
-  chunk->size = 0;
-
-  curl_global_init (CURL_GLOBAL_DEFAULT);
-  if (!(curl = curl_easy_init ()))
-    {
-      if (chunk->mm)
-	free (chunk->mm);
-
-      free (chunk);
+    default:
+      *error = MRSS_ERR_POSIX;
       return NULL;
     }
-
-  curl_easy_setopt (curl, CURLOPT_URL, fl);
-  curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, __mrss_memorize_file);
-  curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1);
-  curl_easy_setopt (curl, CURLOPT_FILE, (void *) chunk);
-
-  if (timeout > 0)
-    curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeout);
-  else if (timeout < 0)
-    curl_easy_setopt (curl, CURLOPT_TIMEOUT, 10);
-
-  if (curl_easy_perform (curl))
-    {
-      if (chunk->mm)
-	free (chunk->mm);
-
-      free (chunk);
-
-      curl_easy_cleanup (curl);
-      return NULL;
-    }
-
-  curl_easy_cleanup (curl);
-
-  return chunk;
 }
 
 /* EOF */

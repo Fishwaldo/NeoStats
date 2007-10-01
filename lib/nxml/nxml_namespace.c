@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
 
 struct __nxml_data_ns_t
 {
@@ -83,9 +82,8 @@ __nxml_namespace_parse_add (nxml_data_t * data, char *prefix, char *namespace)
 {
   nxml_namespace_t *ns;
 
-  if (!(ns = (nxml_namespace_t *) malloc (sizeof (nxml_namespace_t))))
+  if (!(ns = (nxml_namespace_t *) calloc (1, sizeof (nxml_namespace_t))))
     return 1;
-  memset (ns, 0, sizeof (nxml_namespace_t));
 
   if (prefix && !(ns->prefix = strdup (prefix)))
     {
@@ -289,12 +287,8 @@ __nxml_namespace_associate (struct __nxml_data_ns_t **list,
   ns = root->ns_list;
   while (ns)
     {
-      if (!
-	  (tmp =
-	   (struct __nxml_data_ns_t *)
-	   malloc (sizeof (struct __nxml_data_ns_t))))
+      if (!(tmp = calloc (1, sizeof (struct __nxml_data_ns_t))))
 	return;
-      memset (tmp, 0, sizeof (struct __nxml_data_ns_t));
 
       tmp->ns = ns;
       tmp->next = (*list);

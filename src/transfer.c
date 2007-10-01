@@ -163,7 +163,7 @@ static size_t neocurl_callback( void *transferptr, size_t size, size_t nmemb, vo
 				} else {
 					neotrans->savememsize += size - rembuffer;
 					neotrans->savemem = newbuf;
-				}
+ 				}
 			}
 			os_memcpy( (char *)&neotrans->savemem[neotrans->savemempos], transferptr, size );
 			neotrans->savemempos += size;
@@ -358,8 +358,8 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	}
 	/* we have to do this at least once to get things going */
 	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket_all(curlmultihandle, &ret)) {
-		transfer_status();
 	}
+	transfer_status();
 	return NS_SUCCESS;
 }
 

@@ -1,4 +1,4 @@
-/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* mRss - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -27,7 +27,319 @@
 #include "mrss.h"
 #include "mrss_internal.h"
 
-static int __mrss_timeout = 0;
+static void
+__mrss_parse_tag_insert (mrss_tag_t ** where, mrss_tag_t * what)
+{
+  if (!*where)
+    *where = what;
+  else
+    {
+      mrss_tag_t *tag = *where;
+
+      while (tag->next)
+	tag = tag->next;
+
+      tag->next = what;
+    }
+}
+
+static mrss_tag_t *
+__mrss_parse_tag (nxml_t * doc, nxml_data_t * cur)
+{
+  mrss_tag_t *tag;
+  mrss_attribute_t *attribute;
+  nxml_attr_t *nxml_attr;
+
+  if (!(tag = (mrss_tag_t *) calloc (1, sizeof (mrss_tag_t))))
+    return NULL;
+
+  tag->element = MRSS_ELEMENT_TAG;
+  tag->allocated = 1;
+
+  if (!(tag->name = strdup (cur->value)))
+    {
+      mrss_free (tag);
+      return NULL;
+    }
+
+  if (cur->ns && cur->ns->ns && !(tag->ns = strdup (cur->ns->ns)))
+    {
+      mrss_free (tag);
+      return NULL;
+    }
+
+  for (nxml_attr = cur->attributes; nxml_attr; nxml_attr = nxml_attr->next)
+    {
+
+      if (!
+	  (attribute =
+	   (mrss_attribute_t *) calloc (1, sizeof (mrss_attribute_t))))
+	return NULL;
+
+      attribute->element = MRSS_ELEMENT_ATTRIBUTE;
+      attribute->allocated = 1;
+
+      if (!(attribute->name = strdup (nxml_attr->name)))
+	{
+	  mrss_free (tag);
+	  return NULL;
+	}
+
+      if (!(attribute->value = strdup (nxml_attr->value)))
+	{
+	  mrss_free (tag);
+	  return NULL;
+	}
+
+      if (nxml_attr->ns && nxml_attr->ns->ns
+	  && !(attribute->ns = strdup (nxml_attr->ns->ns)))
+	{
+	  mrss_free (tag);
+	  return NULL;
+	}
+
+      if (!tag->attributes)
+	tag->attributes = attribute;
+      else
+	{
+	  mrss_attribute_t *tmp = tag->attributes;
+
+	  while (tmp->next)
+	    tmp = tmp->next;
+
+	  tmp->next = attribute;
+	}
+
+    }
+
+  for (cur = cur->children; cur; cur = cur->next)
+    {
+      if (cur->type == NXML_TYPE_TEXT)
+	{
+	  if (!tag->value && !(tag->value = strdup (cur->value)))
+	    {
+	      mrss_free (tag);
+	      return NULL;
+	    }
+	}
+      else if (cur->type == NXML_TYPE_ELEMENT)
+	{
+	  mrss_tag_t *child = __mrss_parse_tag (doc, cur);
+
+	  if (child)
+	    __mrss_parse_tag_insert (&tag->children, child);
+	}
+    }
+
+  return tag;
+}
+
+static char *
+__mrss_atom_prepare_date (mrss_t * data, char *datestr)
+{
+  struct tm stm;
+
+  if (!datestr)
+    return NULL;
+
+  memset (&stm, 0, sizeof (stm));
+
+  /* format: 2007-01-17T07:45:50Z */
+  if (sscanf
+      (datestr, "%04d-%02d-%02dT%02d:%02d:%02dZ", &stm.tm_year,
+       &stm.tm_mon, &stm.tm_mday, &stm.tm_hour, &stm.tm_min,
+       &stm.tm_sec) == 6)
+    {
+      char datebuf[256];
+      stm.tm_year -= 1900;
+      stm.tm_mon -= 1;
+
+#ifdef USE_LOCALE
+      if (!data->c_locale
+	  && !(data->c_locale = newlocale (LC_ALL_MASK, "C", NULL)))
+	return NULL;
+
+      strftime_l (datebuf, sizeof (datebuf), "%a, %d %b %Y %H:%M:%S %z", &stm,
+		  data->c_locale);
+#else
+      strftime (datebuf, sizeof (datebuf), "%a, %d %b %Y %H:%M:%S %z", &stm);
+#endif
+
+      return strdup (datebuf);
+    }
+
+  return NULL;
+}
+
+static void
+__mrss_parser_atom_category (nxml_data_t * cur, mrss_category_t ** category)
+{
+  char *c;
+  mrss_category_t *cat;
+
+  if (!(cat = calloc (1, sizeof (mrss_category_t))))
+    return;
+
+  if (!(c = nxmle_find_attribute (cur, "term", NULL)))
+    {
+      free (cat);
+      return;
+    }
+
+  cat->element = MRSS_ELEMENT_CATEGORY;
+  cat->allocated = 1;
+  cat->category = c;
+
+  if ((c = nxmle_find_attribute (cur, "scheme", NULL)))
+    cat->domain = c;
+
+  if ((c = nxmle_find_attribute (cur, "label", NULL)))
+    cat->label = c;
+
+  if (!*category)
+    *category = cat;
+
+  else
+    {
+      mrss_category_t *tmp;
+      tmp = *category;
+
+      while (tmp->next)
+	tmp = tmp->next;
+
+      tmp->next = cat;
+    }
+}
+
+static void
+__mrss_parser_atom_author (nxml_data_t * cur, char **name, char **email,
+			   char **uri)
+{
+  for (cur = cur->children; cur; cur = cur->next)
+    {
+      if (!*name && !strcmp (cur->value, "name"))
+	*name = nxmle_get_string (cur, NULL);
+
+      else if (!*email && !strcmp (cur->value, "email"))
+	*email = nxmle_get_string (cur, NULL);
+
+      else if (!*uri && !strcmp (cur->value, "uri"))
+	*uri = nxmle_get_string (cur, NULL);
+    }
+}
+
+static void
+__mrss_parser_atom_entry (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
+{
+  char *c;
+  mrss_item_t *item;
+
+
+  if (!(item = malloc (sizeof (mrss_item_t))))
+    return;
+
+  memset (item, 0, sizeof (mrss_item_t));
+  item->element = MRSS_ELEMENT_ITEM;
+  item->allocated = 1;
+
+  for (cur = cur->children; cur; cur = cur->next)
+    {
+      if (cur->type == NXML_TYPE_ELEMENT)
+	{
+	  /* title -> title */
+	  if (!item->title && !strcmp (cur->value, "title")
+	      && (c = nxmle_get_string (cur, NULL)))
+	    item->title = c;
+
+	  /* link href -> link */
+	  else if (!item->link && !strcmp (cur->value, "link")
+		   && (c = nxmle_find_attribute (cur, "href", NULL)))
+	    item->link = c;
+
+	  /* content -> description */
+	  else if (!item->description && !strcmp (cur->value, "content")
+		   && (c = nxmle_get_string (cur, NULL)))
+	    item->description = c;
+
+	  /* summary -> description */
+	  else if (!item->description && !strcmp (cur->value, "summary")
+		   && (c = nxmle_get_string (cur, NULL)))
+	    item->description = c;
+
+	  /* right -> copyright */
+	  else if (!item->copyright && !strcmp (cur->value, "rights")
+		   && (c = nxmle_get_string (cur, NULL)))
+	    item->copyright = c;
+
+	  /* author structure -> author elements */
+	  else if (!strcmp (cur->value, "author"))
+	    __mrss_parser_atom_author (cur, &item->author,
+				       &item->author_email,
+				       &item->author_uri);
+
+	  /* contributor structure -> contributor elements */
+	  else if (!strcmp (cur->value, "contributor"))
+	    __mrss_parser_atom_author (cur, &item->contributor,
+				       &item->contributor_email,
+				       &item->contributor_uri);
+
+	  /* published -> pubDate */
+	  else if (!item->pubDate && !strcmp (cur->value, "published")
+		   && data->version == MRSS_VERSION_ATOM_1_0
+		   && (c = nxmle_get_string (cur, NULL)))
+	    {
+	      item->pubDate = __mrss_atom_prepare_date (data, c);
+	      free (c);
+	    }
+
+	  else if (!item->pubDate && !strcmp (cur->value, "updated")
+		   && data->version == MRSS_VERSION_ATOM_1_0
+		   && (c = nxmle_get_string (cur, NULL)))
+	    {
+	      item->pubDate = __mrss_atom_prepare_date (data, c);
+	      free (c);
+	    }
+
+	  /* issued -> pubDate (Atom 0.3) */
+	  else if (!item->pubDate && !strcmp (cur->value, "issued")
+		   && (c = nxmle_get_string (cur, NULL)))
+	    {
+	      item->pubDate = __mrss_atom_prepare_date (data, c);
+	      free (c);
+	    }
+
+	  /* id -> guid */
+	  else if (!item->guid && !strcmp (cur->value, "id")
+		   && (c = nxmle_get_string (cur, NULL)))
+	    item->guid = c;
+
+	  /* categories */
+	  else if (!strcmp (cur->value, "category"))
+	    __mrss_parser_atom_category (cur, &item->category);
+
+	  else
+	    {
+	      mrss_tag_t *tag;
+	      if ((tag = __mrss_parse_tag (doc, cur)))
+		__mrss_parse_tag_insert (&item->other_tags, tag);
+	    }
+	}
+    }
+
+  if (!data->item)
+    data->item = item;
+
+  else
+    {
+      mrss_item_t *tmp = data->item;
+
+      while (tmp->next)
+	tmp = tmp->next;
+
+      tmp->next = item;
+    }
+
+}
 
 static void
 __mrss_parser_rss_image (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
@@ -46,9 +358,7 @@ __mrss_parser_rss_image (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	  /* url */
 	  else if (!strcmp (cur->value, "url") && !data->image_url
 		   && (c = nxmle_get_string (cur, NULL)))
-	    {
-	      free (c);
-	    }
+	    data->image_url = c;
 
 	  /* link */
 	  else if (!strcmp (cur->value, "link") && !data->image_link
@@ -127,13 +437,12 @@ __mrss_parser_rss_skipHours (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	    {
 	      mrss_hour_t *hour;
 
-	      if (!(hour = (mrss_hour_t *) malloc (sizeof (mrss_hour_t))))
+	      if (!(hour = (mrss_hour_t *) calloc (1, sizeof (mrss_hour_t))))
 		{
 		  free (c);
 		  return;
 		}
 
-	      memset (hour, 0, sizeof (mrss_hour_t));
 	      hour->element = MRSS_ELEMENT_SKIPHOURS;
 	      hour->allocated = 1;
 	      hour->hour = c;
@@ -169,13 +478,12 @@ __mrss_parser_rss_skipDays (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 	    {
 	      mrss_day_t *day;
 
-	      if (!(day = (mrss_day_t *) malloc (sizeof (mrss_day_t))))
+	      if (!(day = (mrss_day_t *) calloc (1, sizeof (mrss_day_t))))
 		{
 		  free (c);
 		  return;
 		}
 
-	      memset (day, 0, sizeof (mrss_day_t));
 	      day->element = MRSS_ELEMENT_SKIPDAYS;
 	      day->allocated = 1;
 	      day->day = c;
@@ -204,10 +512,9 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
   char *attr;
   mrss_item_t *item;
 
-  if (!(item = (mrss_item_t *) malloc (sizeof (mrss_item_t))))
+  if (!(item = (mrss_item_t *) calloc (1, sizeof (mrss_item_t))))
     return;
 
-  memset (item, 0, sizeof (mrss_item_t));
   item->element = MRSS_ELEMENT_ITEM;
   item->allocated = 1;
 
@@ -265,13 +572,11 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 
 	      if (!
 		  (category =
-		   (mrss_category_t *) malloc (sizeof (mrss_category_t))))
+		   (mrss_category_t *) calloc (1, sizeof (mrss_category_t))))
 		{
 		  free (c);
 		  return;
 		}
-
-	      memset (category, 0, sizeof (mrss_category_t));
 
 	      category->element = MRSS_ELEMENT_CATEGORY;
 	      category->allocated = 1;
@@ -325,6 +630,15 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 		   && (c = nxmle_get_string (cur, NULL)))
 	    item->pubDate = c;
 
+	  /* Other tags: */
+	  else
+	    {
+	      mrss_tag_t *tag;
+
+	      if ((tag = __mrss_parse_tag (doc, cur)))
+		__mrss_parse_tag_insert (&item->other_tags, tag);
+	    }
+
 	}
     }
 
@@ -344,16 +658,152 @@ __mrss_parser_rss_item (nxml_t * doc, nxml_data_t * cur, mrss_t * data)
 }
 
 static mrss_error_t
+__mrss_parser_atom (nxml_t * doc, nxml_data_t * cur, mrss_t ** ret)
+{
+  mrss_t *data;
+  char *c = NULL;
+
+  if (!(data = malloc (sizeof (mrss_t))))
+    return MRSS_ERR_POSIX;
+
+  memset (data, 0, sizeof (mrss_t));
+  data->element = MRSS_ELEMENT_CHANNEL;
+  data->allocated = 1;
+  data->version = MRSS_VERSION_ATOM_1_0;
+
+  if (doc->encoding && !(data->encoding = strdup (doc->encoding)))
+    {
+      mrss_free (data);
+      return MRSS_ERR_POSIX;
+    }
+
+  if (!data->language && (c = nxmle_find_attribute (cur, "xml:lang", NULL)))
+    data->language = c;
+
+  if ((c = nxmle_find_attribute (cur, "version", NULL)))
+    {
+      if (!strcmp (c, "0.3"))
+	data->version = MRSS_VERSION_ATOM_0_3;
+
+      free (c);
+    }
+
+  for (cur = cur->children; cur; cur = cur->next)
+    {
+      if (cur->type == NXML_TYPE_ELEMENT)
+	{
+	  /* title -> title */
+	  if (!strcmp (cur->value, "title") && !data->title
+	      && (c = nxmle_get_string (cur, NULL)))
+	    data->title = c;
+
+	  /* subtitle -> description */
+	  else if (!strcmp (cur->value, "subtitle")
+		   && data->version == MRSS_VERSION_ATOM_1_0
+		   && !data->description
+		   && (c = nxmle_get_string (cur, NULL)))
+	    data->description = c;
+
+	  /* tagline -> description (Atom 0.3) */
+	  else if (!strcmp (cur->value, "tagline")
+		   && data->version == MRSS_VERSION_ATOM_0_3
+		   && !data->description
+		   && (c = nxmle_get_string (cur, NULL)))
+	    data->description = c;
+
+	  /* link href -> link */
+	  else if (!strcmp (cur->value, "link") && !data->link
+		   && (c = nxmle_find_attribute (cur, "href", NULL)))
+	    data->link = c;
+
+	  /* id -> id */
+	  else if (!strcmp (cur->value, "id") && !data->id
+		   && (c = nxmle_get_string (cur, NULL)))
+	    data->id = c;
+
+	  /* rights -> copyright */
+	  else if (!strcmp (cur->value, "rights") && !data->copyright
+		   && (c = nxmle_get_string (cur, NULL)))
+	    data->copyright = c;
+
+	  /* updated -> lastBuildDate */
+	  else if (!strcmp (cur->value, "updated")
+		   && (c = nxmle_get_string (cur, NULL)))
+	    {
+	      data->lastBuildDate = __mrss_atom_prepare_date (data, c);
+	      free (c);
+	    }
+
+	  /* author -> managingeditor */
+	  else if (!strcmp (cur->value, "author"))
+	    __mrss_parser_atom_author (cur, &data->managingeditor,
+				       &data->managingeditor_email,
+				       &data->managingeditor_uri);
+
+	  /* contributor */
+	  else if (!strcmp (cur->value, "contributor"))
+	    __mrss_parser_atom_author (cur, &data->contributor,
+				       &data->contributor_email,
+				       &data->contributor_uri);
+
+	  /* generator -> generator */
+	  else if (!strcmp (cur->value, "generator") && !data->generator
+		   && (c = nxmle_get_string (cur, NULL)))
+	    {
+	      char *attr;
+
+	      data->generator = c;
+
+	      if ((attr = nxmle_find_attribute (cur, "uri", NULL)))
+		data->generator_uri = attr;
+
+	      if ((attr = nxmle_find_attribute (cur, "version", NULL)))
+		data->generator_version = attr;
+	    }
+
+	  /* icon -> image_url */
+	  else if (!strcmp (cur->value, "icon") && !data->image_url
+		   && (c = nxmle_get_string (cur, NULL)))
+	    data->image_url = c;
+
+	  /* logo -> image_logo */
+	  else if (!strcmp (cur->value, "logo") && !data->image_logo
+		   && (c = nxmle_get_string (cur, NULL)))
+	    data->image_logo = c;
+
+	  /* category */
+	  else if (!strcmp (cur->value, "category"))
+	    __mrss_parser_atom_category (cur, &data->category);
+
+	  /* entry -> item */
+	  else if (!strcmp (cur->value, "entry"))
+	    __mrss_parser_atom_entry (doc, cur, data);
+
+	  else
+	    {
+	      mrss_tag_t *tag;
+	      if ((tag = __mrss_parse_tag (doc, cur)))
+		__mrss_parse_tag_insert (&data->other_tags, tag);
+	    }
+
+	}
+    }
+
+  *ret = data;
+
+  return MRSS_OK;
+}
+
+static mrss_error_t
 __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 		   mrss_t ** ret)
 {
   mrss_t *data;
   char *c, *attr;
 
-  if (!(data = (mrss_t *) malloc (sizeof (mrss_t))))
+  if (!(data = (mrss_t *) calloc (1, sizeof (mrss_t))))
     return MRSS_ERR_POSIX;
 
-  memset (data, 0, sizeof (mrss_t));
   data->element = MRSS_ELEMENT_CHANNEL;
   data->allocated = 1;
   data->version = v;
@@ -495,14 +945,12 @@ __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 
 	      if (!
 		  (category =
-		   (mrss_category_t *) malloc (sizeof (mrss_category_t))))
+		   (mrss_category_t *) calloc (1, sizeof (mrss_category_t))))
 		{
 		  mrss_free ((mrss_generic_t *) data);
 		  free (c);
 		  return MRSS_ERR_POSIX;
 		}
-
-	      memset (category, 0, sizeof (mrss_category_t));
 
 	      category->element = MRSS_ELEMENT_CATEGORY;
 	      category->allocated = 1;
@@ -560,6 +1008,15 @@ __mrss_parser_rss (mrss_version_t v, nxml_t * doc, nxml_data_t * cur,
 	      free (c);
 	    }
 
+	  /* Other tags: */
+	  else if (data->version != MRSS_VERSION_1_0
+		   || strcmp (cur->value, "items"))
+	    {
+	      mrss_tag_t *tag;
+
+	      if ((tag = __mrss_parse_tag (doc, cur)))
+		__mrss_parse_tag_insert (&data->other_tags, tag);
+	    }
 	}
     }
 
@@ -609,6 +1066,9 @@ __mrss_parser (nxml_t * doc, mrss_t ** ret)
   else if (!strcmp (cur->value, "RDF"))
     r = __mrss_parser_rss (MRSS_VERSION_1_0, doc, cur->children, ret);
 
+  else if (!strcmp (cur->value, "feed"))
+    r = __mrss_parser_atom (doc, cur, ret);
+
   else
     r = MRSS_ERR_PARSER;
 
@@ -620,24 +1080,56 @@ __mrss_parser (nxml_t * doc, mrss_t ** ret)
 mrss_error_t
 mrss_parse_url (char *url, mrss_t ** ret)
 {
-  __mrss_download_t *download;
+  return mrss_parse_url_with_options_and_error (url, ret, NULL, NULL);
+}
+
+mrss_error_t
+mrss_parse_url_with_options (char *url, mrss_t ** ret,
+			     mrss_options_t * options)
+{
+  return mrss_parse_url_with_options_and_error (url, ret, options, NULL);
+}
+
+mrss_error_t
+mrss_parse_url_with_options_and_error (char *url, mrss_t ** ret,
+				       mrss_options_t * options,
+				       CURLcode * code)
+{
   nxml_t *doc;
   mrss_error_t err;
+  char *buffer;
+  size_t size;
 
   if (!url || !ret)
     return MRSS_ERR_DATA;
 
-  if (!(download = __mrss_download_file (url, __mrss_timeout)))
-    return MRSS_ERR_POSIX;
-
   if (nxml_new (&doc) != NXML_OK)
     return MRSS_ERR_POSIX;
 
-  if (nxml_parse_buffer (doc, download->mm, download->size) != NXML_OK)
+  if (options)
     {
-      free (download->mm);
-      free (download);
+      if (options->timeout >= 0)
+	nxml_set_timeout (doc, options->timeout);
 
+      if (options->proxy)
+	nxml_set_proxy (doc, options->proxy, options->proxy_authentication);
+
+      if (options->authentication)
+	nxml_set_authentication (doc, options->authentication);
+
+      if (options->user_agent)
+	nxml_set_user_agent (doc, options->user_agent);
+
+      nxml_set_certificate (doc, options->certfile, options->password,
+			    options->cacert, options->verifypeer);
+    }
+
+  if (!(buffer = __mrss_download_file (doc, url, &size, &err, code)))
+    return err;
+
+  if (nxml_parse_buffer (doc, buffer, size) != NXML_OK)
+    {
+      free (buffer);
       nxml_free (doc);
 
       return MRSS_ERR_PARSER;
@@ -647,8 +1139,7 @@ mrss_parse_url (char *url, mrss_t ** ret)
     {
       if (!((*ret)->file = strdup (url)))
 	{
-	  free (download->mm);
-	  free (download);
+	  free (buffer);
 
 	  mrss_free (*ret);
 	  nxml_free (doc);
@@ -656,12 +1147,10 @@ mrss_parse_url (char *url, mrss_t ** ret)
 	  return MRSS_ERR_POSIX;
 	}
 
-      (*ret)->size = download->size;
+      (*ret)->size = size;
     }
 
-  free (download->mm);
-  free (download);
-
+  free (buffer);
   nxml_free (doc);
 
   return err;
@@ -730,23 +1219,6 @@ mrss_parse_buffer (char *buffer, size_t size, mrss_t ** ret)
 
   nxml_free (doc);
   return err;
-}
-
-mrss_error_t
-mrss_set_timeout (int timeout)
-{
-  __mrss_timeout = timeout;
-  return MRSS_OK;
-}
-
-mrss_error_t
-mrss_get_timeout (int *timeout)
-{
-  if (!timeout)
-    return MRSS_ERR_DATA;
-
-  *timeout = __mrss_timeout;
-  return MRSS_OK;
 }
 
 /* EOF */

@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
 
 nxml_error_t
 nxml_new (nxml_t ** nxml)
@@ -33,10 +32,8 @@ nxml_new (nxml_t ** nxml)
   if (!nxml)
     return NXML_ERR_DATA;
 
-  if (!(*nxml = (nxml_t *) malloc (sizeof (nxml_t))))
+  if (!(*nxml = (nxml_t *) calloc (1, sizeof (nxml_t))))
     return NXML_ERR_POSIX;
-
-  memset (*nxml, 0, sizeof (nxml_t));
 
   return NXML_OK;
 }
@@ -62,13 +59,9 @@ nxml_add (nxml_t * nxml, nxml_data_t * parent, nxml_data_t ** child)
   if (!nxml || !child)
     return NXML_ERR_DATA;
 
-  if (!*child)
-    {
-      if (!(*child = (nxml_data_t *) malloc (sizeof (nxml_data_t))))
-	return NXML_ERR_POSIX;
+  if (!*child && !(*child = (nxml_data_t *) calloc (1, sizeof (nxml_data_t))))
+    return NXML_ERR_POSIX;
 
-      memset (*child, 0, sizeof (nxml_data_t));
-    }
 
   (*child)->doc = nxml;
   (*child)->parent = parent;
@@ -157,13 +150,8 @@ nxml_add_attribute (nxml_t * nxml, nxml_data_t * element, nxml_attr_t ** attr)
   if (!nxml || !element || !attr)
     return NXML_ERR_DATA;
 
-  if (!*attr)
-    {
-      if (!(*attr = (nxml_attr_t *) malloc (sizeof (nxml_attr_t))))
-	return NXML_ERR_POSIX;
-
-      memset (*attr, 0, sizeof (nxml_attr_t));
-    }
+  if (!*attr && !(*attr = (nxml_attr_t *) calloc (1, sizeof (nxml_attr_t))))
+    return NXML_ERR_POSIX;
 
   (*attr)->next = NULL;
 
@@ -226,15 +214,10 @@ nxml_add_namespace (nxml_t * nxml, nxml_data_t * element,
   if (!nxml || !element || !namespace)
     return NXML_ERR_DATA;
 
-  if (!*namespace)
-    {
-      if (!
-	  (*namespace =
-	   (nxml_namespace_t *) malloc (sizeof (nxml_namespace_t))))
-	return NXML_ERR_POSIX;
-
-      memset (*namespace, 0, sizeof (nxml_namespace_t));
-    }
+  if (!*namespace
+      && !(*namespace =
+	   (nxml_namespace_t *) calloc (1, sizeof (nxml_namespace_t))))
+    return NXML_ERR_POSIX;
 
   (*namespace)->next = NULL;
 
@@ -306,6 +289,112 @@ nxml_set_timeout (nxml_t * nxml, int timeout)
     return NXML_ERR_DATA;
 
   nxml->priv.timeout = timeout;
+
+  return NXML_OK;
+}
+
+nxml_error_t
+nxml_set_proxy (nxml_t * nxml, char *proxy, char *userpwd)
+{
+  if (!nxml)
+    return NXML_ERR_DATA;
+
+  if (nxml->priv.proxy)
+    free (nxml->priv.proxy);
+
+  if (proxy)
+    nxml->priv.proxy = strdup (proxy);
+  else
+    nxml->priv.proxy = NULL;
+
+  if (nxml->priv.proxy_authentication)
+    free (nxml->priv.proxy_authentication);
+
+  if (userpwd)
+    nxml->priv.proxy_authentication = strdup (userpwd);
+  else
+    nxml->priv.proxy_authentication = NULL;
+
+  return NXML_OK;
+}
+
+nxml_error_t
+nxml_set_authentication (nxml_t * nxml, char *userpwd)
+{
+  if (!nxml)
+    return NXML_ERR_DATA;
+
+  if (nxml->priv.authentication)
+    free (nxml->priv.authentication);
+
+  if (userpwd)
+    nxml->priv.authentication = strdup (userpwd);
+  else
+    nxml->priv.authentication = NULL;
+
+  return NXML_OK;
+}
+
+nxml_error_t
+nxml_set_textindent (nxml_t * nxml, char textindent)
+{
+  if (!nxml)
+    return NXML_ERR_DATA;
+
+  if (textindent)
+    nxml->priv.textindent = 1;
+  else
+    nxml->priv.textindent = 0;
+
+  return NXML_OK;
+}
+
+nxml_error_t
+nxml_set_user_agent (nxml_t * nxml, char *user_agent)
+{
+  if (!nxml)
+    return NXML_ERR_DATA;
+
+  if (nxml->priv.user_agent)
+    free (nxml->priv.user_agent);
+
+  if (user_agent)
+    nxml->priv.user_agent = strdup (user_agent);
+  else
+    nxml->priv.user_agent = NULL;
+
+  return NXML_OK;
+}
+
+nxml_error_t
+nxml_set_certificate (nxml_t * nxml, char *certificate, char *password,
+		      char *cacert, int verifypeer)
+{
+  if (!nxml)
+    return NXML_ERR_DATA;
+
+  if (nxml->priv.certfile)
+    free (nxml->priv.certfile);
+
+  if (certificate)
+    nxml->priv.certfile = strdup (certificate);
+  else
+    nxml->priv.certfile = NULL;
+
+  if (nxml->priv.password)
+    free (nxml->priv.password);
+
+  if (password)
+    nxml->priv.password = strdup (password);
+  else
+    nxml->priv.password = NULL;
+
+  if (cacert)
+    nxml->priv.cacert = strdup (cacert);
+  else
+    nxml->priv.cacert = NULL;
+
+  nxml->priv.verifypeer = !verifypeer;
 
   return NXML_OK;
 }

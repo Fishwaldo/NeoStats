@@ -13,7 +13,7 @@ x_maj=3
 x_min='0'
 x_rev="a4"
 x_package='NeoStats'
-MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline perltest templateauth template"
+MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline perltest templateauth template update"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
@@ -482,6 +482,7 @@ AC_CONFIG_FILES([Makefile
 		modules/perltest/Makefile
 		modules/templateauth/Makefile
 		modules/template/Makefile
+		modules/update/Makefile
 		neostats])
 
 AC_CACHE_SAVE

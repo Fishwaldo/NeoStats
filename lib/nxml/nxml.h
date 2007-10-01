@@ -1,19 +1,19 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
- * This source code is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Public License as published 
- * by the Free Software Foundation; either version 2 of the License,
- * or (at your option) any later version.
- *
- * This source code is distributed in the hope that it will be useful,
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * Please refer to the GNU Public License for more details.
- *
- * You should have received a copy of the GNU Public License along with
- * this source code; if not, write to:
- * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef __N_XML_H__
@@ -31,6 +31,12 @@
 #include <string.h>
 #include <errno.h>
 
+#define LIBNXML_VERSION_STRING	"0.18.1"
+
+#define LIBNXML_MAJOR_VERSION	0
+#define LIBNXML_MINOR_VERSION	18
+#define LIBNXML_MICRO_VERSION	1
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -41,14 +47,8 @@ typedef struct nxml_attr_t nxml_attr_t;
 typedef struct nxml_doctype_t nxml_doctype_t;
 typedef struct nxml_namespace_t nxml_namespace_t;
 
-typedef struct __nxml_doctype_notation_t __nxml_doctype_notation_t;
-typedef struct __nxml_doctype_element_t __nxml_doctype_element_t;
-typedef struct __nxml_doctype_element_content_t __nxml_doctype_element_content_t;
-typedef struct __nxml_doctype_attribute_t __nxml_doctype_attribute_t;
-typedef struct __nxml_doctype_attribute_attdef_t __nxml_doctype_attribute_attdef_t;
-typedef struct __nxml_doctype_attribute_attdef_list_t __nxml_doctype_attribute_attdef_list_t;
-typedef struct __nxml_doctype_entity_t __nxml_doctype_entity_t;
 typedef struct __nxml_private_t __nxml_private_t;
+typedef struct __nxml_entity_t __nxml_entity_t;
 
 /** This enum describes the error type of libnxml */
 typedef enum
@@ -56,6 +56,7 @@ typedef enum
   NXML_OK = 0,			/**< No error */
   NXML_ERR_POSIX,		/**< For the correct error, use errno */
   NXML_ERR_PARSER,		/**< Parser error */
+  NXML_ERR_DOWNLOAD,		/**< Download error */
   NXML_ERR_DATA			/**< The parameters are incorrect */
 } nxml_error_t;
 
@@ -66,7 +67,7 @@ typedef enum
   NXML_TYPE_COMMENT,		/**< Comment element */
   NXML_TYPE_ELEMENT,		/**< Data element */
   NXML_TYPE_PI,			/**< PI element */
-  NXML_TYPE_ELEMENT_CLOSE,	/**< Data element - For internal use only */
+  NXML_TYPE_ELEMENT_CLOSE	/**< Data element - For internal use only */
 } nxml_type_t;
 
 /** This enum describes the supported XML version */
@@ -89,46 +90,8 @@ typedef enum
   NXML_CHARSET_UNKNOWN		/**< Unknown format */
 } nxml_charset_t;
 
-#define NXML_DOCTYPEFLAG_NOFLAG		0x0 /**< No flag */
-#define NXML_DOCTYPEFLAG_DOWNLOAD	0x1 /**< Download the document */
-#define NXML_DOCTYPEFLAG_RECURSIVE	0x2 /**< Do it recursive */
-
-/** This enum describes the type of element for the doctype parsing.
- * It is for internal use only */
-typedef enum {
-  NXML_DOCTYPE_ELEMENT_EMPTY,
-  NXML_DOCTYPE_ELEMENT_ANY,
-  NXML_DOCTYPE_ELEMENT_MIXED_OR_CHILDREN,
-} __nxml_doctype_element_type_t;
-
-typedef enum {
-  NXML_DOCTYPE_ELEMENT_CONTENT_ONE = 0,
-  NXML_DOCTYPE_ELEMENT_CONTENT_0_OR_1,
-  NXML_DOCTYPE_ELEMENT_CONTENT_0_OR_MORE,
-  NXML_DOCTYPE_ELEMENT_CONTENT_1_OR_MORE
-} __nxml_doctype_element_content_type_t;
-
-typedef enum {
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_ENUMERATION,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_NOTATION,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_CDATA,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_ID,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_IDREF,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_IDREFS,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_ENTITY,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_ENTITIES,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_NMTOKEN,
-  NXML_DOCTYPE_ATTRIBUTE_TYPE_NMTOKENS,
-} __nxml_doctype_attribute_attdef_type_t;
-
-typedef enum {
-  NXML_DOCTYPE_ATTRIBUTE_VALUE_ANY,
-  NXML_DOCTYPE_ATTRIBUTE_VALUE_REQUIRED,
-  NXML_DOCTYPE_ATTRIBUTE_VALUE_IMPLIED,
-  NXML_DOCTYPE_ATTRIBUTE_VALUE_FIXED
-} __nxml_doctype_attribute_attdef_value_t;
-
-/** Data struct for any element of XML stream 
+/** 
+ * Data struct for any element of XML stream/files
  *
  * \brief
  * Data struct for any element of XML streams/files
@@ -153,7 +116,8 @@ struct nxml_data_t
   nxml_t *doc;			/**< The nxml_t */
 };
 
-/** Data struct for any element of attribute of xml element 
+/** 
+ * Data struct for any element of attribute of xml element 
  *
  * \brief
  * Data struct for any element of attribute of xml element
@@ -168,7 +132,8 @@ struct nxml_attr_t
   nxml_attr_t *next;
 };
 
-/** Data struct for doctype elements
+/** 
+ * Data struct for doctype elements
  *
  * \brief
  * Data struct for doctype elements
@@ -180,119 +145,32 @@ struct nxml_doctype_t
 
   nxml_t *doc;			/**< The nxml_t */
   nxml_doctype_t *next;
-
-  /** This information will be set only after a nxml_valid_dtd(...) */
-
-  char *system_literal;		/**< If the DTD has a system_leteral */
-  char *pubid_literal;		/**< If the DTD has a system_leteral */
 };
 
-/** Data struct private for doctype parsing of contents of a element
- *
- * \brief
- * Data struct private for doctype parsing of contents of a element
- */
-struct __nxml_doctype_element_content_t {
-  char *name;
-  int pcdata;
-  int choose;
-
-  __nxml_doctype_element_content_type_t type;
-  __nxml_doctype_element_content_t *list;
-
-  __nxml_doctype_element_content_t *next;
-};
-
-/** Data struct private for doctype parsing of elements 
- *
- * \brief
- * Data struct private for doctype parsing of elements
- */
-struct __nxml_doctype_element_t {
-  char *name;
-  __nxml_doctype_element_content_t *content;
-
-  __nxml_doctype_element_type_t type;
-  __nxml_doctype_element_t *next;
-};
-
-/** Data struct for any element of attribute of xml element 
- *
- * \brief
- * Data struct for any element of attribute of xml element
- */
-struct __nxml_doctype_attribute_attdef_list_t
-{
-  char *value;
-  __nxml_doctype_attribute_attdef_list_t *next;
-};
-
-/** Data struct private for doctype parsing of attdefs of a attribute
- *
- * \brief
- * Data struct private for doctype parsing of attdefs of a attribute
- */
-struct __nxml_doctype_attribute_attdef_t {
-  char *name;
-
-  __nxml_doctype_attribute_attdef_type_t type;
-
-  __nxml_doctype_attribute_attdef_value_t value;
-  char *fixed_value;
-
-  __nxml_doctype_attribute_attdef_list_t *list;
-
-  __nxml_doctype_attribute_attdef_t *next;
-};
-
-/** Data struct private for doctype parsing of attributes 
- *
- * \brief
- * Data struct private for doctype parsing of attributes
- */
-struct __nxml_doctype_attribute_t {
-  char *element;
-
-  __nxml_doctype_attribute_attdef_t *attdef;
-  __nxml_doctype_attribute_t *next;
-};
-
-/** Data struct private for doctype parsing of entities
- *
- * \brief
- * Data struct private for doctype parsing of entities
- */
-struct __nxml_doctype_entity_t {
-  int percent;
-  char *name;
-  char *reference;
-  char *system;
-  char *pubid;
-  char *ndata;
-  __nxml_doctype_entity_t *next;
-};
-
-/** Data struct private for doctype parsing of notations
- *
- * \brief
- * Data struct private for doctype parsing of notations
- */
-struct __nxml_doctype_notation_t {
-  char *system_literal;
-  char *pubid_literal;
-
-  __nxml_doctype_notation_t *next;
-};
-
-/** Data struct for namespace
+/** 
+ * Data struct for namespace
  *
  * \brief
  * Data struct for namespace
  */
-struct nxml_namespace_t {
+struct nxml_namespace_t
+{
   char *prefix;
   char *ns;
   nxml_namespace_t *next;
+};
+
+/** Data struct private about entities for internal use only
+ *
+ * \brief
+ * Data struct private about entities for internal use only
+ */
+struct __nxml_entity_t
+{
+  char *name;
+  char *entity;
+
+  __nxml_entity_t *next;
 };
 
 /** Data struct private for internal use only
@@ -305,17 +183,28 @@ struct __nxml_private_t
   void (*func) (char *, ...);
   int line;
   int timeout;
+  char *proxy;
+  char *proxy_authentication;
+  char *cacert;
+  char *certfile;
+  char *password;
+  int verifypeer;
+  char *authentication;
+  char *user_agent;
+  char textindent;
 
-  __nxml_doctype_element_t *elements;
-  __nxml_doctype_attribute_t *attributes;
-  __nxml_doctype_entity_t *entities;
-  __nxml_doctype_notation_t *notations;
+  CURLcode curl_error;
+
+  __nxml_entity_t *entities;
 };
 
-/** Principal data struct. It contains pointers to any other structures.
+/** 
+ * Principal data struct. It describes a XML document and it contains pointers
+ * to any other structures.
  *
  * \brief 
- * Principal data struct. It contains pointers to any other structures */
+ * Principal data struct. It describes a XML document and it contains pointers
+ * to any other structures */
 struct nxml_t
 {
 
@@ -339,9 +228,9 @@ struct nxml_t
 /* INIT FUNCTIONS ************************************************************/
 
 /**
- * This function creates a new nxml_t element.
+ * This function creates a new nxml_t data struct.
  *
- * \param nxml Pointer to a nxml_t element. It will be allocted.
+ * \param nxml Pointer to a nxml_t data struct. It will be allocated.
  * \return the error code
  */
 nxml_error_t	nxml_new		(nxml_t ** nxml);
@@ -372,7 +261,7 @@ nxml_error_t	nxml_add		(nxml_t * nxml,
 					 nxml_data_t **child);
 
 /** 
- * This function removes a nxml_data_t child to a parent in the data 
+ * This function removes a nxml_data_t child from a parent in the data 
  * struct. If parent is NULL the child will be removed in the root level of
  * XML document. This function doesn't free the child. If you want you can
  * reinsert the child in another parent tree or use the nxml_free_data 
@@ -428,7 +317,7 @@ nxml_error_t	nxml_add_namespace	(nxml_t *nxml,
 					 nxml_namespace_t **ns);
 
 /**
- * This function removes a nxml_namespace_t data in a nxml document.
+ * This function removes a nxml_namespace_t data from a nxml document.
  *
  * \param nxml Pointer to a nxml_t data struct.
  * \param element The element of the new data struct namespace.
@@ -440,8 +329,8 @@ nxml_error_t	nxml_remove_namespace	(nxml_t *nxml,
 					 nxml_namespace_t *ns);
 
 /**
- * This function sets the output function. If you set a your function the
- * parser write the error with this function. As default there is not a
+ * This function sets the output function. If you set your function, the
+ * parser'll write the error by this function. As default there is not a
  * function. If you want tou can set 'nxml_print_general' function that
  * print to stderr.
  *
@@ -458,9 +347,90 @@ void		nxml_print_generic	(char *, ...);
 /**
  * This function sets the timeout in seconds for the download of a remote
  *  XML document. Default is 0 and 0 is no timeout.
+ *  
+ * \param nxml The struct create with nxml_new.
+ * \param seconds the timeout in seconds
+ * \return the error code
  */
 nxml_error_t	nxml_set_timeout	(nxml_t * nxml,
 					 int seconds);
+
+/**
+ * This functions sets a proxy server for the downloading procedure.
+ *  
+ * \param nxml The struct create with nxml_new.
+ * \param proxy the proxy as a string
+ * \param userpwd the user and password in this format user:password
+ * \return the error code
+ */
+nxml_error_t	nxml_set_proxy		(nxml_t * nxml,
+					 char *proxy,
+					 char *userpwd);
+
+/**
+ * This functions sets a user/password for a for the download procedure.
+ *  
+ * \param nxml The struct create with nxml_new.
+ * \param userpwd the user and password in this format user:password
+ * \return the error code
+ */
+nxml_error_t	nxml_set_authentication	(nxml_t * nxml,
+					 char *userpwd);
+
+/**
+ * This functions sets an user agent for a for the download procedure.
+ *  
+ * \param nxml The struct create with nxml_new.
+ * \param user_agent The agent
+ * \return the error code
+ */
+nxml_error_t	nxml_set_user_agent	(nxml_t * nxml,
+					 char *user_agent);
+
+/**
+ * This functions sets a certificate in the http request. You can set a
+ * certificate file and a password.
+ *  
+ * \param nxml The struct create with nxml_new.
+ * \param certfile the certfile for the ssl connection (can be NULL)
+ * \param password the password of your certifcate (can be NULL)
+ * \param cacert the CA certificate to verify peer against (can be NULL)
+ * \param verifypeer active/deactive the peer validation
+ * \return the error code
+ */
+nxml_error_t	nxml_set_certificate	(nxml_t * nxml,
+					 char *certfile,
+					 char *password,
+					 char *cacert,
+					 int verifypeer);
+
+
+/**
+ * This function (de)actives the indent of the TEXT elements. Default it is
+ * activated.
+ *
+ * \param nxml The struct create with nxml_new
+ * \param textindent If it is != 0, the indent will be activated
+ * \return the error code
+ */
+nxml_error_t	nxml_set_textindent	(nxml_t *nxml,
+					 char textindent);
+
+/* DOWNLOAD *****************************************************************/
+
+/**
+ * This function downloads a stream from a http/https/ftp server.
+ *  
+ * \param nxml The struct create with nxml_new.
+ * \param url the http file
+ * \param buffer a string for the buffer
+ * \param size The function sets here the length of the file if it's not NULL.
+ * \return a buffer or NULL
+ */
+nxml_error_t	nxml_download_file	(nxml_t *nxml,
+					 char *url,
+					 char ** buffer,
+					 size_t *size);
 
 /* PARSER FUNCTIONS *********************************************************/
 
@@ -498,68 +468,11 @@ nxml_error_t	nxml_parse_buffer	(nxml_t * nxml,
 					 char *buffer,
 					 size_t size);
 
-/* DTD FUNCTIONS ************************************************************/
-
-/**
- * This function valids a XML document with its DTD.
- *
- * \param nxml the struct create with nxml_new.
- * \param flag is a attribute for this function. Use some enum like
- * NXML_DOCTYPEFLAG_DOWNLOAD | NXML_DOCTYPEFLAG_RECURSIVE
- * \return the error code
- */
-nxml_error_t	nxml_valid_dtd		(nxml_t * nxml,
-					 int flag);
-
-/**
- * This function parses a remote DTD document and checks if the nxml_t
- * document is valid or not.
- *
- * \param nxml the struct of your XML Document
- * \param url the url that you want parse.
- * \param flag is a attribute for this function. Use some enum like
- * NXML_DOCTYPEFLAG_DOWNLOAD | NXML_DOCTYPEFLAG_RECURSIVE
- * \return the error code
- */
-nxml_error_t	nxml_dtd_parse_url	(nxml_t * nxml,
-					 char *url,
-					 int flag);
-
-/** 
- * This function parses a local DTD document and checks if the nxml_t
- * document is valid or not.
- *
- * \param nxml the struct of your XML Document
- * \param file the file that you want parse.
- * \param flag is a attribute for this function. Use some enum like
- * NXML_DOCTYPEFLAG_DOWNLOAD | NXML_DOCTYPEFLAG_RECURSIVE
- * \return the error code
- */
-nxml_error_t	nxml_dtd_parse_file	(nxml_t * nxml,
-					 char *file,
-					 int flag);
-
-/** 
- * This function parses a buffer in memory as a DTD document and checks
- * if the nxml_t document is valid or not.
- *
- * \param nxml the struct of your XML Document
- * \param buffer the buffer that you want parse.
- * \param size the size of buffer. If size is 0, the function checks the 
- * length of your buffer searching a '\\0'.
- * \param flag is a attribute for this function. Use some enum like
- * NXML_DOCTYPEFLAG_DOWNLOAD | NXML_DOCTYPEFLAG_RECURSIVE
- * \return the error code
- */
-nxml_error_t	nxml_dtd_parse_buffer	(nxml_t * nxml,
-					 char *buffer,
-					 size_t size,
-					 int flag);
-
 /* WRITE FUNCTIONS **********************************************************/
 
 /**
  * This function writes the data struct in a local file.
+ *
  * \param nxml the nxml data strut
  * \param file the local file
  * \return the error code
@@ -569,6 +482,7 @@ nxml_error_t	nxml_write_file		(nxml_t *nxml,
 
 /**
  * This function writes the data struct in a buffer.
+ *
  * \code
  * char *buffer;
  * buffer=NULL; // This is important!
@@ -589,6 +503,7 @@ nxml_error_t	nxml_write_buffer	(nxml_t *nxml,
 /**
  * This function removes the data in a structure nxml_t and makes it clean for
  * another usage.
+ *
  * \param nxml the pointer to you data struct.
  * \return the error code.
  */
@@ -603,25 +518,6 @@ nxml_error_t	nxml_empty		(nxml_t * nxml);
  * \return the error code.
  */
 nxml_error_t	nxml_free		(nxml_t * nxml);
-
-/**
- * This function removes the data in a structure nxml_doctype_t and makes 
- * it clean for another usage (another parsing action).
- *
- * \param doctype the pointer to you data struct.
- * \return the error code.
- */
-nxml_error_t	nxml_empty_doctype	(nxml_doctype_t * doctype);
-
-/** 
- * This function frees the memory of a nxml_doctype_t *element. After the free,
- * your data struct is not useful. If you want erase the internal data, use
- * nxml_empty_doctype function
- *
- * \param doctype the pointer to you data struct.
- * \return the error code.
- */
-nxml_error_t	nxml_free_doctype	(nxml_doctype_t *doctype);
 
 /**
  * This function frees the memory of a nxml_data_t *element and any its
@@ -652,6 +548,7 @@ nxml_error_t	nxml_free_namespace	(nxml_namespace_t *data);
 
 /**
  * This function returns the root element of xml data struct.
+ *
  * \code
  * nxml_t *nxml;
  * nxml_data_t *root;
@@ -672,6 +569,7 @@ nxml_error_t	nxml_root_element	(nxml_t *nxml,
 
 /**
  * This function searchs the request element in the children of the data struct.
+ *
  * \code
  * nxml_t *nxml;
  * nxml_data_t *root;
@@ -709,6 +607,7 @@ nxml_error_t	nxml_doctype_element	(nxml_t *nxml,
 
 /**
  * This function searchs the request attribute and returns its values.
+ *
  * \code
  * nxml_t *nxml;
  * nxml_data_t *root;
@@ -717,10 +616,11 @@ nxml_error_t	nxml_doctype_element	(nxml_t *nxml,
  * nxml_parser_file(nxml, "file.xml");
  * nxml_find_element(nxml, NULL, "hello_world", &root);
  * if(root) {
- *   char *str;
- *   nxml_find_attribute(root, "attribute", &str);
- *   printf("%s\n",attribute);
- *   free(str);
+ *   nxml_attr_t *attribute=NULL;
+ *   nxml_find_attribute(root, "attribute", &attribute);
+ *
+ *   if(attribute)
+ *     printf("%s\n",attribute->value);
  * }
  * nxml_free(nxml);
  * \endcode
@@ -781,13 +681,28 @@ nxml_error_t	nxml_get_string		(nxml_data_t *element,
 
 /**
  * This function returns a static string with the description of error code
+ *
+ * \param nxml the pointer to data struct
  * \param err the error code that you need as string
  * \return a string. Don't free this string!
  */
-char *		nxml_strerror		(nxml_error_t err);
+char *		nxml_strerror		(nxml_t * nxml,
+					 nxml_error_t err);
+
+/**
+ * This function returns the CURLcode error if there was a problem about the
+ * downloading procedure:
+ *
+ * \param nxml the pointer to data struct
+ * \param err the error code that you need as string
+ * \return the CURLcode
+ */
+CURLcode	nxml_curl_error		(nxml_t * nxml,
+					 nxml_error_t err);
 
 /**
  * This function return the line of a error of parse.
+ *
  * \param nxml the pointer to data struct
  * \param line pointer to your integer. In this pointer will be set the line.
  * \return the error code
@@ -811,7 +726,6 @@ nxml_t *	nxmle_new_data		(nxml_error_t *err);
  * This function returns a new nxml_t data and parses a remote url document
  * from http or ftp protocol. This function use nxml_set_func with 
  * nxml_print_generic so the error will be write in the standard output.
- *   
  *
  * \param url the url that you want parse.
  * \param err If err is not NULL, err will be set to the error flag.
@@ -1041,6 +955,10 @@ int		nxmle_line_error	(nxml_t * nxml, nxml_error_t *err);
 #define		nxmle_free_attribute	nxml_free_attribute
 
 #define		nxmle_strerror		nxml_strerror
+
+#ifdef NXML_INTERNAL
+#  include "nxml_internal.h"
+#endif
 
 #ifdef  __cplusplus
 }

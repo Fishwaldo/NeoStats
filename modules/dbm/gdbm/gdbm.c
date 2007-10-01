@@ -97,7 +97,7 @@ void *DBMOpenTable( void *dbname, const char *name )
 	gdbm_file_info *gdbm_file;
 	int cache_size = DEFAULT_CACHESIZE;
 
-	dlog( DEBUG4, "DBMOpenTable %s", name );
+	dlog( DEBUG10, "DBMOpenTable %s", name );
 	ircsprintf( filename, "data/%s-%s.gdbm", (char *)dbname, name );
 	gdbm_file = gdbm_open( filename, 0, GDBM_WRCREAT | GDBM_NOLOCK, 00600, NULL );
 	if( gdbm_file == NULL )
@@ -154,7 +154,7 @@ int DBMFetch( void *unused, void *handle, char *key, void *data, int size )
 	{
 		if( dbdata.dsize != size )
 		{
-			dlog( DEBUG1, "DBMFetch: gdbm_fetch fail: %s data size mismatch", key );
+			nlog( LOG_WARNING, "DBMFetch: gdbm_fetch fail: %s data size mismatch", key );
 			free( dbdata.dptr );
 			return NS_FAILURE;
 		}
@@ -162,7 +162,7 @@ int DBMFetch( void *unused, void *handle, char *key, void *data, int size )
 		free( dbdata.dptr );
 		return NS_SUCCESS;
 	}
-	dlog( DEBUG1, "DBMFetch: gdbm_fetch fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
+	dlog( DEBUG10, "DBMFetch: gdbm_fetch fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 	return NS_FAILURE;
 }
 
@@ -189,7 +189,7 @@ int DBMStore( void *unused, void *handle, char *key, void *data, int size )
 	dbdata.dsize = size;
 	if( gdbm_store( ( gdbm_file_info * )handle, dbkey, dbdata, GDBM_REPLACE ) != 0 )
 	{
-		dlog( DEBUG1, "DBMStore: gdbm_store fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
+		nlog( LOG_WARNING, "DBMStore: gdbm_store fail: %s %s", key, gdbm_strerror( gdbm_errno ) );
 		return NS_FAILURE;
 	}
 	return NS_SUCCESS;
@@ -215,7 +215,7 @@ int DBMFetchRows( void *unused, void *handle, DBRowHandler handler )
 	while( dbkey.dptr != NULL )
 	{
 		rowcount++;
-		dlog( DEBUG4, "DBMFetchRows: key %s", dbkey.dptr );
+		dlog( DEBUG10, "DBMFetchRows: key %s", dbkey.dptr );
 		dbdata = gdbm_fetch( ( gdbm_file_info * )handle, dbkey );
 		/* Allow handler to exit the fetch loop */
 		if( handler( dbdata.dptr, dbdata.dsize ) != 0 )
@@ -242,7 +242,7 @@ int DBMFetchRows2 (void *dbhandle, void *tbhandle, DBRowHandler2 handler)
 	while( dbkey.dptr != NULL )
 	{
 		rowcount++;
-		dlog( DEBUG4, "DBMFetchRows2: key %s", dbkey.dptr );
+		dlog( DEBUG10, "DBMFetchRows2: key %s", dbkey.dptr );
 		dbdata = gdbm_fetch( ( gdbm_file_info * )tbhandle, dbkey );
 		/* Allow handler to exit the fetch loop */
 		if( handler( dbkey.dptr, dbdata.dptr, dbdata.dsize ) != 0 )
@@ -345,7 +345,7 @@ char **DBMListTables(char *Database)
 	char *table;
 	
 
-	dlog(DEBUG1, "DBMListTables %s\n", Database);
+	dlog(DEBUG10, "DBMListTables %s\n", Database);
 	ircsnprintf(search, MAXPATH, "data/%s*.gdbm", Database);
 	if (glob(search, 0, NULL, &g) == 0) {
 		for (i = 0; i < g.gl_pathc; i++) {

@@ -37,7 +37,7 @@ static DB_ENV *db_env;
 static int dbopened = 0;
 
 void db_log_cb(const char *prefix, char *msg) {
-	dlog(DEBUG1, "%s", msg);
+	dlog(DEBUG10, "%s", msg);
 }
 /* some older versions of BDB dun have this */
 #ifndef DB_VERB_REGISTER
@@ -84,7 +84,7 @@ void DBMCloseDB (void *dbhandle)
 		db_env->close(db_env, 0);
 		db_env = NULL;
 	} else {
-		dlog(DEBUG5, "DBMClose: Databases still opened, not destroying enviroment");
+		dlog(DEBUG10, "DBMClose: Databases still opened, not destroying enviroment");
 	}
 	return;
 }
@@ -95,14 +95,14 @@ void *DBMOpenTable (void *dbhandle, const char *name)
 	int dbret;
 	DB *dbp;
 
-	dlog (DEBUG1, "DBMOpenTable %s", name);
+	dlog (DEBUG10, "DBMOpenTable %s", name);
 	if (db_env == NULL) {
-		nlog(DEBUG1, "DataBase Enviroment is not created\n");
+		nlog(LOG_WARNING, "DataBase Enviroment is not created\n");
 		return NULL;
 	}
 	ircsprintf (filename, "%s.bdb", (char *)dbhandle);
 	if ((dbret = db_create(&dbp, db_env, 0)) != 0) {
-		dlog(DEBUG1, "db_create: %s", db_strerror(dbret));
+		dlog(DEBUG10, "db_create: %s", db_strerror(dbret));
 		return NULL;
 	}
 #if (DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR >= 1)
@@ -110,7 +110,7 @@ void *DBMOpenTable (void *dbhandle, const char *name)
 #else
 	if ((dbret = dbp->open(dbp, filename, name, DB_BTREE, DB_CREATE, 0600)) != 0) {
 #endif
-		dlog(DEBUG1, "dbp->open: %s", db_strerror(dbret));
+		nlog(LOG_WARNING, "dbp->open: %s", db_strerror(dbret));
 		return NULL;
 	}
 	return (void *)dbp;
@@ -120,7 +120,7 @@ void DBMCloseTable (void *dbhandle, void *tbhandle)
 {
 	DB *dbp = (DB *)tbhandle;
 
-	dlog(DEBUG1, "DBACloseTable");
+	dlog(DEBUG10, "DBACloseTable");
 	dbp->close(dbp, 0); 
 }
 
@@ -129,7 +129,7 @@ int DBMFetch (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 	int dbret;
 	DB *dbp = (DB *)tbhandle;
 
-	dlog(DEBUG1, "DBAFetch %s", key);
+	dlog(DEBUG10, "DBAFetch %s", key);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
@@ -139,7 +139,7 @@ int DBMFetch (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 		os_memcpy (data, dbdata.data, size);
 		return NS_SUCCESS;
 	}
-	dlog(DEBUG1, "dbp->get fail: %s", db_strerror(dbret));
+	nlog(LOG_WARNING, "dbp->get fail: %s", db_strerror(dbret));
 	return NS_FAILURE;
 }
 
@@ -148,7 +148,7 @@ int DBMStore (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 	int dbret;
 	DB *dbp = (DB *)tbhandle;
 
-	dlog(DEBUG1, "DBAStore %s %s", key, (char *)data);
+	dlog(DEBUG10, "DBAStore %s %s", key, (char *)data);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
@@ -157,7 +157,7 @@ int DBMStore (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 	dbdata.size = size;
 	if ((dbret = dbp->put(dbp, NULL, &dbkey, &dbdata, 0)) != 0) {
 		if (dbret != DB_NOTFOUND) {
-			dlog(DEBUG1, "dbp->put: %s", db_strerror(dbret));
+			nlog(LOG_WARNING, "dbp->put: %s", db_strerror(dbret));
 			return NS_FAILURE;
 		} else {
 			return NS_SUCCESS;
@@ -173,7 +173,7 @@ int DBMFetchRows (void *dbhandle, void *tbhandle, DBRowHandler handler)
 	DB *dbp = (DB *)tbhandle;
 	DBC *dbcp;
 
-	dlog(DEBUG1, "DBMFetchRows here");
+	dlog(DEBUG10, "DBMFetchRows here");
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	/* initilize the cursors */
@@ -191,10 +191,10 @@ int DBMFetchRows (void *dbhandle, void *tbhandle, DBRowHandler handler)
 	
 	} 
 	if (dbret != 0 && dbret != DB_NOTFOUND) {
-		dlog(DEBUG1, "dbp->c_get failed: %s", db_strerror(dbret));
+		nlog(LOG_WARNING, "dbp->c_get failed: %s", db_strerror(dbret));
 	}
 	if ((dbret = dbcp->c_close(dbcp)) != 0) {
-		dlog(DEBUG1, "dbcpp->close failed: %s", db_strerror(dbret));
+		nlog(LOG_WARNING, "dbcpp->close failed: %s", db_strerror(dbret));
 	}	
 	return rowcount;
 }
@@ -206,7 +206,7 @@ int DBMFetchRows2 (void *dbhandle, void *tbhandle, DBRowHandler2 handler)
 	DB *dbp = (DB *)tbhandle;
 	DBC *dbcp;
 
-	dlog(DEBUG1, "DBMFetchRows2 here");
+	dlog(DEBUG10, "DBMFetchRows2 here");
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	/* initilize the cursors */
@@ -224,10 +224,10 @@ int DBMFetchRows2 (void *dbhandle, void *tbhandle, DBRowHandler2 handler)
 		}
 	} 
 	if (dbret != 0 && dbret != DB_NOTFOUND) {
-		dlog(DEBUG1, "dbp->c_get failed: %s", db_strerror(dbret));
+		nlog(LOG_WARNING, "dbp->c_get failed: %s", db_strerror(dbret));
 	}
 	if ((dbret = dbcp->c_close(dbcp)) != 0) {
-		dlog(DEBUG1, "dbcpp->close failed: %s", db_strerror(dbret));
+		nlog(LOG_WARNING, "dbcpp->close failed: %s", db_strerror(dbret));
 	}	
 	return rowcount;
 }
@@ -237,7 +237,7 @@ int DBMDelete (void *dbhandle, void *tbhandle, char * key)
 	int dbret;
 	DB *dbp = (DB *)tbhandle;
 
-	dlog(DEBUG1, "DBMDelete %s", key);
+	dlog(DEBUG10, "DBMDelete %s", key);
 	memset(&dbkey, 0, sizeof(dbkey));
 	dbkey.data = key;
 	dbkey.size = strlen(key);
@@ -294,7 +294,7 @@ char **DBMListTables(char *Database)
 	char **Tables = NULL;;
 	int tl = 0;
 
-	dlog(DEBUG1, "DBMListTables %s\n", Database);
+	dlog(DEBUG10, "DBMListTables %s\n", Database);
 	ircsprintf (filename, "data/%s.bdb", Database);
 	if ((dbret = db_create(&dbp, NULL, 0)) != 0) {
 		nlog(LOG_WARNING, "db_create: %s\n", db_strerror(dbret));

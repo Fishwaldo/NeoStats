@@ -1,19 +1,19 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
- * This source code is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Public License as published 
- * by the Free Software Foundation; either version 2 of the License,
- * or (at your option) any later version.
- *
- * This source code is distributed in the hope that it will be useful,
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * Please refer to the GNU Public License for more details.
- *
- * You should have received a copy of the GNU Public License along with
- * this source code; if not, write to:
- * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef __N_XML_INTERNAL_H__
@@ -56,49 +56,31 @@
 
 #define __NXML_U8() __nxml_utf8((unsigned char **)buffer, size, &byte)
 
-typedef struct __nxml_download_t__ __nxml_download_t;
 typedef struct __nxml_string_t__ __nxml_string_t;
 
-/**
- * \brief
- * For internal use only
- */
-struct __nxml_download_t__
-{
-  char *mm;
-  size_t size;
-};
+int64_t			__nxml_utf8		(unsigned char **buffer,
+	       				 	 size_t *size,
+						 int *byte);
 
-__nxml_download_t *		__nxml_download_file	(nxml_t *nxml,
-							 char *url);
+int64_t			__nxml_int_charset	(int i,
+						 unsigned char *buffer,
+						 char *charset);
 
-int64_t				__nxml_utf8		(unsigned char **buffer,
-	       					 	 size_t *size,
-							 int *byte);
+int			__nxml_utf_detection	(char *r_buffer,
+						 size_t r_size,
+						 char **buffer,
+			   			 size_t *size,
+						 nxml_charset_t *);
 
-int64_t				__nxml_int_charset	(int i,
-							 unsigned char *buffer,
-							 char *charset);
+int			__nxml_escape_spaces	(nxml_t * doc,
+						 char **buffer,
+						 size_t * size);
 
-int				__nxml_utf_detection	(char *r_buffer,
-							 size_t r_size,
-							 char **buffer,
-				   			 size_t *size,
-							 nxml_charset_t *);
+char *			__nxml_get_value	(nxml_t * doc,
+						 char **buffer,
+						 size_t * size);
 
-int				__nxml_escape_spaces	(nxml_t * doc,
-							 char **buffer,
-							 size_t * size);
-
-char *				__nxml_get_value	(nxml_t * doc,
-							 char **buffer,
-							 size_t * size);
-
-char *				__nxml_trim		(char *tmp);
-
-char *				__nxml_entity_trim	(nxml_t * nxml,
-							 char *str);
-	
+char *			__nxml_trim		(char *tmp);
 
 /* nxml_string.c */
 
@@ -112,20 +94,18 @@ struct __nxml_string_t__
   size_t size;
 };
 
-__nxml_string_t	*		__nxml_string_new	(void);
+__nxml_string_t	*	__nxml_string_new	(void);
 
-int				__nxml_string_add	(__nxml_string_t *st,
-							 char *what,
-							 size_t size);
+int			__nxml_string_add	(__nxml_string_t *st,
+						 char *what,
+						 size_t size);
 
-char *				__nxml_string_free	(__nxml_string_t *st);
+char *			__nxml_string_free	(__nxml_string_t *st);
 
 
-void				__nxml_namespace_parse	(nxml_t *nxml);
+void			__nxml_namespace_parse	(nxml_t *nxml);
 
-void				__nxml_entity_parse	(nxml_t * nxml);
-
-int				__nxml_atoi		(char *str);
+int			__nxml_atoi		(char *str);
 
 #endif
 

@@ -56,12 +56,17 @@ CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmrss_la_LIBADD =
-am_libmrss_la_OBJECTS = nxml_download.lo nxml_easy.lo nxml_entity.lo \
-	nxml_free.lo nxml_namespace.lo nxml_string.lo nxml_utf.lo \
-	nxml_dtd.lo nxml_edit.lo nxml_error.lo nxml_init.lo \
-	nxml_parser.lo nxml_tools.lo nxml_write.lo mrss_download.lo \
-	mrss_edit.lo mrss_free.lo mrss_generic.lo mrss_parser.lo \
-	mrss_write.lo
+am_libmrss_la_OBJECTS = libmrss_la-nxml_download.lo \
+	libmrss_la-nxml_easy.lo libmrss_la-nxml_free.lo \
+	libmrss_la-nxml_namespace.lo libmrss_la-nxml_string.lo \
+	libmrss_la-nxml_utf.lo libmrss_la-nxml_edit.lo \
+	libmrss_la-nxml_error.lo libmrss_la-nxml_init.lo \
+	libmrss_la-nxml_parser.lo libmrss_la-nxml_tools.lo \
+	libmrss_la-nxml_write.lo libmrss_la-mrss_download.lo \
+	libmrss_la-mrss_edit.lo libmrss_la-mrss_free.lo \
+	libmrss_la-mrss_generic.lo libmrss_la-mrss_parser.lo \
+	libmrss_la-mrss_write.lo libmrss_la-mrss_options.lo \
+	libmrss_la-mrss_search.lo
 libmrss_la_OBJECTS = $(am_libmrss_la_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -232,9 +237,11 @@ target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 noinst_LTLIBRARIES = libmrss.la
-libmrss_la_SOURCES = nxml_download.c nxml_easy.c nxml_entity.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c nxml_dtd.c \
-       			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c mrss_download.c mrss_edit.c mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c
+libmrss_la_SOURCES = nxml_download.c nxml_easy.c nxml_free.c nxml_namespace.c nxml_string.c nxml_utf.c \
+       			  nxml_edit.c nxml_error.c nxml_init.c nxml_parser.c nxml_tools.c nxml_write.c mrss_download.c mrss_edit.c \
+       			  mrss_free.c mrss_generic.c mrss_parser.c mrss_write.c mrss_options.c mrss_search.c
 
+libmrss_la_CPPFLAGS = -DNXML_INTERNAL
 include_HEADERS = nxml.h mrss.h
 noinst_HEADERS = nxml_internal.h mrss_internal.h
 INCLUDES = -I$(top_srcdir)/lib/curl/
@@ -294,26 +301,166 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_download.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_edit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_free.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_generic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_parser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mrss_write.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_download.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_dtd.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_easy.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_edit.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_entity.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_error.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_free.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_init.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_namespace.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_parser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_string.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_tools.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_utf.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nxml_write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_download.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_edit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_free.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_generic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_options.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_search.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-mrss_write.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_download.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_easy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_edit.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_free.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_init.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_namespace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_tools.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_utf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmrss_la-nxml_write.Plo@am__quote@
+
+libmrss_la-nxml_download.lo: nxml_download.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_download.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_download.Tpo" -c -o libmrss_la-nxml_download.lo `test -f 'nxml_download.c' || echo '$(srcdir)/'`nxml_download.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_download.Tpo" "$(DEPDIR)/libmrss_la-nxml_download.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_download.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_download.c' object='libmrss_la-nxml_download.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_download.lo `test -f 'nxml_download.c' || echo '$(srcdir)/'`nxml_download.c
+
+libmrss_la-nxml_easy.lo: nxml_easy.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_easy.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_easy.Tpo" -c -o libmrss_la-nxml_easy.lo `test -f 'nxml_easy.c' || echo '$(srcdir)/'`nxml_easy.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_easy.Tpo" "$(DEPDIR)/libmrss_la-nxml_easy.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_easy.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_easy.c' object='libmrss_la-nxml_easy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_easy.lo `test -f 'nxml_easy.c' || echo '$(srcdir)/'`nxml_easy.c
+
+libmrss_la-nxml_free.lo: nxml_free.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_free.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_free.Tpo" -c -o libmrss_la-nxml_free.lo `test -f 'nxml_free.c' || echo '$(srcdir)/'`nxml_free.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_free.Tpo" "$(DEPDIR)/libmrss_la-nxml_free.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_free.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_free.c' object='libmrss_la-nxml_free.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_free.lo `test -f 'nxml_free.c' || echo '$(srcdir)/'`nxml_free.c
+
+libmrss_la-nxml_namespace.lo: nxml_namespace.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_namespace.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_namespace.Tpo" -c -o libmrss_la-nxml_namespace.lo `test -f 'nxml_namespace.c' || echo '$(srcdir)/'`nxml_namespace.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_namespace.Tpo" "$(DEPDIR)/libmrss_la-nxml_namespace.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_namespace.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_namespace.c' object='libmrss_la-nxml_namespace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_namespace.lo `test -f 'nxml_namespace.c' || echo '$(srcdir)/'`nxml_namespace.c
+
+libmrss_la-nxml_string.lo: nxml_string.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_string.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_string.Tpo" -c -o libmrss_la-nxml_string.lo `test -f 'nxml_string.c' || echo '$(srcdir)/'`nxml_string.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_string.Tpo" "$(DEPDIR)/libmrss_la-nxml_string.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_string.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_string.c' object='libmrss_la-nxml_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_string.lo `test -f 'nxml_string.c' || echo '$(srcdir)/'`nxml_string.c
+
+libmrss_la-nxml_utf.lo: nxml_utf.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_utf.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_utf.Tpo" -c -o libmrss_la-nxml_utf.lo `test -f 'nxml_utf.c' || echo '$(srcdir)/'`nxml_utf.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_utf.Tpo" "$(DEPDIR)/libmrss_la-nxml_utf.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_utf.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_utf.c' object='libmrss_la-nxml_utf.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_utf.lo `test -f 'nxml_utf.c' || echo '$(srcdir)/'`nxml_utf.c
+
+libmrss_la-nxml_edit.lo: nxml_edit.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_edit.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_edit.Tpo" -c -o libmrss_la-nxml_edit.lo `test -f 'nxml_edit.c' || echo '$(srcdir)/'`nxml_edit.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_edit.Tpo" "$(DEPDIR)/libmrss_la-nxml_edit.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_edit.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_edit.c' object='libmrss_la-nxml_edit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_edit.lo `test -f 'nxml_edit.c' || echo '$(srcdir)/'`nxml_edit.c
+
+libmrss_la-nxml_error.lo: nxml_error.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_error.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_error.Tpo" -c -o libmrss_la-nxml_error.lo `test -f 'nxml_error.c' || echo '$(srcdir)/'`nxml_error.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_error.Tpo" "$(DEPDIR)/libmrss_la-nxml_error.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_error.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_error.c' object='libmrss_la-nxml_error.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_error.lo `test -f 'nxml_error.c' || echo '$(srcdir)/'`nxml_error.c
+
+libmrss_la-nxml_init.lo: nxml_init.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_init.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_init.Tpo" -c -o libmrss_la-nxml_init.lo `test -f 'nxml_init.c' || echo '$(srcdir)/'`nxml_init.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_init.Tpo" "$(DEPDIR)/libmrss_la-nxml_init.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_init.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_init.c' object='libmrss_la-nxml_init.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_init.lo `test -f 'nxml_init.c' || echo '$(srcdir)/'`nxml_init.c
+
+libmrss_la-nxml_parser.lo: nxml_parser.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_parser.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_parser.Tpo" -c -o libmrss_la-nxml_parser.lo `test -f 'nxml_parser.c' || echo '$(srcdir)/'`nxml_parser.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_parser.Tpo" "$(DEPDIR)/libmrss_la-nxml_parser.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_parser.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_parser.c' object='libmrss_la-nxml_parser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_parser.lo `test -f 'nxml_parser.c' || echo '$(srcdir)/'`nxml_parser.c
+
+libmrss_la-nxml_tools.lo: nxml_tools.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_tools.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_tools.Tpo" -c -o libmrss_la-nxml_tools.lo `test -f 'nxml_tools.c' || echo '$(srcdir)/'`nxml_tools.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_tools.Tpo" "$(DEPDIR)/libmrss_la-nxml_tools.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_tools.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_tools.c' object='libmrss_la-nxml_tools.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_tools.lo `test -f 'nxml_tools.c' || echo '$(srcdir)/'`nxml_tools.c
+
+libmrss_la-nxml_write.lo: nxml_write.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-nxml_write.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-nxml_write.Tpo" -c -o libmrss_la-nxml_write.lo `test -f 'nxml_write.c' || echo '$(srcdir)/'`nxml_write.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-nxml_write.Tpo" "$(DEPDIR)/libmrss_la-nxml_write.Plo"; else rm -f "$(DEPDIR)/libmrss_la-nxml_write.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nxml_write.c' object='libmrss_la-nxml_write.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-nxml_write.lo `test -f 'nxml_write.c' || echo '$(srcdir)/'`nxml_write.c
+
+libmrss_la-mrss_download.lo: mrss_download.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_download.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_download.Tpo" -c -o libmrss_la-mrss_download.lo `test -f 'mrss_download.c' || echo '$(srcdir)/'`mrss_download.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_download.Tpo" "$(DEPDIR)/libmrss_la-mrss_download.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_download.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_download.c' object='libmrss_la-mrss_download.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_download.lo `test -f 'mrss_download.c' || echo '$(srcdir)/'`mrss_download.c
+
+libmrss_la-mrss_edit.lo: mrss_edit.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_edit.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_edit.Tpo" -c -o libmrss_la-mrss_edit.lo `test -f 'mrss_edit.c' || echo '$(srcdir)/'`mrss_edit.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_edit.Tpo" "$(DEPDIR)/libmrss_la-mrss_edit.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_edit.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_edit.c' object='libmrss_la-mrss_edit.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_edit.lo `test -f 'mrss_edit.c' || echo '$(srcdir)/'`mrss_edit.c
+
+libmrss_la-mrss_free.lo: mrss_free.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_free.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_free.Tpo" -c -o libmrss_la-mrss_free.lo `test -f 'mrss_free.c' || echo '$(srcdir)/'`mrss_free.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_free.Tpo" "$(DEPDIR)/libmrss_la-mrss_free.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_free.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_free.c' object='libmrss_la-mrss_free.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_free.lo `test -f 'mrss_free.c' || echo '$(srcdir)/'`mrss_free.c
+
+libmrss_la-mrss_generic.lo: mrss_generic.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_generic.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_generic.Tpo" -c -o libmrss_la-mrss_generic.lo `test -f 'mrss_generic.c' || echo '$(srcdir)/'`mrss_generic.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_generic.Tpo" "$(DEPDIR)/libmrss_la-mrss_generic.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_generic.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_generic.c' object='libmrss_la-mrss_generic.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_generic.lo `test -f 'mrss_generic.c' || echo '$(srcdir)/'`mrss_generic.c
+
+libmrss_la-mrss_parser.lo: mrss_parser.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_parser.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_parser.Tpo" -c -o libmrss_la-mrss_parser.lo `test -f 'mrss_parser.c' || echo '$(srcdir)/'`mrss_parser.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_parser.Tpo" "$(DEPDIR)/libmrss_la-mrss_parser.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_parser.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_parser.c' object='libmrss_la-mrss_parser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_parser.lo `test -f 'mrss_parser.c' || echo '$(srcdir)/'`mrss_parser.c
+
+libmrss_la-mrss_write.lo: mrss_write.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_write.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_write.Tpo" -c -o libmrss_la-mrss_write.lo `test -f 'mrss_write.c' || echo '$(srcdir)/'`mrss_write.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_write.Tpo" "$(DEPDIR)/libmrss_la-mrss_write.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_write.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_write.c' object='libmrss_la-mrss_write.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_write.lo `test -f 'mrss_write.c' || echo '$(srcdir)/'`mrss_write.c
+
+libmrss_la-mrss_options.lo: mrss_options.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_options.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_options.Tpo" -c -o libmrss_la-mrss_options.lo `test -f 'mrss_options.c' || echo '$(srcdir)/'`mrss_options.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_options.Tpo" "$(DEPDIR)/libmrss_la-mrss_options.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_options.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_options.c' object='libmrss_la-mrss_options.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_options.lo `test -f 'mrss_options.c' || echo '$(srcdir)/'`mrss_options.c
+
+libmrss_la-mrss_search.lo: mrss_search.c
+@am__fastdepCC_TRUE@	if $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libmrss_la-mrss_search.lo -MD -MP -MF "$(DEPDIR)/libmrss_la-mrss_search.Tpo" -c -o libmrss_la-mrss_search.lo `test -f 'mrss_search.c' || echo '$(srcdir)/'`mrss_search.c; \
+@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/libmrss_la-mrss_search.Tpo" "$(DEPDIR)/libmrss_la-mrss_search.Plo"; else rm -f "$(DEPDIR)/libmrss_la-mrss_search.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='mrss_search.c' object='libmrss_la-mrss_search.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmrss_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libmrss_la-mrss_search.lo `test -f 'mrss_search.c' || echo '$(srcdir)/'`mrss_search.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

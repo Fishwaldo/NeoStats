@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -24,7 +24,6 @@
 #endif
 #endif
 
-#include "nxml_internal.h"
 #include "nxml.h"
 
 static int
@@ -48,14 +47,14 @@ __nxml_parse_unique_attribute (nxml_attr_t * attr, char *name)
 static char *
 __nxml_parse_string (nxml_t * doc, char *buffer, int size)
 {
-  char *ret, *real;
-  int i, j;
+  char *real;
+  int i;
   int q;
+  __nxml_string_t *ret;
 
-  if (!(ret = (char *) malloc (sizeof (char) * ((size * 6) + 1))))
-    return NULL;
+  ret = __nxml_string_new ();
 
-  for (q = i = j = 0; i < size; i++)
+  for (q = i = 0; i < size; i++)
     {
       if (*(buffer + i) == 0xd)
 	continue;
@@ -65,8 +64,10 @@ __nxml_parse_string (nxml_t * doc, char *buffer, int size)
 	{
 	  if (!q)
 	    {
-	      q = 1;
-	      ret[j++] = *(buffer + i);
+	      if (!doc->priv.textindent)
+		q = 1;
+
+	      __nxml_string_add (ret, buffer + i, 1);
 	    }
 	}
 
@@ -74,35 +75,35 @@ __nxml_parse_string (nxml_t * doc, char *buffer, int size)
 	{
 	  if (!strncmp (buffer + i, "&lt;", 4))
 	    {
-	      ret[j++] = '<';
+	      __nxml_string_add (ret, "<", 1);
 	      i += 3;
 	      q = 0;
 	    }
 
 	  else if (!strncmp (buffer + i, "&gt;", 4))
 	    {
-	      ret[j++] = '>';
+	      __nxml_string_add (ret, ">", 1);
 	      i += 3;
 	      q = 0;
 	    }
 
 	  else if (!strncmp (buffer + i, "&amp;", 5))
 	    {
-	      ret[j++] = '&';
+	      __nxml_string_add (ret, "&", 1);
 	      i += 4;
 	      q = 0;
 	    }
 
 	  else if (!strncmp (buffer + i, "&apos;", 6))
 	    {
-	      ret[j++] = '\'';
+	      __nxml_string_add (ret, "'", 1);
 	      i += 5;
 	      q = 0;
 	    }
 
 	  else if (!strncmp (buffer + i, "&quot;", 6))
 	    {
-	      ret[j++] = '"';
+	      __nxml_string_add (ret, "\"", 1);
 	      i += 5;
 	      q = 0;
 	    }
@@ -126,9 +127,11 @@ __nxml_parse_string (nxml_t * doc, char *buffer, int size)
 		last = __nxml_atoi (&buf[1]);
 
 	      if ((last =
-		   __nxml_int_charset (last, (unsigned char *) (ret + j),
+		   __nxml_int_charset (last, (unsigned char *) buf,
 				       doc->encoding)) > 0)
-		j += last;
+		__nxml_string_add (ret, buf, last);
+	      else
+		__nxml_string_add (ret, buffer + i, 1);
 
 	      i += k - i;
 	      q = 0;
@@ -136,21 +139,47 @@ __nxml_parse_string (nxml_t * doc, char *buffer, int size)
 
 	  else
 	    {
+	      __nxml_entity_t *entity;
+	      char buf[1024];
+	      int k = i;
+	      int last;
+
+	      while (*(buffer + k) != ';' && k < size)
+		k++;
+
+	      last = k - (i + 1) > sizeof (buf) ? sizeof (buf) : k - (i + 1);
+	      strncpy (buf, buffer + i + 1, last);
+	      buf[last] = 0;
+
+	      for (entity = doc->priv.entities; entity; entity = entity->next)
+		{
+		  if (!strcmp (entity->name, buf))
+		    {
+		      __nxml_string_add (ret, entity->entity,
+					 strlen (entity->entity));
+		      break;
+		    }
+
+		}
+
+	      if (!entity)
+		__nxml_string_add (ret, buffer + i, 1);
+	      else
+		i += strlen (entity->name) + 1;
+
 	      q = 0;
-	      ret[j++] = *(buffer + i);
 	    }
 	}
 
       else
 	{
 	  q = 0;
-	  ret[j++] = *(buffer + i);
+	  __nxml_string_add (ret, buffer + i, 1);
 	}
     }
 
-  ret[j] = 0;
-  real = strdup (ret);
-  free (ret);
+  if (!(real = __nxml_string_free (ret)))
+    real = strdup ("");
 
   return real;
 }
@@ -223,7 +252,7 @@ __nxml_parse_get_attribute (nxml_t * doc, char **buffer, size_t * size,
    * Rule [10] - AttValue ::= '"' ([^<&"] | Reference)* '"' |
    *                          "'" ([^<&'] | Reference)* "'"
    */
-  char *tag, *value;
+  char *tag, *value, *v;
 
   if (!*size)
     return NXML_OK;
@@ -245,9 +274,18 @@ __nxml_parse_get_attribute (nxml_t * doc, char **buffer, size_t * size,
       return NXML_ERR_PARSER;
     }
 
+  if (!(v = __nxml_parse_string (doc, value, strlen (value))))
+    {
+      free (tag);
+      return NXML_ERR_POSIX;
+    }
+
+  free (value);
+  value = v;
+
   __nxml_escape_spaces (doc, buffer, size);
 
-  if (!(*attr = (nxml_attr_t *) malloc (sizeof (nxml_attr_t))))
+  if (!(*attr = (nxml_attr_t *) calloc (1, sizeof (nxml_attr_t))))
     {
       free (tag);
       free (value);
@@ -255,7 +293,6 @@ __nxml_parse_get_attribute (nxml_t * doc, char **buffer, size_t * size,
       return NXML_ERR_POSIX;
     }
 
-  memset (*attr, 0, sizeof (nxml_attr_t));
   (*attr)->name = tag;
   (*attr)->value = value;
 
@@ -297,10 +334,9 @@ __nxml_parse_cdata (nxml_t * doc, char **buffer, size_t * size,
       return NXML_ERR_PARSER;
     }
 
-  if (!(t = (nxml_data_t *) malloc (sizeof (nxml_data_t))))
+  if (!(t = (nxml_data_t *) calloc (1, sizeof (nxml_data_t))))
     return NXML_ERR_POSIX;
 
-  memset (t, 0, sizeof (nxml_data_t));
   t->doc = doc;
 
   if (!(value = (char *) malloc (sizeof (char) * (i + 1))))
@@ -321,6 +357,162 @@ __nxml_parse_cdata (nxml_t * doc, char **buffer, size_t * size,
   *data = t;
 
   return NXML_OK;
+}
+
+static void
+__nxml_parse_entity (nxml_t * doc, char **buffer, size_t * size)
+{
+  /*
+   * [70]       EntityDecl ::=          GEDecl | PEDecl
+   * [71]       GEDecl     ::=          '<!ENTITY' S Name S EntityDef S? '>'
+   * [72]       PEDecl     ::=          '<!ENTITY' S '%' S Name S PEDef S? '>'
+   * [73]       EntityDef  ::=          EntityValue | (ExternalID NDataDecl?)
+   * [74]       PEDef      ::=          EntityValue | ExternalID
+   */
+
+  int i;
+  char name[1024];
+  char *entity;
+  int byte;
+  int64_t ch;
+
+  __nxml_escape_spaces (doc, buffer, size);
+
+  if (strncmp (*buffer, "<!ENTITY", 8))
+    {
+      int q = i = 0;
+
+      while ((*(*buffer + i) != '>' || q) && i < *size)
+	{
+	  if (*(*buffer + i) == '<')
+	    q++;
+
+	  else if (*(*buffer + i) == '>')
+	    q--;
+
+	  i++;
+	}
+
+      if (*(*buffer) == '>')
+	i++;
+
+      (*buffer) += i;
+      (*size) -= i;
+      return;
+    }
+
+  *buffer += 8;
+  *size -= 8;
+
+  __nxml_escape_spaces (doc, buffer, size);
+
+  /* Name */
+  if (!__NXML_NAMESTARTCHARS)
+    {
+      int q = i = 0;
+
+      while ((*(*buffer + i) != '>' || q) && i < *size)
+	{
+	  if (*(*buffer + i) == '<')
+	    q++;
+
+	  else if (*(*buffer + i) == '>')
+	    q--;
+
+	  i++;
+	}
+
+      if (*(*buffer) == '>')
+	i++;
+
+      (*buffer) += i;
+      (*size) -= i;
+      return;
+    }
+
+  memcpy (&name[0], *buffer, byte);
+
+  i = byte;
+  (*buffer) += byte;
+  (*size) -= byte;
+
+  while (__NXML_NAMECHARS && *size && i < sizeof (name) - 1)
+    {
+      memcpy (&name[i], *buffer, byte);
+
+      i += byte;
+      (*buffer) += byte;
+      (*size) -= byte;
+    }
+
+  name[i] = 0;
+
+  if (!i || !strcmp (name, "%"))
+    {
+      int q = i = 0;
+
+      while ((*(*buffer + i) != '>' || q) && i < *size)
+	{
+	  if (*(*buffer + i) == '<')
+	    q++;
+
+	  else if (*(*buffer + i) == '>')
+	    q--;
+
+	  i++;
+	}
+
+      if (*(*buffer) == '>')
+	i++;
+
+      (*buffer) += i;
+      (*size) -= i;
+      return;
+    }
+
+  __nxml_escape_spaces (doc, buffer, size);
+
+  entity = __nxml_get_value (doc, buffer, size);
+
+  __nxml_escape_spaces (doc, buffer, size);
+
+  if (**buffer == '>')
+    {
+      (*buffer)++;
+      (*size)--;
+    }
+
+  if (entity)
+    {
+      __nxml_entity_t *e;
+
+      if (!(e = calloc (1, sizeof (__nxml_entity_t))))
+	{
+	  free (entity);
+	  return;
+	}
+
+      if (!(e->name = strdup (name)))
+	{
+	  free (e);
+	  free (entity);
+	  return;
+	}
+
+      e->entity = entity;
+
+      if (!doc->priv.entities)
+	doc->priv.entities = e;
+      else
+	{
+	  __nxml_entity_t *tmp = doc->priv.entities;
+
+	  while (tmp->next)
+	    tmp = tmp->next;
+
+	  tmp->next = e;
+	}
+    }
 }
 
 static nxml_error_t
@@ -368,10 +560,9 @@ __nxml_parse_doctype (nxml_t * doc, char **buffer, size_t * size,
 
   str[i] = 0;
 
-  if (!(t = (nxml_doctype_t *) malloc (sizeof (nxml_doctype_t))))
+  if (!(t = (nxml_doctype_t *) calloc (1, sizeof (nxml_doctype_t))))
     return NXML_ERR_POSIX;
 
-  memset (t, 0, sizeof (nxml_doctype_t));
   t->doc = doc;
 
   if (!(t->name = strdup (str)))
@@ -408,15 +599,12 @@ __nxml_parse_doctype (nxml_t * doc, char **buffer, size_t * size,
       return NXML_ERR_PARSER;
     }
 
-  if (!(value = (char *) malloc (sizeof (char) * (i + 1))))
+  if (!(value = __nxml_parse_string (doc, *buffer, i)))
     {
       free (t->value);
       free (t);
       return NXML_ERR_POSIX;
     }
-
-  strncpy (value, *buffer, i);
-  value[i] = 0;
 
   t->value = value;
 
@@ -436,6 +624,20 @@ __nxml_parse_doctype (nxml_t * doc, char **buffer, size_t * size,
     }
 
   *doctype = 1;
+
+  while (value && *value && *value != '[')
+    value++;
+
+  if (value && *value == '[')
+    {
+      unsigned int size;
+
+      value++;
+      size = strlen (value);
+
+      while (size > 0 && value && *value)
+	__nxml_parse_entity (doc, &value, (size_t *)&size);
+    }
 
   return NXML_OK;
 }
@@ -468,20 +670,16 @@ __nxml_parse_comment (nxml_t * doc, char **buffer, size_t * size,
       return NXML_ERR_PARSER;
     }
 
-  if (!(t = (nxml_data_t *) malloc (sizeof (nxml_data_t))))
+  if (!(t = (nxml_data_t *) calloc (1, sizeof (nxml_data_t))))
     return NXML_ERR_POSIX;
 
-  memset (t, 0, sizeof (nxml_data_t));
   t->doc = doc;
 
-  if (!(value = (char *) malloc (sizeof (char) * (i + 1))))
+  if (!(value = __nxml_parse_string (doc, *buffer, i)))
     {
       free (t);
       return NXML_ERR_POSIX;
     }
-
-  strncpy (value, *buffer, i);
-  value[i] = 0;
 
   t->value = value;
 
@@ -542,20 +740,16 @@ __nxml_parse_pi (nxml_t * doc, char **buffer, size_t * size,
       return NXML_ERR_PARSER;
     }
 
-  if (!(t = (nxml_data_t *) malloc (sizeof (nxml_data_t))))
+  if (!(t = (nxml_data_t *) calloc (1, sizeof (nxml_data_t))))
     return NXML_ERR_POSIX;
 
-  memset (t, 0, sizeof (nxml_data_t));
   t->doc = doc;
 
-  if (!(value = (char *) malloc (sizeof (char) * (i + 1))))
+  if (!(value = __nxml_parse_string (doc, *buffer, i)))
     {
       free (t);
       return NXML_ERR_POSIX;
     }
-
-  strncpy (value, *buffer, i);
-  value[i] = 0;
 
   t->value = value;
 
@@ -641,10 +835,9 @@ __nxml_parse_text (nxml_t * doc, char **buffer, size_t * size,
       i++;
     }
 
-  if (!(t = (nxml_data_t *) malloc (sizeof (nxml_data_t))))
+  if (!(t = (nxml_data_t *) calloc (1, sizeof (nxml_data_t))))
     return NXML_ERR_POSIX;
 
-  memset (t, 0, sizeof (nxml_data_t));
   t->doc = doc;
 
   if (!(value = __nxml_parse_string (doc, *buffer, i)))
@@ -730,10 +923,9 @@ __nxml_parse_close (nxml_t * doc, char **buffer, size_t * size,
   (*buffer) += 1;
   (*size) -= 1;
 
-  if (!(tag = (nxml_data_t *) malloc (sizeof (nxml_data_t))))
+  if (!(tag = (nxml_data_t *) calloc (1, sizeof (nxml_data_t))))
     return NXML_ERR_POSIX;
 
-  memset (tag, 0, sizeof (nxml_data_t));
   tag->doc = doc;
 
   if (!(tag->value = strdup (str)))
@@ -836,10 +1028,9 @@ __nxml_parse_get_tag (nxml_t * doc, char **buffer, size_t * size,
       return NXML_ERR_PARSER;
     }
 
-  if (!(tag = (nxml_data_t *) malloc (sizeof (nxml_data_t))))
+  if (!(tag = (nxml_data_t *) calloc (1, sizeof (nxml_data_t))))
     return NXML_ERR_POSIX;
 
-  memset (tag, 0, sizeof (nxml_data_t));
   tag->doc = doc;
 
   if (!(tag->value = strdup (str)))
@@ -1015,109 +1206,55 @@ __nxml_parse_buffer (nxml_t * nxml, char *r_buffer, size_t r_size)
     }
 
   nxml->priv.line = 1;
+  nxml->version = NXML_VERSION_1_0;
+  nxml->standalone = 1;
 
   /* 
    * Rule [22] - prolog ::= XMLDecl Misc* (doctypedecl Misc*)?
    * Rule [23] - XMLDecl ::= '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
    */
-  if (strncmp (buffer, "<?xml ", 6))
+  if (!strncmp (buffer, "<?xml ", 6))
     {
-      if (nxml->priv.func)
-	nxml->priv.func ("%s: expected char '<?xml' (line %d)\n",
-			 nxml->file ? nxml->file : "", nxml->priv.line);
+      buffer += 6;
+      size -= 6;
 
-      if (freed)
-	free (buffer);
-
-      return NXML_ERR_PARSER;
-    }
-
-  buffer += 6;
-  size -= 6;
-
-  if ((err =
-       __nxml_parse_get_attribute (nxml, &buffer, &size, &attr)) != NXML_OK)
-    {
-      nxml_empty (nxml);
-
-      if (freed)
-	free (buffer);
-
-      return err;
-    }
-
-  if (!attr)
-    {
-      if (nxml->priv.func)
-	nxml->priv.func ("%s: expected 'version' attribute (line %d)\n",
-			 nxml->file ? nxml->file : "", nxml->priv.line);
-
-      if (freed)
-	free (buffer);
-
-      return NXML_ERR_PARSER;
-    }
-#ifndef PACKAGE
-#define PACKAGE "nxml"
-#endif
-  if (!strcmp (attr->value, "1.0"))
-    nxml->version = NXML_VERSION_1_0;
-
-  else if (!strcmp (attr->value, "1.1"))
-    nxml->version = NXML_VERSION_1_1;
-
-  else
-    {
-      if (nxml->priv.func)
-	nxml->priv.
-	  func (PACKAGE " 1.0 suports only xml 1.1 or 1.0 (line %d)\n", nxml->priv.line);
-
-      if (freed)
-	free (buffer);
-
-      return NXML_ERR_PARSER;
-    }
-
-  nxml_free_attribute (attr);
-
-  while (!(err = __nxml_parse_get_attribute (nxml, &buffer, &size, &attr))
-	 && attr)
-    {
-      if (!strcmp (attr->name, "standalone"))
+      if ((err =
+	   __nxml_parse_get_attribute (nxml, &buffer, &size,
+				       &attr)) != NXML_OK)
 	{
-	  if (!strcmp (attr->value, "yes"))
-	    nxml->standalone = 1;
+	  nxml_empty (nxml);
 
-	  else
-	    nxml->standalone = 0;
+	  if (freed)
+	    free (buffer);
+
+	  return err;
 	}
 
-      else if (!strcmp (attr->name, "encoding"))
+      if (!attr)
 	{
-	  nxml->encoding = strdup (attr->value);
+	  if (nxml->priv.func)
+	    nxml->priv.func ("%s: expected 'version' attribute (line %d)\n",
+			     nxml->file ? nxml->file : "", nxml->priv.line);
 
-	  if (!nxml->encoding)
-	    {
-	      nxml_empty (nxml);
-	      nxml_free_attribute (attr);
+	  if (freed)
+	    free (buffer);
 
-	      if (freed)
-		free (buffer);
-
-	      return NXML_ERR_POSIX;
-	    }
+	  return NXML_ERR_PARSER;
 	}
+
+      if (!strcmp (attr->value, "1.0"))
+	nxml->version = NXML_VERSION_1_0;
+
+      else if (!strcmp (attr->value, "1.1"))
+	nxml->version = NXML_VERSION_1_1;
 
       else
 	{
-
 	  if (nxml->priv.func)
-	    nxml->priv.func ("%s: unexpected attribute '%s' (line %d)\n",
-			     nxml->file ? nxml->file : "", attr->name,
-			     nxml->priv.line);
-
-	  nxml_empty (nxml);
-	  nxml_free_attribute (attr);
+	    nxml->priv.
+	      func (PACKAGE " " VERSION
+		    " suports only xml 1.1 or 1.0 (line %d)\n",
+		    nxml->priv.line);
 
 	  if (freed)
 	    free (buffer);
@@ -1126,24 +1263,72 @@ __nxml_parse_buffer (nxml_t * nxml, char *r_buffer, size_t r_size)
 	}
 
       nxml_free_attribute (attr);
+
+      while (!(err = __nxml_parse_get_attribute (nxml, &buffer, &size, &attr))
+	     && attr)
+	{
+	  if (!strcmp (attr->name, "standalone"))
+	    {
+	      if (!strcmp (attr->value, "yes"))
+		nxml->standalone = 1;
+
+	      else
+		nxml->standalone = 0;
+	    }
+
+	  else if (!strcmp (attr->name, "encoding"))
+	    {
+	      nxml->encoding = strdup (attr->value);
+
+	      if (!nxml->encoding)
+		{
+		  nxml_empty (nxml);
+		  nxml_free_attribute (attr);
+
+		  if (freed)
+		    free (buffer);
+
+		  return NXML_ERR_POSIX;
+		}
+	    }
+
+	  else
+	    {
+
+	      if (nxml->priv.func)
+		nxml->priv.func ("%s: unexpected attribute '%s' (line %d)\n",
+				 nxml->file ? nxml->file : "", attr->name,
+				 nxml->priv.line);
+
+	      nxml_empty (nxml);
+	      nxml_free_attribute (attr);
+
+	      if (freed)
+		free (buffer);
+
+	      return NXML_ERR_PARSER;
+	    }
+
+	  nxml_free_attribute (attr);
+	}
+
+      if (err || strncmp (buffer, "?>", 2))
+	{
+	  if (nxml->priv.func)
+	    nxml->priv.func ("%s expected '?>' (line %d)\n",
+			     nxml->file ? nxml->file : "", nxml->priv.line);
+
+	  nxml_empty (nxml);
+
+	  if (freed)
+	    free (buffer);
+
+	  return NXML_ERR_PARSER;
+	}
+
+      buffer += 2;
+      size -= 2;
     }
-
-  if (err || strncmp (buffer, "?>", 2))
-    {
-      if (nxml->priv.func)
-	nxml->priv.func ("%s expected '?>' (line %d)\n",
-			 nxml->file ? nxml->file : "", nxml->priv.line);
-
-      nxml_empty (nxml);
-
-      if (freed)
-	free (buffer);
-
-      return NXML_ERR_PARSER;
-    }
-
-  buffer += 2;
-  size -= 2;
 
   root = last = NULL;
   while (!(err = __nxml_parse_get_tag (nxml, &buffer, &size, &tag, &doctype))
@@ -1202,14 +1387,15 @@ __nxml_parse_buffer (nxml_t * nxml, char *r_buffer, size_t r_size)
 nxml_error_t
 nxml_parse_url (nxml_t * nxml, char *url)
 {
-  __nxml_download_t *download;
   nxml_error_t err;
+  char *buffer;
+  size_t size;
 
   if (!url || !nxml)
     return NXML_ERR_DATA;
 
-  if (!(download = __nxml_download_file (nxml, url)))
-    return NXML_ERR_POSIX;
+  if ((err = nxml_download_file (nxml, url, &buffer, &size)) != NXML_OK)
+    return err;
 
   if (nxml->file)
     free (nxml->file);
@@ -1220,14 +1406,13 @@ nxml_parse_url (nxml_t * nxml, char *url)
       return NXML_ERR_POSIX;
     }
 
-  nxml->size = download->size;
+  nxml->size = size;
 
   nxml_empty (nxml);
 
-  err = __nxml_parse_buffer (nxml, download->mm, download->size);
+  err = __nxml_parse_buffer (nxml, buffer, size);
 
-  free (download->mm);
-  free (download);
+  free (buffer);
 
   return err;
 }

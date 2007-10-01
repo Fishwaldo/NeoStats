@@ -2018,7 +2018,7 @@ x_maj=3
 x_min='0'
 x_rev="a4"
 x_package='NeoStats'
-MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline perltest templateauth template"
+MODULES="connectserv hostserv statserv ircdauth extauth limitserv textserv quoteserv operlog dccpartyline perltest templateauth template update"
 #dont edit anything after this line!
 
 x_version=$x_maj.$x_min.$x_rev
@@ -26593,7 +26593,7 @@ CFLAGS="$CFLAGS -fno-strict-aliasing"
 
 
 
-ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile modules/protocol/Makefile modules/dbm/Makefile modules/dbm/bdb/Makefile modules/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile lib/nxml/Makefile lib/execinfo/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/quoteserv/Makefile modules/limitserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile modules/perltest/Makefile modules/templateauth/Makefile modules/template/Makefile neostats"
+ac_config_files="$ac_config_files Makefile include/Makefile src/Makefile modules/protocol/Makefile modules/dbm/Makefile modules/dbm/bdb/Makefile modules/dbm/gdbm/Makefile lib/Makefile lib/curl/Makefile lib/pcre/Makefile lib/event/Makefile lib/nxml/Makefile lib/execinfo/Makefile modules/Makefile modules/connectserv/Makefile modules/extauth/Makefile modules/hostserv/Makefile modules/ircdauth/Makefile modules/statserv/Makefile modules/textserv/Makefile modules/quoteserv/Makefile modules/limitserv/Makefile modules/operlog/Makefile modules/dccpartyline/Makefile modules/perltest/Makefile modules/templateauth/Makefile modules/template/Makefile modules/update/Makefile neostats"
 
 
 cat >confcache <<\_ACEOF
@@ -27303,6 +27303,7 @@ do
     "modules/perltest/Makefile") CONFIG_FILES="$CONFIG_FILES modules/perltest/Makefile" ;;
     "modules/templateauth/Makefile") CONFIG_FILES="$CONFIG_FILES modules/templateauth/Makefile" ;;
     "modules/template/Makefile") CONFIG_FILES="$CONFIG_FILES modules/template/Makefile" ;;
+    "modules/update/Makefile") CONFIG_FILES="$CONFIG_FILES modules/update/Makefile" ;;
     "neostats") CONFIG_FILES="$CONFIG_FILES neostats" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

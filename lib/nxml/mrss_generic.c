@@ -1,4 +1,4 @@
-/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* mRss - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -38,6 +38,9 @@ mrss_strerror (mrss_error_t err)
     case MRSS_ERR_PARSER:
       return "Parser error";
 
+    case MRSS_ERR_DOWNLOAD:
+      return "Download error";
+
     case MRSS_ERR_VERSION:
       return "Version error";
 
@@ -47,6 +50,12 @@ mrss_strerror (mrss_error_t err)
     default:
       return strerror (errno);
     }
+}
+
+char *
+mrss_curl_strerror (CURLcode err)
+{
+  return (char *) curl_easy_strerror (err);
 }
 
 mrss_error_t
@@ -77,8 +86,14 @@ __mrss_get_last_modified_header (void *ptr, size_t size, size_t nmemb,
 mrss_error_t
 mrss_get_last_modified (char *urlstring, time_t * lastmodified)
 {
+  return mrss_get_last_modified_with_options (urlstring, lastmodified, NULL);
+}
+
+mrss_error_t
+mrss_get_last_modified_with_options (char *urlstring, time_t * lastmodified,
+				     mrss_options_t * options)
+{
   CURL *curl;
-  int timeout;
 
   if (!urlstring || !lastmodified)
     return MRSS_ERR_DATA;
@@ -96,12 +111,32 @@ mrss_get_last_modified (char *urlstring, time_t * lastmodified)
   curl_easy_setopt (curl, CURLOPT_NOBODY, 1);
   curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1);
 
-  if (mrss_get_timeout (&timeout) == MRSS_OK)
+  if (options)
     {
-      if (timeout > 0)
-	curl_easy_setopt (curl, CURLOPT_TIMEOUT, timeout);
-      else if (timeout < 0)
+      if (options->timeout > 0)
+	curl_easy_setopt (curl, CURLOPT_TIMEOUT, options->timeout);
+      else if (options->timeout < 0)
 	curl_easy_setopt (curl, CURLOPT_TIMEOUT, 10);
+
+      if (options->certfile)
+	curl_easy_setopt (curl, CURLOPT_SSLCERT, options->certfile);
+
+      if (options->password)
+	curl_easy_setopt (curl, CURLOPT_SSLCERTPASSWD, options->password);
+
+      if (options->cacert)
+	curl_easy_setopt (curl, CURLOPT_CAINFO, options->cacert);
+
+      if (options->proxy)
+	{
+	  curl_easy_setopt (curl, CURLOPT_PROXY, options->proxy);
+
+	  if (options->proxy_authentication)
+	    curl_easy_setopt (curl, CURLOPT_PROXYUSERPWD,
+			      options->proxy_authentication);
+	}
+
+      curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, options->verifypeer);
     }
 
   if (curl_easy_perform (curl))

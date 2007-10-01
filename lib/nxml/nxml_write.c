@@ -1,4 +1,4 @@
-/* nXml - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* nXml - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 #endif
 
 #include "nxml.h"
-#include "nxml_internal.h"
 
 static void
 __nxml_write_escape_string (void (*func) (void *, char *, ...), void *obj,
@@ -134,66 +133,67 @@ __nxml_write_escape_string (void (*func) (void *, char *, ...), void *obj,
     }
 }
 
+static int
+__nxml_write_haslines (char *what)
+{
+  while (what && *what)
+    {
+      if (*what == '\n')
+	return 1;
+      what++;
+    }
+
+  return 0;
+}
+
 static void
-__nxml_write_data_text (nxml_data_t * data,
-			void (*func) (void *, char *, ...), void *obj,
-			int indent)
+__nxml_write_indent (void (*func) (void *, char *, ...), void *obj,
+		     int indent)
 {
   int i;
-
   for (i = 0; i < indent; i++)
     func (obj, "  ");
+}
 
-  __nxml_write_escape_string (func, obj, data->value);
+static void
+__nxml_write_newline (void (*func) (void *, char *, ...), void *obj)
+{
   func (obj, "\n");
 }
 
 static void
-__nxml_write_data_comment (nxml_data_t * data,
-			   void (*func) (void *, char *, ...), void *obj,
-			   int indent)
+__nxml_write_data_text (nxml_data_t * data,
+			void (*func) (void *, char *, ...), void *obj)
 {
-  int i;
-  for (i = 0; i < indent; i++)
-    func (obj, "  ");
-
-  func (obj, "<!--%s-->\n", data->value);
+  __nxml_write_escape_string (func, obj, data->value);
 }
 
 static void
-__nxml_write_data_pi (nxml_data_t * data,
-		      void (*func) (void *, char *, ...), void *obj,
-		      int indent)
+__nxml_write_data_comment (nxml_data_t * data,
+			   void (*func) (void *, char *, ...), void *obj)
 {
-  int i;
-  for (i = 0; i < indent; i++)
-    func (obj, "  ");
+  func (obj, "<!--%s-->", data->value);
+}
 
-  func (obj, "<?%s?>\n", data->value);
+static void
+__nxml_write_data_pi (nxml_data_t * data, void (*func) (void *, char *, ...),
+		      void *obj)
+{
+  func (obj, "<?%s?>", data->value);
 }
 
 static void
 __nxml_write_data_doctype (nxml_doctype_t * data,
-			   void (*func) (void *, char *, ...), void *obj,
-			   int indent)
+			   void (*func) (void *, char *, ...), void *obj)
 {
-  int i;
-  for (i = 0; i < indent; i++)
-    func (obj, "  ");
-
-  func (obj, "<!DOCTYPE %s %s>\n", data->name, data->value);
+  func (obj, "<!DOCTYPE %s %s>", data->name, data->value);
 }
 
 static void
 __nxml_write_data_element (nxml_data_t * data,
-			   void (*func) (void *, char *, ...), void *obj,
-			   int indent)
+			   void (*func) (void *, char *, ...), void *obj)
 {
-  int i;
   nxml_attr_t *attr;
-
-  for (i = 0; i < indent; i++)
-    func (obj, "  ");
 
   func (obj, "<");
   if (data->ns && data->ns->prefix)
@@ -203,7 +203,12 @@ __nxml_write_data_element (nxml_data_t * data,
   attr = data->attributes;
   while (attr)
     {
-      func (obj, " %s=\"", attr->name);
+      func (obj, " ");
+
+      if (attr->ns && attr->ns->prefix)
+	func (obj, "%s:", attr->ns->prefix);
+      func (obj, "%s=\"", attr->name);
+
       __nxml_write_escape_string (func, obj, attr->value);
       func (obj, "\"");
       attr = attr->next;
@@ -212,7 +217,7 @@ __nxml_write_data_element (nxml_data_t * data,
   if (!data->children)
     func (obj, " /");
 
-  func (obj, ">\n");
+  func (obj, ">");
 }
 
 static void
@@ -220,23 +225,47 @@ __nxml_write_data (nxml_t * nxml, nxml_data_t * data,
 		   void (*func) (void *, char *, ...), void *obj, int indent)
 {
   nxml_data_t *tmp;
+  int i;
 
   switch (data->type)
     {
     case NXML_TYPE_TEXT:
-      __nxml_write_data_text (data, func, obj, indent);
+      if (data->children || data->next || __nxml_write_haslines (data->value)
+	  || (data->parent && data->parent->children != data))
+	{
+	  i = 1;
+	  __nxml_write_indent (func, obj, indent);
+	}
+      else
+	i = 0;
+
+      __nxml_write_data_text (data, func, obj);
+
+      if (i)
+	__nxml_write_newline (func, obj);
       break;
 
     case NXML_TYPE_COMMENT:
-      __nxml_write_data_comment (data, func, obj, indent);
+      __nxml_write_indent (func, obj, indent);
+      __nxml_write_data_comment (data, func, obj);
+      __nxml_write_newline (func, obj);
       break;
 
     case NXML_TYPE_PI:
-      __nxml_write_data_pi (data, func, obj, indent);
+      __nxml_write_indent (func, obj, indent);
+      __nxml_write_data_pi (data, func, obj);
+      __nxml_write_newline (func, obj);
       break;
 
     default:
-      __nxml_write_data_element (data, func, obj, indent);
+      __nxml_write_indent (func, obj, indent);
+      __nxml_write_data_element (data, func, obj);
+
+      if (!data->children || data->children->type != NXML_TYPE_TEXT
+	  || data->children->next
+	  || __nxml_write_haslines (data->children->value))
+	__nxml_write_newline (func, obj);
+
       break;
     }
 
@@ -252,14 +281,17 @@ __nxml_write_data (nxml_t * nxml, nxml_data_t * data,
 
       if (data->type == NXML_TYPE_ELEMENT)
 	{
-	  int i;
-	  for (i = 0; i < indent; i++)
-	    func (obj, "  ");
+	  if (!data->children || data->children->type != NXML_TYPE_TEXT
+	      || data->children->next || data->children->children
+	      || __nxml_write_haslines (data->children->value))
+	    __nxml_write_indent (func, obj, indent);
 
 	  func (obj, "</");
 	  if (data->ns && data->ns->prefix)
 	    func (obj, "%s:", data->ns->prefix);
-	  func (obj, "%s>\n", data->value);
+	  func (obj, "%s>", data->value);
+
+	  __nxml_write_newline (func, obj);
 	}
     }
 }
@@ -295,7 +327,9 @@ __nxml_write_real (nxml_t * nxml, void (*func) (void *, char *, ...),
 
   while (doctype)
     {
-      __nxml_write_data_doctype (doctype, func, obj, 0);
+      __nxml_write_indent (func, obj, 0);
+      __nxml_write_data_doctype (doctype, func, obj);
+      __nxml_write_newline (func, obj);
 
       doctype = doctype->next;
     }

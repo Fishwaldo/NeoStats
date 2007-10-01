@@ -1,4 +1,4 @@
-/* mRss - Copyright (C) 2005-2006 bakunin - Andrea Marchesini 
+/* mRss - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -337,15 +337,12 @@ __mrss_write_real_skipDays (mrss_t * mrss, void (*func) (void *, char *, ...),
 }
 
 static void
-__mrss_write_real_category (mrss_t * mrss, void (*func) (void *, char *, ...),
-			    void *obj)
+__mrss_write_real_category (mrss_t * mrss, mrss_category_t * category,
+			    void (*func) (void *, char *, ...), void *obj)
 {
-  mrss_category_t *category;
-
   if ((mrss->version == MRSS_VERSION_0_92
        || mrss->version == MRSS_VERSION_2_0) && mrss->category)
     {
-      category = mrss->category;
       while (category)
 	{
 	  func (obj, "    <category");
@@ -367,13 +364,127 @@ __mrss_write_real_category (mrss_t * mrss, void (*func) (void *, char *, ...),
 }
 
 static void
+__mrss_write_real_tag (mrss_tag_t * tag, void (*func) (void *, char *, ...),
+		       void *obj, int index)
+{
+  mrss_attribute_t *attribute;
+
+  struct mrss_ns_t
+  {
+    char *ns;
+    struct mrss_ns_t *next;
+  } *namespaces = NULL, *nstmp;
+
+  int i;
+
+  while (tag)
+    {
+      if (tag->ns)
+	{
+	  if (!(namespaces = calloc (1, sizeof (struct mrss_ns_t))))
+	    return;
+
+	  namespaces->ns = tag->ns;
+	}
+
+      for (attribute = tag->attributes; attribute;
+	   attribute = attribute->next)
+	{
+	  if (attribute->ns)
+	    {
+	      for (nstmp = namespaces; nstmp; nstmp = nstmp->next)
+		if (!strcmp (nstmp->ns, attribute->ns))
+		  break;
+
+	      if (nstmp)
+		continue;
+
+	      if (!(nstmp = calloc (1, sizeof (struct mrss_ns_t))))
+		return;
+
+	      nstmp->ns = attribute->ns;
+	      nstmp->next = namespaces->next;
+	      namespaces->next = nstmp;
+	    }
+	}
+
+
+      for (i = 0; i < index; i++)
+	func (obj, "  ");
+
+      if (tag->ns)
+	func (obj, "  <ns0:%s", tag->name);
+      else
+	func (obj, "  <%s", tag->name);
+
+      for (i = 0, nstmp = namespaces; nstmp; nstmp = nstmp->next)
+	func (obj, " xmlns:ns%d=\"%s\"", i++, nstmp->ns);
+
+      for (attribute = tag->attributes; attribute;
+	   attribute = attribute->next)
+	{
+	  if (attribute->ns)
+	    {
+	      for (i = 0, nstmp = namespaces; nstmp; i++, nstmp = nstmp->next)
+		{
+		  if (!strcmp (nstmp->ns, attribute->ns))
+		    {
+		      func (obj, " ns%d:%s=\"%s\"", i, attribute->name,
+			    attribute->value);
+		      break;
+		    }
+		}
+	    }
+	  else
+	    func (obj, " %s=\"%s\"", attribute->name, attribute->value);
+	}
+
+      if (tag->value)
+	{
+	  func (obj, ">");
+	  __mrss_write_string (func, obj, tag->value);
+	}
+
+      if (tag->children)
+	{
+	  if (!tag->value)
+	    func (obj, ">\n");
+
+	  func (obj, "\n");
+	  __mrss_write_real_tag (tag->children, func, obj, index + 1);
+	}
+
+      if (tag->children || tag->value)
+	{
+	  if (tag->children)
+	    for (i = 0; i < index; i++)
+	      func (obj, "  ");
+
+	  if (tag->ns)
+	    func (obj, "</ns0:%s>\n", tag->name);
+	  else
+	    func (obj, "</%s>\n", tag->name);
+
+	}
+      else
+	func (obj, "/>\n");
+
+      while (namespaces)
+	{
+	  nstmp = namespaces;
+	  namespaces = namespaces->next;
+	  free (nstmp);
+	}
+
+      tag = tag->next;
+    }
+}
+
+static void
 __mrss_write_real_item (mrss_t * mrss, void (*func) (void *, char *, ...),
 			void *obj)
 {
-  mrss_item_t *item;
-  mrss_category_t *category;
-
-  item = mrss->item;
+  mrss_item_t *item = mrss->item;
 
   while (item)
     {
@@ -460,78 +571,361 @@ __mrss_write_real_item (mrss_t * mrss, void (*func) (void *, char *, ...),
 	      else
 		func (obj, " />\n");
 	    }
-
-	  if (item->enclosure || item->enclosure_length
-	      || item->enclosure_type)
-	    {
-	      func (obj, "      <enclosure");
-
-	      if (item->enclosure_url)
-		{
-		  func (obj, " url=\"");
-		  __mrss_write_string (func, obj, item->enclosure_url);
-		  func (obj, "\"");
-		}
-
-	      if (item->enclosure_length)
-		func (obj, " length=\"%d\"", item->enclosure_length);
-
-	      if (item->enclosure_type)
-		{
-		  func (obj, " type=\"");
-		  __mrss_write_string (func, obj, item->enclosure_type);
-		  func (obj, "\"");
-		}
-
-	      if (item->enclosure)
-		{
-		  func (obj, ">");
-		  __mrss_write_string (func, obj, item->enclosure);
-		  func (obj, "</enclosure>\n");
-		}
-	      else
-		func (obj, " />\n");
-
-	    }
-
-	  category = item->category;
-	  while (category)
-	    {
-	      func (obj, "      <category");
-
-	      if (category->domain)
-		{
-		  func (obj, " domain=\"");
-		  __mrss_write_string (func, obj, category->domain);
-		  func (obj, "\"");
-		}
-
-	      func (obj, ">");
-	      __mrss_write_string (func, obj, category->category);
-	      func (obj, "</category>\n");
-
-	      category = category->next;
-	    }
 	}
+
+      if (item->enclosure || item->enclosure_length || item->enclosure_type)
+	{
+	  func (obj, "      <enclosure");
+
+	  if (item->enclosure_url)
+	    {
+	      func (obj, " url=\"");
+	      __mrss_write_string (func, obj, item->enclosure_url);
+	      func (obj, "\"");
+	    }
+
+	  if (item->enclosure_length)
+	    func (obj, " length=\"%d\"", item->enclosure_length);
+
+	  if (item->enclosure_type)
+	    {
+	      func (obj, " type=\"");
+	      __mrss_write_string (func, obj, item->enclosure_type);
+	      func (obj, "\"");
+	    }
+
+	  if (item->enclosure)
+	    {
+	      func (obj, ">");
+	      __mrss_write_string (func, obj, item->enclosure);
+	      func (obj, "</enclosure>\n");
+	    }
+	  else
+	    func (obj, " />\n");
+
+	}
+
+      __mrss_write_real_category (mrss, item->category, func, obj);
+
+      if (item->other_tags)
+	__mrss_write_real_tag (item->other_tags, func, obj, 1);
 
       func (obj, "  %s</item>\n",
 	    mrss->version == MRSS_VERSION_1_0 ? "" : "  ");
 
       item = item->next;
     }
+
+}
+
+static void
+__mrss_write_real_atom_category (mrss_category_t * category,
+				 void (*func) (void *, char *, ...),
+				 void *obj)
+{
+  while (category)
+    {
+      func (obj, "    <category");
+
+      if (category->domain)
+	{
+	  func (obj, " scheme=\"");
+	  __mrss_write_string (func, obj, category->domain);
+	  func (obj, "\"");
+	}
+
+      if (category->category)
+	{
+	  func (obj, " term=\"");
+	  __mrss_write_string (func, obj, category->category);
+	  func (obj, "\"");
+	}
+
+      if (category->label)
+	{
+	  func (obj, " label=\"");
+	  __mrss_write_string (func, obj, category->label);
+	  func (obj, "\"");
+	}
+
+      func (obj, "/>\n");
+
+      category = category->next;
+    }
+}
+
+static void
+__mrss_write_real_atom_entry (mrss_t * mrss,
+			      void (*func) (void *, char *, ...), void *obj)
+{
+  mrss_item_t *item = mrss->item;
+
+  while (item)
+    {
+      func (obj, "  <entry>\n");
+
+      if (item->title)
+	{
+	  func (obj, "    <title>");
+	  __mrss_write_string (func, obj, item->title);
+	  func (obj, "</title>\n");
+	}
+
+      if (item->link)
+	{
+	  func (obj, "    <link>");
+	  __mrss_write_string (func, obj, item->link);
+	  func (obj, "</link>\n");
+	}
+
+      if (item->description)
+	{
+	  func (obj, "    <summary>");
+	  __mrss_write_string (func, obj, item->description);
+	  func (obj, "</summary>\n");
+	}
+
+      if (item->copyright)
+	{
+	  func (obj, "    <rights>");
+	  __mrss_write_string (func, obj, item->copyright);
+	  func (obj, "</rights>\n");
+	}
+
+      if (item->author)
+	{
+	  func (obj, "    <author>\n");
+	  func (obj, "      <name>");
+	  __mrss_write_string (func, obj, item->author);
+	  func (obj, "</name>\n");
+
+	  if (item->author_email)
+	    {
+	      func (obj, "      <email>");
+	      __mrss_write_string (func, obj, item->author_email);
+	      func (obj, "</email>\n");
+	    }
+
+	  if (item->author_uri)
+	    {
+	      func (obj, "      <uri>");
+	      __mrss_write_string (func, obj, item->author_uri);
+	      func (obj, "</uri>\n");
+	    }
+
+	  func (obj, "    </author>\n");
+	}
+
+      if (item->contributor)
+	{
+	  func (obj, "    <contributor>\n");
+	  func (obj, "      <name>");
+	  __mrss_write_string (func, obj, item->contributor);
+	  func (obj, "</name>\n");
+
+	  if (item->contributor_email)
+	    {
+	      func (obj, "      <email>");
+	      __mrss_write_string (func, obj, item->contributor_email);
+	      func (obj, "</email>\n");
+	    }
+
+	  if (item->contributor_uri)
+	    {
+	      func (obj, "      <uri>");
+	      __mrss_write_string (func, obj, item->contributor_uri);
+	      func (obj, "</uri>\n");
+	    }
+
+	  func (obj, "    </contributor>\n");
+	}
+
+      /* TODO */
+      if (mrss->pubDate)
+	{
+	  if (mrss->version == MRSS_VERSION_ATOM_1_0)
+	    {
+	      func (obj, "  <published>");
+	      __mrss_write_string (func, obj, item->pubDate);
+	      func (obj, "</published>\n");
+	    }
+	  else
+	    {
+	      func (obj, "  <issued>");
+	      __mrss_write_string (func, obj, item->pubDate);
+	      func (obj, "</issued>\n");
+	    }
+	}
+
+      if (item->guid)
+	{
+	  func (obj, "    <id>");
+	  __mrss_write_string (func, obj, item->guid);
+	  func (obj, "</id>\n");
+	}
+
+      __mrss_write_real_atom_category (item->category, func, obj);
+
+      if (item->other_tags)
+	__mrss_write_real_tag (item->other_tags, func, obj, 1);
+
+      func (obj, "  </entry>\n");
+
+      item = item->next;
+    }
+}
+
+static mrss_error_t
+__mrss_write_atom (mrss_t * mrss, void (*func) (void *, char *, ...),
+		   void *obj)
+{
+  func (obj, "<feed xmlns=\"http://www.w3.org/2005/Atom\"");
+
+  if (mrss->language)
+    func (obj, " xml:lang=\"%s\"", mrss->language);
+
+  if (mrss->version == MRSS_VERSION_ATOM_0_3)
+    func (obj, " version=\"0.3\"");
+
+  func (obj, ">\n");
+
+  func (obj, "  <title>");
+  __mrss_write_string (func, obj, mrss->title);
+  func (obj, "</title>\n");
+
+  if (mrss->description)
+    {
+      if (mrss->version == MRSS_VERSION_ATOM_1_0)
+	{
+	  func (obj, "  <subtitle>");
+	  __mrss_write_string (func, obj, mrss->description);
+	  func (obj, "</subtitle>\n");
+	}
+      else
+	{
+	  func (obj, "  <tagline>");
+	  __mrss_write_string (func, obj, mrss->description);
+	  func (obj, "</tagline>\n");
+	}
+    }
+
+  if (mrss->link)
+    {
+      func (obj, "  <link href=\"");
+      __mrss_write_string (func, obj, mrss->link);
+      func (obj, "\"/>\n");
+    }
+
+  if (mrss->id)
+    {
+      func (obj, "  <id>");
+      __mrss_write_string (func, obj, mrss->id);
+      func (obj, "</id>\n");
+    }
+
+  if (mrss->copyright)
+    {
+      func (obj, "  <rights>");
+      __mrss_write_string (func, obj, mrss->copyright);
+      func (obj, "</rights>\n");
+    }
+
+  /* TODO */
+  if (mrss->lastBuildDate)
+    {
+      func (obj, "  <updated>");
+      __mrss_write_string (func, obj, mrss->lastBuildDate);
+      func (obj, "</updated>\n");
+    }
+
+  if (mrss->managingeditor)
+    {
+      func (obj, "  <author>\n");
+      func (obj, "    <name>");
+      __mrss_write_string (func, obj, mrss->managingeditor);
+      func (obj, "</name>\n");
+
+      if (mrss->managingeditor_email)
+	{
+	  func (obj, "    <email>");
+	  __mrss_write_string (func, obj, mrss->managingeditor_email);
+	  func (obj, "</email>\n");
+	}
+
+      if (mrss->managingeditor_uri)
+	{
+	  func (obj, "    <uri>");
+	  __mrss_write_string (func, obj, mrss->managingeditor_uri);
+	  func (obj, "</uri>\n");
+	}
+
+      func (obj, "  </author>\n");
+    }
+
+  if (mrss->generator)
+    {
+      func (obj, "  <generator");
+
+      if (mrss->generator_uri)
+	{
+	  func (obj, " uri=\"");
+	  __mrss_write_string (func, obj, mrss->generator_uri);
+	  func (obj, "\"");
+	}
+
+      if (mrss->generator_version)
+	{
+	  func (obj, " version=\"");
+	  __mrss_write_string (func, obj, mrss->generator_version);
+	  func (obj, "\"");
+	}
+
+      func (obj, ">");
+      __mrss_write_string (func, obj, mrss->generator);
+      func (obj, "</generator>\n");
+    }
+
+  if (mrss->image_url)
+    {
+      func (obj, "  <icon>");
+      __mrss_write_string (func, obj, mrss->image_url);
+      func (obj, "</icon>\n");
+    }
+
+  if (mrss->image_logo)
+    {
+      func (obj, "  <logo>");
+      __mrss_write_string (func, obj, mrss->image_logo);
+      func (obj, "</logo>\n");
+    }
+
+  __mrss_write_real_atom_category (mrss->category, func, obj);
+
+  __mrss_write_real_atom_entry (mrss, func, obj);
+
+  if (mrss->other_tags)
+    __mrss_write_real_tag (mrss->other_tags, func, obj, 0);
+
+  func (obj, "</feed>\n");
+
+  return MRSS_OK;
 }
 
 static mrss_error_t
 __mrss_write_real (mrss_t * mrss, void (*func) (void *, char *, ...),
 		   void *obj)
 {
-  func (obj, "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n");
+  func (obj, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n");
 
   if (mrss->version == MRSS_VERSION_1_0)
     func (obj,
 	  "<rdf:RDF\n"
 	  "  xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n"
 	  "  xmlns=\"http://purl.org/rss/1.0/\">\n");
+
+  else if (mrss->version == MRSS_VERSION_ATOM_1_0
+	   || mrss->version == MRSS_VERSION_ATOM_0_3)
+    return __mrss_write_atom (mrss, func, obj);
 
   else
     {
@@ -702,7 +1096,10 @@ __mrss_write_real (mrss_t * mrss, void (*func) (void *, char *, ...),
 
   __mrss_write_real_skipDays (mrss, func, obj);
 
-  __mrss_write_real_category (mrss, func, obj);
+  __mrss_write_real_category (mrss, mrss->category, func, obj);
+
+  if (mrss->other_tags)
+    __mrss_write_real_tag (mrss->other_tags, func, obj, 1);
 
   __mrss_write_real_item (mrss, func, obj);
 
