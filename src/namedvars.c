@@ -117,6 +117,7 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 		newitem->mod = GET_CUR_MODULE();
 		newitem->data = (void *)list_create(count);
 		newitem->updatehandler = set_handler;
+		newitem->no_flds = 0;
 		while (newitem->format[newitem->no_flds].fldname != NULL) {
 			newitem->no_flds++;
 		}
@@ -203,35 +204,35 @@ char *nv_gf_string(const void *data, const nv_list *item, const int field) {
 
 int nv_gf_int(const void *data, const nv_list *item, const int field) {
 	int output;
+	size_t offset;
 	void *data2;
 	if (item->format[field].type != NV_INT) {
 		nlog(LOG_WARNING, "nv_gf_int: field is not a int %d", field);
 		return 0;
 	}
 	if (item->format[field].fldoffset != -1) {
-		data2 = (void *)((int)data + item->format[field].fldoffset);
-		data2 = (void *)*((int *)data2);
+		offset = item->format[field].fldoffset + item->format[field].offset;
 	} else {
-		data2 = (void *)data;
+		offset = item->format[field].offset;
 	}		
-	output = *((int *)((int)data2 + item->format[field].offset));
+	output = *((int *)((int)data + offset));
 	return output;
 }
 
 long nv_gf_long(const void *data, const nv_list *item, const int field) {
 	long output;
 	void *data2;
+	size_t offset;
 	if (item->format[field].type != NV_LONG) {
 		nlog(LOG_WARNING, "nv_gf_long: field is not a long %d", field);
 		return 0;
 	}
 	if (item->format[field].fldoffset != -1) {
-		data2 = (void *)((int)data + item->format[field].fldoffset);
-		data2 = (void *)*((int *)data2);
+		offset = item->format[field].fldoffset + item->format[field].offset;
 	} else {
-		data2 = (void *)data;
+		offset = item->format[field].offset;
 	}		
-	output = *((long *)((int)data2 + item->format[field].offset));
+	output = *((long *)((int)data + offset));
 	return output;
 }
 
