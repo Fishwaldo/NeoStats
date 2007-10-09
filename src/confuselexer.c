@@ -472,7 +472,7 @@ char *yytext;
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
-#endif /* WIN32 */
+#endif 
 #include "neostats.h"
 #include <assert.h>
 

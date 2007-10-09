@@ -102,6 +102,12 @@ sub event_ping {
 sub event_pong {
 	my ($source) = @_;
 	NeoStats::ChanAlert($bot, "Pong $source");
+	NeoStats::Internal::DBAStore("hello", "data", "This is a string data");
+	my $text = NeoStats::Internal::DBAFetch("hello", "data");
+	NeoStats::debug($text);
+	Dump(NeoStats::Internal::DBAFetchRows("hello"));
+	NeoStats::Internal::DBADelete("hello", "data");
+
 #	my $testvar = new NeoStats::NV("users");
 #	Dump($testvar->{fish});
 #	NeoStats::debug($testvar->{fish}->{nick});

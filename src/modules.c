@@ -68,41 +68,6 @@ nv_struct nv_modules[] = {
 };
 
 
-/* WIP */
-#if 0
-/* Database descriptors */
-static NS_FIELD ModuleTableFields[] =
-{
-	NS_FIELD_INT( "type", "type of module", offsetof( Module, type ) ),
-	NS_FIELD_INT( "info", "pointer to info structure", offsetof( Module, info ) ),
-	NS_FIELD_INT( "event_list", "pointer to event list ", offsetof( Module, event_list ) ),
-	NS_FIELD_INT( "authcb", "module supplied auth callback", offsetof( Module, authcb ) ),
-	NS_FIELD_INT( "userauth", "Auth callback for auth modules", offsetof( Module, userauth ) ),
-	NS_FIELD_INT( "exclude_list", "Exclude list", offsetof( Module, exclude_list ) ),
-	NS_FIELD_INT( "exclude_cmd_list", "Exclude command list", offsetof( Module, exclude_cmd_list ) ),
-	NS_FIELD_INT( "handle", "Dynamic library handle", offsetof( Module, handle ) ),
-	NS_FIELD_INT( "modnum", "index", offsetof( Module, modnum ) ),
-	NS_FIELD_INT( "status", "status", offsetof( Module, status ) ),
-	NS_FIELD_INT( "userdatacnt", "moddata flags", offsetof( Module, userdatacnt ) ),
-	NS_FIELD_INT( "serverdatacnt", "moddata flags", offsetof( Module, serverdatacnt ) ),
-	NS_FIELD_INT( "channeldatacnt", "moddata flags", offsetof( Module, channeldatacnt ) ),
-#ifdef USE_PERL
-	NS_FIELD_INT( "pm", "PerlModInfo", offsetof( Module, pm ) ),
-#endif /* USE_PERL */
-	NS_FIELD_END()
-};
-
-static NS_TABLE ModuleTable =
-{
-	"Modules",
-	"List of modules",
-	ModuleTableFields,
-	NULL,
-	sizeof( Module ),
-	0
-};
-#endif
-/* WIP */
 /** @brief ProcessModuleList
  *
  *  Calls handler for all modules

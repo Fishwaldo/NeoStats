@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Fix Logging Levels (F)
  - Fix the wrong ordering of transfer_status in Curl Code (F)
  - upgrade nxml and mrss libraries to latest version (F)
  - Fix up Debug Log Levels a bit to remove cruft (F)

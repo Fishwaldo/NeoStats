@@ -1536,6 +1536,8 @@ void do_pong( const char *origin, const char *destination )
 	s = FindServer( origin );
 	if( s != NULL )
 	{
+		if (me.tslastping == 0)
+			me.tslastping = me.now;
 		s->server->ping = me.now - me.tslastping;
 		if( me.ulag > 1 )
 			s->server->ping -= me.ulag;

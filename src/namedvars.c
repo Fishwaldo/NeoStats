@@ -205,7 +205,6 @@ char *nv_gf_string(const void *data, const nv_list *item, const int field) {
 int nv_gf_int(const void *data, const nv_list *item, const int field) {
 	int output;
 	size_t offset;
-	void *data2;
 	if (item->format[field].type != NV_INT) {
 		nlog(LOG_WARNING, "nv_gf_int: field is not a int %d", field);
 		return 0;
@@ -221,7 +220,6 @@ int nv_gf_int(const void *data, const nv_list *item, const int field) {
 
 long nv_gf_long(const void *data, const nv_list *item, const int field) {
 	long output;
-	void *data2;
 	size_t offset;
 	if (item->format[field].type != NV_LONG) {
 		nlog(LOG_WARNING, "nv_gf_long: field is not a long %d", field);

@@ -93,13 +93,97 @@ ModuleEvent module_events[] =
 	NS_EVENT_END()
 };
 
+unsigned int string_to_ver(const char *str)
+{
+    static char lookup[] = "abcdef0123456789";
+    unsigned int maj = 0, min = 0, rev = 0, ver;
+    unsigned char *cptr, *idx;
+    int bits;
+
+    // do the major number
+    cptr = (unsigned char *)str;
+    for (; *cptr; cptr++)
+    {
+	if (*cptr == '.' || *cptr == '_')
+	{
+	    cptr++;
+	    break;
+	}
+	idx = (unsigned char *)strchr(lookup, tolower(*cptr));
+	if (!idx)
+	    continue;
+	
+	maj = (maj << 4) | ((char *)idx - lookup);
+    }
+    
+    // do the minor number
+    for (bits = 2; *cptr && *cptr != '.' && *cptr != '_' && bits > 0; cptr++)
+    {
+	idx = (unsigned char *)strchr(lookup, tolower(*cptr));
+	if (!idx)
+	    continue;
+	
+	min = (min << 4) | ((char *)idx - lookup);
+	bits--;
+    }
+    
+    // do the revision number
+    for (bits = 4; *cptr && bits > 0; cptr++)
+    {
+	idx = (unsigned char *)strchr(lookup, tolower(*cptr));
+	if (!idx)
+	    continue;
+
+	rev = (rev << 4) | ((char *)idx - lookup);
+	bits--;
+    }
+
+    ver = (maj << 24) | (min << 16) | (rev << (4*bits));
+
+    return ver;
+}
+static int BuildMods( Module *mod_ptr, void *v) {
+	hash_t *loadedmods = (hash_t *)v;
+	hnode_create_insert(loadedmods, mod_ptr, mod_ptr->info->name);
+	return NS_FALSE;
+}
+
+static void CheckModVersions(mrss_item_t *item, Module *mod) {
+	mrss_tag_t *othertags;
+	char **av;
+	int ac = 0;
+	othertags = item->other_tags;
+	while (othertags) {
+		if (!ircstrcasecmp(othertags->name, "Version")) {
+			if (mod) {
+				/* av[0] - Main Version av[2] - SVN revison if ac > 1 */
+				ac = split_buf((char *)mod->info->version, &av);
+				irc_chanalert(ns_botptr, "%x %x", string_to_ver(othertags->value), string_to_ver(av[0]));
+			} else {
+				ac = split_buf(me.version, &av);
+				irc_chanalert(ns_botptr, "%x(%s) %x(%s)", string_to_ver(othertags->value), othertags->value, string_to_ver(av[0]), av[0]);
+			}
+			ns_free(av);
+		}			
+		othertags = othertags->next;
+	}
+	irc_chanalert(ns_botptr, "%s", item->title);
+	irc_chanalert(ns_botptr, "%s", item->description);
+	irc_chanalert(ns_botptr, "%s", item->link);
+}
+
+
 static void UpdateRSSHandler(void *userptr, int status, char *data, int datasize)
 {
 	mrss_error_t ret;
 	mrss_t *mrss;
 	mrss_item_t *item;
 	mrss_tag_t *othertags;
+	hash_t *loadedmods;
+	hnode_t *node;
+	Module *mod;
 	SET_SEGV_LOCATION();
+
 
 	if (status != NS_SUCCESS) {
 		nlog(LOG_WARNING, "RSS Update Feed download failed: %s", data);
@@ -113,22 +197,36 @@ static void UpdateRSSHandler(void *userptr, int status, char *data, int datasize
 		mrss_free(mrss);
 		return;
 	}
+
+	/* build a hash of modules 
+	 * we do this every check rather than at Init/Sych time
+	 * as we might have loaded/unloaded modules 
+	 */
+	loadedmods = hash_create(HASHCOUNT_T_MAX, 0, 0);
+	ProcessModuleList(BuildMods, loadedmods);
+
 	item = mrss->item;
 	while (item)
 	{
-		irc_chanalert(ns_botptr, "%s", item->title);
-		irc_chanalert(ns_botptr, "%s", item->description);
-		irc_chanalert(ns_botptr, "%s", item->link);
 		othertags = item->other_tags;
 		while (othertags) {
-			if (!ircstrcasecmp(othertags->name, "Version"))
-				irc_chanalert(ns_botptr, "%s", othertags->value);
+			if (!ircstrcasecmp(othertags->name, "Module")) {
+				mod = (Module *)hnode_find(loadedmods, othertags->value);
+				if (mod) {
+					CheckModVersions(item, mod);
+				} else {
+					/* check if its our Core! */
+					if (!ircstrcasecmp(othertags->value, "NeoStats")) {
+						CheckModVersions(item, NULL);
+					}
+				}
+			}			
 			othertags = othertags->next;
 		}
 		item = item->next;
-	}	
+	}
 	mrss_free(mrss);
-
+	hash_free_nodes(loadedmods);
 }
 
 static int update_check_updates(void *unused)

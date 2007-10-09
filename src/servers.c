@@ -123,6 +123,7 @@ Client *AddServer( const char *name, const char *uplink, const char *hops, const
 	if( numeric )
 		s->server->numeric =  atoi( numeric );
 	s->tsconnect = me.now;
+	s->server->ping = 0;
 	if( ircstrcasecmp( name, me.name ) == 0 )
 		s->flags |= CLIENT_FLAG_ME;
 	/* check exclusions */

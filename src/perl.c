@@ -1427,6 +1427,95 @@ XS (XS_NeoStats_DelTimer)
 	XSRETURN_UV(NS_FAILURE);
 }
 
+static
+XS(XS_NeoStats_DBAStore)
+{
+	dXSARGS;
+	size_t mysize;
+	if (items < 3) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:DBAStore(table, name, data)");
+	} else {
+		/* our DBA layer expects us to be able to know the size of the data when we fetch, which in the
+		 * case of perl, we have no idea, so this is a workaround to store the size in a seperate entry
+		 * and we can retrive that in a Fetch Call before actually fetching the data
+		 */
+		mysize = strlen(SvPV_nolen(ST(2)));
+		DBAStoreInt("PerlSizes", SvPV_nolen(ST(1)), &mysize);
+		XSRETURN_UV(DBAStore(SvPV_nolen(ST(0)), SvPV_nolen(ST(1)), SvPV_nolen(ST(2)), strlen(SvPV_nolen(ST(2)))));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+static
+XS(XS_NeoStats_DBAFetch)
+{
+	dXSARGS;
+	char *data;
+	SV *ret;
+	size_t mysize;
+	
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:DBAFetch(table, name)");
+	} else {
+		/* first get the size */
+		DBAFetchInt("PerlSizes", SvPV_nolen(ST(1)), &mysize);
+		data = ns_malloc((int)mysize+1);
+		DBAFetch(SvPV_nolen(ST(0)), SvPV_nolen(ST(1)), data, (int)mysize);
+		data[mysize] = '\0';
+		ret = newSVpv(data, strlen(data));
+		free(data);
+		sv_2mortal(ret);
+		XPUSHs(ret);
+		XSRETURN(1);
+	}
+	XSRETURN_EMPTY;
+}	
+
+static
+XS(XS_NeoStats_DBADelete)
+{
+	dXSARGS;
+	if (items < 2) {
+		nlog(LOG_WARNING, "Usage: NeoStats:Internal:DBADelete(table, name)");
+	} else {
+		/* our DBA layer expects us to be able to know the size of the data when we fetch, which in the
+		 * case of perl, we have no idea, so this is a workaround to store the size in a seperate entry
+		 * and we can retrive that in a Fetch Call before actually fetching the data
+		 */
+		DBADelete("PerlSizes", SvPV_nolen(ST(1)));
+		XSRETURN_UV(DBADelete(SvPV_nolen(ST(0)), SvPV_nolen(ST(1))));
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
+
+/* I hate Global Variables, but there is no user cookie var to pass around */
+HV *perlFetchRows;
+
+static int
+load_perl_rows(char *key, void *data, int size)
+{
+	hv_store(perlFetchRows, key, strlen(key),
+		newSVpv(data, size), 0);
+	return NS_FALSE;
+}
+
+static
+XS(XS_NeoStats_DBAFetchRows)
+{
+	dXSARGS;
+	if (items < 1) {
+		nlog(LOG_WARNING, "Useage: NeoStats::Internal::DBAFetchRows(table)");
+	} else {
+		SP -= items;
+		hv_clear(perlFetchRows);
+		DBAFetchRows2(SvPV_nolen(ST(0)), load_perl_rows);
+		sv_2mortal((SV *)perlFetchRows);
+		XPUSHs(newRV_noinc((SV *)perlFetchRows));
+		PUTBACK;
+		XSRETURN(1);
+	}
+	XSRETURN_UV(NS_FAILURE);
+}
 
 /* xs_init is the second argument perl_parse. As the name hints, it
    initializes XS subroutines (see the perlembed manpage) */
@@ -1482,6 +1571,10 @@ xs_init (pTHX)
 	newXS ("NeoStats::Internal::Rakill", XS_NeoStats_Rakill, __FILE__);
 	newXS ("NeoStats::Internal::AddTimer", XS_NeoStats_AddTimer, __FILE__);
 	newXS ("NeoStats::Internal::DelTimer", XS_NeoStats_DelTimer, __FILE__);
+	newXS ("NeoStats::Internal::DBAFetch", XS_NeoStats_DBAFetch, __FILE__);
+	newXS ("NeoStats::Internal::DBAStore", XS_NeoStats_DBAStore, __FILE__);
+	newXS ("NeoStats::Internal::DBADelete", XS_NeoStats_DBADelete, __FILE__);
+	newXS ("NeoStats::Internal::DBAFetchRows", XS_NeoStats_DBAFetchRows, __FILE__);
 	
 	stash = get_hv ("NeoStats::", TRUE);
 	if (stash == NULL) {
@@ -1574,6 +1667,7 @@ xs_init (pTHX)
 		mod->pm->extninit();
 	}
 	Init_Perl_NV();
+	perlFetchRows = newHV();
 
 }
 

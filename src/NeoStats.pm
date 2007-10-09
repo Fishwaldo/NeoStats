@@ -5,6 +5,9 @@ BEGIN {
 use File::Spec();
 use File::Basename();
 use Symbol();
+my ($haveStorable) = eval 'require Storable;';
+Storable->import(qw/nfreeze thaw/) if $haveStorable;
+
 
 {
   package NeoStats;

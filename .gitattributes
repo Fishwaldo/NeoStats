@@ -450,6 +450,7 @@ modules/operlog/operlog.h -text
 modules/operlog/operlog.vcproj -text
 modules/perltest/Makefile.am -text
 modules/perltest/Makefile.in -text
+modules/perltest/NamedVarsInspector.pl -text
 modules/perltest/extension.ple -text
 modules/perltest/main.c -text
 modules/perltest/test.pl -text
