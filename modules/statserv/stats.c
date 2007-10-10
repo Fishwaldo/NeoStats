@@ -320,14 +320,14 @@ static void announce( int announcetype, const char *msg )
 	switch( announcetype )
 	{
 		case 3:
-			irc_wallops( ss_bot, "%s", msg );
+			irc_wallops( statbot, "%s", msg );
 			break;
 		case 2:
-			irc_globops( ss_bot, "%s", msg );
+			irc_globops( statbot, "%s", msg );
 			break;
 		case 1:
 		default:
-			irc_chanalert( ss_bot, "%s", msg );
+			irc_chanalert( statbot, "%s", msg );
 			break;
 	}
 }

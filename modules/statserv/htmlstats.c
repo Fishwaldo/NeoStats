@@ -684,13 +684,13 @@ void HTMLOutput( void )
 	tpl = os_fopen( html_template, "rt" );
 	if( !tpl ) {
 		nlog( LOG_WARNING, "Failed to open StatServ HTML template %s.", html_template );
-		irc_chanalert( ss_bot, "Failed to open StatServ HTML template %s.", html_template );
+		irc_chanalert( statbot, "Failed to open StatServ HTML template %s.", html_template );
 		return;
 	}
 	opf = os_fopen( StatServ.htmlpath, "wt" );
 	if( !opf ) {
 		nlog( LOG_WARNING, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
-		irc_chanalert( ss_bot, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
+		irc_chanalert( statbot, "Failed to open HTML output file %s. Check file permissions.", StatServ.htmlpath );
 		return;
 	}
 	while( os_fgets( buf, HTMLREADBUFSIZE, tpl ) != NULL )

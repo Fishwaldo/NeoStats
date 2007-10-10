@@ -181,7 +181,7 @@ static void LoadVersionStats( void )
 
 static void ClientVersionReport( const ss_ctcp_version *cv, const void *v )
 {
-	irc_prefmsg( ss_bot, ( Client * ) v, "%d -> %s", cv->users.current, cv->name );
+	irc_prefmsg( statbot, ( Client * ) v, "%d -> %s", cv->users.current, cv->name );
 }
 
 /** @brief GetClientStats
@@ -242,13 +242,13 @@ int ss_cmd_ctcpversion( const CmdParams *cmdparams )
 	}
 	if( list_count( ctcp_version_list ) == 0 )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "No Stats Available." );
+		irc_prefmsg( statbot, cmdparams->source, "No Stats Available." );
 		return NS_SUCCESS;
 	}
-	irc_prefmsg( ss_bot, cmdparams->source, "Top %d Client Versions:", limit );
-	irc_prefmsg( ss_bot, cmdparams->source, "======================" );
+	irc_prefmsg( statbot, cmdparams->source, "Top %d Client Versions:", limit );
+	irc_prefmsg( statbot, cmdparams->source, "======================" );
 	GetClientStats( ClientVersionReport, limit, ( void * )cmdparams->source );
-	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+	irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 

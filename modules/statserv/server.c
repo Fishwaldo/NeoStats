@@ -463,7 +463,7 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
 	if( isroot )
 	{
 		/* its the root server */
-		irc_prefmsg( ss_bot, u, "\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
+		irc_prefmsg( statbot, u, "\2%-45s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
 			ss->name, s->server->users, ( int )ss->users.alltime.max, ss->opers.current, ss->opers.alltime.max,
 			( int )s->server->ping, ss->highest_ping );
 	}
@@ -472,7 +472,7 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
 		/* its not the root server */
 		if( StatServ.flatmap )
 		{
-			irc_prefmsg( ss_bot, u, "\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]", 
+			irc_prefmsg( statbot, u, "\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]", 
 				ss->name, s->server->users, ( int )ss->users.alltime.max,
 				ss->opers.current, ss->opers.alltime.max, ( int )s->server->ping, ss->highest_ping );
 		}
@@ -481,7 +481,7 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
 			buf[0]='\0';
 			for( ; depth > 1; depth-- )
 				strlcat( buf, "     |", 256 );
-			irc_prefmsg( ss_bot, u, "%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
+			irc_prefmsg( statbot, u, "%s \\_\2%-40s      [ %d/%d ]   [ %d/%d ]   [ %d/%ld ]",
 				buf, ss->name, s->server->users, ( int )ss->users.alltime.max,
 				ss->opers.current, ss->opers.alltime.max, ( int )s->server->ping, ss->highest_ping );
 		}
@@ -501,10 +501,10 @@ static void MapHandler( const Client *s, int isroot, int depth, void *v )
 int ss_cmd_map( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_prefmsg( ss_bot, cmdparams->source, "%-40s      %-10s %-10s %-10s",
+	irc_prefmsg( statbot, cmdparams->source, "%-40s      %-10s %-10s %-10s",
 		"\2[NAME]\2", "\2[USERS/MAX]\2", "\2[OPERS/MAX]\2", "\2[LAG/MAX]\2" );
 	ProcessServerMap( MapHandler, StatServ.exclusions, (void *)cmdparams->source );
-	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+	irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
@@ -524,15 +524,15 @@ int ss_cmd_server_list( const CmdParams *cmdparams )
 	hscan_t scan;
 	hnode_t *node;
 
-	irc_prefmsg( ss_bot, cmdparams->source, "Server listing:" );
+	irc_prefmsg( statbot, cmdparams->source, "Server listing:" );
 	hash_scan_begin( &scan, serverstathash );
 	while( ( node = hash_scan_next( &scan ) ) != NULL )
 	{
 		ss = hnode_get( node );
-		irc_prefmsg( ss_bot, cmdparams->source, "%s (%s)", ss->name, 
+		irc_prefmsg( statbot, cmdparams->source, "%s (%s)", ss->name, 
 			( ss->s ) ? "ONLINE" : "OFFLINE" );
 	}
-	irc_prefmsg( ss_bot,cmdparams->source, "End of list." );
+	irc_prefmsg( statbot,cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
@@ -556,12 +556,12 @@ static int ss_server_del( const CmdParams *cmdparams )
 	ss = findserverstats( cmdparams->av[1] );
 	if( !ss )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "%s is not in the database", cmdparams->av[1] );
+		irc_prefmsg( statbot, cmdparams->source, "%s is not in the database", cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
 	if( ss->s )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, 
+		irc_prefmsg( statbot, cmdparams->source, 
 			"Cannot remove %s from the database, it is online!!", cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
@@ -571,7 +571,7 @@ static int ss_server_del( const CmdParams *cmdparams )
 		ss = ( serverstat * )hnode_get( node );
 		hash_delete_destroy_node( serverstathash, node );
 		ns_free( ss );
-		irc_prefmsg( ss_bot, cmdparams->source, "Removed %s from the database.",
+		irc_prefmsg( statbot, cmdparams->source, "Removed %s from the database.",
 			cmdparams->av[1] );
 		nlog( LOG_NOTICE, "%s deleted stats for %s", cmdparams->source->name, cmdparams->av[1] );
 	}
@@ -604,7 +604,7 @@ static int ss_server_rename( const CmdParams *cmdparams )
 	{
 		if( dest->s )
 		{
-			irc_prefmsg( ss_bot, cmdparams->source, "Server %s is online!", cmdparams->av[2] );
+			irc_prefmsg( statbot, cmdparams->source, "Server %s is online!", cmdparams->av[2] );
 			return NS_SUCCESS;
 		}
 		ns_free( dest );
@@ -612,12 +612,12 @@ static int ss_server_rename( const CmdParams *cmdparams )
 	src = findserverstats( cmdparams->av[1] );
 	if( !src )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "%s is not in the database", 
+		irc_prefmsg( statbot, cmdparams->source, "%s is not in the database", 
 			cmdparams->av[1] );
 		return NS_SUCCESS;
 	}
 	strlcpy( dest->name, cmdparams->av[2], MAXHOST );
-	irc_prefmsg( ss_bot, cmdparams->source, "Renamed database entry for %s to %s", 
+	irc_prefmsg( statbot, cmdparams->source, "Renamed database entry for %s to %s", 
 		cmdparams->av[1], cmdparams->av[2] );
 	nlog( LOG_NOTICE, "%s requested STATS RENAME %s to %s", cmdparams->source->name, 
 		cmdparams->av[1], cmdparams->av[2] );
@@ -647,15 +647,15 @@ static int ss_cmd_server_stats( const CmdParams *cmdparams )
 	if( !ss )
 	{
 		nlog( LOG_CRITICAL, "Unable to find server statistics for %s", server );
-		irc_prefmsg( ss_bot, cmdparams->source, "Unable to find server statistics for %s", server );
+		irc_prefmsg( statbot, cmdparams->source, "Unable to find server statistics for %s", server );
 		return NS_SUCCESS;
 	}
-	irc_prefmsg( ss_bot, cmdparams->source, "Statistics for \2%s\2 since %s",
+	irc_prefmsg( statbot, cmdparams->source, "Statistics for \2%s\2 since %s",
 		ss->name, sftime( ss->ts_start ) );
 	s = ss->s;
 	if( !s )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "Server Last Seen: %s", 
+		irc_prefmsg( statbot, cmdparams->source, "Server Last Seen: %s", 
 			sftime( ss->ts_lastseen ) );
 	}
 	else
@@ -664,39 +664,39 @@ static int ss_cmd_server_stats( const CmdParams *cmdparams )
 		time_t uptime;
 
 		uptime = s->server->uptime + ( me.now - me.ts_boot );
-		irc_prefmsg( ss_bot, cmdparams->source, "Version: %s", s->version );
-		irc_prefmsg( ss_bot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld", ( uptime / TS_ONE_DAY ), ( ( uptime / TS_ONE_DAY ) == 1 ) ? "" : "s", ( ( uptime / TS_ONE_HOUR ) % 24 ), ( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ), ( uptime % 60 ) );
-		irc_prefmsg( ss_bot, cmdparams->source, "Current Users: %-3d (%d%%)", 
+		irc_prefmsg( statbot, cmdparams->source, "Version: %s", s->version );
+		irc_prefmsg( statbot, cmdparams->source, "Uptime:  %ld day%s, %02ld:%02ld:%02ld", ( uptime / TS_ONE_DAY ), ( ( uptime / TS_ONE_DAY ) == 1 ) ? "" : "s", ( ( uptime / TS_ONE_HOUR ) % 24 ), ( ( uptime / TS_ONE_MINUTE ) % TS_ONE_MINUTE ), ( uptime % 60 ) );
+		irc_prefmsg( statbot, cmdparams->source, "Current Users: %-3d (%d%%)", 
 			s->server->users, 
 			( int )( ( float ) s->server->users /( float ) networkstats.users.current * 100 ) );
 	}
-	irc_prefmsg( ss_bot, cmdparams->source, "Maximum users: %-3d at %s",
+	irc_prefmsg( statbot, cmdparams->source, "Maximum users: %-3d at %s",
 		ss->users.alltime.max, sftime( ss->users.alltime.ts_max ) );
-	irc_prefmsg( ss_bot, cmdparams->source, "Total users connected: %-3d", ss->users.alltime.runningtotal );
+	irc_prefmsg( statbot, cmdparams->source, "Total users connected: %-3d", ss->users.alltime.runningtotal );
 	if( s )
-		irc_prefmsg( ss_bot, cmdparams->source, "Current opers: %-3d", ss->opers.current );
-	irc_prefmsg( ss_bot, cmdparams->source, "Maximum opers: %-3d at %s",
+		irc_prefmsg( statbot, cmdparams->source, "Current opers: %-3d", ss->opers.current );
+	irc_prefmsg( statbot, cmdparams->source, "Maximum opers: %-3d at %s",
 		ss->opers.alltime.max, sftime( ss->opers.alltime.ts_max ) );
-	irc_prefmsg( ss_bot, cmdparams->source, "IRCop kills: %d", ss->operkills.alltime.runningtotal );
-	irc_prefmsg( ss_bot, cmdparams->source, "Server kills: %d", ss->serverkills.alltime.runningtotal );
-	irc_prefmsg( ss_bot, cmdparams->source, "Lowest ping: %-3d at %s",
+	irc_prefmsg( statbot, cmdparams->source, "IRCop kills: %d", ss->operkills.alltime.runningtotal );
+	irc_prefmsg( statbot, cmdparams->source, "Server kills: %d", ss->serverkills.alltime.runningtotal );
+	irc_prefmsg( statbot, cmdparams->source, "Lowest ping: %-3d at %s",
 		( int )ss->lowest_ping, sftime( ss->ts_lowest_ping ) );
-	irc_prefmsg( ss_bot, cmdparams->source, "Higest ping: %-3d at %s",
+	irc_prefmsg( statbot, cmdparams->source, "Highest ping: %-3d at %s",
 		( int )ss->highest_ping, sftime( ss->ts_highest_ping ) );
 	if( s )
-		irc_prefmsg( ss_bot, cmdparams->source, "Current Ping: %-3d", ( int )s->server->ping );
+		irc_prefmsg( statbot, cmdparams->source, "Current Ping: %-3d", ( int )s->server->ping );
 	if( ss->splits.alltime.runningtotal >= 1 )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, 
+		irc_prefmsg( statbot, cmdparams->source, 
 			"%s has split from the network %d time %s",
 			ss->name, ss->splits.alltime.runningtotal, ( ss->splits.alltime.runningtotal == 1 ) ? "" : "s" );
 	}
 	else
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "%s has never split from the network.", 
+		irc_prefmsg( statbot, cmdparams->source, "%s has never split from the network.", 
 			ss->name );
 	}
-	irc_prefmsg( ss_bot, cmdparams->source, "***** End of Statistics *****" );
+	irc_prefmsg( statbot, cmdparams->source, "***** End of Statistics *****" );
 	return NS_SUCCESS;
 }
 

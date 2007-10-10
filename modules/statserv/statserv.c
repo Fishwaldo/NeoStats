@@ -48,7 +48,7 @@ static int ss_set_html_cb( const CmdParams *cmdparams, SET_REASON reason );
 static int ss_set_htmlpath_cb( const CmdParams *cmdparams, SET_REASON reason );
 
 /** Bot pointer */
-Bot *ss_bot;
+Bot *statbot;
 
 /** Module Events */
 ModuleEvent module_events[] = {
@@ -127,7 +127,7 @@ static bot_setting ss_settings[]=
 };
 
 /** BotInfo */
-static BotInfo ss_botinfo = 
+static BotInfo statbotinfo = 
 {
 	"StatServ", 
 	"StatServ1", 
@@ -201,8 +201,8 @@ int ModInit( void )
 int ModSynch( void )
 {
 	SET_SEGV_LOCATION();
-	ss_bot = AddBot( &ss_botinfo );
-	if( !ss_bot )
+	statbot = AddBot( &statbotinfo );
+	if( !statbot )
 		return NS_FAILURE;
 	/* Timer to save the database */
 	AddTimer( TIMER_TYPE_INTERVAL, SaveStatsTimer, "SaveStatsTimer", DBSAVETIME, NULL );
@@ -260,7 +260,7 @@ static int ss_set_html_cb( const CmdParams *cmdparams, SET_REASON reason )
 	{
 		if( StatServ.html && StatServ.htmlpath[0] == 0 )
 		{
-			irc_prefmsg ( ss_bot, cmdparams->source, 
+			irc_prefmsg ( statbot, cmdparams->source, 
 				"You need to SET HTMLPATH. HTML output disabled." );
 			StatServ.html = 0;
 			return NS_SUCCESS;
@@ -293,7 +293,7 @@ static int ss_set_htmlpath_cb( const CmdParams *cmdparams, SET_REASON reason )
 		opf = os_fopen( StatServ.htmlpath, "wt" );
 		if( !opf )
 		{
-			irc_prefmsg( ss_bot, cmdparams->source, 
+			irc_prefmsg( statbot, cmdparams->source, 
 				"Failed to open HTML output file %s. Check file permissions. HTML output disabled.", StatServ.htmlpath );
 			return NS_SUCCESS;
 		}

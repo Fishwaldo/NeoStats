@@ -227,14 +227,14 @@ static int operlist( Client *u, void * v )
 		return NS_FALSE;
 	if( !operlistserver )
 	{
-		irc_prefmsg( ss_bot, listu, "%-15s %-15s %-10d",
+		irc_prefmsg( statbot, listu, "%-15s %-15s %-10d",
 			u->name, u->uplink->name, UserLevel( u ) );
 	}
 	else
 	{
 		if( ircstrcasecmp( operlistserver, u->uplink->name ) )
 			return NS_FALSE;
-		irc_prefmsg( ss_bot, listu, "%-15s %-15s %-10d", 
+		irc_prefmsg( statbot, listu, "%-15s %-15s %-10d", 
 			u->name, u->uplink->name, UserLevel( u ) );
 	}
 	return NS_FALSE;
@@ -259,8 +259,8 @@ int ss_cmd_operlist( CmdParams *cmdparams )
 	operlistserver = NULL;
 	if( cmdparams->ac == 0 )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops:" );
-		irc_prefmsg( ss_bot, cmdparams->source, "ID  %-15s %-15s %-10s", 
+		irc_prefmsg( statbot, cmdparams->source, "Online IRCops:" );
+		irc_prefmsg( statbot, cmdparams->source, "ID  %-15s %-15s %-10s", 
 			"Nick", "Server", "Level" );
 	}
 	if( cmdparams->ac != 0 )
@@ -272,15 +272,15 @@ int ss_cmd_operlist( CmdParams *cmdparams )
 	{
 		operlistaway = 1;
 		flags = NULL;
-		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops( not away ):" );
+		irc_prefmsg( statbot, cmdparams->source, "Online IRCops( not away ):" );
 	}
 	if( !operlistaway && flags && strchr( flags, '.' ) )
 	{
 		operlistserver = flags;
-		irc_prefmsg( ss_bot, cmdparams->source, "Online IRCops on server %s", operlistserver );
+		irc_prefmsg( statbot, cmdparams->source, "Online IRCops on server %s", operlistserver );
 	}
 	ProcessUserList( operlist, ( void * )cmdparams->source );
-	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+	irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 
@@ -301,7 +301,7 @@ static int botlist( Client *u, void * v )
 
 	listu = ( Client * )v;
 	if IsBot( u )
-		irc_prefmsg( ss_bot, listu, "%-15s %s", u->name, u->uplink->name );
+		irc_prefmsg( statbot, listu, "%-15s %s", u->name, u->uplink->name );
 	return NS_FALSE;
 }
 
@@ -318,9 +318,9 @@ static int botlist( Client *u, void * v )
 int ss_cmd_botlist( CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_prefmsg( ss_bot, cmdparams->source, "Online bots:" );
+	irc_prefmsg( statbot, cmdparams->source, "Online bots:" );
 	ProcessUserList( botlist, ( void * )cmdparams->source );
-	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+	irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 

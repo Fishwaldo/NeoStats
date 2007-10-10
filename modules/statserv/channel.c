@@ -508,7 +508,7 @@ static void top10membershandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
-	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Members %d", 
+	irc_prefmsg( statbot, cmdparams->source, "Channel %s Members %d", 
 		cs->name, cs->c->users );
 }
 
@@ -526,7 +526,7 @@ static void top10joinshandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
-	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Joins %d", 
+	irc_prefmsg( statbot, cmdparams->source, "Channel %s Joins %d", 
 		cs->name, cs->users.alltime.runningtotal );
 }
 
@@ -544,7 +544,7 @@ static void top10kickshandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
-	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Kicks %d", 
+	irc_prefmsg( statbot, cmdparams->source, "Channel %s Kicks %d", 
 		cs->name, cs->kicks.alltime.runningtotal );
 }
 
@@ -562,7 +562,7 @@ static void top10topicshandler( channelstat *cs, const void *v )
 {
 	CmdParams *cmdparams = ( CmdParams * ) v;
 
-	irc_prefmsg( ss_bot, cmdparams->source, "Channel %s Topics %d",
+	irc_prefmsg( statbot, cmdparams->source, "Channel %s Topics %d",
 		cs->name, cs->topics.alltime.runningtotal );
 }
 
@@ -583,58 +583,58 @@ int ss_cmd_channel( const CmdParams *cmdparams )
 
 	if( cmdparams->ac == 0 )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Online Channels:" );
-		irc_prefmsg( ss_bot, cmdparams->source, "=======================" );
+		irc_prefmsg( statbot, cmdparams->source, "Top 10 Online Channels:" );
+		irc_prefmsg( statbot, cmdparams->source, "=======================" );
 		GetChannelStats( top10membershandler, CHANNEL_SORT_MEMBERS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
-		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+		irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	}
 	else if( ircstrcasecmp( cmdparams->av[0], "POP" ) == 0 )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Join Channels (Ever):" );
-		irc_prefmsg( ss_bot, cmdparams->source, "============================" );
+		irc_prefmsg( statbot, cmdparams->source, "Top 10 Join Channels (Ever):" );
+		irc_prefmsg( statbot, cmdparams->source, "============================" );
 		GetChannelStats( top10joinshandler, CHANNEL_SORT_JOINS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
-		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+		irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	}
 	else if( ircstrcasecmp( cmdparams->av[0], "KICKS" ) == 0 )
 	{
-		irc_prefmsg( ss_bot,cmdparams->source, "Top 10 Kick Channels (Ever):" );
-		irc_prefmsg( ss_bot,cmdparams->source, "============================" );
+		irc_prefmsg( statbot,cmdparams->source, "Top 10 Kick Channels (Ever):" );
+		irc_prefmsg( statbot,cmdparams->source, "============================" );
 		GetChannelStats( top10kickshandler, CHANNEL_SORT_KICKS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
-		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+		irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	}
 	else if( ircstrcasecmp( cmdparams->av[0], "TOPICS" ) == 0 )
 	{
-		irc_prefmsg( ss_bot, cmdparams->source, "Top 10 Topic Channels (Ever):" );
-		irc_prefmsg( ss_bot, cmdparams->source, "=============================" );
+		irc_prefmsg( statbot, cmdparams->source, "Top 10 Topic Channels (Ever):" );
+		irc_prefmsg( statbot, cmdparams->source, "=============================" );
 		GetChannelStats( top10topicshandler, CHANNEL_SORT_TOPICS, 10, ( UserLevel( cmdparams->source ) < NS_ULEVEL_OPER ), ( void * )cmdparams );
-		irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+		irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	}
 	else
 	{
 		cs = findchanstats( cmdparams->av[0] );
 		if( cs == NULL  )
 		{
-			irc_prefmsg( ss_bot,cmdparams->source, 
+			irc_prefmsg( statbot,cmdparams->source, 
 				"No statistics for %s", cmdparams->av[0] );
 			return NS_SUCCESS;
 		}
-		irc_prefmsg( ss_bot, cmdparams->source, "\2Channel statistics for %s (%s)\2", 
+		irc_prefmsg( statbot, cmdparams->source, "\2Channel statistics for %s (%s)\2", 
 			cmdparams->av[0], cs->c ? "Online" : "Offline" );
-		irc_prefmsg( ss_bot, cmdparams->source, "Current Members: %d (Max %d on %s)",
+		irc_prefmsg( statbot, cmdparams->source, "Current Members: %d (Max %d on %s)",
 			cs->c->users, cs->users.alltime.max, sftime( cs->users.alltime.ts_max ) );
-		irc_prefmsg( ss_bot,cmdparams->source, "Max Members today: %d at %s", 
+		irc_prefmsg( statbot,cmdparams->source, "Max Members today: %d at %s", 
 			cs->users.daily.max, sftime( cs->users.daily.ts_max ) );
-		irc_prefmsg( ss_bot,cmdparams->source, "Total Channel Joins: %d", 
+		irc_prefmsg( statbot,cmdparams->source, "Total Channel Joins: %d", 
 			cs->users.alltime.runningtotal );
-		irc_prefmsg( ss_bot, cmdparams->source, "Total Joins today: %d (Max %d on %s)",
+		irc_prefmsg( statbot, cmdparams->source, "Total Joins today: %d (Max %d on %s)",
 			cs->joins.daily.runningtotal, cs->joins.alltime.max, sftime( cs->joins.alltime.ts_max ) );
-		irc_prefmsg( ss_bot,cmdparams->source, "Total Topic Changes Today: %d (Total %d)", 
+		irc_prefmsg( statbot,cmdparams->source, "Total Topic Changes Today: %d (Total %d)", 
 			cs->topics.daily.runningtotal, cs->topics.alltime.runningtotal );
-		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks: %d", cs->kicks.alltime.runningtotal );
-		irc_prefmsg( ss_bot, cmdparams->source, "Total Kicks today %d (Max %d on %s)",
+		irc_prefmsg( statbot, cmdparams->source, "Total Kicks: %d", cs->kicks.alltime.runningtotal );
+		irc_prefmsg( statbot, cmdparams->source, "Total Kicks today %d (Max %d on %s)",
 			cs->kicks.daily.max, cs->kicks.alltime.max, sftime( cs->kicks.alltime.ts_max ) );
 		if( cs->c == NULL  )
-			irc_prefmsg( ss_bot, cmdparams->source, "Channel last seen at %s",
+			irc_prefmsg( statbot, cmdparams->source, "Channel last seen at %s",
 				sftime( cs->ts_lastseen ) );
 	}
 	return NS_SUCCESS;

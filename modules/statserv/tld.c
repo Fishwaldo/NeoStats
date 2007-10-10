@@ -164,7 +164,7 @@ static int sortusers( const void *v, const void *v2 )
 
 void TLDReport( const TLD *tld, const void *v )
 {
-	irc_prefmsg( ss_bot, ( Client * ) v, 
+	irc_prefmsg( statbot, ( Client * ) v, 
 		"%3s \2%3d\2 (%d%%) -> %s ---> Daily Total: %d",
 		tld->tld, tld->users.alltime.max, ( int )( ( float ) tld->users.current / ( float ) networkstats.users.current ) * 100,
 		tld->country, tld->users.current );
@@ -207,9 +207,9 @@ void GetTLDStats( const TLDStatHandler handler, const void *v )
 int ss_cmd_tldmap( const CmdParams *cmdparams )
 {
 	SET_SEGV_LOCATION();
-	irc_prefmsg( ss_bot, cmdparams->source, "Top Level Domain Statistics:" );
+	irc_prefmsg( statbot, cmdparams->source, "Top Level Domain Statistics:" );
 	GetTLDStats( TLDReport, ( void * )cmdparams->source );
-	irc_prefmsg( ss_bot, cmdparams->source, "End of list." );
+	irc_prefmsg( statbot, cmdparams->source, "End of list." );
 	return NS_SUCCESS;
 }
 

@@ -34,7 +34,7 @@
 /* but only save data older than 1 hour! */
 #define PROGCHANTIME TS_ONE_HOUR
 
-extern Bot *ss_bot;
+extern Bot *statbot;
 
 typedef struct tStatServ { 
 	int lagtime; 
