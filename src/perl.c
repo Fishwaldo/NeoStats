@@ -1439,9 +1439,9 @@ XS(XS_NeoStats_DBAStore)
 		 * case of perl, we have no idea, so this is a workaround to store the size in a seperate entry
 		 * and we can retrive that in a Fetch Call before actually fetching the data
 		 */
-		mysize = strlen(SvPV_nolen(ST(2)));
+		mysize = SvCUR(ST(2));
 		DBAStoreInt("PerlSizes", SvPV_nolen(ST(1)), &mysize);
-		XSRETURN_UV(DBAStore(SvPV_nolen(ST(0)), SvPV_nolen(ST(1)), SvPV_nolen(ST(2)), strlen(SvPV_nolen(ST(2)))));
+		XSRETURN_UV(DBAStore(SvPV_nolen(ST(0)), SvPV_nolen(ST(1)), SvPVbyte_nolen(ST(2)), SvCUR(ST(2))));
 	}
 	XSRETURN_UV(NS_FAILURE);
 }
@@ -1457,15 +1457,17 @@ XS(XS_NeoStats_DBAFetch)
 	if (items < 2) {
 		nlog(LOG_WARNING, "Usage: NeoStats:Internal:DBAFetch(table, name)");
 	} else {
+		SP -= items;
 		/* first get the size */
 		DBAFetchInt("PerlSizes", SvPV_nolen(ST(1)), &mysize);
-		data = ns_malloc((int)mysize+1);
+		data = ns_malloc((int)mysize);
 		DBAFetch(SvPV_nolen(ST(0)), SvPV_nolen(ST(1)), data, (int)mysize);
 		data[mysize] = '\0';
-		ret = newSVpv(data, strlen(data));
+		ret = newSVpv(data, mysize);
 		free(data);
 		sv_2mortal(ret);
 		XPUSHs(ret);
+		PUTBACK;
 		XSRETURN(1);
 	}
 	XSRETURN_EMPTY;
@@ -1490,10 +1492,12 @@ XS(XS_NeoStats_DBADelete)
 
 /* I hate Global Variables, but there is no user cookie var to pass around */
 HV *perlFetchRows;
+int gotitems = 0;
 
 static int
 load_perl_rows(char *key, void *data, int size)
 {
+	gotitems = 1;
 	hv_store(perlFetchRows, key, strlen(key),
 		newSVpv(data, size), 0);
 	return NS_FALSE;
@@ -1507,9 +1511,11 @@ XS(XS_NeoStats_DBAFetchRows)
 		nlog(LOG_WARNING, "Useage: NeoStats::Internal::DBAFetchRows(table)");
 	} else {
 		SP -= items;
-		hv_clear(perlFetchRows);
+		if (gotitems > 0) {
+			hv_clear(perlFetchRows);
+			gotitems = 0;
+		}
 		DBAFetchRows2(SvPV_nolen(ST(0)), load_perl_rows);
-		sv_2mortal((SV *)perlFetchRows);
 		XPUSHs(newRV_noinc((SV *)perlFetchRows));
 		PUTBACK;
 		XSRETURN(1);

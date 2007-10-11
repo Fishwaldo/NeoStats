@@ -9,6 +9,7 @@
 # Using the following command:
 use Devel::Peek;
 import NeoStats::NV;
+use Storable;
 my $bot;
 
 NeoStats::register( "Test", "1.0", "Test Script 1 description", "setupbot", "shutdownbot");
@@ -102,11 +103,11 @@ sub event_ping {
 sub event_pong {
 	my ($source) = @_;
 	NeoStats::ChanAlert($bot, "Pong $source");
-	NeoStats::Internal::DBAStore("hello", "data", "This is a string data");
-	my $text = NeoStats::Internal::DBAFetch("hello", "data");
+	NeoStats::DBAStore("hello", "data", "This is a string data");
+	my $text = NeoStats::DBAFetch("hello", "data");
 	NeoStats::debug($text);
-	Dump(NeoStats::Internal::DBAFetchRows("hello"));
-	NeoStats::Internal::DBADelete("hello", "data");
+	Dump(NeoStats::DBAFetchRows("hello"));
+	NeoStats::DBADelete("hello", "data");
 
 #	my $testvar = new NeoStats::NV("users");
 #	Dump($testvar->{fish});
@@ -153,6 +154,11 @@ sub event_pong {
 	$blah->{passwd} = "pass";
 	$blah->{added} = "Fish";
 	$blah->{tslastused} = "0";
+	NeoStats::DBASaveData("blah", $blah->{nick}, $blah);
+	my $ha = NeoStats::DBAFetchAllData("blah");
+	Dump($ha);
+	NeoStats::debug("ha.".$ha->{'Gheheh'}->{passwd});
+#	Dump($blah);
 #	Dump($hostserv);
 	$hostserv->AddNode(-2, $blah);
 	while ( my ($key, $value) = each(%$hostserv)) {

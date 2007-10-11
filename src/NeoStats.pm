@@ -7,12 +7,12 @@ use File::Basename();
 use Symbol();
 my ($haveStorable) = eval 'require Storable;';
 Storable->import(qw/nfreeze thaw/) if $haveStorable;
-
+use MIME::Base64;
 
 {
   package NeoStats;
   use base qw(Exporter);
-#  use strict;
+  use strict;
   use warnings;
   our %EXPORT_TAGS = ( all => [
 			       qw(register hook_server hook_command),
@@ -622,9 +622,81 @@ Storable->import(qw/nfreeze thaw/) if $haveStorable;
     my $name = shift;
     return NeoStats::Internal::DelTimer($name);
   }
-
+ 
+  sub DBAStore {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of arguements to DBAStore");
+      return NeoStats::NS_FAILURE;
+    }
+    my $table = shift;
+    my $name = shift;
+    my $data = shift;
+    if ((ref($data) eq 'ARRAY') || (ref($data) eq 'HASH')) {
+      NeoStats::debug("Data must be a string in DBAStore");
+      return NeoStats::NS_FAILURE;
+    }
+    return NeoStats::Internal::DBAStore($table, $name, $data);
+  }
+  sub DBAFetch {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguements to DBAFetch");
+      return;
+    }
+    my $table = shift;
+    my $name = shift;
+    return NeoStats::Internal::DBAFetch($table, $name);
+  } 
+  
+  sub DBADelete {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of arguements to DBADelete");
+      return NeoStats::NS_FAILURE;
+    }
+    my $table = shift;
+    my $name = shift;
+    return NeoStats::Internal::DBADelete($table, $name);
+  }
+  sub DBAFetchRows {
+    if (@_ < 1) {
+      NeoStats::debug("Invaid Number of Arguements to DBAFetchRows");
+      return;
+    }
+    my $table = shift;
+    return NeoStats::Internal::DBAFetchRows($table);
+  }
+  sub DBASaveData {
+    if (@_ < 3) {
+      NeoStats::debug("Invalid Number of Arguements to DBASaveData");
+      return NeoStats::NS_FAILURE;
+    }
+    my $table = shift;
+    my $name = shift;
+    my $data = shift;
+    $data = Storable::nfreeze($data);
+    return NeoStats::Internal::DBAStore($table, $name, MIME::Base64::encode($data));
+  }
+  sub DBAFetchData {
+    if (@_ < 2) {
+      NeoStats::debug("Invalid Number of Arguements to DBAFetchData");
+      return NeoStats::NS_FAILURE;
+    }
+    my $table = shift;
+    my $name = shift;
+    return Storable::thaw(MIME::Base64::decode(NeoStats::Internal::DBAFetch($table, $name)));
+  }
+  sub DBAFetchAllData {
+    if (@_ < 1) {
+      NeoStats::debug("Invalid Number of Arguements to DBAFetchAllData");
+      return NeoStats::NS_FAILURE;
+    }
+    my $table = shift;
+    my $frozenhash = NeoStats::Internal::DBAFetchRows($table);
+    while ( my ($key, $value) = each(%$frozenhash)) {
+       $frozenhash->{$key} = Storable::thaw(MIME::Base64::decode($value));
+    }
+    return $frozenhash;
+  }  
   sub debug {
-
     my $text = shift @_;
     return 1 unless $text;
     if ( ref( $text ) eq 'ARRAY' ) {
