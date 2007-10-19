@@ -688,7 +688,7 @@ static int ss_cmd_server_stats( const CmdParams *cmdparams )
 	if( ss->splits.alltime.runningtotal >= 1 )
 	{
 		irc_prefmsg( statbot, cmdparams->source, 
-			"%s has split from the network %d time %s",
+			"%s has split from the network %d time%s",
 			ss->name, ss->splits.alltime.runningtotal, ( ss->splits.alltime.runningtotal == 1 ) ? "" : "s" );
 	}
 	else
