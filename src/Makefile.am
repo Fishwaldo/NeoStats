@@ -13,6 +13,8 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c confuse.c confusel
 
 if DO_PERL
 neostats_SOURCES += perl.c neostats.pm.h NV.c
+BUILT_SOURCES 	= NV.c
+CLEANFILES 	= NV.c
 else
 neostats_SOURCES +=
 endif
@@ -23,8 +25,6 @@ AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @
 neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/libneostats.la $(top_builddir)/lib/event/libevent.la 
 
 EXTRA_dist	= typemap NV.xs
-BUILT_SOURCES 	= NV.c
-CLEANFILES 	= NV.c
 
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 

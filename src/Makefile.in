@@ -266,13 +266,13 @@ neostats_SOURCES = auth.c bans.c bots.c channels.c commands.c \
 	adnssetup.c adnstransmit.c adnstypes.c oscalls.c ossocket.c \
 	osfile.c updates.c MiniMessage.c MiniMessageGateway.c \
 	namedvars.c $(am__append_1) $(am__append_2)
+@DO_PERL_TRUE@BUILT_SOURCES = NV.c
+@DO_PERL_TRUE@CLEANFILES = NV.c
 AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @PERL_CFLAGS@ \
 		-I$(top_srcdir)/lib/event -I$(top_srcdir)/lib/nxml 
 
 neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/libneostats.la $(top_builddir)/lib/event/libevent.la 
 EXTRA_dist = typemap NV.xs
-BUILT_SOURCES = NV.c
-CLEANFILES = NV.c
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 noinst_HEADERS = confuselexer.l NeoStats.pm
 LINK = $(CCDV) $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \

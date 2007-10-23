@@ -7,7 +7,6 @@
 "use Symbol();\n"
 "my ($haveStorable) = eval 'require Storable;';\n"
 "Storable->import(qw/nfreeze thaw/) if $haveStorable;\n"
-"use Devel::Peek;\n"
 "use MIME::Base64;\n"
 "\n"
 "{\n"
