@@ -4,6 +4,10 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - add SVSKILL recieving support to Unreal3.2 module. Might be worthwhile as
+   a global function though (F)
+ - Tokens are case sensitive (at least in Unreal) so make sure we use the
+   right comparision for token checks (F)
  - Incorporate a Perl Script (NamedVarsInspector.pl) that allows you to view available NamedVar
    entries - Usefull for Perl Module Developers (F)
  - Implementation of DBA* routines for Perl Modules. (F)

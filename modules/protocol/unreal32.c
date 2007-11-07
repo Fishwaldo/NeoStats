@@ -326,6 +326,7 @@ static void m_sjoin( char *origin, char **argv, int argc, int srv );
 static void m_smo( char *origin, char **argv, int argc, int srv );
 static void m_swhois( char *origin, char **argv, int argc, int srv );
 static void m_tkl( char *origin, char **argv, int argc, int srv );
+static void m_svskill( char *origin, char **argv, int argc, int srv);
 
 ProtocolInfo protocol_info = 
 {
@@ -368,6 +369,7 @@ irc_cmd cmd_list[] =
 	{&MSG_SMO, &TOK_SMO, m_smo, 0},
 	{&MSG_EOS, &TOK_EOS, m_eos, 0},
 	{&MSG_TKL, &TOK_TKL, m_tkl, 0},
+	{&MSG_SVSKILL, &TOK_SVSKILL, m_svskill, 0},
 	IRC_CMD_END()
 };
 
@@ -896,6 +898,31 @@ static void m_swhois( char *origin, char **argv, int argc, int srv )
 static void m_smo( char *origin, char **argv, int argc, int srv )
 {
 	/* TODO */
+}
+
+/** m_svskill
+ *
+ *  process SVSKILL command
+ *  RX:
+ *    DEBUG1 NeoStats - origin: NickServ 
+ *    DEBUG1 NeoStats - cmd   : h 
+ *    DEBUG1 NeoStats - args  : Sean :NickServ (GHOST command used by Eliot) 
+ *  Format:
+ *    :origin SMO ? :message
+ *
+ *  @param origin source of kill (user/server)
+ *  @param argv list of message parameters
+ *    argv[0] - Killer
+ *    argv[1] - Comment
+ *  @param argc parameter count
+ *  @param srv command flag
+ *
+ *  @return none
+ */
+
+static void m_svskill( char *origin, char **argv, int argc, int srv )
+{
+	do_kill(origin, argv[0], argv[1]);
 }
 
 /** m_tkl
