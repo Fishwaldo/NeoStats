@@ -1103,18 +1103,30 @@ void CleanupUserModdata( void )
 	GET_CUR_MODULE()->userdatacnt = 0;
 }
 
+/** @brief SyncServerClients
+ *
+ *  Sync all users on a server
+ *  NeoStats core use only.
+ *
+ *  @param pointer to server client
+ *
+ *  @return none
+ */
+
 void SyncServerClients(Client *s) 
 {
 	hscan_t scan2;
 	hnode_t *node2;
 	Client *u;
-			hash_scan_begin(&scan2, userhash);
-			while ( ( node2 = hash_scan_next(&scan2) ) != NULL) 
-			{
-				u = hnode_get(node2);
-				if (u->uplink == s) {
-					dlog(DEBUG1, "SyncServerClients: User %s (Server %s) is Synced", u->name, u->uplink->name);
-					ClearNetSplit(u);
-				}
-			}	
+
+	hash_scan_begin( &scan2, userhash );
+	while ( ( node2 = hash_scan_next(&scan2) ) != NULL) 
+	{
+		u = hnode_get( node2 );
+		if ( u->uplink == s )
+		{
+			dlog( DEBUG1, "SyncServerClients: User %s (Server %s) is Synced", u->name, u->uplink->name );
+			ClearNetSplit( u );
+		}
+	}	
 }
