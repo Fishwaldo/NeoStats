@@ -37,6 +37,8 @@
 #define LIBNXML_MINOR_VERSION	18
 #define LIBNXML_MICRO_VERSION	1
 
+#define LIBNXML_PACKAGE "nxml"
+
 #ifdef  __cplusplus
 extern "C" {
 #endif

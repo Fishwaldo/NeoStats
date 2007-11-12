@@ -210,8 +210,7 @@ __nxml_dtd_parse_get_block (nxml_t * nxml, char **buffer, size_t * size,
 }
 
 static void
-__nxml_dtd_parse_free_element_content (__nxml_doctype_element_content_t *
-				       content)
+__nxml_dtd_parse_free_element_content (__nxml_doctype_element_content_t *content)
 {
   __nxml_doctype_element_content_t *tmp, *next;
   if (!content)
