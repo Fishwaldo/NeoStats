@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "nxml.h"
+#include "nxml_internal.h"
 
 char *
 nxml_strerror (nxml_t * nxml, nxml_error_t err)

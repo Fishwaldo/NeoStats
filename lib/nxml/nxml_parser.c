@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "nxml.h"
+#include "nxml_internal.h"
 
 static int
 __nxml_parse_unique_attribute (nxml_attr_t * attr, char *name)

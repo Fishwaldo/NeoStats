@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "nxml.h"
+#include "nxml_internal.h"
 
 static void
 __nxml_write_escape_string (void (*func) (void *, char *, ...), void *obj,

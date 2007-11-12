@@ -24,7 +24,6 @@
 #endif
 #endif
 
-#include "nxml.h"
 #include "nxml_internal.h"
 
 static nxml_error_t __nxml_dtd_valid_node (nxml_t * nxml, nxml_data_t * data);

@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "nxml.h"
+#include "nxml_internal.h"
 
 typedef struct __nxml_download_t__ __nxml_download_t;
 

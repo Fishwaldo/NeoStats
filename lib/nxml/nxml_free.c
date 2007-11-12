@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "nxml.h"
+#include "nxml_internal.h"
 
 static void __nxml_private_free (__nxml_private_t * priv);
 static void __nxml_entity_free (__nxml_private_t * priv);

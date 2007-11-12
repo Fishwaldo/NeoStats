@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "nxml.h"
+#include "nxml_internal.h"
 
 nxml_t *
 nxmle_new_data (nxml_error_t * err)

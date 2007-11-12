@@ -24,7 +24,6 @@
 #endif
 #endif
 
-#include "nxml.h"
 #include "nxml_internal.h"
 
 
