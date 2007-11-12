@@ -331,10 +331,8 @@ lib/nxml/mrss_write.c -text
 lib/nxml/nxml.h -text
 lib/nxml/nxml.vcproj -text
 lib/nxml/nxml_download.c -text
-lib/nxml/nxml_dtd.c -text
 lib/nxml/nxml_easy.c -text
 lib/nxml/nxml_edit.c -text
-lib/nxml/nxml_entity.c -text
 lib/nxml/nxml_error.c -text
 lib/nxml/nxml_free.c -text
 lib/nxml/nxml_init.c -text

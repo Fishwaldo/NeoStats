@@ -204,23 +204,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nxml_dtd.c"
-				>
-			</File>
-			<File
 				RelativePath=".\nxml_easy.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nxml_edit.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nxml_entity.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nxml_error.c"
 				>
 			</File>
 			<File
@@ -228,15 +212,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nxml_init.c"
-				>
-			</File>
-			<File
 				RelativePath=".\nxml_namespace.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nxml_parser.c"
 				>
 			</File>
 			<File
@@ -244,11 +220,27 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nxml_tools.c"
+				RelativePath=".\nxml_utf.c"
 				>
 			</File>
 			<File
-				RelativePath=".\nxml_utf.c"
+				RelativePath=".\nxml_edit.c"
+				>
+			</File>
+			<File
+				RelativePath=".\nxml_error.c"
+				>
+			</File>
+			<File
+				RelativePath=".\nxml_init.c"
+				>
+			</File>
+			<File
+				RelativePath=".\nxml_parser.c"
+				>
+			</File>
+			<File
+				RelativePath=".\nxml_tools.c"
 				>
 			</File>
 			<File
