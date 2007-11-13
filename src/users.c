@@ -187,6 +187,9 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 	CmdParams *cmdparams;
 	unsigned long ipaddress = 0;
 	Client *u;
+	struct in_addr *ipad;
+	int res;
+
 
 	SET_SEGV_LOCATION();
 	u = FindUser( nick );
@@ -199,9 +202,19 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 	u = new_user( nick );
 	if( !u )
 		return NULL;
-	if( ip )
-		ipaddress = strtoul( ip, NULL, 10 );
-	else if( !( ircd_srv.protocol&PROTOCOL_NICKIP ) && me.want_nickip == 1 )
+	if( ip ) {
+		/* first, if the u->host is a ip address, just convert it */
+		ipad = ns_calloc( sizeof( struct in_addr ) );
+		res = inet_aton( ip, ipad );
+		if( res > 0 )
+		{
+			/* its valid */
+			ipaddress = htonl( ipad->s_addr );
+			ns_free( ipad );
+		} else {
+			ipaddress = strtoul( ip, NULL, 10 );
+		}
+	} else if( !( ircd_srv.protocol&PROTOCOL_NICKIP ) && me.want_nickip == 1 )
 		ipaddress = process_ip( u->name, host );
 	u->tsconnect = TS ? strtol( TS, NULL, 10 ) : me.now;
 	strlcpy( u->user->hostname, host, MAXHOST );
