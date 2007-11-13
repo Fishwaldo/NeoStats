@@ -11,6 +11,7 @@ IF NOT EXIST modules mkdir modules
 @copy ..\README .
 @copy ..\COPYING .
 @copy ..\src\win32\neostats.conf .
+@copy ..\modules\statserv\data\*.tpl data
 cd ..
 "C:\Program Files\Pantaray\QSetup\Composer.exe" tools\NeoStats.qsp /Compile /Exit
 move tools\NeoStats-Setup.exe tools\NeoStats-Setup-3-0-a4-%1.exe
