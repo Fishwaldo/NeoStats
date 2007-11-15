@@ -198,7 +198,6 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 		nlog( LOG_WARNING, "AddUser: trying to add a user that already exists %s", nick );
 		return NULL;
 	}
-	dlog( DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, ( int )htonl( ipaddress ), server, TS );
 	u = new_user( nick );
 	if( !u )
 		return NULL;
@@ -249,6 +248,7 @@ Client *AddUser( const char *nick, const char *user, const char *host,
 	ns_do_exclude_user( u );
 	if( ( ircd_srv.protocol & PROTOCOL_B64NICK ) && numeric )
 		set_nick_base64( u->name, numeric );
+	dlog( DEBUG2, "AddUser: %s (%s@%s) %s (%d) -> %s at %s", nick, user, host, realname, ( int )htonl( ipaddress ), server, TS );
 	cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->source = u;	
 	SendAllModuleEvent( EVENT_SIGNON, cmdparams );

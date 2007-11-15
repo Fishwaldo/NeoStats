@@ -4,6 +4,15 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Add initial inspircd support for Inspircd 1.1 only. Still WIP (F)
+ - Fix Userdump using channel mode function, rather than usermode function
+   (F)
+ - Make the default action in the Mode Parser to "Add" to work around a
+   Inspircd bug (F)
+ - Fix CmodePrefixToMask to return -1 rather than 0, then we can set certian
+   characters to ignore (such as Inspircd's use of , as a delimiter in FJOIN
+   command (F)
+ - Fix inbuild SJOIN function to handle NULL mode param (F)
  - add SVSKILL recieving support to Unreal3.2 module. Might be worthwhile as
    a global function though (F)
  - Tokens are case sensitive (at least in Unreal) so make sure we use the

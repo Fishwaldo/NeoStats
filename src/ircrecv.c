@@ -1800,7 +1800,7 @@ void do_sjoin( const char *tstime, const char *channame, const char *modes, cons
 	unsigned int paramcnt = 0;
 	unsigned int paramidx = 0;
 
-	if( *modes == '#' )
+	if( modes && *modes == '#' )
 	{
 		JoinChannel( sjoinnick, modes );
 		return;
@@ -1820,7 +1820,7 @@ void do_sjoin( const char *tstime, const char *channame, const char *modes, cons
 			}
 		}
 		mask = 0;
-		while( CmodePrefixToMask( *nicklist ) != 0 )
+		while( CmodePrefixToMask( *nicklist ) != -1 )
 		{
 			mask |= CmodePrefixToMask( *nicklist );
 			nicklist ++;

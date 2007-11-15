@@ -554,7 +554,7 @@ unsigned int CmodePrefixToMask( unsigned char prefix )
 			return ircd_cmodes[i].mask;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 /** @brief CmodePrefixToChar
@@ -764,8 +764,8 @@ void ChanModeHandler( Channel *c, const char *modes, int avindex, char **av, int
 	int modeexists;
 	ModeParams *m;
 	lnode_t *mn;
-	int add = 0;
-
+	/* default to add to work around a bug in Inspircd */
+	int add = 1;
 	while( *modes != '\0' )
 	{
 		unsigned int mask;
@@ -981,7 +981,7 @@ void ListChannelModes( const CmdParams *cmdparams, const Channel *c )
 	ModeParams *m;
 	int i;
 
-	irc_prefmsg( ns_botptr, cmdparams->source, __( "Mode:       %s", cmdparams->source ), UmodeMaskToString( c->modes ) );
+	irc_prefmsg( ns_botptr, cmdparams->source, __( "Mode:       %s", cmdparams->source ), CmodeMaskToString( c->modes ) );
 	cmn = list_first( c->modeparams );
 	while( cmn != NULL )
 	{

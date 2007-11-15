@@ -87,7 +87,7 @@ static void( *irc_send_unzline )( const char *source, const char *mask );
 static void( *irc_send_kline )( const char *source, const char *mask, const char *reason );
 static void( *irc_send_unkline )( const char *source, const char *mask );
 static void( *irc_send_ping )( const char *source, const char *reply, const char *to );
-static void( *irc_send_pong )( const char *reply );
+static void( *irc_send_pong )( const char *reply);
 static void( *irc_send_server )( const char *source, const char *name, const int numeric, const char *infoline );
 static void( *irc_send_squit )( const char *server, const char *quitmsg );
 static void( *irc_send_nick )( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname );
@@ -124,7 +124,7 @@ static void _send_invite( const char *source, const char *target, const char *ch
 static void _send_topic( const char *source, const char *channel, const char *topic );
 static void _send_quit( const char *source, const char *quitmsg );
 static void _send_ping( const char *source, const char *reply, const char *target );
-static void _send_pong( const char *reply );
+static void _send_pong( const char *reply);
 static void _send_server( const char *source, const char *name, const int numeric, const char *infoline );
 static void _send_squit( const char *server, const char *quitmsg );
 static void _send_netinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
@@ -625,12 +625,13 @@ void send_cmd( const char *fmt, ... )
 	dlog( DEBUGTX, "%s", buf );
 	if( strnlen( buf, BUFSIZE ) < BUFSIZE - 2 )
 	{
-		strlcat( buf, "\n", BUFSIZE );
+		strlcat( buf, "\r\n", BUFSIZE );
 	}
 	else
 	{
 		buf[BUFSIZE - 1] = 0;
-		buf[BUFSIZE - 2] = '\n';
+		buf[BUFSIZE - 2] = '\r';
+		buf[BUFSIZE - 3] = '\n';
 	}
 	buflen = strnlen( buf, BUFSIZE );
 	send_to_sock( me.servsock, buf, buflen );
