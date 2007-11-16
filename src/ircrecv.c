@@ -476,7 +476,7 @@ void _m_stats( char *origin, char **argv, int argc, int srv )
 void _m_ping( char *origin, char **argv, int argc, int srv )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
-		do_ping( base64_to_server( origin ), argv[1] );
+		do_ping( base64_to_server( origin ), argv[1]);
 	else
 		do_ping( argv[0], argc > 1 ? argv[1] : NULL );
 }
@@ -1512,7 +1512,7 @@ void do_synch_neostats( void )
 
 void do_ping( const char *origin, const char *destination )
 {
-	irc_pong( origin );
+	irc_pong( origin, destination );
 	if( ircd_srv.burst )
 	{
 		irc_ping( me.name, origin, origin );

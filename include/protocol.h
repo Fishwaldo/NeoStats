@@ -385,7 +385,7 @@ MODULEFUNC void send_unzline( const char *source, const char *mask );
 MODULEFUNC void send_kline( const char *source, const char *mask, const char *reason );
 MODULEFUNC void send_unkline( const char *source, const char *mask );
 MODULEFUNC void send_ping( const char *source, const char *reply, const char *target );
-MODULEFUNC void send_pong( const char *reply );
+MODULEFUNC void send_pong( const char *reply, const char *data );
 MODULEFUNC void send_server( const char *source, const char *name, const int numeric, const char *infoline );
 MODULEFUNC void send_squit( const char *server, const char *quitmsg );
 MODULEFUNC void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname );

@@ -21,8 +21,10 @@
 ** $Id: inspircd.c 3236 2007-11-07 04:02:54Z Fish $
 */
 
+#define _GNU_SOURCE
 #include "neostats.h"
 #include "protocol.h"
+#include "support.h"
 
 /* Umodes */				
 #define UMODE_FAILOP		0x00200000
@@ -305,6 +307,87 @@ mode_init user_umodes[] =
 	MODE_INIT_END()
 };
 
+/** @brief parse
+ *
+ *  parser for inspircd to handle PUSH messages
+ *
+ *  @param notused
+ *  @param rline
+ *  @param len
+ *
+ *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
+ */
+
+int parse( void *notused, void *rline, int len )
+{
+	char origin[64], cmd[64], *coreLine;
+	char *origline, *coreLine2;
+	char *line = (char *)rline;
+	int cmdptr = 0;
+	int ac = 0;
+	int ret = NS_FAILURE;
+	char **av = NULL;
+
+	SET_SEGV_LOCATION();
+	if( *line == '\0' )
+		return NS_FAILURE;
+	origline = strdup(line);
+	if( *line == ':' )
+	{
+		coreLine = strpbrk( line, " " );
+		if( coreLine == NULL )
+			return NS_FAILURE;
+		*coreLine = 0;
+		while( isspace( *++coreLine ) )
+			;
+		strlcpy( origin, line + 1, sizeof( origin ) );
+		memmove( line, coreLine, strnlen( coreLine, BUFSIZE ) + 1 );
+		cmdptr = 1;
+	}
+	else
+	{
+		cmdptr = 0;
+		*origin = 0;
+	}
+	if( *line == '\0' ) {
+		ns_free(origline);
+		return NS_FAILURE;
+	}
+	coreLine = strpbrk( line, " " );
+	if( coreLine )
+	{
+		*coreLine = 0;
+		while( isspace( *++coreLine ) )
+			;
+	}
+	else
+	{
+		coreLine = line + strlen( line );
+	}
+	strlcpy( cmd, line, sizeof( cmd ) ); 
+	coreLine2 = strdup(coreLine);
+	ac = ircsplitbuf( coreLine, &av, 1 );
+	if (!ircstrcasecmp(line, "PUSH")) {
+		ret = parse(NULL, av[1], strlen(av[1]));
+		ns_free(av);
+		ns_free(origline);
+		return ret;
+	}
+	dlog( DEBUG1, "------------------------BEGIN PARSE-------------------------" );
+	dlog( DEBUGRX, "%s", origline );
+	dlog( DEBUG1, "origin: %s", origin );
+	dlog( DEBUG1, "cmd   : %s", cmd );
+	dlog( DEBUG1, "args  : %s", coreLine2 );
+	process_ircd_cmd( cmdptr, cmd, origin, av, ac );
+	ns_free( av );
+	ns_free(origline);
+	ns_free(coreLine2);
+	dlog( DEBUG1, "-------------------------END PARSE--------------------------" );
+	return NS_SUCCESS;
+}
+
+
+
 void send_server_connect( const char *name, const int numeric, const char *infoline, const char *pass, const unsigned long tsboot, const unsigned long tslink )
 {
 	 /*
@@ -312,7 +395,7 @@ void send_server_connect( const char *name, const int numeric, const char *infol
 	 * Sent: BURST 1133994664
 	 */
 	send_cmd( "SERVER %s %s 0 :%s", name, pass, infoline );
-	send_cmd( "BURST %d", me.now);
+	send_cmd( "BURST %ld", (long)me.now);
 }
 
 /** m_server
@@ -390,7 +473,6 @@ static void m_endburst( char *origin, char **argv, int argc, int srv )
 static void m_nick( char *origin, char **argv, int argc, int srv)
 {
 	if (argc == 8) {
-		/* XXX - todo - SMODES (umode +n) should be stripped and sent vi SMODE param */
 		/*      nick     hop   ts       user     host     server  ip       svcid mode     vhost    realname nume smode */
 		do_nick(argv[1], NULL, argv[0], argv[4], argv[2], origin, argv[6], NULL, argv[5], argv[3], argv[7], NULL, NULL);
 	} else {
@@ -491,16 +573,26 @@ static void m_fhost (char *origin, char **argv, int argc, int srv)
 }
 
 /* send_pong needs the target in its params */
-void send_pong(const char *reply) {
-	send_cmd(":%s PONG %s :%s", me.name, me.name, reply);
+void send_pong(const char *reply, const char *data) {
+	if (data)
+		send_cmd(":%s PONG %s :%s", me.name, reply, data);
+	else
+		send_cmd(":%s PONG %s", me.name, reply);
 } 
 
 void send_ping(const char *source, const char *reply, const char *to) {
-	send_cmd(":%s PING %s :%s", reply, to, to); 
+	send_cmd(":%s PING %s :%s", source, source, to); 
 }
 
 void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
-	send_cmd( ":%s %s %d %s %s %s %s %s 0.0.0.0 :%s", server, MSGTOK( NICK ), ts, nick, host, host, ident, newmode, realname);
+	send_cmd( ":%s %s %ld %s %s %s %s %s 0.0.0.0 :%s", server, MSGTOK( NICK ), ts, nick, host, host, ident, newmode, realname);
 }
-
+/* 
+ * DEBUG1 NeoStats - origin: penguin.omega.org.za
+ * DEBUG1 NeoStats - cmd   : PUSH
+ * DEBUG1 NeoStats - args  : NeoStats ::penguin.omega.org.za 242 NeoStats :Server up 0 days, 16:10:09
+ */
+void send_numeric(const char *source, const int numeric, const char *target, const char *buf) {
+	send_cmd( ":%s PUSH %s ::%s %d %s :%s", source, target, source, numeric, target, buf);
+}

@@ -87,7 +87,7 @@ static void( *irc_send_unzline )( const char *source, const char *mask );
 static void( *irc_send_kline )( const char *source, const char *mask, const char *reason );
 static void( *irc_send_unkline )( const char *source, const char *mask );
 static void( *irc_send_ping )( const char *source, const char *reply, const char *to );
-static void( *irc_send_pong )( const char *reply);
+static void( *irc_send_pong )( const char *reply, const char *data);
 static void( *irc_send_server )( const char *source, const char *name, const int numeric, const char *infoline );
 static void( *irc_send_squit )( const char *server, const char *quitmsg );
 static void( *irc_send_nick )( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname );
@@ -124,7 +124,7 @@ static void _send_invite( const char *source, const char *target, const char *ch
 static void _send_topic( const char *source, const char *channel, const char *topic );
 static void _send_quit( const char *source, const char *quitmsg );
 static void _send_ping( const char *source, const char *reply, const char *target );
-static void _send_pong( const char *reply);
+static void _send_pong( const char *reply, const char *data);
 static void _send_server( const char *source, const char *name, const int numeric, const char *infoline );
 static void _send_squit( const char *server, const char *quitmsg );
 static void _send_netinfo( const char *source, const char *maxglobalcnt, const unsigned long ts, const int prot, const char *cloak, const char *netname );
@@ -428,7 +428,7 @@ static void _send_ping( const char *source, const char *reply, const char *targe
 		send_cmd( ":%s %s %s :%s", source, MSGTOK( PING ), reply, target );
 }
 
-static void _send_pong( const char *reply )
+static void _send_pong( const char *reply, const char *data )
 {
 	if( ircd_srv.protocol & PROTOCOL_P10 )
 		send_cmd( "%s %s %s :%s", me.s->name64, TOK_PONG, me.s->name64, reply );
@@ -1667,14 +1667,14 @@ int irc_ping( const char *source, const char *reply, const char *to )
  *  @return NS_SUCCESS if succeeds, NS_FAILURE if not 
  */
 
-int irc_pong( const char *reply )
+int irc_pong( const char *reply, const char *data )
 {
 	if( irc_send_pong == NULL )
 	{
 		unsupported_cmd( "PONG" );
 		return NS_FAILURE;
 	}
-	irc_send_pong( reply );
+	irc_send_pong( reply, data );
 	return NS_SUCCESS;
 }
 

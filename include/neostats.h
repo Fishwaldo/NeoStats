@@ -1355,7 +1355,7 @@ EXPORTFUNC int irc_setident( const Bot *botptr, const char *ident );
 EXPORTFUNC int irc_stats( const char *source, const char type, const char *target );
 
 int irc_ping( const char *source, const char *reply, const char *to );
-int irc_pong( const char *reply );
+int irc_pong( const char *reply, const char *data );
 
 /*  SVS functions 
  *  these operate from the server rather than a bot 

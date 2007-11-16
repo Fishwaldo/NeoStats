@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Inspircd requires additional params for PONG messages. Update (F)
  - Add initial inspircd support for Inspircd 1.1 only. Still WIP (F)
  - Fix Userdump using channel mode function, rather than usermode function
    (F)
