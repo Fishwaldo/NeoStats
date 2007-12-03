@@ -60,7 +60,7 @@ AC_DEFINE_UNQUOTED(OS, "${host}", [cpu-machine-OS])
 	
 # Checks for libraries.
 # AC_LIB_LTDL
-# bah AC_CHECK_LIB(dl, dlopen)
+AC_CHECK_LIB(dl, dlopen)
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(m, log10)
 AC_REPLACE_FUNCS(getopt)
