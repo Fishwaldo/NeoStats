@@ -499,13 +499,14 @@ static void m_fmode ( char *origin, char **argv, int argc, int srv)
 	char **nargv;
 	int nargc;
 	int i, j = 0;
+return;
 	for (i = 0; i < argc; i++) {
 		if (i == 1)
 			continue;
-		AddStringToList(&nargv, argv[i], &nargc);
+/* 		AddStringToList(&nargv, argv[i], &nargc); */
 		j++;
 	}
-	do_mode_channel(origin, nargv, nargc);
+/* 	do_mode_channel(origin, nargv, nargc);*/
 	ns_free(nargv);
 }
 /*
