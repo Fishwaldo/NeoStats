@@ -25,6 +25,7 @@
 #include "neostats.h"
 #include "protocol.h"
 #include "support.h"
+#include "services.h"
 
 /* Umodes */				
 #define UMODE_FAILOP		0x00200000
@@ -497,16 +498,15 @@ static void m_fjoin( char *origin, char **argv, int argc, int srv)
 static void m_fmode ( char *origin, char **argv, int argc, int srv)
 {
 	char **nargv;
-	int nargc;
+	int nargc =0;
 	int i, j = 0;
-return;
 	for (i = 0; i < argc; i++) {
 		if (i == 1)
 			continue;
-/* 		AddStringToList(&nargv, argv[i], &nargc); */
+ 		AddStringToList(&nargv, argv[i], &nargc); 
 		j++;
 	}
-/* 	do_mode_channel(origin, nargv, nargc);*/
+ 	do_mode_channel(origin, nargv, nargc);
 	ns_free(nargv);
 }
 /*
@@ -596,4 +596,84 @@ void send_nick( const char *nick, const unsigned long ts, const char *newmode, c
  */
 void send_numeric(const char *source, const int numeric, const char *target, const char *buf) {
 	send_cmd( ":%s PUSH %s ::%s %d %s :%s", source, target, source, numeric, target, buf);
+}
+
+/* 
+ * DEBUG1 NeoStats - origin: penguin.omega.org.za
+ * DEBUG1 NeoStats - cmd   : FMODE
+ * DEBUG1 NeoStats - args  : #services 1196825064 +
+ */
+void send_cmode(const char *sourceserver, const char *sourceuser, const char *chan, const char *mode, const char *args, const unsigned long ts) {
+	send_cmd( ":%s FMODE %s %ld %s %s", sourceserver, chan, ts, mode, args);
+}
+
+/* 
+ * DEBUG1 NeoStats - origin: Fish
+ * DEBUG1 NeoStats - cmd   : FHOST
+ * DEBUG1 NeoStats - args  : blah.com
+ */
+void send_chghost(const char *server, const char *target, const char *vhost) {
+	send_cmd( ":%s CHGHOST %s :%s", ns_botptr->name, target, vhost);
+}
+
+/*
+ * DEBUG1 NeoStats - origin: Fish
+ * DEBUG1 NeoStats - cmd   : CHGIDENT
+ * DEBUG1 NeoStats - args  : Fish :haha
+ */
+
+void send_chgident(const char *server, const char *target, const char *ident) {
+	send_cmd( ":%s CHGIDENT %s :%s", ns_botptr->name, target, ident);
+}
+/*
+ * DEBUG1 NeoStats - origin: Fish
+ * DEBUG1 NeoStats - cmd   : CHGNAME
+ * DEBUG1 NeoStats - args  : Fish :haha
+ */
+
+void send_chgname(const char *server, const char *target, const char *name) {
+	send_cmd( ":%s CHGNAME %s :%s", ns_botptr->name, target, name);
+}
+
+static void send_addline(const char type, const char *source, const char *mask, const char *bot, const char *reason, const unsigned long length) {
+	send_cmd( ":%s ADDLINE %c %s %s %ld %ld :%s", source, type, mask, bot != NULL ? bot : me.name, me.now, length, reason);
+}
+void send_akill(const char *server, const char *host, const char *ident, const char *bot, const unsigned long length, const char *reason, const unsigned long ts) {
+	char buf[BUFSIZE];
+	snprintf(buf, BUFSIZE, "%s@%s", ident, ident);
+	send_addline('G', server, buf, bot, reason, length);
+}
+void send_sqline(const char *source, const char *mask, const char *reason) {
+	send_addline('Q', source, mask, NULL, reason, 0);
+}
+void send_zline(const char *source, const char *mask, const char *reason) {
+	send_addline('Z', source, mask, NULL, reason, 0);
+}
+void send_kline(const char *source, const char *mask, const char *reason) {
+	send_addline('G', source, mask, NULL, reason, 0);
+}
+void send_gline(const char *source, const char *mask, const char *reason) {
+	send_addline('G', source, mask, NULL, reason, 0);
+}
+
+/* :<source server> SVSJOIN <nick> <channel>
+ */
+void send_svsjoin(const char *source, const char *target, const char *chan) {
+	send_cmd( ":%s SVSJOIN %s %s", source, target, chan);
+}
+
+/* :<source server> SVSPART <nick> <channel>
+ */
+void send_svspart(const char *source, const char *target, const char *chan) {
+	send_cmd( ":%s SVSPART %s %s", source, target, chan);
+}
+
+/* :<source server> SVSNICK <old nick> <new nick> <timestamp>
+ */
+void send_svsnick(const char *source, const char *target, const char *newnick, const unsigned long ts) {
+	send_cmd( ":%s SVSNICK %s %s %ld", source, target, newnick, ts);
+}
+
+void send_svsmode(const char *source, const char *target, const char *modes) {
+	send_cmd( ":%s SVSMODE %s %s", source, target, modes);
 }

@@ -210,7 +210,6 @@ void _m_chatops( char *origin, char **argv, int argc, int srv )
 
 void _m_error( char *origin, char **argv, int argc, int srv )
 {
-	fprintf(stderr, "IRCD reported error: %s", argv[0] );
 	nlog (LOG_ERROR, "IRCD reported error: %s", argv[0] );
 	do_exit (NS_EXIT_ERROR, argv[0] );
 }

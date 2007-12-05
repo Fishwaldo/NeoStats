@@ -1135,8 +1135,13 @@ int irc_cmode( const Bot *botptr, const char *chan, const char *mode, const char
 {
 	char **av;
 	unsigned int ac;
-
-	irc_send_cmode( me.name, botptr->u->name, chan, mode, args, ( unsigned long )me.now );
+	Channel *c;
+	
+	c = FindChannel(chan);
+	if (c) {
+		irc_send_cmode( me.name, botptr->u->name, chan, mode, args, c->creationtime );
+	} else
+		irc_send_cmode( me.name, botptr->u->name, chan, mode, args, (unsigned long)me.now);
 	ircsnprintf( ircd_buf, BUFSIZE, "%s %s %s", chan, mode, args );
 	ac = split_buf( ircd_buf, &av );
 	ChanMode( me.name, av, ac );
@@ -1151,13 +1156,18 @@ int irc_cmode( const Bot *botptr, const char *chan, const char *mode, const char
 
 int irc_chanusermode( const Bot *botptr, const char *chan, const char *mode, const char *target )
 {
+	Channel *c;
 	if( ( ircd_srv.protocol & PROTOCOL_B64NICK ) )
 	{
 		irc_send_cmode( me.name, botptr->u->name, chan, mode, nick_to_base64( target ), ( unsigned long )me.now );
 	}
 	else
 	{
-		irc_send_cmode( me.name, botptr->u->name, chan, mode, target, ( unsigned long )me.now );
+		c = FindChannel(chan);
+		if (c) 
+			irc_send_cmode( me.name, botptr->u->name, chan, mode, target, ( unsigned long )c->creationtime );
+		else
+			irc_send_cmode( me.name, botptr->u->name, chan, mode, target, ( unsigned long )me.now );
 	}
 	ChanUserMode( chan, target, 1, CmodeStringToMask( mode ) );
 	return NS_SUCCESS;
