@@ -182,6 +182,7 @@ static int get_options( int argc, char **argv )
 			}
 			printf( "debug.log enabled at level %d. Watch your disk space\n", level );
 			nsconfig.debuglevel = level;
+			nsconfig.debug = 1;
 			break;
 		case 'n':
 			nsconfig.modnoload = 1;

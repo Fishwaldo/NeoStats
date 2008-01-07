@@ -26,8 +26,6 @@ neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/libneostats.la $(top
 
 EXTRA_DIST	= typemap NV.xs
 
-neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
-
 noinst_HEADERS          =       confuselexer.l NeoStats.pm
 
 neostats.pm.h: NeoStats.pm 	 
