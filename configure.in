@@ -50,10 +50,9 @@ fi
 
 case "$system" in
 	"Darwin")
-		RDYNAMIC_FLAG=
 		;;
 	*)
-		RDYNAMIC_FLAG="-rdynamic"
+		CFLAGS="$CFLAGS -g -rdynamic"
 		;;
 esac	
 AC_DEFINE_UNQUOTED(OS, "${host}", [cpu-machine-OS])
@@ -233,8 +232,6 @@ LIBS="-g $LIBS"]
 AC_DEFINE(HAVE_BACKTRACE, 1, 'backtrace function available')
 AC_SUBST([BLD_LIBEXEC])
 AC_SUBST([LNK_LIBEXEC])
-dnl this is needed so function names can be resolved 
-dnl LDFLAGS="-Wl,--export-dynamic $LDFLAGS"
 
 
 dnl **** Check for underscore on external symbols ****
@@ -454,7 +451,6 @@ AC_SUBST(MODULES)
 AC_SUBST(LIBDB)
 AC_SUBST(CCDV)
 AC_SUBST(EVNTLIBOBJS)
-AC_SUBST(RDYNAMIC_FLAG)
 AC_CONFIG_FILES([Makefile 
 		include/Makefile 
 		src/Makefile
