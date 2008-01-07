@@ -53,6 +53,7 @@ case "$system" in
 		;;
 	*)
 		CFLAGS="$CFLAGS -g -rdynamic"
+		LDFLAGS="$LDFLAGS -g -rdynamic"
 		;;
 esac	
 AC_DEFINE_UNQUOTED(OS, "${host}", [cpu-machine-OS])
