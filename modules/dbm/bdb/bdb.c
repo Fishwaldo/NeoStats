@@ -139,7 +139,7 @@ int DBMFetch (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 		os_memcpy (data, dbdata.data, size);
 		return NS_SUCCESS;
 	}
-	nlog(LOG_WARNING, "dbp->get fail: %s", db_strerror(dbret));
+	dlog(DEBUG10, "dbp->get fail: %s", db_strerror(dbret));
 	return NS_FAILURE;
 }
 
@@ -191,7 +191,7 @@ int DBMFetchRows (void *dbhandle, void *tbhandle, DBRowHandler handler)
 	
 	} 
 	if (dbret != 0 && dbret != DB_NOTFOUND) {
-		nlog(LOG_WARNING, "dbp->c_get failed: %s", db_strerror(dbret));
+		dlog(DEBUG10, "dbp->c_get failed: %s", db_strerror(dbret));
 	}
 	if ((dbret = dbcp->c_close(dbcp)) != 0) {
 		nlog(LOG_WARNING, "dbcpp->close failed: %s", db_strerror(dbret));
@@ -224,7 +224,7 @@ int DBMFetchRows2 (void *dbhandle, void *tbhandle, DBRowHandler2 handler)
 		}
 	} 
 	if (dbret != 0 && dbret != DB_NOTFOUND) {
-		nlog(LOG_WARNING, "dbp->c_get failed: %s", db_strerror(dbret));
+		dlog(DEBUG10, "dbp->c_get failed: %s", db_strerror(dbret));
 	}
 	if ((dbret = dbcp->c_close(dbcp)) != 0) {
 		nlog(LOG_WARNING, "dbcpp->close failed: %s", db_strerror(dbret));
@@ -329,7 +329,7 @@ char **DBMListTables(char *Database)
 		}
 	} 
 	if (dbret != 0 && dbret != DB_NOTFOUND) {
-		nlog(LOG_WARNING, "dbp->c_get failed: %s\n", db_strerror(dbret));
+		dlog(DEBUG10, "dbp->c_get failed: %s\n", db_strerror(dbret));
 	}
 	if ((dbret = dbcp->c_close(dbcp)) != 0) {
 		nlog(LOG_WARNING, "dbcpp->close failed: %s\n", db_strerror(dbret));
