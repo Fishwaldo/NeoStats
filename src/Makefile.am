@@ -24,7 +24,7 @@ AM_CFLAGS = -I$(top_srcdir)/include @PCRE_CFLAGS@ @CURL_CFLAGS@ -DNEOSTATSCORE @
 		
 neostats_LDADD = @LIBDB@ @PERL_LDFLAGS@ $(top_builddir)/lib/libneostats.la $(top_builddir)/lib/event/libevent.la 
 
-EXTRA_dist	= typemap NV.xs
+EXTRA_DIST	= typemap NV.xs
 
 neostats_LDFLAGS = --export-dynamic @RDYNAMIC_FLAG@ 
 
