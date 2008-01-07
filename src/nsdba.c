@@ -425,14 +425,13 @@ int DBAStore( const char *table, const char *key, void *data, int size )
 	int islocalopen = 0;
 	int ret = 0;
 	tableentry *tbe;
+	dbentry *dbe = DBAFetchDBEntry();
 	
 	if (data == NULL) {
-		nlog)LOG_WARNING, "Error Trying to save NULL data in table %s for key %s", table, key);
+		nlog(LOG_WARNING, "Error Trying to save NULL data in table %s for key %s", table, key);
 		return NS_FAILURE;
 	}
 	
-	dbentry *dbe = DBAFetchDBEntry();
-
 	dlog( DEBUG10, "DBAStore %s %s", table, key );
 	tbe = DBAFetchTableEntry( table, &islocalopen );
 	if (!dbe ) {
