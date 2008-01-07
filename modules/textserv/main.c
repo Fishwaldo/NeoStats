@@ -736,8 +736,7 @@ static int ts_cmd_add( const CmdParams *cmdparams )
 			"%s already exists in the bot list", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	strlcpy( filename, "data/TSDB/", MAXPATH );
-	strlcat( filename, cmdparams->av[1], MAXPATH );
+        ircsnprintf(filename, MAXPATH, "data/%s.tsdb", db->tsbot.dbname);
 	fp = os_fopen( filename, "rt" );
 	if( !fp )
 	{
