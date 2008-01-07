@@ -302,7 +302,7 @@ int ss_event_nickip( const CmdParams *cmdparams )
 
 static void SaveTLDStat( const TLD *tld, const void *v )
 {
-	DBAStore( TLD_TABLE, tld->tld, ( void * )v, sizeof( TLD ) );
+	DBAStore( TLD_TABLE, tld->tld, ( void * )tld, sizeof( TLD ) );
 }
 
 /** @brief SaveTLDStats
