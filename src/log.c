@@ -288,7 +288,7 @@ void dlog( NS_DEBUG_LEVEL level, const char *fmt, ... )
 {
 	va_list ap;
 	
-	if( (level - 1) <= nsconfig.debuglevel ) {
+	if( (nsconfig.debug == 1) && (level - 2) <= nsconfig.debuglevel ) {
 		/* Support for module specific only debug info */
 		if( ircstrcasecmp( nsconfig.debugmodule, "all" ) == 0 || ircstrcasecmp( nsconfig.debugmodule, GET_CUR_MODNAME() ) == 0 )
 		{
