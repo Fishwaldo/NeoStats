@@ -1278,6 +1278,7 @@ EXPORTFUNC char *sftime( time_t t );
 EXPORTFUNC char *make_safe_filename( char *name );
 EXPORTFUNC char *joinbuf( char **av, int ac, int from );
 EXPORTFUNC unsigned int split_buf( char *buf, char ***argv );
+EXPORTFUNC unsigned int ircsplitbuf( char *buf, char ***argv, int colon_special );
 
 /*  For use by modules to report command information channel which 
  *  takes account of neostats reporting options
