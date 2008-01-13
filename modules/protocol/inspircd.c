@@ -587,7 +587,7 @@ void send_ping(const char *source, const char *reply, const char *to) {
 
 void send_nick( const char *nick, const unsigned long ts, const char *newmode, const char *ident, const char *host, const char *server, const char *realname )
 {
-	send_cmd( ":%s %s %ld %s %s %s %s %s 0.0.0.0 :%s", server, MSGTOK( NICK ), ts, nick, host, host, ident, newmode, realname);
+	send_cmd( ":%s %s %ld %s %s %s %s %s 0.0.0.0 :%s", server, MSG_NICK, ts, nick, host, host, ident, newmode, realname);
 }
 /* 
  * DEBUG1 NeoStats - origin: penguin.omega.org.za
