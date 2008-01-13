@@ -467,6 +467,7 @@ modules/protocol/hybrid6.vcproj -text
 modules/protocol/hybrid7.c eol=lf
 modules/protocol/hybrid7.vcproj -text
 modules/protocol/inspircd.c -text
+modules/protocol/inspircd.vcproj -text
 modules/protocol/ircup10.c eol=lf
 modules/protocol/ircup10.vcproj -text
 modules/protocol/ircup10base.c -text
