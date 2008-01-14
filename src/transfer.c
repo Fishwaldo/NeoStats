@@ -62,6 +62,8 @@ typedef struct neo_transfer {
 	transfer_callback *callback;
 	/* the module that is using this function */
 	Module *module_ptr;
+	/* The Socket Structure for this connection */
+	Sock *sock;
 } neo_transfer;
 
 /* this is the curl multi handle we use */
@@ -70,6 +72,8 @@ static list_t *activetransfers;
 static int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp);
 static int curltimercallback(void *);
 static void transfer_status( void );
+static int multi_timer_cb(CURLM *multi, long timeout_ms, void *);
+
 #undef CURL_TEST 
 /* #define CURL_TEST 1 */
 #ifdef CURL_TEST
@@ -107,12 +111,7 @@ int InitCurl(void)
 		nlog(LOG_WARNING, "Libcurl failed to initialize the multisock interface");
 		return NS_FAILURE;
 	}
-      	/* Since we need a global timeout to occur after a given time of inactivity,
-        ** we use a single timeout-event. Get the timeout value from libcurl, and
-        ** update it after every call to libcurl. */
-        curl_multi_timeout(curlmultihandle, &timeout_ms);
-	if ((timeout_ms/1000) < 1) timeout_ms = 1000;
-	AddTimer(TIMER_TYPE_INTERVAL, curltimercallback, "CurlTimeOut", (timeout_ms/1000), curlmultihandle);
+	curl_multi_setopt(curlmultihandle, CURLMOPT_TIMERFUNCTION, multi_timer_cb);
 #endif
 	/* init the internal list to track downloads */
 	activetransfers = list_create(MAX_TRANSFERS);
@@ -360,6 +359,7 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket_all(curlmultihandle, &ret)) {
 	}
 	transfer_status();
+
 	return NS_SUCCESS;
 }
 
@@ -373,6 +373,9 @@ static void transfer_status( void )
 		if (msg->msg == CURLMSG_DONE) {
 			/* find the handle here */
 			curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &neotrans);
+			/* what ever we do, we must close the socket */
+			DelSock(neotrans->sock);
+
 
 			/* close up any handles */
 			switch (neotrans->savefileormem) {
@@ -444,31 +447,43 @@ void CurlHackReadLoop( void )
 int curl_read(void *userp, void *data, int size) {
 	int ret;
 	curl_socket_t sock = (int)userp;
-	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket(curlmultihandle, sock, &ret))
-	{
-	}
+	if (size == -1) {
+		while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket_action(curlmultihandle, sock,  CURL_CSELECT_ERR, &ret))
+		{
+		}
+	} else {
+		while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket_action(curlmultihandle, sock, CURL_CSELECT_IN, &ret))
+		{
+		}
+	}			
 	transfer_status();
 	return NS_SUCCESS;
 }
 int curl_write(int socket, void *userp) {
 	int ret;
-	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket(curlmultihandle, socket, &ret))
+	while(CURLM_CALL_MULTI_PERFORM == curl_multi_socket_action(curlmultihandle, socket, CURL_CSELECT_OUT, &ret))
 	{
 	}
 	transfer_status();
 	return NS_SUCCESS;
 }
-static void update_timeout(CURLM *multi_handle)
+
+static int multi_timer_cb(CURLM *multi, long timeout_ms, void *g)
 {
-	long timeout_ms;
-    
-      	/* Since we need a global timeout to occur after a given time of inactivity,
-        ** we use a single timeout-event. Get the timeout value from libcurl, and
-        ** update it after every call to libcurl. */
-        curl_multi_timeout(multi_handle, &timeout_ms);
-                  
-	if ((timeout_ms/1000) < 1) timeout_ms=1000;
-	SetTimerInterval("CurlTimeOut", (timeout_ms/1000));
+	if ((timeout_ms == -1)  && (FindTimer("CurlTimeOut"))) {
+		DelTimer("CurlTimeOut");
+		return 0;
+	} else if (timeout_ms == 0) {
+		curltimercallback(multi);
+		return 0;
+	} else {
+		if ((timeout_ms/1000) < 1) timeout_ms = 1000;
+		if (!FindTimer("CurlTimeOut")) {
+			AddTimer(TIMER_TYPE_INTERVAL, curltimercallback, "CurlTimeOut", (timeout_ms/1000), multi);
+		} else {
+			SetTimerInterval("CurlTimeOut", (timeout_ms/1000));
+		}
+	}
 }
 
 /* called from libevent when our timer event expires */
@@ -480,45 +495,47 @@ static int curltimercallback(void *userp)
           
         /* tell libcurl to deal with the transfer associated with this socket */
         do {
-        	rc = curl_multi_socket(multi_handle, CURL_SOCKET_TIMEOUT,
+        	rc = curl_multi_socket_action(multi_handle, CURL_SOCKET_TIMEOUT, 0,
         		&running_handles);
 
         } while (rc == CURLM_CALL_MULTI_PERFORM);
 	transfer_status();
-        if(running_handles)
-        	/* Get the current timeout value from libcurl and set a new timeout */
-        	update_timeout(multi_handle);
 	return NS_SUCCESS;
 }
 
 int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp) {
 	Sock *sock;
 	char buf[BUFSIZE];
+	neo_transfer *neotrans;
 	/* if socketp is NULL, this is the first time we have seen this socket from CURL, so create it in our 
 	 * routines */
-	if (socketp == NULL) {
-		ircsnprintf(buf, BUFSIZE, "CURL-%d", s);
-		sock = AddSock(SOCK_NATIVE, buf, s, curl_read, curl_write, 0, (void *)s, NULL);
+ 	if (socketp == NULL) {
+		curl_easy_getinfo(easy, CURLINFO_PRIVATE, &neotrans);
+		if (!neotrans->sock) {
+			ircsnprintf(buf, BUFSIZE, "CURL-%d", s);
+			sock = AddSock(SOCK_NATIVE, buf, s, curl_read, curl_write, 0, (void *)s, NULL);
+			neotrans->sock = sock;
+		} else {
+			sock = neotrans->sock;
+		}
 		if (sock) curl_multi_assign(curlmultihandle, s, sock);
 	} else {
 		sock = socketp;
 	}
+	dlog(DEBUG2, "CurlSockCallBack: Update %s with new event %d", sock->name, action);
 	switch (action) {
 		case CURL_POLL_NONE:
 		case CURL_POLL_IN:
 			UpdateSock(sock, EV_READ|EV_PERSIST, 1, NULL);
-			update_timeout(curlmultihandle);
 			break;
 		case CURL_POLL_OUT:
 			UpdateSock(sock, EV_WRITE|EV_PERSIST, 1, NULL);	
-			update_timeout(curlmultihandle);
 			break;
 		case CURL_POLL_INOUT:
 			UpdateSock(sock, EV_READ|EV_WRITE|EV_PERSIST, 1, NULL);	
-			update_timeout(curlmultihandle);
 			break;	
 		case CURL_POLL_REMOVE:
-			DelSock(sock);
+			UpdateSock(sock, 0, 1, NULL);
 			break;
 	}
 
