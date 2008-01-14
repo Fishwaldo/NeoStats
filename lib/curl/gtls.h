@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2005, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,7 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: gtls.h,v 1.1 2005/04/07 15:27:14 bagder Exp $
+ * $Id: gtls.h,v 1.5 2007/09/27 02:45:58 danf Exp $
  ***************************************************************************/
 int Curl_gtls_init(void);
 int Curl_gtls_cleanup(void);
@@ -29,11 +29,13 @@ CURLcode Curl_gtls_connect(struct connectdata *conn, int sockindex);
 /* tell GnuTLS to close down all open information regarding connections (and
    thus session ID caching etc) */
 void Curl_gtls_close_all(struct SessionHandle *data);
-void Curl_gtls_close(struct connectdata *conn); /* close a SSL connection */
+
+ /* close a SSL connection */
+void Curl_gtls_close(struct connectdata *conn, int sockindex);
 
 /* return number of sent (non-SSL) bytes */
-int Curl_gtls_send(struct connectdata *conn, int sockindex,
-                   void *mem, size_t len);
+ssize_t Curl_gtls_send(struct connectdata *conn, int sockindex,
+                       void *mem, size_t len);
 ssize_t Curl_gtls_recv(struct connectdata *conn, /* connection data */
                        int num,                  /* socketindex */
                        char *buf,                /* store read data here */
@@ -41,5 +43,6 @@ ssize_t Curl_gtls_recv(struct connectdata *conn, /* connection data */
                        bool *wouldblock);
 void Curl_gtls_session_free(void *ptr);
 size_t Curl_gtls_version(char *buffer, size_t size);
+int Curl_gtls_shutdown(struct connectdata *conn, int sockindex);
 
 #endif

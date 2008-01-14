@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,13 +18,22 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: strequal.c,v 1.29 2006-10-27 03:47:58 yangtse Exp $
+ * $Id: strequal.c,v 1.32 2007-09-25 17:33:56 danf Exp $
  ***************************************************************************/
+
+#ifndef _GNU_SOURCE
+/* glibc needs this to define the prototype for strcasestr */
+#define _GNU_SOURCE 1
+#endif
 
 #include "setup.h"
 
 #include <string.h>
 #include <ctype.h>
+
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
 
 #include "strequal.h"
 
@@ -86,6 +95,9 @@ int curl_strnequal(const char *first, const char *second, size_t max)
  */
 char *Curl_strcasestr(const char *haystack, const char *needle)
 {
+#if defined(HAVE_STRCASESTR)
+  return strcasestr(haystack, needle);
+#else
   size_t nlen = strlen(needle);
   size_t hlen = strlen(haystack);
 
@@ -95,6 +107,7 @@ char *Curl_strcasestr(const char *haystack, const char *needle)
     haystack++;
   }
   return NULL;
+#endif
 }
 
 #ifndef HAVE_STRLCAT

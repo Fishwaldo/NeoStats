@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: getinfo.c,v 1.53 2006-09-25 00:54:32 yangtse Exp $
+ * $Id: getinfo.c,v 1.58 2007-08-01 21:20:01 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -75,13 +75,18 @@ CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
   double *param_doublep=NULL;
   char **param_charp=NULL;
   struct curl_slist **param_slistp=NULL;
+#ifdef MSG_PEEK
   char buf;
+#endif
+  int type;
+
+  if(!data)
+    return CURLE_BAD_FUNCTION_ARGUMENT;
 
   va_start(arg, info);
 
-  switch(info&CURLINFO_TYPEMASK) {
-  default:
-    return CURLE_BAD_FUNCTION_ARGUMENT;
+  type = CURLINFO_TYPEMASK & (int)info;
+  switch(type) {
   case CURLINFO_STRING:
     param_charp = va_arg(arg, char **);
     if(NULL == param_charp)
@@ -102,6 +107,8 @@ CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
     if(NULL == param_slistp)
       return CURLE_BAD_FUNCTION_ARGUMENT;
     break;
+  default:
+    return CURLE_BAD_FUNCTION_ARGUMENT;
   }
 
   switch(info) {
@@ -169,7 +176,7 @@ CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
     *param_charp = data->info.contenttype;
     break;
   case CURLINFO_PRIVATE:
-    *param_charp = data->set.private_data;
+    *param_charp = (char *) data->set.private_data;
     break;
   case CURLINFO_HTTPAUTH_AVAIL:
     *param_longp = data->info.httpauthavail;

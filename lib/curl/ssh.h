@@ -1,3 +1,6 @@
+#ifndef __SSH_H
+#define __SSH_H
+
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -18,49 +21,23 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: getenv.c,v 1.30 2006/01/09 13:17:14 bagder Exp $
+ * $Id: ssh.h,v 1.9 2007-10-12 13:36:38 patrickm Exp $
  ***************************************************************************/
 
-#include "setup.h"
+#ifdef USE_LIBSSH2
+extern const struct Curl_handler Curl_handler_scp;
+extern const struct Curl_handler Curl_handler_sftp;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+ssize_t Curl_scp_send(struct connectdata *conn, int sockindex,
+                      void *mem, size_t len);
+ssize_t Curl_scp_recv(struct connectdata *conn, int sockindex,
+                      char *mem, size_t len);
 
-#ifdef VMS
-#include <unixlib.h>
-#endif
+ssize_t Curl_sftp_send(struct connectdata *conn, int sockindex,
+                       void *mem, size_t len);
+ssize_t Curl_sftp_recv(struct connectdata *conn, int sockindex,
+                       char *mem, size_t len);
 
-#include "curl.h"
-#include "memory.h"
+#endif /* USE_LIBSSH2 */
 
-#include "memdebug.h"
-
-static
-char *GetEnv(const char *variable)
-{
-#ifdef _WIN32_WCE
-  return NULL;
-#else
-#ifdef WIN32
-  char env[MAX_PATH]; /* MAX_PATH is from windef.h */
-  char *temp = getenv(variable);
-  env[0] = '\0';
-  if (temp != NULL)
-    ExpandEnvironmentStrings(temp, env, sizeof(env));
-  return (env[0] != '\0')?strdup(env):NULL;
-#else
-  char *env = getenv(variable);
-#ifdef VMS
-  if (env && strcmp("HOME",variable) == 0)
-    env = decc$translate_vms(env);
-#endif
-  return (env && env[0])?strdup(env):NULL;
-#endif
-#endif
-}
-
-char *curl_getenv(const char *v)
-{
-  return GetEnv(v);
-}
+#endif /* __SSH_H */

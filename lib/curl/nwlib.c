@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2004, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: nwlib.c,v 1.4 2004/06/10 21:20:15 gknauf Exp $
+ * $Id: nwlib.c,v 1.8 2004/06/10 21:20:15 gknauf Exp $
  ***************************************************************************/
 
 #include <errno.h>
@@ -146,7 +146,7 @@ void _NonAppStop( void )
 ** we return a non-zero value. Right now, there isn't any reason not to allow
 ** it.
 */
-int  _NonAppCheckUnload( void )
+int _NonAppCheckUnload( void )
 {
     return 0;
 }
@@ -273,10 +273,10 @@ int GetOrSetUpData(int id, libdata_t **appData,
   return err;
 }
 
-int DisposeLibraryData( void    *data)
+int DisposeLibraryData( void *data )
 {
   if (data) {
-    void    *tenbytes = ((libdata_t *) data)->tenbytes;
+    void *tenbytes = ((libdata_t *) data)->tenbytes;
     
     if (tenbytes)
       free(tenbytes);
@@ -287,10 +287,10 @@ int DisposeLibraryData( void    *data)
   return 0;
 }
 
-void DisposeThreadData(void    *data)
+void DisposeThreadData( void *data )
 {
   if (data) {
-    void    *twentybytes = ((libthreaddata_t *) data)->twentybytes;
+    void *twentybytes = ((libthreaddata_t *) data)->twentybytes;
     
     if (twentybytes)
       free(twentybytes);
@@ -298,3 +298,22 @@ void DisposeThreadData(void    *data)
     free(data);
   }
 }
+
+#else /* __NOVELL_LIBC__ */
+/* For native CLib-based NLM seems we can do a bit more simple. */
+#include <nwthread.h>
+
+int main ( void )
+{
+    /* initialize any globals here... */
+
+    /* do this if any global initializing was done 
+    SynchronizeStart();
+    */
+    ExitThread (TSR_THREAD, 0);
+    return 0;
+}
+
+#endif /* __NOVELL_LIBC__ */
+
+#endif /* NETWARE */

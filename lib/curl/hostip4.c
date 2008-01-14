@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: hostip4.c,v 1.30 2006-10-27 03:47:58 yangtse Exp $
+ * $Id: hostip4.c,v 1.41 2007-07-11 21:47:31 gknauf Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -28,9 +28,6 @@
 
 #ifdef NEED_MALLOC_H
 #include <malloc.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
 #endif
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -124,11 +121,17 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
                                 int port,
                                 int *waitp)
 {
+#if defined(HAVE_GETHOSTBYNAME_R_3)
+  int res;
+#endif
   Curl_addrinfo *ai = NULL;
   struct hostent *h = NULL;
   in_addr_t in;
-  struct SessionHandle *data = conn->data;
   struct hostent *buf = NULL;
+
+#ifdef CURL_DISABLE_VERBOSE_STRINGS
+  (void)conn;
+#endif
 
   (void)port; /* unused in IPv4 code */
 
@@ -146,7 +149,6 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
    */
   else {
     int h_errnop;
-    int res=ERANGE;
 
     buf = (struct hostent *)calloc(CURL_HOSTENT_SIZE, 1);
     if(!buf)
@@ -159,7 +161,6 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
 
 #ifdef HAVE_GETHOSTBYNAME_R_5
     /* Solaris, IRIX and more */
-    (void)res; /* prevent compiler warning */
     h = gethostbyname_r(hostname,
                         (struct hostent *)buf,
                         (char *)buf + sizeof(struct hostent),
@@ -180,7 +181,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
 #ifdef HAVE_GETHOSTBYNAME_R_6
     /* Linux */
 
-    res=gethostbyname_r(hostname,
+    (void)gethostbyname_r(hostname,
                         (struct hostent *)buf,
                         (char *)buf + sizeof(struct hostent),
                         CURL_HOSTENT_SIZE - sizeof(struct hostent),
@@ -252,7 +253,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
                             (struct hostent *)buf,
                             (struct hostent_data *)((char *)buf +
                                                     sizeof(struct hostent)));
-      h_errnop= errno; /* we don't deal with this, but set it anyway */
+      h_errnop = SOCKERRNO; /* we don't deal with this, but set it anyway */
     }
     else
       res = -1; /* failure, too smallish buffer size */
@@ -273,7 +274,7 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
     else
 #endif /* HAVE_GETHOSTBYNAME_R_3 */
       {
-      infof(data, "gethostbyname_r(2) failed for %s\n", hostname);
+      infof(conn->data, "gethostbyname_r(2) failed for %s\n", hostname);
       h = NULL; /* set return code to NULL */
       free(buf);
     }
@@ -283,9 +284,13 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
      * which the gethostbyname() is the preferred() function.
      */
   else {
+#if (defined(NETWARE) && !defined(__NOVELL_LIBC__))
+    h = gethostbyname((char*)hostname);
+#else
     h = gethostbyname(hostname);
+#endif
     if (!h)
-      infof(data, "gethostbyname(2) failed for %s\n", hostname);
+      infof(conn->data, "gethostbyname(2) failed for %s\n", hostname);
 #endif /*HAVE_GETHOSTBYNAME_R */
   }
 
@@ -374,12 +379,15 @@ Curl_addrinfo *Curl_he2ai(const struct hostent *he, int port)
        and use that area to store the address */
     ai->ai_addr = (struct sockaddr *) ((char*)ai + sizeof(Curl_addrinfo));
 
+    /* FIXME: need to free this eventually */
+    ai->ai_canonname = strdup(he->h_name);
+
     /* leave the rest of the struct filled with zero */
 
     addr = (struct sockaddr_in *)ai->ai_addr; /* storage area for this info */
 
     memcpy((char *)&(addr->sin_addr), curr, sizeof(struct in_addr));
-    addr->sin_family = he->h_addrtype;
+    addr->sin_family = (unsigned short)(he->h_addrtype);
     addr->sin_port = htons((unsigned short)port);
 
     prevai = ai;

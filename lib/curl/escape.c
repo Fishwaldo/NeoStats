@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: escape.c,v 1.38 2006-10-17 21:32:56 bagder Exp $
+ * $Id: escape.c,v 1.41 2007-09-30 22:40:24 bagder Exp $
  ***************************************************************************/
 
 /* Escape and unescape URL encoding in strings. The functions return a new
@@ -59,7 +59,7 @@ char *curl_easy_escape(CURL *handle, const char *string, int inlength)
   size_t alloc = (inlength?(size_t)inlength:strlen(string))+1;
   char *ns;
   char *testing_ptr = NULL;
-  unsigned char in;
+  unsigned char in; /* we need to treat the characters unsigned */
   size_t newlen = alloc;
   int strindex=0;
   size_t length;
@@ -75,9 +75,27 @@ char *curl_easy_escape(CURL *handle, const char *string, int inlength)
   length = alloc-1;
   while(length--) {
     in = *string;
-    if(!(in >= 'a' && in <= 'z') &&
-       !(in >= 'A' && in <= 'Z') &&
-       !(in >= '0' && in <= '9')) {
+
+    /* Portable character check (remember EBCDIC). Do not use isalnum() because
+       its behavior is altered by the current locale. */
+
+    switch (in) {
+    case '0': case '1': case '2': case '3': case '4':
+    case '5': case '6': case '7': case '8': case '9':
+    case 'a': case 'b': case 'c': case 'd': case 'e':
+    case 'f': case 'g': case 'h': case 'i': case 'j':
+    case 'k': case 'l': case 'm': case 'n': case 'o':
+    case 'p': case 'q': case 'r': case 's': case 't':
+    case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+    case 'A': case 'B': case 'C': case 'D': case 'E':
+    case 'F': case 'G': case 'H': case 'I': case 'J':
+    case 'K': case 'L': case 'M': case 'N': case 'O':
+    case 'P': case 'Q': case 'R': case 'S': case 'T':
+    case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
+      /* just copy this */
+      ns[strindex++]=in;
+      break;
+    default:
       /* encode it */
       newlen += 2; /* the size grows with two, since this'll become a %XX */
       if(newlen > alloc) {
@@ -105,10 +123,7 @@ char *curl_easy_escape(CURL *handle, const char *string, int inlength)
       snprintf(&ns[strindex], 4, "%%%02X", in);
 
       strindex+=3;
-    }
-    else {
-      /* just copy this */
-      ns[strindex++]=in;
+      break;
     }
     string++;
   }

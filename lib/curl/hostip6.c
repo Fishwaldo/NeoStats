@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: hostip6.c,v 1.37 2006-07-27 22:28:53 bagder Exp $
+ * $Id: hostip6.c,v 1.40 2007-07-01 22:01:19 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -27,9 +27,6 @@
 
 #ifdef NEED_MALLOC_H
 #include <malloc.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
 #endif
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -210,7 +207,7 @@ static void dump_addrinfo(struct connectdata *conn, const struct addrinfo *ai)
     if (Curl_printable_address(ai, buf, sizeof(buf)))
       printf("%s\n", buf);
     else
-      printf("failed; %s\n", Curl_strerror(conn, Curl_sockerrno()));
+      printf("failed; %s\n", Curl_strerror(conn, SOCKERRNO));
   }
 }
 #else
@@ -282,9 +279,10 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
     /* the given address is numerical only, prevent a reverse lookup */
     hints.ai_flags = AI_NUMERICHOST;
   }
-#if 0 /* removed nov 8 2005 before 7.15.1 */
-  else
-    hints.ai_flags = AI_CANONNAME;
+#ifdef HAVE_GSSAPI
+  if(conn->data->set.krb)
+    /* if krb is used, we (might) need the canonical host name */
+    hints.ai_flags |= AI_CANONNAME;
 #endif
 
   if(port) {

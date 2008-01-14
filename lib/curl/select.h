@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,16 +20,33 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: select.h,v 1.5 2006-09-24 10:41:01 bagder Exp $
+ * $Id: select.h,v 1.13 2007-06-14 11:21:48 bagder Exp $
  ***************************************************************************/
+
+#include "setup.h"
 
 #ifdef HAVE_SYS_POLL_H
 #include <sys/poll.h>
-#elif defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0600)
-/* for Vista, use WSAPoll(). */
-#include <winsock2.h>
-#define CURL_HAVE_WSAPOLL
-#else
+#endif
+
+/*
+ * poll() function on Windows Vista and later is called WSAPoll()
+ */
+
+#if defined(USE_WINSOCK) && (USE_WINSOCK > 1) && \
+    defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0600)
+#undef  HAVE_POLL
+#define HAVE_POLL 1
+#undef  HAVE_POLL_FINE
+#define HAVE_POLL_FINE 1
+#define poll(x,y,z) WSAPoll((x),(y),(z))
+#endif
+
+/*
+ * Definition of pollfd struct and constants for platforms lacking them.
+ */
+
+#ifndef HAVE_SYS_POLL_H
 
 #define POLLIN      0x01
 #define POLLPRI     0x02
@@ -47,11 +64,20 @@ struct pollfd
 
 #endif
 
-#define CSELECT_IN   0x01
-#define CSELECT_OUT  0x02
-#define CSELECT_ERR  0x04
+#ifndef POLLRDNORM
+#define POLLRDNORM POLLIN
+#endif
 
-int Curl_select(curl_socket_t readfd, curl_socket_t writefd, int timeout_ms);
+#ifndef POLLWRNORM
+#define POLLWRNORM POLLOUT
+#endif
+
+#ifndef POLLRDBAND
+#define POLLRDBAND POLLPRI
+#endif
+
+int Curl_socket_ready(curl_socket_t readfd, curl_socket_t writefd,
+                      int timeout_ms);
 
 int Curl_poll(struct pollfd ufds[], unsigned int nfds, int timeout_ms);
 
@@ -60,4 +86,4 @@ int tpf_select_libcurl(int maxfds, fd_set* reads, fd_set* writes,
                        fd_set* excepts, struct timeval* tv);
 #endif
 
-#endif
+#endif /* __SELECT_H */

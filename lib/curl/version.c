@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: version.c,v 1.50 2006-08-15 17:02:24 giva Exp $
+ * $Id: version.c,v 1.55 2007-08-24 09:06:17 patrickm Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -45,6 +45,11 @@
 #include <iconv.h>
 #endif
 
+#ifdef USE_LIBSSH2
+#include <libssh2.h>
+#endif
+
+
 char *curl_version(void)
 {
   static char version[200];
@@ -52,12 +57,19 @@ char *curl_version(void)
   size_t len;
   size_t left = sizeof(version);
   strcpy(ptr, LIBCURL_NAME "/" LIBCURL_VERSION );
-  ptr=strchr(ptr, '\0');
-  left -= strlen(ptr);
-
-  len = Curl_ssl_version(ptr, left);
+  len = strlen(ptr);
   left -= len;
   ptr += len;
+
+  if (left > 1) {
+    len = Curl_ssl_version(ptr + 1, left - 1);
+
+    if (len > 0) {
+      *ptr = ' ';
+      left -= ++len;
+      ptr += len;
+    }
+  }
 
 #ifdef HAVE_LIBZ
   len = snprintf(ptr, left, " zlib/%s", zlibVersion());
@@ -88,6 +100,11 @@ char *curl_version(void)
   left -= len;
   ptr += len;
 #endif
+#ifdef USE_LIBSSH2
+  len = snprintf(ptr, left, " libssh2/%s", LIBSSH2_VERSION);
+  left -= len;
+  ptr += len;
+#endif
 
   return version;
 }
@@ -109,6 +126,9 @@ static const char * const protocols[] = {
 #endif
 #ifndef CURL_DISABLE_LDAP
   "ldap",
+#ifdef HAVE_LDAP_SSL
+  "ldaps",
+#endif
 #endif
 #ifndef CURL_DISABLE_HTTP
   "http",
@@ -125,6 +145,12 @@ static const char * const protocols[] = {
   "ftps",
 #endif
 #endif
+
+#ifdef USE_LIBSSH2
+  "scp",
+  "sftp",
+#endif
+
   NULL
 };
 
@@ -179,10 +205,15 @@ static curl_version_info_data version_info = {
   0,    /* c-ares version numerical */
   NULL, /* libidn version */
   0,    /* iconv version */
+  NULL, /* ssh lib version */
 };
 
 curl_version_info_data *curl_version_info(CURLversion stamp)
 {
+#ifdef USE_LIBSSH2
+  static char ssh_buffer[80];
+#endif
+
 #ifdef USE_SSL
   static char ssl_buffer[80];
   Curl_ssl_version(ssl_buffer, sizeof(ssl_buffer));
@@ -215,6 +246,11 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   /* version unknown */
   version_info.iconv_ver_num = -1;
 #endif /* _LIBICONV_VERSION */
+#endif
+
+#ifdef USE_LIBSSH2
+  snprintf(ssh_buffer, sizeof(ssh_buffer), "libssh2/%s", LIBSSH2_VERSION);
+  version_info.libssh_version = ssh_buffer;
 #endif
 
   (void)stamp; /* avoid compiler warnings, we don't use this */

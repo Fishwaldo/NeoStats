@@ -42,8 +42,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(include_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/autotools/rules.mk COPYING depcomp missing \
-	mkinstalldirs
+	$(top_srcdir)/autotools/rules.mk COPYING
 subdir = lib/curl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -72,7 +71,7 @@ am_libcurl_la_OBJECTS = file.lo timeval.lo base64.lo hostip.lo \
 	strtoofft.lo strerror.lo hostares.lo hostasyn.lo hostip4.lo \
 	hostip6.lo hostsyn.lo hostthre.lo inet_ntop.lo parsedate.lo \
 	select.lo gtls.lo sslgen.lo tftp.lo splay.lo strdup.lo \
-	socks.lo
+	socks.lo ssh.lo qssl.lo
 libcurl_la_OBJECTS = $(am_libcurl_la_OBJECTS)
 DEFAULT_INCLUDES = 
 depcomp = $(SHELL) $(top_srcdir)/autotools/depcomp
@@ -257,17 +256,18 @@ libcurl_la_SOURCES = file.c timeval.c base64.c hostip.c progress.c formdata.c	\
   content_encoding.c share.c http_digest.c md5.c http_negotiate.c	\
   http_ntlm.c inet_pton.c strtoofft.c strerror.c hostares.c hostasyn.c	\
   hostip4.c hostip6.c hostsyn.c hostthre.c inet_ntop.c parsedate.c	\
-  select.c gtls.c sslgen.c tftp.c splay.c strdup.c socks.c
+  select.c gtls.c sslgen.c tftp.c splay.c strdup.c socks.c ssh.c qssl.c
 
 noinst_HEADERS = arpa_telnet.h netrc.h file.h timeval.h base64.h hostip.h	\
   progress.h formdata.h cookie.h http.h sendf.h ftp.h url.h dict.h	\
   if2ip.h speedcheck.h urldata.h ldap.h ssluse.h escape.h telnet.h	\
   getinfo.h strequal.h krb4.h memdebug.h inet_ntoa_r.h \
-  http_chunks.h strtok.h connect.h llist.h hash.h content_encoding.h	\
+  http_chunks.h strtok.h connect.h llist.h hash.h content_encoding.h 	\
   share.h md5.h http_digest.h http_negotiate.h http_ntlm.h ca-bundle.h	\
   inet_pton.h strtoofft.h strerror.h inet_ntop.h curlx.h memory.h	\
   setup.h transfer.h select.h easyif.h multiif.h parsedate.h sslgen.h   \
-  gtls.h tftp.h sockaddr.h splay.h strdup.h setup_once.h socks.h
+  gtls.h tftp.h sockaddr.h splay.h strdup.h setup_once.h socks.h ssh.h  \
+  qssl.h nssg.h curl_ldap.h
 
 include_HEADERS = curl.h curlver.h easy.h multi.h mprintf.h
 BUILT_SOURCES = $(srcdir)/ca-bundle.h
@@ -366,6 +366,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netrc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parsedate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/progress.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/qssl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/security.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/select.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sendf.Plo@am__quote@
@@ -373,6 +374,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/speedcheck.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/splay.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sslgen.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ssluse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strdup.Plo@am__quote@

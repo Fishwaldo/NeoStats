@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: http_negotiate.c,v 1.17 2006-10-17 21:32:56 bagder Exp $
+ * $Id: http_negotiate.c,v 1.21 2007-09-21 11:05:31 bagder Exp $
  ***************************************************************************/
 #include "setup.h"
 
@@ -49,7 +49,7 @@
 #include "memdebug.h"
 
 static int
-get_gss_name(struct connectdata *conn, gss_name_t *server)
+get_gss_name(struct connectdata *conn, bool proxy, gss_name_t *server)
 {
   struct negotiatedata *neg_ctx = &conn->data->state.negotiate;
   OM_uint32 major_status, minor_status;
@@ -69,11 +69,11 @@ get_gss_name(struct connectdata *conn, gss_name_t *server)
   else
     service = "HTTP";
 
-  token.length = strlen(service) + 1 + strlen(conn->host.name) + 1;
+  token.length = strlen(service) + 1 + strlen(proxy ? conn->proxy.name : conn->host.name) + 1;
   if (token.length + 1 > sizeof(name))
     return EMSGSIZE;
 
-  snprintf(name, sizeof(name), "%s@%s", service, conn->host.name);
+  snprintf(name, sizeof(name), "%s@%s", service, proxy ? conn->proxy.name : conn->host.name);
 
   token.value = (void *) name;
   major_status = gss_import_name(&minor_status,
@@ -113,7 +113,7 @@ log_gss_error(struct connectdata *conn, OM_uint32 error_status, char *prefix)
   infof(conn->data, "%s", buf);
 }
 
-int Curl_input_negotiate(struct connectdata *conn, char *header)
+int Curl_input_negotiate(struct connectdata *conn, bool proxy, const char *header)
 {
   struct negotiatedata *neg_ctx = &conn->data->state.negotiate;
   OM_uint32 major_status, minor_status, minor_status2;
@@ -156,7 +156,7 @@ int Curl_input_negotiate(struct connectdata *conn, char *header)
   }
 
   if (neg_ctx->server_name == NULL &&
-      (ret = get_gss_name(conn, &neg_ctx->server_name)))
+      (ret = get_gss_name(conn, proxy, &neg_ctx->server_name)))
     return ret;
 
   header += strlen(neg_ctx->protocol);
@@ -245,7 +245,7 @@ int Curl_input_negotiate(struct connectdata *conn, char *header)
 }
 
 
-CURLcode Curl_output_negotiate(struct connectdata *conn)
+CURLcode Curl_output_negotiate(struct connectdata *conn, bool proxy)
 {
   struct negotiatedata *neg_ctx = &conn->data->state.negotiate;
   OM_uint32 minor_status;
@@ -290,15 +290,16 @@ CURLcode Curl_output_negotiate(struct connectdata *conn)
     }
   }
 #endif
-  len = Curl_base64_encode(neg_ctx->output_token.value,
+  len = Curl_base64_encode(conn->data,
+                           neg_ctx->output_token.value,
                            neg_ctx->output_token.length,
                            &encoded);
 
-  if (len < 0)
+  if (len == 0)
     return CURLE_OUT_OF_MEMORY;
 
   conn->allocptr.userpwd =
-    aprintf("Authorization: %s %s\r\n", neg_ctx->protocol, encoded);
+    aprintf("%sAuthorization: %s %s\r\n", proxy ? "Proxy-" : "", neg_ctx->protocol, encoded);
   free(encoded);
   gss_release_buffer(&minor_status, &neg_ctx->output_token);
   return (conn->allocptr.userpwd == NULL) ? CURLE_OUT_OF_MEMORY : CURLE_OK;

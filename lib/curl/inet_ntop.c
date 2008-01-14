@@ -25,9 +25,6 @@
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -55,13 +52,6 @@
 #define INADDRSZ         4
 #define INT16SZ          2
 
-#ifdef USE_WINSOCK
-#define EAFNOSUPPORT    WSAEAFNOSUPPORT
-#define SET_ERRNO(e)    WSASetLastError(errno = (e))
-#else
-#define SET_ERRNO(e)    errno = e
-#endif
-
 /*
  * Format an IPv4 address, more or less like inet_ntoa().
  *
@@ -74,12 +64,17 @@ static char *inet_ntop4 (const unsigned char *src, char *dst, size_t size)
 {
 #if defined(HAVE_INET_NTOA_R_2_ARGS)
   const char *ptr;
-  curlassert(size >= 16);
+  DEBUGASSERT(size >= 16);
   ptr = inet_ntoa_r(*(struct in_addr*)src, dst);
   return (char *)memmove(dst, ptr, strlen(ptr)+1);
 
 #elif defined(HAVE_INET_NTOA_R)
+
+#if defined(HAVE_INT_INET_NTOA_R)
+  return inet_ntoa_r(*(struct in_addr*)src, dst, size)? NULL: dst;
+#else
   return inet_ntoa_r(*(struct in_addr*)src, dst, size);
+#endif
 
 #else
   const char *addr = inet_ntoa(*(struct in_addr*)src);
@@ -204,8 +199,14 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
 /*
  * Convert a network format address to presentation format.
  *
- * Returns pointer to presentation format address (`buf'),
- * Returns NULL on error (see errno).
+ * Returns pointer to presentation format address (`buf').
+ * Returns NULL on error and errno set with the specific
+ * error, EAFNOSUPPORT or ENOSPC.
+ *
+ * On Windows we store the error in the thread errno, not
+ * in the winsock error code. This is to avoid loosing the
+ * actual last winsock error. So use macro ERRNO to fetch the
+ * errno this funtion sets when returning NULL, not SOCKERRNO.
  */
 char *Curl_inet_ntop(int af, const void *src, char *buf, size_t size)
 {

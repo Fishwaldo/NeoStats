@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,7 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: setup.h,v 1.123 2006-10-18 15:57:49 yangtse Exp $
+ * $Id: setup.h,v 1.135 2007-08-23 14:30:24 patrickm Exp $
  ***************************************************************************/
 
 #ifdef HTTP_ONLY
@@ -63,8 +63,13 @@
 #include "config-mac.h"
 #endif
 
-#ifdef AMIGA
+#ifdef __AMIGA__
 #include "amigaos.h"
+#endif
+
+#ifdef __OS400__
+#include "config-os400.h"
+#include "setup-os400.h"
 #endif
 
 #ifdef TPF
@@ -120,18 +125,6 @@
 #endif
 
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#if !defined(__cplusplus) && !defined(__BEOS__) && !defined(__ECOS) && !defined(typedef_bool)
-typedef unsigned char bool;
-#define typedef_bool
-#endif
-
 #ifdef HAVE_LONGLONG
 #define LONG_LONG long long
 #define ENABLE_64BIT
@@ -175,11 +168,11 @@ typedef unsigned char bool;
 #endif
 
 #ifndef STDC_HEADERS /* no standard C headers! */
-#include <curl/stdcheaders.h>
+#include "stdcheaders.h"
 #endif
 
 /*
- * PellesC cludge section (yikes);
+ * PellesC kludge section (yikes);
  *  - It has 'ssize_t', but it is in <unistd.h>. The way the headers
  *    on Win32 are included, forces me to include this header here.
  *  - sys_nerr, EINTR is missing in v4.0 or older.
@@ -194,7 +187,7 @@ typedef unsigned char bool;
 #endif
 
 /*
- * Salford-C cludge section (mostly borrowed from wxWidgets).
+ * Salford-C kludge section (mostly borrowed from wxWidgets).
  */
 #ifdef __SALFORDC__
   #pragma suppress 353             /* Possible nested comments */
@@ -202,13 +195,6 @@ typedef unsigned char bool;
   #pragma suppress 61              /* enum has no name */
   #pragma suppress 106             /* unnamed, unused parameter */
   #include <clib.h>
-#endif
-
-#if defined(CURLDEBUG) && defined(HAVE_ASSERT_H)
-#define curlassert(x) assert(x)
-#else
-/* does nothing without CURLDEBUG defined */
-#define curlassert(x)
 #endif
 
 
@@ -278,6 +264,12 @@ typedef unsigned char bool;
 #define sclose(x) CloseSocket(x)
 #endif
 
+#ifdef __minix
+/* Minix 3 versions up to at least 3.1.3 are missing these prototypes */
+extern char * strtok_r(char *s, const char *delim, char **last);
+extern struct tm * gmtime_r(const time_t * const timep, struct tm *tmp);
+#endif
+
 #define DIR_CHAR      "/"
 #ifndef DOT_CHAR
 #define DOT_CHAR      "."
@@ -328,6 +320,11 @@ int fileno( FILE *stream);
 #endif
 
 #ifdef NETWARE
+int netware_init(void);
+#ifndef __NOVELL_LIBC__
+#include <sys/bsdskt.h>
+#include <sys/timeval.h>
+#endif
 #undef HAVE_ALARM
 #endif
 
@@ -348,8 +345,8 @@ int fileno( FILE *stream);
 #define HAVE_INET_NTOA_R_2_ARGS 1
 #endif
 
-#if defined(USE_GNUTLS) || defined(USE_SSLEAY)
-#define USE_SSL    /* Either OpenSSL || GnuTLS */
+#if defined(USE_GNUTLS) || defined(USE_SSLEAY) || defined(USE_NSS) || defined(USE_QSOSSL)
+#define USE_SSL    /* SSL support has been enabled */
 #endif
 
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_NTLM)
@@ -358,10 +355,9 @@ int fileno( FILE *stream);
 #endif
 #endif
 
-#ifdef CURLDEBUG
-#define DEBUGF(x) x
-#else
-#define DEBUGF(x)
+/* non-configure builds may define CURL_WANTS_CA_BUNDLE_ENV */
+#if defined(CURL_WANTS_CA_BUNDLE_ENV) && !defined(CURL_CA_BUNDLE)
+#define CURL_CA_BUNDLE getenv("CURL_CA_BUNDLE")
 #endif
 
 /*

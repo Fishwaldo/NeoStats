@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * $Id: mprintf.c,v 1.55 2006-10-17 21:32:56 bagder Exp $
+ * $Id: mprintf.c,v 1.59 2007-08-09 21:05:05 gknauf Exp $
  *
  *************************************************************************
  *
@@ -31,7 +31,6 @@
 
 
 #include "setup.h"
-#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -79,7 +78,7 @@
 # define BOOL char
 #endif
 
-#ifdef _AMIGASF
+#ifdef __AMIGA__
 # undef FORMAT_INT
 #endif
 
@@ -297,10 +296,10 @@ int dprintf_Pass1Report(va_stack_t *vto, int max)
  *
  ******************************************************************/
 
-static long dprintf_Pass1(char *format, va_stack_t *vto, char **endpos,
+static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
                           va_list arglist)
 {
-  char *fmt = format;
+  char *fmt = (char *)format;
   int param_num = 0;
   long this_param;
   long width;
@@ -615,7 +614,7 @@ static int dprintf_formatf(
   va_stack_t *p;
 
   /* Do the actual %-code parsing */
-  dprintf_Pass1((char *)format, vto, endpos, ap_save);
+  dprintf_Pass1(format, vto, endpos, ap_save);
 
   end = &endpos[0]; /* the initial end-position from the list dprintf_Pass1()
                        created for us */
@@ -694,7 +693,7 @@ static int dprintf_formatf(
     else
       prec = -1;
 
-    alt = (p->flags & FLAGS_ALT)?TRUE:FALSE;
+    alt = (char)((p->flags & FLAGS_ALT)?TRUE:FALSE);
 
     switch (p->type) {
     case FORMAT_INT:
@@ -734,14 +733,14 @@ static int dprintf_formatf(
 #ifdef ENABLE_64BIT
       if(p->flags & FLAGS_LONGLONG) {
         /* long long */
-        is_neg = p->data.lnum < 0;
+        is_neg = (char)(p->data.lnum < 0);
         num = is_neg ? (- p->data.lnum) : p->data.lnum;
       }
       else
 #endif
       {
         signed_num = (long) num;
-        is_neg = signed_num < 0;
+        is_neg = (char)(signed_num < 0);
         num = is_neg ? (- signed_num) : signed_num;
       }
       goto number;
@@ -944,9 +943,9 @@ static int dprintf_formatf(
           *fptr++ = 'l';
 
         if (p->flags & FLAGS_FLOATE)
-          *fptr++ = p->flags&FLAGS_UPPER ? 'E':'e';
+          *fptr++ = (char)((p->flags & FLAGS_UPPER) ? 'E':'e');
         else if (p->flags & FLAGS_FLOATG)
-          *fptr++ = p->flags & FLAGS_UPPER ? 'G' : 'g';
+          *fptr++ = (char)((p->flags & FLAGS_UPPER) ? 'G' : 'g');
         else
           *fptr++ = 'f';
 

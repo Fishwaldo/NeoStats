@@ -200,7 +200,6 @@ lib/curl/cookie.c -text
 lib/curl/cookie.h -text
 lib/curl/curl.h -text
 lib/curl/curl.vcproj -text
-lib/curl/depcomp -text
 lib/curl/dict.c -text
 lib/curl/dict.h -text
 lib/curl/easy.c -text
@@ -245,8 +244,6 @@ lib/curl/md5.c -text
 lib/curl/md5.h -text
 lib/curl/memdebug.c -text
 lib/curl/memdebug.h -text
-lib/curl/missing -text
-lib/curl/mkinstalldirs -text
 lib/curl/mprintf.c -text
 lib/curl/mprintf.h -text
 lib/curl/multi.c -text
@@ -266,7 +263,6 @@ lib/curl/speedcheck.c -text
 lib/curl/speedcheck.h -text
 lib/curl/ssluse.c -text
 lib/curl/ssluse.h -text
-lib/curl/stamp-h1 -text
 lib/curl/stdcheaders.h -text
 lib/curl/strequal.c -text
 lib/curl/strequal.h -text

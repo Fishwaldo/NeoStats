@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: dict.c,v 1.47 2006-10-11 16:01:17 yangtse Exp $
+ * $Id: dict.c,v 1.52 2007-10-17 16:58:32 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -31,12 +31,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
-#endif
 
 #ifdef WIN32
 #include <time.h>
@@ -88,13 +82,40 @@
 /* The last #include file should be: */
 #include "memdebug.h"
 
-static char *unescape_word(struct SessionHandle *data, char *inp)
+
+/*
+ * Forward declarations.
+ */
+
+static CURLcode Curl_dict(struct connectdata *conn, bool *done);
+
+/*
+ * DICT protocol handler.
+ */
+
+const struct Curl_handler Curl_handler_dict = {
+  "DICT",                               /* scheme */
+  ZERO_NULL,                            /* setup_connection */
+  Curl_dict,                            /* do_it */
+  ZERO_NULL,                            /* done */
+  ZERO_NULL,                            /* do_more */
+  ZERO_NULL,                            /* connect_it */
+  ZERO_NULL,                            /* connecting */
+  ZERO_NULL,                            /* doing */
+  ZERO_NULL,                            /* proto_getsock */
+  ZERO_NULL,                            /* doing_getsock */
+  ZERO_NULL,                            /* disconnect */
+  PORT_DICT,                            /* defport */
+  PROT_DICT                             /* protocol */
+};
+
+static char *unescape_word(struct SessionHandle *data, const char *inp)
 {
   char *newp;
   char *dictp;
   char *ptr;
   int len;
-  unsigned char byte;
+  char byte;
   int olen=0;
 
   newp = curl_easy_unescape(data, inp, 0, &len);
@@ -106,7 +127,7 @@ static char *unescape_word(struct SessionHandle *data, char *inp)
     /* According to RFC2229 section 2.2, these letters need to be escaped with
        \[letter] */
     for(ptr = newp;
-        (byte = (unsigned char)*ptr) != 0;
+        (byte = *ptr) != 0;
         ptr++) {
       if ((byte <= 32) || (byte == 127) ||
           (byte == '\'') || (byte == '\"') || (byte == '\\')) {
@@ -121,7 +142,7 @@ static char *unescape_word(struct SessionHandle *data, char *inp)
   return dictp;
 }
 
-CURLcode Curl_dict(struct connectdata *conn, bool *done)
+static CURLcode Curl_dict(struct connectdata *conn, bool *done)
 {
   char *word;
   char *eword;
@@ -165,7 +186,8 @@ CURLcode Curl_dict(struct connectdata *conn, bool *done)
     }
 
     if ((word == NULL) || (*word == (char)0)) {
-      failf(data, "lookup word is missing");
+      infof(data, "lookup word is missing");
+      word=(char *)"default";
     }
     if ((database == NULL) || (*database == (char)0)) {
       database = (char *)"!";
@@ -219,7 +241,8 @@ CURLcode Curl_dict(struct connectdata *conn, bool *done)
     }
 
     if ((word == NULL) || (*word == (char)0)) {
-      failf(data, "lookup word is missing");
+      infof(data, "lookup word is missing");
+      word=(char *)"default";
     }
     if ((database == NULL) || (*database == (char)0)) {
       database = (char *)"!";

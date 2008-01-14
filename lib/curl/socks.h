@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,7 +20,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: socks.h,v 1.2 2006-09-23 19:09:39 bagder Exp $
+ * $Id: socks.h,v 1.5 2007-08-27 06:31:28 danf Exp $
  ***************************************************************************/
 
 /*
@@ -28,6 +28,9 @@
  * final destination server.
  */
 CURLcode Curl_SOCKS4(const char *proxy_name,
+                     const char *hostname,
+                     int remote_port,
+                     int sockindex,
                      struct connectdata *conn);
 
 /*
@@ -36,6 +39,9 @@ CURLcode Curl_SOCKS4(const char *proxy_name,
  */
 CURLcode Curl_SOCKS5(const char *proxy_name,
                      const char *proxy_password,
+                     const char *hostname,
+                     int remote_port,
+                     int sockindex,
                      struct connectdata *conn);
 
 #endif

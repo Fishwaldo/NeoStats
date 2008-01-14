@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2006, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2007, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,7 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: hostip.c,v 1.180 2006-08-21 22:28:19 danf Exp $
+ * $Id: hostip.c,v 1.187 2007-09-28 18:47:59 danf Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -27,9 +27,6 @@
 
 #ifdef NEED_MALLOC_H
 #include <malloc.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
 #endif
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
@@ -134,7 +131,8 @@ static void freednsentry(void *freethis);
 void Curl_global_host_cache_init(void)
 {
   if (!host_cache_initialized) {
-    Curl_hash_init(&hostname_cache, 7, freednsentry);
+    Curl_hash_init(&hostname_cache, 7, Curl_hash_str, Curl_str_key_compare,
+                   freednsentry);
     host_cache_initialized = 1;
   }
 }
@@ -202,7 +200,7 @@ create_hostcache_id(const char *server, int port)
 }
 
 struct hostcache_prune_data {
-  int cache_timeout;
+  long cache_timeout;
   time_t now;
 };
 
@@ -234,7 +232,7 @@ hostcache_timestamp_remove(void *datap, void *hc)
  * Prune the DNS cache. This assumes that a lock has already been taken.
  */
 static void
-hostcache_prune(struct curl_hash *hostcache, int cache_timeout, time_t now)
+hostcache_prune(struct curl_hash *hostcache, long cache_timeout, time_t now)
 {
   struct hostcache_prune_data user;
 
@@ -400,7 +398,6 @@ int Curl_resolv(struct connectdata *conn,
   char *entry_id = NULL;
   struct Curl_dns_entry *dns = NULL;
   size_t entry_len;
-  int wait;
   struct SessionHandle *data = conn->data;
   CURLcode result;
   int rc;
@@ -449,19 +446,20 @@ int Curl_resolv(struct connectdata *conn,
     /* The entry was not in the cache. Resolve it to IP address */
 
     Curl_addrinfo *addr;
+    int respwait;
 
     /* Check what IP specifics the app has requested and if we can provide it.
      * If not, bail out. */
     if(!Curl_ipvalid(data))
       return CURLRESOLV_ERROR;
 
-    /* If Curl_getaddrinfo() returns NULL, 'wait' might be set to a non-zero
-       value indicating that we need to wait for the response to the resolve
-       call */
-    addr = Curl_getaddrinfo(conn, hostname, port, &wait);
+    /* If Curl_getaddrinfo() returns NULL, 'respwait' might be set to a
+       non-zero value indicating that we need to wait for the response to the
+       resolve call */
+    addr = Curl_getaddrinfo(conn, hostname, port, &respwait);
 
     if (!addr) {
-      if(wait) {
+      if(respwait) {
         /* the response to our resolve call will come asynchronously at
            a later time, good or bad */
         /* First, check that we haven't received the info by now */
@@ -512,7 +510,7 @@ int Curl_resolv(struct connectdata *conn,
  */
 void Curl_resolv_unlock(struct SessionHandle *data, struct Curl_dns_entry *dns)
 {
-  curlassert(dns && (dns->inuse>0));
+  DEBUGASSERT(dns && (dns->inuse>0));
 
   if(data->share)
     Curl_share_lock(data, CURL_LOCK_DATA_DNS, CURL_LOCK_ACCESS_SINGLE);
@@ -540,7 +538,7 @@ static void freednsentry(void *freethis)
  */
 struct curl_hash *Curl_mk_dnscache(void)
 {
-  return Curl_hash_alloc(7, freednsentry);
+  return Curl_hash_alloc(7, Curl_hash_str, Curl_str_key_compare, freednsentry);
 }
 
 #ifdef CURLRES_ADDRINFO_COPY
@@ -577,6 +575,8 @@ void Curl_freeaddrinfo(Curl_addrinfo *ai)
   /* walk over the list and free all entries */
   while(ai) {
     next = ai->ai_next;
+    if(ai->ai_canonname)
+      free(ai->ai_canonname);
     free(ai);
     ai = next;
   }
@@ -601,6 +601,14 @@ struct namebuf {
 Curl_addrinfo *Curl_ip2addr(in_addr_t num, const char *hostname, int port)
 {
   Curl_addrinfo *ai;
+
+#if defined(VMS) && \
+    defined(__INITIAL_POINTER_SIZE) && (__INITIAL_POINTER_SIZE == 64)
+#pragma pointer_size save
+#pragma pointer_size short
+#pragma message disable PTRMISMATCH
+#endif
+
   struct hostent *h;
   struct in_addr *addrentry;
   struct namebuf buffer;
@@ -627,10 +635,16 @@ Curl_addrinfo *Curl_ip2addr(in_addr_t num, const char *hostname, int port)
   /* Now store the dotted version of the address */
   snprintf((char *)h->h_name, 16, "%s", hostname);
 
+#if defined(VMS) && \
+    defined(__INITIAL_POINTER_SIZE) && (__INITIAL_POINTER_SIZE == 64)
+#pragma pointer_size restore
+#pragma message enable PTRMISMATCH
+#endif
+
   ai = Curl_he2ai(h, port);
 
   return ai;
 }
-#endif
+#endif /* CURLRES_IPV4 || CURLRES_ARES */
 
 
