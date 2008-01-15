@@ -401,3 +401,22 @@ void nassert_fail( const char *expr, const char *file, const int line, const cha
 	nlog( LOG_CRITICAL, "Shutting Down!" );
 	exit( EXIT_FAILURE );
 }
+
+void CaptureBackTrace (const char *file, const int line, const char *func) {
+#ifdef HAVE_BACKTRACE
+	void *array[MAXBACKTRACESIZE];
+	size_t size;
+	char **strings;
+	size_t i;
+
+	size = backtrace( array, MAXBACKTRACESIZE );
+	strings = backtrace_symbols( array, size );
+#endif /* HAVE_BACKTRACE */
+	nlog( LOG_CRITICAL, "Abnormal Alert:!" );
+	nlog( LOG_CRITICAL, "Function: %s %s %d", func, file, line );
+#ifdef HAVE_BACKTRACE
+	for( i = 1; i < size; i++ ) {
+		nlog( LOG_CRITICAL, "BackTrace (%d) : %s", (int) i - 1, strings[i] );
+	}
+#endif /* HAVE_BACKTRACE */
+}

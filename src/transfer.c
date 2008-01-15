@@ -85,8 +85,6 @@ void CurlTest( void *data, int status, char *ver, int versize ) {
 
 int InitCurl(void) 
 {
-	long timeout_ms;
-    
 	/* global curl init */
 	switch (curl_global_init(CURL_GLOBAL_ALL)) {
 		case CURLE_OK:
@@ -484,6 +482,7 @@ static int multi_timer_cb(CURLM *multi, long timeout_ms, void *g)
 			SetTimerInterval("CurlTimeOut", (timeout_ms/1000));
 		}
 	}
+	return NS_SUCCESS;
 }
 
 /* called from libevent when our timer event expires */

@@ -1562,7 +1562,7 @@ extern void nassert_fail( const char *expr, const char *file, const int line, co
 #else /* NDEBUG */
 #define nassert(expr) (__ASSERT_VOID_CAST (0))
 #endif /* NDEBUG */
-
+EXPORTFUNC void CaptureBackTrace (const char *file, const int line, const char *func);
 EXPORTFUNC void nlog( NS_LOG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 EXPORTFUNC void dlog( NS_DEBUG_LEVEL level, const char *fmt, ...) __attribute__((format(printf,2,3))); /* 2=format 3=params */
 

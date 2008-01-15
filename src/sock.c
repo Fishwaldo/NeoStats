@@ -844,7 +844,7 @@ int DelSock( Sock *sock )
 	if (sock == NULL) {
 		/* its a double Del! Oh Oh. Print a BackTrace! */
 		nlog(LOG_WARNING, "DelSock: Double Delete?");
-		do_backtrace();
+		CaptureBackTrace(__FILE__, __LINE__, __FUNCTION__);
 		return NS_SUCCESS;
 	}
 	CloseSock( sock );
