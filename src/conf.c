@@ -475,6 +475,10 @@ static int cb_verify_bind( cfg_t *cfg, cfg_opt_t *opt )
 		cfg_error( cfg, "Error testing bind setting." );
 		return CFG_PARSE_ERROR;
 	}
+	if ( !ircstrcasecmp(opt->values[0]->string, "localhost") || !ircstrcasecmp(opt->values[0]->string, "127.0.0.1")) {
+		cfg_error( cfg, "Error. %s is not a valid value for BindTo", opt->values[0]->string);
+		return CFG_PARSE_ERROR;
+	}
 	if ( ( hp = gethostbyname( opt->values[0]->string ) ) == NULL )
 	{
 		cfg_error( cfg, "Unable to bind to address %s for option %s: %s", opt->values[0]->string, opt->name, strerror( errno ) );
