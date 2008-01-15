@@ -8,13 +8,14 @@ command HAIL {
 	output = {"*sings* Hail to the %P, they're the %P and they need hailing, hail to the %P so you better all hail like crazy..."}
 	action = true
 	paramlist = {"<Nick> - Who to Hail!"}
+	triggertype = 2
 }
 command REDNECK {
 	helpstring ={"Send a redneck dubbing to someone"}
 	output = {"I dub thee \"Redneck\", May you enjoy your coons and over sexation and many hours of weird contemplation. If its dead you eat it, ifs living kill it than eat it. This is the redneck way. Country Music all the time no rap no jive no rock no hop this is the redneck way, now go forth into a redneck world and don't forget your boots."}
 	action = false
 	paramlist = {"<Nick/Channel> - Who to send the Redneck Dubbing too"}
-	triggertype = 0
+	triggertype = 2
 }
 command CHEERUP {
 	helpstring ={
@@ -23,6 +24,7 @@ command CHEERUP {
 	          "All of us on the network love you! 3--<--<--<{4@"}
 	action = false
 	paramlist = {"<Nick/Channel> - Who to send the Cheerup message to"}
+	triggertype = 2
 }
 command BEHAPPY {
 	helpstring = {"Send a behappy song to someone"}
@@ -48,6 +50,7 @@ command BEHAPPY {
 		  "Don't Worry, it will soon pass, whatever it is",
 		  "Don't Worry - Be Happy, I'm not worried, I'm happy . . . ."}
 	action = false
+	triggertype = 2
 }
 command WONDERFUL {
 	helpstring = {"Send a wonderful song to someone"}
@@ -62,6 +65,7 @@ command WONDERFUL {
 		  "How wonderful life is while %P is in the world"}
 	action = false
 	paramlist = {"<Nick/Channel> - Who to sing the song to"}
+	triggertype = 2
 }
 command ODE {
 	helpstring = {"Send an ode about someone"}
@@ -73,6 +77,7 @@ command ODE {
 		   "*bows*"}
 	action = false
 	paramlist = {"<Nick/Channel> - Who to sing a Ode About"}
+	triggertype = 2
 }
 command LAPDANCE {
 	helpstring ={"Send a lapdance to someone"}
@@ -80,6 +85,7 @@ command LAPDANCE {
 		  "*%B sits across %P's legs and gives %P the best lap dance of their life*",
 		  "*I think we both need a cold shower now*... *wink*"}
 	paramlist = {"<Nick/Channel> - Who to do the lapdance for"}
+	triggertype = 2
 }
 command POEM {
 	helpstring = {"Send an poem about someone"}
@@ -91,4 +97,5 @@ command POEM {
 		  "*bows*"}
 	action = false
 	paramlist = {"<Nick/Channel> - Who to recite a poem about"}
+	triggertype = 2
 }

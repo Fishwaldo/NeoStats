@@ -236,7 +236,7 @@ static void bot_chan_event( Event event, CmdParams *cmdparams )
 				cmdparams->bot = botptr;
 				if( ircstrcasecmp( cmdparams->channel->name, chan ) == 0 )
 				{
-					if( cmdflag == 0 || ( botptr->botcmds == NULL ) || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS )
+					if( cmdflag == 0 || run_bot_cmd( cmdparams, cmdflag ) != NS_SUCCESS || (botptr->botcmds == NULL) )
 					{
 						/* Reset message if we have stripped cmdchar */
 						if( cmdflag != 0 )
@@ -286,6 +286,8 @@ void bot_notice( const char *origin, char *const *av, int ac )
 			}
 		}		
 	}
+	if (cmdparams->ac > 0)
+		ns_free(cmdparams->av);
 	ns_free( cmdparams );
 }
 
@@ -322,6 +324,8 @@ void bot_chan_notice( const char *origin, char *const *av, int ac )
 			}
 		}
 	}
+	if (cmdparams->ac > 0)
+		ns_free(cmdparams->av);
 	ns_free( cmdparams );
 }
 
@@ -361,6 +365,8 @@ void bot_private( const char *origin, char *const *av, int ac )
 			}
 		}
 	}
+	if (cmdparams->ac > 0)
+		ns_free(cmdparams->av);
 	ns_free( cmdparams );
 }
 
@@ -397,6 +403,8 @@ void bot_chan_private( const char *origin, char *const *av, int ac )
 			}
 		}
 	}
+	if (cmdparams->ac > 0)
+		ns_free(cmdparams->av);
 	ns_free( cmdparams );
 }
 

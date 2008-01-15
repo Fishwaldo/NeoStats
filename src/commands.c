@@ -596,8 +596,6 @@ int run_bot_cmd( CmdParams *cmdparams, int ischancmd )
 	}
 	if( ac )
 		ns_free( av );
-	if( cmdparams->ac )
-		ns_free( cmdparams->av );
 	return cmdret;
 }
 

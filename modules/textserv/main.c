@@ -41,22 +41,13 @@ typedef struct botentry {
 } botentry;
 
 
-typedef struct output {
-	char **outputstring;
-	int action;
-	int target;
-} output;
-
 typedef struct dbbot {
 	botentry tsbot;
 	BotInfo botinfo;
 	Bot *botptr;
-	char *abouttext;
-	char *creditstext;
-	char *versiontext;
-	output **outstr;
-	int commandcount;
 	hash_t *chanhash;
+	hash_t *cmds;
+	cfg_t *cfg;
 }dbbot;
 
 typedef struct botchanentry {
@@ -71,12 +62,10 @@ static int ts_cmd_list( const CmdParams *cmdparams );
 static int ts_cmd_del( const CmdParams *cmdparams );
 
 static int ts_cmd_msg( const CmdParams* cmdparams );
-static int ts_cmd_about( const CmdParams* cmdparams );
-static int ts_cmd_credits( const CmdParams* cmdparams );
-static int ts_cmd_version( const CmdParams* cmdparams );
 static int ts_cmd_add_chan( const CmdParams *cmdparams );
 static int ts_cmd_del_chan( const CmdParams *cmdparams );
-
+static int ts_cmd_list_chan( const CmdParams *cmdparams );
+static void ts_process_cmd(const CmdParams *cmdparams, cfg_t *cmd);
 /** hash to store database and bot info */
 static hash_t *tshash;
 
@@ -110,7 +99,7 @@ static bot_cmd ts_commands[]=
 {
 	{"ADD",		ts_cmd_add,	3,	NS_ULEVEL_ADMIN,	ts_help_add, 0, NULL, NULL},
 	{"DEL",		ts_cmd_del,	1, 	NS_ULEVEL_ADMIN,	ts_help_del, 0, NULL, NULL},
-	{"LIST",	ts_cmd_list,	0, 	0,				ts_help_list, 0, NULL, NULL},
+	{"LIST",	ts_cmd_list,	0, 	0,			ts_help_list, 0, NULL, NULL},
 	NS_CMD_END()
 };
 
@@ -119,6 +108,14 @@ static bot_setting ts_settings[]=
 {
 	NS_SETTING_END()
 };
+
+ModuleEvent module_events[] = 
+{
+	{EVENT_PRIVATE, ts_cmd_msg,	EVENT_FLAG_USE_EXCLUDE},
+	{EVENT_CPRIVATE, ts_cmd_msg,	EVENT_FLAG_USE_EXCLUDE},
+	NS_EVENT_END()
+};
+
 
 /** Sub bot command table template */
 static const char *ts_help_about[] = {
@@ -147,7 +144,7 @@ static const char *ts_help_version[] = {
 
 static const char *ts_help_addchan[] = {
 	"Add Channel to Client",
-	"Syntax: \2ADD <#channel>\2",
+	"Syntax: \2JOIN <#channel>\2",
 	"",
 	"Adds the channel to the clients list",
 	NULL
@@ -155,51 +152,20 @@ static const char *ts_help_addchan[] = {
 
 static const char *ts_help_delchan[] = {
 	"Remove Channel from Client",
-	"Syntax: \2DEL <#channel>\2",
+	"Syntax: \2PART <#channel>\2",
 	"",
 	"Removes the channel from the clients list",
 	NULL
 };
 
-static bot_cmd ts_commandtemplate =
-{
-	NULL,	ts_cmd_msg,	1, 	0,	NULL, CMD_FLAG_CHANONLY, NULL, NULL
+static const char *ts_help_listchan[] = {
+	"Remove Channel from Client",
+	"Syntax: \2LIST\2",
+	"",
+	"Lists all the channels that the bot will join",
+	NULL
 };
 
-static bot_cmd ts_commandtemplateabout =
-{
-	"ABOUT",	ts_cmd_about,	0, 	0,	ts_help_about, 0, NULL, NULL
-};
-
-static bot_cmd ts_commandtemplatecredits =
-{
-	"CREDITS",	ts_cmd_credits,	0, 	0,	ts_help_credits, 0, NULL, NULL
-};
-
-static bot_cmd ts_commandtemplateversion =
-{
-	"VERSION",	ts_cmd_version,	0, 	0,	ts_help_version, 0, NULL, NULL
-};
-
-static bot_cmd ts_commandtemplateaddchanpublic =
-{
-	"ADD",	ts_cmd_add_chan,	1, 	0,	ts_help_addchan, 0, NULL, NULL
-};
-
-static bot_cmd ts_commandtemplatedelchanpublic =
-{
-	"DEL",	ts_cmd_del_chan,	1, 	0,	ts_help_delchan, 0, NULL, NULL
-};
-
-static bot_cmd ts_commandtemplateaddchanprivate =
-{
-	"ADD",	ts_cmd_add_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_addchan, 0, NULL, NULL
-};
-
-static bot_cmd ts_commandtemplatedelchanprivate =
-{
-	"DEL",	ts_cmd_del_chan,	1, 	NS_ULEVEL_ADMIN,	ts_help_delchan, 0, NULL, NULL
-};
 
 
 /** TextServ BotInfo */
@@ -378,7 +344,7 @@ static void ts_read_database( dbbot *db )
 {
 	char filename[MAXPATH];
 	int commandreadcount = 0;
-	int i, j, k;
+	int i;
 	cfg_t *cfg;
 	cfg_t *cmd;
 	int ret;
@@ -395,77 +361,13 @@ static void ts_read_database( dbbot *db )
 		cfg_free(cfg);
 		return;
 	}
-	/* count the number of commands */
+	db->cfg = cfg;
 	commandreadcount = cfg_size(cfg, "command");
-	/* first, do the description section */
-	db->botinfo.bot_cmd_list = ns_calloc( ( commandreadcount + 4) * sizeof( bot_cmd ) );
-	db->abouttext = cfg_getstr(cfg, "description|about");
-	db->creditstext = cfg_getstr(cfg, "description|credits");
-	db->versiontext = cfg_getstr(cfg, "description|version");
-	db->outstr = ns_calloc(commandreadcount * sizeof(output));
+	db->cmds = hash_create(commandreadcount, 0, 0);
 	for (i = 0; i < commandreadcount; i++) {
 		cmd = cfg_getnsec(cfg, "command", i);
-		os_memcpy( &db->botinfo.bot_cmd_list[i], &ts_commandtemplate, sizeof( bot_cmd ) );
-		/* get min no of commands */
-		db->botinfo.bot_cmd_list[i].minparams = cfg_size(cmd, "paramlist");
-		/* get message type (!chan trigger or PM to bot (default is chan trigger)) */
-		if (cfg_getint(cmd, "triggertype") == 0) 
-			db->botinfo.bot_cmd_list[i].flags = 0;
-		else if (cfg_getint(cmd, "triggertype") == 2)
-			db->botinfo.bot_cmd_list[i].flags = CMD_FLAG_PRIVMSGONLY;
-		
-		db->botinfo.bot_cmd_list[i].cmd = ns_malloc(strlen(cfg_title(cmd)+1));
-		strlcpy((char *)db->botinfo.bot_cmd_list[i].cmd, cfg_title(cmd), strlen(cfg_title(cmd))+1);
-		db->botinfo.bot_cmd_list[i].helptext = ns_calloc( (cfg_size(cmd, "helpstring")+cfg_size(cmd, "paramlist")+2) * sizeof(char *));
-		/* first item is generic help string */
-		db->botinfo.bot_cmd_list[i].helptext[0] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", 0)));
-		strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[0], cfg_getnstr(cmd, "helpstring", 0), strlen(cfg_getnstr(cmd, "helpstring", 0))+1);
-		db->botinfo.bot_cmd_list[i].helptext[1] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", 0)));
-		strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[1], cfg_getnstr(cmd, "helpstring", 0), strlen(cfg_getnstr(cmd, "helpstring", 0))+1);
-		for (k = 0; k < cfg_size(cmd, "paramlist"); k++) {
-			db->botinfo.bot_cmd_list[i].helptext[k+2] = ns_malloc(strlen(cfg_getnstr(cmd, "paramlist", k)+1));
-			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[k+2], cfg_getnstr(cmd, "paramlist", k), strlen(cfg_getnstr(cmd, "paramlist", k))+1);
-		}			
-		for (j = 1; j < cfg_size(cmd, "helpstring"); j++) {		
-			db->botinfo.bot_cmd_list[i].helptext[j+k+1] = ns_malloc(strlen(cfg_getnstr(cmd, "helpstring", j)+1));
-			strlcpy((char *)db->botinfo.bot_cmd_list[i].helptext[j+k+1], cfg_getnstr(cmd, "helpstring", j), strlen(cfg_getnstr(cmd, "helpstring", j))+1);
-		}
-		/* make sure the last helpstring is null */
-		db->botinfo.bot_cmd_list[i].helptext[j+k+1] = NULL;
-		db->outstr[i] = ns_calloc(sizeof(output));
-		db->outstr[i]->outputstring = ns_calloc(cfg_size(cmd, "output") * sizeof(char *));
-		if (cfg_getint(cmd, "sendtosource") == 1)
-			db->outstr[i]->target = 1;
-		for (j = 0; j < cfg_size(cmd, "output"); j++) {		
-			db->outstr[i]->outputstring[j] = ns_malloc(strlen(cfg_getnstr(cmd, "output", j))+1);
-			strlcpy(db->outstr[i]->outputstring[j], cfg_getnstr(cmd, "output", j), strlen(cfg_getnstr(cmd, "output", j))+1);
-		}
-		db->outstr[i]->action = cfg_getbool(cmd, "action");
-		/* make sure the last output string is null */
-		db->outstr[i]->outputstring[j++] = NULL;
-		db->botinfo.bot_cmd_list[i].moddata = db->outstr[i];
-	}
-	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateabout, sizeof( bot_cmd ) );
-	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatecredits, sizeof( bot_cmd ) );
-	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateversion, sizeof( bot_cmd ) );
-	if( db->tsbot.ispublic == 1 )
-	{
-		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanpublic, sizeof( bot_cmd ) );
-		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanpublic, sizeof( bot_cmd ) );
-	} else {
-		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplateaddchanprivate, sizeof( bot_cmd ) );
-		os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplatedelchanprivate, sizeof( bot_cmd ) );
-	}
-	os_memcpy( &db->botinfo.bot_cmd_list[i++], &ts_commandtemplate, sizeof( bot_cmd ) );
-#if 0
-	output *blah;
-	for (i = 0; i < commandreadcount; i++) {
-		printf("cmd: %s\n", db->botinfo.bot_cmd_list[i].cmd);
-		printf("help: %s\n", db->botinfo.bot_cmd_list[i].helptext[0]);
-		blah = db->botinfo.bot_cmd_list[i].moddata;
-		printf("output %s\n", blah->outputstring[0]);
-	}
-#endif
+		hnode_create_insert(db->cmds, cmd, cfg_title(cmd));
+	}	
 }
 
 /** @brief BuildBot
@@ -484,10 +386,6 @@ static void BuildBot( dbbot *db )
 	strlcpy( db->botinfo.user, (db->tsbot.botuser[0] != '\0') ? db->tsbot.botuser : "ts", MAXUSER );
 	strlcpy( db->botinfo.host, db->tsbot.bothost, MAXHOST );
 	strlcat( db->botinfo.realname, db->tsbot.dbname, MAXREALNAME );
-#if 0
-	db->botinfo.bot_setting_list = ns_calloc( sizeof (ts_settingstemplate) );
-	os_memcpy( db->botinfo.bot_setting_list, ts_settingstemplate, sizeof (ts_settingstemplate) );
-#endif
 	db->botinfo.bot_setting_list = NULL;
 	db->botinfo.flags = 0;
 	if( db->tsbot.ispublic > 1 )
@@ -538,7 +436,6 @@ static void PartBot( dbbot *db )
 	hnode_t *hn;
 	hscan_t hs;
 	char *channame;
-	int i, j;
 
 	if( db->botptr )
 	{
@@ -555,23 +452,12 @@ static void PartBot( dbbot *db )
 		irc_quit( db->botptr, "" );
 		hash_destroy( db->chanhash );
 	}
-	for( i = 0; i < db->commandcount; i++ )
+	hash_scan_begin(&hs, db->cmds);
+	while (( hn = hash_scan_next(&hs)) != NULL) 
 	{
-		j = 0;
-		while (db->botinfo.bot_cmd_list[i].helptext[j] != NULL) {
-			ns_free( db->botinfo.bot_cmd_list[i].helptext[j] );
-			j++;
-		}
-		j = 0;
-		while (db->outstr[i]->outputstring[j] != NULL) {
-			ns_free(db->outstr[i]->outputstring[j]);
-			j++;
-		};
-		ns_free( db->botinfo.bot_cmd_list[i].cmd);
+		hash_scan_delete_destroy_node(db->cmds, hn);
 	}
-	ns_free( db->abouttext );
-	ns_free( db->creditstext );	
-	ns_free( db->versiontext );	
+	cfg_free(db->cfg);	
 }
 
 /** @brief load_botentry
@@ -867,9 +753,131 @@ static int ts_cmd_del( const CmdParams *cmdparams )
 
 static int ts_cmd_msg( const CmdParams* cmdparams )
 {
-	char buf[BUFSIZE];
-	output *fmt;
 	dbbot *db;
+	hnode_t *node;
+	hscan_t hscan;
+	cfg_t *cmd;
+	int i;
+	int chan = 0;
+	char bottrig[BUFSIZE];	
+	
+	SET_SEGV_LOCATION();
+	if (cmdparams->bot->flags & BOT_FLAG_ROOT)
+		return NS_SUCCESS;
+	if (cmdparams->channel != NULL) 
+		chan = 1;
+	else
+		ircsnprintf(bottrig, BUFSIZE, "!%s", cmdparams->bot->u->name);
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	if (!ircstrcasecmp(cmdparams->cmd, "help")) {
+		if (cmdparams->ac == 0) {
+			/* list of available commands */
+			irc_prefmsg(cmdparams->bot, cmdparams->source, "\2The following commands can be used with %s:\2", cmdparams->bot->u->name);
+			hash_scan_begin(&hscan, db->cmds);
+			while ( ( node = hash_scan_next(&hscan) ) != NULL) {
+				cmd = hnode_get(node);
+				if (chan == 1) {
+					/* Channel help, then trigger types 0 or 1 */
+					if (cfg_getint(cmd, "triggertype") != 2)
+		 				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 %s", cfg_title(cmd), cfg_getnstr(cmd, "helpstring", 0)); 
+				} else {
+					/* PM help, then trigger types 0 or 2 */
+					if (!cfg_getint(cmd, "triggertype") != 1)
+		 				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 %s", cfg_title(cmd), cfg_getnstr(cmd, "helpstring", 0)); 
+				}
+			}
+			if (chan != 1) {
+				if (db->tsbot.ispublic == 1) {
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 Join a channel", "JOIN");
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 Part a Channel", "PART");
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 List channels joined", "LIST");
+				}
+				/* don't display these in the channel */
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 Display current Database Version", "VERSION");
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 Display information about current database", "ABOUT");
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 Display credits of current database", "CREDITS");
+			}
+			irc_prefmsg(cmdparams->bot, cmdparams->source, "To execute a command:");
+			irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%s %s command\2", chan == 0 ? "/msg" : bottrig, cmdparams->bot->u->name);
+			irc_prefmsg(cmdparams->bot, cmdparams->source, "For help on a command:");
+			irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%s %s HELP command\2", chan == 0 ? "/msg": bottrig, cmdparams->bot->u->name);
+			if (chan == 1) {
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "More Commands may be available via Private Message. See /msg %s help", cmdparams->bot->u->name);
+			} else {
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "More Commands may be available via channel messages. Issue !%s help in a channel that I am in", cmdparams->bot->u->name);
+			}
+		} else {
+			/* help on a specific command */
+			cmd = (cfg_t *)hnode_find(db->cmds, cmdparams->av[0]);
+			if (cmd) {
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "%s", cfg_getnstr(cmd, "helpstring", 0));
+				for (i = 0; i < cfg_size(cmd, "paramlist"); i++) 
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "Syntax: \2%s\2", cfg_getnstr(cmd, "paramlist", i));
+				for (i = 1; i < cfg_size(cmd, "helpstring"); i++)
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "%s", cfg_getnstr(cmd, "helpstring", i));
+				if (cfg_getint(cmd, "triggertype") == 1) {
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "This command is only available via Private Messages");
+				} else if (cfg_getint(cmd, "triggertype") == 2) {
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "This command is only available via Channel Messages");
+				}
+			} else if (!ircstrcasecmp(cmdparams->av[0], "join")) {
+				irc_prefmsg_list(cmdparams->bot, cmdparams->source, ts_help_addchan);
+			} else if (!ircstrcasecmp(cmdparams->av[0], "part")) {
+				irc_prefmsg_list(cmdparams->bot, cmdparams->source, ts_help_delchan);
+			} else if (!ircstrcasecmp(cmdparams->av[0], "list")) {
+				irc_prefmsg_list(cmdparams->bot, cmdparams->source, ts_help_listchan);
+			} else if (!ircstrcasecmp(cmdparams->av[0], "about")) {
+				irc_prefmsg_list(cmdparams->bot, cmdparams->source, ts_help_about);
+			} else if (!ircstrcasecmp(cmdparams->av[0], "credits")) {
+				irc_prefmsg_list(cmdparams->bot, cmdparams->source, ts_help_credits);
+			} else if (!ircstrcasecmp(cmdparams->av[0], "version")) {
+				irc_prefmsg_list(cmdparams->bot, cmdparams->source, ts_help_version);
+			} else {
+				if (chan == 0) 
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "No help available or unknown help topic: %s", cmdparams->av[0]);
+			}
+		}
+	} else if (!ircstrcasecmp(cmdparams->cmd, "join")) {
+		ts_cmd_add_chan(cmdparams);
+	} else if (!ircstrcasecmp(cmdparams->cmd, "part")) {
+		ts_cmd_del_chan(cmdparams);
+	} else if (!ircstrcasecmp(cmdparams->cmd, "list")) {
+		ts_cmd_list_chan(cmdparams);
+	} else if (!ircstrcasecmp(cmdparams->cmd, "version")) {
+		/* version command */
+		irc_prefmsg(cmdparams->bot, cmdparams->source, "%s", cfg_getstr(db->cfg, "description|version"));
+	} else if (!ircstrcasecmp(cmdparams->cmd, "about")) {
+		/* about command */
+		irc_prefmsg(cmdparams->bot, cmdparams->source, "%s", cfg_getstr(db->cfg, "description|about"));
+	} else if (!ircstrcasecmp(cmdparams->cmd, "credits")) {
+		/* credits command */
+		irc_prefmsg(cmdparams->bot, cmdparams->source, "%s", cfg_getstr(db->cfg, "description|credits"));
+	} else {
+		/* actual output */
+		cmd = (cfg_t *)hnode_find(db->cmds, cmdparams->cmd);
+		if (!cmd) {
+			if (chan == 0) 
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "Syntax error: unkown command: %s", cmdparams->cmd);
+			return NS_FAILURE;
+		} else {
+			if ((cfg_getint(cmd, "triggertype") == 2) && (chan == 0)) {
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "This Command is only available in channels");
+			} else if ((cfg_getint(cmd, "triggertype") == 1) && (chan == 1)) {
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "This Command is only available in Private Messages");
+			} else {
+				if (cfg_size(cmd, "paramlist") > cmdparams->ac) {
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "Insufficent parameters for command %s", cmdparams->cmd);
+					irc_prefmsg(cmdparams->bot, cmdparams->source, "\2/msg %s help %s\2 for help", cmdparams->bot->u->name, cmdparams->cmd);
+				} else {
+					ts_process_cmd(cmdparams, cmd);
+				}
+			}
+	 	}	
+	}
+	return NS_SUCCESS;
+}
+static void ts_process_cmd(const CmdParams *cmdparams, cfg_t *cmd) {
+	char buf[BUFSIZE];
 	Client *target = NULL;
 	Channel *targetc = NULL;
 	lnode_t *chans;
@@ -878,10 +886,7 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 	/* targettype 0 is channel, targettype 1 is requestor, targettype 2 is nickname, targettype 3 is channel specified */
 	int targettype = 0;
 
-	SET_SEGV_LOCATION();
-	db = (dbbot *) GetBotModValue( cmdparams->bot );
-	fmt = cmdparams->cmd_ptr->moddata;
-	
+
 	/* logic here:
 	 *   (1) if command executed in a channel, we dont require a destination for the message 
 	 *       (2) the command can specify to be sent to the requestor
@@ -895,7 +900,7 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
          /* this is (1) above */
          if (cmdparams->channel != NULL) {
          	/* (2) if target is 1, then its sent to the requestor */
-		if (fmt->target == 1) {
+		if (cfg_getint(cmd, "sendtosource") == 1) {
 			targettype = 1;         
 			target = cmdparams->source;
 		/* (2a) send to the source channel */
@@ -906,7 +911,7 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 	/* (3) now it gets complicated */
 	 } else {
 	 	/* (4) send to the requestor */
-	 	if (fmt->target == 1) {
+	 	if (cfg_getint(cmd, "sendtosource") == 1) {
 	 		targettype = 1;
 			target = cmdparams->source;
 		/* (5) send to a channel */
@@ -915,7 +920,7 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 			targetc = FindChannel(cmdparams->av[0]);
 			if (!targetc) {
 				irc_prefmsg(cmdparams->bot, cmdparams->source, "%s is not a valid Channel", cmdparams->av[0]);
-				return NS_FAILURE;
+				return;
 			} else {
 				/* check if I am on this channel */
 				chans = list_first(cmdparams->bot->u->user->chans);
@@ -927,7 +932,7 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 				}
 				if (validt == 0) {
 					irc_prefmsg(cmdparams->bot, cmdparams->source, "I am not on %s channel. Message Not Sent", targetc->name);
-					return NS_FAILURE;
+					return;
 				}
 			}
 		/* (6) send to channel member */
@@ -937,7 +942,7 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 			if( !target ) 
 			{
 				/* FindValidUser already send a error to the user */
-				return NS_FAILURE;
+				return;
 			} else {
 				chans = list_first(cmdparams->bot->u->user->chans);
 				while (chans) {
@@ -948,63 +953,30 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 				}		
 				if (validt == 0) {
 					irc_prefmsg(cmdparams->bot, cmdparams->source, "%s is not on any channels I am on. Command Not Sent", target->name);
-					return NS_FAILURE;
+					return;
 				} 
 			}
 		}
 	}
-	while (fmt->outputstring[i] != NULL) {
-		tsprintf(cmdparams, targettype, buf, BUFSIZE, fmt->outputstring[i]);
+	for (i = 0; i < cfg_size(cmd, "output"); i++) {
+		tsprintf(cmdparams, targettype, buf, BUFSIZE, cfg_getnstr(cmd, "output", i));
 		/* its a trigger message to the channel */
 		if ((targettype == 0) || (targettype == 3)) {
-			if (fmt->action == 1)
+			if (cfg_getbool(cmd, "action") == 1)
 				irc_ctcp_action_req_channel( cmdparams->bot, targetc, buf );
 			else
 				irc_chanprivmsg( cmdparams->bot, targetc->name, buf );
 		/* its a message to a user */
 		} else {
-			if (fmt->action == 1) 
+			if (cfg_getbool(cmd, "action") == 1) 
 				irc_ctcp_action_req(cmdparams->bot, target, buf);
 			else
 				irc_privmsg(cmdparams->bot, target, buf);
 		}
-		i++;
 	}
-	if ((targettype == 0) || (targettype == 3)) 
-		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, targetc->name );
-	else 
+	if ((targettype == 1) || (targettype == 2)) 
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s has been sent to %s", cmdparams->cmd, target->name );
-	return NS_SUCCESS;
-}
-
-static int ts_cmd_about( const CmdParams* cmdparams )
-{
-	dbbot *db;
-
-	SET_SEGV_LOCATION();
-	db = (dbbot *) GetBotModValue( cmdparams->bot );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, db->abouttext );
-	return NS_SUCCESS;
-}
-
-static int ts_cmd_credits( const CmdParams* cmdparams )
-{
-	dbbot *db;
-
-	SET_SEGV_LOCATION();
-	db = (dbbot *) GetBotModValue( cmdparams->bot );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, db->creditstext );
-	return NS_SUCCESS;
-}
-
-static int ts_cmd_version( const CmdParams* cmdparams )
-{
-	dbbot *db;
-
-	SET_SEGV_LOCATION();
-	db = (dbbot *) GetBotModValue( cmdparams->bot );
-	irc_prefmsg( cmdparams->bot, cmdparams->source, db->versiontext );
-	return NS_SUCCESS;
+	return;
 }
 
 /** @brief ts_cmd_add_chan
@@ -1022,18 +994,25 @@ static int ts_cmd_add_chan( const CmdParams *cmdparams )
 	dbbot *db;
 	char *channame;
 	botchanentry *bce;
-
 	SET_SEGV_LOCATION();
+	if (cmdparams->ac < 1) {
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Insuffficent parameters");
+		return NS_SUCCESS;
+	}
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
 	if( ValidateChannel( cmdparams->av[0] ) != NS_SUCCESS )
 	{
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "invalid channel name specified - %s ", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	if ((db->tsbot.ispublic == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.ispublic == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) ) {
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Access Denied");
 		return NS_FAILURE;
-	if ((db->tsbot.ispublic == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	}
+	if ((db->tsbot.ispublic == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) ) {
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Error. You must be a Channel Operator on %s", cmdparams->av[0]);
 		return NS_FAILURE;
+	}
 	if( hash_lookup( db->chanhash, cmdparams->av[0] ) != NULL )
 	{
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "%s is already in the channel list", cmdparams->av[0] );
@@ -1070,16 +1049,24 @@ static int ts_cmd_del_chan( const CmdParams *cmdparams )
 	hnode_t *hn;
 
 	SET_SEGV_LOCATION();
+	if (cmdparams->ac < 1) {
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Insuffficent parameters");
+		return NS_SUCCESS;
+	}
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
 	if( ValidateChannel( cmdparams->av[0] ) != NS_SUCCESS )
 	{
 		irc_prefmsg( cmdparams->bot, cmdparams->source, "invalid channel name specified - %s ", cmdparams->av[0] );
 		return NS_SUCCESS;
 	}
-	if ((db->tsbot.ispublic == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	if ((db->tsbot.ispublic == 0) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) ) {
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Access Denied");
 		return NS_FAILURE;
-	if ((db->tsbot.ispublic == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) )
+	}
+	if ((db->tsbot.ispublic == 1) && (!IsChanOp(FindChannel(cmdparams->av[0]), cmdparams->source)) && (cmdparams->source->user->ulevel < NS_ULEVEL_ADMIN) ) {
+		irc_prefmsg( cmdparams->bot, cmdparams->source, "Error. You must be a Channel Operator on %s", cmdparams->av[0]);
 		return NS_FAILURE;
+	}
 	hn = hash_lookup( db->chanhash, cmdparams->av[0] );
 	if( hn == NULL )
 	{
@@ -1095,5 +1082,23 @@ static int ts_cmd_del_chan( const CmdParams *cmdparams )
 	hash_delete_destroy_node( db->chanhash, hn );
 	ns_free( channame );
 	ns_free( botchan );
+	return NS_SUCCESS;
+}
+static int ts_cmd_list_chan( const CmdParams *cmdparams ) {
+	dbbot *db;
+	hnode_t *hn2;
+	hscan_t hs2;
+	char *channame;
+
+	SET_SEGV_LOCATION();
+	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	irc_prefmsg(cmdparams->bot, cmdparams->source, "List of Channels %s is a member of:", cmdparams->bot->u->name);irc_prefmsg(cmdparams->bot, cmdparams->source, "    %s", db->tsbot.channel);
+	hash_scan_begin( &hs2, db->chanhash );
+	while( ( hn2 = hash_scan_next( &hs2 ) ) != NULL )
+	{
+		channame = ( ( char * )hnode_get( hn2 ) );
+		irc_prefmsg(cmdparams->bot, cmdparams->source, "    %s", channame);
+	}
+	irc_prefmsg(cmdparams->bot, cmdparams->source, "End of List.");
 	return NS_SUCCESS;
 }
