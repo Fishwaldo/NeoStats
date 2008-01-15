@@ -766,8 +766,8 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 		return NS_SUCCESS;
 	if (cmdparams->channel != NULL) 
 		chan = 1;
-	else
-		ircsnprintf(bottrig, BUFSIZE, "!%s", cmdparams->bot->u->name);
+
+	ircsnprintf(bottrig, BUFSIZE, "!%s", cmdparams->bot->u->name);
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
 	if (!ircstrcasecmp(cmdparams->cmd, "help")) {
 		if (cmdparams->ac == 0) {
@@ -777,12 +777,12 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 			while ( ( node = hash_scan_next(&hscan) ) != NULL) {
 				cmd = hnode_get(node);
 				if (chan == 1) {
-					/* Channel help, then trigger types 0 or 1 */
-					if (cfg_getint(cmd, "triggertype") != 2)
+					/* Channel help, then trigger types 0 or 2 */
+					if (cfg_getint(cmd, "triggertype") != 1)
 		 				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 %s", cfg_title(cmd), cfg_getnstr(cmd, "helpstring", 0)); 
 				} else {
-					/* PM help, then trigger types 0 or 2 */
-					if (!cfg_getint(cmd, "triggertype") != 1)
+					/* PM help, then trigger types 0 or 1 */
+					if (!cfg_getint(cmd, "triggertype") != 2)
 		 				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 %s", cfg_title(cmd), cfg_getnstr(cmd, "helpstring", 0)); 
 				}
 			}
