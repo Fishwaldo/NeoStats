@@ -55,7 +55,7 @@ static int ns_cmd_status( const CmdParams *cmdparams );
 static int ns_set_debug_cb( const CmdParams *cmdparams, SET_REASON reason );
 #endif /* DEBUG */
 static int ns_set_servicecmode_cb(const CmdParams *cmdparams, SET_REASON reason);
-
+static int ns_set_pingtime_cb(const CmdParams *cmdparams, SET_REASON reason);
 config nsconfig;
 tme me;
 
@@ -143,7 +143,7 @@ static bot_setting ns_settings[] =
 	{"MSGTHRESHOLD",	&nsconfig.msgthreshold,		SET_TYPE_INT,		1,	100,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_msgthreshold, NULL, ( void * )5 },
 	{"SPLITTIME",		&nsconfig.splittime,		SET_TYPE_INT,		0,	1000,		NS_ULEVEL_ADMIN, NULL,	ns_help_set_splittime, NULL, ( void * )300 },
 	{"JOINSERVICESCHAN",&nsconfig.joinserviceschan, SET_TYPE_BOOLEAN,	0, 0, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_joinserviceschan, NULL, ( void* )1 },
-	{"PINGTIME",		&nsconfig.pingtime,			SET_TYPE_INT,		0, 65534, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_pingtime, NULL, ( void* )120 },
+	{"PINGTIME",		&nsconfig.pingtime,			SET_TYPE_INT,		0, 65534, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_pingtime, ns_set_pingtime_cb, ( void* )120 },
 	{"SERVICECMODE",	me.servicescmode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_servicecmode, ns_set_servicecmode_cb, NULL },
 	{"SERVICEUMODE",	me.servicesumode,			SET_TYPE_STRING,	0, MODESIZE, 	NS_ULEVEL_ADMIN, NULL,	ns_help_set_serviceumode, NULL, NULL },
 	{"CMDCHAR",			nsconfig.cmdchar,			SET_TYPE_STRING,	0, 2, 			NS_ULEVEL_ADMIN, NULL,	ns_help_set_cmdchar, NULL, ( void* )"!" },
@@ -451,3 +451,11 @@ static int ns_set_servicecmode_cb( const CmdParams *cmdparams, SET_REASON reason
 	return NS_SUCCESS;
 }
 
+static int ns_set_pingtime_cb(const CmdParams *cmdparams, SET_REASON reason)
+{
+	if( reason == SET_LOAD || reason == SET_CHANGE ) {
+		SetTimerInterval("PingServers", nsconfig.pingtime);
+		SetTimerInterval("FlushLogs", nsconfig.pingtime);
+	}
+	return NS_SUCCESS;
+}

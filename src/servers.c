@@ -34,6 +34,7 @@
 #include "servers.h"
 #include "services.h"
 #include "users.h"
+#include "main.h"
 #include "namedvars.h"
 #include "namedvars-core.h"
 
@@ -376,13 +377,33 @@ static int PingServer( Client *s, void *v )
  *  @return none
  */
 
-void PingServers( void )
+int PingServers(void *arg)
 {
 	if( !IsNeoStatsSynched() )
-		return;
+		return NS_SUCCESS;
 	dlog( DEBUG3, "Sending pings..." );
 	me.ulag = 0;
+	me.tslastping = me.now;	
 	ProcessServerList( PingServer, NULL );
+	return NS_SUCCESS;
+}
+
+/** @brief SetServersTime
+ *
+ *  use SVSTIME on the servers
+ *  NeoStats core use only.
+ *
+ *  @param none
+ *
+ *  @return none
+ */
+
+int SetServersTime( void *arg)
+{
+	if( !IsNeoStatsSynched() )
+		return NS_SUCCESS;
+	irc_svstime(ns_botptr, NULL, me.now);
+	return NS_SUCCESS;
 }
 
 /** @brief FiniServers

@@ -37,7 +37,8 @@
 
 void CloseLogs( void );
 int InitLogs( void );
-void ResetLogs( void );
+int ResetLogs( void *arg );
+int FlushLogs(void *arg);
 void FiniLogs( void );
 /* Configurable log filename format string */
 extern char LogFileNameFormat[MAX_LOGFILENAME];

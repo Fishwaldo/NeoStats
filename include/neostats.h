@@ -1135,6 +1135,8 @@ typedef struct Timer {
 	timer_handler handler;
 	/** Pointer to user suplied context */
 	void *userptr;
+	/** Next Run at time */
+	time_t nextrun;
 } Timer;
 
 /** @brief BotInfo structure

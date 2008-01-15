@@ -50,7 +50,7 @@ static void libevent_log(int severity, const char *msg)
 {
 	switch (severity) {
 		case _EVENT_LOG_DEBUG:
-			dlog(DEBUG1, "LibEvent: %s", msg);
+			dlog(DEBUG10, "LibEvent: %s", msg);
 			break;
 		case _EVENT_LOG_MSG:
 			nlog(LOG_INFO, "LibEvent: %s", msg);

@@ -183,6 +183,19 @@ void CloseLogs( void )
 		ns_free( logentry );
 	}
 }
+/* @breif FlushLogs
+ * 
+ *  Flush Log files out. Called from timers 
+ *  Neostats Core use only.
+ * 
+ *  @param arg - user supplied pointer. Not used
+ *
+ *  @return SUCCESS - Keep Timer around. FAILURE - Delete Timer
+ */
+int FlushLogs(void *arg) {
+	fflush(NULL);
+	return NS_SUCCESS;
+}	
 
 /*  @brief ResetLogs
  * 
@@ -193,8 +206,7 @@ void CloseLogs( void )
  *
  *  @return none
  */
-
-void ResetLogs( void )
+int ResetLogs( void *arg )
 {
 	hscan_t hs;
 	hnode_t *hn;
@@ -219,6 +231,7 @@ void ResetLogs( void )
 		/* make new file name but do not open until needed to avoid 0 length files*/
 		make_log_filename( logentry->name, logentry->logname );
 	}
+	return NS_SUCCESS;
 }
 
 /*  @brief new_logentry

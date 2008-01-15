@@ -54,11 +54,11 @@ HV *perl_encode_namedvars(nv_list *nv, void *data) {
 }
 
 nv_item *perl_store_namedvars(nv_list *nv, HV *values) {
-	SV **value;
 	int i, j;
 	i = 0;
 	j = 0;
         nv_item *item;
+	SV **value;
 	item = nv_new_item(nv);
 	while (nv->format[i].fldname != NULL) {
 		if (hv_exists(values, nv->format[i].fldname, strlen(nv->format[i].fldname))) {

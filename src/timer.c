@@ -35,12 +35,11 @@
 #define TIMER_TABLE_SIZE	300	/* Number of Timers */
 
 /* @brief Module Timer hash list */
-static hash_t *timerhash;
-static struct event *timers;
+static list_t *timerlist;
+static struct event *evtimers;
 
-static int midnight = 0;
-static time_t lastservertimesync = 0;
-
+static void TimerCalcNextRun(Timer *timer, lnode_t *node);
+static void NextSchedule();
 /** @brief InitTimers
  *
  *  Init timer subsystem
@@ -53,19 +52,19 @@ static time_t lastservertimesync = 0;
 
 int InitTimers( void )
 {
-	struct timeval tv;
-
-	timerhash = hash_create( TIMER_TABLE_SIZE, 0, 0 );
-	if( !timerhash )
+	timerlist = list_create( TIMER_TABLE_SIZE);
+	if( !timerlist )
 	{
 		nlog( LOG_CRITICAL, "Unable to create timer hash" );
 		return NS_FAILURE;
 	}
-	timers = ns_malloc( sizeof( struct event ) );
-	timerclear( &tv );
-	tv.tv_sec = 1;
-	evtimer_set( timers, CheckTimers_cb, NULL );
-	evtimer_add( timers, &tv );
+	evtimers = ns_malloc( sizeof( struct event ) );
+	evtimer_set( evtimers, CheckTimers_cb, NULL );
+	AddTimer(TIMER_TYPE_INTERVAL, PingServers, "PingServers", nsconfig.pingtime, NULL);
+	AddTimer(TIMER_TYPE_INTERVAL, FlushLogs, "FlushLogs", nsconfig.pingtime, NULL);
+	if (nsconfig.setservertimes > 0) 
+		AddTimer(TIMER_TYPE_INTERVAL, SetServersTime, "SetServersTime", nsconfig.setservertimes, NULL);
+	AddTimer(TIMER_TYPE_DAILY, ResetLogs, "ResetLogs", 0, NULL);
 	return NS_SUCCESS;
 }
 
@@ -81,130 +80,27 @@ int InitTimers( void )
 
 void FiniTimers( void )
 {
-	hscan_t tscan;
-	hnode_t *tn;
-	evtimer_del( timers );
-	os_free( timers );
+	lnode_t *tn;
+	Timer *timer;
+	
+	evtimer_del( evtimers );
+	os_free( evtimers );
+	DelTimer("PingServers");
+	DelTimer("FlushLogs");
+	if (nsconfig.setservertimes > 0) 
+		DelTimer("SetServersTime");
+	DelTimer("ResetLogs");
 
-	if (hash_count(timerhash) > 0) {
-		hash_scan_begin( &tscan, timerhash );
-		while( ( tn = hash_scan_next( &tscan ) ) != NULL )
+	if (list_count(timerlist) > 0) {
+		tn = list_first(timerlist);
+		while( tn != NULL )
 		{
-			Timer *timer = NULL;
-			timer = hnode_get( tn );
+			timer = lnode_get( tn );
 			dlog( DEBUG3, "FiniTimers() BUG: Timer %s not deleted for module %s", timer->name, timer->moduleptr->info->name );
+			tn = list_next(timerlist, tn);
 		}
 	}
-	hash_destroy( timerhash );
-}
-
-/** @brief is_midnight
- *
- *  Determine midnight
- *  Timer subsystem use only.
- *
- *  @param none
- *
- *  @return 1 if midnight else 0
- */
-
-static int is_midnight( void )
-{
-	struct tm *ltm = localtime( &me.now );
-
-	if( ltm->tm_hour == 0 && ltm->tm_min == 0 )
-		return 1;
-	return 0;
-}
-
-/** @brief run_mod_timers
- *
- *  NeoStats command to run pending timer functions
- *
- *  @param ismidnight whether we are at midnight
- * 
- *  @return none
- */
-
-static void run_mod_timers( int ismidnight )
-{
-	struct tm *ts;
-	Timer *timer = NULL;
-	hscan_t tscan;
-	hnode_t *tn;
-
-	ts = gmtime( &me.now );
-	/* First, lets see if any modules have a function that is due to run..... */
-	hash_scan_begin( &tscan, timerhash );
-	while( ( tn = hash_scan_next( &tscan ) ) != NULL )
-	{
-		SET_SEGV_LOCATION();
-		timer = hnode_get( tn );
-		/* If a module is not yet synched, reset it's lastrun */
-		if( !IsModuleSynched( timer->moduleptr ) )
-		{
-			timer->lastrun = ( int ) me.now;
-		}
-		else
-		{
-			switch( timer->type )
-			{
-				case TIMER_TYPE_DAILY:
-					if( !ismidnight )
-						continue;
-					break;
-				case TIMER_TYPE_WEEKLY:
-					if( !ismidnight )
-						continue;
-					if( ts->tm_wday != 0 )
-						continue;
-					break;
-				case TIMER_TYPE_MONTHLY:
-					if( !ismidnight )
-						continue;
-					if( ts->tm_mday != 1 )
-						continue;
-					break;
-				case TIMER_TYPE_INTERVAL:
-					if( me.now - timer->lastrun < timer->interval ) 
-						continue;
-					break;
-				case TIMER_TYPE_COUNTDOWN:
-					if( me.now - timer->lastrun < timer->interval )
-					{
-						timer->interval -= ( me.now - timer->lastrun );
-						timer->lastrun = me.now;
- 						continue;
-					}
-					break;
-			}
-			if( setjmp( sigvbuf ) == 0 )
-			{
-				dlog( DEBUG10, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name );
-				SET_RUN_LEVEL( timer->moduleptr );
-				if( timer->handler( timer->userptr ) < 0 )
-				{
-					dlog( DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name );
-					hash_scan_delete_destroy_node( timerhash, tn );
-					ns_free( timer );
-				}
-				else
-				{
-					timer->lastrun = ( int ) me.now;
-				}
-				RESET_RUN_LEVEL();
-				if( timer->type == TIMER_TYPE_COUNTDOWN )
-				{
-					hash_scan_delete_destroy_node( timerhash, tn );
-					ns_free( timer );
-				}
-			}
-			else
-			{
-				nlog( LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s", timer->moduleptr->info->name );
-			}
-		}
-	}
+	list_destroy( timerlist );
 }
 
 /** @brief CheckTimers_cb
@@ -221,44 +117,43 @@ static void run_mod_timers( int ismidnight )
 
 void CheckTimers_cb( int notused, short event, void *arg )
 {
-	struct timeval tv;
+	Timer *timer = NULL;
+	lnode_t *tn;
 
 	SET_SEGV_LOCATION();
+
 	update_time_now();
-	timerclear( &tv );
-	tv.tv_sec = 1;
-	if( ( me.now - me.tslastping ) > nsconfig.pingtime )
-	{
-		PingServers();
-		me.tslastping = me.now;
-		/* flush log files */
-		fflush( NULL );
-	}
-	if( IsNeoStatsSynched() && nsconfig.setservertimes )
-	{
-		if( ( me.now - lastservertimesync ) > nsconfig.setservertimes )
-		{
-			/* The above check does not need to be exact, but 
-			   setting times ought to be so reset me.now */
-			irc_svstime( ns_botptr, NULL, me.now );
-			lastservertimesync = me.now;
+	/* We only run Timers one at a time */
+	tn = list_first(timerlist);
+	timer = lnode_get( tn );
+	/* If a module is not yet synched, reset it's lastrun */
+	if( !IsModuleSynched( timer->moduleptr ) ) {
+		timer->lastrun = ( int ) me.now;
+	} else if (timer->nextrun <= me.now) {
+		if( setjmp( sigvbuf ) == 0 ) {
+			dlog( DEBUG10, "run_mod_timers: Running timer %s for module %s", timer->name, timer->moduleptr->info->name );
+			SET_RUN_LEVEL( timer->moduleptr );
+			if( timer->handler( timer->userptr ) < 0 ) {
+				dlog( DEBUG2, "run_mod_timers: Deleting Timer %s for Module %s as requested", timer->name, timer->moduleptr->info->name );
+				list_delete_destroy_node(timerlist, tn);
+				ns_free( timer );
+				NextSchedule();
+			} else {
+				timer->lastrun = ( int ) me.now;
+				TimerCalcNextRun(timer, tn);
+			}
+			RESET_RUN_LEVEL();
+#if 0
+			if( timer->type == TIMER_TYPE_COUNTDOWN ) {
+					hash_scan_delete_destroy_node( timerlist, tn );
+					ns_free( timer );
+			}
+#endif
+		} else {
+			nlog( LOG_CRITICAL, "run_mod_timers: setjmp() failed, can't call module %s", timer->moduleptr->info->name );
+			NextSchedule();
 		}
 	}
-	if( is_midnight() && midnight == 0 )
-	{
-		dlog( DEBUG1, "Midnight (%s)", sctime( me.now ) );
-		run_mod_timers( 1 );
-		ResetLogs();
-		midnight = 1;
-	}
-	else
-	{
-		run_mod_timers( 0 );
-		if( midnight == 1 && is_midnight() == 0 )
-			midnight = 0;
-	}	
-	/* re-add this timeout */
-	event_add( timers, &tv );
 }
 
 /** @brief create new new_timer
@@ -275,7 +170,7 @@ static Timer *new_timer( const char *name )
 	Timer *timer;
 
 	SET_SEGV_LOCATION();
-	if( hash_isfull( timerhash ) )
+	if( list_isfull( timerlist ) )
 	{
 		nlog( LOG_WARNING, "new_timer: timer hash is full" );
 		return NULL;
@@ -283,7 +178,6 @@ static Timer *new_timer( const char *name )
 	dlog( DEBUG2, "new_timer: %s", name );
 	timer = ns_calloc( sizeof( Timer ) );
 	strlcpy( timer->name, name, MAX_MOD_NAME );
-	hnode_create_insert( timerhash, timer, name );
 	return timer;
 }
 
@@ -298,12 +192,124 @@ static Timer *new_timer( const char *name )
 
 Timer *FindTimer( const char *name )
 {
+	lnode_t *tn;
 	Timer *t;
 
-	t = ( Timer * )hnode_find( timerhash, name );
-	if( !t )
-		dlog( DEBUG3, "FindTimer: %s not found", name );
-	return t;
+	tn = list_first(timerlist);
+	while (tn != NULL) {
+		t = lnode_get(tn);
+		if (!ircstrcasecmp(t->name, name))
+			return t;
+		tn = list_next(timerlist, tn);
+	}
+	dlog( DEBUG3, "FindTimer: %s not found", name );
+	return NULL;
+}
+
+static void TimerCalcNextRun(Timer *timer, lnode_t *node) {
+	struct tm *newtime;
+	Timer *CurTimer, *NextTimer;
+	lnode_t *CurNode, *NextNode;
+
+	newtime = localtime(&timer->lastrun);
+	switch(timer->type) {
+		case TIMER_TYPE_DAILY:
+			newtime->tm_hour = 0;
+			newtime->tm_min = 0;
+			newtime->tm_sec = 0;
+			newtime->tm_mday += 1;
+			break;
+		case TIMER_TYPE_WEEKLY:
+			/* weekly and monthly timers can run at any time */
+			newtime->tm_mday += 7;
+			break;
+		case TIMER_TYPE_MONTHLY:
+			newtime->tm_mon += 1;
+			break;
+		case TIMER_TYPE_INTERVAL:
+			newtime->tm_sec += timer->interval;
+			break;
+		case TIMER_TYPE_COUNTDOWN:
+#if 0
+					if( me.now - timer->lastrun < timer->interval )
+					{
+						timer->interval -= ( me.now - timer->lastrun );
+						timer->lastrun = me.now;
+ 						continue;
+					}
+#endif
+			newtime->tm_sec += timer->interval;
+			break;
+	}	
+	timer->nextrun = mktime(newtime);
+	if (list_count(timerlist) == 0) {
+		/* the list is empty, insert at the top */
+		node = lnode_create_prepend(timerlist, timer);
+		return;
+	} else {
+		if (!node) 
+			node = lnode_create(timer);
+		else 
+			list_delete(timerlist, node);
+	}		
+	/* now move though the timer list and insert this at the right order */
+	CurNode = list_first(timerlist);
+	NextNode = list_next(timerlist, CurNode);
+	while (CurNode != NULL) {
+		if (CurNode) CurTimer = lnode_get(CurNode);
+		if (NextNode) {
+			/* if the NextNode is NULL, we are at the end of the list already */
+			NextTimer = lnode_get(NextNode);
+		} else {
+			/* if the timer is after the CurNode, then */
+			if (CurTimer->nextrun < timer->nextrun) 
+				/* insert it afterwards */
+				list_ins_after(timerlist, node, CurNode);
+			else
+				/* else insert it before */
+				list_ins_before(timerlist, node, CurNode);
+			/* and exit the while loop */
+			break;
+		}
+		/* if the Curent Timer is going to run before this one */
+		if (CurTimer->nextrun < timer->nextrun) {
+			/* and the next timer is also going to run before this one */
+			if (NextTimer->nextrun < timer->nextrun) {
+				/* then Swap CurNode for NextNode */
+				CurNode = NextNode;
+				/* and get a new NextNode */
+				NextNode = list_next(timerlist, CurNode);
+			} else {
+				/* otherwise insert it after the NextNode */
+				list_ins_after(timerlist, node, CurNode);
+				break;
+			}
+		} else {
+			/* its before CurTimer, so insert it beforehand */
+			list_ins_before(timerlist, node, CurNode);
+			break;
+		}
+	}	
+	NextSchedule();
+}
+static void NextSchedule() {
+	lnode_t *CurNode;
+	Timer *CurTimer;
+	struct timeval tv;
+	/* finally, update the Event Based Timers */
+	update_time_now();
+	CurNode = list_first(timerlist);
+	if (CurNode) {
+		CurTimer = lnode_get(CurNode);
+		timerclear( &tv );
+		tv.tv_sec = CurTimer->nextrun - me.now;;
+		if (tv.tv_sec <= 0) {
+			/* only run one timer at a time, so wake up in 10 seconds */
+			tv.tv_sec = 10;
+		}
+		evtimer_add( evtimers, &tv );
+		dlog(DEBUG3, "Timers will next run in %d Seconds (or around %s)", (int)tv.tv_sec, sftime(CurTimer->nextrun));
+	} 
 }
 
 /** @brief AddTimer
@@ -314,7 +320,7 @@ Timer *FindTimer( const char *name )
  *  @param handler for timer
  *  @param name of timer
  *  @param interval the interval at which the timer triggers in seconds
- *  @param userptr Justin????
+ *  @param userptr User Baton to pass around.
  * 
  *  @return NS_SUCCESS if added, NS_FAILURE if not 
  */
@@ -345,6 +351,7 @@ int AddTimer( TIMER_TYPE type, timer_handler handler, const char *name, int inte
 		timer->moduleptr = moduleptr;
 		timer->handler = handler;
 		timer->userptr = userptr;
+		TimerCalcNextRun(timer, NULL);
 		dlog( DEBUG2, "AddTimer: Module %s added timer %s", moduleptr->info->name, name );
 		return NS_SUCCESS;
 	}
@@ -364,22 +371,25 @@ int AddTimer( TIMER_TYPE type, timer_handler handler, const char *name, int inte
 int DelTimer( const char *name )
 {
 	Timer *timer;
-	hnode_t *tn;
+	lnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	tn = hash_lookup( timerhash, name );
-	if( tn )
-	{
-		timer = hnode_get( tn );
-		dlog( DEBUG2, "DelTimer: removed timer %s for module %s", name, timer->moduleptr->info->name );
-		hash_delete_destroy_node( timerhash, tn );
+	tn = list_first(timerlist);
+	while (tn != NULL) {
+		timer = lnode_get(tn);
+		if (!ircstrcasecmp(timer->name, name)) {
+			dlog( DEBUG2, "DelTimer: removed timer %s for module %s", name, timer->moduleptr->info->name );
+			list_delete_destroy_node(timerlist, tn);
 #ifdef USE_PERL
-		if( IS_PERL_MOD( timer->moduleptr ) )
-			ns_free( timer->userptr );
+			if( IS_PERL_MOD( timer->moduleptr ) )
+				ns_free( timer->userptr );
 #endif /* USE_PERL */
-		ns_free( timer );
-		return NS_SUCCESS;
+			ns_free( timer );
+			return NS_SUCCESS;
+		}
+		tn = list_next(timerlist, tn);
 	}
+	dlog(DEBUG2, "DelTimer: Timer %s not found", name);
 	return NS_FAILURE;
 }
 
@@ -396,19 +406,24 @@ int DelTimer( const char *name )
 int del_timers( const Module *mod_ptr )
 {
 	Timer *timer;
-	hnode_t *tn;
-	hscan_t hscan;
+	lnode_t *tn, *tn2;
 
-	hash_scan_begin( &hscan, timerhash );
-	while( ( tn = hash_scan_next( &hscan ) ) != NULL )
+	tn = list_first(timerlist);
+	while( tn != NULL )
 	{
-		timer = hnode_get( tn );
+		tn2 = list_next(timerlist, tn);
+		timer = lnode_get( tn );
 		if( timer->moduleptr == mod_ptr )
 		{
 			dlog( DEBUG1, "del_timers: deleting timer %s from module %s.", timer->name, mod_ptr->info->name );
-			hash_scan_delete_destroy_node( timerhash, tn );
+			list_delete_destroy_node(timerlist, tn);
+#ifdef USE_PERL
+			if( IS_PERL_MOD( timer->moduleptr ) )
+				ns_free( timer->userptr );
+#endif /* USE_PERL */
 			ns_free( timer );
 		}
+		tn = tn2;
 	}
 	return NS_SUCCESS;
 }
@@ -426,15 +441,21 @@ int del_timers( const Module *mod_ptr )
 int SetTimerInterval( const char *name, int interval )
 {
 	Timer *timer;
+	lnode_t *tn;
 
 	SET_SEGV_LOCATION();
-	timer = FindTimer( name );
-	if( timer )
-	{
-		timer->interval = interval;
-		dlog( DEBUG2, "SetTimerInterval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval );
-		return NS_SUCCESS;
+	tn = list_first(timerlist);
+	while (tn != NULL) {
+		timer = lnode_get(tn);
+		if (!ircstrcasecmp(timer->name, name)) {
+			timer->interval = interval;
+			dlog( DEBUG2, "SetTimerInterval: timer interval for %s (%s) set to %d", name, timer->moduleptr->info->name, interval );
+			TimerCalcNextRun(timer, tn);
+			return NS_SUCCESS;
+		}
+		tn = list_next(timerlist, tn);	
 	}
+	dlog(DEBUG2, "SetTimerInterval: timer %s not found", name);
 	return NS_FAILURE;
 }
 
@@ -450,15 +471,14 @@ int SetTimerInterval( const char *name, int interval )
 int ns_cmd_timerlist( const CmdParams *cmdparams )
 {
 	Timer *timer = NULL;
-	hscan_t ts;
-	hnode_t *tn;
+	lnode_t *tn;
 
 	SET_SEGV_LOCATION();
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "Timer List:", cmdparams->source ) );
-	hash_scan_begin( &ts, timerhash );
-	while( ( tn = hash_scan_next( &ts ) ) != NULL )
+	tn = list_first(timerlist);
+	while( tn != NULL )
 	{
-		timer = hnode_get( tn );
+		timer = lnode_get( tn );
 		irc_prefmsg( ns_botptr, cmdparams->source, "%s:", timer->moduleptr->info->name );
 		irc_prefmsg( ns_botptr, cmdparams->source, __( "Timer: %s", cmdparams->source ), timer->name );
 		switch( timer->type )
@@ -474,13 +494,16 @@ int ns_cmd_timerlist( const CmdParams *cmdparams )
 				break;
 			case TIMER_TYPE_INTERVAL:
 				irc_prefmsg( ns_botptr, cmdparams->source, "Timer Type: Interval");
+				irc_prefmsg( ns_botptr, cmdparams->source, __( "Interval: %ld", cmdparams->source ), ( long )timer->interval );
 				break;
 			case TIMER_TYPE_COUNTDOWN:
 				irc_prefmsg( ns_botptr, cmdparams->source, "Timer Type: Countdown");
+				irc_prefmsg( ns_botptr, cmdparams->source, __( "Interval: %ld", cmdparams->source ), ( long )timer->interval );
 				break;
 		}
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "Interval: %ld", cmdparams->source ), ( long )timer->interval );
-		irc_prefmsg( ns_botptr, cmdparams->source, __( "Next run in: %ld", cmdparams->source ), ( long )( timer->interval -( me.now - timer->lastrun ) ) );
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "Next run at: %s", cmdparams->source ), sftime(timer->nextrun));
+		irc_prefmsg( ns_botptr, cmdparams->source, __( "Last run at: %s", cmdparams->source ), sftime(timer->lastrun));
+		tn = list_next(timerlist, tn);
 	}
 	irc_prefmsg( ns_botptr, cmdparams->source, __( "End of list.", cmdparams->source ) );
 	return 0;

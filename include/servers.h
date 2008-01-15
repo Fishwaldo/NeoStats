@@ -28,7 +28,8 @@ Client *AddServer( const char *name, const char *uplink, const char *hops, const
 void DelServer( const char *name, const char *reason );
 int ns_cmd_serverlist( const CmdParams *cmdparams );
 int InitServers( void );
-void PingServers( void );
+int PingServers( void *);
+int SetServersTime( void *arg);
 void FiniServers( void );
 Client *find_server_base64( const char *num );
 void RequestServerUptimes( void );

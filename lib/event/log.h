@@ -34,6 +34,7 @@ void event_warnx(const char *fmt, ...);
 void event_msgx(const char *fmt, ...);
 void _event_debugx(const char *fmt, ...);
 
+#define USE_DEBUG 1
 #ifdef USE_DEBUG
 #define event_debug(x) _event_debugx x
 #else
