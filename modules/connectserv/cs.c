@@ -188,6 +188,13 @@ static bot_setting cs_settings[] =
 	NS_SETTING_END()
 };
 
+/** Bot command table */
+static bot_cmd cs_commands[]=
+{
+	NS_CMD_END()
+};
+
+
 /** BotInfo */
 static BotInfo cs_botinfo = 
 {
@@ -197,7 +204,7 @@ static BotInfo cs_botinfo =
 	BOT_COMMON_HOST, 
 	"Connection monitoring service", 	
 	BOT_FLAG_ROOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
-	NULL, 
+	cs_commands, 
 	cs_settings,
 };
 

@@ -66,6 +66,11 @@ static bot_setting operlog_settings[] =
 	NS_SETTING_END()
 };
 
+static bot_cmd operlog_commands[] = 
+{
+	NS_CMD_END()
+};
+
 /** BotInfo */
 static BotInfo operlog_botinfo = 
 {
@@ -75,7 +80,7 @@ static BotInfo operlog_botinfo =
 	BOT_COMMON_HOST, 
 	"Operator command logging service",
 	BOT_FLAG_ROOT|BOT_FLAG_RESTRICT_OPERS|BOT_FLAG_DEAF, 
-	NULL, 
+	operlog_commands, 
 	operlog_settings,
 };
 
