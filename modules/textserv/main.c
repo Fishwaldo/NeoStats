@@ -769,6 +769,10 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 
 	ircsnprintf(bottrig, BUFSIZE, "!%s", cmdparams->bot->u->name);
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
+	if (!cmdparams->cmd) {
+		/* no command, so just return */
+		return NS_SUCCESS;
+	}
 	if (!ircstrcasecmp(cmdparams->cmd, "help")) {
 		if (cmdparams->ac == 0) {
 			/* list of available commands */
