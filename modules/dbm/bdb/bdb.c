@@ -47,6 +47,30 @@ void db_log_cb(const char *prefix, char *msg) {
 #define DB_REGISTER 0
 #endif
 
+
+#define BDB_VERSION_AT_LEAST(major,minor) \
+    (DB_VERSION_MAJOR > (major) \
+         || (DB_VERSION_MAJOR == (major) && DB_VERSION_MINOR >= (minor)))
+
+/* In BDB 4.3, the error gatherer function grew a new DBENV parameter,
+   and the MSG parameter's type changed. */
+#if BDB_VERSION_AT_LEAST(4,3)
+/* Prevents most compilers from whining about unused parameters. */
+#define BDB_ERROR_GATHERER_IGNORE(varname) ((void)(varname))
+#else
+#define bdb_error_gatherer(param1, param2, param3) \
+        bdb_error_gatherer(param2, char *msg)
+#define BDB_ERROR_GATHERER_IGNORE(varname) ((void)0)
+#endif
+
+
+void bdb_error_gatherer(const DB_ENV *dbenv, const char *prefix, const char *msg) {
+	BDB_ERROR_GATHERER_IGNORE(dbenv);
+	dlog(DEBUG10, "%s", msg);
+}
+
+
+
 void *DBMOpenDB (const char *name)
 {
 	int dbret;
@@ -57,18 +81,18 @@ void *DBMOpenDB (const char *name)
 			return NULL;
 		}
 		db_env->set_verbose(db_env, DB_VERB_RECOVERY|DB_VERB_REGISTER, 1);
-#ifdef DEBUG
+#if 0
 		db_env->set_errfile(db_env, stderr);
 		db_env->set_msgfile(db_env, stderr);		
 #endif
-		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL, 0600)) != 0) {
+		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL|DB_INIT_LOCK|DB_INIT_LOG, 0600)) != 0) {
 			nlog(LOG_WARNING, "db evn open failed: %s", db_strerror(dbret));
 			db_env->close(db_env, 0);
 			return NULL;
 		}
+		db_env->set_errcall(db_env, (bdb_error_gatherer));
 #if 0
-		db_env->set_errcall(db_env, db_log_cb);
-		db_env->set_msgcall(db_env, db_log_cb);
+		db_env->set_msgcall(db_env, (bdb_error_gatherer));
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 #endif
 	}
@@ -106,9 +130,9 @@ void *DBMOpenTable (void *dbhandle, const char *name)
 		return NULL;
 	}
 #if (DB_VERSION_MAJOR == 4 && DB_VERSION_MINOR >= 1)
-	if ((dbret = dbp->open(dbp, NULL, filename, name, DB_BTREE, DB_CREATE, 0600)) != 0) {
+	if ((dbret = dbp->open(dbp, NULL, filename, name, DB_BTREE, DB_CREATE|DB_AUTO_COMMIT, 0600)) != 0) {
 #else
-	if ((dbret = dbp->open(dbp, filename, name, DB_BTREE, DB_CREATE, 0600)) != 0) {
+	if ((dbret = dbp->open(dbp, filename, name, DB_BTREE, DB_CREATE|DB_AUTO_COMMIT, 0600)) != 0) {
 #endif
 		nlog(LOG_WARNING, "dbp->open: %s", db_strerror(dbret));
 		return NULL;
