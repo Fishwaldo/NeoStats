@@ -89,6 +89,7 @@ void *DBMOpenDB (const char *name)
 		db_env->set_errfile(db_env, stderr);
 		db_env->set_msgfile(db_env, stderr);		
 #endif
+		db_env->set_flags(db_env, DB_TXN_WRITE_NOSYNC, 1);
 		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL|DB_INIT_LOCK|DB_INIT_LOG, 0600)) != 0) {
 			nlog(LOG_WARNING, "db evn open failed: %s", db_strerror(dbret));
 			db_env->close(db_env, 0);
@@ -105,6 +106,8 @@ void *DBMOpenDB (const char *name)
 void DBMCloseDB (void *dbhandle)
 {
 	ns_free(dbhandle);
+	db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
+	db_env->txn_checkpoint(db_env, 0, 0, DB_FORCE);
 	dbopened--;
 	if (dbopened <= 0) {
 		db_env->close(db_env, 0);
@@ -112,7 +115,6 @@ void DBMCloseDB (void *dbhandle)
 	} else {
 		dlog(DEBUG10, "DBMClose: Databases still opened, not destroying enviroment");
 	}
-	db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 	return;
 }
 
@@ -166,7 +168,8 @@ int DBMFetch (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 		os_memcpy (data, dbdata.data, size);
 		return NS_SUCCESS;
 	}
-	dlog(DEBUG10, "dbp->get fail: %s", db_strerror(dbret));
+	if (dbret != DB_NOTFOUND) 
+		dlog(DEBUG10, "dbp->get fail: %s", db_strerror(dbret));
 	return NS_FAILURE;
 }
 
@@ -174,22 +177,37 @@ int DBMStore (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 {
 	int dbret;
 	DB *dbp = (DB *)tbhandle;
+	DB_TXN *txn = NULL;
 
 	dlog(DEBUG10, "DBMStore %s %s", key, (char *)data);
+	if ((dbret = db_env->txn_begin(db_env, NULL, &txn, 0)) != 0) {
+		nlog(LOG_WARNING, "db_env->txn_begin: %s", db_strerror(dbret));
+		return NS_FAILURE;
+	}
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
 	dbkey.size = strlen(key);
 	dbdata.data = data;
 	dbdata.size = size;
-	if ((dbret = dbp->put(dbp, NULL, &dbkey, &dbdata, 0)) != 0) {
+	if ((dbret = dbp->put(dbp, txn, &dbkey, &dbdata, 0)) != 0) {
 		if (dbret != DB_NOTFOUND) {
 			nlog(LOG_WARNING, "dbp->put: %s", db_strerror(dbret));
+			if ((dbret = txn->abort(txn)) != 0) {
+				nlog(LOG_WARNING, "txn->commit: %s", db_strerror(dbret));
+			}
 			return NS_FAILURE;
 		} else {
+			if ((dbret = txn->commit(txn, 0)) != 0) {
+				nlog(LOG_WARNING, "txn->commit: %s", db_strerror(dbret));
+			}
 			return NS_SUCCESS;
 		}
 	}
+	if ((dbret = txn->commit(txn, 0)) != 0) {
+		nlog(LOG_WARNING, "txn->commit: %s", db_strerror(dbret));
+	}
+
 	return NS_SUCCESS;
 }
 
