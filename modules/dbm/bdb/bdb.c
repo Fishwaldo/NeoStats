@@ -36,9 +36,6 @@ static DB_ENV *db_env;
 
 static int dbopened = 0;
 
-void db_log_cb(const char *prefix, char *msg) {
-	dlog(DEBUG10, "%s", msg);
-}
 /* some older versions of BDB dun have this */
 #ifndef DB_VERB_REGISTER
 #define DB_VERB_REGISTER 0
@@ -69,6 +66,9 @@ void bdb_error_gatherer(const DB_ENV *dbenv, const char *prefix, const char *msg
 	dlog(DEBUG10, "%s", msg);
 }
 
+void bdb_msg_gatherer(const DB_ENV *dbenv, const char *msg) {
+	bdb_error_gatherer(db_env, NULL, msg);
+}
 
 
 void *DBMOpenDB (const char *name)
@@ -91,10 +91,8 @@ void *DBMOpenDB (const char *name)
 			return NULL;
 		}
 		db_env->set_errcall(db_env, (bdb_error_gatherer));
-#if 0
-		db_env->set_msgcall(db_env, (bdb_error_gatherer));
+		db_env->set_msgcall(db_env, (bdb_msg_gatherer));
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
-#endif
 	}
 	dbopened++;
 	return strdup(name);
