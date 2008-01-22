@@ -62,16 +62,12 @@ static int dbopened = 0;
 
 
 void bdb_error_gatherer(const DB_ENV *dbenv, const char *prefix, const char *msg) {
-	char newmsg[BUFSIZE];
-	ircsnprintf(newmsg, BUFSIZE, "BDB Error: %s", msg);
 	BDB_ERROR_GATHERER_IGNORE(dbenv);
-	dlog(DEBUG10, "%s", msg);
+	nlog(LOG_WARNING, "BDB Error: %s", msg);
 }
 
 void bdb_msg_gatherer(const DB_ENV *dbenv, const char *msg) {
-	char newmsg[BUFSIZE];
-	ircsnprintf(newmsg, BUFSIZE, "BDB Info: %s", msg);
-	bdb_error_gatherer(db_env, NULL, newmsg);
+	dlog(DEBUG10, "BDB Info: %s", msg);
 }
 
 
@@ -97,6 +93,7 @@ void *DBMOpenDB (const char *name)
 		}
 		db_env->set_errcall(db_env, (bdb_error_gatherer));
 		db_env->set_msgcall(db_env, (bdb_msg_gatherer));
+		db_env->txn_checkpoint(db_env, 0, 0, DB_FORCE);
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 	}
 	dbopened++;
