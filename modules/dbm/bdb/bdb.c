@@ -108,6 +108,7 @@ void DBMCloseDB (void *dbhandle)
 	} else {
 		dlog(DEBUG10, "DBMClose: Databases still opened, not destroying enviroment");
 	}
+	db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 	return;
 }
 
