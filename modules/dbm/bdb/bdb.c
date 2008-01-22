@@ -62,12 +62,16 @@ static int dbopened = 0;
 
 
 void bdb_error_gatherer(const DB_ENV *dbenv, const char *prefix, const char *msg) {
+	char newmsg[BUFSIZE];
+	ircsnprintf(newmsg, BUFSIZE, "BDB Error: %s", msg);
 	BDB_ERROR_GATHERER_IGNORE(dbenv);
 	dlog(DEBUG10, "%s", msg);
 }
 
 void bdb_msg_gatherer(const DB_ENV *dbenv, const char *msg) {
-	bdb_error_gatherer(db_env, NULL, msg);
+	char newmsg[BUFSIZE];
+	ircsnprintf(newmsg, BUFSIZE, "BDB Info: %s", msg);
+	bdb_error_gatherer(db_env, NULL, newmsg);
 }
 
 
@@ -143,7 +147,7 @@ void DBMCloseTable (void *dbhandle, void *tbhandle)
 {
 	DB *dbp = (DB *)tbhandle;
 
-	dlog(DEBUG10, "DBACloseTable");
+	dlog(DEBUG10, "DBMCloseTable");
 	dbp->close(dbp, 0); 
 }
 
@@ -152,7 +156,7 @@ int DBMFetch (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 	int dbret;
 	DB *dbp = (DB *)tbhandle;
 
-	dlog(DEBUG10, "DBAFetch %s", key);
+	dlog(DEBUG10, "DBMFetch %s", key);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
@@ -171,7 +175,7 @@ int DBMStore (void *dbhandle, void *tbhandle, char *key, void *data, int size)
 	int dbret;
 	DB *dbp = (DB *)tbhandle;
 
-	dlog(DEBUG10, "DBAStore %s %s", key, (char *)data);
+	dlog(DEBUG10, "DBMStore %s %s", key, (char *)data);
 	memset(&dbkey, 0, sizeof(dbkey));
 	memset(&dbdata, 0, sizeof(dbdata));
 	dbkey.data = key;
