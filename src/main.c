@@ -265,9 +265,9 @@ static int InitCore( void )
 	/* init named vars first */
 	if (nv_init() != NS_SUCCESS) 
 		return NS_FAILURE;
-	if( InitTimers() != NS_SUCCESS )
-		return NS_FAILURE;
 	if( InitSocks() != NS_SUCCESS )
+		return NS_FAILURE;
+	if( InitTimers() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitDBA() != NS_SUCCESS )
 		return NS_FAILURE;
