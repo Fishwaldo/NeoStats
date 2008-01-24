@@ -32,7 +32,7 @@
 static DBT dbkey;
 static DBT dbdata;
 
-static DB_ENV *db_env;
+static DB_ENV *db_env = NULL;
 
 static int dbopened = 0;
 
@@ -71,6 +71,11 @@ void bdb_msg_gatherer(const DB_ENV *dbenv, const char *msg) {
 }
 
 
+int CheckPointBDB( void *userptr ) {
+	if (db_env)
+		db_env->txn_checkpoint(db_env, 0, 0, DB_FORCE);
+}
+
 void *DBMOpenDB (const char *name)
 {
 	int dbret;
@@ -93,8 +98,11 @@ void *DBMOpenDB (const char *name)
 		}
 		db_env->set_errcall(db_env, (bdb_error_gatherer));
 		db_env->set_msgcall(db_env, (bdb_msg_gatherer));
-		db_env->txn_checkpoint(db_env, 0, 0, DB_FORCE);
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
+
+		/* timer to checkpoint the databases */
+		AddTimer( TIMER_TYPE_INTERVAL, CheckPointBDB, "CheckPintBDB", 3600, NULL );
+		
 	}
 	dbopened++;
 	return strdup(name);
@@ -104,7 +112,6 @@ void DBMCloseDB (void *dbhandle)
 {
 	ns_free(dbhandle);
 	db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
-	db_env->txn_checkpoint(db_env, 0, 0, DB_FORCE);
 	dbopened--;
 	if (dbopened <= 0) {
 		db_env->close(db_env, 0);
