@@ -317,7 +317,7 @@ void FiniUpdate(void)
 	lnode_t *node;
 	ResetMQ();
 	DelTimer("MQPingSrv");
-	if (list_count(MQlist) > 0) {
+	if (MQlist && (list_count(MQlist) > 0)) {
 		while ((node = list_first(MQlist)) != NULL) {
 			qmsg = lnode_get(node);
 			MMFreeMessage(qmsg);

@@ -265,16 +265,16 @@ static int InitCore( void )
 	/* init named vars first */
 	if (nv_init() != NS_SUCCESS) 
 		return NS_FAILURE;
-	/* initialize Module subsystem */
+	if( InitTimers() != NS_SUCCESS )
+		return NS_FAILURE;
 	if( InitSocks() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitDBA() != NS_SUCCESS )
 		return NS_FAILURE;
 	/* Open core database */
 	DBAOpenDatabase();
+	/* initialize Module subsystem */
 	if( InitModules() != NS_SUCCESS )
-		return NS_FAILURE;
-	if( InitTimers() != NS_SUCCESS )
 		return NS_FAILURE;
 	if( InitBots() != NS_SUCCESS )
 		return NS_FAILURE;
