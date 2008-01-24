@@ -111,9 +111,9 @@ void *DBMOpenDB (const char *name)
 void DBMCloseDB (void *dbhandle)
 {
 	ns_free(dbhandle);
-	db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 	dbopened--;
 	if (dbopened <= 0) {
+		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
 		db_env->close(db_env, 0);
 		db_env = NULL;
 	} else {
