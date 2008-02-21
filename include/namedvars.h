@@ -128,7 +128,9 @@ extern hash_t *namedvars;
 
 int nv_init();
 EXPORTFUNC hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char *name, nv_struct *nvstruct, nv_flags flags, nv_set_handler set_handler);
+EXPORTFUNC void nv_hash_destroy(hash_t *hash, char *name);
 EXPORTFUNC list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler set_handler);
+EXPORTFUNC void nv_list_destroy(list_t *list, char *name);
 EXPORTFUNC nv_list *FindNamedVars(char *name);
 EXPORTFUNC char *nv_gf_string(const void *, const nv_list *, const int);
 EXPORTFUNC int nv_gf_int(const void *, const nv_list *, const int);

@@ -4,8 +4,9 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.a4-dev
+ - Finish the Update Module (F)
  - Move the copyright handler in the HTML output of StatServ to a proper
-function, simplifies the HTMLOutput loop, and hopefully fixes NEO-420 (F)
+   function, simplifies the HTMLOutput loop, and hopefully fixes NEO-420 (F)
  - Timers now only fire when needed, rather than once every second (F)
  - Update Libevent Logging to LogLevel 10 and enable it (F)
  - Update CURL to hopefully fix a "Invalid Socket" error (F)

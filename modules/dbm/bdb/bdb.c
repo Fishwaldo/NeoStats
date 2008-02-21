@@ -74,6 +74,7 @@ void bdb_msg_gatherer(const DB_ENV *dbenv, const char *msg) {
 int CheckPointBDB( void *userptr ) {
 	if (db_env)
 		db_env->txn_checkpoint(db_env, 0, 0, DB_FORCE);
+	return NS_SUCCESS;
 }
 
 void *DBMOpenDB (const char *name)

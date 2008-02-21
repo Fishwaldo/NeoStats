@@ -190,11 +190,12 @@ static void SendEvent( const ModuleEvent *eventptr, Event event, const CmdParams
  *  @return none
  */
 
-void SendModuleEvent( Event event, const CmdParams *cmdparams, Module *module_ptr )
+void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr )
 {
 	SET_SEGV_LOCATION();
 	dlog( DEBUG9, "SendModuleEvent: %s to module %s", EventStrings[event], module_ptr->info->name );
 
+	cmdparams->eventid = event;
 	if( module_ptr->event_list )
 		SendEvent( module_ptr->event_list[event], event, cmdparams, module_ptr );
 #ifdef USE_PERL

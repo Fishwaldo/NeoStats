@@ -105,6 +105,10 @@ hash_t *nv_hash_create(hashcount_t count, hash_comp_t comp, hash_fun_t fun, char
 		return hash_create(count, comp, fun);
 	}
 }
+void nv_hash_destroy(hash_t *hash, char *name) {
+	/* XXX: Delete out of NV list */
+	hash_destroy(hash);
+}
 
 list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_flags flags, nv_set_handler set_handler) {
 	nv_list *newitem;
@@ -129,6 +133,10 @@ list_t *nv_list_create(listcount_t count, char *name2, nv_struct *nvstruct, nv_f
 	}
 }
 
+void nv_list_destroy(list_t *list, char *name) {
+	/* XXX: Delete out of NamedVars listing */
+	list_destroy(list);
+}
 
 
 int dump_namedvars(char *name2)

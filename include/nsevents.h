@@ -25,7 +25,7 @@
 #define _NSEVENTS_H_
 
 void SendAllModuleEvent( Event event, CmdParams *cmdparams );
-void SendModuleEvent( Event event, const CmdParams *cmdparams, Module *module_ptr );
+void SendModuleEvent( Event event, CmdParams *cmdparams, Module *module_ptr );
 void FreeEventList( Module *mod_ptr );
 
 #endif /* _NSEVENTS_H_ */
