@@ -154,6 +154,7 @@ void ChannelTopic( const char *chan, const char *owner, const char *ts, const ch
 	c->topictime = ( ts ) ? atoi( ts ) : me.now;
 	cmdparams = (CmdParams *) ns_calloc( sizeof( CmdParams ) );
 	cmdparams->source = FindClient( owner );
+	cmdparams->param = c->topic;
 	cmdparams->channel = c;
 	SendAllModuleEvent( EVENT_TOPIC, cmdparams );
 	ns_free( cmdparams );
