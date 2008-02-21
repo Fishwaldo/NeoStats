@@ -167,6 +167,7 @@ echo "     8) Plexus"
 echo "     9) IRCu P10"
 echo "     10) Asuka"
 echo "     11) Nefarious"
+echo "     12) Inspircd 1.1"
 while [ $validselection -eq 0 ] ; do
 	echo $n " [$IRCD_DEFAULT] -> $c"
 	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
@@ -221,6 +222,10 @@ while [ $validselection -eq 0 ] ; do
 			;;
 		11)
 			IRCD="nefarious"
+			validselection=1
+			;;
+		12)
+			IRCD="inspircd"
 			validselection=1
 			;;
 		*)
