@@ -62,7 +62,7 @@ static void html_tldmap( void );
 static void html_version( void );
 static void html_title( void );
 static void html_clientstats( void );
-
+static void html_copyright( void );
 /** Output file pointer */
 static FILE *opf;
 /** Output file template */
@@ -86,6 +86,7 @@ static htmlfunc htmlfuncs[]=
 	{"!VERSION!", html_version},
 	{"!TITLE!", html_title},
 	{"!CLIENTSTATS!", html_clientstats},
+	{"</body>", html_copyright},
 	{NULL, NULL},
 };
 
@@ -120,7 +121,7 @@ static void html_version( void )
 	os_fputs( me.version, opf );
 }
 
-/** @brief put_copyright
+/** @brief html_copyright
  *
  *  HTML handler for copyright footer
  *
@@ -129,7 +130,7 @@ static void html_version( void )
  *  @return none
  */
 
-static void put_copyright( void )
+static void html_copyright( void )
 {
 	os_fprintf( opf, "<br><br><center>Statistics last updated at %s<br>", sftime( time( NULL ) ) );
 	os_fprintf( opf, "<b>StatServ Information:</b>\n" );
@@ -138,6 +139,7 @@ static void put_copyright( void )
 		module_info.build_date, module_info.build_time );
 	os_fprintf( opf, "<br><a href=\"http://www.neostats.net\">http://www.neostats.net</a>\n" );
 	os_fprintf( opf, "</center>\n" );
+	os_fprintf( opf, "</body>\n" );
 }
 
 /** @brief serverlisthandler
@@ -706,12 +708,6 @@ void HTMLOutput( void )
 				bufptr = buftemp + strlen( htmlfuncptr->directive );
 			}		
 			htmlfuncptr++;
-		}
-		buftemp = strcasestr( bufptr, "</html>" );
-		if( buftemp ) {
-			os_fwrite( bufptr, ( int )buftemp - ( int )bufptr, 1, opf );
-			put_copyright();
-			bufptr = buftemp;
 		}
 		os_fputs( bufptr, opf );
 	}
