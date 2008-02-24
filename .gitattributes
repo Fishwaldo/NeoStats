@@ -564,6 +564,7 @@ src/win32/neostats.rc -text
 src/win32/neostatsversion.rc -text
 src/win32/resource.h -text
 src/win32/winmain.c -text
+tools/copyright-update.pl -text
 tools/generate_header -text
 tools/neostats.suppression -text
 tools/runvalgrind.sh -text

@@ -3,7 +3,7 @@
  *
  * $Id: lexer.l,v 1.10 2004/10/02 17:19:36 mhe Exp $
  *
- * Copyright (c) 2002-2003, Martin Hedenfalk <mhe@home.se>
+ * Copyright (c) 2002-2008, Martin Hedenfalk <mhe@home.se>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

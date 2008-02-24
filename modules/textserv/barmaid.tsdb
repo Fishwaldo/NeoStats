@@ -1,7 +1,7 @@
 description {
 	version = "3.0.a3"
 	about = "Bar Service."
-	credits = "Copyright (c) 1999-2005, NeoStats. http://www.neostats.net/"
+	credits = "Copyright (c) 1999-2008, NeoStats. http://www.neostats.net/"
 }
 command beer {
 	helpstring = {"Nice cold beer of your choice"}

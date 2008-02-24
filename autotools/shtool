@@ -1,7 +1,7 @@
 #!/bin/sh
 ##
 ##  GNU shtool -- The GNU Portable Shell Tool
-##  Copyright (c) 1994-2002 Ralf S. Engelschall <rse@engelschall.com>
+##  Copyright (c) 1994-2008 Ralf S. Engelschall <rse@engelschall.com>
 ##
 ##  See http://www.gnu.org/software/shtool/ for more information.
 ##  See ftp://ftp.gnu.org/gnu/shtool/ for latest version.
@@ -68,7 +68,7 @@ if [ $# -eq 0 ]; then
 fi
 if [ ".$1" = ".-h" -o ".$1" = ".--help" ]; then
     echo "This is GNU shtool, version 1.6.2 (02-Nov-2002)"
-    echo "Copyright (c) 1994-2002 Ralf S. Engelschall <rse@engelschall.com>"
+    echo "Copyright (c) 1994-2008 Ralf S. Engelschall <rse@engelschall.com>"
     echo "Report bugs to <bug-shtool@gnu.org>"
     echo ''
     echo "Usage: shtool [<options>] [<cmd-name> [<cmd-options>] [<cmd-args>]]"
@@ -397,7 +397,7 @@ case $tool in
 echo )
     ##
     ##  echo -- Print string with optional construct expansion
-    ##  Copyright (c) 1998-2002 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2008 Ralf S. Engelschall <rse@engelschall.com>
     ##  Originally written for WML as buildinfo
     ##
     
@@ -651,7 +651,7 @@ echo )
 install )
     ##
     ##  install -- Install a program, script or datafile
-    ##  Copyright (c) 1997-2002 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1997-2008 Ralf S. Engelschall <rse@engelschall.com>
     ##  Originally written for shtool
     ##
     
@@ -812,7 +812,7 @@ install )
 mkdir )
     ##
     ##  mkdir -- Make one or more directories
-    ##  Copyright (c) 1996-2002 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1996-2008 Ralf S. Engelschall <rse@engelschall.com>
     ##  Originally written for public domain by Noah Friedman <friedman@prep.ai.mit.edu>
     ##  Cleaned up and enhanced for shtool
     ##
@@ -901,7 +901,7 @@ mkdir )
 path )
     ##
     ##  path -- Deal with program paths
-    ##  Copyright (c) 1998-2002 Ralf S. Engelschall <rse@engelschall.com>
+    ##  Copyright (c) 1998-2008 Ralf S. Engelschall <rse@engelschall.com>
     ##  Originally written for Apache
     ##
     

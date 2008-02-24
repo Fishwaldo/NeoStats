@@ -2,7 +2,7 @@
  *
  * $Id: confuse.c,v 1.27 2004/10/17 16:57:00 mhe Exp $
  *
- * Copyright (c) 2002-2003, Martin Hedenfalk <mhe@home.se>
+ * Copyright (c) 2002-2008, Martin Hedenfalk <mhe@home.se>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

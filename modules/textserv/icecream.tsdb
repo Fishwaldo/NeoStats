@@ -1,7 +1,7 @@
 description {
 	version = "3.0.a3"
 	about = "Ice Cream Parlour"
-	credits = "Copyright (c) 1999-2007, NeoStats. http://www.neostats.net/"
+	credits = "Copyright (c) 1999-2008, NeoStats. http://www.neostats.net/"
 }
 command SCOOP {
 	helpstring = {"Have a scoop of ice cream of your choice"}

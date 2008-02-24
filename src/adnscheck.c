@@ -1,10 +1,10 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2007 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2008 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  Based on adns, which is
-**    Copyright (C) 1997-2000 Ian Jackson <ian@davenant.greenend.org.uk>
-**    Copyright (C) 1999-2000 Tony Finch <dot@dotat.at>
+**    Copyright (C) 1997-2008 Ian Jackson <ian@davenant.greenend.org.uk>
+**    Copyright (C) 1999-2008 Tony Finch <dot@dotat.at>
 **  
 **  This program is free software; you can redistribute it and/or modify
 **  it under the terms of the GNU General Public License as published by

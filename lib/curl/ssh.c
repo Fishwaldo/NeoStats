@@ -2230,7 +2230,7 @@ ssize_t Curl_sftp_recv(struct connectdata *conn, int sockindex,
 /* The get_pathname() function is being borrowed from OpenSSH sftp.c
    version 4.6p1. */
 /*
- * Copyright (c) 2001-2004 Damien Miller <djm@openbsd.org>
+ * Copyright (c) 2001-2008 Damien Miller <djm@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above

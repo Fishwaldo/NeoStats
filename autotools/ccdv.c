@@ -1,6 +1,6 @@
 /* ccdv.c
  *
- * Copyright (C) 2002-2003, by Mike Gleason, NcFTP Software.
+ * Copyright (C) 2002-2008, by Mike Gleason, NcFTP Software.
  * All Rights Reserved.
  *
  * Licensed under the GNU Public License.

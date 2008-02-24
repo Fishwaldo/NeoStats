@@ -321,7 +321,7 @@ cat > $CONF << __EOF__
 ##################################################
 ## Configuration file for NeoStats
 ## Created:  $DATE - $TIME
-## NeoStats Copyright (c) 1999-2007, Adam Rutter, Justin Hammond, Mark Hetherington
+## NeoStats Copyright (c) 1999-2008, Adam Rutter, Justin Hammond, Mark Hetherington
 ## Web: http://www.NeoStats.Net
 ## File Revision: 3.0
 ##################################################

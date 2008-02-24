@@ -1,4 +1,4 @@
-/* mRss - Copyright (C) 2005-2007 bakunin - Andrea Marchesini 
+/* mRss - Copyright (C) 2005-2008 bakunin - Andrea Marchesini 
  *                                    <bakunin@autistici.org>
  *
  * This library is free software; you can redistribute it and/or

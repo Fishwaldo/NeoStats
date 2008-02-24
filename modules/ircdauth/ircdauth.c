@@ -1,5 +1,5 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2007 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2008 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
 **  This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ typedef struct UserAuthModes {
 /** Copyright info */
 static const char *ircdauth_copyright[] =
 {
-	"Copyright (c) 1999-2007, NeoStats",
+	"Copyright (c) 1999-2008, NeoStats",
 	"http://www.neostats.net/",
 	NULL
 };

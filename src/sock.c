@@ -1,8 +1,8 @@
 /* NeoStats - IRC Statistical Services 
-** Copyright (c) 1999-2007 Adam Rutter, Justin Hammond, Mark Hetherington
+** Copyright (c) 1999-2008 Adam Rutter, Justin Hammond, Mark Hetherington
 ** http://www.neostats.net/
 **
-**  Portions Copyright (c) 2000-2001 ^Enigma^
+**  Portions Copyright (c) 2000-2008 ^Enigma^
 **
 **  Portions Copyright (c) 1999 Johnathan George net@lite.net
 **

@@ -3084,7 +3084,7 @@ if test -f "$ltmain"; then
 # Generated automatically by $PROGRAM (GNU $PACKAGE $VERSION$TIMESTAMP)
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
-# Copyright (C) 1996-2000 Free Software Foundation, Inc.
+# Copyright (C) 1996-2008 Free Software Foundation, Inc.
 # Originally by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 #
 # This program is free software; you can redistribute it and/or modify
@@ -3420,7 +3420,7 @@ EOF
         # on Windows for dlls which lack them. Don't remove nor modify the
         # starting and closing comments
 # /* impgen.c starts here */
-# /*   Copyright (C) 1999-2000 Free Software Foundation, Inc.
+# /*   Copyright (C) 1999-2008 Free Software Foundation, Inc.
 #
 #  This file is part of GNU libtool.
 #
