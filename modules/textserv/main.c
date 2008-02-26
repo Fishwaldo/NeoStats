@@ -388,11 +388,7 @@ static void BuildBot( dbbot *db )
 	strlcpy( db->botinfo.host, db->tsbot.bothost, MAXHOST );
 	strlcat( db->botinfo.realname, db->tsbot.dbname, MAXREALNAME );
 	db->botinfo.bot_setting_list = NULL;
-	db->botinfo.flags = 0;
-	if( db->tsbot.ispublic == 1 )
-	{
-		db->botinfo.flags = BOT_FLAG_PERSIST;
-	}
+	db->botinfo.flags = BOT_FLAG_PERSIST;
 	ts_read_database( db );
 }
 
