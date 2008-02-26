@@ -87,20 +87,20 @@ void *DBMOpenDB (const char *name)
 			return NULL;
 		}
 		db_env->set_verbose(db_env, DB_VERB_RECOVERY|DB_VERB_REGISTER, 1);
-#if 0
-		db_env->set_errfile(db_env, stderr);
-		db_env->set_msgfile(db_env, stderr);		
-#endif
 		db_env->set_flags(db_env, DB_TXN_WRITE_NOSYNC, 1);
+#ifdef DB_LOG_AUTOREMOVE
+		db_env->set_flags(db_end, DB_LOG_AUTOREMOVE, 1);
+#endif
 		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL|DB_INIT_LOCK|DB_INIT_LOG, 0600)) != 0) {
 			nlog(LOG_WARNING, "db evn open failed: %s", db_strerror(dbret));
 			db_env->close(db_env, 0);
 			return NULL;
 		}
+#if BDB_VERSION_AT_LEAST(4,3)
 		db_env->set_errcall(db_env, (bdb_error_gatherer));
 		db_env->set_msgcall(db_env, (bdb_msg_gatherer));
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
-
+#endif
 		/* timer to checkpoint the databases */
 		AddTimer( TIMER_TYPE_INTERVAL, CheckPointBDB, "CheckPintBDB", 3600, NULL );
 		
@@ -114,7 +114,9 @@ void DBMCloseDB (void *dbhandle)
 	ns_free(dbhandle);
 	dbopened--;
 	if (dbopened <= 0) {
+#if BDB_VERSION_AT_LEAST(4,3)
 		db_env->stat_print(db_env, DB_STAT_ALL|DB_STAT_SUBSYSTEM);
+#endif
 		db_env->close(db_env, 0);
 		db_env = NULL;
 	} else {
