@@ -28,6 +28,7 @@
  */
 
 #include "neostats.h"
+#include "services.h"
 #include "textserv.h"
 #include "confuse.h"
 
@@ -759,7 +760,6 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 	cfg_t *cmd;
 	int i;
 	int chan = 0;
-	char bottrig[BUFSIZE];	
 	
 	SET_SEGV_LOCATION();
 	if (cmdparams->bot->flags & BOT_FLAG_ROOT)
@@ -767,7 +767,6 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 	if (cmdparams->channel != NULL) 
 		chan = 1;
 
-	ircsnprintf(bottrig, BUFSIZE, "!%s", cmdparams->bot->u->name);
 	db = (dbbot *) GetBotModValue( cmdparams->bot );
 	if (!cmdparams->cmd) {
 		/* no command, so just return */
@@ -801,14 +800,18 @@ static int ts_cmd_msg( const CmdParams* cmdparams )
 				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 Display information about current database", "ABOUT");
 				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%-20s\2 Display credits of current database", "CREDITS");
 			}
-			irc_prefmsg(cmdparams->bot, cmdparams->source, "To execute a command:");
-			irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%s %s command\2", chan == 0 ? "/msg" : bottrig, cmdparams->bot->u->name);
-			irc_prefmsg(cmdparams->bot, cmdparams->source, "For help on a command:");
-			irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%s %s HELP command\2", chan == 0 ? "/msg": bottrig, cmdparams->bot->u->name);
 			if (chan == 1) {
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "To execute a command:");
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%ccommand\2", nsconfig.cmdchar[0]);
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "For help on a command:");
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2%cHELP command\2", nsconfig.cmdchar[0]);
 				irc_prefmsg(cmdparams->bot, cmdparams->source, "More Commands may be available via Private Message. See /msg %s help", cmdparams->bot->u->name);
 			} else {
-				irc_prefmsg(cmdparams->bot, cmdparams->source, "More Commands may be available via channel messages. Issue !%s help in a channel that I am in", cmdparams->bot->u->name);
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "To execute a command:");
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2/msg %s command\2", cmdparams->bot->u->name);
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "For help on a command:");
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "    \2/msg %s HELP command\2", cmdparams->bot->u->name);
+				irc_prefmsg(cmdparams->bot, cmdparams->source, "More Commands may be available via channel messages. Issue %chelp in a channel that I am in", nsconfig.cmdchar[0]);
 			}
 		} else {
 			/* help on a specific command */
