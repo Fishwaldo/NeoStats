@@ -1,7 +1,7 @@
 AC_DEFUN([CHK_LIBEVNT], [
 dnl Check for optional stuff
 AC_ARG_WITH(rtsig,
-   [  --with-rtsig		compile with support for real time signals (experimental)],
+   AC_HELP_STRING([--with-rtsig], [compile with support for real time signals (experimental)]),
    [usertsig=yes], [usertsig=no])
 
 dnl Checks for header files.
