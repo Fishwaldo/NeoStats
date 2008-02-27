@@ -89,7 +89,7 @@ void *DBMOpenDB (const char *name)
 		db_env->set_verbose(db_env, DB_VERB_RECOVERY|DB_VERB_REGISTER, 1);
 		db_env->set_flags(db_env, DB_TXN_WRITE_NOSYNC, 1);
 #ifdef DB_LOG_AUTOREMOVE
-		db_env->set_flags(db_end, DB_LOG_AUTOREMOVE, 1);
+		db_env->set_flags(db_env, DB_LOG_AUTOREMOVE, 1);
 #endif
 		if ((dbret = db_env->open(db_env, "data/", DB_RECOVER|DB_REGISTER|DB_CREATE|DB_INIT_TXN|DB_INIT_MPOOL|DB_INIT_LOCK|DB_INIT_LOG, 0600)) != 0) {
 			nlog(LOG_WARNING, "db evn open failed: %s", db_strerror(dbret));
