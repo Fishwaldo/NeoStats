@@ -40,6 +40,7 @@ autotools/missing -text
 autotools/mkinstalldirs -text
 autotools/rules.mk -text
 autotools/shtool -text
+autotools/ylwrap -text
 /configure -text
 /configure.in -text
 data/niconfig.db -text
