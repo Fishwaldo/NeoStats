@@ -160,6 +160,7 @@ AC_CHECK_FUNCS( socket \
                 strdup \
                 strstr \
                 strspn \
+		strsep \
                 strcasestr \
                 strtok_r \
                 uname \

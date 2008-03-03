@@ -38,6 +38,10 @@
 
 char *	__mrss_download_file	(nxml_t *, char *, size_t *, mrss_error_t *, CURLcode *code);
 
+#ifdef WIN32
+#define 	lstat(path, sb)   stat((path), (sb))
+#endif
+
 #endif
 
 /* EOF */

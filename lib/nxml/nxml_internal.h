@@ -23,6 +23,8 @@
 
 #ifdef WIN32
 #define int64_t __int64
+#define strncasecmp              strnicmp
+#define strcasecmp               stricmp
 #endif
 
 /* Rule [4] */
