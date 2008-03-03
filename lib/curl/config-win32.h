@@ -350,7 +350,7 @@
 /* ---------------------------------------------------------------- */
 /*                           LDAP SUPPORT                           */
 /* ---------------------------------------------------------------- */
-
+#define CURL_DISABLE_LDAP
 #if defined(CURL_HAS_NOVELL_LDAPSDK) || defined(CURL_HAS_MOZILLA_LDAPSDK)
 #undef CURL_LDAP_HYBRID
 #undef CURL_LDAP_WIN

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
@@ -192,7 +192,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mrss_options.c"
+				>
+			</File>
+			<File
 				RelativePath=".\mrss_parser.c"
+				>
+			</File>
+			<File
+				RelativePath=".\mrss_search.c"
 				>
 			</File>
 			<File
@@ -208,22 +216,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\nxml_free.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nxml_namespace.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nxml_string.c"
-				>
-			</File>
-			<File
-				RelativePath=".\nxml_utf.c"
-				>
-			</File>
-			<File
 				RelativePath=".\nxml_edit.c"
 				>
 			</File>
@@ -232,7 +224,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nxml_free.c"
+				>
+			</File>
+			<File
 				RelativePath=".\nxml_init.c"
+				>
+			</File>
+			<File
+				RelativePath=".\nxml_namespace.c"
 				>
 			</File>
 			<File
@@ -240,7 +240,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\nxml_string.c"
+				>
+			</File>
+			<File
 				RelativePath=".\nxml_tools.c"
+				>
+			</File>
+			<File
+				RelativePath=".\nxml_utf.c"
 				>
 			</File>
 			<File

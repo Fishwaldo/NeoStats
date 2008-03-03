@@ -66,7 +66,7 @@ typedef struct config {
 	size_t recvq;
 } config;
 
-extern config nsconfig;
+EXPORTVAR extern config nsconfig;
 
 extern ModuleInfo ns_module_info;
 extern Module ns_module;
