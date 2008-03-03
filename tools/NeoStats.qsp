@@ -5,8 +5,8 @@ ComposerVersion=8.5.0.4
 OperatingSystem=WinXP  5.1  2600 (Service Pack 2)
 ProcessorNameString=Intel(R) Xeon(TM) CPU 2.40GHz
 ComputerRAM=1534 MB
-ProjectDrive=C:\  (9.99 GB Free)
-DateTime=01-AUG-2007  21:17:19
+ProjectDrive=TOO  (4.18 GB Free)
+DateTime=03-MAR-2008  18:47:10
 OutputType=EXE
 Language=ENGLISH
 License=PRO
@@ -56,7 +56,7 @@ TopLabel2=0
 BottomLabel=1
 TopLabelText="NeoStats IRC Services"
 TopLabel2Text=""
-BottomLabelText="Copyright © 2007"
+BottomLabelText="Copyright © 2008"
 BackgroundDesign=Light Source (Left)
 TopBackgroundColor=16758613
 BottomBackgroundColor=11613445
@@ -90,9 +90,10 @@ TargetDirectory=<ProgramFilesDir>NeoStats
 CommonDirectory=<CommonFilesDir>NeoStats
 AuxDirectory=<RunTimeDir_1>Modules
 TargetExeName=<Application Folder>\neostats.exe
+RunTimeDir_2=|0||0||0||1|0|0||1|0|1|Include|0|0|0|0|0|0|
 
 [Dialogs]
-SelectedDialogs=*Welcome,*License,Readme,User Information,Setup Type,*Custom,*Destination,Associate,*Shortcuts,*Confirm Setup,*Copy Files,*Complete
+SelectedDialogs=*Welcome,*License,Readme,Setup Type,User Information,*Custom,*Destination,Associate,*Shortcuts,*Confirm Setup,*Copy Files,*Complete
 LicenseTextFile=NeoStats3.0\COPYING
 ReadmeTextFile=
 ReadmeTextFile2=NeoStats3.0\README
@@ -217,7 +218,7 @@ InstallDotNetFxText=
 InstallDotNetFxUrl=0
 InstallDotNetFxUrlText=http://
 DotNetFrameworkReqVer=1.0,1.1,2.0
-TestExeBeforeInstall=0
+TestExeBeforeInstall=1
 TestExeBeforeUnInstall=1
 AutorunCreateInfFile=0
 AutorunTest=0
@@ -248,6 +249,7 @@ UnInstallHelpLink=
 UnInstallInfoAboutURL=
 
 [Registry]
+Reg-000=*|HKEY_LOCAL_MACHINE\SOFTWARE\NeoStats|Path|<ProgramFilesDir>|Create|Remove Key|String|
 
 [IniFile]
 
@@ -281,52 +283,104 @@ Spin2=0
 [Execute]
 ExecuteDllCheckBox=0
 ExecutionDllFileName=
+Exec-000=*||CheckPerl|After Custom|10|Conditional|0|1|Registry Key Found||0|0|0|Ask Yes/No||0|0|0|File Found||1|Display Message||1|Download File (HTTP)||0|Display Message||0|Display Message||1|Run MSI File and Wait||0|Display Message||0|
+Arg-000-1=HKEY_LOCAL_MACHINE\SOFTWARE\ActiveState\ActivePerl\1002
+Arg-000-2==
+Arg-000-6==
+Arg-000-10==
+Arg-000-13=You need to install Perl for NeoStats to operate correctly
+Arg-000-16=http://www2.neostats.net/downloads/files/ActivePerl-5.10.0.1002-MSWin32-x86-283697.msi
+Arg-000-17=<TempDir>NeoStats-Perl.msi
+Arg-000-18=TRUE
+Arg-000-25=<TempDir>NeoStats-Perl.msi
+Arg-000-26=Install
 
 [MSI]
 Version=1
 AddMergeModule=0
-Msm2MsiData=|MSM2MSI_NeoStats-Setup.msi|1|1|1|0|
+Msm2MsiData=|MSM2MSI_NeoStats-Setup.msi|1|2|2|0|
 
 [GroupNames]
 Group-000=Main Group
+Group-001=Development Files
 
 [Group-000]
 TypicalCompactData=15
 Description=This is the main group of files
 SizeInKB=0
 Item-000=Fol*<Application Folder>
-Item-001=Fil*NeoStats3.0\neostats.conf
-Item-002=Fil*NeoStats3.0\neostats.exe
+Item-001=Fil*src\win32\neostats.conf[67108864]
+Item-002=Fil*neostats.exe[16777216]
 Item-003=Dir*<Application Folder>\data
-Item-004=Fil*NeoStats3.0\data\tlds.nfo
-Item-005=Fil*NeoStats3.0\data\niconfig.db
-Item-006=Dir*<Application Folder>\logs
-Item-007=Dir*<Application Folder>\modules
-Item-008=Fil*NeoStats3.0\modules\unreal32.dll
-Item-009=Fil*NeoStats3.0\modules\unreal31.dll
-Item-010=Fil*NeoStats3.0\modules\ultimate3.dll
-Item-011=Fil*NeoStats3.0\modules\ultimate2.dll
-Item-012=Fil*NeoStats3.0\modules\textserv.dll
-Item-013=Fil*NeoStats3.0\modules\templateauth.dll
-Item-014=Fil*NeoStats3.0\modules\template.dll
-Item-015=Fil*NeoStats3.0\modules\statserv.dll
-Item-016=Fil*NeoStats3.0\modules\quoteserv.dll
-Item-017=Fil*NeoStats3.0\modules\plexus.dll
-Item-018=Fil*NeoStats3.0\modules\operlog.dll
-Item-019=Fil*NeoStats3.0\modules\nefarious.dll
-Item-020=Fil*NeoStats3.0\modules\limitserv.dll
-Item-021=Fil*NeoStats3.0\modules\ircup10.dll
-Item-022=Fil*NeoStats3.0\modules\ircdauth.dll
-Item-023=Fil*NeoStats3.0\modules\hybrid7.dll
-Item-024=Fil*NeoStats3.0\modules\hybrid6.dll
-Item-025=Fil*NeoStats3.0\modules\hostserv.dll
-Item-026=Fil*NeoStats3.0\modules\gdbm.dll
-Item-027=Fil*NeoStats3.0\modules\extauth.dll
-Item-028=Fil*NeoStats3.0\modules\dccpartyline.dll
-Item-029=Fil*NeoStats3.0\modules\connectserv.dll
-Item-030=Fil*NeoStats3.0\modules\client.dll
-Item-031=Fil*NeoStats3.0\modules\bahamut18.dll
-Item-032=Fil*NeoStats3.0\modules\bahamut14.dll
-Item-033=Fil*NeoStats3.0\modules\asuka.dll
-Item-034=Fil*NeoStats3.0\data\html.tpl
+Item-004=Fil*data\tlds.nfo[16777216]
+Item-005=Fil*data\niconfig.db[16777216]
+Item-006=Fil*modules\statserv\html\index.tpl[16777216]
+Item-007=Fil*modules\statserv\GeoIP.dat[16777216]
+Item-008=Fil*modules\quoteserv\data\discworld[16777216]
+Item-009=Fil*modules\quoteserv\data\redneck[16777216]
+Item-010=Fil*modules\textserv\barmaid.tsdb[16777216]
+Item-011=Fil*modules\textserv\icecream.tsdb[16777216]
+Item-012=Fil*modules\textserv\loveserv.tsdb[16777216]
+Item-013=Fil*modules\textserv\moraleserv.tsdb[16777216]
+Item-014=Fil*modules\textserv\waitress.tsdb[16777216]
+Item-015=Dir*<Application Folder>\logs
+Item-016=Dir*<Application Folder>\modules
+Item-017=Fil*modules\unreal32.dll[16777216]
+Item-018=Fil*modules\unreal31.dll[16777216]
+Item-019=Fil*modules\ultimate3.dll[16777216]
+Item-020=Fil*modules\ultimate2.dll[16777216]
+Item-021=Fil*modules\textserv.dll[16777216]
+Item-022=Fil*modules\templateauth.dll[16777216]
+Item-023=Fil*modules\template.dll[16777216]
+Item-024=Fil*modules\statserv.dll[16777216]
+Item-025=Fil*modules\quoteserv.dll[16777216]
+Item-026=Fil*modules\plexus.dll[16777216]
+Item-027=Fil*modules\operlog.dll[16777216]
+Item-028=Fil*modules\nefarious.dll[16777216]
+Item-029=Fil*modules\limitserv.dll[16777216]
+Item-030=Fil*modules\ircup10.dll[16777216]
+Item-031=Fil*modules\ircdauth.dll[16777216]
+Item-032=Fil*modules\hybrid7.dll[16777216]
+Item-033=Fil*modules\hybrid6.dll[16777216]
+Item-034=Fil*modules\hostserv.dll[16777216]
+Item-035=Fil*modules\gdbm.dll[16777216]
+Item-036=Fil*modules\extauth.dll[16777216]
+Item-037=Fil*modules\dccpartyline.dll[16777216]
+Item-038=Fil*modules\connectserv.dll[16777216]
+Item-039=Fil*modules\client.dll[16777216]
+Item-040=Fil*modules\bahamut18.dll[16777216]
+Item-041=Fil*modules\bahamut14.dll[16777216]
+Item-042=Fil*modules\asuka.dll[16777216]
+Item-043=Fil*modules\inspircd.dll[16777216]
+Item-044=Fil*modules\update.dll[16777216]
+
+[Group-001]
+TypicalCompactData=5
+Description=Files used to develop modules or add-ons for NeoStats
+SizeInKB=0
+Item-000=Dir*<Application Folder>\include
+Item-001=Fil*include\neostats.h[16777216]
+Item-002=Fil*include\configwin32.h[16777216]
+Item-003=Fil*include\list.h[16777216]
+Item-004=Fil*include\hash.h[16777216]
+Item-005=Fil*include\support.h[16777216]
+Item-006=Fil*include\events.h[16777216]
+Item-007=Fil*include\numeric.h[16777216]
+Item-008=Fil*include\adns.h[16777216]
+Item-009=Fil*include\protocol.h[16777216]
+Item-010=Fil*include\perlmod.h[16777216]
+Item-011=Fil*include\confuse.h[16777216]
+Item-012=Fil*include\updates.h[16777216]
+Item-013=Fil*include\MiniMessage.h[16777216]
+Item-014=Fil*include\MiniMessageGateway.h[16777216]
+Item-015=Fil*include\MuscleSupport.h[16777216]
+Item-016=Fil*include\NeoNet.h[16777216]
+Item-017=Fil*include\namedvars.h[16777216]
+Item-018=Fil*include\services.h[16777216]
+Item-019=Dir*<Application Folder>\libs
+Item-020=Fil*neostats.lib[16777216]
+Item-021=Fil*lib\curl.lib[16777216]
+Item-022=Fil*lib\nxml.lib[16777216]
+Item-023=Fil*lib\libevent.lib[16777216]
+Item-024=Fil*lib\pcre.lib[16777216]
 

@@ -28,10 +28,11 @@
  */
 
 #include "neostats.h"
+#include "services.h"
 #include "namedvars.h"
 #include "mrss.h"
 #include "update.h"
-#include "services.h"
+
 
 
 /** local structures */

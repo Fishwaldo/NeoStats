@@ -56,6 +56,8 @@ struct timezone {
 
 EXPORTFUNC int gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif /* HAVE_GETTIMEOFDAY */
-
+#ifndef HAVE_STRSEP
+EXPORTFUNC char *strsep (char **stringp, const char *delim);
+#endif
 
 #endif /* _SUPPORT_H_ */

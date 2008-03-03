@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+# Visual C++ Express 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "connectserv", "modules\connectserv\connectserv.vcproj", "{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
@@ -97,6 +97,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dbm", "dbm", "{F258FB36-4162-456B-89F0-46A44FF24452}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "inspircd", "modules\protocol\inspircd.vcproj", "{5AEE479F-9B32-417E-8E0F-532FD62822DC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "update", "modules\update\update.vcproj", "{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -330,6 +335,14 @@ Global
 		{5AEE479F-9B32-417E-8E0F-532FD62822DC}.Perl-Release|Win32.Build.0 = Perl-Release|Win32
 		{5AEE479F-9B32-417E-8E0F-532FD62822DC}.Release|Win32.ActiveCfg = Release|Win32
 		{5AEE479F-9B32-417E-8E0F-532FD62822DC}.Release|Win32.Build.0 = Release|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Debug|Win32.Build.0 = Debug|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Perl-Debug|Win32.ActiveCfg = Perl-Debug|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Perl-Debug|Win32.Build.0 = Perl-Debug|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Perl-Release|Win32.ActiveCfg = Perl-Release|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Perl-Release|Win32.Build.0 = Perl-Release|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Release|Win32.ActiveCfg = Release|Win32
+		{BCFEBB84-6A6D-4F0A-9258-F37DD7AA95F6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
