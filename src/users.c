@@ -120,6 +120,8 @@ static void lookupnickip( void *data, adns_answer *a )
 		strlcpy( u->hostip, inet_ntoa( u->ip ), HOSTIPLEN );
 		if( u->ip.s_addr > 0 )
 		{
+			/* check if the user is excluded */
+			ns_do_exclude_user( u );
 			cmdparams = ( CmdParams* ) ns_calloc( sizeof( CmdParams ) );
 			cmdparams->source = u;	
 			SendAllModuleEvent( EVENT_NICKIP, cmdparams );

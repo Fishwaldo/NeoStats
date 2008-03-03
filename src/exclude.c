@@ -493,6 +493,10 @@ static int ExcludeUserHandler( Exclude *exclude, void *v )
 				u->flags |= NS_FLAG_EXCLUDED;
 				return NS_TRUE;
 			}
+			if ( match( exclude->pattern, u->hostip ) ) {
+				u->flags |= NS_FLAG_EXCLUDED;
+				return NS_TRUE;
+			}
 			break;
 		case NS_EXCLUDE_USERHOST:
 			if( match( exclude->pattern, u->user->userhostmask ) )
@@ -561,6 +565,10 @@ static int ModExcludeUserHandler( Exclude *exclude, void *v )
 			if( match( exclude->pattern, u->user->hostname ) )
 			{
 				dlog( DEBUG1, "User %s is excluded by host entry %s", u->name, exclude->pattern );
+				return NS_TRUE;
+			}
+			if ( match( exclude->pattern, u->hostip ) ) {
+				dlog( DEBUG1, "user %s is excluded by IP entry %s", u->name, exclude->pattern );
 				return NS_TRUE;
 			}
 			break;
