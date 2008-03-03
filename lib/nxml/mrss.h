@@ -21,6 +21,13 @@
 
 #include <sys/types.h>
 #include <curl.h>
+#ifdef WIN32
+#define EXPORTFUNC __declspec(dllexport)
+#define EXPORTVAR __declspec(dllexport)
+#else
+#define EXPORTFUNC
+#define EXPORTVAR
+#endif
 
 #define LIBMRSS_VERSION_STRING  "0.18.0"
 
@@ -525,7 +532,7 @@ struct mrss_options_t {
  * \param mrss the pointer to your data struct
  * \return the error code
  */
-mrss_error_t	mrss_parse_url		(char *		url,
+EXPORTFUNC mrss_error_t	mrss_parse_url		(char *		url,
 					 mrss_t **	mrss);
 
 /**
@@ -535,7 +542,7 @@ mrss_error_t	mrss_parse_url		(char *		url,
  * \param options a pointer to a options data struct
  * \return the error code
  */
-mrss_error_t	mrss_parse_url_with_options
+EXPORTFUNC mrss_error_t	mrss_parse_url_with_options
 					(char *		url,
 					 mrss_t **	mrss,
 					 mrss_options_t	* options);
@@ -548,7 +555,7 @@ mrss_error_t	mrss_parse_url_with_options
  * \param curlcode the error code from libcurl
  * \return the error code
  */
-mrss_error_t	mrss_parse_url_with_options_and_error
+EXPORTFUNC mrss_error_t	mrss_parse_url_with_options_and_error
 					(char *		url,
 					 mrss_t **	mrss,
 					 mrss_options_t	* options,
@@ -560,7 +567,7 @@ mrss_error_t	mrss_parse_url_with_options_and_error
  * \param mrss the pointer to your data struct
  * \return the error code
  */
-mrss_error_t	mrss_parse_file		(char *		file,
+EXPORTFUNC mrss_error_t	mrss_parse_file		(char *		file,
 					 mrss_t **	mrss);
 
 /** 
@@ -570,7 +577,7 @@ mrss_error_t	mrss_parse_file		(char *		file,
  * \param mrss the pointer to your data struct
  * \return the error code
  */
-mrss_error_t	mrss_parse_buffer	(char *		buffer,
+EXPORTFUNC mrss_error_t	mrss_parse_buffer	(char *		buffer,
 					 size_t		size_buffer,
 					 mrss_t **	mrss);
 
@@ -582,7 +589,7 @@ mrss_error_t	mrss_parse_buffer	(char *		buffer,
  * \param file the local file
  * \return the error code
  */
-mrss_error_t	mrss_write_file		(mrss_t *	mrss,
+EXPORTFUNC mrss_error_t	mrss_write_file		(mrss_t *	mrss,
 					 char *		file);
 
 /**
@@ -599,7 +606,7 @@ mrss_error_t	mrss_write_file		(mrss_t *	mrss,
  * \param buffer the buffer
  * \return the error code
  */
-mrss_error_t	mrss_write_buffer	(mrss_t *	mrss,
+EXPORTFUNC mrss_error_t	mrss_write_buffer	(mrss_t *	mrss,
 					 char **	buffer);
 
 /** FREE FUNCTION ***********************************************************/
@@ -620,7 +627,7 @@ mrss_error_t	mrss_write_buffer	(mrss_t *	mrss,
  * \param element the data struct
  * \return the error code
  */
-mrss_error_t	mrss_free		(mrss_generic_t	element);
+EXPORTFUNC mrss_error_t	mrss_free		(mrss_generic_t	element);
 
 /** GENERIC FUNCTION ********************************************************/
 
@@ -629,14 +636,14 @@ mrss_error_t	mrss_free		(mrss_generic_t	element);
  * \param err the error code that you need as string
  * \return a string. Don't free this string!
  */
-char *		mrss_strerror		(mrss_error_t	err);
+EXPORTFUNC char *		mrss_strerror		(mrss_error_t	err);
 
 /** 
  * This function returns a static string with the description of curl code
  * \param err the error code that you need as string
  * \return a string. Don't free this string!
  */
-char *		mrss_curl_strerror	(CURLcode	err);
+EXPORTFUNC char *		mrss_curl_strerror	(CURLcode	err);
 
 /**
  * This function returns the mrss_element_t of a mrss data struct.
@@ -644,7 +651,7 @@ char *		mrss_curl_strerror	(CURLcode	err);
  * \param ret it is a pointer to a mrss_element_t. It will be sets.
  * \return the error code
  */
-mrss_error_t	mrss_element		(mrss_generic_t	element,
+EXPORTFUNC mrss_error_t	mrss_element		(mrss_generic_t	element,
 					 mrss_element_t *ret);
 
 /**
@@ -656,7 +663,7 @@ mrss_error_t	mrss_element		(mrss_generic_t	element,
  * be 0 if the HEAD request does not return a Last-Modified value.
  * \return the error code
  */
-mrss_error_t	mrss_get_last_modified	(char *		urlstring,
+EXPORTFUNC mrss_error_t	mrss_get_last_modified	(char *		urlstring,
 					 time_t *	lastmodified);
 
 /**
@@ -668,7 +675,7 @@ mrss_error_t	mrss_get_last_modified	(char *		urlstring,
  * \param options a pointer to a options struct
  * \return the error code
  */
-mrss_error_t	mrss_get_last_modified_with_options
+EXPORTFUNC mrss_error_t	mrss_get_last_modified_with_options
 					(char *		urlstring,
 					 time_t *	lastmodified,
 					 mrss_options_t * options);
@@ -682,7 +689,7 @@ mrss_error_t	mrss_get_last_modified_with_options
  * \param curl_code it will contain the error code of libcurl
  * \return the error code
  */
-mrss_error_t	mrss_get_last_modified_with_options_and_error
+EXPORTFUNC mrss_error_t	mrss_get_last_modified_with_options_and_error
 					(char *		urlstring,
 					 time_t *	lastmodified,
 					 mrss_options_t * options,
@@ -724,7 +731,7 @@ mrss_error_t	mrss_get_last_modified_with_options_and_error
  * \param mrss is the pointer to the new data struct
  * \return the error code
  */
-mrss_error_t	mrss_new		(mrss_t **	mrss);
+EXPORTFUNC mrss_error_t	mrss_new		(mrss_t **	mrss);
 
 /**
  * For insert/replace/remove a flags use this function as this example:
@@ -739,7 +746,7 @@ mrss_error_t	mrss_new		(mrss_t **	mrss);
  * \see mrss_flag_t
  * \return the error code
  */
-mrss_error_t	mrss_set		(mrss_generic_t	element,
+EXPORTFUNC mrss_error_t	mrss_set		(mrss_generic_t	element,
 					 ...);
 
 /**
@@ -753,7 +760,7 @@ mrss_error_t	mrss_set		(mrss_generic_t	element,
  * \param element it is any type of mrss data struct.
  * \return the error code
  */
-mrss_error_t	mrss_get		(mrss_generic_t	element,
+EXPORTFUNC mrss_error_t	mrss_get		(mrss_generic_t	element,
 					 ...);
 
 /**
@@ -779,7 +786,7 @@ mrss_error_t	mrss_get		(mrss_generic_t	element,
  * \return the error code
  * \see mrss_element_t
  */
-mrss_error_t	mrss_new_subdata	(mrss_generic_t	element,
+EXPORTFUNC mrss_error_t	mrss_new_subdata	(mrss_generic_t	element,
 					 mrss_element_t	subelement,
 					 mrss_generic_t	subdata);
 
@@ -795,7 +802,7 @@ mrss_error_t	mrss_new_subdata	(mrss_generic_t	element,
  * and reinsert it after.
  * \return the error code
  */
-mrss_error_t	mrss_remove_subdata	(mrss_generic_t	element,
+EXPORTFUNC mrss_error_t	mrss_remove_subdata	(mrss_generic_t	element,
 					 mrss_generic_t	subdata);
 
 /* TAGS FUNCTIONS **********************************************************/
@@ -809,7 +816,7 @@ mrss_error_t	mrss_remove_subdata	(mrss_generic_t	element,
  * \param tag the return pointer
  * \return the error code
  */
-mrss_error_t	mrss_search_tag		(mrss_generic_t	element,
+EXPORTFUNC mrss_error_t	mrss_search_tag		(mrss_generic_t	element,
 					 char *		name,
 					 char *		ns,
 					 mrss_tag_t **	tag);
@@ -822,7 +829,7 @@ mrss_error_t	mrss_search_tag		(mrss_generic_t	element,
  * \param attribute the return pointer
  * \return the error code
  */
-mrss_error_t	mrss_search_attribute	(mrss_generic_t	element,
+EXPORTFUNC mrss_error_t	mrss_search_attribute	(mrss_generic_t	element,
 					 char *		name,
 					 char *		ns,
 					 mrss_attribute_t ** attribute);
@@ -843,7 +850,7 @@ mrss_error_t	mrss_search_attribute	(mrss_generic_t	element,
  * \param user_agent a user_agent. can be NULL
  * \return a pointer to a new allocated mrss_options_t struct 
  */
-mrss_options_t *
+EXPORTFUNC mrss_options_t *
 		mrss_options_new	(int timeout,
 					 char *proxy,
 					 char *proxy_authentication,
@@ -858,7 +865,7 @@ mrss_options_t *
  * This function destroys a options struct.
  * \param options a pointer to a options struct
  */
-void		mrss_options_free	(mrss_options_t *options);
+EXPORTFUNC void		mrss_options_free	(mrss_options_t *options);
 
 #ifdef  __cplusplus
 }

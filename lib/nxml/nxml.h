@@ -31,6 +31,15 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef WIN32
+#define EXPORTFUNC __declspec(dllexport)
+#define EXPORTVAR __declspec(dllexport)
+#else
+#define EXPORTFUNC
+#define EXPORTVAR 
+#endif
+
+
 #define LIBNXML_VERSION_STRING	"0.18.1"
 
 #define LIBNXML_MAJOR_VERSION	0
@@ -235,7 +244,7 @@ struct nxml_t
  * \param nxml Pointer to a nxml_t data struct. It will be allocated.
  * \return the error code
  */
-nxml_error_t	nxml_new		(nxml_t ** nxml);
+EXPORTFUNC nxml_error_t	nxml_new		(nxml_t ** nxml);
 
 /** 
  * This function creates a new nxml_data_t child of a parent in the data 
@@ -258,7 +267,7 @@ nxml_error_t	nxml_new		(nxml_t ** nxml);
  * nxml_add(nxml, NULL, &data2);
  * \endcode
  */
-nxml_error_t	nxml_add		(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_add		(nxml_t * nxml,
 					 nxml_data_t *parent,
 					 nxml_data_t **child);
 
@@ -275,7 +284,7 @@ nxml_error_t	nxml_add		(nxml_t * nxml,
  * \param child It is the pointer to the child that you want remove
  * \return the error code
  */
-nxml_error_t	nxml_remove		(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_remove		(nxml_t * nxml,
 					 nxml_data_t *parent,
 					 nxml_data_t *child);
 
@@ -289,7 +298,7 @@ nxml_error_t	nxml_remove		(nxml_t * nxml,
  * be allocated, else no.
  * \return the error code
  */
-nxml_error_t	nxml_add_attribute	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_add_attribute	(nxml_t *nxml,
 					 nxml_data_t *element,
 					 nxml_attr_t **attribute);
 
@@ -302,7 +311,7 @@ nxml_error_t	nxml_add_attribute	(nxml_t *nxml,
  * \param attribute The attribute that you want remove.
  * \return the error code
  */
-nxml_error_t	nxml_remove_attribute	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_remove_attribute	(nxml_t *nxml,
 					 nxml_data_t *element,
 					 nxml_attr_t *attribute);
 
@@ -314,7 +323,7 @@ nxml_error_t	nxml_remove_attribute	(nxml_t *nxml,
  * \param ns The namespace that you want add
  * \return the error code
  */
-nxml_error_t	nxml_add_namespace	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_add_namespace	(nxml_t *nxml,
 		                         nxml_data_t *element,
 					 nxml_namespace_t **ns);
 
@@ -326,7 +335,7 @@ nxml_error_t	nxml_add_namespace	(nxml_t *nxml,
  * \param ns The namespace that you want remove
  * \return the error code
  */
-nxml_error_t	nxml_remove_namespace	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_remove_namespace	(nxml_t *nxml,
 		                         nxml_data_t *element,
 					 nxml_namespace_t *ns);
 
@@ -341,10 +350,10 @@ nxml_error_t	nxml_remove_namespace	(nxml_t *nxml,
  * As default a nxml_t element has not a output function.
  * \return the error code
  */
-nxml_error_t	nxml_set_func		(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_set_func		(nxml_t * nxml,
 					 void (*func) (char *, ...));
 
-void		nxml_print_generic	(char *, ...);
+EXPORTFUNC void		nxml_print_generic	(char *, ...);
 
 /**
  * This function sets the timeout in seconds for the download of a remote
@@ -354,7 +363,7 @@ void		nxml_print_generic	(char *, ...);
  * \param seconds the timeout in seconds
  * \return the error code
  */
-nxml_error_t	nxml_set_timeout	(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_set_timeout	(nxml_t * nxml,
 					 int seconds);
 
 /**
@@ -365,7 +374,7 @@ nxml_error_t	nxml_set_timeout	(nxml_t * nxml,
  * \param userpwd the user and password in this format user:password
  * \return the error code
  */
-nxml_error_t	nxml_set_proxy		(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_set_proxy		(nxml_t * nxml,
 					 char *proxy,
 					 char *userpwd);
 
@@ -376,7 +385,7 @@ nxml_error_t	nxml_set_proxy		(nxml_t * nxml,
  * \param userpwd the user and password in this format user:password
  * \return the error code
  */
-nxml_error_t	nxml_set_authentication	(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_set_authentication	(nxml_t * nxml,
 					 char *userpwd);
 
 /**
@@ -386,7 +395,7 @@ nxml_error_t	nxml_set_authentication	(nxml_t * nxml,
  * \param user_agent The agent
  * \return the error code
  */
-nxml_error_t	nxml_set_user_agent	(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_set_user_agent	(nxml_t * nxml,
 					 char *user_agent);
 
 /**
@@ -400,7 +409,7 @@ nxml_error_t	nxml_set_user_agent	(nxml_t * nxml,
  * \param verifypeer active/deactive the peer validation
  * \return the error code
  */
-nxml_error_t	nxml_set_certificate	(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_set_certificate	(nxml_t * nxml,
 					 char *certfile,
 					 char *password,
 					 char *cacert,
@@ -415,7 +424,7 @@ nxml_error_t	nxml_set_certificate	(nxml_t * nxml,
  * \param textindent If it is != 0, the indent will be activated
  * \return the error code
  */
-nxml_error_t	nxml_set_textindent	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_set_textindent	(nxml_t *nxml,
 					 char textindent);
 
 /* DOWNLOAD *****************************************************************/
@@ -429,7 +438,7 @@ nxml_error_t	nxml_set_textindent	(nxml_t *nxml,
  * \param size The function sets here the length of the file if it's not NULL.
  * \return a buffer or NULL
  */
-nxml_error_t	nxml_download_file	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_download_file	(nxml_t *nxml,
 					 char *url,
 					 char ** buffer,
 					 size_t *size);
@@ -444,7 +453,7 @@ nxml_error_t	nxml_download_file	(nxml_t *nxml,
  * \param url the url that you want parse.
  * \return the error code
  */
-nxml_error_t	nxml_parse_url		(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_parse_url		(nxml_t * nxml,
 					 char *url);
 
 /** 
@@ -454,7 +463,7 @@ nxml_error_t	nxml_parse_url		(nxml_t * nxml,
  * \param file the file that you want parse.
  * \return the error code
  */
-nxml_error_t	nxml_parse_file		(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_parse_file		(nxml_t * nxml,
 					 char *file);
 
 /** 
@@ -466,7 +475,7 @@ nxml_error_t	nxml_parse_file		(nxml_t * nxml,
  * length of your buffer searching a '\\0'.
  * \return the error code
  */
-nxml_error_t	nxml_parse_buffer	(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_parse_buffer	(nxml_t * nxml,
 					 char *buffer,
 					 size_t size);
 
@@ -479,7 +488,7 @@ nxml_error_t	nxml_parse_buffer	(nxml_t * nxml,
  * \param file the local file
  * \return the error code
  */
-nxml_error_t	nxml_write_file		(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_write_file		(nxml_t *nxml,
 					 char *file);
 
 /**
@@ -497,7 +506,7 @@ nxml_error_t	nxml_write_file		(nxml_t *nxml,
  * \param buffer the memory buffer
  * \return the error code
  */
-nxml_error_t	nxml_write_buffer	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_write_buffer	(nxml_t *nxml,
 					 char **buffer);
 
 /* FREE FUNCTIONS ************************************************************/
@@ -509,7 +518,7 @@ nxml_error_t	nxml_write_buffer	(nxml_t *nxml,
  * \param nxml the pointer to you data struct.
  * \return the error code.
  */
-nxml_error_t	nxml_empty		(nxml_t * nxml);
+EXPORTFUNC nxml_error_t	nxml_empty		(nxml_t * nxml);
 
 /** 
  * This function frees the memory of a nxml_t *element. After the free,
@@ -519,7 +528,7 @@ nxml_error_t	nxml_empty		(nxml_t * nxml);
  * \param nxml the pointer to your data struct.
  * \return the error code.
  */
-nxml_error_t	nxml_free		(nxml_t * nxml);
+EXPORTFUNC nxml_error_t	nxml_free		(nxml_t * nxml);
 
 /**
  * This function frees the memory of a nxml_data_t *element and any its
@@ -528,7 +537,7 @@ nxml_error_t	nxml_free		(nxml_t * nxml);
  * \param data the pointer to you data struct.
  * \return the error code
  */
-nxml_error_t	nxml_free_data		(nxml_data_t *data);
+EXPORTFUNC nxml_error_t	nxml_free_data		(nxml_data_t *data);
 
 /**
  * This function frees the memory of a nxml_attr_t *element.
@@ -536,7 +545,7 @@ nxml_error_t	nxml_free_data		(nxml_data_t *data);
  * \param data the pointer to you data struct.
  * \return the error code
  */
-nxml_error_t	nxml_free_attribute	(nxml_attr_t *data);
+EXPORTFUNC nxml_error_t	nxml_free_attribute	(nxml_attr_t *data);
 
 /**
  * This function frees the memory of a nxml_namespace_t *element.
@@ -544,7 +553,7 @@ nxml_error_t	nxml_free_attribute	(nxml_attr_t *data);
  * \param data the pointer to you data struct.
  * \return the error code
  */
-nxml_error_t	nxml_free_namespace	(nxml_namespace_t *data);
+EXPORTFUNC nxml_error_t	nxml_free_namespace	(nxml_namespace_t *data);
 
 /* EDIT FUNCTIONS ***********************************************************/
 
@@ -566,7 +575,7 @@ nxml_error_t	nxml_free_namespace	(nxml_namespace_t *data);
  * \param element the pointer to your nxml_data_t struct
  * \return the error code
  */
-nxml_error_t	nxml_root_element	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_root_element	(nxml_t *nxml,
 					 nxml_data_t **element);
 
 /**
@@ -591,7 +600,7 @@ nxml_error_t	nxml_root_element	(nxml_t *nxml,
  * NULL, the item that you want does not exist.
  * \return the error code
  */
-nxml_error_t	nxml_find_element	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_find_element	(nxml_t *nxml,
 					 nxml_data_t *parent,
 					 char *name, 
 					 nxml_data_t **element);
@@ -604,7 +613,7 @@ nxml_error_t	nxml_find_element	(nxml_t *nxml,
  * NULL, the item that you want does not exist.
  * \return the error code
  */
-nxml_error_t	nxml_doctype_element	(nxml_t *nxml,
+EXPORTFUNC nxml_error_t	nxml_doctype_element	(nxml_t *nxml,
 					 nxml_doctype_t **doctype);
 
 /**
@@ -634,7 +643,7 @@ nxml_error_t	nxml_doctype_element	(nxml_t *nxml,
  * does not exist.
  * \return the error code
  */
-nxml_error_t	nxml_find_attribute	(nxml_data_t *data,
+EXPORTFUNC nxml_error_t	nxml_find_attribute	(nxml_data_t *data,
 					 char *name, 
 					 nxml_attr_t **attribute);
 
@@ -648,7 +657,7 @@ nxml_error_t	nxml_find_attribute	(nxml_data_t *data,
  * does not exist.
  * \return the error code
  */
-nxml_error_t	nxml_find_namespace	(nxml_data_t *data,
+EXPORTFUNC nxml_error_t	nxml_find_namespace	(nxml_data_t *data,
 					 char *name, 
 					 nxml_namespace_t **ns);
 
@@ -676,7 +685,7 @@ nxml_error_t	nxml_find_namespace	(nxml_data_t *data,
  * \param string the pointer to you char *. You must free it after usage.
  * \return the error code
  */
-nxml_error_t	nxml_get_string		(nxml_data_t *element,
+EXPORTFUNC nxml_error_t	nxml_get_string		(nxml_data_t *element,
 					 char **string);
 
 /* ERROR FUNCTIONS **********************************************************/
@@ -688,7 +697,7 @@ nxml_error_t	nxml_get_string		(nxml_data_t *element,
  * \param err the error code that you need as string
  * \return a string. Don't free this string!
  */
-char *		nxml_strerror		(nxml_t * nxml,
+EXPORTFUNC char *		nxml_strerror		(nxml_t * nxml,
 					 nxml_error_t err);
 
 /**
@@ -699,7 +708,7 @@ char *		nxml_strerror		(nxml_t * nxml,
  * \param err the error code that you need as string
  * \return the CURLcode
  */
-CURLcode	nxml_curl_error		(nxml_t * nxml,
+EXPORTFUNC CURLcode	nxml_curl_error		(nxml_t * nxml,
 					 nxml_error_t err);
 
 /**
@@ -709,7 +718,7 @@ CURLcode	nxml_curl_error		(nxml_t * nxml,
  * \param line pointer to your integer. In this pointer will be set the line.
  * \return the error code
  */
-nxml_error_t	nxml_line_error		(nxml_t * nxml,
+EXPORTFUNC nxml_error_t	nxml_line_error		(nxml_t * nxml,
 					 int *line);
 
 /* EASY FUNCTIONS ***********************************************************/
@@ -722,7 +731,7 @@ nxml_error_t	nxml_line_error		(nxml_t * nxml,
  * code. This function use nxml_set_func with nxml_print_generic so the
  * error will be write in the standard output.
  */
-nxml_t *	nxmle_new_data		(nxml_error_t *err);
+EXPORTFUNC nxml_t *	nxmle_new_data		(nxml_error_t *err);
 
 /**
  * This function returns a new nxml_t data and parses a remote url document
@@ -733,7 +742,7 @@ nxml_t *	nxmle_new_data		(nxml_error_t *err);
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_t data.
  */
-nxml_t *	nxmle_new_data_from_url	(char *url,
+EXPORTFUNC nxml_t *	nxmle_new_data_from_url	(char *url,
 					 nxml_error_t *err);
 
 /**
@@ -745,7 +754,7 @@ nxml_t *	nxmle_new_data_from_url	(char *url,
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_t data.
  */
-nxml_t *	nxmle_new_data_from_file
+EXPORTFUNC nxml_t *	nxmle_new_data_from_file
 					(char *file,
 					 nxml_error_t *err);
 
@@ -759,7 +768,7 @@ nxml_t *	nxmle_new_data_from_file
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_t data.
  */
-nxml_t *	nxmle_new_data_from_buffer
+EXPORTFUNC nxml_t *	nxmle_new_data_from_buffer
 					(char *buffer,
 					 size_t size,
 					 nxml_error_t *err);
@@ -774,7 +783,7 @@ nxml_t *	nxmle_new_data_from_buffer
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_data_t data child.
  */
-nxml_data_t *	nxmle_add_new		(nxml_t * nxml,
+EXPORTFUNC nxml_data_t *	nxmle_add_new		(nxml_t * nxml,
 					 nxml_data_t *parent,
 					 nxml_error_t *err);
 
@@ -789,7 +798,7 @@ nxml_data_t *	nxmle_add_new		(nxml_t * nxml,
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_data_t data child.
  */
-nxml_data_t *	nxmle_add_data		(nxml_t * nxml,
+EXPORTFUNC nxml_data_t *	nxmle_add_data		(nxml_t * nxml,
 					 nxml_data_t *parent,
 					 nxml_data_t *child,
 					 nxml_error_t *err);
@@ -803,7 +812,7 @@ nxml_data_t *	nxmle_add_data		(nxml_t * nxml,
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_data_t data child.
  */
-nxml_attr_t *	nxmle_add_attribute_new	(nxml_t *nxml,
+EXPORTFUNC nxml_attr_t *	nxmle_add_attribute_new	(nxml_t *nxml,
 					 nxml_data_t *element,
 					 nxml_error_t *err);
 
@@ -817,7 +826,7 @@ nxml_attr_t *	nxmle_add_attribute_new	(nxml_t *nxml,
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_data_t data child.
  */
-nxml_attr_t *	nxmle_add_attribute_data
+EXPORTFUNC nxml_attr_t *	nxmle_add_attribute_data
 					(nxml_t *nxml,
 					 nxml_data_t *element,
 					 nxml_attr_t *attribute,
@@ -832,7 +841,7 @@ nxml_attr_t *	nxmle_add_attribute_data
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_data_t data child.
  */
-nxml_namespace_t * nxmle_add_namespace_new
+EXPORTFUNC nxml_namespace_t * nxmle_add_namespace_new
 					(nxml_t *nxml,
 					 nxml_data_t *element,
 	       				 nxml_error_t *err);
@@ -846,7 +855,7 @@ nxml_namespace_t * nxmle_add_namespace_new
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the pointer to a new nxml_data_t data child.
  */
-nxml_namespace_t * nxmle_add_namespace_data
+EXPORTFUNC nxml_namespace_t * nxmle_add_namespace_data
 					(nxml_t *nxml,
 					 nxml_data_t *element,
 					 nxml_namespace_t *ns,
@@ -860,7 +869,7 @@ nxml_namespace_t * nxmle_add_namespace_data
  * \return the pointer to the root element. If NULL the element does not
  * exist.
  */
-nxml_data_t *	nxmle_root_element	(nxml_t *nxml,
+EXPORTFUNC nxml_data_t *	nxmle_root_element	(nxml_t *nxml,
 					 nxml_error_t *err);
 
 /**
@@ -871,7 +880,7 @@ nxml_data_t *	nxmle_root_element	(nxml_t *nxml,
  * \return the pointer to the doctype element. If NULL the element does not
  * exist.
  */
-nxml_doctype_t *nxmle_doctype_element	(nxml_t *nxml,
+EXPORTFUNC nxml_doctype_t *nxmle_doctype_element	(nxml_t *nxml,
 					 nxml_error_t *err);
 
 /**
@@ -886,7 +895,7 @@ nxml_doctype_t *nxmle_doctype_element	(nxml_t *nxml,
  * \return the pointer to the root element. If NULL the element does not
  * exist.
  */
-nxml_data_t *	nxmle_find_element	(nxml_t *nxml,
+EXPORTFUNC nxml_data_t *	nxmle_find_element	(nxml_t *nxml,
 					 nxml_data_t *parent,
 					 char *name,
 					 nxml_error_t *err);
@@ -900,7 +909,7 @@ nxml_data_t *	nxmle_find_element	(nxml_t *nxml,
  * \return a pointer to a char allocated so you must free it after usage. If
  * it is NULL, the attribute does not exist.
  */
-char *		nxmle_find_attribute	(nxml_data_t *element,
+EXPORTFUNC char *		nxmle_find_attribute	(nxml_data_t *element,
 					 char *name,
 					 nxml_error_t *err);
 
@@ -913,7 +922,7 @@ char *		nxmle_find_attribute	(nxml_data_t *element,
  * \return a pointer to a char allocated so you must free it after usage. If
  * it is NULL, the namespace does not exist.
  */
-char *		nxmle_find_namespace	(nxml_data_t *element,
+EXPORTFUNC char *		nxmle_find_namespace	(nxml_data_t *element,
 					 char *name,
 					 nxml_error_t *err);
 
@@ -925,7 +934,7 @@ char *		nxmle_find_namespace	(nxml_data_t *element,
  * \return a pointer to a char allocated so you must free it after usage. If
  * it is NULL, the attribute does not exist.
  */
-char *		nxmle_get_string	(nxml_data_t *element,
+EXPORTFUNC char *		nxmle_get_string	(nxml_data_t *element,
 					 nxml_error_t *err);
 
 /**
@@ -935,7 +944,7 @@ char *		nxmle_get_string	(nxml_data_t *element,
  * \param err If err is not NULL, err will be set to the error flag.
  * \return a pointer to a char allocated so you must free it after usage.
  */
-char *		nxmle_write_buffer	(nxml_t *nxml, nxml_error_t *err);
+EXPORTFUNC char *		nxmle_write_buffer	(nxml_t *nxml, nxml_error_t *err);
 
 /**
  * This function return the line of a error of parse.
@@ -943,7 +952,7 @@ char *		nxmle_write_buffer	(nxml_t *nxml, nxml_error_t *err);
  * \param err If err is not NULL, err will be set to the error flag.
  * \return the line with the error.
  */
-int		nxmle_line_error	(nxml_t * nxml, nxml_error_t *err);
+EXPORTFUNC int		nxmle_line_error	(nxml_t * nxml, nxml_error_t *err);
 
 /* Easy functions defined: */
 #define		nxmle_remove		nxml_remove
