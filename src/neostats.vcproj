@@ -13,6 +13,9 @@
 		/>
 	</Platforms>
 	<ToolFiles>
+		<ToolFile
+			RelativePath=".\win32\Rules.rules"
+		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -28,6 +31,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PerlSUB"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -116,6 +122,9 @@
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
+				Name="PerlSUB"
+			/>
+			<Tool
 				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
@@ -197,6 +206,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="PerlSUB"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -282,6 +294,9 @@
 				Name="VCCustomBuildTool"
 			/>
 			<Tool
+				Name="PerlSUB"
+			/>
+			<Tool
 				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
@@ -345,6 +360,107 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release-Perl|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				ExecutionBucket="2"
+			/>
+			<Tool
+				Name="PerlSUB"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+				ExecutionBucket="4"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				ExecutionBucket="5"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="6"
+				AdditionalIncludeDirectories="C:\Perl\lib\CORE;..\include;..\lib\curl;..\lib\pcre;win32;..\lib\event"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;NEOSTATSCORE;DLL_EXPORT;HAVE_CONFIG_H;CURL_STATICLIB;USE_PERL"
+				RuntimeLibrary="0"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+				ExecutionBucket="7"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				ExecutionBucket="8"
+				PreprocessorDefinitions="_VC80_UPGRADE=0x0710;NEOSTATSCORE=1"
+				Culture="3081"
+				AdditionalIncludeDirectories="../include"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+				ExecutionBucket="9"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				ExecutionBucket="10"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib shlwapi.lib curl.lib perl510.lib pcre.lib libevent.lib nxml.lib"
+				OutputFile="../neostats.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Perl\lib\CORE;..\lib"
+				IgnoreDefaultLibraryNames="LIBC"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+				ExecutionBucket="11"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				ExecutionBucket="12"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+				ExecutionBucket="13"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				ExecutionBucket="14"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+				ExecutionBucket="15"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+				ExecutionBucket="16"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				ExecutionBucket="17"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 		</Configuration>
 	</Configurations>
@@ -463,6 +579,14 @@
 						PreprocessorDefinitions="__STDC__"
 					/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="Release-Perl|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="__STDC__"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\ctcp.c"
@@ -563,6 +687,22 @@
 			<File
 				RelativePath=".\numerics.c"
 				>
+			</File>
+			<File
+				RelativePath=".\NV.c"
+				>
+			</File>
+			<File
+				RelativePath=".\NV.xs"
+				>
+				<FileConfiguration
+					Name="Release-Perl|Win32"
+					>
+					<Tool
+						Name="PerlSUB"
+						AdditionalOptions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\oscalls.c"
@@ -787,11 +927,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\namedvars-core.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\namedvars.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\NeoNet.h"
 				>
 			</File>
 			<File
 				RelativePath="..\include\neostats.h"
+				>
+			</File>
+			<File
+				RelativePath=".\neostats.pm.h"
 				>
 			</File>
 			<File
@@ -823,11 +975,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\win32\resource.h"
+				RelativePath="..\..\src\win32\resource.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\resource.h"
+				RelativePath=".\win32\resource.h"
 				>
 			</File>
 			<File

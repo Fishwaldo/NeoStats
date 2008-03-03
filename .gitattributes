@@ -558,6 +558,7 @@ src/neostats.pm.h -text
 src/neostats.vcproj -text
 src/nsevents.c -text
 src/typemap -text
+src/win32/Rules.rules -text
 src/win32/icon1.ico -text
 src/win32/neostats.bmp -text
 src/win32/neostats.conf -text

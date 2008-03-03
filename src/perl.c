@@ -1692,19 +1692,6 @@ static Module *load_perlfiles (const char *filename, Module *mod, perl_xs_init i
 	};
 
 
-#ifdef WIN32
-	static HINSTANCE lib = NULL;
-
-	if (!lib) {
-		lib = LoadLibrary (PERL_DLL);
-		if (!lib) {
-			nlog(LOG_WARNING, "Warning, Could not load ActivePerl. Please see documentation");
-			return NULL;
-		}
-	}
-#endif
-
-
 	mod->pm = ns_calloc(sizeof(PerlModInfo));
 	mod->pm->registered = 0;
 	mod->pm->extninit = init_func;

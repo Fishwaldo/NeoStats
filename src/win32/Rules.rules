@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="PerlXS"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="PerlSUB"
+			DisplayName="BuildXS"
+			CommandLine="c:\perl\bin\xsubpp.bat -prototypes [inputs] &gt; $(InputName).c"
+			Outputs="$(InputName).c"
+			FileExtensions="*.xs"
+			ExecutionDescription="Converting XS files"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>
