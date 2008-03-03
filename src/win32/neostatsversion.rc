@@ -13,7 +13,7 @@
 			BLOCK "040704e4"
 	        BEGIN
 		        VALUE "CompanyName", "NeoStats"
-			    VALUE "Copyright (C) 2007", "Copyright (c) 1999-2008 Adam Rutter, Justin Hammond, Mark Hetherington"
+			    VALUE "Copyright (C) 2008", "Copyright (c) 1999-2008 Adam Rutter, Justin Hammond, Mark Hetherington"
 				VALUE "FileDescription", "NeoStats IRC Services"
 	            VALUE "FileVersion", NEO_WIN32VER
 		        VALUE "InternalName", "neostats.exe"
