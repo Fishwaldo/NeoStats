@@ -561,7 +561,7 @@ src/typemap -text
 src/win32/Rules.rules -text
 src/win32/icon1.ico -text
 src/win32/neostats.bmp -text
-src/win32/neostats.conf -text
+src/win32/neostats.conf eol=crlf
 src/win32/neostats.rc -text
 src/win32/neostatsversion.rc -text
 src/win32/resource.h -text
