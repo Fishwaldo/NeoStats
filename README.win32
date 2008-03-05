@@ -1,29 +1,30 @@
-Win32 Build files
+Win32 Installation Instructions
 
-NeoStats for Windows requires Microsoft Visual Studio .NET 2005. 
-It may or not build on other versions of Visual Studio.
+Currently, Win32 versions of NeoStats appear to be stable, but for this 
+Release, a Debug Version is used. This means that when run, NeoStats 
+will open a console window and output large amounts of Debug 
+Information. Closing this window will result in NeoStats closing as 
+well.
 
-Main build files:
-neostatslibs.sln	- Library solution. 
-neostats.sln		- Main solution. 
+To Configure NeoStats, you must edit the neostats.conf file located in the 
+NeoStats installation directory, this is typically c:\Program Files\NeoStats 
+but if you change it during the setup, it will be in the location you 
+specify.
 
-NeoStats requires that ActivePerl be installed before you compile, 
-and that the ActivePerl installation is located at c:\perl. If your 
-activeperl is located at a different location, you will have to 
-modify the INCLUDE and LIBRARY paths specifiec in the properties
-of the neostats.sln solution. 
+Once you have edited the Configuration File, you may start NeoStats by 
+clicking on the NeoStats icon in your Start Menu. NeoStats will then
+open the Console Window and place a icon in the taskbar. After that, 
+NeoStats will operate just like the Unix Version.
 
-NeoStats depends on the libraries in the library solution. To build 
-NeoStats for Windows, load the library solution and select build 
-solution from the Build menu. Then load the neostats solution and 
-select build solution from the Build menu.
+As 3rd party modules are released, we will provide Win32 installations
+for those files as well.
 
-The NeoStats Setup exe that we distribute NeoStats with also 
-contains the library and header files you need to compile other
-modules. By default they are installed when you install NeoStats
-and are located in the include and library directories of your 
-NeoStats installation. 3rd party modules (such as OPSB) are 
-setup to look in these directories when building, so if you
-change the location of NeoStats installation then you will 
-need to modify the INCLUDE and LIBRARY paths for those 
-3rd party modules to point to the correct directory.
+If you encounter any problems on Win32, please post the issues to our
+Forums so we can investigate.
+
+We hope that with future releases, you will be able to run NeoStats as 
+a service rather than as a program, but that is not currently implemented.
+
+Thanks
+
+The NeoStats Developers
