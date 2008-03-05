@@ -46,6 +46,7 @@ data/niconfig.db -text
 data/tlds.nfo -text
 doc/CODINGMODULES.txt -text
 doc/README.dev -text
+doc/READMEWIN32.dev -text
 doc/old/ChangeLog.connectserv.old -text
 doc/old/ChangeLog.hostserv.old -text
 doc/old/ChangeLog.loveserv.old -text
