@@ -3,6 +3,9 @@ NeoStats 3.x ChangeLog
 Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
+* NeoStats * Version 3.0.1 (F)
+ - Bump Version (F)
+
 * NeoStats * Version 3.0.0
  - Finish the Update Module (F)
  - Move the copyright handler in the HTML output of StatServ to a proper
