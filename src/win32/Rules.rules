@@ -7,10 +7,11 @@
 		<CustomBuildRule
 			Name="PerlSUB"
 			DisplayName="BuildXS"
-			CommandLine="c:\perl\bin\xsubpp.bat -prototypes [inputs] &gt; $(InputName).c"
+			CommandLine="c:\perl\bin\perl c:\perl\lib\ExtUtils\xsubpp -prototypes [inputs] &gt; $(InputName).c"
 			Outputs="$(InputName).c"
 			FileExtensions="*.xs"
 			ExecutionDescription="Converting XS files"
+			ShowOnlyRuleProperties="false"
 			>
 			<Properties>
 			</Properties>
