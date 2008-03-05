@@ -339,7 +339,7 @@ void del_bot_cmd( hash_t *cmd_hash, const bot_cmd *cmd_ptr )
 	{
 		dlog( DEBUG3, "deleting command %s from services bot", ( ( bot_cmd* )hnode_get( cmdnode ) )->cmd );
 		hash_delete_destroy_node( cmd_hash, cmdnode );
-#if USE_PERL
+#ifdef USE_PERL
 		if (IS_PERL_MOD(cmd_ptr->modptr))
 		{
 			ns_free(cmd_ptr->cmd);
@@ -865,7 +865,7 @@ static int bot_cmd_about( const CmdParams *cmdparams )
 		if( IS_STANDARD_MOD( cmdparams->bot->moduleptr ) )
 		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, cmdparams->bot->moduleptr->info->about_text );
-#if USE_PERL
+#ifdef USE_PERL
 		}
 		else
 		{
@@ -901,7 +901,7 @@ static int bot_cmd_credits( const CmdParams *cmdparams )
 		{
 			irc_prefmsg_list( cmdparams->bot, cmdparams->source, 
 				cmdparams->bot->moduleptr->info->copyright );
-#if USE_PERL
+#ifdef USE_PERL
 		}
 		else
 		{

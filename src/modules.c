@@ -620,7 +620,7 @@ int unload_module( const char *modname, Client * u )
 			RESET_RUN_LEVEL();
 			SET_SEGV_LOCATION();
 		}
-#if USE_PERL
+#ifdef USE_PERL
 	} else {
 		SET_RUN_LEVEL( mod_ptr );
 		PerlModFini( mod_ptr );

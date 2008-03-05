@@ -46,7 +46,7 @@ static HMENU hTrayPopMenu;
 static POINT TrayPoint;
 
 static char szConfigFileName[ MAX_PATH ];
-
+#undef NDEBUG
 #ifndef NDEBUG
 static void InitDebugConsole( void )
 {

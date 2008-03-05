@@ -12,7 +12,7 @@
 /* 'Enable Debugging' */
 /* #undef DEBUG */
 #define DEBUG
-
+#define USE_PERL
 /* Set to explicitly specify we don't want to use thread-safe functions in
    curl */
 /* #undef DISABLED_THREADSAFE */

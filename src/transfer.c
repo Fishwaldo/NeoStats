@@ -248,6 +248,16 @@ int new_transfer(char *url, char *params, NS_TRANSFER savetofileormemory, char *
 		return NS_FAILURE;
 	}	
 #endif
+
+		/* dont reuse any connections to the server. This causes havoc with out socket code */
+	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_FORBID_REUSE, 1)) != 0) {
+		nlog(LOG_WARNING, "Curl Set forbid reuse failed. Returned %d for url %s", ret, url);
+		nlog(LOG_WARNING, "Error Was: %s", newtrans->curlerror);
+		curl_easy_cleanup(newtrans->curleasyhandle);
+		ns_free(newtrans);
+		return NS_FAILURE;
+	}	
+
 	/* setup no signals... */
 	if ((ret = curl_easy_setopt(newtrans->curleasyhandle, CURLOPT_NOSIGNAL, 1)) != 0) {
 		nlog(LOG_WARNING, "Curl Set nosignal failed. Returned %d for url %s", ret, url);
@@ -526,15 +536,19 @@ int curl_socket_event_callback(CURL *easy, curl_socket_t s, int action, void *us
 		case CURL_POLL_NONE:
 		case CURL_POLL_IN:
 			UpdateSock(sock, EV_READ|EV_PERSIST, 1, NULL);
+			dlog(DEBUG2, "CurlSock READ %d %d", EV_READ|EV_PERSIST, action);
 			break;
 		case CURL_POLL_OUT:
 			UpdateSock(sock, EV_WRITE|EV_PERSIST, 1, NULL);	
+			dlog(DEBUG2, "CurlSock write %d %d", EV_WRITE|EV_PERSIST, action);
 			break;
 		case CURL_POLL_INOUT:
 			UpdateSock(sock, EV_READ|EV_WRITE|EV_PERSIST, 1, NULL);	
+			dlog(DEBUG2, "CurlSock INOUT %d %d", EV_READ|EV_WRITE|EV_PERSIST, action);
 			break;	
 		case CURL_POLL_REMOVE:
 			UpdateSock(sock, 0, 1, NULL);
+			dlog(DEBUG2, "CurlSock RM %d %d", 0, action);
 			break;
 	}
 

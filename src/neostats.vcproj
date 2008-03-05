@@ -395,7 +395,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="6"
 				AdditionalIncludeDirectories="C:\Perl\lib\CORE;..\include;..\lib\curl;..\lib\pcre;win32;..\lib\event"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;NEOSTATSCORE;DLL_EXPORT;HAVE_CONFIG_H;CURL_STATICLIB;USE_PERL"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;NEOSTATSCORE;DLL_EXPORT;HAVE_CONFIG_H;CURL_STATICLIB"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -975,11 +975,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\resource.h"
+				RelativePath=".\win32\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\win32\resource.h"
+				RelativePath="..\..\src\win32\resource.h"
 				>
 			</File>
 			<File
