@@ -5,8 +5,8 @@ ComposerVersion=8.5.0.4
 OperatingSystem=WinXP  5.1  2600 (Service Pack 2)
 ProcessorNameString=Intel(R) Xeon(TM) CPU 2.40GHz
 ComputerRAM=1534 MB
-ProjectDrive=TOO  (4.18 GB Free)
-DateTime=03-MAR-2008  18:47:10
+ProjectDrive=
+DateTime=05-MAR-2008  17:28:42
 OutputType=EXE
 Language=ENGLISH
 License=PRO
@@ -18,7 +18,7 @@ NonSFXDirectory=tools\\NonSFX
 MediaFileName=NeoStats-Setup
 CopyMediaToFName=\\tsclient\Fish\Users\justin\Documents\downloads\NeoStats-Setup.exe
 ProgramDescriptiveName=NeoStats IRC Services
-ProgramVersion=3.0.3.0
+ProgramVersion=3.0.0.0
 CompanyName=NeoStats
 ProgVerLiveUpdate=1
 RegisterAsApp=1
@@ -93,10 +93,10 @@ TargetExeName=<Application Folder>\neostats.exe
 RunTimeDir_2=|0||0||0||1|0|0||1|0|1|Include|0|0|0|0|0|0|
 
 [Dialogs]
-SelectedDialogs=*Welcome,*License,Readme,Setup Type,User Information,*Custom,*Destination,Associate,*Shortcuts,*Confirm Setup,*Copy Files,*Complete
-LicenseTextFile=NeoStats3.0\COPYING
-ReadmeTextFile=
-ReadmeTextFile2=NeoStats3.0\README
+SelectedDialogs=*Welcome,*License,*Readme,Setup Type,User Information,*Custom,*Destination,Associate,*Shortcuts,*Confirm Setup,*Copy Files,*Complete
+LicenseTextFile=COPYING
+ReadmeTextFile=README.win32.txt
+ReadmeTextFile2=
 UseNotepad=0
 SpaceReqOnDriveCheckBox=0
 SpaceReqOnDrive=
@@ -120,7 +120,7 @@ ShowProgBar2=1
 SilentSetup=0
 EnableCancelButton=1
 HiddenSetup=0
-ProposeReadme=1
+ProposeReadme=0
 ProposeLaunch=1
 ProposeRestart=0
 ProposeReadmeChecked=1
@@ -289,7 +289,7 @@ Arg-000-2==
 Arg-000-6==
 Arg-000-10==
 Arg-000-13=You need to install Perl for NeoStats to operate correctly
-Arg-000-16=http://www2.neostats.net/downloads/files/ActivePerl-5.10.0.1002-MSWin32-x86-283697.msi
+Arg-000-16=http://mirror.neostats.net/downloads/files/ActivePerl-5.10.0.1002-MSWin32-x86-283697.msi
 Arg-000-17=<TempDir>NeoStats-Perl.msi
 Arg-000-18=TRUE
 Arg-000-25=<TempDir>NeoStats-Perl.msi
