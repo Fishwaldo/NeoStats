@@ -6,7 +6,7 @@ DISTCHECK_CONFIGURE_FLAGS = --cache-file=../config.cache
 dist_bin_SCRIPTS 	= makeconf
 dist_data_DATA		= neostats.motd
 #docdir			= @prefix@/doc
-dist_doc_DATA		= doc/FAQ doc/USERMAN
+dist_doc_DATA		= doc/README.dev Changelog.old doc/CODINGMODULES.txt
 neodir			= $(prefix)
 neo_SCRIPTS		= neostats
 DISTCLEANFILES		= autotools/ccdv

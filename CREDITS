@@ -5,7 +5,8 @@ development of NeoStats in their own various ways over the years and who have
 helped better this project for all users.  Thanks to everyone :)
 
 
-chrisv@b0rked.dhs.org		Code for Dynamically Loading Modules (Hurricane IRCD)
+chrisv at b0rked dot dhs net org
+				Code for Dynamically Loading Modules (Hurricane IRCD)
 
 monkeyIRCD			Module Segv Catching code
 
@@ -38,5 +39,5 @@ herrohr 			liquid IRCd support
 
 Shmad				Previous Developer of NeoStats from version 1.0 till the 2.0 series
 
-If we left anyone out of this list please email support@neostats.net and if you
-do deserve to be on this list you shall be added.
+If we left anyone out of this list please email admin @ lists dot neostats
+dot net and if you do deserve to be on this list you shall be added.

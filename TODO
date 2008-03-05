@@ -1,15 +1,3 @@
 NeoStats - TODO Log:
 --------------------
-(have a look at our Bug tracking page for additional TODO's at
-http://bugs.neostats.net)
-
-
-<StatServ> rollergirl.sg.as.irc-chat.net is lagged out with a ping of 1123867742
-
-My NeoStats is using 29Mb of memory on 150 users.... most modules loaded. Valgrind is overdue
-just to check memory allocations
-
-http://www.neostats.net/boards/viewtopic.php?t=1672&highlight=
-
-http://www.neostats.net/boards/viewtopic.php?p=7094#7094
-
+http://bugs.neostats.net

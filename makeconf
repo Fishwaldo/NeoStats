@@ -463,6 +463,7 @@ Options {
 #    NeoStats will default to GDBM if this is not provided.
 #    Valid options are:
 #          gdbm
+#          bdb (if found during configure)
 #
 #          DatabaseType = "gdbm"
 #      
@@ -610,34 +611,36 @@ Modules {
 #    external modules before trying to load them.
 
 MODULENAME = {
-
+# Update notification module, loaded by default
+        "update",
+        
 # StatServ, maintain and report various networks statistics
-#	"statserv",
+	"statserv",
 
 # HostServ, vhost services for users
-#	"hostserv",
+	"hostserv",
 
 # TextServ, text messaging service
-#	"textserv",
+	"textserv",
 
 # ConnectServ, monitor connections to the network: user connections, oper 
 # modes, server connections and nick changes.
-#	"connectserv",
+	"connectserv",
 
 # Operlog, operator command logging service
-#	"operlog",
+	"operlog",
 
 # IRCdauth, authenticate users based on their user modes.
-#	"ircdauth",
+	"ircdauth",
 
 # Extauth, authenticate users based on nick!user@host access lists
-#	"extauth",
+	"extauth",
 
 # QuoteServ, Quote Message Service
-#	"quoteserv",
+	"quoteserv",
 
 # LimitServ, Channel Limit Setting Service
-#	"limitserv",
+	"limitserv",
 
 # SecureServ. You must download and install SecureServ first.
 #	"secureserv",
@@ -712,7 +715,7 @@ NeoNet {
 #	     	is set to No
 #	demand 	- Only connect to NeoNet when there is a pending NeoNet Message
 #	     	to be sent. 
-	Connect = "no"
+	Connect = "yes"
 }                                
 
 ###############################################################################

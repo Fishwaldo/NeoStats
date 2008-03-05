@@ -6,6 +6,9 @@
 ** Homepage: http://www.neostats.net/                                 **
 ************************************************************************
 
+(For the most recent version of these guides, refer to 
+http://wiki.neostats.net/confluence/display/Dev)
+
 How to write a NeoStats 3.0 Module
 ----------------------------------
 

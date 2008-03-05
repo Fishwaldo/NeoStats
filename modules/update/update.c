@@ -121,7 +121,7 @@ ModuleInfo module_info =
 /** Bot setting table */
 static bot_setting update_settings[] =
 {
-	{"UPDATEURL",		&update_cfg.updateurl,	SET_TYPE_STRING,	0, BUFSIZE, 	NS_ULEVEL_ADMIN, NULL,	update_help_set_updateurl, update_set_updateurl_cb, ( void *)"http://beta.neostats.net/feed.php" },
+	{"UPDATEURL",		&update_cfg.updateurl,	SET_TYPE_STRING,	0, BUFSIZE, 	NS_ULEVEL_ADMIN, NULL,	update_help_set_updateurl, update_set_updateurl_cb, ( void *)"http://www.neostats.net/feed.php" },
 	{"UPDATEENABLED",	&update_cfg.enabled,	SET_TYPE_BOOLEAN,	0, 0, 	NS_ULEVEL_ADMIN, NULL,	update_help_set_updateenabled, update_set_updateenabled_cb, ( void* )1 },
 	NS_SETTING_END()
 };

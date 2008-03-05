@@ -38,13 +38,17 @@ but a brief summary is:
       session.
     - Native Windows support including full support for modules.
     - All commands have configurable user levels.
+    - Perl API, so you can write new modules or extend existing modules
+      in the Perl Scripting Language
+    - Automatic notification of new versions, when they become available
+    - a large range of supported IRCd's 
 
 Visit http://www.neostats.net for the latest news and NeoStats updates.
 
 Please read all documentation included with NeoStats carefully. The 
 documents contain all the information you need to get NeoStats running
-on your network. These documents include README, and all the documents 
-in the doc directory. 
+on your network. These documents include README, and the wiki, at 
+http://wiki.neostats.net/confluence/display/NeoStats/Home
 
 -----------------------------------<>-----------------------------------
 All documentation applies to version 3.0.0 and higher. For older 
@@ -57,16 +61,17 @@ Following is a quick guide to the main NeoStats documentation:
 
 README -        This file. How to install and configure NeoStats 
                 and support information.
-DOCS/USERMAN -  Manual for run time operation of NeoStats. You should 
-                read this when you have NeoStats running for information
-                on how to use NeoStats.
-DOCS/FAQ -      Frequently Asked Questions about NeoStats.
 RELNOTES -      Release notes about the current version. This is 
                 displayed during the installation process but you should 
                 refer to it if you have problems.
 ChangeLog -     Information about what has changed between versions. 
                 Consult this document for detailed information about the
                 changes. 
+The Majority of Documentation can now be found on our NeoStats Wiki, 
+located at http://wiki.neostats.net/confluence/display/NeoStats/Home
+You are encouraged to check that site, as thats where most recent 
+version of our documenation will be
+
 -----------------------------------<>-----------------------------------
 
 Contents
@@ -267,12 +272,13 @@ change to the directory where NeoStats in installed e.g.
 
 Then to run NeoStats type:
 
-        ./neostats
+        ./neostats start
 
 It should link and sync with your server in a matter of seconds.
 
-Please now read USERMAN for details on how to operate NeoStats from an 
-IRC Client.
+Please now read
+http://wiki.neostats.net/confluence/display/NeoStats/Operator+Manual
+for details on how to operate NeoStats from an IRC Client.
 
 If anything goes wrong, there *might* be an error message in the log 
 files. Have a look in ~/NeoStats3.0/logs/neostats-date.log it might give 
@@ -292,7 +298,7 @@ useful:
 To use these options, add the option(s) you require when you run 
 NeoStats, e.g.:
 
-	./bin/neostats -h
+	./neostats start -h
 	
 Note: although you can combine most of these options, -v (version)
 and -h (help) will return information to you and NeoStats will not
@@ -430,14 +436,15 @@ find out when they are fixed. For the bug tracking system, visit:
 
         http://www.neostats.net/boards/
 
+* The Neostats Wiki available at:
+	http://wiki.neostats.net/confluence/display/NeoStats/
+
 * The NeoStats IRC support channel at:
 
         server:  irc.irc-chat.net 
         channel: #neostats
 
 Be warned that we are not always available on the channel to help you. 
-There is a bot there called neoserv that contains the latest bugs and
-support information (duplicated from the NeoStats board).
 
 2.2 What to provide when requesting support
 -------------------------------------------
@@ -470,6 +477,22 @@ files:
 This will help us to be able to reproduce the bug and create a fix for 
 it.
 
+Sometimes we might request you to run a GDB backtrace of the problem
+In order to generate that you will execute the following commands:
+        
+	gdb bin/neostats 
+
+when you arrive at the GDB command prompt, type:
+
+        run -fd 10
+
+now go and make NeoStats crash in some way. when it crashs, you will 
+be returned to the GDB command prompt. Type:
+
+	bt full
+
+and save that output to send to us. To exit GDB, just type "quit"        
+
 Remember you cannot give us too much information about your system and
 setup, but if you do not give us enough, we cannot help you and if we 
 have to keep asking you to provide more information, that is less time
@@ -485,18 +508,27 @@ Want to Help us?
 We are always looking for help.
 
 Currently, what we really are looking for is people to help us out with 
-translating our documentation and of course, other people that can code 
+our documentation on the wiki and of course, other people that can code 
 in C to help us with development.
 
-We hope to shortly provide a Module Programmers Guide to help those 
-people out there take advantage of NeoStats and write their own 
-extensions (or Modules) for NeoStats.
+if you would like to have a go at writting your own module, in either 
+C or Perl, you can consult 
+http://wiki.neostats.net/confluence/display/Dev for documenation. We 
+will also provide you with a SVN repository, bug tracker, and all the 
+other tools that we use (such as build servers etc) if you want it. 
+Just contact Fish to find out how to get started.
 
 If you would like to help out, See Support Information above for details 
 on how to contact us.
 
+Finally, as I (Fish) do not have a single artistic bone in my body, I'm
+always looking for people to help out with our websites at 
+http://www.neostats.net and http://secure.irc-chat.net/. If you are any
+good with HTML and would like to help us "spruce" up our webpages, just 
+contact me.
+
 -----------------------------------<>-----------------------------------
 
 ************************************************************************
-** This document was last updated on January 31st, 2005 by M          **
+** This document was last updated on March 5th, 2008 by Fish          **
 ************************************************************************

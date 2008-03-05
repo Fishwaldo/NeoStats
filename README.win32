@@ -1,13 +1,29 @@
 Win32 Build files
 
-NeoStats for Windows requires Microsoft Visual Studio .NET 2003. 
+NeoStats for Windows requires Microsoft Visual Studio .NET 2005. 
 It may or not build on other versions of Visual Studio.
 
 Main build files:
 neostatslibs.sln	- Library solution. 
 neostats.sln		- Main solution. 
 
+NeoStats requires that ActivePerl be installed before you compile, 
+and that the ActivePerl installation is located at c:\perl. If your 
+activeperl is located at a different location, you will have to 
+modify the INCLUDE and LIBRARY paths specifiec in the properties
+of the neostats.sln solution. 
+
 NeoStats depends on the libraries in the library solution. To build 
 NeoStats for Windows, load the library solution and select build 
 solution from the Build menu. Then load the neostats solution and 
 select build solution from the Build menu.
+
+The NeoStats Setup exe that we distribute NeoStats with also 
+contains the library and header files you need to compile other
+modules. By default they are installed when you install NeoStats
+and are located in the include and library directories of your 
+NeoStats installation. 3rd party modules (such as OPSB) are 
+setup to look in these directories when building, so if you
+change the location of NeoStats installation then you will 
+need to modify the INCLUDE and LIBRARY paths for those 
+3rd party modules to point to the correct directory.

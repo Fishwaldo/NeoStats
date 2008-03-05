@@ -30,7 +30,7 @@
 #include "perlmod.h"
 
 static Bot *perl_bot;
-static int perlext_pong (CmdParams *cmds);
+static int perlext_pong (const CmdParams *cmds);
 
 const char* perl_copyright[] = 
 {
@@ -108,10 +108,11 @@ XS (XS_NeoStats_Test_PerlExt)
 	}
 }
 
-static void 
+static int 
 perl_ext_init() {
 	newXS("NeoStats::PerlExt::TestPerlExt", XS_NeoStats_Test_PerlExt, __FILE__);
 	nlog(LOG_INFO, "Loaded Perl Extensions Hooks");
+	return NS_SUCCESS;
 }
 
 
@@ -250,7 +251,7 @@ int ModFini( void )
 }
 
 static int
-perlext_pong (CmdParams *cmds) {
+perlext_pong (const CmdParams *cmds) {
 	irc_chanalert(perl_bot, "Got Pong fromm %s", cmds->source->name);
 
 }

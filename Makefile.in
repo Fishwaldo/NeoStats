@@ -43,7 +43,7 @@ DIST_COMMON = README $(am__configure_deps) $(dist_bin_SCRIPTS) \
 	AUTHORS COPYING ChangeLog INSTALL NEWS TODO autotools/compile \
 	autotools/config.guess autotools/config.sub autotools/depcomp \
 	autotools/install-sh autotools/ltmain.sh autotools/missing \
-	autotools/mkinstalldirs
+	autotools/mkinstalldirs autotools/ylwrap
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/autotools/acinclude.m4 \
@@ -248,7 +248,7 @@ DISTCHECK_CONFIGURE_FLAGS = --cache-file=../config.cache
 dist_bin_SCRIPTS = makeconf
 dist_data_DATA = neostats.motd
 #docdir			= @prefix@/doc
-dist_doc_DATA = doc/FAQ doc/USERMAN
+dist_doc_DATA = doc/README.dev Changelog.old
 neodir = $(prefix)
 neo_SCRIPTS = neostats
 DISTCLEANFILES = autotools/ccdv
