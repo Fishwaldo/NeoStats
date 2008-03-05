@@ -371,6 +371,10 @@ int ModFini( void )
 	updateinfo *item;
 	
 	SET_SEGV_LOCATION();
+	del_services_set_list(update_settings);
+	del_services_cmd_list(update_cmds);
+
+
 	hash_scan_begin(&scan, availableupdates);
 	while ( ( node = hash_scan_next (&scan)) != NULL) {
 		item = hnode_get(node);
