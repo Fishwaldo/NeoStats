@@ -430,7 +430,7 @@
 #define RETSIGTYPE void
 
 /* "Revision Version Number" */
-#define REV "a4"
+#define REV "0"
 
 /* Define to the type of arg 1 for `select'. */
 #define SELECT_TYPE_ARG1 int
@@ -465,8 +465,8 @@
 /* #undef USE_RAW */
 
 /* "Full Version" */
-#define NEO_VERSION "3.0.b3"
-#define NEO_WIN32VER "3,0,b3,0"
+#define NEO_VERSION "3.0.0"
+#define NEO_WIN32VER "3,0,0,0"
 #define NEO_WIN32VERN 3,0,0
 
 /* Number of bits in a file offset, on hosts where this is settable. */

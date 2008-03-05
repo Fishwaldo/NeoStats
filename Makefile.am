@@ -6,12 +6,12 @@ DISTCHECK_CONFIGURE_FLAGS = --cache-file=../config.cache
 dist_bin_SCRIPTS 	= makeconf
 dist_data_DATA		= neostats.motd
 #docdir			= @prefix@/doc
-dist_doc_DATA		= doc/README.dev Changelog.old doc/CODINGMODULES.txt
+dist_doc_DATA		= doc/README.dev Changelog.old doc/CODINGMODULES.txt RELNOTES CREDITS README
 neodir			= $(prefix)
 neo_SCRIPTS		= neostats
 DISTCLEANFILES		= autotools/ccdv
 
-EXTRA_DIST		= autotools/ccdv.c CREDITS INSTNOTES RELNOTES autotools/shtool
+EXTRA_DIST		= autotools/ccdv.c autotools/shtool INSTNOTES
 
 all-local:
 		if test ! -f .message; then \

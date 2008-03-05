@@ -253,6 +253,6 @@ int ModFini( void )
 static int
 perlext_pong (const CmdParams *cmds) {
 	irc_chanalert(perl_bot, "Got Pong fromm %s", cmds->source->name);
-
+	return NS_SUCCESS;
 }
 

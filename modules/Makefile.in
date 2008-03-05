@@ -208,7 +208,6 @@ target_alias = @target_alias@
 unamepath = @unamepath@
 wi_PWD = @wi_PWD@
 SUBDIRS = dbm protocol @MODULES@
-EXTRA_DIST = modules.txt
 LINK = $(LIBTOOL) --tag=CC --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
         $(AM_LDFLAGS) $(LDFLAGS) -o $@
 

@@ -456,7 +456,7 @@ void nassert_fail( const char *expr, const char *file, const int line, const cha
 	nlog( LOG_CRITICAL, "Expression: %s", expr );
 #ifdef HAVE_BACKTRACE
 	for( i = 1; i < size; i++ ) {
-		nlog( LOG_CRITICAL, "BackTrace (%d) : %s", i - 1, strings[i] );
+		nlog( LOG_CRITICAL, "BackTrace (%d) : %s", (int)i - 1, strings[i] );
 	}
 #endif /* HAVE_BACKTRACE */
 	nlog( LOG_CRITICAL, "Shutting Down!" );
