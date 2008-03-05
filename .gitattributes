@@ -14,7 +14,7 @@
 /NEWS -text
 NeoStats.xcode/project.pbxproj -text
 /README -text
-/README.win32 -text
+/README.win32.txt -text
 /RELNOTES -text
 /TODO -text
 /aclocal.m4 -text
