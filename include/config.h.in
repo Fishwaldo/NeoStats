@@ -3,6 +3,9 @@
 /* to disable LDAP */
 #undef CURL_DISABLE_LDAP
 
+/* Berkeley DB Header */
+#undef DB_HEADER
+
 /* 'Enable Debugging' */
 #undef DEBUG
 
@@ -61,9 +64,6 @@
 /* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 
-/* Define to 1 if you have the <db.h> header file. */
-#undef HAVE_DB_H
-
 /* Define if /dev/poll is available */
 #undef HAVE_DEVPOLL
 
@@ -96,6 +96,9 @@
 
 /* Define to 1 if you have the <err.h> header file. */
 #undef HAVE_ERR_H
+
+/* Define to 1 if you have the <EXTERN.h> header file. */
+#undef HAVE_EXTERN_H
 
 /* Define to 1 if you have the `fcntl' function. */
 #undef HAVE_FCNTL
@@ -157,9 +160,6 @@
 /* Define to 1 if you have the `getopt' function. */
 #undef HAVE_GETOPT
 
-/* Define to 1 if you have the `getpass_r' function. */
-#undef HAVE_GETPASS_R
-
 /* Define to 1 if you have the `getpwuid' function. */
 #undef HAVE_GETPWUID
 
@@ -220,6 +220,9 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
@@ -252,9 +255,6 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the <memory.y> header file. */
-#undef HAVE_MEMORY_Y
 
 /* Define to 1 if you have the MSG_NOSIGNAL flag. */
 #undef HAVE_MSG_NOSIGNAL
@@ -303,6 +303,9 @@
 
 /* Define to 1 if you have the <pem.h> header file. */
 #undef HAVE_PEM_H
+
+/* Define to 1 if you have the <perl.h> header file. */
+#undef HAVE_PERL_H
 
 /* Define to 1 if you have the `perror' function. */
 #undef HAVE_PERROR
@@ -373,6 +376,12 @@
 /* Define to 1 if you have the `sigtimedwait' function. */
 #undef HAVE_SIGTIMEDWAIT
 
+/* Define to 1 if sig_atomic_t is an available typedef. */
+#undef HAVE_SIG_ATOMIC_T
+
+/* Define to 1 if sig_atomic_t is already defined as volatile. */
+#undef HAVE_SIG_ATOMIC_T_VOLATILE
+
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
 
@@ -419,9 +428,6 @@
 /* Define to 1 if you have the `strerror_r' function. */
 #undef HAVE_STRERROR_R
 
-/* Define to 1 if you have the `strftime' function. */
-#undef HAVE_STRFTIME
-
 /* Define to 1 if you have the `stricmp' function. */
 #undef HAVE_STRICMP
 
@@ -443,14 +449,14 @@
 /* Define to 1 if you have the `strnlen' function. */
 #undef HAVE_STRNLEN
 
+/* Define to 1 if you have the `strsep' function. */
+#undef HAVE_STRSEP
+
 /* Define to 1 if you have the `strspn' function. */
 #undef HAVE_STRSPN
 
 /* Define to 1 if you have the `strstr' function. */
 #undef HAVE_STRSTR
-
-/* Define to 1 if you have the `strsep' function. */
-#undef HAVE_STRSEP
 
 /* Define to 1 if you have the `strtok_r' function. */
 #undef HAVE_STRTOK_R
@@ -518,12 +524,6 @@
 /* Define if TAILQ_FOREACH is defined in <sys/queue.h> */
 #undef HAVE_TAILQFOREACH
 
-/* Define to 1 if you have the `tcgetattr' function. */
-#undef HAVE_TCGETATTR
-
-/* Define to 1 if you have the `tcsetattr' function. */
-#undef HAVE_TCSETATTR
-
 /* Define to 1 if you have the <termios.h> header file. */
 #undef HAVE_TERMIOS_H
 
@@ -584,11 +584,11 @@
 /* Define to 1 if you have the <x509.h> header file. */
 #undef HAVE_X509_H
 
+/* Define to 1 if you have the <XSUB.h> header file. */
+#undef HAVE_XSUB_H
+
 /* if you have the zlib.h header file */
 #undef HAVE_ZLIB_H
-
-/* Define to 1 if you have the <\> header file. */
-#undef HAVE__
 
 /* Define if we have __va_copy */
 #undef HAVE___VA_COPY
@@ -766,9 +766,6 @@
 #undef inline
 #endif
 
-/* Define to `long int' if <sys/types.h> does not define. */
-#undef off_t
-
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
 
@@ -799,5 +796,3 @@
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */
 #undef volatile
-
-#undef DB_HEADER

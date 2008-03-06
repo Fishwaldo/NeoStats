@@ -150,8 +150,8 @@ static int qs_read_database( database *db )
 		/* comment char */
 		if( buf[0] == '#' )
 			continue;
-		dlog( DEBUG1, "read %s", buf );
 		strip(buf);
+		dlog( DEBUG1, "read %s", buf );
 		len = strlen( buf );
 		if( len == 0 )
 			continue;

@@ -2019,6 +2019,7 @@ AC_SYS_LARGEFILE
 CURL_CHECK_FUNC_RECV
 CURL_CHECK_FUNC_SEND
 CURL_CHECK_MSG_NOSIGNAL
+TYPE_SIG_ATOMIC_T
 CURL_CHECK_HEADER_MALLOC
 CURL_CHECK_TYPE_SOCKLEN_T
 CURL_CHECK_FUNC_GETNAMEINFO
@@ -2143,3 +2144,43 @@ AC_SUBST([CURL_LIBS])
 AC_SUBST([CURL_CFLAGS])
 AM_CONDITIONAL(BUILD_CURL, true)
 ])
+dnl TYPE_SIG_ATOMIC_T
+dnl -------------------------------------------------
+dnl Check if the sig_atomic_t type is available, and
+dnl verify if it is already defined as volatile.
+
+AC_DEFUN([TYPE_SIG_ATOMIC_T], [
+  AC_CHECK_HEADERS(signal.h)
+  AC_CHECK_TYPE([sig_atomic_t],[
+    AC_DEFINE(HAVE_SIG_ATOMIC_T, 1,
+      [Define to 1 if sig_atomic_t is an available typedef.])
+  ], ,[
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+  ])
+  case "$ac_cv_type_sig_atomic_t" in
+    yes)
+      #
+      AC_MSG_CHECKING([if sig_atomic_t is already defined as volatile])
+      AC_TRY_LINK([
+#ifdef HAVE_SIGNAL_H
+#include <signal.h>
+#endif
+        ],[
+          static volatile sig_atomic_t dummy = 0;
+        ],[ 
+          AC_MSG_RESULT([no])
+          ac_cv_sig_atomic_t_volatile="no"
+        ],[
+          AC_MSG_RESULT([yes])
+          ac_cv_sig_atomic_t_volatile="yes"
+      ])
+      #
+      if test "$ac_cv_sig_atomic_t_volatile" = "yes"; then
+        AC_DEFINE(HAVE_SIG_ATOMIC_T_VOLATILE, 1,
+          [Define to 1 if sig_atomic_t is already defined as volatile.])
+      fi
+      ;;
+  esac
+]) # AC_DEFUN

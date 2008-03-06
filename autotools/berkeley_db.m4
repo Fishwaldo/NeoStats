@@ -129,7 +129,7 @@ AC_DEFUN([AX_BERKELEY_DB],
     AC_MSG_RESULT([not found])
     ifelse([$3], , :, [$3])
   else
-    AC_DEFINE_UNQUOTED(DB_HEADER, ["$DB_HEADER"])
+    AC_DEFINE_UNQUOTED(DB_HEADER, ["$DB_HEADER"], [Berkeley DB Header])
     AC_SUBST(DB_LIBS)
     AC_SUBST(DB_CPPFLAGS)
     AC_SUBST(DB_LDFLAGS)
