@@ -5,6 +5,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.1 (F)
  - Bump Version (F)
+ - A much more robust checking if Perl is available in configure (F)
 
 * NeoStats * Version 3.0.0
  - Finish the Update Module (F)

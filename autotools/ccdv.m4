@@ -89,7 +89,7 @@ if test "x$CCDV" != x ; then
 	wi_cv_path_ccdv="$CCDV"
 	CC="$CCDV $CC"	# trailing space needed
 	USECCDV="#"
-	AC_MSG_RESULT($ccdv)
+	AC_MSG_RESULT($CCDV)
 else
 	wi_cv_path_ccdv=""
 	USECCDV=""

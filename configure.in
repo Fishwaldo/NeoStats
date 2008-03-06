@@ -307,6 +307,11 @@ dnl		PERL_CFLAGS=`echo $PERL_CFLAGS |$sedpath 's/-Wdeclaration-after-statement /
 			AC_MSG_RESULT([not found, building without perl.])
 			perl=no
 		else
+			AC_MSG_RESULT(ok)
+			AC_MSG_CHECKING([Checking for perl includes directory])
+			PERL_INCLUDES=`$perlpath -MExtUtils::Embed -e perl_inc 2>/dev/null`
+			AC_MSG_RESULT($PERL_INCLUDES)
+			CFLAGS="$CFLAGS "$PERL_INCLUDES
 			PERL_LDFLAGS=`$perlpath -MExtUtils::Embed -e ldopts |$sedpath 's/-lgdbm //'`
 			PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-ldb //'`
 			PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-lndbm //'`
@@ -315,38 +320,36 @@ dnl		PERL_CFLAGS=`echo $PERL_CFLAGS |$sedpath 's/-Wdeclaration-after-statement /
 				PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-lposix //'`
 			fi
 			PERL_LDFLAGS=`echo $PERL_LDFLAGS |$sedpath 's/-lc //'`
-			AC_MSG_RESULT(ok)
 
 			AC_MSG_CHECKING(for $perlpath >= 5.8.0)
 			PERL_VER=`$perlpath -e 'print $]>= 5.008?"yes":"no"'`
 
 			if test "$PERL_VER" = "yes"; then
 				AC_MSG_RESULT(yes)
-				AC_MSG_CHECKING([Checking for perl compiler, linker, libraries and headers])
-	    			PERL_CC=`$perlpath -MConfig -e 'print $Config{cc},"\n";'`
-			    	PERL_LD=`$perlpath -MConfig -e 'print $Config{ld},"\n";'`
-
-				rm -f testperl$ac_exeext testperl.$ac_objext testperl.c testperl.err
-	    			cat > testperl.c <<EOF
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-int main () { (void)&perl_construct; return 0; }
-EOF
-				$PERL_CC $PERL_CFLAGS -c testperl.c 2>&5 &&
-	   	 		$PERL_LD -o testperl testperl.o $PERL_LDFLAGS 2>&5 &&
-	    			test -x testperl &&
-	    			have_perl=yes
-				if test "$have_perl" = "yes"; then
-					AC_MSG_RESULT(ok)
-					AC_DEFINE_UNQUOTED(USE_PERL, 1, 'Enable Perl Support')
-				else
+				perl=no
+dnl				AC_MSG_CHECKING([Checking for perl compiler, linker, libraries and headers])
+				AC_CHECK_HEADERS([EXTERN.h perl.h XSUB.h], [
+					perl=yes
+				],
+				[
+					perl=no
 					PERL_LDFLAGS=""
 					PERL_CFLAGS=""
 					AC_MSG_RESULT([Failed. Perl Support Disabled. See the RELNOTES file])
-				fi
-				rm -f testperl$ac_exeext testperl.$ac_objext testperl.c testperl.err
-
+					break
+				],
+				[
+				#ifdef HAVE_EXTERN_H
+				#include <EXTERN.h>
+				#endif
+				#ifdef HAVE_PERL_H
+				#include <perl.h>
+				#endif
+				#ifdef HAVE_XSUB_H
+				#include <XSUB.h>
+				#endif
+				]
+				)
 			else
 				AC_MSG_RESULT(no)
 				PERL_LDFLAGS=""
@@ -360,7 +363,9 @@ EOF
 AC_SUBST(PERL_CFLAGS)
 AC_SUBST(PERL_LDFLAGS)
 AM_CONDITIONAL(DO_PERL, test "x$perl" = "xyes")
-
+if test "x$perl" = "xyes"; then
+	AC_DEFINE_UNQUOTED(USE_PERL, 1, 'Enable Perl Support')
+fi
 
 
 
