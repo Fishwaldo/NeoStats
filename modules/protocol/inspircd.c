@@ -261,8 +261,8 @@ irc_cmd cmd_list[] =
 mode_init chan_umodes[] = 
 {
 	{'h', CUMODE_HALFOP, 0, '%'},
-	{'a', CUMODE_CHANPROT, 0, '~'},
-	{'q', CUMODE_CHANOWNER, 0, '*'},
+	{'a', CUMODE_CHANPROT, 0, '&'},
+	{'q', CUMODE_CHANOWNER, 0, '~'},
 	/* this shouldn't break stuff, but will have to see */
 	{' ', CUMODE_NOTHING, 0, ','},
 	MODE_INIT_END()
