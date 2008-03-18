@@ -342,7 +342,7 @@ int ConfLoad( void )
 	}
 	cfg_free( cfg );
 #ifndef WIN32
-	printf( "Sucessfully loaded config file, booting NeoStats\n" );
+	printf( "Successfully loaded config file, booting NeoStats\n" );
 	printf( "If NeoStats does not connect, please check logs/neostats-<date>.log for further information\n" );
 #endif /* WIN32 */
 	return NS_SUCCESS;

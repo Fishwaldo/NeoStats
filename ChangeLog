@@ -4,8 +4,12 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.1 (F)
- - Bump Version (F)
+ - Fix wrong prefixs for Inspircd Module as reported by Brain (F)
+ - Some FreeBSD's define sig_atomic and we were not checking for it in
+   configure. Fixed (F)
  - A much more robust checking if Perl is available in configure (F)
+ - Bump Version (F)
+ - Fix spelling mistake (one of many I'm sure) found by Paul Balfe (F)
 
 * NeoStats * Version 3.0.0
  - Finish the Update Module (F)
