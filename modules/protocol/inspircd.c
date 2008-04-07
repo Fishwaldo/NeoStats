@@ -640,7 +640,7 @@ static void send_addline(const char type, const char *source, const char *mask, 
 }
 void send_akill(const char *server, const char *host, const char *ident, const char *bot, const unsigned long length, const char *reason, const unsigned long ts) {
 	char buf[BUFSIZE];
-	ircsnprintf(buf, BUFSIZE, "%s@%s", ident, ident);
+	ircsnprintf(buf, BUFSIZE, "%s@%s", ident, host);
 	send_addline('G', server, buf, bot, reason, length);
 }
 void send_sqline(const char *source, const char *mask, const char *reason) {

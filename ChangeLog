@@ -4,6 +4,7 @@ Anything we add/remove/fix/change is in here (even our rants)
 Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.1 (F)
+ - Fix Inspircd module Glining *@* (Neo-428) (F)
  - Fix wrong prefixs for Inspircd Module as reported by Brain (F)
  - Some FreeBSD's define sig_atomic and we were not checking for it in
    configure. Fixed (F)
