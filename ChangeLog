@@ -5,6 +5,7 @@ Fish (F), Mark (M), DeadNotBuried (D)
 ===============================================================================
 * NeoStats * Version 3.0.2 (F)
  - Bump Version (F)
+ - Partially fix the DNS related errors in NEO-426 (we were not canceling DNS queries successfully) (F)
 
 * NeoStats * Version 3.0.1 (F)
  - Fix Inspircd module Glining *@* (Neo-428) (F)

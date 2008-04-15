@@ -322,15 +322,14 @@ void canx_dns(Module *modptr)
 		dnsdata = lnode_get(dnsnode);
 		if (dnsdata->modptr == modptr) {
 			adns_cancel(dnsdata->q);
-			ns_free (dnsdata->a);
+			if (dnsdata->a) ns_free (dnsdata->a);
 			ns_free (dnsdata);
 			lnode2 = list_next(dnslist, dnsnode);
 			list_delete_destroy_node( dnslist, dnsnode );
 			dnsnode = lnode2;
-		}
-		if (dnsnode == NULL) 
-			continue;
-		dnsnode = list_next(dnslist, dnsnode);
+		} else {
+			dnsnode = list_next(dnslist, dnsnode);
+		}	
 	}
 	dnsnode = list_first(dnsqueue);
 	while (dnsnode != NULL) {
@@ -340,8 +339,9 @@ void canx_dns(Module *modptr)
 			lnode2 = list_next(dnsqueue, dnsnode);
 			list_delete_destroy_node( dnsqueue, dnsnode );
 			dnsnode = lnode2;
-		}
-		dnsnode = list_next(dnsqueue, dnsnode);
+		} else {
+			dnsnode = list_next(dnsqueue, dnsnode);
+		}	
 	}
 	dns_check_queue();
 }
