@@ -557,6 +557,17 @@ src/neostats.pm.h -text
 src/neostats.vcproj -text
 src/nsevents.c -text
 src/typemap -text
+src/win32/Gui/AssemblyInfo.cpp -text
+src/win32/Gui/Form1.h -text
+src/win32/Gui/Form1.resx -text
+src/win32/Gui/NeoStats[!!-~]Control[!!-~]Panel.cpp -text
+src/win32/Gui/NeoStats[!!-~]Control[!!-~]Panel.sln -text
+src/win32/Gui/NeoStats[!!-~]Control[!!-~]Panel.vcproj -text
+src/win32/Gui/app.ico -text
+src/win32/Gui/app.rc -text
+src/win32/Gui/resource.h -text
+src/win32/Gui/stdafx.cpp -text
+src/win32/Gui/stdafx.h -text
 src/win32/Rules.rules -text
 src/win32/icon1.ico -text
 src/win32/neostats.bmp -text
