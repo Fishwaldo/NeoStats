@@ -569,6 +569,8 @@ src/win32/Gui/resource.h -text
 src/win32/Gui/stdafx.cpp -text
 src/win32/Gui/stdafx.h -text
 src/win32/Rules.rules -text
+src/win32/ServiceTest/ServiceTest.cpp -text
+src/win32/ServiceTest/ServiceTest.vcproj -text
 src/win32/icon1.ico -text
 src/win32/neostats.bmp -text
 src/win32/neostats.conf eol=crlf

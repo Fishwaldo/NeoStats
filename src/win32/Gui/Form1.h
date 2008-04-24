@@ -71,6 +71,7 @@ namespace NeoStatsControlPanel {
 	private: System::Windows::Forms::ToolStripSeparator^  toolStripSeparator1;
 	private: System::Windows::Forms::ToolStripMenuItem^  quitNeoStatsControlPanelToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  logViewerToolStripMenuItem;
+	private: System::Diagnostics::Process^  process1;
 
 
 
@@ -115,6 +116,7 @@ namespace NeoStatsControlPanel {
 			this->toolStripSeparator1 = (gcnew System::Windows::Forms::ToolStripSeparator());
 			this->quitNeoStatsControlPanelToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->logViewerToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->process1 = (gcnew System::Diagnostics::Process());
 			this->contextMenuStrip1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->performanceCounter1))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->performanceCounter2))->BeginInit();
@@ -286,6 +288,17 @@ namespace NeoStatsControlPanel {
 			this->logViewerToolStripMenuItem->Size = System::Drawing::Size(77, 20);
 			this->logViewerToolStripMenuItem->Text = L"Log Viewer";
 			// 
+			// process1
+			// 
+			this->process1->StartInfo->Domain = L"";
+			this->process1->StartInfo->LoadUserProfile = false;
+			this->process1->StartInfo->Password = nullptr;
+			this->process1->StartInfo->StandardErrorEncoding = nullptr;
+			this->process1->StartInfo->StandardOutputEncoding = nullptr;
+			this->process1->StartInfo->UserName = L"";
+			this->process1->SynchronizingObject = this;
+			this->process1->Exited += gcnew System::EventHandler(this, &Form1::process1_Exited);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -390,6 +403,10 @@ private: System::Void startToolStripMenuItem_Click(System::Object^  sender, Syst
 				 MessageBox::Show(e->Message + ":\r\n" + e->InnerException->Message, "Error Starting Service");				 
 			 }
 		 }
+private: System::Void process1_Exited(System::Object^  sender, System::EventArgs^  e) {
+			 System::Diagnostics::Debug::WriteLine(this->process1->ExitCode);
+		 }
+		 
 };
 }
 

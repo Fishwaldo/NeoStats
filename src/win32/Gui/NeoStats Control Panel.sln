@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeoStats Control Panel", "NeoStats Control Panel.vcproj", "{FACB5498-CC3E-415A-96E5-91737F986A52}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServiceTest", "..\ServiceTest\ServiceTest.vcproj", "{9504558B-6EF4-4ECE-AA2B-00C1AD9C5F4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{FACB5498-CC3E-415A-96E5-91737F986A52}.Debug|Win32.Build.0 = Debug|Win32
 		{FACB5498-CC3E-415A-96E5-91737F986A52}.Release|Win32.ActiveCfg = Release|Win32
 		{FACB5498-CC3E-415A-96E5-91737F986A52}.Release|Win32.Build.0 = Release|Win32
+		{9504558B-6EF4-4ECE-AA2B-00C1AD9C5F4C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9504558B-6EF4-4ECE-AA2B-00C1AD9C5F4C}.Debug|Win32.Build.0 = Debug|Win32
+		{9504558B-6EF4-4ECE-AA2B-00C1AD9C5F4C}.Release|Win32.ActiveCfg = Release|Win32
+		{9504558B-6EF4-4ECE-AA2B-00C1AD9C5F4C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
