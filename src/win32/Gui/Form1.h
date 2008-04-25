@@ -1,5 +1,5 @@
 #pragma once
-
+#include "LogViewer.h"
 
 namespace NeoStatsControlPanel {
 
@@ -287,6 +287,7 @@ namespace NeoStatsControlPanel {
 			this->logViewerToolStripMenuItem->Name = L"logViewerToolStripMenuItem";
 			this->logViewerToolStripMenuItem->Size = System::Drawing::Size(77, 20);
 			this->logViewerToolStripMenuItem->Text = L"Log Viewer";
+			this->logViewerToolStripMenuItem->Click += gcnew System::EventHandler(this, &Form1::logViewerToolStripMenuItem_Click);
 			// 
 			// process1
 			// 
@@ -407,6 +408,11 @@ private: System::Void process1_Exited(System::Object^  sender, System::EventArgs
 			 System::Diagnostics::Debug::WriteLine(this->process1->ExitCode);
 		 }
 		 
+private: System::Void logViewerToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+			LogViewer^ lv;
+			lv = (gcnew LogViewer());
+			lv->Show();
+		 }
 };
 }
 

@@ -228,6 +228,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\taillogfile.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -240,6 +244,34 @@
 				>
 				<File
 					RelativePath=".\Form1.resX"
+					SubType="Designer"
+					>
+				</File>
+			</File>
+			<File
+				RelativePath=".\LogViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LogViewer.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\LogViewer.resx"
+					SubType="Designer"
+					>
+				</File>
+			</File>
+			<File
+				RelativePath=".\LogWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LogWindow.h"
+				FileType="3"
+				>
+				<File
+					RelativePath=".\LogWindow.resx"
 					SubType="Designer"
 					>
 				</File>

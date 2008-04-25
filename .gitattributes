@@ -560,6 +560,12 @@ src/typemap -text
 src/win32/Gui/AssemblyInfo.cpp -text
 src/win32/Gui/Form1.h -text
 src/win32/Gui/Form1.resx -text
+src/win32/Gui/LogViewer.cpp -text
+src/win32/Gui/LogViewer.h -text
+src/win32/Gui/LogViewer.resx -text
+src/win32/Gui/LogWindow.cpp -text
+src/win32/Gui/LogWindow.h -text
+src/win32/Gui/LogWindow.resx -text
 src/win32/Gui/NeoStats[!!-~]Control[!!-~]Panel.cpp -text
 src/win32/Gui/NeoStats[!!-~]Control[!!-~]Panel.sln -text
 src/win32/Gui/NeoStats[!!-~]Control[!!-~]Panel.vcproj -text
@@ -568,6 +574,7 @@ src/win32/Gui/app.rc -text
 src/win32/Gui/resource.h -text
 src/win32/Gui/stdafx.cpp -text
 src/win32/Gui/stdafx.h -text
+src/win32/Gui/taillogfile.cpp -text
 src/win32/Rules.rules -text
 src/win32/ServiceTest/ServiceTest.cpp -text
 src/win32/ServiceTest/ServiceTest.vcproj -text
