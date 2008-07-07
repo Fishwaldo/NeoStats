@@ -37,7 +37,9 @@
 #define PERLDEFINES
 #include "perlmod.h"
 
+#ifdef WIN32
 #pragma comment(lib, "perl510.lib")
+#endif
 
 extern void boot_DynaLoader (pTHX_ CV * cv);
 void dump_hash(HV *rethash);
