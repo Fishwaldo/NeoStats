@@ -420,7 +420,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				ExecutionBucket="10"
-				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib shlwapi.lib curl.lib perl510.lib pcre.lib libevent.lib nxml.lib"
+				AdditionalDependencies="Ws2_32.lib winmm.lib Iphlpapi.lib shlwapi.lib curl.lib pcre.lib libevent.lib nxml.lib"
 				OutputFile="../neostats.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="C:\Perl\lib\CORE;..\lib"
@@ -975,11 +975,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\win32\resource.h"
+				RelativePath=".\win32\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\win32\resource.h"
+				RelativePath="..\..\src\win32\resource.h"
 				>
 			</File>
 			<File

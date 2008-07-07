@@ -26,6 +26,7 @@
  */
 
 #include "neostats.h"
+#ifdef USE_PERL
 #include "services.h"
 #include "modules.h"
 #include "nsevents.h"
@@ -36,6 +37,7 @@
 #define PERLDEFINES
 #include "perlmod.h"
 
+#pragma comment(lib, "perl510.lib")
 
 extern void boot_DynaLoader (pTHX_ CV * cv);
 void dump_hash(HV *rethash);
@@ -1863,3 +1865,5 @@ void unload_perlextension(Module *mod)
 	}
 	free(mod->pm);
 }
+
+#endif /* USE_PERL */
