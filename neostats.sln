@@ -1,11 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protocol", "protocol", "{3F7B09E6-AF66-4309-B523-593A6BF95494}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{D6959A3F-527C-4D57-9B22-4F9827DD72DD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dbm", "dbm", "{F258FB36-4162-456B-89F0-46A44FF24452}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "connectserv", "modules\connectserv\connectserv.vcproj", "{E033ECCE-E55E-43BC-89E7-ABE8AA46CE1F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{02AF1A66-8B8D-4BC3-AC09-0C0B339614F3} = {02AF1A66-8B8D-4BC3-AC09-0C0B339614F3}
