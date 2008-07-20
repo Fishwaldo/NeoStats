@@ -547,10 +547,12 @@ typedef int int_t;
 /* perl uses a different typedef, this will avoid it */
 typedef unsigned short mode_t; 
 
+#if _MSC_VER < 1500
 struct pollfd { int fd; short events; short revents; };
 #define POLLIN  1
 #define POLLPRI 2
 #define POLLOUT 4
 #define POLLERR 8
+#endif
 
 #define _CRT_SECURE_NO_WARNINGS
